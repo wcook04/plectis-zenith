@@ -51,6 +51,18 @@ upstream autonomous shell loop is installed.
    entry and historical features independently of future labels. Match identity
    cues across information treatments. Bound serialized Unicode context before
    a paid cohort, and include every scheduled control in the call plan.
+   Before adding historical state, verify repeated missing comparisons in
+   training inputs. Pair original dated claims, not asserted expectations;
+   compound headlines require period/year scope within the relevant clause.
+   Text baselines and retrieval must fit representations on eligible training
+   evidence only. Keep column order explicit, bind numerical-library versions
+   and normalize persisted receipts to JSON types before replay comparison.
+   Do not rank memories by hindsight outcomes. Preserve assessment coverage
+   when narrowing a declared budget profile and remove omitted-arm claims.
+   Keep raw failure coverage separate from any preregistered fallback system.
+   Cite borrowed mechanisms at their use, retaining source contradictions and
+   target differences in the source manifest; a bibliography entry is not
+   evidence that a method was reproduced.
 2. Establish the baseline. Then change one declared factor per trial; record
    the hypothesis and exact change, candidate identity/hash, requested/actual
    model identity where applicable, elapsed resources and outcome. Record

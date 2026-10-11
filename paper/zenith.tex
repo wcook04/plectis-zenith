@@ -12,7 +12,7 @@
 \title{Zenith: Dated Evaluation and Controlled Updates\\of a Reasoning Graph}
 \subtitle{Implementation and retrospective evaluation}
 \author{Will Cook}
-\date{Draft, 11 October 2026}
+\date{Draft, 12 October 2026}
 \runninghead{Zenith: dated graph evaluation}
 \newcommand{\code}[1]{\texttt{\detokenize{#1}}}
 
@@ -22,8 +22,10 @@
 direction. The source and experimental receipts define the evidence reported here.}
 
 \begin{abstract}
-Zenith evaluates changes to a reasoning graph using dated inputs, native output
-contracts and complete paired forecast support. Its executor binds runs to
+Zenith asks whether experience can teach a reasoning graph to recognize
+financially relevant changes and improve later forecasts. It evaluates updates
+using dated inputs, native output contracts and complete paired forecast support.
+Its executor binds runs to
 source, graph, policy and provider identities; diagnostics distinguish recorded
 failures from hypotheses about their cause. A proposal compiler can change one
 node-policy field for controlled replay. A historical price-only study compared
@@ -269,13 +271,33 @@ rather than forming a citation inventory here.
 \subsection{Compiled A-share experiment, without model results}
 
 The next experiment preserves two language-reasoning nodes: interpretation and
-forecast. The forecaster receives the original evidence as well as the saved
-interpretation, and only its short skill is mutable. The base skill distinguishes
+forecast. Mixed dated prices and news, related-stock examples and financial
+instruction tuning already appear in Yu et al.\ \citep{yu2023temporal}.
+Their ordinal-return target and future-news lexical-overlap score differ from
+our continuous return loss and source-conditional probes; neither fluent prose
+nor overlap with later reporting establishes explanation fidelity. Here the
+forecaster receives the original evidence as well as the saved interpretation,
+and only its short skill is mutable. The base skill distinguishes
 reported growth from surprise relative to a supplied expectation, new facts
 from repeated reports, economic transmission from causal certainty, and the
 effect remaining after entry from an overnight response already missed.
+The initial-response/drift distinction is explicit in Lopez-Lira and Tang
+\citep[Sections 6 and 8.1]{lopezlira2023}; their reported US effects do not
+establish remaining predictability in this panel.
 
-The pinned TraderHarness tables provide a fixed ten-stock panel. After a
+The interpreter separates the reported subject from the forecast issuer and
+requests evidence for direct relevance or a hypothesized indirect channel.
+Customer--supplier transmission supplies an economic motivation
+\citep{cohen2008}. Huang et al.\ first retrieve candidate disclosure pairs and
+then classify their relationship using evidence spans
+\citep[Section 4.2]{huang2026semantic}. We borrow that separation of candidate
+similarity from supported relationship, allow unknown or multiple channels,
+and require source references. The present headlines cannot reproduce their
+disclosure network. Their competitor exclusion, mean-reversion weights,
+performance and contamination claims are not local assumptions.
+
+The pinned TraderHarness release and dataset provide a fixed ten-stock panel
+\citep{traderharness2026,traderharnessdata2026}. After a
 twenty-session history window plus a preceding close within the continuous
 February 2023 onward interval, the compiler schedules 138 nonoverlapping
 five-session windows. Two are purged across phase boundaries. All 136 remaining
@@ -285,7 +307,12 @@ issues in 2025. These are 1,360 asset allowances, not 1,360 independent market
 histories. The earlier numerical anchor uses a fixed 2021 fit schedule.
 
 Each asset receives at most four issuer-tagged items and two common headlines
-from the preceding seven calendar days. In 452 asset windows there is no
+from the preceding seven calendar days. A bounded selector now adds at most two
+earlier numerical profit claims with a matching fiscal period and issuer
+candidate token, within 180 days of the current claim. Five recurring training
+omissions justified this change; the revised full panel adds only 11 older
+items. A match supplies a comparison to inspect, not a verified expectation:
+issuer estimates are not market consensus. In 452 asset windows there is no
 issuer-tagged item. Announcement titles and derived headlines lack full-report
 context; an upstream issuer token can also identify a related listed company
 incorrectly. Financial-statement vintages remain excluded. News epochs are
@@ -305,13 +332,35 @@ with the same issuer-code cues and separate interpretations. Learning arms
 compare unchanged, outcome-trained, hindsight-trained and feedback-blinded
 skills, plus bounded retrieval of reflected experiences. Outcome and hindsight
 teachers receive identical forward traces and per-asset residuals; hindsight
-alone adds reporting from the completed outcome interval. Lessons cannot become
+alone adds reporting from the completed outcome interval, following the
+privileged-teacher information pattern \citep{vapnik2015}. Lessons cannot become
 available before either their outcome or the latest report they use. Each
 review states an observable trigger, conditional lesson, uncertainty and
 disconfirmation condition. One candidate per skill arm competes with unchanged
-on validation; unchanged wins ties. The memory comparator is an implementation
-inspired by the mechanism, not a reproduction of FinMem or FinCon, and its
-larger context allowance precludes an equal-token efficiency claim.
+on validation; unchanged wins ties. Reflected experiences are motivated by
+FinMem \citep{finmem2023}; combining narrative and numerical analogs also
+appears in network-indicator forecasting \citep[Section 2.3]{wang2026network}.
+That paper predicts quarterly topology, not stock returns. Here a fixed mixture
+of forward-text cosine similarity and standardized market-state proximity
+retrieves at most three matured training cases, without ranking their outcomes.
+This is a local comparator, not a reproduction of either system; its larger
+context allowance precludes an equal-token efficiency claim.
+
+Supervised text-return modeling is established prior art \citep{ke2019}.
+An inexpensive comparator adds Chinese character 2--4-gram TF--IDF to the same
+numerical, event-metadata and issuer features, with fixed ridge penalty one.
+The matched comparator omits text. Vocabulary, weighting, scaling and regression
+fit only matured training examples, using scikit-learn \citep{sklearn2011}.
+This deliberately modest method is not a reproduction of Ke et al.; it tests
+whether these particular headlines can support a cheaper target-trained rule.
+An expanding chronological development-only diagnostic warms up on eight issues
+and scores the remaining 33 dates (330 asset forecasts), using only labels mature
+before each query. Date-equal MSE is 0.00109518 for zero, 0.00141850 for
+numeric/metadata/issuer ridge, and 0.00148344 with text. The fixed text method
+does not improve this diagnostic. Its settings were not changed after observing
+the ranking. This consumes no validation or assessment scores and provides no
+LLM or learned-skill result; the complete receipt is
+\code{docs/ashare-development-controls.json}.
 
 Primary MSE averages stocks within each issue, then weights issues equally.
 For a single issue, predicted returns $\widehat y_s$ and outcomes $y_s$ satisfy
@@ -323,18 +372,38 @@ For a single issue, predicted returns $\widehat y_s$ and outcomes $y_s$ satisfy
 The decomposition separates error in the common level from error in relative
 stock magnitudes. Ranking is checked separately. Training-fitted calibration
 and a skill-on-metadata diagnostic test simpler explanations of improvement.
-Missing forecasts make aggregate error unavailable. Paired issue losses use
+Missing forecasts make raw aggregate error unavailable. A separately frozen
+system score replaces failures with a zero market-relative forecast and reports
+every replacement; this score cannot select a skill. For base forecast $b$,
+outcome $y$ and revised forecast $b+\delta$, the exact identity
+\[
+ (y-b)^2-(y-b-\delta)^2=2(y-b)\delta-\delta^2
+\]
+separates alignment with the base error from the penalty for changing its size.
+The report averages both terms with the primary date weights. A correction
+can move in the right direction and still overshoot. This arithmetic diagnostic
+does not prove the teacher's causal explanation. Paired issue losses use
 descriptive block intervals, without claiming multiplicity-adjusted superiority.
-Seven prepared behavioral probes, motivated by CheckList \citep{checklist2020},
+Eleven prepared behavioral probes, motivated by CheckList \citep{checklist2020},
 test supplied expectations, paraphrases, duplication, absent support and an
-already observed price response; they have no historical counterfactual labels.
+already observed price response, subject identity, unsupported relationships,
+indirect input costs and comparison with an issuer estimate. They have no
+historical counterfactual labels. Reference validation and prompt requirements
+do not mechanically certify economic reasoning or span entailment.
 
 The compiler, teacher clocks, stage provenance, selection and accounting have
 offline contract tests. The admission receipt and exact protocol are
 \code{docs/ashare-admission.json} and \code{docs/ashare-study.md}. The complete
-plan allows at most 1,213 core model calls plus 14 optional probe calls, exceeding
-the previous 600-call authorization. Execution remains held. No new
-information-use, learning, trading or novelty result follows from this compile.
+plan allows at most 1,213 core model calls, plus 22 probe calls and 24 additional
+development information-control calls. A separately frozen first-learning
+profile keeps all 41 training and 48 assessment issues, selects 24 validation
+issues by evenly spaced calendar positions, and compares the rich base,
+outcome skill, hindsight skill and memory. It requires at most 526 core calls
+or 572 including capability checks. It omits blinded proposals, assessment
+information contrasts, transfer and repeat claims. One artifact per learning
+arm does not establish the reliability of the learning procedure across draws.
+Execution remains held under the existing immutable budget. No LLM
+information-use, learned-skill, trading or novelty result follows from this compile.
 
 \subsection{Controlled routing validation}
 

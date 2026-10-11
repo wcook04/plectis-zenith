@@ -11,6 +11,7 @@ import math
 from research.engine import canonical, event_time
 from research import trading_protocol as typed
 from benchmarks.traderharness import sha
+from research.ashare_text import retrieve
 
 BASE_SKILL = (
     'Start from the numerical anchor as a weak reference, not an answer. Separate '
@@ -44,6 +45,11 @@ GUARD = (
 )
 
 
+def render(value):
+    """Compact Unicode prompt text; canonical ASCII bytes still bind hashes."""
+    return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(',', ':'), allow_nan=False)
+
+
 def project(packet, mode):
     """Metadata contains time, count, type and identity cues, never text semantics."""
     if mode not in ('rich', 'metadata', 'price'):
@@ -71,11 +77,19 @@ def interpret_prompt(packet):
     return (GUARD + 'Interpret before forecasting. Preserve material facts, what is new, '
             'supplied expectations or their absence, transmission, remaining horizon, '
             'counterevidence and missing context in each summary (max800characters). '
-            'A title announcing a report does not reveal its financial contents. '
+            'For the strongest item, state evidence age, reported subject versus forecast '
+            'issuer, direct relevance or hypothesized indirect relationship (or unknown), '
+            'and short exact supporting spans with their refs. Similar language or an '
+            'issuer tag is not proof of an economic relationship. Multiple channels may '
+            'coexist. Compare any supplied older claim on the same fiscal period; issuer '
+            'estimates are not market consensus. Describe the price response already '
+            'visible in history separately from the hypothetical effect after next open. '
+            'Missing comparisons, relationship evidence or event-aligned prices mean '
+            'unknown, not permission to invent. A report title does not reveal its contents. '
             'Return {"schema":"zenith_trading_interpretation_v1","packet_sha256":'
             'the supplied hash,"interpretations":[{"asset_id":...,"summary":...,'
             '"evidence_refs":[...]}]}, exactly one row per asset.\nEVIDENCE_JSON\n'
-            + canonical(packet).decode())
+            + render(packet))
 
 
 def forecast_prompt(packet, interpretation, skill=BASE_SKILL, memories=()):
@@ -94,7 +108,7 @@ def forecast_prompt(packet, interpretation, skill=BASE_SKILL, memories=()):
             'packet hash,"interpretation_sha256":the supplied interpretation hash,'
             '"forecasts":[{"asset_id":...,"mean_expected_return":finite number in[-1,1],'
             '"evidence_refs":[...],"reasoning":text(max800characters),"abstain":false}]}. '
-            'Exactly one row per asset.\nEVIDENCE_JSON\n' + canonical(data).decode())
+            'Exactly one row per asset.\nEVIDENCE_JSON\n' + render(data))
 
 
 def teacher_case(packet, forecast, interpretation, rows, boundary, *, hindsight):
@@ -138,7 +152,7 @@ def review_prompt(case):
             '"accounting_error"],"trigger":text,"lesson":text,"disconfirmation":text,'
             '"uncertainty":text,"evidence_refs":[supplied refs]}. Each text max240characters. '
             'Use unresolved when the evidence cannot diagnose the error.\nCASE_JSON\n'
-            + canonical(case).decode())
+            + render(case))
 
 
 def parse_review(text, case):
@@ -169,35 +183,12 @@ def skill_prompt(arm, reviews):
             'No causal certainty or remembered outcomes. Blinded proposals receive no '
             'feedback. Return {"schema":"zenith_trading_skill_v1","skill":text,'
             '"rationale":text(max400characters),"evidence_refs":[allowed case IDs]}.\n'
-            + canonical({'base_skill': BASE_SKILL, 'arm': arm, 'reviews': supplied, 'allowed_refs': refs}).decode())
+            + render({'base_skill': BASE_SKILL, 'arm': arm, 'reviews': supplied, 'allowed_refs': refs}))
 
 
 def retrieve_memories(packet, cases, reviews):
-    """Three equal-weight nearest training states, no outcome-based retrieval."""
-    candidates = []
-    target = [math.fsum(a['features'][k] for a in packet['assets']) / len(packet['assets'])
-              for k in ('return_5', 'realized_vol_20')]
-    for case, review in zip(cases, reviews, strict=True):
-        if event_time(case['update_available_at']) >= event_time(packet['issue_at']):
-            continue
-        if review.get('status') == 'rejected' or review.get('classification') == 'accounting_error':
-            continue
-        state = [math.fsum(a['features'][k] for a in case['packet']['assets']) / len(case['packet']['assets'])
-                 for k in ('return_5', 'realized_vol_20')]
-        distance = sum((x - y) ** 2 for x, y in zip(target, state, strict=True))
-        # Bounded reflected experience: retain each asset's forecast and outcome,
-        # plus the fixed state representation and conditional review. Retrieval
-        # never uses the forecast errors or the review's success classification.
-        experience = {'case_id': case['case_id'], 'state': state, 'review': review,
-                      'outcomes': case['outcomes']}
-        candidates.append((distance, case['case_id'], experience))
-    selected = []
-    for _, _, experience in sorted(candidates):
-        if len(canonical(selected + [experience])) <= 24000:
-            selected.append(experience)
-        if len(selected) == 3:
-            break
-    return selected
+    """Fixed forward-text/state retrieval; never rank by realized success."""
+    return retrieve(packet, cases, reviews)
 
 
 def semantic_probes(packet):
@@ -220,7 +211,15 @@ def semantic_probes(packet):
               'No profit growth or surprise can be inferred.'),
              ('duplicate', 'Profit grew 30%; previously supplied guidance was 10% growth. '
               'Profit grew 30%; previously supplied guidance was 10% growth.',
-              'One repeated fact, not two independent observations.')]
+              'One repeated fact, not two independent observations.'),
+             ('wrong_subject', 'The tagged headline concerns a separately listed subsidiary, not the forecast issuer. No ownership or exposure information is supplied.',
+              'Do not treat the subsidiary event as a direct issuer fact; indirect exposure is unknown.'),
+             ('unsupported_relation', 'Two companies mention rising copper prices. Their business activities and commercial relationship are not supplied.',
+              'Shared language is not evidence of a supplier, customer or competitor link.'),
+             ('supported_indirect', 'The issuer disclosure states that it buys copper as an input under spot contracts. A dated market report says copper prices fell. Demand and selling-price effects are unknown.',
+              'Identify supported input-cost transmission as one hypothesis; do not assert a positive net return or ignore demand uncertainty.'),
+             ('prior_estimate', 'Earlier issuer estimate: first-half profit growth about 20%. Current reported first-half growth: 20.1%. No market consensus is supplied.',
+              'Distinguish a small change versus an issuer estimate from market surprise; growth itself is not novel.')]
     result = []
     for name, content, expectation in cases:
         row = json.loads(canonical(base))

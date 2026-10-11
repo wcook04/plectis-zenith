@@ -90,6 +90,31 @@ def test_missing_or_zero_volume_bar_is_not_bridged():
     assert not data.valid_bar({'open': 10, 'high': 11, 'low': 9, 'close': 10, 'volume': 0})
 
 
+def test_profit_period_uses_own_clause_and_does_not_infer_annual_report_contents():
+    key = data.profit_period('一季度净利86亿元同比增66% 2022年年报拟10派28.58元', '2023-04-24')
+    assert key['year'] == '2023' and key['period'] == 'Q1'
+    assert data.profit_period('2022年年度报告', '2023-04-24') is None
+    assert data.profit_period('2022年上半年净利润增长30%', '2023-04-24')['year'] == '2022'
+    assert data.profit_period('2022 年上半年净利润增长30%', '2023-04-24')['year'] == '2022'
+    assert data.profit_period('2022年上半年营业收入增长20%，2023年一季度净利润增长30%', '2023-04-24')['period'] == 'Q1'
+
+
+def test_prior_claim_addition_is_bounded_period_matched_and_never_future():
+    def item(id, date, content, issuer='600519'):
+        return {'id': id, 'available_at': date + 'T00:00:00+00:00', 'published_date': date,
+                'content': content, 'entities': [issuer], 'kind': 'news'}
+    prior = item('prior', '2023-07-13', '预计上半年净利润约356亿元 同比增长19.5%')
+    wrong = item('wrong', '2023-07-25', '一季度净利润增长30%')
+    current = item('current', '2023-08-02', '上半年净利润359.8亿元 同比增长20.76%')
+    future = item('future', '2023-08-04', '上半年净利润增长99%')
+    selected, count = data.select_text([prior, wrong, current, future], '2023-08-03T00:00:00+00:00', '600519')
+    assert {r['id'] for r in selected} == {'prior', 'current'}
+    assert count['comparison_pairs'][0]['prior_role'] == 'explicit_issuer_estimate'
+    assert count['prior_comparison_items'] == 1
+    review, _ = data.select_text([prior, current], '2023-08-03T00:00:00+00:00', '600519', after='2023-07-31T00:00:00+00:00')
+    assert {r['id'] for r in review} == {'current'}
+
+
 def test_teacher_window_retains_holiday_reporting_older_than_seven_calendar_days():
     row = {'id': 'holiday', 'kind': 'news', 'available_at': '2023-04-28T08:00:00+00:00',
            'content': 'Quarterly earnings changed.', 'entities': ['002594']}

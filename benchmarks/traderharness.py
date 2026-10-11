@@ -201,6 +201,64 @@ def text_index(tables, sessions, calendar, symbols):
     return records, dict(audit)
 
 
+def profit_period(content, published_date):
+    """Conservative retrieval key, not an authenticated accounting fact.
+
+    Scope year to the profit clause. A later '2022 annual dividend' clause must
+    not relabel a current-year Q1 profit. Annual or ambiguous periods abstain.
+    """
+    for clause in re.split(r'[。；;！!？?，,]', content):
+        # A clause may append another year's annual-report/dividend statement.
+        clause = re.split(r'\s+(?=20\d{2}年年报)', clause)[0]
+        if not re.search(r'净利(?:润)?', clause) or not re.search(r'\d+(?:\.\d+)?\s*(?:%|％|亿|万)', clause):
+            continue
+        matches = list(re.finditer(r'(?:((?:20)\d{2})\s*年\s*)?(第一季度|一季度|Q1|上半年|半年度|H1|前三季度)', clause))
+        if len(matches) != 1:
+            continue
+        match = matches[0]
+        period = {'第一季度': 'Q1', '一季度': 'Q1', 'Q1': 'Q1',
+                  '上半年': 'H1', '半年度': 'H1', 'H1': 'H1', '前三季度': 'Q1-Q3'}[match[2]]
+        year = match[1] or published_date[:4]
+        return {'family': 'profit', 'year': year, 'period': period,
+                'year_basis': 'explicit_period_year' if match[1] else 'publication_year_for_intrayear_period'}
+    return None
+
+
+def prior_comparisons(records, chosen, cutoff, symbol):
+    """At most two original prior claims; no semantic/surprise certification."""
+    additions, pairs = [], []
+    seen = {r['id'] for r in chosen}
+    normalized = {re.sub(r'\s+', '', r['content']) for r in chosen}
+    for current in chosen:
+        if current['scope'] != 'issuer':
+            continue
+        key = profit_period(current['content'], current.get('published_date', current['available_at'][:10]))
+        if key is None:
+            continue
+        lower = iso(datetime.fromisoformat(current['available_at']) - timedelta(days=180))
+        candidates = []
+        for r in records:
+            if symbol not in r['entities'] or not lower < r['available_at'] < current['available_at'] <= cutoff:
+                continue
+            other = profit_period(r['content'], r.get('published_date', r['available_at'][:10]))
+            if other and all(other[k] == key[k] for k in ('family', 'year', 'period')):
+                if re.sub(r'\s+', '', r['content']) != re.sub(r'\s+', '', current['content']):
+                    candidates.append(r)
+        if not candidates:
+            continue
+        prior = max(candidates, key=lambda r: (r['available_at'], r['id']))
+        if prior['id'] not in seen:
+            if len(additions) == 2 or re.sub(r'\s+', '', prior['content']) in normalized:
+                continue
+            additions.append({**prior, 'scope': 'prior_comparison', 'content': prior['content'][:600]})
+            seen.add(prior['id'])
+            normalized.add(re.sub(r'\s+', '', prior['content']))
+        pairs.append({'current_id': current['id'], 'prior_id': prior['id'], 'key': key,
+                      'basis': 'same source issuer candidate token and profit-period key; identity/metric comparability unverified',
+                      'prior_role': 'explicit_issuer_estimate' if re.search(r'预计|预告', prior['content']) else 'earlier_claim'})
+    return additions, pairs
+
+
 def select_text(records, cutoff, symbol, *, after=None):
     lower = iso(datetime.fromisoformat(cutoff) - timedelta(days=7))
     if after is not None:
@@ -220,9 +278,12 @@ def select_text(records, cutoff, symbol, *, after=None):
             count += 1
             if count == limit:
                 break
+    additions, pairs = prior_comparisons(records, chosen, cutoff, symbol) if after is None else ([], [])
+    chosen += additions
     return chosen, {'issuer_available': len(issuer), 'common_available': len(common),
                     'issuer_retained': sum(r['scope'] == 'issuer' for r in chosen),
                     'common_retained': sum(r['scope'] == 'common' for r in chosen),
+                    'prior_comparison_items': len(additions), 'comparison_pairs': pairs,
                     'retained_characters': sum(len(r['content']) for r in chosen)}
 
 
@@ -245,7 +306,7 @@ def build(tables, *, symbols=SYMBOLS, start='2023-02-01', end='2026-01-01', spli
     record_times = [r['available_at'] for r in records]
 
     def evidence(cutoff, symbol, after=None):
-        lo = after if after is not None else iso(datetime.fromisoformat(cutoff) - timedelta(days=7))
+        lo = after if after is not None else iso(datetime.fromisoformat(cutoff) - timedelta(days=187))
         subset = records[bisect_right(record_times, lo):bisect_right(record_times, cutoff)]
         return select_text(subset, cutoff, symbol, after=after)
 

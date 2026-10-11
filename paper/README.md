@@ -74,6 +74,21 @@ the later work renamed QuantHarness. FinRobot's current strategy loop is cited
 as code, separately from its 2024 platform paper. No upstream stack is installed
 as a consequence of these citations.
 
+The 12 October revision assimilates three supplied papers: Huang et al.
+(arXiv:2604.19476v2), Wang and Yeung (Frontiers 9:1722121), and Yu et al.
+(arXiv:2306.11025v1). The annotated/original Yu uploads contain identical
+decoded page contents and no distinguishable operator notes. Native parent
+annexes preserve identities, source passages, critical findings and transfer
+decisions. Citations occur at each adopted mechanism, economic motivation,
+dataset or software use. Future-news ROUGE is not treated as explanation
+fidelity, and financial network indicators are not mistaken for return targets.
+
+The revised A-share section includes the actual negative development-only
+text-control comparison from docs/ashare-development-controls.json. The LLM
+study remains unexecuted. The first-learning profile retains all 48 assessment
+dates and allows 572 total calls including capability checks; that plan does
+not release the paid hold or expand the immutable budget.
+
 Authoring owners used:
 
 - ai_workflow/.agents/skills/route-human-authoring/SKILL.md and

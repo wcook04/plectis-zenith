@@ -137,9 +137,9 @@ def test_mse_equal_weights_dates_not_number_of_assets():
 def test_semantic_probes_are_label_free_and_do_not_mutate_real_packet():
     p = packet()
     probes = protocol.semantic_probes(p)
-    assert len(probes) == 7
+    assert len(probes) == 11
     assert 'actual_return' not in json.dumps(probes)
-    assert len({r['packet']['packet_sha256'] for r in probes}) == 7
+    assert len({r['packet']['packet_sha256'] for r in probes}) == 11
     for probe in probes:
         typed.validate_packet(probe['packet'])
     assert p == packet()
@@ -179,7 +179,8 @@ def test_verification_never_runs_missing_node(tmp_path):
         study.node(tmp_path, 'missing', 'prompt', lambda x: x, {'_cache_only': True})
 
 
-def test_synthetic_full_study_executes_contracts_and_rejects_resealed_selection(tmp_path, monkeypatch):
+@pytest.mark.parametrize('profile_name', ['full', 'first_learning'])
+def test_synthetic_full_study_executes_contracts_and_rejects_resealed_selection(tmp_path, monkeypatch, profile_name):
     """Exercise actual cache/reparse path with a declared synthetic transport."""
     from research import trading_study
     calls = []
@@ -206,14 +207,21 @@ def test_synthetic_full_study_executes_contracts_and_rejects_resealed_selection(
     # Lexicographic symbol order is the adapter's frozen join convention.
     symbols = sorted({r['symbol'] for r in all_rows})
     packets = {d: packet(d, n=10) for d in sorted({r['issue_date'] for r in all_rows})}
+    for p in packets.values():
+        for a, symbol in zip(p['assets'], symbols, strict=True):
+            a['context_evidence'][0]['content'] = 'Fixed universe issuer code: ' + symbol
+        p['packet_sha256'] = sha({k: v for k, v in p.items() if k != 'packet_sha256'})
+    for r in all_rows:
+        r['issue_at'] = packets[r['issue_date']]['issue_at']
     spec = {'budget': {}, 'authorization': {'synthetic': True}, 'symbols': symbols,
             'teacher_boundary': '2023-12-31T23:59:59+08:00', 'claim_limit': 'synthetic only',
             'anchor': {'coefficients': [0.] * (len(FEATURES) + 1), 'mean': [0.] * len(FEATURES), 'scale': [1.] * len(FEATURES)}}
+    spec['profile'] = study.execution_profile(profile_name, all_rows)
     write_json(tmp_path / 'binding.json', {'frozen_sha256': 'fixture'})
     study.development(tmp_path, spec, all_rows, packets)
     study.learn(tmp_path, spec, all_rows, packets)
     selected = study.select(tmp_path, spec, all_rows, packets)
-    assert selected['choices'] == dict.fromkeys(study.ARMS, 'rich')  # unchanged wins ties
+    assert selected['choices'] == dict.fromkeys(spec['profile']['learning_arms'], 'rich')  # unchanged wins ties
     altered = deepcopy(selected)
     altered['policies']['rich']['skill'] = 'Unproposed test skill.'
     altered['selection_sha256'] = sha({k: v for k, v in altered.items() if k != 'selection_sha256'})
@@ -246,3 +254,40 @@ def test_unicode_memory_is_packed_before_prompt_generation():
     assert len(json.dumps(memories, sort_keys=True, separators=(',', ':')).encode()) <= 24000
     later = packet('2024-02-01')
     protocol.forecast_prompt(later, interpretation(later), memories=memories)
+
+
+def test_correction_gain_detects_overshoot_and_withholds_incomplete_support():
+    r = rows(n=1)
+    key = r[0]['sample_id']
+    result = study.correction_gain(r, {key: 0.}, {key: .03})
+    assert result['alignment'] > 0
+    assert result['change_penalty'] > result['alignment']
+    assert result['mse_improvement'] == pytest.approx(result['alignment'] - result['change_penalty'])
+    assert study.correction_gain(r, {}, {key: 0.})['status'] == 'incomplete_support'
+
+
+def test_fallback_is_separate_and_does_not_discard_failed_dates():
+    r = rows()
+    pred = {r[0]['sample_id']: float('nan')}
+    assert study.evaluate(r, pred)['metrics']['mse'] is None
+    completed = study.fallback_system(r, pred)
+    assert completed['fallback_count'] == 2 and completed['score']['complete']
+    assert completed['score']['metrics']['mse'] == pytest.approx((.01**2 + .02**2) / 2)
+
+
+def test_first_learning_profile_preserves_all_assessment_and_budgets_all_calls():
+    from datetime import date, timedelta
+    all_rows = []
+    for phase, year, count in [('training', 2023, 41), ('validation', 2024, 47), ('test', 2025, 48)]:
+        for i in range(count):
+            all_rows += rows((date(year, 1, 1) + timedelta(days=i * 5)).isoformat(), phase)
+    profile = study.execution_profile('first_learning', all_rows)
+    assert len(profile['phase_dates']['validation']) == 24
+    assert len(profile['phase_dates']['test']) == 48
+    spec = {'profile': profile, 'splits': {'training': ['2023', '2024'], 'validation': ['2024', '2025'], 'test': ['2025', '2026']}}
+    packets = {d: packet(d) for d in study.groups(all_rows)}
+    plan = study.cost_plan(spec, packets)
+    assert plan['maximum_core_calls'] == 526
+    assert plan['maximum_total_calls'] == 572
+    assert plan['stages']['assessment'] == 240
+    assert len(study.phase_rows(all_rows, 'validation', spec)) == 48

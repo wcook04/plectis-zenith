@@ -2,6 +2,74 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Source assimilation and stronger comparisons, 12 October 2026
+
+Three papers now have reviewed annexes in the parent repository, with source
+hashes, passage-level notes, adopted/deferred/rejected mechanisms and native
+validation receipts. The two supplied copies of *Temporal Data Meets LLM*
+contain identical decoded page content; their PDF annotations are links, not
+operator comments. Both hashes belong to one canonical source. The
+[source manifest](finance-adaptive-sources.json) binds all three annexes to
+their actual uses and limitations. The [manuscript](../paper/zenith.tex) cites
+each borrowed mechanism where it is used, including the data and software.
+No paper's reported performance is inherited as evidence for Zenith.
+
+The [revised protocol](ashare-study.md) restores earlier, same-issuer,
+same-period numerical profit claims within a bounded 180-day window. It adds
+11 older evidence items, including five training comparisons. Issuer estimates
+remain distinct from analyst consensus. The interpreter now requests evidence
+age, issuer relevance, uncertain indirect channels and the distinction between
+an observed price response and a remaining forecast effect. Eleven semantic
+probes exercise these distinctions; prompt requirements do not establish
+semantic correctness before those model responses are inspected.
+
+New controls fit character-text ridge and a matched numerical/metadata/issuer
+model using eligible training data only. Memory retrieval combines text
+similarity with numerical market state; it does not rank by outcomes or review
+lessons. Fixed feature order, library versions, fitted transformations and
+model hashes are bound into receipts. Correction diagnostics separate useful
+alignment from excessive adjustment, and a declared fallback is scored
+separately from raw failures and abstentions.
+
+The actual [development measurement](ashare-development-controls.json), after
+eight warm-up issues, covers 33 chronological dates and 330 asset forecasts:
+
+| Fixed control | Mean squared market-relative return error |
+| --- | ---: |
+| Zero relative return | 0.0010951783 |
+| Numerical/metadata/issuer ridge | 0.0014184998 |
+| Same inputs plus character text | 0.0014834418 |
+
+Text worsens this comparison. These are development controls, not an assessment
+result; settings were not retuned after observing them. The omitted-comparison
+finding and this negative result are captured in the parent Task Ledger as
+`cap_quick_zenith_omitted_prior_financial_compariso_2423cad4219e` and
+`cap_quick_zenith_development_text_control_does_not_1b3ba7c87c2f`.
+The former is addressed by the bounded retrieval and explicit source limits;
+the latter is retained in the measurement receipt and manuscript.
+
+The current [full admission](ashare-admission.json) binds all 41 training,
+47 validation and 48 assessment dates, with at most 1,259 calls. The
+[first-learning profile](ashare-first-run.json) retains all training and
+assessment dates, selects 24 validation dates before execution and allows at
+most 572 calls. Its omitted ablations and transfer claims are explicit. Its
+quoted conservative USD 36.46 reservation ceiling is not an expected bill or
+evidence that it fits the earlier USD 4 authorization. Paid execution remains
+held: no account check, new budget, model call or final-assessment score was
+produced. Compatibility, semantic-probe review and authorized resources remain
+execution conditions. Cohorts live under ignored
+`work/ashare-v2-full-bound-20261012/` and `work/ashare-v2-first-20261012/`.
+
+Validation: **573 offline tests passed** after the final runtime source freeze.
+The study module was then rerun successfully with both execution profiles in
+the synthetic end-to-end test. Both real cohort manifests load against the
+current source and library pins. The 11-page PDF compiled, all 23 cited keys
+resolve, and the revised pages were visually checked with no overflow. The
+original study, calibration and deterministic-repair exports remain unchanged.
+All three annexes validate as healthy and curated. Reusable implementation
+lessons now live in the scientific-experiments skill; unavailable relationship
+datasets and paper-specific fine-tuning remain explicitly deferred.
+
 ## Compiled hindsight-learning experiment, 11 October 2026
 
 The [A-share protocol](ashare-study.md) now has a complete offline compiler,

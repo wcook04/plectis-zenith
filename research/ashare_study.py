@@ -19,8 +19,9 @@ import numpy as np
 
 from benchmarks import traderharness as data
 from benchmarks.stocknet import fit_ridge, ridge_predict
-from research.engine import canonical, read_json, write_json
+from research.engine import canonical, event_time, read_json, write_json
 from research import ashare_protocol as protocol
+from research import ashare_text
 from research import trading_protocol as typed
 from research.trading_study import _observe_node
 
@@ -30,7 +31,7 @@ ARMS = ('outcome', 'hindsight', 'blinded')
 
 def source_hashes():
     paths = ['benchmarks/traderharness.py', 'benchmarks/trading_task.py', 'benchmarks/stocknet.py',
-             'research/ashare_study.py', 'research/ashare_protocol.py', 'research/trading_protocol.py',
+             'research/ashare_study.py', 'research/ashare_protocol.py', 'research/ashare_text.py', 'research/trading_protocol.py',
              'research/trading_study.py', 'research/engine.py', 'zenith/budgeted.py', 'zenith/providers.py']
     return {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in paths}
 
@@ -40,6 +41,63 @@ def groups(rows):
     for row in rows:
         result[row['issue_date']].append(row)
     return dict(sorted(result.items()))
+
+
+def spaced(values, count):
+    """Fixed even temporal coverage, chosen without prices, text or outcomes."""
+    return [values[i] for i in np.linspace(0, len(values) - 1, min(count, len(values)), dtype=int)]
+
+
+def execution_profile(name, rows):
+    dates = {p: list(groups([r for r in rows if r['phase'] == p])) for p in data.SPLITS}
+    if name not in ('full', 'first_learning'):
+        raise ValueError('unknown execution profile')
+    full = name == 'full'
+    validation = dates['validation'] if full else spaced(dates['validation'], 24)
+    return {'name': name, 'phase_dates': {**dates, 'validation': validation},
+            'learning_arms': list(ARMS) if full else ['outcome', 'hindsight'],
+            'information_modes': ['rich', 'metadata', 'price'] if full else ['rich'],
+            'repeat': full, 'hindsight_metadata': full,
+            'capability_dates': spaced(dates['training'], 6),
+            'date_selection': 'evenly spaced integer positions including endpoints; no outcome ranking',
+            'omitted_claims': [] if full else ['feedback versus a blinded proposal', 'assessment price/metadata contrast',
+                                               'learned-skill metadata transfer', 'unchanged-model repeat'],
+            'claim_unit': 'one realized artifact per learning arm on this fixed panel; not learning-procedure reliability'}
+
+
+def phase_rows(rows, phase, spec):
+    allowed = spec.get('profile', {}).get('phase_dates', {}).get(phase)
+    return [r for r in rows if r['phase'] == phase and (allowed is None or r['issue_date'] in allowed)]
+
+
+def score(rows, predictions):
+    return {**evaluate(rows, predictions), 'predictions': predictions}
+
+
+def correction_gain(rows, baseline, revised):
+    """Exact date-equal identity: improvement = 2 residual*change - change²."""
+    if not evaluate(rows, baseline)['complete'] or not evaluate(rows, revised)['complete']:
+        return {'status': 'incomplete_support'}
+    daily = []
+    for stamp, batch in groups(rows).items():
+        terms = []
+        for r in batch:
+            b, p = baseline[r['sample_id']], revised[r['sample_id']]
+            residual, delta = r['actual_return'] - b, p - b
+            terms.append((2 * residual * delta, delta ** 2, residual ** 2 - (r['actual_return'] - p) ** 2))
+        means = [math.fsum(t[i] for t in terms) / len(terms) for i in range(3)]
+        daily.append(dict(zip(('alignment', 'change_penalty', 'mse_improvement'), means), issue_date=stamp))
+    return {'status': 'complete_descriptive_identity',
+            **{k: math.fsum(d[k] for d in daily) / len(daily) for k in ('alignment', 'change_penalty', 'mse_improvement')},
+            'daily': daily, 'interpretation': 'Positive alignment may still be outweighed by oversized changes; no causal diagnosis.'}
+
+
+def fallback_system(rows, predictions):
+    raw = evaluate(rows, predictions)
+    failed = set(raw['missing'])
+    completed = {r['sample_id']: 0. if r['sample_id'] in failed else predictions[r['sample_id']] for r in rows}
+    return {'policy': 'zero market-relative forecast for missing, invalid or abstained output',
+            'fallback_count': len(failed), 'raw_complete': raw['complete'], 'score': evaluate(rows, completed)}
 
 
 def evaluate(rows, predictions):
@@ -103,7 +161,7 @@ def paired(candidate, baseline, *, replicates=2000):
             'replicates': replicates, 'interpretation': 'Descriptive unadjusted interval; not a superiority test or multiplicity correction.'}
 
 
-def compile_study(dataset, study):
+def compile_study(dataset, study, *, profile='full'):
     if study.exists():
         raise ValueError('refuse to overwrite a study')
     tables, hashes = data.read_sources(dataset)
@@ -129,7 +187,11 @@ def compile_study(dataset, study):
                  'tie': 'unchanged wins', 'reject': 'any missing or schema-invalid validation forecast',
                  'mutation_slot': 'forecast skill; forecaster also receives original evidence',
                  'slot_basis': 'design choice; held inference means no empirical bottleneck-selection claim'}
-    frozen = {'schema': 'zenith_ashare_study_v1', 'created_at': datetime.now(timezone.utc).isoformat(),
+    frozen = {'schema': 'zenith_ashare_study_v2', 'created_at': datetime.now(timezone.utc).isoformat(),
+              'profile': execution_profile(profile, rows), 'library_versions': ashare_text.library_versions(),
+              'input_revision': 'profit-prior-pairs-v2',
+              'comparators': {'text': ashare_text.TEXT_CONFIG, 'ridge_alpha': 1., 'memory': ashare_text.RETRIEVAL_RULE,
+                              'fallback': 'separate zero market-relative system policy; never raw-model selection'},
               'question': 'Does admitted text improve forecasts, and does hindsight teach a transferable skill beyond outcome learning and reflected memory?',
               'target': 'next-open through fifth-session close: gross stock wealth return minus CSI300 price return',
               'symbols': built['symbols'], 'splits': data.SPLITS, 'base_skill': protocol.BASE_SKILL,
@@ -166,25 +228,47 @@ def compile_study(dataset, study):
 
 def cost_plan(spec, packets, *, input_per_million=None, output_per_million=None, output_tokens=4096):
     counts = {p: sum(a <= stamp < b for stamp in packets) for p, (a, b) in spec['splits'].items()}
+    profile = spec.get('profile', {})
+    if profile:
+        counts = {p: len(dates) for p, dates in profile['phase_dates'].items()}
     # Train base (2T), matched teachers (2T), three proposals. Validation:
     # three independent interpreters + base for each (6V), three skills + memory (4V).
     # Test adds repeat (1), learned-skill metadata transfer (1), same four learning arms.
-    calls = 4 * counts['training'] + 10 * counts['validation'] + 12 * counts['test'] + 3
+    arms = len(profile.get('learning_arms', ARMS))
+    modes = len(profile.get('information_modes', ['rich', 'metadata', 'price']))
+    val_per_date = 2 * modes + arms + 1
+    test_per_date = val_per_date + int(profile.get('repeat', True)) + int(profile.get('hindsight_metadata', True))
+    calls = 4 * counts['training'] + val_per_date * counts['validation'] + test_per_date * counts['test'] + arms
+    probe_calls = 2 * len(protocol.semantic_probes(packets[min(packets)]))
+    capability_extra = 4 * len(profile.get('capability_dates', []))
     max_packet_bytes = max(len(canonical(p)) for p in packets.values())
     # Conservative UTF-8 byte bound, not an alleged tokenizer count. Include
     # original evidence twice in teacher case, two model responses and hindsight.
     forward_input = max_packet_bytes + 96000
     teacher_input = max_packet_bytes + 384000
     proposal_input = counts['training'] * 24000 + 12000
-    total_input = ((2 * counts['training'] + 10 * counts['validation'] + 12 * counts['test']) * forward_input
-                   + 2 * counts['training'] * teacher_input + 3 * proposal_input)
-    total_output = calls * output_tokens
+    total_input = ((2 * counts['training'] + val_per_date * counts['validation'] + test_per_date * counts['test']
+                    + capability_extra + probe_calls) * forward_input
+                   + 2 * counts['training'] * teacher_input + arms * proposal_input)
+    total_output = (calls + capability_extra + probe_calls) * output_tokens
+    sizes = [len(protocol.interpret_prompt(protocol.project(p, 'rich')).encode('utf-8')) for p in packets.values()]
     priced = input_per_million is not None and output_per_million is not None
     if priced and (input_per_million < 0 or output_per_million < 0):
         raise ValueError('negative price quote')
-    return {'schema': 'zenith_ashare_execution_plan_v1', 'status': 'held_no_paid_execution',
+    return {'schema': 'zenith_ashare_execution_plan_v2', 'status': 'held_no_paid_execution',
+            'profile': profile.get('name', 'full'),
             'phase_issue_counts': counts, 'maximum_core_calls': calls,
-            'probes': {'additional_calls': 14, 'included_in_core_budget': False, 'status': 'unexecuted'},
+            'probes': {'additional_calls': probe_calls, 'included_in_core_budget': False, 'status': 'unexecuted'},
+            'capability_extra_calls': capability_extra,
+            'maximum_total_calls': calls + capability_extra + probe_calls,
+            'stages': {'capability': probe_calls + 6 * len(profile.get('capability_dates', [])),
+                       'development_and_learning_including_reused_capability_rich': 4 * counts['training'] + arms,
+                       'validation': val_per_date * counts['validation'], 'assessment': test_per_date * counts['test']},
+            'prepared_interpret_prompt_utf8_bytes': {'min': min(sizes), 'median': float(np.median(sizes)), 'max': max(sizes)},
+            'unchanged_policy_reuse': 'Already cached interpretation and identical base skill reuse exact observations; maximum assumes every proposal is valid and different.',
+            'expected_bill': None,
+            'bill_uncertainty': 'No selected-model tokenization or real A-share usage receipt exists. Prepared bytes are measured; intermediate responses are bounded. No pilot average is invented.',
+            'absolute_spending_limit': 'Only the existing immutable authorization ledger can supply remaining money/calls; this plan grants neither.',
             'max_packet_utf8_bytes': max_packet_bytes, 'max_output_tokens_per_call': output_tokens,
             'conservative_input_token_bound': total_input, 'maximum_output_tokens': total_output,
             'quote_input_usd_per_million': input_per_million, 'quote_output_usd_per_million': output_per_million,
@@ -199,6 +283,8 @@ def load(study):
     spec = read_json(study / 'frozen.json')
     if data.sha(spec) != read_json(study / 'binding.json')['frozen_sha256'] or spec['source_hashes'] != source_hashes():
         raise ValueError('frozen study/source changed')
+    if spec['library_versions'] != ashare_text.library_versions():
+        raise ValueError('frozen numerical/text runtime versions changed')
     values = {}
     for name, expected in spec['files'].items():
         values[name] = read_json(study / name)
@@ -232,7 +318,8 @@ def load_stage(study, name):
 
 def forecasts(study, phase, policies, spec, rows, packets, cases=(), reviews=()):
     records = {name: {} for name in policies}
-    for stamp, batch in groups([r for r in rows if r['phase'] == phase]).items():
+    selected_rows = phase_rows(rows, phase, spec)
+    for stamp, batch in groups(selected_rows).items():
         for name, policy in policies.items():
             mode = policy.get('mode', 'rich')
             packet = protocol.project(packets[stamp], mode)
@@ -243,7 +330,7 @@ def forecasts(study, phase, policies, spec, rows, packets, cases=(), reviews=())
                 write_json(study / 'memory-receipts' / (stamp + '.json'), {
                     'selected_case_ids': [m['case_id'] for m in memory],
                     'serialized_bytes': len(canonical(memory)), 'max_bytes': 24000, 'max_cases': 3,
-                    'retrieval': 'nearest mean return_5 and realized_vol_20; stable case ID tie; pack in rank order',
+                    'retrieval': ashare_text.RETRIEVAL_RULE,
                     'input_packet_sha256': packet['packet_sha256']})
             prompt = protocol.forecast_prompt(packet, interpretation['value'], policy['skill'], memory)
             # Identical unchanged policies alias actual baseline draws; repeat
@@ -260,7 +347,7 @@ def forecasts(study, phase, policies, spec, rows, packets, cases=(), reviews=())
             for f in values:
                 symbol = spec['symbols'][int(f['asset_id'].split('_')[1]) - 1]
                 predicted[stamp + ':' + symbol] = f['mean_expected_return']
-        scores[name] = evaluate([r for r in rows if r['phase'] == phase], predicted)
+        scores[name] = evaluate(selected_rows, predicted)
         scores[name]['predictions'] = predicted
     return scores
 
@@ -303,7 +390,7 @@ def learn(study, spec, rows, packets, *, verify=False):
             source_cases.append(case)
         banks[arm], cases[arm] = bank, source_cases
     candidates = {}
-    for arm in ARMS:
+    for arm in spec.get('profile', {}).get('learning_arms', ARMS):
         bank = banks.get(arm, [])
         record = node(study, 'proposal_' + arm, protocol.skill_prompt(arm, bank),
                       lambda text: typed.parse_skill_update(text, [r['case_id'] for r in bank]), spec)
@@ -318,8 +405,9 @@ def learn(study, spec, rows, packets, *, verify=False):
             'scheduled_training_cases_per_treatment': len(cases['hindsight'])}
 
 
-def policies(learning):
-    result = {mode: {'skill': protocol.BASE_SKILL, 'mode': mode} for mode in ('rich', 'metadata', 'price')}
+def policies(learning, spec=None):
+    modes = (spec or {}).get('profile', {}).get('information_modes', ['rich', 'metadata', 'price'])
+    result = {mode: {'skill': protocol.BASE_SKILL, 'mode': mode} for mode in modes}
     for arm, record in learning['candidates'].items():
         if record['value'] is not None:
             result[arm] = {'skill': record['value']['skill']}
@@ -333,12 +421,12 @@ def select(study, spec, rows, packets, *, verify=False):
     if verify:
         spec = {**spec, '_cache_only': True}
     learning = learn(study, spec, rows, packets, verify=True)
-    proposed = policies(learning)
+    proposed = policies(learning, spec)
     scores = forecasts(study, 'validation', proposed, spec, rows, packets,
                        learning['cases']['hindsight'], learning['banks']['hindsight'])
     choices = {}
     base = scores['rich']['metrics']['mse']
-    for arm in ARMS:
+    for arm in spec.get('profile', {}).get('learning_arms', ARMS):
         candidate = scores.get(arm, {}).get('metrics', {}).get('mse')
         choices[arm] = arm if base is not None and candidate is not None and candidate < base else 'rich'
     # Keep the raw memory arm even if worse: it is a mechanism comparator, not
@@ -389,23 +477,37 @@ def final(study, spec, rows, packets):
             raise ValueError('interrupted assessment is spent; no automatic resampling')
     else:
         write_json(seal_path, seal)
-    chosen = {mode: {'skill': protocol.BASE_SKILL, 'mode': mode} for mode in ('rich', 'metadata', 'price')}
+    profile = spec.get('profile', {})
+    chosen = {mode: {'skill': protocol.BASE_SKILL, 'mode': mode}
+              for mode in profile.get('information_modes', ['rich', 'metadata', 'price'])}
     chosen.update({arm: selection['policies'][name] for arm, name in selection['choices'].items()})
-    chosen.update(memory={'skill': protocol.BASE_SKILL}, repeat={'skill': protocol.BASE_SKILL})
-    chosen['hindsight_metadata'] = {**chosen['hindsight'], 'mode': 'metadata'}
+    chosen['memory'] = {'skill': protocol.BASE_SKILL}
+    if profile.get('repeat', True):
+        chosen['repeat'] = {'skill': protocol.BASE_SKILL}
+    if profile.get('hindsight_metadata', True):
+        chosen['hindsight_metadata'] = {**chosen['hindsight'], 'mode': 'metadata'}
     scores = forecasts(study, 'test', chosen, spec, rows, packets,
                        learning['cases']['hindsight'], learning['banks']['hindsight'])
     fit, calibration = numerical_controls(rows, load_stage(study, 'training')['base']['predictions'])
-    test = [r for r in rows if r['phase'] == 'test']
+    test = phase_rows(rows, 'test', spec)
     for name, predict in [('zero', lambda r: 0.), ('momentum', lambda r: r['momentum']),
                           ('ridge_2021', lambda r: ridge_predict(r, spec['anchor'])),
                           ('ridge_training', lambda r: ridge_predict(r, fit))]:
-        scores[name] = evaluate(test, {r['sample_id']: predict(r) for r in test})
+        scores[name] = score(test, {r['sample_id']: predict(r) for r in test})
     if calibration is not None:
-        scores['calibration'] = evaluate(test, {k: calibration[0] + calibration[1] * v
+        scores['calibration'] = score(test, {k: calibration[0] + calibration[1] * v
                                                for k, v in scores['rich']['predictions'].items() if v is not None})
+    control_fits = {}
+    for use_text, name in [(False, 'ridge_numeric_metadata_identity'), (True, 'ridge_character_text')]:
+        control = ashare_text.fit_control(phase_rows(rows, 'training', spec), packets, use_text=use_text)
+        scores[name] = score(test, ashare_text.predict_control(control, test, packets))
+        control_fits[name] = control['receipt']
     result = {'status': 'completed_historical_forecast_assessment', 'selection': selection['choices'],
               'scores': scores, 'paired_vs_rich': {k: paired(v, scores['rich']) for k, v in scores.items() if k != 'rich'},
+              'correction_vs_rich': {k: correction_gain(test, scores['rich']['predictions'], v['predictions'])
+                                     for k, v in scores.items() if k != 'rich'},
+              'system_zero_fallback': {k: fallback_system(test, v['predictions']) for k, v in scores.items()},
+              'text_control_fits': control_fits,
               'calibration': calibration, 'seal': seal, 'claim_limit': spec['claim_limit']}
     if replay:
         if load_stage(study, 'result') != result:
@@ -435,6 +537,49 @@ def probes(study, spec, rows, packets):
     return results
 
 
+def capability(study, spec, rows, packets):
+    """Declared probes and development contrasts; no assessment consumption."""
+    behavior = probes(study, spec, rows, packets)
+    dates = spec['profile']['capability_dates']
+    local_spec = {**spec, 'profile': {**spec['profile'], 'phase_dates': {'training': dates}}}
+    scores = forecasts(study, 'training', {mode: {'skill': protocol.BASE_SKILL, 'mode': mode}
+                        for mode in ('rich', 'metadata', 'price')}, local_spec, rows, packets)
+    result = {'probe_count': len(behavior), 'development_dates': dates, 'scores': scores,
+              'next_decision': 'Inspect supplied-evidence behavior and operational failures before continuing the released budget; no automatic semantic pass.'}
+    save_stage(study, 'capability', result)
+    return result
+
+
+def offline_controls(study):
+    """Chronological development-only numeric/text comparison, never test loss."""
+    spec, rows, packets = load(study)
+    training = phase_rows(rows, 'training', spec)
+    dates = list(groups(training))
+    if len(dates) <= 8:
+        raise ValueError('offline controls need more than eight training issue dates')
+    predictions = {'zero': {}, 'ridge_numeric_metadata_identity': {}, 'ridge_character_text': {}}
+    evaluated, fits = [], []
+    for stamp in dates[8:]:
+        query = [r for r in training if r['issue_date'] == stamp]
+        fitted = [r for r in training if r['issue_date'] < stamp
+                  and event_time(r['outcome_available_at']) < event_time(query[0]['issue_at'])]
+        evaluated += query
+        predictions['zero'].update({r['sample_id']: 0. for r in query})
+        for use_text, name in [(False, 'ridge_numeric_metadata_identity'), (True, 'ridge_character_text')]:
+            fit = ashare_text.fit_control(fitted, packets, use_text=use_text)
+            predictions[name].update(ashare_text.predict_control(fit, query, packets))
+            fits.append({'query_issue': stamp, 'name': name, **fit['receipt']})
+    scores = {name: evaluate(evaluated, p) for name, p in predictions.items()}
+    result = {'schema': 'zenith_ashare_development_controls_v1', 'status': 'development_only_measured',
+              'frozen_sha256': read_json(study / 'binding.json')['frozen_sha256'],
+              'training_warmup_issues': 8, 'evaluated_issue_dates': dates[8:], 'scores': scores,
+              'correction_text_vs_metadata': correction_gain(evaluated, predictions['ridge_numeric_metadata_identity'], predictions['ridge_character_text']),
+              'fits': fits, 'inference_calls': 0, 'assessment_consumed': False,
+              'claim_limit': 'Expanding chronological training-only diagnostic of fixed cheap comparators. No LLM, learned-skill, heldout or trading result.'}
+    save_stage(study, 'offline-controls', result)
+    return result
+
+
 def report(study, *, input_per_million=None, output_per_million=None):
     """Text-free public projection of an actual offline admission, not model results."""
     spec, rows, packets = load(study)
@@ -448,10 +593,13 @@ def report(study, *, input_per_million=None, output_per_million=None):
                          'without_issuer_tagged_text': sum(r['issuer_retained'] == 0 for r in items),
                          'issuer_items_retained': sum(r['issuer_retained'] for r in items),
                          'common_items_retained': sum(r['common_retained'] for r in items),
+                         'prior_comparison_items': sum(r.get('prior_comparison_items', 0) for r in items),
+                         'asset_windows_with_comparison': sum(bool(r.get('comparison_pairs')) for r in items),
                          'min_text_characters': min(r['retained_characters'] for r in items),
                          'max_text_characters': max(r['retained_characters'] for r in items)}
     return {'schema': 'zenith_ashare_offline_receipt_v1', 'status': 'compiled_offline_unexecuted',
             'inference_calls': 0, 'frozen_sha256': read_json(study / 'binding.json')['frozen_sha256'],
+            'profile': spec['profile'], 'input_revision': spec['input_revision'],
             'source_hashes': spec['source_hashes'], 'data_hashes': admission['source_hashes'],
             'calendar': admission['calendar'], 'phases': phases, 'scheduled_windows': len(admission['schedule']),
             'excluded_windows': admission['exclusions'], 'clock_audit': admission['clock_audit'],
@@ -468,6 +616,7 @@ def main():
     p = sub.add_parser('compile')
     p.add_argument('--dataset', type=Path, required=True)
     p.add_argument('--study', type=Path, required=True)
+    p.add_argument('--profile', choices=('full', 'first_learning'), default='full')
     p = sub.add_parser('plan')
     p.add_argument('--study', type=Path, required=True)
     p.add_argument('--input-usd-per-million', type=float)
@@ -477,17 +626,23 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--input-usd-per-million', type=float)
     p.add_argument('--output-usd-per-million', type=float)
-    for action in ('development', 'learn', 'select', 'final', 'probes'):
+    p = sub.add_parser('offline-controls')
+    p.add_argument('--study', type=Path, required=True)
+    p.add_argument('--output', type=Path, required=True)
+    for action in ('development', 'learn', 'select', 'final', 'probes', 'capability'):
         p = sub.add_parser(action)
         p.add_argument('--study', type=Path, required=True)
         p.add_argument('--authorization', type=Path, required=True)
         p.add_argument('--env-file', type=Path)
     args = parser.parse_args()
     if args.action == 'compile':
-        result = compile_study(args.dataset, args.study)
+        result = compile_study(args.dataset, args.study, profile=args.profile)
     else:
         spec, rows, packets = load(args.study)
-        if args.action == 'report':
+        if args.action == 'offline-controls':
+            result = offline_controls(args.study)
+            write_json(args.output, result)
+        elif args.action == 'report':
             result = report(args.study, input_per_million=args.input_usd_per_million,
                             output_per_million=args.output_usd_per_million)
             write_json(args.output, result)
