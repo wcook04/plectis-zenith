@@ -47,7 +47,7 @@ def parser() -> argparse.ArgumentParser:
             run.add_argument("--responses", help="prompt-bound captured JSON responses")
             run.add_argument("--model", help="model ID; nvidia_nim requires an explicit selection")
             run.add_argument("--env-file", type=Path, help="explicit local dotenv file")
-            run.add_argument("--max-cost-usd", help="explicit shared paid batch cap, at most 0.25 USD")
+            run.add_argument("--max-cost-usd", help="explicit shared paid batch cap, at most 5 USD")
             run.add_argument("--max-calls", type=int, help="maximum attempted calls across the shared paid batch")
             run.add_argument("--max-output-tokens", type=int, default=4096, help="paid response token cap")
             run.add_argument("--budget-dir", type=Path, help="one shared ledger directory for the entire paid batch")

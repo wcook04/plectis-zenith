@@ -43,17 +43,29 @@ This command sends the prepared mission prompts to the provider. Inspect and sel
 
 ## OpenRouter: explicitly bounded paid trials
 
-`openrouter_budgeted` is a separate opt-in adapter. It requires your own key, an explicit concrete model ID, maximum USD cost, maximum calls, output token cap, and one ledger directory shared by **every run in the batch**. The current trial ceiling is USD 0.25. Recurring free execution keeps using `openrouter_free`.
+`openrouter_budgeted` is a separate opt-in adapter. It requires your own key, an explicit concrete model ID, maximum USD cost, maximum calls, output token cap, and one ledger directory shared by **every run and model in the authorized batch**. The supported ceiling is USD 5; a smaller explicit cap is valid. This ceiling is not permission to start another batch. One authorization for USD 5 means one shared USD 5 ledger for all newly authorized calls, not USD 5 per model, run or agent. Recurring free execution keeps using `openrouter_free`.
 
 ```sh
 python -m zenith run lab --run-id MY_BOUNDED_LAB --feed-source MY_RECORDED_FEEDS \
   --provider openrouter_budgeted --model YOUR_CURRENT_TEXT_MODEL \
-  --max-cost-usd 0.25 --max-calls 40 --max-output-tokens 1024 \
-  --budget-dir state/budgets/my-first-batch --env-file .env \
+  --max-cost-usd 5 --max-calls 40 --max-output-tokens 1024 \
+  --budget-dir state/budgets/my-authorized-batch --env-file .env \
   --context-profile compact_feeds --horizon next_us_close
 ```
 
-Use the same `--budget-dir` and limits for additional run IDs in that batch. Limits are frozen in each run manifest and in the shared ledger; resume cannot raise them. Independent ledger directories represent independent budgets, so creating a new directory does not preserve a previous batch cap.
+Use the same `--budget-dir` and limits for additional run IDs or concrete models in that batch. A run's model is immutable; testing another model requires another run ID sharing the batch ledger. Limits are frozen in each run manifest and in the shared ledger; resume cannot raise them. The earlier halted USD 0.25 study remains halted with its original reservations. A newly authorized batch uses fresh run IDs and a fresh shared ledger; it must not reset, edit or reuse the halted study. Independent ledger directories represent independent budgets, so creating another directory would escape the shared authorization rather than preserve its cap.
+
+### Cheap text candidates checked on 11 October 2026
+
+These exact IDs passed the adapter's public-catalogue checks without credentials. Prices are USD per million input/output tokens; limits are advertised catalogue values, not measured throughput or available account quota. Recheck before each new inference as the adapter already does.
+
+| Concrete model | Input / output price | Context tokens | Maximum output tokens |
+| --- | --- | --- | --- |
+| [ibm-granite/granite-4.0-h-micro](https://openrouter.ai/ibm-granite/granite-4.0-h-micro) | 0.017 / 0.112 | 131,000 | 117,900 |
+| [amazon/nova-micro-v1](https://openrouter.ai/amazon/nova-micro-v1) | 0.035 / 0.140 | 128,000 | 5,120 |
+| [qwen/qwen3.5-flash-02-23](https://openrouter.ai/qwen/qwen3.5-flash-02-23) | 0.065 / 0.260 | 1,000,000 | 65,536 |
+
+Nova Micro is described as the lowest-latency model in its family; Granite Micro is a small text model. Qwen3.5 Flash advertises fast responses and JSON-schema structured outputs, making it a candidate for typed tasks; this adapter still uses prompt instructions and native validation rather than requesting provider-side JSON mode. This supports a shortlist, not a forecasting-quality or measured-speed claim. Nemo's prior HTTP 429 does not establish capacity for a new study. The [public catalogue](https://openrouter.ai/api/v1/models) supplies no per-request limits for these models. Account-specific RPM/TPM and provider capacity remain unknown without separate authoritative evidence; paid access can still receive a 429. The adapter halts rather than retrying or switching models. [OpenRouter limits](https://openrouter.ai/docs/api_reference/limits).
 
 Before each new inference, a public unauthenticated catalogue lookup must confirm the exact text model, finite nonnegative prices, context length, and output limit. Prompt/completion prices are required; any present ancillary price must be known and zero, apart from a known request fee. Requests contain no tools, plugins, model fallbacks or routing aliases. The provider requires parameter support, disables provider fallback, and receives price ceilings for prompt/completion, request and image charges. [OpenRouter provider routing](https://openrouter.ai/docs/guides/routing/provider-selection).
 

@@ -14,7 +14,7 @@ from .providers import Provider, digest, now, text_digest, write_json
 
 ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 INPUT_OVERHEAD_TOKENS = 4096
-MAX_BATCH_USD = Decimal("0.25")
+MAX_BATCH_USD = Decimal("5")
 
 
 def durable(value):
@@ -53,7 +53,7 @@ def budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir
         raise ValueError("budgeted inference requires a concrete catalogue model, without routing variants")
     limit = amount(max_cost_usd, "max_cost_usd")
     if not 0 < limit <= MAX_BATCH_USD:
-        raise ValueError("max_cost_usd must be positive and at most 0.25 for this bounded trial")
+        raise ValueError(f"max_cost_usd must be positive and at most {MAX_BATCH_USD} for this bounded trial")
     if budget_dir is None:
         raise ValueError("openrouter_budgeted requires an explicit shared budget_dir")
     return {"max_cost_usd": str(limit), "max_calls": positive_int(max_calls, "max_calls"),
@@ -163,6 +163,7 @@ class OpenRouterBudgetedProvider(Provider):
                 if text_digest(packet["response_text"]) != previous["response_sha256"]:
                     raise RuntimeError("stored budgeted response hash mismatch")
                 self.receipt(identity, provider="openrouter_budgeted", status="loaded_previous_response",
+                             execution_kind="openrouter_budgeted",
                              requested_model=self.model, actual_model=packet.get("model"),
                              usage=packet.get("usage"), cost=packet.get("cost"), endpoint=ENDPOINT,
                              budget_dir=str(self.budget_dir))
@@ -203,6 +204,7 @@ class OpenRouterBudgetedProvider(Provider):
         reservation = prices["prompt"] * input_bound + prices["completion"] * output_bound + prices.get("request", Decimal(0))
         record = {"schema": "zenith_api_call_v1", **identity, "call_id": call_id,
                   "provider": "openrouter_budgeted", "requested_model": self.model,
+                  "execution_kind": "openrouter_budgeted",
                   "endpoint": ENDPOINT, "recorded_at": now(), "status": "attempt_started", "cost": None,
                   "owner_pid": os.getpid(),
                   "reserved_cost_usd": str(reservation), "input_token_bound": input_bound,
@@ -264,6 +266,7 @@ class OpenRouterBudgetedProvider(Provider):
             record.update(status="response_supplied", provider_receipt=packet, response_sha256=text_digest(content))
             self._settle(call_id, record, call_path)
             self.receipt(identity, provider="openrouter_budgeted", status="response_supplied",
+                         execution_kind="openrouter_budgeted",
                          requested_model=self.model, actual_model=actual_model, usage=usage, cost=str(cost),
                          reserved_cost_usd=str(reservation), endpoint=ENDPOINT, budget_dir=str(self.budget_dir),
                          response_sha256=text_digest(content))
@@ -273,6 +276,7 @@ class OpenRouterBudgetedProvider(Provider):
             record.update(status="failed", error=message)
             self._settle(call_id, record, call_path, halt=True)
             self.receipt(identity, provider="openrouter_budgeted", status="failed", requested_model=self.model,
+                         execution_kind="openrouter_budgeted",
                          actual_model=record.get("provider_response", {}).get("model"),
                          usage=record.get("provider_response", {}).get("usage"), cost=record.get("cost"),
                          reserved_cost_usd=str(reservation), error=message, endpoint=ENDPOINT)

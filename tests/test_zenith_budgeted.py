@@ -61,7 +61,7 @@ class BudgetedTests(unittest.TestCase):
     def test_explicit_caps_and_model_required_and_cli_flags(self):
         for model, cost, calls, tokens, directory in [
             (None, ".25", 40, 100, self.root), (MODEL, None, 40, 100, self.root),
-            (MODEL, "NaN", 40, 100, self.root), (MODEL, ".251", 40, 100, self.root),
+            (MODEL, "NaN", 40, 100, self.root), (MODEL, "5.000001", 40, 100, self.root),
             (MODEL, 0, 40, 100, self.root), (MODEL, ".25", 0, 100, self.root),
             (MODEL, ".25", True, 100, self.root), (MODEL, ".25", 40, 0, self.root),
             (MODEL, ".25", 40, 100, None), ("openrouter/auto", ".25", 40, 100, self.root)]:
@@ -71,6 +71,9 @@ class BudgetedTests(unittest.TestCase):
             "--model", MODEL, "--max-cost-usd", "0.25", "--max-calls", "40", "--max-output-tokens", "1024", "--budget-dir", str(self.root)])
         self.assertEqual(args.max_calls, 40)
         self.assertEqual(args.max_cost_usd, "0.25")
+        for cost in ("0.25", "0.251", "5", "5.00"):
+            with self.subTest(accepted_cost=cost):
+                self.assertEqual(budget_options(MODEL, cost, 40, 100, self.root)["max_cost_usd"], cost)
 
     def test_atomic_reservation_before_post_and_alias_receipts(self):
         observed = []
@@ -110,6 +113,24 @@ class BudgetedTests(unittest.TestCase):
             self.ask(reloaded, prompt="repair this output")
         self.assertEqual(post.call_count, 1)
         self.assertEqual(len(self.ledger()["entries"]), 1)
+
+    def test_native_execution_kind_is_explicit_for_new_cached_and_failed_receipts(self):
+        provider = self.provider()
+        self.ask(provider)
+        os.environ.pop("OPENROUTER_API_KEY")
+        self.ask(provider)
+        receipts = [json.loads(p.read_text()) for p in (provider.run_dir / "handoff/receipts").glob("*.json")]
+        self.assertEqual({r["status"] for r in receipts},
+                         {"attempt_started", "response_supplied", "loaded_previous_response"})
+        self.assertTrue(all(r.get("execution_kind") == "openrouter_budgeted" for r in receipts))
+        self.assertEqual(next(iter(self.ledger()["entries"].values()))["execution_kind"], "openrouter_budgeted")
+        os.environ["OPENROUTER_API_KEY"] = SECRET
+        failed = self.provider("failed", caller=Mock(side_effect=RuntimeError("synthetic failure")))
+        with self.assertRaises(RuntimeError):
+            self.ask(failed)
+        receipts = [json.loads(p.read_text()) for p in (failed.run_dir / "handoff/receipts").glob("*.json")]
+        self.assertEqual({r["status"] for r in receipts}, {"attempt_started", "failed"})
+        self.assertTrue(all(r.get("execution_kind") == "openrouter_budgeted" for r in receipts))
 
     def test_shared_run_budget_max_calls_and_immutable_limits(self):
         first, second = self.provider("A", max_calls=1), self.provider("B", max_calls=1)
@@ -222,6 +243,75 @@ class BudgetedTests(unittest.TestCase):
         self.assertEqual(len(self.ledger()["entries"]), 3)
         self.assertEqual(self.ledger()["total_reserved_usd"], "0.018447")
         self.assertFalse(self.ledger()["halted"])
+
+    def test_five_dollar_ceiling_is_shared_across_concurrent_models_and_runs(self):
+        # A known $1 request fee makes the exact shared ceiling observable;
+        # cheaper actual billing must never release successful reservations.
+        rows = [{**ROW, "id": model, "pricing": {"prompt": "0", "completion": "0", "request": "1"}}
+                for model in (MODEL, "synthetic/second-text")]
+        barrier = threading.Barrier(8)
+        posted = []
+        lock = threading.Lock()
+        def post(url, headers, payload, timeout):
+            with lock:
+                posted.append(payload["model"])
+            time.sleep(.02)
+            return reply(cost="0.1")
+        def execute(index):
+            row = rows[index % 2]
+            provider = OpenRouterBudgetedProvider(self.root / str(index), row["id"], "5", 20, 1024,
+                self.root / "shared", caller=post, catalogue_get=lambda *args: {"data": [row]})
+            if index >= 2:
+                barrier.wait(timeout=5)
+            try:
+                self.ask(provider)
+                return True
+            except RuntimeError as exc:
+                self.assertIn("reservation", str(exc))
+                return False
+        results = [execute(0), execute(1)]
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            results += list(pool.map(execute, range(2, 10)))
+        ledger = self.ledger()
+        self.assertEqual(sum(results), 5)
+        self.assertEqual(len(posted), 5)
+        self.assertEqual(set(posted), {row["id"] for row in rows})
+        self.assertEqual(len(ledger["entries"]), 5)
+        self.assertEqual(ledger["total_reserved_usd"], "5")
+        self.assertEqual(ledger["total_reported_cost_usd"], "0.5")
+        self.assertFalse(ledger["halted"])
+
+    def test_new_ceiling_cannot_raise_existing_batch_or_run_caps(self):
+        first = self.provider()
+        self.ask(first)
+        batch = self.root / "shared/budget.json"
+        binding = first.run_dir / "handoff/budgeted_binding.json"
+        original_batch, original_binding = batch.read_bytes(), binding.read_bytes()
+        for run in (first.run_dir.name, "another_run"):
+            changed = self.provider(run, max_cost_usd="5", caller=Mock())
+            with self.subTest(run=run), self.assertRaisesRegex(RuntimeError, "immutable"):
+                self.ask(changed, node="new_case")
+            changed.caller.assert_not_called()
+            self.assertFalse(changed.catalogue_seen)
+        self.assertEqual(batch.read_bytes(), original_batch)
+        self.assertEqual(binding.read_bytes(), original_binding)
+
+    def test_five_dollar_batch_halts_all_new_models_on_unknown_cost(self):
+        data = reply()
+        data["usage"].pop("cost")
+        first = self.provider("first", max_cost_usd="5", caller=Mock(return_value=data))
+        with self.assertRaisesRegex(RuntimeError, "actual cost"):
+            self.ask(first)
+        second = OpenRouterBudgetedProvider(self.root / "second", "synthetic/second-text", "5", 40, 1024,
+            self.root / "shared", caller=Mock(), catalogue_get=Mock())
+        with self.assertRaisesRegex(RuntimeError, "halted"):
+            self.ask(second)
+        second.caller.assert_not_called()
+        second.catalogue_get.assert_not_called()
+        ledger = self.ledger()
+        self.assertEqual(len(ledger["entries"]), 1)
+        self.assertEqual(ledger["total_reserved_usd"], "0.006149")
+        self.assertIsNone(next(iter(ledger["entries"].values()))["cost"])
 
     def test_interruption_keeps_reservation_and_halts(self):
         provider = self.provider(caller=Mock(side_effect=KeyboardInterrupt()))

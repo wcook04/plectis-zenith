@@ -25,12 +25,22 @@ DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 MISSION_TARGETS = {"lab": "lab_integrity", "oracle": "oracle_cp2_emitter", "feeds": "global_calculator_feed", "refinement": "version_committer"}
 
 
-def load_graph(root: Path, graph_variant: dict | None = None):
+def _graph_loader(root: Path, graph_variant: dict | None = None):
     loader = PhysicalLoader(Path(root))
     if graph_variant is not None:
-        from variants.graph import FrozenGraphLoader
-        loader = FrozenGraphLoader(loader, graph_variant)
-    return loader.load_all_nodes()
+        if not isinstance(graph_variant, dict):
+            raise ValueError("graph variant must be an object")
+        from variants.predictor import SCHEMA, PredictorLoader
+        if graph_variant.get("schema_version") == SCHEMA:
+            loader = PredictorLoader(loader, graph_variant)
+        else:
+            from variants.graph import FrozenGraphLoader
+            loader = FrozenGraphLoader(loader, graph_variant)
+    return loader
+
+
+def load_graph(root: Path, graph_variant: dict | None = None):
+    return _graph_loader(root, graph_variant).load_all_nodes()
 
 
 def graph_for_manifest(root: Path, spec: dict):
@@ -179,8 +189,7 @@ class CompactContextEngine(GodModeEngine):
 def _engine(root: Path, run_dir: Path, spec: dict, *, resume: bool, provider=None):
     loader = None
     if spec.get("graph_variant") is not None:
-        from variants.graph import FrozenGraphLoader
-        loader = FrozenGraphLoader(PhysicalLoader(root), spec["graph_variant"])
+        loader = _graph_loader(root, spec["graph_variant"])
     engine_type = CompactContextEngine if spec.get("context_profile") == "compact_feeds" else GodModeEngine
     return engine_type(run_id=run_dir.name, root_dir=str(root), loader=loader,
                          run_mode=RunMode.RESUME if resume else RunMode.FRESH,
