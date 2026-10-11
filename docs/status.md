@@ -11,6 +11,7 @@ This records implementation evidence, not a claim that the system predicts marke
 - Tiny generated node skill cards refer to canonical implementations. Frozen policies tune short rules, incoming context weights and budgets. A real graph variant inserts an evidence-check node and feeds its result into CP1.
 - CP2 feedback admits validated forecasts, resolves exact dated truth and measures price errors. Default proposal gates require 20 issue times and recurring failures across three time buckets. Multiple assets or overlapping report windows do not become independent trials.
 - The experiment harness retains failed attempts, freezes the evaluator and support, and spends a single final assessment. Its probability adapter maps frozen forecasts. A separate cohort adapter freezes candidate graphs and common inputs, imports actual native CP2 runs, measures them through feedback, and exposes the next commands for an agent.
+- Cohort imports carry read-only mechanical observations of artifacts, handoffs, validation and bound context-policy receipts, including pre-CP2 failures. Unknown evidence stays unknown; diagnostics cannot change acceptance. Complete comparisons retain paired issue losses and target coverage, preserving equal issue weight and withholding all scores on incomplete support.
 - Development reflection preserves the complete feedback batch and its denominators, adds bounded verified node traces, and compiles one short skill, context-budget or edge-weight change through the native policy validator. A verified parent cohort can supply a candidate row for a new study, retaining model, provider and graph identity. Reflection itself does not execute or accept the candidate.
 - Lean models conditional skill composition/refinement, evidence availability and graph acyclicity. Python projects the actual graph; explicit Lean receipts distinguish compiled proofs from ordinary Python checks.
 - StockNet historical import and price-only baselines are executable. Source pins, protocol, row exclusions, splits, predictor packets and truth packets remain separately attributable.
@@ -62,6 +63,23 @@ Extraction, generated skills and the finite semantic checker also pass. These
 checks did not rerun Lean compilation or produce a new forecast. The temporary
 website implementation was removed at the operator's request.
 
+The diagnosis and paired-comparison pass subsequently passed **423 tests** in
+the standalone environment (199.98 seconds; ten existing dependency deprecation
+warnings). Negative cases cover absent versus malformed records, escaped paths,
+unbound handoff/validation evidence and inconsistent context receipts. Cohort
+cases cover additive observer failures, pre-CP2 attempts and equal issue
+weighting with unequal target counts. A new synthetic fixture initially lacked
+its second target's required evidence grounding; the native validator rejected
+it, and the fixture was corrected before this complete passing run.
+
+The accompanying review adds Trace/OptoPrime, DSPy MIPRO, Agent Lightning,
+evolution strategies and temporal/model-selection methods to the existing
+source decisions. Papers and selected code were inspected, with implementation
+pins and licensing evidence recorded where verified. No upstream optimizer,
+training stack or provider execution was added. Nested rolling assessment and
+lifetime history-exposure tracking are specified future work, not claimed
+runtime protections.
+
 ## Remaining evidence obligations
 
 | Work | Current boundary | Next evidence needed |
@@ -70,6 +88,8 @@ website implementation was removed at the operator's request.
 | Forecasting advantage | Historical baselines exist; no model advantage is established | Prospective or carefully qualified historical predictions, matched support, uncertainty analysis and a genuinely untouched assessment |
 | Automatic Evolve | Original reviewed runner retained; browser dispatch still separate | An agent/provider dispatch seam and batch-proposal consumer, with reviewed promotion kept explicit |
 | General architecture search | Current variants add nodes and reroute edges while retaining base ancestry | A separately specified ablation contract before removing baseline branches or changing acceptance outputs |
+| Selection across studies | Per-study chronology, embargo, candidate budget, complete support and final seal are enforced | Nested chronological selection manifests and lifetime history-exposure accounting; a renamed study must not present previously inspected dates as unseen |
+| Method novelty | Primary graph, textual optimization, neural-learning and evaluation sources are compared and pinned where code was inspected | One precise new mechanism and equal-budget comparisons against the closest methods; current distinctions do not establish novelty |
 | Context selection | Metadata compaction and explicit weighted excerpt budgets are available | Compare evidence-preserving context selection against the full snapshot on a frozen study |
 | Provider operation | Real OpenRouter receipts and a rate-limit halt are recorded; the first matched comparison is incomplete | Capacity-aware planning for a new frozen batch; keep failed attempts and unknown cost, and do not bypass the halted ledger. NVIDIA operation remains mock/metadata-only |
 | Candidate isolation | Candidate Python is trusted local code, not a security sandbox | External isolation if untrusted code or confidential heldout labels enter the experiment |

@@ -4,6 +4,13 @@ An agent-native research graph for making dated market predictions, measuring th
 
 Zenith extracts the existing Lab → Oracle → Evolve system into its own repository. Its 71 authored nodes, engine, typed contracts and provenance rules remain the execution authority. This checkout contains the backend, a read-only graph API and the contract for a separately built frontend.
 
+The learning model is **one prediction graph, evaluated over dated episodes,
+with changes between versions**. Lab executes the predictor, Oracle evaluates
+its frozen attempts, and Evolve proposes a successor. Current Lab remains the
+28-node baseline; a compact synthesis-and-forecast candidate is specified in
+the [learning design](docs/learning-design.md), pending an explicit ablation
+contract and measured comparison.
+
 ## Start here
 
 Use Python 3.11 or newer from an editable checkout; the validation environment uses Python 3.12. A pinned test environment is recorded in `requirements-test.lock`:
@@ -78,8 +85,12 @@ The [reflection commands](docs/experiments.md#from-measured-failures-to-one-nati
 connect those pieces: freeze a complete development feedback packet, let an agent
 propose one node parameter change, and compile it into a validated native policy
 with an exact diff and evidence hashes. Test that policy in a new frozen cohort.
-The design adapts specific ideas from [TextGrad, GEPA, AFlow and ADAS](docs/architecture-sources.md);
-it does not import their execution engines or claim their benchmark results.
+Every cohort import retains mechanical diagnostic observations, including
+rejected attempts. Complete comparisons retain paired per-issue losses and
+coverage; incomplete support cannot produce a favorable partial ranking.
+The [source comparison](docs/architecture-sources.md) covers textual graph
+optimization, neural learning and protection against selection overfitting.
+Source assimilation does not establish forecasting advantage or method novelty.
 
 ## Historical comparisons and formal semantics
 

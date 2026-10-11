@@ -278,6 +278,23 @@ def attach(study, *, candidate_id, issue_id, run):
                 receipt.update(state=item['state'], attachment=item)
         except (ValueError, OSError, KeyError, TypeError) as exc:
             receipt.update(state='error', error=f'{type(exc).__name__}: {exc}')
+        # Diagnosis observes the attempted run, including pre-CP2 failures. It is
+        # additive evidence, never an acceptance gate or an attachment mutation.
+        try:
+            from research.diagnosis import observe_run
+            observation = observe_run(run)
+            if not isinstance(observation, dict):
+                raise ValueError('diagnostic observation must be an object')
+            feedback.canonical(observation)  # Reject unserializable diagnostic values independently.
+            receipt['diagnostics'] = observation
+        except Exception as exc:
+            receipt['diagnostics'] = {
+                'schema': 'zenith_run_diagnosis_v1', 'status': 'unknown', 'run_path': str(run),
+                'manifest_ref': None, 'observations': [{
+                    'code': 'diagnostic_observer_unavailable',
+                    'details': f'{type(exc).__name__}: {exc}', 'verification': 'unknown'}],
+                'verification_boundary': 'Additive observation failed; cohort acceptance result is unchanged.',
+                'causal_claims': False}
         write_json(study / 'imports' / f'{number}.json', receipt)
     return receipt
 
@@ -287,11 +304,21 @@ def _compare(study, spec, state, phase):
     if not issues:
         raise ValueError('no preregistered issues for this phase')
     values, pending, fixture_flags = {}, [], set()
+    per_issue_scores, per_issue_coverage = {}, {}
     for candidate in spec['candidates']:
+        candidate_id = candidate['candidate_id']
+        per_issue_scores[candidate_id], per_issue_coverage[candidate_id] = {}, {}
         rows = []
         for issue in issues:
-            key = f"{candidate['candidate_id']}/{issue['issue_id']}"
+            issue_id = issue['issue_id']
+            key = f"{candidate_id}/{issue_id}"
             item = state['attachments'].get(key)
+            coverage = {'expected_target_count': len(issue['target_ids']),
+                        'expected_target_ids': sorted(issue['target_ids']),
+                        'forecast_target_count': len(item.get('forecasts', [])) if item else 0,
+                        'scored_target_count': 0, 'scored_target_ids': [],
+                        'missing_target_ids': sorted(issue['target_ids']), 'status': 'forecast_pending'}
+            per_issue_coverage[candidate_id][issue_id] = coverage
             if not item or item['state'] != 'complete':
                 pending.append(key)
                 continue
@@ -299,19 +326,36 @@ def _compare(study, spec, state, phase):
                 raise ValueError('accepted native run outputs changed')
             fixture_flags.add(item['synthetic_fixture'])
             result = feedback.score(study / item['measurement_store'], study / spec['truth_source'], spec['truth_as_of'])
-            if any(r['status'] != 'scored' for r in result['evaluations']):
+            scored = [r for r in result['evaluations'] if r['status'] == 'scored']
+            forecast_targets = {forecast['forecast_id']: forecast['target_id'] for forecast in item['forecasts']}
+            scored_ids = [forecast_targets[r['forecast_id']] for r in scored]
+            coverage.update(scored_target_count=len(scored), scored_target_ids=sorted(scored_ids),
+                            missing_target_ids=sorted(set(issue['target_ids']) - set(scored_ids)),
+                            status='truth_pending')
+            if (any(r['status'] != 'scored' for r in result['evaluations'])
+                    or len(scored) != len(issue['target_ids']) or set(scored_ids) != set(issue['target_ids'])):
                 pending.append(key + ':truth')
                 continue
             # Equal weight per issue, then per preregistered target within issue.
-            rows.append(sum(r['metrics']['target_price_relative_error'] for r in result['evaluations']) / len(result['evaluations']))
+            loss = sum(r['metrics']['target_price_relative_error'] for r in result['evaluations']) / len(result['evaluations'])
+            per_issue_scores[candidate_id][issue_id] = loss
+            coverage['status'] = 'complete'
+            rows.append(loss)
         if len(rows) == len(issues):
-            values[candidate['candidate_id']] = sum(rows) / len(rows)
+            values[candidate_id] = sum(rows) / len(rows)
     if pending:
-        return {'state': 'pending', 'pending_support': pending, 'scores': None, 'decision': None}
+        return {'state': 'pending', 'pending_support': pending, 'scores': None, 'decision': None,
+                'per_issue_scores': None, 'paired_issue_deltas': None, 'per_issue_coverage': per_issue_coverage}
     if len(fixture_flags) != 1:
         raise ValueError('synthetic and non-synthetic cohorts cannot be pooled')
     weeks = {event_time(i['time_anchor']).isocalendar()[:2] for i in issues}
     result = {'state': 'complete', 'phase': phase, 'scores': values, 'issue_count': len(issues),
+              'per_issue_scores': per_issue_scores,
+              'paired_issue_deltas': {candidate: {issue_id: loss - per_issue_scores['baseline'][issue_id]
+                                                 for issue_id, loss in scores.items()}
+                                      for candidate, scores in per_issue_scores.items()},
+              'paired_delta_interpretation': 'candidate minus baseline issue loss; negative favors candidate; descriptive, not uncertainty or causal attribution',
+              'per_issue_coverage': per_issue_coverage,
               'clustered_weeks': len(weeks), 'synthetic_fixture': fixture_flags == {True},
               'metric': 'mean_issue_mean_target_price_relative_error',
               'interpretation': 'CP2 target-price error; no return, significance, or LLM forecasting claim',

@@ -112,6 +112,25 @@ python -m research cohort-evaluate --study work/graph-study --final-key final-1
 
 Every preregistered candidate spends a trial slot before outputs are imported. Import errors, incomplete runs, and immutable successful-output hashes have separate durable receipts under `imports/`. Accepted runs are idempotent; their JSON output bytes cannot subsequently change. A pending manifest may accumulate results but cannot change its frozen identity. Native failures are errors; incomplete agent handoffs remain pending. Missing truth remains pending. A comparison with any missing issue, target, candidate, or observation returns no partial score: favorable subsets cannot win.
 
+Each import receipt also carries `diagnostics`, a read-only view produced by
+`research.diagnosis.observe_run`. It records witnessed native artifact,
+handoff, validation and context-policy states, including attempts that failed
+before CP2. Invalid or unbound diagnostic evidence remains unknown. This view
+does not change the import's acceptance result and does not assign causal blame.
+`attempt` counts imports, not all executions: a run never submitted to the
+cohort is outside this record.
+
+A complete comparison exposes `per_issue_scores[candidate][issue]` and
+`paired_issue_deltas[candidate][issue]`, alongside the aggregate `scores`.
+The delta is candidate loss minus baseline loss on that same issue; negative
+values favor the candidate. Each issue retains equal aggregate weight even
+when issues contain different numbers of targets. `per_issue_coverage` records
+expected, forecast and scored target counts, scored/missing target IDs and
+completion status. If any common support is missing, aggregate scores,
+per-issue scores and deltas are all null; coverage and `pending_support` remain
+available. These are descriptive comparisons, not confidence intervals or
+causal diagnoses.
+
 At least **20 distinct issue times** are required for a development candidate proposal. The number of calendar-week clusters is reported; that gate is not a significance test. Fixed loss improvement produces a proposal with `live_mutation_permission=false`. No dossier or skill is edited. For final evaluation, the best eligible development proposal is selected before opening heldout outcomes, and only it and the baseline are measured. The final key seals evaluation once, including when the result is pending, interrupted, or erroneous. Development comparisons and imports then close. Wait until heldout support is ready before deliberately spending that seal.
 
 An executable twenty-issue fixture generates the complete native manifest/CP2/provider grammar and runs the consumer:

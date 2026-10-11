@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from feedback.demo import fixture_policy, fixture_run
 from research import cohort
@@ -92,6 +93,12 @@ class CohortTests(unittest.TestCase):
         self.assertEqual(result['clustered_weeks'], 20)
         self.assertAlmostEqual(result['scores']['baseline'], 9 / 101)
         self.assertEqual(result['scores']['candidate'], 0.0)
+        self.assertEqual(set(result['per_issue_scores']['baseline']), {f'issue-{i}' for i in range(20)})
+        self.assertTrue(all(value == 0.0 for value in result['per_issue_scores']['candidate'].values()))
+        self.assertTrue(all(abs(value + 9 / 101) < 1e-12 for value in result['paired_issue_deltas']['candidate'].values()))
+        self.assertTrue(all(value == 0 for value in result['paired_issue_deltas']['baseline'].values()))
+        self.assertTrue(all(row['status'] == 'complete' and row['scored_target_count'] == row['expected_target_count'] == 1
+                            for row in result['per_issue_coverage']['candidate'].values()))
         self.assertEqual(result['decisions']['candidate'], 'candidate_proposal')
         self.assertFalse(result['live_mutation_permission'])
         self.assertTrue(result['synthetic_fixture'])
@@ -122,6 +129,10 @@ class CohortTests(unittest.TestCase):
         result = cohort.evaluate(self.study)
         self.assertEqual(result['state'], 'pending')
         self.assertIsNone(result['scores'])
+        self.assertIsNone(result['per_issue_scores'])
+        self.assertIsNone(result['paired_issue_deltas'])
+        self.assertEqual(result['per_issue_coverage']['candidate']['issue-1']['status'], 'forecast_pending')
+        self.assertEqual(result['per_issue_coverage']['baseline']['issue-0']['scored_target_count'], 1)
         self.assertIn('candidate/issue-1', result['pending_support'])
         run = self.run_fixture('candidate', 1)
         self.assertEqual(cohort.attach(self.study, candidate_id='candidate', issue_id='issue-1', run=run)['state'], 'complete')
@@ -134,6 +145,86 @@ class CohortTests(unittest.TestCase):
         result = cohort.evaluate(self.study)
         self.assertEqual(result['state'], 'pending')
         self.assertTrue(all(key.endswith(':truth') for key in result['pending_support']))
+        self.assertIsNone(result['per_issue_scores'])
+        self.assertIsNone(result['paired_issue_deltas'])
+        self.assertEqual(result['per_issue_coverage']['baseline']['issue-0']['scored_target_count'], 0)
+        self.assertEqual(result['per_issue_coverage']['baseline']['issue-0']['missing_target_ids'], ['XOM'])
+
+    def test_issue_scores_and_paired_deltas_preserve_equal_issue_weight_with_unequal_targets(self):
+        self.prepare(2)
+        raw = read_json(self.base / 'spec.json')
+        raw['issues'][0]['target_ids'].append('SPY')
+        feed_path = Path(raw['issues'][0]['feed_source']) / 'artifacts/global_stock_feed.json'
+        feed = read_json(feed_path)
+        feed['data']['rows'].append(['SPY', 100.0, raw['issues'][0]['time_anchor']])
+        write_json(feed_path, feed)
+        truth = read_json(self.base / 'truth.json')
+        truth['data']['rows'].append({'target_id': 'SPY', 'timestamp': raw['issues'][0]['target_time'], 'price': 200.0})
+        write_json(self.base / 'truth.json', truth)
+        write_json(self.base / 'multi-spec.json', raw)
+        self.study = self.base / 'multi-cohort'
+        cohort.freeze(self.base / 'multi-spec.json', self.study)
+        self.spec = read_json(self.study / 'cohort.json')
+        for candidate in ('baseline', 'candidate'):
+            run = self.run_fixture(candidate, 0)
+            cp2_path = run / 'artifacts/lab_director.json'
+            cp2 = read_json(cp2_path)
+            extra = dict(cp2['data']['predictions_t'][0], target_id='SPY',
+                         target_price=110.0 if candidate == 'baseline' else 200.0,
+                         invalidation='Synthetic SPY at or below baseline at the declared horizon.')
+            cp2['data']['predictions_t'].append(extra)
+            cp2['data']['evidence_dictionary'].append({
+                'ref_id': '[2]', 'ledger_id': 'S_00000002', 'subject': 'SPY',
+                'signal_summary': 'Synthetic fixture, not market evidence.'})
+            for field in ('epicentre_thesis', 'trade_rationale'):
+                cp2['data'][field] += ' [2] Synthetic SPY shares the declared fixture baseline.'
+            write_json(cp2_path, cp2)
+            self.assertEqual(cohort.attach(self.study, candidate_id=candidate, issue_id='issue-0', run=run)['state'], 'complete')
+            self.assertEqual(self.attach(candidate, 1, target=110.0 if candidate == 'baseline' else 105.0)['state'], 'complete')
+        result = cohort.evaluate(self.study)
+        issue_zero = (9 / 101 + 90 / 200) / 2
+        self.assertAlmostEqual(result['per_issue_scores']['baseline']['issue-0'], issue_zero)
+        self.assertAlmostEqual(result['scores']['baseline'], (issue_zero + 9 / 101) / 2)
+        self.assertAlmostEqual(result['scores']['candidate'], (0 + 4 / 101) / 2)
+        self.assertAlmostEqual(result['paired_issue_deltas']['candidate']['issue-0'], -issue_zero)
+        self.assertAlmostEqual(result['paired_issue_deltas']['candidate']['issue-1'], -5 / 101)
+        coverage = result['per_issue_coverage']['candidate']
+        self.assertEqual(coverage['issue-0']['expected_target_count'], 2)
+        self.assertEqual(coverage['issue-0']['scored_target_ids'], ['SPY', 'XOM'])
+        self.assertEqual(coverage['issue-1']['expected_target_count'], 1)
+        self.assertEqual(result['decisions']['candidate'], 'insufficient_issues')
+
+    def test_import_diagnostics_are_additive_for_complete_pending_and_errors(self):
+        self.prepare()
+        complete = self.attach()
+        self.assertEqual(complete['state'], 'complete')
+        self.assertEqual(complete['diagnostics']['schema'], 'zenith_run_diagnosis_v1')
+        self.assertFalse(complete['diagnostics']['causal_claims'])
+        attachment_before = read_json(self.study / 'cohort-state.json')['attachments']['baseline/issue-0']
+        pending = self.attach('candidate', pending=True)
+        self.assertEqual(pending['state'], 'pending')
+        self.assertIn('diagnostics', pending)
+        failed_run = self.run_fixture('candidate')
+        write_json(failed_run / 'artifacts/lab_seed_state.json', {'status': 'failure', 'metadata': {'error': 'upstream provider timeout'}})
+        failed = cohort.attach(self.study, candidate_id='candidate', issue_id='issue-0', run=failed_run)
+        self.assertEqual(failed['state'], 'error')
+        self.assertIn('native node failed', failed['error'])
+        self.assertIn('diagnostics', failed)
+        self.assertEqual(read_json(self.study / 'imports' / f"{failed['attempt']}.json"), failed)
+        self.assertEqual(read_json(self.study / 'cohort-state.json')['attachments']['baseline/issue-0'], attachment_before)
+
+    def test_observation_exception_cannot_mask_acceptance_or_original_error(self):
+        self.prepare()
+        with patch('research.diagnosis.observe_run', side_effect=RuntimeError('synthetic diagnostic defect')):
+            complete = self.attach()
+            self.assertEqual(complete['state'], 'complete')
+            self.assertEqual(complete['diagnostics']['status'], 'unknown')
+            self.assertEqual(complete['diagnostics']['observations'][0]['code'], 'diagnostic_observer_unavailable')
+            bad = cohort.attach(self.study, candidate_id='unknown', issue_id='issue-0', run=self.base / 'absent-run')
+            self.assertEqual(bad['state'], 'error')
+            self.assertIn('preregistered', bad['error'])
+            self.assertIn('synthetic diagnostic defect', bad['diagnostics']['observations'][0]['details'])
+        self.assertNotIn('diagnostics', read_json(self.study / 'cohort-state.json')['attachments']['baseline/issue-0'])
 
     def test_manifest_model_wronginput_horizon_and_receipts_refused_durably(self):
         self.prepare()

@@ -8,7 +8,10 @@
       "paper": "https://arxiv.org/abs/2410.10762v4",
       "license": "MIT",
       "license_sha256": "bce279a8f86499db0f9b1962884544108e4f81705d7c966ad59c66917b1131e5",
-      "inspected_paths": ["scripts/optimizer.py", "scripts/optimizer_utils/data_utils.py"],
+      "inspected_paths": [
+        "scripts/optimizer.py",
+        "scripts/optimizer_utils/data_utils.py"
+      ],
       "use": "pattern_transfer_to_native_reflection",
       "decision": "Parent-relative single changes and execution evidence; defer tree search and retain native temporal evaluation.",
       "scripts_executed": false
@@ -20,7 +23,10 @@
       "paper": "https://arxiv.org/abs/2408.08435v2",
       "license": "Apache-2.0",
       "license_sha256": "2591bb5c650dc96c48e4244d52c7bc179ff904e3129d65dcb9180bc726a4b3ad",
-      "inspected_paths": ["_gpqa/search.py", "_mgsm/search.py"],
+      "inspected_paths": [
+        "_gpqa/search.py",
+        "_mgsm/search.py"
+      ],
       "use": "pattern_transfer_to_native_reflection",
       "decision": "Separate proposer and executor, preserve parent evidence; do not replace native execution with arbitrary generated code or omit failed trials.",
       "scripts_executed": false
@@ -33,7 +39,12 @@
       "paper_version_read": "https://arxiv.org/abs/2406.07496v1",
       "license": "MIT",
       "license_sha256": "ed05ff64a2b47ecba690d8b6fe28d970de1f6e31b1c84daa229f21294ece9702",
-      "inspected_paths": ["textgrad/variable.py", "textgrad/autograd/llm_ops.py", "textgrad/optimizer/optimizer.py", "evaluation/prompt_optimization.py"],
+      "inspected_paths": [
+        "textgrad/variable.py",
+        "textgrad/autograd/llm_ops.py",
+        "textgrad/optimizer/optimizer.py",
+        "evaluation/prompt_optimization.py"
+      ],
       "use": "pattern_transfer_to_native_reflection",
       "decision": "Keep criticism attached to its measured context; defer backward traversal and textual optimizer integration.",
       "scripts_executed": false
@@ -45,7 +56,12 @@
       "paper_version_read": "https://arxiv.org/abs/2507.19457v2",
       "license": "MIT",
       "license_sha256": "10c47467a961feb40adf3294fe27dd9cba79d4d1b7cf27173b1c34586d4126c3",
-      "inspected_paths": ["src/gepa/core/adapter.py", "src/gepa/proposer/reflective_mutation/reflective_mutation.py", "src/gepa/core/engine.py", "src/gepa/strategies/batch_sampler.py"],
+      "inspected_paths": [
+        "src/gepa/core/adapter.py",
+        "src/gepa/proposer/reflective_mutation/reflective_mutation.py",
+        "src/gepa/core/engine.py",
+        "src/gepa/strategies/batch_sampler.py"
+      ],
       "use": "pattern_transfer_to_native_reflection",
       "decision": "Keep measured scores separate from component trajectory feedback; defer population, Pareto selection and minibatch acceptance until native proposals justify them.",
       "scripts_executed": false
@@ -76,6 +92,167 @@
       "license_sha256": "f372f582c99dc5b0e8dcf5ca5542183a735365468857ec6416af628490187cc1",
       "use": "teaching_and_architecture_reference_only",
       "scripts_executed": false
+    },
+    {
+      "name": "trace_optoprime",
+      "url": "https://github.com/microsoft/Trace",
+      "commit": "8190d032e43ffe18943a8cad9ea9ee99e43d6773",
+      "paper_version_read": "https://arxiv.org/abs/2406.16218v2",
+      "license": "MIT",
+      "license_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "inspected_paths": [
+        "opto/trace/propagators/graph_propagator.py",
+        "opto/optimizers/optoprime.py",
+        "opto/optimizers/optimizer.py",
+        "opto/trace/bundle.py",
+        "examples/bbh/run_prompt_bigbench_trace.py"
+      ],
+      "decision": "Closest prior art for execution-graph feedback and heterogeneous parameter proposals. Reuse proposal/report separation; defer unrestricted updates and full dynamic trace integration.",
+      "use": "primary_method_and_selected_code_review; no runtime dependency",
+      "scripts_executed": false
+    },
+    {
+      "name": "dspy_mipro",
+      "url": "https://github.com/stanfordnlp/dspy",
+      "commit": "f1260ff14610286cb295c7d3a5ee2cbfd0ba5cb9",
+      "paper_version_read": "https://arxiv.org/abs/2406.11695v2",
+      "license": "MIT",
+      "license_sha256": "fc84421fcf968a696680dacf66ad53db769f699f557690127c5ccb3f6358cfdb",
+      "inspected_paths": [
+        "dspy/teleprompt/mipro_optimizer_v2.py",
+        "dspy/propose/grounded_proposer.py",
+        "dspy/teleprompt/utils.py"
+      ],
+      "decision": "Grounded candidate bank and complete development comparison. Defer joint TPE, demonstrations and minibatch optimization. MIPRO paper and current MIPROv2 code are distinct versions.",
+      "use": "primary_method_and_selected_code_review; no runtime dependency",
+      "scripts_executed": false
+    },
+    {
+      "name": "evolution_strategies",
+      "url": "https://github.com/openai/evolution-strategies-starter",
+      "commit": "951f19986921135739633fb23e55b2075f66c2e6",
+      "paper_version_read": "https://arxiv.org/abs/1703.03864v2",
+      "license": "MIT",
+      "license_sha256": "ecd4a4aacc4512a31bbdc3252ffc014d37ac7ef56ed34bc2a5d0f6337df6daa5",
+      "inspected_paths": [
+        "es_distributed/es.py"
+      ],
+      "decision": "Mirrored numeric perturbations inform controlled experiments. Defer optimizer and distributed stack; no derivative through opaque model calls or causal attribution.",
+      "use": "primary_method_and_selected_code_review; no runtime dependency",
+      "scripts_executed": false
+    },
+    {
+      "name": "agent_lightning",
+      "url": "https://github.com/microsoft/agent-lightning",
+      "commit": "69f5a40b36d9bff646b8e7a5532e8b78bd41eaf9",
+      "paper_version_read": "https://arxiv.org/abs/2508.03680v1",
+      "paper_source_sha256": "ee5df9062e497dde0ef5cdfe3b9cb0b1e27366142dc50a4865fa9a07f6e24e26",
+      "license": "MIT",
+      "license_sha256": "8f71659370c5268d9a1dc962a46232540e8fca63462586d8efaa95aab492a208",
+      "inspected_paths": [
+        "agentlightning/verl/rollout_level_advantage.py",
+        "agentlightning/verl/per_rollout_loss.py"
+      ],
+      "paper_sections_read": [
+        "Unified Data Interface",
+        "Markov Decision Process in Agents",
+        "LightningRL",
+        "Results",
+        "Discussion and Future Work"
+      ],
+      "decision": "Keep execution/training separation. Original paper assigns uniform episode return; inspected later code broadcasts rollout advantage. These are update signals, not causal diagnosis. No neural training integrated; paper and current code versions differ.",
+      "use": "primary_method_and_selected_code_review; no runtime dependency",
+      "scripts_executed": false
+    },
+    {
+      "name": "graph_of_thoughts",
+      "url": "https://github.com/spcl/graph-of-thoughts",
+      "commit": null,
+      "paper": "https://ojs.aaai.org/index.php/AAAI/article/view/29720",
+      "paper_version_read": "AAAI 2024, 38(16), 17682-17690",
+      "inspected_paths": [
+        "README.md"
+      ],
+      "paper_sections_read": [
+        "2 The GoT Framework",
+        "3 System Architecture and Extensibility"
+      ],
+      "decision": "Prior art for graph operations, reasoning state, aggregation and scoring. No upstream runtime integrated.",
+      "use": "primary_method_and_selected_code_review; no runtime dependency",
+      "scripts_executed": false,
+      "license": null,
+      "license_sha256": null,
+      "license_status": "not verified; no source redistribution"
+    },
+    {
+      "name": "nested_model_selection",
+      "url": "https://github.com/scikit-learn/scikit-learn",
+      "commit": "102e5daf66759cf896beeee229d1bf7c80ab2ba4",
+      "paper": "https://www.jmlr.org/papers/volume11/cawley10a/cawley10a.pdf",
+      "paper_sections_read": [
+        "5.1",
+        "5.2"
+      ],
+      "inspected_paths": [
+        "examples/model_selection/plot_nested_cross_validation_iris.py"
+      ],
+      "decision": "Evaluate the whole proposal/selection procedure in outer chronological windows. Do not copy shuffled benchmark folds. Rolling coordinator remains planned.",
+      "use": "primary_method_and_selected_code_review; no runtime dependency",
+      "scripts_executed": false,
+      "license": null,
+      "license_sha256": null,
+      "license_status": "not verified; no source redistribution"
+    },
+    {
+      "name": "timeseriescv",
+      "url": "https://github.com/sam31415/timeseriescv",
+      "commit": "cb04fb6ea7a0b2c15920ca253f882336fe336ba8",
+      "inspected_paths": [
+        "timeseriescv/cross_validation.py"
+      ],
+      "decision": "Explicit prediction and evaluation times, purge and embargo. Reuse native chronology; strict endpoint exclusion differs from native equality allowance. No library imported.",
+      "use": "primary_method_and_selected_code_review; no runtime dependency",
+      "scripts_executed": false,
+      "license": null,
+      "license_sha256": null,
+      "license_status": "not verified; no source redistribution"
+    },
+    {
+      "name": "deflated_sharpe_reference",
+      "url": "https://github.com/rubenbriones/Probabilistic-Sharpe-Ratio",
+      "commit": "7c65ea513df575a93a3a474b6e3c2a0a9e724607",
+      "paper": "https://www.davidhbailey.com/dhbpapers/deflated-sharpe.pdf",
+      "paper_version_read": "Working paper 2014-07-31",
+      "paper_sections_read": [
+        "Deflated Sharpe Ratio",
+        "Appendix 3"
+      ],
+      "inspected_paths": [
+        "src/sharpe_ratio_stats.py",
+        "tests/test_sharpe_ratio_stats.py"
+      ],
+      "decision": "Retain all trials and cross-study exposure. Defer Sharpe-specific correction; current objective is price error. Reference implementation is not represented as author-maintained code.",
+      "use": "primary_method_and_selected_code_review; no runtime dependency",
+      "scripts_executed": false,
+      "license": null,
+      "license_sha256": null,
+      "license_status": "not verified; no source redistribution"
+    },
+    {
+      "name": "adaptive_holdout",
+      "url": "https://arxiv.org/abs/1506.02629v2",
+      "commit": null,
+      "paper_version_read": "https://arxiv.org/abs/1506.02629v2",
+      "paper_sections_read": [
+        "4.1 Thresholdout",
+        "Figure 1"
+      ],
+      "decision": "Retire exposed final periods and track history exposure. No Thresholdout implementation; IID/restricted-query assumptions do not automatically hold for dependent market labels.",
+      "use": "primary_method_and_selected_code_review; no runtime dependency",
+      "scripts_executed": false,
+      "license": null,
+      "license_sha256": null,
+      "license_status": "not verified; no source redistribution"
     }
   ]
 }

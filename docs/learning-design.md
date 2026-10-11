@@ -78,6 +78,8 @@ It supports nondeterministic model operations as well as deterministic checks.
 Composition and refinement can establish conditional contract properties;
 forward-safe context composition excludes declared future/truth inputs; rank
 certificates establish acyclicity. Those are useful structural guarantees.
+Safety applies to the records' declared availability and context classes; it
+does not authenticate source clocks, prove completeness or enforce model obedience.
 Empirical accuracy, useful output and causal fault attribution remain separate.
 An empty relation is a refinement too, so refinement alone cannot mean
 improvement. [The semantics](semantics.md) give the exact proved boundaries.
@@ -103,14 +105,28 @@ acquire it; did the graph route it; and did the node's prompt retain it? The
 first two need source/acquisition evidence. The latter two use graph and context
 receipts. A trace showing retained text cannot prove the model understood it.
 
-The narrow implementation seam is the existing cohort import receipt, not a
-new experiment registry. The cohort already records rejected imports and
-requires complete matched support. A diagnostic projection can join its
-candidate/issue identity, native run state, node validation, context receipts
-and available feedback result. It must distinguish an execution attempt from
-an import attempt: a run never submitted to the cohort is not silently counted
-as an observed execution. Feedback itself admits successful CP2 forecasts and
-must not be stretched into a ledger of all prior failures.
+Keep three records distinct: **acquired source → admitted snapshot → delivered
+node context**. `zenith.context.compact_feeds` removes repeated metadata while
+preserving feed data. The older `system.lib.feed_compression` can omit middle
+price rows, and the reasoning policy can excerpt or omit an incoming edge.
+Their selection receipts describe different operations. A historical source
+acquired after A can support a qualified replay; it does not prove the system
+possessed that information at A. Unknown source clocks remain unknown.
+
+The implementation uses the existing cohort import receipt. Every import,
+including a rejected or pre-CP2 attempt, receives a read-only diagnostic view
+of the run's recorded artifacts and verified context-policy receipts. Unverified
+evidence stays unknown. Diagnostics cannot admit a run or alter its acceptance
+result. The receipt counts an **import attempt**: a run never submitted to the
+cohort is not silently counted as an observed execution. Feedback itself admits
+successful CP2 forecasts and remains the authority for subsequent measurement.
+
+Complete comparisons retain per-issue losses, target coverage and paired
+candidate-minus-baseline deltas; negative deltas favor the candidate. Each issue
+has equal weight after averaging its declared targets. If any required support
+is incomplete, score and delta maps are null and coverage remains visible.
+These descriptive differences do not supply uncertainty estimates or causal
+attribution. See [the receipt contract](experiments.md#compare-actual-graph-candidates).
 
 Start diagnosis with those factual states. For a data-access hypothesis, restore
 one recorded input or context allocation. For a reasoning hypothesis, change
@@ -122,7 +138,7 @@ snapshot per issue and must not silently substitute another one.
 
 ## Forward evaluation and loss
 
-For an issue time `t`, freeze the evidence available by `t`, execute `G` with `θ`, and retain forecasts for each declared horizon. Resolve each forecast only when its exact target observation matures. Missing evidence or invalid output is a coverage/validity failure; it must not disappear to make average error look better.
+For an issue time `t`, freeze the evidence available by `t`, execute `G` with `θ`, and retain forecasts for each declared horizon. Resolve each forecast only when its exact target observation matures. Missing required prediction/measurement support or invalid output is a coverage/validity failure; it must not disappear to make average error look better. An absent auxiliary feed remains a recorded input condition; a forecast with valid price support can still be scored.
 
 The input is a collection of feeds, not just a price series. A historical snapshot must identify each feed's source revision, observation time, first availability time, units and missing fields. Price bars, published text, filings and macro releases have different clocks. A financial period end is not the date its filing became available; a current fundamental value cached under an old date is not historical evidence. Preserve unknown availability rather than inventing a timestamp. Extra modalities earn admission through their provenance, not their count.
 
@@ -140,7 +156,15 @@ Use cheap deterministic checks before spending inference calls. Reject an invali
 
 ## Backward diagnosis, then a controlled intervention
 
-Accumulate failures from a fixed graph and model configuration. Group them by observed failure: stale evidence, missing context, unsupported conclusion, inconsistent units/basis, overconfidence, wrong direction, or large price error. Preserve successes and the full denominator. The feedback implementation starts proposing work only after at least 20 distinct issue times and repeated failures across three time buckets; this is an operational gate, not a significance test.
+Accumulate outcomes from a fixed graph and model configuration. The current
+measured error classes are direction miss, worse than no change and relative
+price error. Keep recorded input/contract defects, such as omitted context or
+inconsistent basis, separate from hypotheses such as unsupported reasoning or
+overconfidence. Preserve successes and the full denominator. The feedback
+implementation starts proposing work only after at least 20 distinct issue
+times and repeated failures across three time buckets; this is an operational
+gate, not a significance test. A single episode can be inspected immediately;
+inspection does not waive that proposal gate.
 
 A downstream error selects upstream traces to inspect. It does not assign causal blame to every ancestor. To test an explanation, change one bounded component and rerun the same subject-side snapshots. Examples are a shorter rule that requires a dated price source, more context allocated to the relevant evidence edge, a new unit-check node, or an additional connection supplying a missing intermediate result. The candidate's forecast must be generated again; changing a provenance label on an old forecast is not an experiment.
 
@@ -153,6 +177,77 @@ Freeze data, split membership, evaluator, model configuration, resource budget a
 Choose candidates using development evidence. Preserve the final assessment for the frozen selection, then retire that assessment from future tuning. A new rolling period can supply new evidence; repeatedly inspecting the same heldout period cannot. Overlapping horizons and multiple stocks on one date are correlated observations. The current descriptive scores do not provide uncertainty estimates or causal attribution.
 
 Cost and simplicity matter, but their acceptance rules must also be set in advance: calls, tokens, elapsed time, node/edge count and rule length belong beside accuracy. Structural validity is checked separately from empirical usefulness. Lean proves conditional composition and rank-based acyclicity; it does not select the most accurate graph.
+
+## Learn the update procedure without fitting the historical test
+
+The candidate generator is part of what must be evaluated. Repeatedly selecting
+the best graph on a development period can fit that period even when each
+individual run is temporally valid. Renaming the study does not restore unseen
+data. A nested chronological protocol should work as follows:
+
+1. On an inner historical window, identify recurring failures and propose a
+   fixed, bounded number of changes. Compare candidates on later inner
+   validation windows using identical evidence, model and target support.
+2. Freeze the entire selection procedure, selected candidate and resource
+   budget before a later outer window. Record every tried candidate, inspected
+   date and exposed outcome across studies, including unsuccessful proposals.
+3. Ensure development labels have matured before the outer prediction window;
+   exclude overlapping label intervals and apply a declared temporal gap.
+   Group correlated observations by issue time, not individual stock rows.
+4. Evaluate the selected graph and unchanged baseline on the outer window.
+   Once inspected, that window belongs to future development history. Finish
+   with a fresh prospective period that has not influenced selection.
+
+The native cohort already checks development target times plus `embargo_days`
+against the first heldout issue time, prevents a calendar week crossing splits,
+freezes candidate budgets and consumes a final-assessment seal. Nested rolling
+coordination and cross-study exposure accounting are **not yet implemented**.
+They should extend those owners rather than introduce another evaluator.
+The current boundary permits equality after the configured embargo. A future
+rolling protocol must declare whether a label finalized exactly at the next
+issue time is already available; timestamps alone do not resolve publication
+or acquisition ordering. Strict interval exclusion is the conservative option.
+
+Repeat an unchanged baseline to estimate model-response variation before
+interpreting small improvements. Retain the new paired issue deltas so a later
+uncertainty analysis can respect temporal dependence. Neither a count of 20
+issues nor a positive mean difference establishes statistical confidence.
+Deflated Sharpe measures address a trading-return statistic; they must not be
+applied unchanged to this forecast-error objective. Reusable-holdout methods
+also depend on assumptions that overlapping, serially dependent market labels
+do not automatically satisfy. Historical contamination of model training data
+remains a separate limit even after input timestamps are correct.
+
+## What transfers from neural-network learning
+
+The useful analogy is parameterized composition: typed node operations, a
+forward execution, stored intermediate values, an external loss and an update
+tested on separate data. Reuse the existing skill contracts and traces for
+those parts. An intermediate validator supplies a local correctness signal;
+its score must not quietly replace the final forecasting objective.
+
+For now, optimize short skill rules and context allocations with bounded,
+single-component proposals. Small changes make comparisons easier to interpret
+and keep the candidate space constrained; they do not eliminate interactions
+or overfitting. Freeze the simplicity rule in advance, such as preferring lower
+call cost among candidates meeting a declared accuracy and coverage threshold.
+If evidence suggests two changes only work together, predeclare a small
+baseline/A/B/A+B comparison on the same support. That tests an interaction
+without immediately adopting unrestricted joint search; one-field greedy
+updates have no general optimality guarantee.
+
+Textual criticism proposes a search direction. It is not a derivative. Numeric
+finite differences or evolution strategies estimate sensitivity through actual
+perturbed executions and need repeated measurements when responses are noisy.
+Policy-gradient training additionally needs a trainable policy and suitable
+probability/training access; ordinary hosted model calls do not provide that
+interface. These are possible future update methods, not installed optimizers.
+
+The [source comparison](architecture-sources.md) records which mechanisms
+already exist elsewhere and what this implementation actually reuses. The
+research question is whether verified temporal evidence and targeted graph
+interventions improve later prediction at a fixed resource budget. Graph-shaped
+reasoning, textual updates and scored candidate search themselves are prior art.
 
 ## The smallest executable learning step
 
@@ -196,6 +291,7 @@ what was read, adopted, deferred and actually executed.
 | Admit price forecasts, resolve exact truth, aggregate failures | `feedback/engine.py` |
 | Reserve bounded trials and seal a final probability-mapping assessment | `research/engine.py` |
 | Compare completed native graph runs on frozen multi-feed snapshots | `research/cohort.py` |
+| Observe submitted attempts and retain paired issue losses without causal blame | `research/diagnosis.py` and `research/cohort.py` |
 | Bind development failures and compile one native policy intervention | `research/reflection.py` |
 | Reproduce dated price-only baselines and export predictor/truth packets | `benchmarks/stocknet.py` |
 | Check declared semantics and finite graph certificates | `formal/ZenithSemantics.lean` and `scripts/check_semantics.py` |
