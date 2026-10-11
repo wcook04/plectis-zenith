@@ -4,6 +4,12 @@ Zenith is a standalone extraction of the existing market research system. The au
 
 ## The research cycle
 
+The current design direction is **one trainable forward graph** with a dated
+evaluation and revision loop. [Learning design](learning-design.md) defines the
+evidence, target, skill and failure-diagnosis contracts. The table below records
+the retained implementation; it does not require every future experiment to
+execute all three historical Lab/Oracle/Evolve reasoning pipelines.
+
 | Stage | Existing owner | Responsibility |
 |---|---|---|
 | Feeds | `codex/substrate/nodes/feeds` | Stock, ETF, macro, news, Polymarket, Stockgrid and Calculator envelopes |
@@ -13,6 +19,13 @@ Zenith is a standalone extraction of the existing market research system. The au
 | Surveillance | `codex/substrate/nodes/surveillance` | Retained authored monitoring family; requires separate execution configuration |
 
 The current graph contains 71 nodes. Lab scope contains 28 nodes in 11 waves including its seven feeds; Oracle scope contains 31 nodes in seven waves. Selecting a target includes all siblings in its mission and upstream dependencies. `lab_integrity` therefore runs after `lab_director`; a target is not an ancestor-only subgraph request.
+
+Those nodes already share one physical registry and executor. Oracle loads
+frozen subject artifacts by run reference; the learning transition consumes
+feedback across graph versions. These temporal handoffs are not ordinary edges
+that may be connected back into an earlier forward run. The compact proposed
+predictor is a replacement experiment, not the existing 71-node graph with a
+new label.
 
 Actual Lab ordering is feed evidence → seed → seven first-pass miners → cross-correlation → orientation → CP1 → seven second-pass miners → cross-correlation → CP2 → integrity. Some historical doctrine sketches put orientation before miners. Runtime dependencies win over those sketches.
 

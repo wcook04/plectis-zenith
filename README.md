@@ -2,7 +2,7 @@
 
 An agent-native research graph for making dated market predictions, measuring their errors, and testing changes to how the graph reasons.
 
-Zenith extracts the existing Lab → Oracle → Evolve system into its own repository. Its 71 authored nodes, engine, typed contracts and provenance rules remain the execution authority. The previous website has been removed. This checkout contains the research system itself.
+Zenith extracts the existing Lab → Oracle → Evolve system into its own repository. Its 71 authored nodes, engine, typed contracts and provenance rules remain the execution authority. This checkout contains the backend, a read-only graph API and the contract for a separately built frontend.
 
 ## Start here
 
@@ -19,6 +19,26 @@ python -m pytest tests
 ```
 
 No model or market-data credentials are needed for inspection, planning or the offline tests. For a pinned Python 3.12 setup, install `requirements-test.lock` before the editable package. `.[feeds]` adds optional acquisition dependencies. The runtime resolves contracts and assets from this checkout; a standalone wheel is not yet a verified distribution format.
+
+## Frontend integration
+
+Serve the native graph's reviewed metadata locally:
+
+```sh
+python -m zenith serve --allow-origin http://localhost:5173
+curl http://127.0.0.1:8765/api/v1/graph
+curl http://127.0.0.1:8765/api/v1/openapi.json
+```
+
+The API exposes graph, mission and node views, including real dependency edges
+and wave order. It takes a source snapshot at startup and never invokes a model
+or opens private run data. The optional origin flag lets an independently built
+frontend read it. [API documentation](docs/backend-api.md) and the
+[frontend handoff](docs/frontend-handoff.md) describe the exact contract.
+
+The same projection is available in [public-graph.json](data/graph/public-graph.json).
+Run `python scripts/build_demo_data.py --check` to verify its source freshness.
+There is no bundled frontend or website deployment.
 
 ## Execute the actual graph
 
@@ -88,3 +108,9 @@ Lean is pinned under `formal/`; the last command requires that toolchain. [Sourc
 [Current validation and remaining work](docs/status.md) distinguish synthetic execution checks, historical measurements and live collection. This is a local research repository. Credentials, collected provider data and runtime artifacts stay outside Git. The internal workstation collector continues to own market-open/close scheduling; this checkout does not silently install another daemon.
 
 There is no public deployment or demonstrated forecasting advantage. Read the existing [research and release boundary](docs/research-boundary.md) before preparing a public product; data reuse rights and the actual product behavior require review separately from software licenses.
+
+The source is licensed under [Apache-2.0](LICENSE), with separate imported-source
+and dataset notices in [NOTICE](NOTICE). See [reproduction](docs/reproducing.md),
+[contribution](CONTRIBUTING.md), [security reporting](SECURITY.md) and
+[citation metadata](CITATION.cff). CI checks the native graph, projection,
+semantics, offline suite and included historical fixture from a source install.

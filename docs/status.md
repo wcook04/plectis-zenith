@@ -4,6 +4,8 @@ This records implementation evidence, not a claim that the system predicts marke
 
 ## Implemented
 
+- A standalone read-only graph API exposes the reviewed native topology, mission closures and node neighborhoods through versioned JSON and OpenAPI. It serves no frontend, private run state or execution endpoints. The frontend contract is in [frontend-handoff.md](frontend-handoff.md).
+- Source distribution includes Apache-2.0 licensing, retained-source and dataset notices, contribution/security/citation files, pinned offline CI and a clean-checkout reproduction guide. The positive-allowlist graph projection has its own backend owner and freshness check.
 - The actual 71-node engine and contracts load independently of the internal kernel. Base Lab includes 28 nodes in 11 waves; Oracle includes 31 in seven waves.
 - Agent packets, captured responses and provider adapters return through native validation, repair and resume. Frozen runs bind source, input, graph and policy hashes.
 - Tiny generated node skill cards refer to canonical implementations. Frozen policies tune short rules, incoming context weights and budgets. A real graph variant inserts an evidence-check node and feeds its result into CP1.
@@ -52,6 +54,14 @@ membership, bounded trace integrity, one-parameter policies and consumption of
 the candidate row by a fresh native cohort. These are software and synthetic
 contract checks; no additional provider call or live learning result occurred.
 
+The subsequent standalone backend pass passed **399 tests**: the original suite,
+six public-projection checks and 23 API cases. The API tests validate real HTTP
+responses against the OpenAPI contract, exact native mission scopes, private
+field exclusion, conditional requests, origin permissions and write rejection.
+Extraction, generated skills and the finite semantic checker also pass. These
+checks did not rerun Lean compilation or produce a new forecast. The temporary
+website implementation was removed at the operator's request.
+
 ## Remaining evidence obligations
 
 | Work | Current boundary | Next evidence needed |
@@ -63,6 +73,7 @@ contract checks; no additional provider call or live learning result occurred.
 | Context selection | Metadata compaction and explicit weighted excerpt budgets are available | Compare evidence-preserving context selection against the full snapshot on a frozen study |
 | Provider operation | Real OpenRouter receipts and a rate-limit halt are recorded; the first matched comparison is incomplete | Capacity-aware planning for a new frozen batch; keep failed attempts and unknown cost, and do not bypass the halted ledger. NVIDIA operation remains mock/metadata-only |
 | Candidate isolation | Candidate Python is trusted local code, not a security sandbox | External isolation if untrusted code or confidential heldout labels enter the experiment |
-| Distribution | Editable checkout is the tested layout | Clean installation/reproduction on another machine; source/data license review before publication |
+| Distribution | An isolated tracked-source checkout installed and passed the original 370-test suite on the same host; source/retained-skill/UCI notices are included | Independent-machine reproduction and destination-specific publication review; wheel portability is not verified |
+| Frontend | Backend graph API and integration contract are ready; the requested website implementation was removed | Claude owns the separate frontend; no UI or public deployment is bundled |
 
 The internal workstation collector owns daily market-open/close scheduling. It runs while the laptop is awake and logged in, with exchange holidays, early closes and daylight saving handled by the calendar. The standalone repository does not install a duplicate service. A future standalone scheduler must preserve the same timestamp and missed-capture rules.

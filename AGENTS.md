@@ -2,6 +2,10 @@
 
 Read README.md, docs/architecture.md and program.md. The executable node JSON, loader, engine and schema validators own behavior. Inspect the graph before changing it. Preserve dependencies, mission sibling scope, contract injection, temporal rules and artifact provenance.
 
+For graph learning or diagnosis, read docs/learning-design.md: one trainable forward graph, dated evaluation, and reviewed transitions between versions. Distinguish mechanical facts from causal hypotheses. The current 28-node Lab is the baseline; a smaller replacement graph needs an explicit ablation contract, not a display-only simplification.
+
+Public metadata uses zenith/public_graph.py and the read-only API in zenith/api.py. Follow docs/backend-api.md and docs/frontend-handoff.md. Never replace the allowlisted projection with hydrated CLI inspection or private run state; regenerate data/graph/public-graph.json through scripts/build_demo_data.py.
+
 Use the standalone CLI from this checkout. Inspect and plan without provider calls; use an explicit provider for execution. Agent packets must go through the native import/validation path. Do not fabricate completed artifacts or call browser providers as an incidental consequence of inspection.
 
 Research work uses the frozen specification and complete trial ledger in `research/`. Change one declared variable per trial; keep the evaluator and data fixed. Failed and rejected trials count. Development selection and final holdout assessment are separate. Never automatically alter live dossiers, prompts or providers from a favorable score.

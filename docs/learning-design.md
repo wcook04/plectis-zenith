@@ -1,6 +1,124 @@
 # Learning a reasoning graph
 
-The optimization object is `(G, θ)`: a typed directed acyclic graph `G`, and per-node parameters `θ`. A node's parameters include a short skill rule, incoming-context weights, context budget and model choice. Its output contract and evidence cutoff constrain what the operation may do. This is a trainable computational graph; language-model calls do not supply the derivatives that ordinary neural-network backpropagation requires.
+## One predictor, one experiment, successive versions
+
+The design direction is one trainable prediction graph `G`, evaluated on dated
+episodes. Lab names its forward execution. Oracle names evaluation and diagnosis
+of a frozen attempt. Evolve names a proposed transition from one graph version to
+the next. These roles do not require three independently designed prediction
+systems or three model-driven DAGs. The existing Oracle and refinement runners
+remain implementations we can reuse selectively, not mandatory complexity for
+every experiment.
+
+At time A, freeze the evidence that was available, the target definition and
+the graph's parameters. Execute the graph and retain its intermediate artifacts
+and forecast. At time B, obtain the exact target observation, score the frozen
+forecast and inspect the recorded trace. A proposed change produces a new
+version for a new controlled run. It cannot change the inputs or prediction of
+the old episode.
+
+```text
+recorded feeds at A
+       │
+       ▼
+dated evidence admission and join
+       │
+       ▼
+G_k: synthesis skill → forecasting skill → validate and freeze
+                                             │
+                                             ▼
+target observation at B ───────────────────► score
+                                             │
+frozen intermediate artifacts ────────────► diagnose
+                                             │
+                                             ▼
+                                    propose one change
+                                             │
+                                             ▼
+                                    test G_(k+1)
+```
+
+This is the proposed compact shape, not a claim that the current Lab has two
+model calls. Current Lab executes 28 nodes, including seven feed/calculation
+nodes and two passes of reasoning. The two-skill candidate should reuse CP1
+thesis/synthesis and CP2 forecasting contracts, with their deterministic
+validators. Feed adapters keep their own dependency structure. In particular,
+the existing `lab_seed_state` is a reasoning node; relabeling it as deterministic
+data admission would be wrong.
+
+The current variant contract retains every base node and its mandatory ancestry;
+mission selection also includes siblings. Hiding branches, reducing an edge
+weight or drawing five boxes does not reduce executed calls. Testing a genuinely
+smaller graph requires an explicit replacement/ablation contract that preserves
+the evidence cutoff, target support, CP2 interface, provenance and evaluator,
+while permitting removal of internal reasoning branches. The existing graph is
+the baseline until that experiment is implemented and assessed.
+
+The optimization object is `(G, θ)`: a typed directed acyclic graph `G`, and per-node parameters `θ`. A node's parameters include a short skill rule, incoming-context weights, context budget and model choice. Its output contract and evidence cutoff constrain what the operation may do. Language-model calls do not supply the local derivatives that ordinary neural-network backpropagation requires. The current native context budget measures serialized source **characters**, not tokens.
+
+## What the data and skills mean
+
+Do not make every feed share the same raw payload. A price row, news article and
+filing can share an evidence envelope while retaining different content types.
+The envelope needs source identity and revision, observation/event time, first
+availability, acquisition time, units/basis where applicable, missingness and
+content hashes. Admission at A checks the clocks and retains exclusions. An
+earlier event date does not make a later-published article available at A.
+
+The target is a declared projection of later data: for example, a particular
+asset's price at one exact horizon with a fixed currency and adjustment basis.
+It is not an unspecified instruction to predict every field in every later
+feed. Freeze that target before execution. The no-change baseline uses the
+same subject quote and target convention as the graph.
+
+Each skill has typed inputs, an output contract, parameters and a recorded
+application to particular evidence. Reuse the existing Lean model
+`Skill Parameters Input Output = Parameters → Input → Output → Prop`.
+It supports nondeterministic model operations as well as deterministic checks.
+Composition and refinement can establish conditional contract properties;
+forward-safe context composition excludes declared future/truth inputs; rank
+certificates establish acyclicity. Those are useful structural guarantees.
+Empirical accuracy, useful output and causal fault attribution remain separate.
+An empty relation is a refinement too, so refinement alone cannot mean
+improvement. [The semantics](semantics.md) give the exact proved boundaries.
+
+## Diagnose facts before assigning causes
+
+One bad final prediction cannot uniquely identify the upstream cause. Keep an
+observed outcome, a mechanically witnessed fact and a causal hypothesis as
+separate fields. Preserve `unknown` when the evidence cannot choose among them.
+
+| Evidence | Mechanical conclusion | What it does not establish |
+| --- | --- | --- |
+| Exact target observation is missing or has the wrong basis/time | Measurement is pending or has a data gap | That the prediction or reasoning was wrong |
+| A required artifact is absent, failed or too late at A | A particular admission/execution condition failed | That acquiring another source would improve the forecast |
+| A context-policy receipt marks an input absent, omitted or excerpted | The recorded node received missing or reduced source context under that policy | Whether the omitted content was necessary, or whether the model used retained content |
+| Native response validation rejected a bound response | That response failed the declared acceptance contract | A general reasoning failure, or the cause of a later forecast miss |
+| An accepted forecast differs from exact later truth | A measured error under the frozen scoring rule | Which ancestor caused it, or whether the outcome was predictable from A |
+| A reproducible intermediate calculation violates a checked rule | A localized, witnessed contract/calculation defect | That fixing it improves forecasts on unseen episodes |
+| A controlled replacement improves repeated matched runs | Evidence for that intervention on the measured support | Universal node blame, a mathematical gradient, or generalization beyond the assessment |
+
+Separate four data questions: did the information exist by A; did the system
+acquire it; did the graph route it; and did the node's prompt retain it? The
+first two need source/acquisition evidence. The latter two use graph and context
+receipts. A trace showing retained text cannot prove the model understood it.
+
+The narrow implementation seam is the existing cohort import receipt, not a
+new experiment registry. The cohort already records rejected imports and
+requires complete matched support. A diagnostic projection can join its
+candidate/issue identity, native run state, node validation, context receipts
+and available feedback result. It must distinguish an execution attempt from
+an import attempt: a run never submitted to the cohort is not silently counted
+as an observed execution. Feedback itself admits successful CP2 forecasts and
+must not be stretched into a ledger of all prior failures.
+
+Start diagnosis with those factual states. For a data-access hypothesis, restore
+one recorded input or context allocation. For a reasoning hypothesis, change
+one skill while keeping the input snapshot, model and evaluator fixed. Re-run
+the affected computation and downstream forecast; retain failures and compare
+paired per-issue losses, coverage and cost. Newly acquiring an additional feed
+is a different input ablation protocol: the current cohort freezes one feed
+snapshot per issue and must not silently substitute another one.
 
 ## Forward evaluation and loss
 
