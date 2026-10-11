@@ -6,6 +6,14 @@ It is the strongest ready joined corpus among those inspected. This is a data
 selection, not an executed experiment or a claim of profitable trading.
 Paid execution remains held under the operator's research-first instruction.
 
+**Offline implementation:** the [five-session study](ashare-study.md) now
+compiles 136 admitted issue batches / 1,360 stock forecasts, after two phase
+purges. Its [generated receipt](ashare-admission.json) records exact dates,
+text support, calendar/data/source hashes and the complete call plan. This
+supersedes the unfinished adapter/phase-freeze steps below; it adds no model
+performance result. The final packet audit finds 452 asset windows without
+issuer-tagged text, and treats upstream entity tags as uncertain relevance links.
+
 The practical question is: **given recent prices and dated company information,
 does this reasoning graph forecast five-session market-relative returns better
 than price-only controls, and does one bounded skill revision improve it on later
@@ -77,17 +85,18 @@ See [exact sources, hashes and checks](data-selection-intraday.json).
    a plausible story is not a causal label. An explanation earns confidence when
    its bounded intervention improves later matched cases.
 
-February 2023–December 2025 is the proposed coverage interval; exact phase
-boundaries, episode counts, cost cap and stop rule remain to be frozen after
-the adapter and labels pass admission. Data-quality inspection has exposed
+February 2023–December 2025 is the source coverage interval. The compiled
+protocol uses 2023 for training, 2024 for validation and 2025 for assessment,
+with an explicit history warm-up and boundary purges. Its call plan and stop
+rule are recorded; paid resource release remains held. Data-quality inspection has exposed
 some historical prices and corporate actions. Later-trained model knowledge
 is also unknown. A historical split can separate our fitting and selection,
 but cannot establish globally unseen evidence; prospective capture is required
 for that stronger claim.
 
-The existing [two-node adapter](trading-study.md) implements next-session US
-long/cash decisions, not this five-session China task. Do not reuse its trading
-score unchanged. Validate China T+1, suspensions, price limits, lot sizes, fees,
+The earlier [two-node adapter](trading-study.md) implements next-session US
+long/cash decisions. The China adapter uses its JSON/cache/provider contracts
+with a separate protected task and forecasting score. Validate China T+1, suspensions, price limits, lot sizes, fees,
 taxes and execution before making any strategy-return claim. The first proposed
 study measures forecast information and learning feasibility only.
 

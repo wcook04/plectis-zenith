@@ -75,13 +75,15 @@ using the same native engine, validator and evaluator. Its [systems paper](paper
 documents the method, prior art and receipt-backed evidence as the implementation
 develops. Neither artifact establishes forecasting advantage or method novelty.
 
-The [data selection audit](docs/data-selection.md) recommends the collected
-TraderHarness panel for a first multi-session test of information use and skill
-learning. The prior Apple schedule was withdrawn after finding a year without
-news. A tested, [unexecuted two-node adapter](docs/trading-study.md) prepares
-interpretation → forecast comparisons and bounded skill updates, but its US
-next-session evaluator does not implement the proposed China study. Paid
-execution is held; neither data collection nor passing tests establish an edge.
+The [A-share study](docs/ashare-study.md) compiles the collected TraderHarness
+panel into 136 admitted five-session batches across ten stocks, with dated
+headlines, separate wealth labels and actual LLM interpretation → forecast
+nodes. It compares information use, outcome-trained skills, hindsight-trained
+skills and reflected experiences. The [admission receipt](docs/ashare-admission.json)
+records the actual support and call plan. Paid execution remains held; the
+compiled study establishes no new forecast or learning result. The earlier
+[US adapter](docs/trading-study.md) and its withdrawn Apple schedule remain
+separate historical work.
 
 ## What can change, and how it earns acceptance
 

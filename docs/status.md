@@ -2,6 +2,57 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Compiled hindsight-learning experiment, 11 October 2026
+
+The [A-share protocol](ashare-study.md) now has a complete offline compiler,
+protected two-node reasoning interface, matched outcome/hindsight reviewers,
+bounded skill proposals, reflected-memory comparator, semantic probe executor,
+validation selection and sealed assessment. It reuses the existing validated
+response/cache/provider lane. Derived training, learning, selection and final
+projections are reconstructed against original responses before consumption;
+rewriting a summary and its self-hash does not replace the model evidence.
+
+The [admission receipt](ashare-admission.json) records an actual compile of
+136 issue batches and 1,360 stock allowances: 41 training, 47 validation and
+48 assessment dates. All admitted windows have complete stock/benchmark bars;
+two windows are purged at phase boundaries. `work/ashare-offline-20261011/`
+holds the source-bound packets, separate evaluator labels, complete inventory,
+representative real inputs, semantic-probe definitions and call plan.
+The [independent real-label checks](ashare-label-checks.json) agree exactly
+with Fraction arithmetic for five BYD/Maotai distribution-boundary cases.
+
+Actual packet inspection found 452 asset windows without issuer-tagged text.
+All source news is headline material, and announcements are titles. The source
+can conflate related companies in entity placeholders; prompts now preserve
+that uncertainty. Fixed-panel turnover amounts are absent in the later era,
+and volume units change across source eras. The adapter omits amount and uses
+within-window relative volume. Teacher reporting now uses the whole declared
+outcome interval, including exchange holidays, instead of clipping it to seven
+calendar days. Those findings were captured in the parent Task Ledger as
+`cap_quick_zenith_a_share_volume_unit_and_historica_2171abc78b0f` and
+`cap_quick_zenith_teacher_window_and_source_entity_9d9795374b80`.
+
+Paid execution remains held. The full comparison permits at most 1,213 core
+calls plus 14 optional probes, exceeding the earlier 600-call allowance. The
+quoted USD 69.06 bound deliberately reserves schema-maximum escaped-Unicode
+input and 4,096 output tokens per call; it is a loose ceiling, not an expected
+bill. No account check, new budget, paid call or model result was produced.
+Explicit resource release and model compatibility are the remaining execution
+conditions. The earlier empirical exports remain byte-for-byte unchanged.
+
+Validation: **565 offline tests passed** after source freeze, including the
+synthetic end-to-end learning/selection/final workflow and resealed-projection
+tampering checks. The real corpus compile admits the exact support above; five
+independent real-label checks pass. Dependency deprecation warnings remain.
+The revised LaTeX manuscript compiled successfully; the original empirical
+study, calibration and deterministic-repair exports are unchanged.
+
+Reusable lessons now live in the scientific-experiments skill: inspect final
+per-asset packets, qualify entity links, preserve teacher clocks across
+holidays, rederive stage projections from responses, and bound Unicode context
+before paid execution. The paper incorporates FinMem, FinCon, privileged
+information and behavioral testing without claiming method novelty.
+
 ## Data-first study selection, 11 October 2026
 
 Four independent scout tracks and direct record inspection now support the
@@ -14,7 +65,7 @@ excluded. The previous AAPL schedule was withdrawn because its news archive
 has no 2024 records. Source rights, timestamp precision, gaps and corporate
 actions are recorded in the five data-selection inspection files.
 
-The proposed five-session, market-relative study is **not frozen or executed**.
+At this earlier checkpoint, the proposed five-session, market-relative study was **not frozen or executed**.
 It still requires a China-specific adapter, admitted wealth labels, common
 episode support and a frozen comparison. The prepared US two-node study adds
 training-only review, bounded forecast-skill proposals, exact cache/paid-receipt

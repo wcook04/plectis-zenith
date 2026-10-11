@@ -1,5 +1,9 @@
 # Rich-input forecast-skill study
 
+The selected A-share experiment is now implemented by
+[the five-session study](ashare-study.md). This document describes the earlier
+US next-session adapter and its withdrawn AAPL schedule.
+
 This is an executable, **unexecuted capability** while experiment execution is
 on hold for data selection. No result or trading advantage is established here.
 The AAPL schedule below is **not the selected next experiment**: the density

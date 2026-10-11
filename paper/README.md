@@ -142,11 +142,17 @@ an ATLAS/StockSim reproduction. StockSim's public snapshot does not expose the
 paper's complete optimizer configuration. The new executable-return learning
 study is still being specified; this manuscript reports no results from it.
 
-Later study planning is held at data admission. The selection rationale is
+The later A-share study is compiled offline; model execution remains held.
+The [protocol](../docs/ashare-study.md) and
+[admission receipt](../docs/ashare-admission.json) bind 136 admitted issue
+batches, separate forward/teacher/evaluator information, complete comparisons,
+calendar provenance and a 1,213-call maximum core plan. No new learning result
+is reported. The original study and calibration exports remain unchanged.
+The selection rationale is
 [data-selection.md](../docs/data-selection.md), with the independent cross-track
 protocol recommendation in [data-selection-design.json](../docs/data-selection-design.json).
-TraderHarness is proposed for a multi-session forecast panel from February
-2023 onward after price-basis, corporate-action and fixed-support qualification.
+TraderHarness supplies the multi-session forecast panel from February
+2023 onward after explicit warm-up, corporate-action and fixed-support checks.
 Its earlier price coverage gaps prevent a min/max date range from establishing
 continuous coverage. Unknown-vintage fundamentals are omitted; announcement
 availability is conservative. No new paid learning study or result is reported.

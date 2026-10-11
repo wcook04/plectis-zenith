@@ -9,6 +9,14 @@ compatibility: Python standard library; repository-local research CLI. Read prog
 Read `program.md`, `docs/skills.md`, the proposed experiment spec and the
 native `research` command help. Choose the owner for the actual hypothesis:
 
+- `research/ashare_study.py` owns the five-session TraderHarness forecast
+  experiment. Read `docs/ashare-study.md`. `compile`, `plan` and `report` are
+  offline; execution remains held until an explicit hash-bound release uses
+  one immutable shared budget and exact provider tag. Keep stock wealth labels
+  distinct from executable portfolio returns. Outcome and hindsight teachers
+  receive identical forward traces; only subsequent reporting differs. Always
+  reconstruct stage projections and selection from recorded responses before
+  using them downstream. A self-hash alone is not response provenance.
 - `research/trading_study.py` owns the experimental interpretation → forecast
   graph and bounded forecast-skill learning on executable next-session returns.
   Follow `docs/trading-study.md`; rich inputs and training-only hindsight are
@@ -37,6 +45,12 @@ upstream autonomous shell loop is installed.
    release claim do not establish continuous source coverage. Preserve timestamp
    precision, source-body vintage, missing lanes and post-outcome fields. Let the
    verified information and executable decision determine the target and horizon.
+   Qualify the final per-asset packet, including entity-link uncertainty, not
+   only archive density. Calendar-day clipping must not silently shorten an
+   exchange-session teacher interval. Test corporate-action entitlement at
+   entry and historical features independently of future labels. Match identity
+   cues across information treatments. Bound serialized Unicode context before
+   a paid cohort, and include every scheduled control in the call plan.
 2. Establish the baseline. Then change one declared factor per trial; record
    the hypothesis and exact change, candidate identity/hash, requested/actual
    model identity where applicable, elapsed resources and outcome. Record
