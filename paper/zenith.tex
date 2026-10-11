@@ -1,0 +1,545 @@
+% SPDX-FileCopyrightText: 2026 Will Cook
+% SPDX-License-Identifier: Apache-2.0
+\documentclass[11pt,a4paper]{article}
+\usepackage{booktabs,tabularx}
+\usepackage{paper-house-style}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=linkinternal,citecolor=linkinternal,
+  urlcolor=linkexternal,pdftitle={Zenith: Dated Evaluation and Controlled Updates of a Reasoning Graph},
+  pdfauthor={Will Cook}}
+\urlstyle{same}
+\title{Zenith: Dated Evaluation and Controlled Updates\\of a Reasoning Graph}
+\subtitle{Implementation and retrospective evaluation}
+\author{Will Cook}
+\date{Draft, 11 October 2026}
+\runninghead{Zenith: dated graph evaluation}
+\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+
+\begin{document}
+\maketitle
+\provenancenote{AI agents researched and drafted this manuscript under Will Cook's
+direction. The source and experimental receipts define the evidence reported here.}
+
+\begin{abstract}
+Reasoning graphs can combine data acquisition, language-model calls and output
+checks, yet a poor final prediction rarely identifies which component should
+change. Zenith implements a dated evaluation loop for such graphs. A native
+executor binds each run to its graph, node contracts, context policy, input
+snapshot and model receipts. A separate evaluator resolves price forecasts
+against exact later observations and retains incomplete support. Mechanical
+diagnostics describe recorded failures and context delivery; an agent proposes
+one bounded policy intervention from development evidence. The same executor
+and evaluator compare the candidate with a frozen baseline. We describe this
+implementation, its conditional formal contracts and a chronological assessment
+protocol. A compact historical study completed 100 reasoning calls. A fixed
+persistence/scale rule lowered model-baseline loss in both windows; on five later
+dates its mean relative price error was 0.8875\%, versus 0.9966\% for the
+model baseline and 1.0453\% for no change. These exposed historical windows
+establish native pipeline feasibility and a descriptive comparison. Forecasting
+advantage, generalized graph learning and novelty remain unestablished.
+\end{abstract}
+
+\section{Problem and scope}
+
+A financial forecast is issued with a particular information set and judged
+after its horizon matures. If its target price is inaccurate, possible
+explanations include unavailable source evidence, evidence excluded from a
+node's context, an unsupported inference, model-response variation and an
+unpredictable outcome. The final error does not distinguish these explanations.
+The relevant experiment changes a declared part of the process and generates
+new predictions on matched evidence.
+
+Zenith extracts an existing Lab--Oracle--Refinement system into a standalone
+repository. The authored inventory contains 71 nodes; the default Lab plan
+contains 28 nodes in 11 execution waves. These are structural counts, not
+completed forecasts. Lab consumes forward evidence and emits structured thesis
+and forecast checkpoints, called CP1 and CP2. Oracle inspects later observations
+and prepares hindsight feedback. The retained refinement runner and the newer
+reflection/cohort route are separate implementations.
+
+Graph of Thoughts already represents reasoning operations, aggregation and
+scoring as graphs \citep{got2024}. Trace, TextGrad, GEPA, AFlow and ADAS already
+study optimization of compound systems or generated workflows
+\citep{trace2024,textgrad2024,gepa2025,aflow2024,adas2024}.
+The implementation described here combines dated evidence admission, native
+contracts, complete forecast accounting and reviewed interventions. We make no
+claim that this combination is new or that it outperforms those methods.
+
+\section{Method}
+
+\subsection{One executor and a frozen run identity}
+
+A node declares dependencies, instructions and an output schema. Frozen
+reasoning policies can add a short skill rule, set nonnegative incoming-edge
+weights and impose a context-character budget. The base instruction and output
+contract remain binding. The executor preserves canonical upstream artifacts;
+weighted context views retain either the full serialized artifact, a declared
+excerpt or an omission marker. A receipt records source hashes, original and
+retained character counts, and missing dependencies.
+
+The dependency graph describes scheduled node inputs. Effective requests also
+contain runtime-injected contracts, temporal substitutions and other configured
+context. Prompt hashes and request identities are recorded separately. Trace
+availability depends on the provider: agent-provider request packets retain
+complete prompts, while the budgeted paid adapter records prompt hashes and the
+engine's attempt sidecars retain a prompt snippet of at most 4,000 characters
+alongside response text. Declared ancestry therefore identifies where to
+inspect; it does not establish actual model consumption or causal
+responsibility.
+
+The native engine can pause for an agent response. A request packet binds the
+run, node and prompt hash. Imported responses pass through the original output
+validation and resume path. Explicit provider adapters record requested and
+actual model identity, attempts and reported usage. Candidate evaluation uses
+these same execution and validation paths.
+Paid cohorts require an identical requested provider endpoint in both arms;
+receipts check the returned provider against the endpoint's catalog binding.
+
+Topology variants have their own admission rules. Adding a check or changing a
+connection must preserve the relevant output contracts and temporal boundary.
+An explicitly admitted compact graph is a separate experimental design; results
+from it do not establish execution or usefulness of the full default Lab.
+
+\subsection{Dated evidence and forecast measurement}
+
+Observation time, first availability time and acquisition time are distinct.
+For issue time $t$, forward input must belong to the subject-side evidence class
+and have recorded availability no later than $t$. Unknown availability remains
+an uncertainty. A declared conservative release rule can support historical
+replay, but it cannot prove the original publication or acquisition sequence.
+Future truth is kept in a separate evaluator.
+
+Every forecast specifies a target, horizon, issue price, target price, price
+basis and currency. Before the horizon matures, its evaluation is pending.
+Missing, duplicated or incompatible target observations produce a data gap
+without a realized error. A missing evaluation target is distinct from missing
+evidence in the forward snapshot.
+
+For a complete issue $i$ with fixed target set $S_i$, target prices
+$q_{is}$ and positive realized prices $y_{is}$, the native cohort loss is
+\[
+  L_i = \frac{1}{|S_i|}\sum_{s\in S_i}
+       \frac{|q_{is}-y_{is}|}{y_{is}},
+  \qquad
+  L = \frac{1}{n}\sum_{i=1}^{n} L_i .
+\]
+This gives each issue equal weight even when target counts differ. The evaluator
+also reports direction errors and a no-change forecast using the issue price.
+Price error is not a trading return, probability-calibration score or causal
+diagnosis. Different horizon objectives require separately declared comparisons
+or weights fixed before selection.
+
+The cohort importer checks frozen inputs, graph and policy identities,
+implementation hashes, declared horizon and model receipts. A comparison
+requires every candidate to have the complete preregistered issue/target
+support. If any run or truth observation remains incomplete, aggregate and
+paired scores remain unavailable. For complete support it records
+$L_i^{\mathrm{candidate}}-L_i^{\mathrm{baseline}}$; negative values favor the
+candidate. Coverage and failed attempts remain visible.
+
+\subsection{Financial task and loss}
+
+This experiment forecasts a next-session price, rather than selecting trades
+or estimating portfolio returns. A low price-level error can coexist with no
+advantage over the current-price forecast. No-change and past-one-session
+momentum references therefore use the same issue/target support and loss as
+the model arms. Testing market efficiency would additionally require a
+specified information set and risk-adjusted returns after trading costs;
+the present harness does not perform that test \citep{timmermann2004}.
+
+The implemented loss is absolute percentage error without the factor of 100.
+For positive outcomes with finite inverse moment, its optimal point is an
+inverse-price-weighted median, generally distinct from the conditional mean
+\citep{gneiting2011}. The current instructions request a target price without
+specifying that functional. A subsequent protocol should disclose its loss
+or request a statistical functional with a compatible score before execution.
+Percentage losses are unsuitable for zero or signed return targets; a
+training-scaled absolute-error objective is a possible separately preregistered
+alternative, provided its training denominator is nonzero
+\citep{hyndman2006}. The present receipts retain their original price loss.
+
+\subsection{Diagnostics and reviewed proposals}
+
+The diagnostic observer reads run manifests, artifacts, handoff packets,
+validation records and context-policy receipts. It distinguishes absent records
+from unreadable or mismatched records. Its verification labels identify checks
+of recorded bytes, hashes and declared bindings. It does not independently
+certify execution, source timestamps, model behavior or consumption of context.
+Observer failures cannot change cohort acceptance.
+
+\begin{table}[t]
+\caption{Diagnostic evidence and its reach. These observations may select a
+trace for investigation; they do not assign causal blame.}
+\label{tab:diagnosis}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.27\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Recorded condition & Interpretation \\
+\midrule
+Artifact absent & No artifact exists at the declared node's expected path within the run. \\
+Artifact or receipt unbound & The purported evidence remains unknown. \\
+Native validation rejection & A bound record reports rejection by the native validator. \\
+Context missing, omitted or excerpted & A bound policy receipt records a delivery condition. \\
+Forecast price/direction error & Exact later truth supports the measured discrepancy. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Feedback aggregation retains successes, failures and unresolved denominators.
+Its default proposal gate requires at least 20 distinct issue times and recurring
+failures across three time buckets. These counts route repeated-error
+investigations; they are not a significance test.
+
+A development reflection packet binds the feedback proposal, membership,
+sources and a bounded selection of verified node artifacts and available
+agent-provider handoff exchanges. It does not consume the paid engine's debug
+sidecars; without a handoff packet, its selected-node input prompt remains
+unavailable. An agent supplies a hypothesis and one proposed change. The
+compiler checks the measured graph and
+baseline policy, then changes one short skill rule, one context budget or one
+incoming-edge weight through the existing policy validator. Its output is an
+ordinary native policy with an exact before/after record and evidence hashes.
+Compilation neither executes nor accepts the candidate.
+
+A useful first intervention restores a clipped context view while preserving
+canonical evidence and the skill. A skill intervention instead holds the input
+view fixed. New data acquisition needs a separately declared input-ablation
+protocol; silently substituting source snapshots would confound the comparison.
+When two changes appear coupled, a small preregistered baseline/A/B/A+B study can
+test their interaction. Single-component search has no general optimality
+guarantee.
+
+\section{Contract checking}
+
+The Lean model treats a skill as a parameterized input/output relation. Its
+composition result is conditional: if the first skill establishes an
+intermediate condition and the second preserves the desired postcondition,
+their composition satisfies that postcondition. Other results express
+subject-side availability constraints and rank-based acyclicity. An executable
+finite rank certificate can instantiate the graph theorem.
+
+The Python checker verifies declared port types, evidence classes, source
+hashes and finite ranks. It explicitly leaves behavioral semantics unverified.
+These checks do not prove that a natural-language instruction implements its
+declared relation. They also do not prove timestamp authenticity, successful
+reasoning or forecast accuracy. Source and checking entrypoints are listed in
+Appendix~\ref{sec:artifacts}; completed checking receipts must identify their
+exact inputs.
+
+\section{Evaluation protocol and evidence}
+
+\subsection{Chronological assessment}
+
+Candidate generation and selection are part of fitting
+\citep{cawley2010}. An inner development window supplies failures and proposals;
+later inner validation compares a fixed candidate bank. Before an outer
+assessment, freeze the selected design, selection procedure, evaluator and
+resource budget. Development labels must mature before outer issue times, with
+a declared gap and exclusion of overlapping label intervals. Group assets by
+issue time.
+
+The implemented cohort freezes candidates and shared inputs, separates
+development and holdout membership by calendar week, checks development target
+times plus an embargo against the first heldout issue, and seals final
+assessment before opening it. Its boundary permits equality after the declared
+embargo; a study must specify whether an observation finalized at the issue
+time was already available. A conservative protocol excludes that ambiguous
+boundary.
+
+Nested rolling coordination and exposure accounting across studies remain
+planned. Renaming a study cannot restore an unseen assessment. Adaptive
+holdout research motivates this distinction, but its assumptions and protected
+query mechanisms are not implemented here \citep{dwork2015}. Once inspected, an
+outer period becomes development history. Fresh prospective predictions are
+needed to assess a procedure that has repeatedly searched the same history.
+
+Historical LLM evaluation also needs a separate check on pretrained knowledge.
+Glasserman and Lin compare original and anonymized news headlines, treating
+company knowledge as both potential look-ahead information and distraction
+\citep{glasserman2023}. KTD-Fin masks tickers and dates consistently through
+prompts and tools, probes re-identification, and separates portfolio returns
+into common, style and residual components \citep{ktdfin2026}. These are
+relevant controls, not mechanisms currently implemented in Zenith. Masking can
+also change useful context, and limited re-identification tests cannot prove
+absence of memorization. The historical StockNet snapshot is not an
+uncontaminated model test merely because its explicit inputs precede its
+target.
+
+Repeat an unchanged baseline when estimating model-response variation. Compare
+equal declared call, token and cost budgets, retain invalid and failed attempts,
+and preregister any simplicity tie-breaker. Neither a lower development mean
+nor 20 issues establishes statistical confidence. Statistical uncertainty must
+account for serial dependence and overlapping horizons.
+White's Reality Check evaluates a searched family against a benchmark using
+dependence-aware resampling \citep{white2000}. It motivates preserving all
+paired losses and tried alternatives, but its assumptions and inferential
+procedure are not implemented here. The incomplete pilots supply no test
+statistic.
+
+\subsection{Current empirical evidence}
+\label{sec:results}
+
+This draft describes implemented execution, diagnostics and comparison
+interfaces. Synthetic regression fixtures establish software behavior under
+constructed inputs; they cannot establish forecasting improvement. Historical
+StockNet preparations and an incomplete input-comparison attempt likewise
+remain distinct from a complete native graph experiment
+\citep{stocknet2018}.
+
+Four compatibility pilots used the 1 July 2015 snapshot, excluded from both
+development and later assessment. The first two ran predictor profile v1; all 105 recorded implementation
+hashes match commit \code{c4c051c}. They used the unchanged native validator
+and no automatic retry. Requested and returned model identifiers agreed:
+\code{amazon/nova-micro-v1} and \code{qwen/qwen3.5-flash-02-23}, respectively.
+The third requested \code{deepseek/deepseek-v4.1-flash} under prompt-only
+profile v2, introduced at \code{7582bf1}, which requests word-count margins
+while retaining the validator. Its 105 implementation hashes match
+\code{aa2f8ec}; the introduction commit matches only 104, differing in the
+paid adapter. An HTTP 429 occurred at the first CP1 request; no model response,
+usage or actual model identity was recorded. The fourth pinned that same model
+to \code{deepinfra/fp8}; the returned provider was DeepInfra. Both CP1 and CP2
+were accepted under the unchanged validator, with all 105 implementation
+hashes matching \code{01522cc}. These matches reconstruct implementation
+content: the manifests contain no observed Git HEAD, and a match need not
+identify a unique revision. These calibrations changed model,
+prompt or provider settings; they are not matched model-performance comparisons.
+
+\begin{table}[h]
+\caption{Compatibility calibration, not forecast evaluation. Rejections report
+native output-contract checks. Costs are provider-reported USD.}
+\label{tab:calibration}
+\small
+\begin{tabularx}{\linewidth}{@{}l r >{\raggedright\arraybackslash}X r@{}}
+\toprule
+Model & Attempts & Native outcome & Reported cost \\
+\midrule
+Nova Micro & 1 & CP1 rejected: thesis 36 words (minimum 150); unbracketed reference IDs. & 0.000307895 \\
+Qwen Flash & 2 & CP1 accepted; CP2 rejected: rationale 145 words (minimum 165). & 0.001489930 \\
+DeepSeek Flash & 1 & HTTP 429 at CP1; no response; CP2 not started. & Unknown \\
+DeepSeek/DeepInfra & 2 & CP1 and CP2 accepted; three-node run completed. & 0.002375240 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The first three pilots produced three responses from four attempts, with
+USD 0.001797825 in known reported charges and one unknown-cost attempt.
+Following the HTTP 429, an explicitly authorized, hash-bound ledger recovery
+retained that failed attempt, its full reservation and the original budget
+limits. The fourth pilot used a fresh run rather than resending the failed
+request. Its two responses cost USD 0.002375240; CP1 recorded 5,018 input/652
+output tokens and CP2 recorded 6,272 input/1,240 output tokens. At compatibility
+completion the six attempts had five responses, USD 0.004173065 in known
+charges, one unknown charge and USD 0.038015120 in reservations. The ledger
+was no longer halted; reservations remain distinct from reported charges.
+All failures remain recorded. Native acceptance demonstrates compatibility
+and pipeline execution, without measuring forecasting accuracy. Length/format
+rejection and transport failure likewise do not identify a reasoning failure.
+
+The first native study was prepared at source commit \code{01522cc}, with
+frozen cohort hash \code{bd5224387591} (full identity in the evidence export).
+It uses a compact two-reasoning-node CP1--CP2 design and the same
+engine/evaluator. Development completed 40 native episodes across 20 issue
+dates and four calendar weeks, with complete support in both arms. A frozen baseline is compared with one short CP2
+skill intervention on dated StockNet price evidence. The rule uses current
+close as a persistence prior, separates direction from move size and shrinks
+projected movement toward zero when past-return scale evidence is weak. It
+preserves targets, quotes, horizons and grounding requirements. The rule is
+fixed before development scoring; it is not a learned or reflection-generated
+update.
+The protocol generator selects the first 20 common mature August 2015 issue
+dates for development and the first five October dates for later assessment,
+with AAPL, MSFT and GOOG as fixed targets. It supplies 20 sessions of past
+OHLCV observations and forecasts the next exchange-session close. The two arms
+share graph, data, model and 24,000-character context caps; their sole difference
+is the CP2 skill rule. The complete two-arm study used 100 reasoning calls. The graph is admitted under
+the explicit predictor-replacement protocol, separately from ordinary variants
+that retain base ancestry. The retained default Lab graph is not the evaluated
+architecture of this study.
+
+The development dates were previously exposed in a flat input study; the later
+assessment dates were examined in deterministic benchmark work. This study
+freezes membership and candidate identity, but the later period is not a
+pristine test set. The experiment can establish native pipeline feasibility and
+a controlled historical comparison under its declared identities. It cannot
+establish an unseen-history or prospective forecasting advantage.
+
+\begin{table}[h]
+\caption{Native cohort study. Values are percentages, $100L$, with equal
+issue/target weighting and three fixed targets per date. Deterministic
+references share the support but are not model arms. Later assessment is
+sealed; exact scores remain in the evidence export.}
+\label{tab:results}
+\small
+\begin{tabularx}{\linewidth}{@{}l r*{4}{>{\raggedleft\arraybackslash}X}@{}}
+\toprule
+Phase & Dates & Baseline & Candidate & No change & Momentum \\
+\midrule
+Development & 20 & 2.1000 & 1.9142 & 1.8254 & 2.3756 \\
+Later assessment & 5 & 0.9966 & 0.8875 & 1.0453 & 0.9038 \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The development candidate-minus-baseline mean issue delta was
+$-0.00185743$, with lower candidate loss on 14 dates and higher
+loss on six. The frozen rule classified it as a candidate proposal for later
+assessment. This is a descriptive selection outcome, not statistical confidence
+or a learned update. The candidate's 1.9142\% loss remained above the
+no-change reference's 1.8254\%; it establishes no advantage over persistence.
+Development had 80 attempts and 80 responses, all 40 episodes accepted,
+USD 0.0992369112 in reported charges and no unknown costs or failed attempts.
+All calls returned the requested
+\code{deepseek/deepseek-v4.1-flash} through reported DeepInfra, with
+\code{deepinfra/fp8} requested in both arms. The development report and exact
+per-issue/target accounting are bound in \code{paper/study-evidence.json}.
+
+Later assessment completed all 10 episodes across five dates and two
+calendar weeks, with three targets per date and arm. It was sealed once under
+\code{native-deepinfra-final-v1}. Candidate-minus-baseline mean issue loss was
+$-0.00109107$, lower on three dates and higher on two. The candidate's
+0.8875\% mean loss was below the model baseline, no-change and momentum
+references on this support. The native decision remained
+\code{insufficient_issues}: five dates are below its 20-issue proposal gate,
+and the receipt grants no live mutation permission. Twenty attempts returned
+20 responses at USD 0.0244918688, with no failed or unknown-cost study calls.
+Both arms retained the same requested and actual model/provider identities.
+
+Across calibration and production, the settled ledger records 106 attempts,
+105 responses, USD 0.1279018450 in known charges and the earlier unknown-cost
+HTTP 429. It retains USD 1.137895220 in reservations and is not halted;
+reservations are not actual charges. The production study itself had 100
+responses and USD 0.1237287800 in reported charges. Its final report matches
+the sealed state receipt, and both phase exports preserve full common support.
+These are descriptive observations from a modern model on previously examined
+2015 windows, with one manually frozen intervention and no unchanged-baseline
+replicates. They establish neither significance nor a learned improvement,
+prospective forecasting advantage or profitability. Historical evaluation
+remains vulnerable to model-training contamination even when forward input
+timestamps are valid.
+
+\section{Related work and adopted mechanisms}
+
+\subsection{Financial agents}
+
+TradingAgents organizes specialist analysis, bullish/bearish research, trading
+and risk review \citep{tradingagents2024}. QuantAgent's 2024 writer/judge loop
+retrieves prior experience while an outer market-data evaluation feeds signal
+code, scores and feedback into its knowledge base \citep{quantagent2024}.
+This is close conceptual prior art for the whole feedback loop; its alpha-factor
+task and information-coefficient/Sharpe evaluation differ from dated price
+forecasting.
+
+FinCon compares consecutive training trajectories and propagates revised
+beliefs to selected analysts and a manager
+\citep{fincon2024}. This is close prior art for using measured outcomes to
+revise particular agent instructions. Its evaluation concerns single-stock
+trading and portfolio tasks measured by returns, Sharpe and drawdown;
+those results are not comparable to Zenith's point-price loss. Zenith's
+present artifact binds proposals to recorded node evidence and admits a
+bounded intervention for native replay. An independent causal diagnosis,
+successful update procedure and forecasting advantage remain unestablished.
+
+The reviewed FinRobot source implements typed strategy-parameter proposals,
+up to three in-sample backtests, selection and a later tail evaluation
+\citep{finrobotcode2026}. This is relevant executable prior art for a bounded
+propose/evaluate/select loop. It is later code, not an experimental finding of
+the 2024 platform paper \citep{finrobot2024}. Its return objective, shared split-boundary date and
+fallback behavior are not Zenith's comparison contract. Paper versions, code
+pins and this distinction are retained in
+\code{docs/finance-related-work.json}. The compact Zenith study needs no
+specialist ensemble to test its single declared rule; additional nodes need
+separately measured ablations.
+
+\subsection{Compound-system optimization}
+
+Trace and TextGrad expose execution/context-bearing criticism
+\citep{trace2024,textgrad2024}; GEPA and MIPRO propose and search prompt
+candidates \citep{gepa2025,mipro2024}. Zenith uses development feedback to
+compile one reviewed policy change for native comparison. Reverse textual
+feedback, population/Pareto search, categorical TPE, demonstrations and
+minibatching remain deferred. Criticism is not a numerical derivative, and
+successful final outputs do not certify every intermediate trace.
+
+AFlow searches code-represented workflows, while ADAS uses a meta agent and
+archive to generate and evaluate agent programs \citep{aflow2024,adas2024}.
+Zenith retains parent-relative proposals and lineage through admitted policies
+and graph variants. Unrestricted generated-program execution is outside the
+current method.
+
+Evolution strategies and Agent Lightning use numerical optimization or
+reinforcement learning interfaces \citep{es2017,lightning2025} unavailable
+through this hosted inference adapter. Their update signals do not identify
+a unique cause of a failed forecast. Context parameters can still be compared
+through controlled native reruns.
+
+Exact implementation pins, inspected paths and adoption decisions reside in
+\code{docs/architecture-sources.json}. The paper versions and later code
+versions are recorded separately. No cited upstream optimizer or training stack
+is a silently installed runtime dependency.
+
+\section{Limitations}
+
+The principal empirical boundary is incomplete evidence for forecasting
+advantage and transfer of the update procedure. A historical prompt can encode
+outcomes learned during model training. Conservative availability rules cannot
+recover unknown publication clocks, revisions or price vintages. Missing input,
+restricted context and reasoning may interact; a successful intervention
+establishes conditional sensitivity on measured support, without uniquely
+identifying the original cause.
+
+Current comparisons are descriptive. Generalization requires independent
+assessment of the entire proposal/selection procedure, sufficient dependent-data
+uncertainty analysis and prospective evidence. Cross-study exposure accounting,
+nested rolling selection and autonomous optimization are unfinished. A compact
+pilot cannot establish the usefulness of every branch of the default graph.
+Candidate code is trusted local code, not a security sandbox. Client-side
+provider budgets and reported costs do not guarantee provider billing.
+
+These limits leave a concrete research question: at a fixed resource budget,
+does a verified diagnostic packet produce interventions that improve later
+forecast error and coverage over unchanged, compact and simple-search
+baselines? The implementation supplies the experiment boundary; the answer
+requires controlled measurements.
+
+\clearpage
+\appendix
+\section{Artifacts and reproduction}
+\label{sec:artifacts}
+
+The source repository contains the executor and schemas, not redistributed
+market text or private provider packets. The following owners permit inspection
+of the claims in this paper.
+
+\begin{center}
+\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{.34\linewidth}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Operation & Source owner \\
+\midrule
+Native execution and planning & \code{zenith/runtime.py}; \code{system/core/engine.py} \\
+Skill/context policy & \code{system/lib/reasoning_policy.py} \\
+Forecast admission and truth & \code{feedback/engine.py} \\
+Matched comparison and seals & \code{research/cohort.py} \\
+Recorded diagnostics & \code{research/diagnosis.py} \\
+Proposal compilation & \code{research/reflection.py};\newline \code{research/reflection_cohort.py} \\
+Conditional formal model & \code{formal/ZenithSemantics.lean}; \code{scripts/check_semantics.py} \\
+Source/data decisions & \code{docs/architecture-sources.json}; \code{docs/data-sources.md} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+From an editable source checkout, \code{python -m zenith validate} and
+\code{python -m zenith plan lab} inspect the authored graph without inference.
+The repository's reproduction guide owns environment and offline checking
+commands. Provider execution is explicit. Experiment reports must bind the
+frozen specification, implementation hashes, source inputs and model receipts;
+a code citation alone is insufficient to reproduce a measured comparison.
+
+\begingroup
+\raggedright
+\small
+\bibliographystyle{plainnat}
+\bibliography{references}
+\endgroup
+\end{document}

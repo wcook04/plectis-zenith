@@ -2,6 +2,10 @@
 
 ## One predictor, one experiment, successive versions
 
+The [finance grounding](finance-design.md) relates this loop to QuantAgent,
+TradingAgents and other reviewed systems, with versioned sources and explicit
+forecast-versus-investment evaluation boundaries.
+
 The design direction is one trainable prediction graph `G`, evaluated on dated
 episodes. Lab names its forward execution. Oracle names evaluation and diagnosis
 of a frozen attempt. Evolve names a proposed transition from one graph version to
@@ -38,21 +42,23 @@ frozen intermediate artifacts ────────────► diagnose
                                     test G_(k+1)
 ```
 
-This is the proposed compact shape, not a claim that the current Lab has two
-model calls. Current Lab executes 28 nodes, including seven feed/calculation
-nodes and two passes of reasoning. The two-skill candidate should reuse CP1
-thesis/synthesis and CP2 forecasting contracts, with their deterministic
-validators. Feed adapters keep their own dependency structure. In particular,
-the existing `lab_seed_state` is a reasoning node; relabeling it as deterministic
-data admission would be wrong.
+The explicit price-only replacement in `variants/predictor.py` implements this
+compact shape: the original STOCK tool feeds CP1 synthesis and CP2 forecasting.
+Both reasoning nodes retain their native output schemas and validators. This
+profile executes three nodes and at most two model calls. The default Lab still
+executes 28 nodes, including seven feed/calculation nodes and two passes of
+reasoning. In particular, its `lab_seed_state` is a reasoning node; it has not
+been relabeled as deterministic data admission.
 
-The current variant contract retains every base node and its mandatory ancestry;
-mission selection also includes siblings. Hiding branches, reducing an edge
-weight or drawing five boxes does not reduce executed calls. Testing a genuinely
-smaller graph requires an explicit replacement/ablation contract that preserves
-the evidence cutoff, target support, CP2 interface, provenance and evaluator,
-while permitting removal of internal reasoning branches. The existing graph is
-the baseline until that experiment is implemented and assessed.
+The ancestry-preserving variant contract retains every base node; mission
+selection also includes siblings. The separate
+`zenith_predictor_replacement_v1` contract explicitly removes internal branches,
+declares the absent feed lanes, and standardizes the two surviving instructions
+without claiming ancestry preservation. Source identity, evidence cutoff, target
+support, CP2 interface, provenance and evaluator remain binding. The first
+[native backtest](native-backtest.md) compares a fixed compact baseline with one
+skill change on that same graph. It does not compare compact versus full Lab or
+establish that either architecture is better.
 
 The optimization object is `(G, θ)`: a typed directed acyclic graph `G`, and per-node parameters `θ`. A node's parameters include a short skill rule, incoming-context weights, context budget and model choice. Its output contract and evidence cutoff constrain what the operation may do. Language-model calls do not supply the local derivatives that ordinary neural-network backpropagation requires. The current native context budget measures serialized source **characters**, not tokens.
 

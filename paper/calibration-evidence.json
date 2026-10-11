@@ -1,0 +1,382 @@
+{
+  "schema": "zenith_paper_calibration_evidence_v4",
+  "prior_failed_pilot_snapshot": {
+    "schema": "zenith_paper_calibration_evidence_v2",
+    "budget_source_at_snapshot": {
+      "path": "work/stocknet-native-five-dollar-budget/budget.json",
+      "sha256": "f04cff0322ce7d56496101d2c01eea1c34258e589fa006cc969514c03d897f69"
+    },
+    "total_pilot_attempts": 4,
+    "total_pilot_responses": 3,
+    "total_pilot_known_reported_cost_usd": "0.001797825",
+    "unknown_cost_count": 1,
+    "total_reserved_usd_at_snapshot": "0.016168820",
+    "budget_halted_at_snapshot": true,
+    "budget_halt_reason_at_snapshot": "RuntimeError: HTTPError: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+    "claim_boundary": "Compatibility, transport and recorded native validation only; no admitted CP2 forecasts, accuracy score, reasoning diagnosis or v2 success. Snapshot halt does not prove permanent unavailability; unknown costs remain distinct from known charges and reservations."
+  },
+  "budget_source_at_read": {
+    "path": "work/stocknet-native-five-dollar-budget/budget.json",
+    "sha256": "f14e39ca2591df2cb65286e4f21bedeeca717b4d657aba404df68bf0d9af9b16"
+  },
+  "calibration_subset_accounting": {
+    "attempts": 6,
+    "responses": 5,
+    "known_reported_cost_usd": "0.004173065",
+    "unknown_cost_count": 1,
+    "reserved_cost_usd": "0.038015120"
+  },
+  "recovery": {
+    "source": {
+      "path": "work/provider-selection-20261011/recovery-receipt.json",
+      "sha256": "109e750b130ff546647204f116c611e25fe70ff1b21f0aa147c56885a4513b5d"
+    },
+    "prior_ledger_sha256": "f04cff0322ce7d56496101d2c01eea1c34258e589fa006cc969514c03d897f69",
+    "failed_call_id": "43f382023ec2bab9609d57542dbe1b74783cf2a6901bbf847910d175b900731c",
+    "retained_reserved_usd": "0.016168820",
+    "failed_actual_cost": null,
+    "failed_reservation_usd": "0.0103083",
+    "authorization_recorded": true
+  },
+  "pilots": [
+    {
+      "run_id": "PILOT_963f920f4854fc89",
+      "predictor_profile": "stocknet_price_only_cp1_cp2_v1",
+      "issue_date": "2015-07-01",
+      "study_membership": "excluded from development and later assessment",
+      "native_result": {
+        "path": "work/stocknet-native-nova-july-pilot/native-result.json",
+        "sha256": "ac77c69ed0e2c9c07306b0039a5b58b73f36d7287e1e9ba78f97e051e0aecab0"
+      },
+      "pilot_spec": {
+        "path": "work/stocknet-native-nova-july-pilot/pilot.json",
+        "sha256": "e57f0c51f61dc1e97d5b64856712fb4748a2ff5b5eec7bec6cf2697adca89733"
+      },
+      "run_manifest": {
+        "path": "state/runs/PILOT_963f920f4854fc89/zenith_run.json",
+        "sha256": "5b875deb72d96c3062c47bfad6470d8383c28f8598021742f1f98dc6f6a66d07"
+      },
+      "node_outcomes": {
+        "global_stock_feed": "success",
+        "lab_decide": "failure",
+        "lab_director": "not_started"
+      },
+      "native_status": "failed",
+      "calls": [
+        {
+          "source": {
+            "path": "state/runs/PILOT_963f920f4854fc89/handoff/api_calls/openrouter_budgeted/1adc506946e42ec6caf9725164033ed886c2ab971350cdc5baeb9cf465a32fb9.json",
+            "sha256": "8a24264ea8c70f3352d402c9bfcba784cf9eaad9b4c634fb02f3147e76bce881"
+          },
+          "call_id": "1adc506946e42ec6caf9725164033ed886c2ab971350cdc5baeb9cf465a32fb9",
+          "node_id": "lab_decide",
+          "status": "response_supplied",
+          "requested_model": "amazon/nova-micro-v1",
+          "requested_provider_slug": null,
+          "actual_provider": null,
+          "cost": "0.000307895",
+          "reserved_cost_usd": "0.001189230",
+          "actual_model": "amazon/nova-micro-v1",
+          "prompt_tokens": 7397,
+          "completion_tokens": 350
+        }
+      ],
+      "validation_attempts": [
+        {
+          "source": {
+            "path": "state/runs/PILOT_963f920f4854fc89/debug/json_attempts/lab_decide.attempt_01.json",
+            "sha256": "dfdad201126393709ca6a5d6b4b9f8ab93ba97d9a2d4f9e8ba4d8ce994d7439d"
+          },
+          "node_id": "lab_decide",
+          "status": "failure",
+          "error_class": "SCHEMA_VALIDATION",
+          "errors": [
+            "BELOW_MIN_WORD_COUNT: epicentre_thesis has 36 words (min 150)",
+            "INVALID_REF_ID: evidence[0].ref_id='1'",
+            "INVALID_REF_ID: evidence[1].ref_id='2'",
+            "INVALID_REF_ID: evidence[2].ref_id='3'"
+          ]
+        }
+      ],
+      "implementation_provenance": {
+        "matching_git_commit": "c4c051c6d6470df8cc34d3c1261bd7c3323e2496",
+        "basis": "All recorded implementation_hashes equal SHA256 of Git blob bytes at this commit. The native manifest does not record HEAD; this reconstructs content compatibility, not an observed executed HEAD or a unique revision.",
+        "recorded_head": null,
+        "checks": [
+          {
+            "git_commit": "c4c051c6d6470df8cc34d3c1261bd7c3323e2496",
+            "manifest_path_count": 105,
+            "matching_path_count": 105,
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "PILOT_73a5d70df11b85b8",
+      "predictor_profile": "stocknet_price_only_cp1_cp2_v1",
+      "issue_date": "2015-07-01",
+      "study_membership": "excluded from development and later assessment",
+      "native_result": {
+        "path": "work/stocknet-native-qwen-july-pilot/native-result.json",
+        "sha256": "ed0b74a1277d744ead52b6a02d3705cb5c1fe63c4a2c9006bf328f7654c50286"
+      },
+      "pilot_spec": {
+        "path": "work/stocknet-native-qwen-july-pilot/pilot.json",
+        "sha256": "1995c87fd8e885ee558eb82ef7262130d9b177774062e25e07f79a127aaff31d"
+      },
+      "run_manifest": {
+        "path": "state/runs/PILOT_73a5d70df11b85b8/zenith_run.json",
+        "sha256": "b5a3c8235b30b89e0d755a45333cc10ab178b22763c27b082b2b478c1b8760ea"
+      },
+      "node_outcomes": {
+        "global_stock_feed": "success",
+        "lab_decide": "success",
+        "lab_director": "failure"
+      },
+      "native_status": "failed",
+      "calls": [
+        {
+          "source": {
+            "path": "state/runs/PILOT_73a5d70df11b85b8/handoff/api_calls/openrouter_budgeted/c5d772ec9060be15888c2c7595e8488888f911b78809f7f5f2798f52fc143280.json",
+            "sha256": "d192cf0caee568602edf1c92e374e43c5024982ba8b36e4949649e274cfebfdd"
+          },
+          "call_id": "c5d772ec9060be15888c2c7595e8488888f911b78809f7f5f2798f52fc143280",
+          "node_id": "lab_decide",
+          "status": "response_supplied",
+          "requested_model": "qwen/qwen3.5-flash-02-23",
+          "requested_provider_slug": null,
+          "actual_provider": null,
+          "cost": "0.00063947",
+          "reserved_cost_usd": "0.002208570",
+          "actual_model": "qwen/qwen3.5-flash-02-23",
+          "prompt_tokens": 7298,
+          "completion_tokens": 635
+        },
+        {
+          "source": {
+            "path": "state/runs/PILOT_73a5d70df11b85b8/handoff/api_calls/openrouter_budgeted/5b3beca8cbee50eb8b19628489e73b5e477658da7315b9340df339b662fe3cd3.json",
+            "sha256": "482352d7e7018b109cf370c75f845cefeecbf5af55e3bf1979176c69ac45d7d1"
+          },
+          "call_id": "5b3beca8cbee50eb8b19628489e73b5e477658da7315b9340df339b662fe3cd3",
+          "node_id": "lab_director",
+          "status": "response_supplied",
+          "requested_model": "qwen/qwen3.5-flash-02-23",
+          "requested_provider_slug": null,
+          "actual_provider": null,
+          "cost": "0.00085046",
+          "reserved_cost_usd": "0.002462720",
+          "actual_model": "qwen/qwen3.5-flash-02-23",
+          "prompt_tokens": 8552,
+          "completion_tokens": 1133
+        }
+      ],
+      "validation_attempts": [
+        {
+          "source": {
+            "path": "state/runs/PILOT_73a5d70df11b85b8/debug/json_attempts/lab_decide.attempt_01.json",
+            "sha256": "1dcd859da739f0f58c56563236d0c78005dc7ead8e5da8a3df817bbfe07ec664"
+          },
+          "node_id": "lab_decide",
+          "status": "success",
+          "error_class": "OK",
+          "errors": []
+        },
+        {
+          "source": {
+            "path": "state/runs/PILOT_73a5d70df11b85b8/debug/json_attempts/lab_director.attempt_01.json",
+            "sha256": "5b074bc621b4d430e8730500e44f8a0345147791fec68886cc5f8b8ba78f9e42"
+          },
+          "node_id": "lab_director",
+          "status": "failure",
+          "error_class": "SCHEMA_VALIDATION",
+          "errors": [
+            "BELOW_MIN_WORD_COUNT: trade_rationale has 145 words (min 165)"
+          ]
+        }
+      ],
+      "implementation_provenance": {
+        "matching_git_commit": "c4c051c6d6470df8cc34d3c1261bd7c3323e2496",
+        "basis": "All recorded implementation_hashes equal SHA256 of Git blob bytes at this commit. The native manifest does not record HEAD; this reconstructs content compatibility, not an observed executed HEAD or a unique revision.",
+        "recorded_head": null,
+        "checks": [
+          {
+            "git_commit": "c4c051c6d6470df8cc34d3c1261bd7c3323e2496",
+            "manifest_path_count": 105,
+            "matching_path_count": 105,
+            "mismatches": []
+          }
+        ]
+      }
+    },
+    {
+      "run_id": "PILOT_c6715ffae65db729",
+      "predictor_profile": "stocknet_price_only_cp1_cp2_v2",
+      "issue_date": "2015-07-01",
+      "study_membership": "excluded from development and later assessment",
+      "native_result": {
+        "path": "work/stocknet-native-deepseek-v2-july-pilot/native-result.json",
+        "sha256": "13ed1a5a3f0ead64b68085656e1da8e25c2d0f0ff1d166c1a3af3f3bf85607e3"
+      },
+      "pilot_spec": {
+        "path": "work/stocknet-native-deepseek-v2-july-pilot/pilot.json",
+        "sha256": "77b08cc0ac041fd4222e52e2b5e7802e832da4d3fd67446e9a953f85f198cbc0"
+      },
+      "run_manifest": {
+        "path": "state/runs/PILOT_c6715ffae65db729/zenith_run.json",
+        "sha256": "8c2047f8ddc4218ec466f25678f82b45dc14ef66cd5ed40fb04b3591cafdcad5"
+      },
+      "node_outcomes": {
+        "global_stock_feed": "success",
+        "lab_decide": "failure",
+        "lab_director": "not_started"
+      },
+      "native_status": "failed",
+      "calls": [
+        {
+          "source": {
+            "path": "state/runs/PILOT_c6715ffae65db729/handoff/api_calls/openrouter_budgeted/43f382023ec2bab9609d57542dbe1b74783cf2a6901bbf847910d175b900731c.json",
+            "sha256": "cfb99cdb67761e1e0b973ea9cf11b5d1083ab3df064f1970d2903ff26d18a8ee"
+          },
+          "call_id": "43f382023ec2bab9609d57542dbe1b74783cf2a6901bbf847910d175b900731c",
+          "node_id": "lab_decide",
+          "status": "failed",
+          "requested_model": "deepseek/deepseek-v4.1-flash",
+          "requested_provider_slug": null,
+          "actual_provider": null,
+          "cost": null,
+          "reserved_cost_usd": "0.0103083",
+          "actual_model": null,
+          "prompt_tokens": null,
+          "completion_tokens": null
+        }
+      ],
+      "validation_attempts": [],
+      "implementation_provenance": {
+        "matching_git_commit": "aa2f8ec044d05e12ef09e8b7abdb8f024f13f864",
+        "basis": "All recorded implementation_hashes equal SHA256 of Git blob bytes at this commit. The native manifest does not record HEAD; this reconstructs content compatibility, not an observed executed HEAD or a unique revision.",
+        "recorded_head": null,
+        "checks": [
+          {
+            "git_commit": "7582bf18a8618beddfe34684e565f10cabf840f2",
+            "manifest_path_count": 105,
+            "matching_path_count": 104,
+            "mismatches": [
+              {
+                "path": "zenith/budgeted.py",
+                "manifest_sha256": "d65bcba32acc4a07de5304ac4284085795cfd70a801891fe90080646569a8b81",
+                "git_blob_sha256": "c3b22968f1b273285d92860330e0206cfe4e35472b1310cbfdadfaa9f53e88b6"
+              }
+            ]
+          },
+          {
+            "git_commit": "aa2f8ec044d05e12ef09e8b7abdb8f024f13f864",
+            "manifest_path_count": 105,
+            "matching_path_count": 105,
+            "mismatches": []
+          }
+        ]
+      },
+      "prompt_profile_introduced_commit": "7582bf18a8618beddfe34684e565f10cabf840f2"
+    },
+    {
+      "run_id": "PILOT_93884c7d509631dd",
+      "predictor_profile": "stocknet_price_only_cp1_cp2_v2",
+      "issue_date": "2015-07-01",
+      "study_membership": "excluded from development and later assessment",
+      "native_result": {
+        "path": "work/stocknet-native-deepinfra-v2-july-pilot/native-result.json",
+        "sha256": "9a5483af5ff0fb45ff94edd51b8daae543122821b2c1388c973e7db481d9116b"
+      },
+      "pilot_spec": {
+        "path": "work/stocknet-native-deepinfra-v2-july-pilot/pilot.json",
+        "sha256": "2c78786de0e23a4571fa42c85614a31e1cce2d3e62b59774dfcb1a288a33473a"
+      },
+      "run_manifest": {
+        "path": "state/runs/PILOT_93884c7d509631dd/zenith_run.json",
+        "sha256": "b40d203c1c6f239f33f1419ce524b60f91b6db2a176ab92983b2c8fcc5c9e4ec"
+      },
+      "node_outcomes": {
+        "global_stock_feed": "success",
+        "lab_decide": "success",
+        "lab_director": "success"
+      },
+      "native_status": "completed",
+      "calls": [
+        {
+          "source": {
+            "path": "state/runs/PILOT_93884c7d509631dd/handoff/api_calls/openrouter_budgeted/201d860579b999b6d3bfba91d2cdf87ac6f623c55f31bc63abfca080c31d7e82.json",
+            "sha256": "2337ee1a8d6db88da32c370ccb90bc65df13d2efd975acc410466b70fe81a648"
+          },
+          "call_id": "201d860579b999b6d3bfba91d2cdf87ac6f623c55f31bc63abfca080c31d7e82",
+          "node_id": "lab_decide",
+          "status": "response_supplied",
+          "requested_model": "deepseek/deepseek-v4.1-flash",
+          "requested_provider_slug": "deepinfra/fp8",
+          "actual_provider": "DeepInfra",
+          "cost": "0.00097636",
+          "reserved_cost_usd": "0.0103077",
+          "actual_model": "deepseek/deepseek-v4.1-flash",
+          "prompt_tokens": 5018,
+          "completion_tokens": 652
+        },
+        {
+          "source": {
+            "path": "state/runs/PILOT_93884c7d509631dd/handoff/api_calls/openrouter_budgeted/49918bb78fa2c9094cac7f29e14b1e8fe3db1c1f563ac1aa8d9da36c198d3341.json",
+            "sha256": "f1d0a68bcd2493674e538fc8e308c93c41f578fe04e142a5a55c923a8220dda5"
+          },
+          "call_id": "49918bb78fa2c9094cac7f29e14b1e8fe3db1c1f563ac1aa8d9da36c198d3341",
+          "node_id": "lab_director",
+          "status": "response_supplied",
+          "requested_model": "deepseek/deepseek-v4.1-flash",
+          "requested_provider_slug": "deepinfra/fp8",
+          "actual_provider": "DeepInfra",
+          "cost": "0.00139888",
+          "reserved_cost_usd": "0.0115386",
+          "actual_model": "deepseek/deepseek-v4.1-flash",
+          "prompt_tokens": 6272,
+          "completion_tokens": 1240
+        }
+      ],
+      "validation_attempts": [
+        {
+          "source": {
+            "path": "state/runs/PILOT_93884c7d509631dd/debug/json_attempts/lab_decide.attempt_01.json",
+            "sha256": "2f6840a83b7f3d2123c9d27eecde46f1d02abde05af7804428ea877f1592ba31"
+          },
+          "node_id": "lab_decide",
+          "status": "success",
+          "error_class": "OK",
+          "errors": []
+        },
+        {
+          "source": {
+            "path": "state/runs/PILOT_93884c7d509631dd/debug/json_attempts/lab_director.attempt_01.json",
+            "sha256": "2bb7398e9b522774cc9e547495896bfa442f503b4b7f979e36712ca49a1d8455"
+          },
+          "node_id": "lab_director",
+          "status": "success",
+          "error_class": "OK",
+          "errors": []
+        }
+      ],
+      "implementation_provenance": {
+        "matching_git_commit": "01522cc83d3c9f8fb45e280dc08a9b19287021fe",
+        "basis": "All recorded implementation_hashes equal SHA256 of Git blob bytes at this commit. The native manifest does not record HEAD; this reconstructs content compatibility, not an observed executed HEAD or a unique revision.",
+        "recorded_head": null,
+        "checks": [
+          {
+            "git_commit": "01522cc83d3c9f8fb45e280dc08a9b19287021fe",
+            "manifest_path_count": 105,
+            "matching_path_count": 105,
+            "mismatches": []
+          }
+        ]
+      },
+      "prompt_profile_introduced_commit": "7582bf18a8618beddfe34684e565f10cabf840f2"
+    }
+  ],
+  "claim_boundary": "Excluded calibration attempts only. One accepted native CP2 demonstrates pipeline compatibility, not price accuracy or a matched model comparison. Unknown cost and failed reservation retained across explicit recovery. The live shared budget may contain additional production attempts outside this calibration subset.",
+  "provenance_rule": "For every pilot, bind the original native manifest hash and compare every recorded implementation_hashes entry with SHA256(git show COMMIT:PATH). Report full/partial coverage and mismatches. Keep prompt-profile introduction separate from hash-matched implementation; never infer an observed HEAD from a matching revision.",
+  "budget_source_at_read_boundary": "Settled ledger at full study completion; calibration subset remains four pilots/six attempts. Earlier ledger hash denotes a historical state bound by the recovery receipt, not current bytes at the mutable ledger path."
+}

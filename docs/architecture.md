@@ -23,9 +23,12 @@ The current graph contains 71 nodes. Lab scope contains 28 nodes in 11 waves inc
 Those nodes already share one physical registry and executor. Oracle loads
 frozen subject artifacts by run reference; the learning transition consumes
 feedback across graph versions. These temporal handoffs are not ordinary edges
-that may be connected back into an earlier forward run. The compact proposed
-predictor is a replacement experiment, not the existing 71-node graph with a
-new label.
+that may be connected back into an earlier forward run. The compact
+predictor uses the separate `zenith_predictor_replacement_v1` admission contract
+in `variants/predictor.py`. It executes the existing STOCK tool, CP1 and CP2 in
+three waves through the same engine. Its price-only instructions declare every
+removed lane unavailable. [The native backtest](native-backtest.md) compares two
+policies on this compact graph; the 71-node registry remains intact.
 
 Actual Lab ordering is feed evidence → seed → seven first-pass miners → cross-correlation → orientation → CP1 → seven second-pass miners → cross-correlation → CP2 → integrity. Some historical doctrine sketches put orientation before miners. Runtime dependencies win over those sketches.
 

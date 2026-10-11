@@ -7,9 +7,9 @@ Zenith extracts the existing Lab → Oracle → Evolve system into its own repos
 The learning model is **one prediction graph, evaluated over dated episodes,
 with changes between versions**. Lab executes the predictor, Oracle evaluates
 its frozen attempts, and Evolve proposes a successor. Current Lab remains the
-28-node baseline; a compact synthesis-and-forecast candidate is specified in
-the [learning design](docs/learning-design.md), pending an explicit ablation
-contract and measured comparison.
+28-node baseline; the explicit three-node price-only replacement implements
+the compact synthesis-and-forecast design. The [learning design](docs/learning-design.md)
+defines both contracts. A measured compact-versus-full comparison remains open.
 
 ## Start here
 
@@ -63,9 +63,17 @@ python -m zenith status LAB_example
 
 The engine executes tools and pauses when a reasoning response is needed. Its packet contains the assembled prompt and request hash. An agent can return a response through `import-response`; the original engine validates it before advancing. `run --provider openrouter_free` is an explicit alternative with zero-price eligibility checks and requested/actual model receipts. It never silently selects a paid fallback. NVIDIA hosted NIM is available with `--provider nvidia_nim --model YOUR_SELECTED_NVIDIA_MODEL` and the user’s own `NVIDIA_API_KEY`; its cost remains unknown when the service does not report it. See [provider and key setup](docs/providers.md), CLI help and [the runtime architecture](docs/architecture.md).
 
-Explicit paid experiments use `openrouter_budgeted`, a concrete model and a shared batch budget directory. It reserves conservative costs before calls, limits calls and output tokens, and retains reported usage and cost. Failed or ambiguous calls are not retried; unknown cost halts the batch. The first-trial implementation permits at most US$0.25 per shared budget. This is a client-side spending guard, not a provider billing guarantee. Keys are supplied locally through environment variables or an explicitly selected private environment file.
+Explicit paid experiments use `openrouter_budgeted`, a concrete model and a shared batch budget directory. It reserves conservative costs before calls, limits calls and output tokens, and retains reported usage and cost. Failed or ambiguous calls are not retried; unknown cost halts the batch. The implementation permits an explicitly authorized ceiling of at most US$5 per shared budget; existing budgets remain immutable. This is a client-side spending guard, not a provider billing guarantee. Keys are supplied locally through environment variables or an explicitly selected private environment file.
 
 The compact feed profile removes duplicated diagnostics from prompt context while retaining every feed data row and dated price provenance. It is recorded in the frozen run identity. It does not make large datasets fit every model automatically.
+
+The [compact native backtest](docs/native-backtest.md) runs the existing STOCK,
+CP1 and CP2 nodes as an explicit three-node replacement. It compares one frozen
+forecasting-skill change with a fixed compact baseline on dated StockNet prices,
+using the same native engine, validator and evaluator. Its [systems paper](paper/zenith.pdf)
+([source](paper/zenith.tex))
+documents the method, prior art and receipt-backed evidence as the implementation
+develops. Neither artifact establishes forecasting advantage or method novelty.
 
 ## What can change, and how it earns acceptance
 
@@ -91,6 +99,11 @@ coverage; incomplete support cannot produce a favorable partial ranking.
 The [source comparison](docs/architecture-sources.md) covers textual graph
 optimization, neural learning and protection against selection overfitting.
 Source assimilation does not establish forecasting advantage or method novelty.
+
+The [finance design](docs/finance-design.md) compares the closest financial
+agent systems and keeps forecast error, investment returns, feedback maturity
+and adaptive model selection distinct. It explains which mechanisms Zenith
+reuses and which safeguards still need implementation.
 
 ## Historical comparisons and formal semantics
 

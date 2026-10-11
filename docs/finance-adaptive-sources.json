@@ -1,0 +1,461 @@
+{
+  "schema": "zenith_finance_adaptive_sources_v1",
+  "reviewed_at": "2026-10-11",
+  "scope": "Primary method/code comparison only; no upstream runtime executed and no provider calls.",
+  "implementation_boundary": "This review adds attribution and proposed mechanisms only. Zenith currently compiles one declared skill/context parameter into a review-only candidate; none of these methods is installed or validated by this review.",
+  "native_existing_contracts": [
+    {
+      "path": "research/reflection.py",
+      "symbol": "compile_candidate",
+      "status": "implemented",
+      "allowed_changes": [
+        "skill_addon",
+        "max_context_chars",
+        "one incoming_weights edge"
+      ],
+      "live_mutation_permission": false
+    },
+    {
+      "path": "docs/learning-design.md",
+      "status": "design plus implemented freeze gate; nested selection and lifetime exposure are planned contracts"
+    }
+  ],
+  "simplest_next_experiment": {
+    "status": "proposed_unimplemented",
+    "intervention": "one participating-node skill_addon expressing one sourced error lesson",
+    "required_evidence": [
+      "frozen evaluator and inputs",
+      "complete paired per-issue support including failures",
+      "development-only diagnosis and proposal",
+      "separate final holdout/prospective assessment",
+      "matured truth available before feedback enters a later forecast"
+    ],
+    "claim_boundary": "Mechanical error labels and prose causal hypotheses remain distinct; no gradient, causal proof, forecast advantage or trading profit claim."
+  },
+  "sources": [
+    {
+      "name": "finmem",
+      "paper": {
+        "title": "FinMem: A Performance-Enhanced LLM Trading Agent with Layered Memory and Character Design",
+        "authors": [
+          "Yangyang Yu",
+          "Haohang Li",
+          "Zhi Chen",
+          "Yuechen Jiang",
+          "Yang Li",
+          "Denghui Zhang",
+          "Rong Liu",
+          "Jordan W. Suchow",
+          "Khaldoun Khashanah"
+        ],
+        "year": 2023,
+        "version": "2311.13743v2",
+        "url": "https://arxiv.org/abs/2311.13743v2",
+        "doi_url": "https://doi.org/10.48550/arXiv.2311.13743",
+        "inspected_sections": [
+          "Architecture §§Profiling,Working memory,Layered long-term memory,Decision-making",
+          "Experiments §§Baselines,Evaluation metrics,Implementation details",
+          "Ablations §§Character design,Top-K retrieval capacity"
+        ],
+        "license_url": "http://creativecommons.org/licenses/by/4.0/",
+        "license_evidence_url": "https://arxiv.org/abs/2311.13743v2",
+        "license_evidence_sha256": "3730dc46b7d5c704d38fd32a9e04f2e689fe370413976027a15a6273d79fe7b9"
+      },
+      "code": {
+        "url": "https://github.com/pipiku915/FinMem-LLM-StockTrading",
+        "commit": "be814aa47970de9bf2fdd6a1d5a60ae5cf361b46",
+        "relationship_to_paper": "author-linked implementation",
+        "acquisition": "selected_raw_files_not_full_checkout",
+        "inspected_files": [
+          {
+            "path": "README.md",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/README.md",
+            "sha256": "fabfdb2814652c39c48c390c2026a51d6458fe55ebd3d7e574f1adfb4230170b"
+          },
+          {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/LICENSE",
+            "sha256": "d5009b159bf5c6c12c3d1663eb1b6a216c228079dca31fd2b83b21729fb54025"
+          },
+          {
+            "path": "puppy/agent.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/puppy/agent.py",
+            "sha256": "cac3a2d40ecf43370dd4473bf6e8541515ad9609defa171b2206019dcc44b317"
+          },
+          {
+            "path": "puppy/environment.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/puppy/environment.py",
+            "sha256": "cbdf27dde9160b2a632924d9cee53d9afc7207983a4b9f1ca6cb1b46c40666e2"
+          },
+          {
+            "path": "puppy/memorydb.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/puppy/memorydb.py",
+            "sha256": "7134fe4f4022c00d4b5cec2602ac3f589df6424508bdd7e1558e1cfc0a3bfc67"
+          },
+          {
+            "path": "puppy/reflection.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/puppy/reflection.py",
+            "sha256": "b38dc619915979ed68de373b052bd8e624c4db3ebce11aef13e78a4e90e0a5d6"
+          },
+          {
+            "path": "puppy/portfolio.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/puppy/portfolio.py",
+            "sha256": "5afae15047ada6b585902906df76044852eecc6c72b9dd510c47c99754d85355"
+          },
+          {
+            "path": "puppy/prompts.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/puppy/prompts.py",
+            "sha256": "f69a8e4fc567510ca7082d404eef531e73cef4726713c8e725b3990e6f72d075"
+          },
+          {
+            "path": "puppy/memory_functions/compound_score.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/puppy/memory_functions/compound_score.py",
+            "sha256": "25518489cb5f1181722c23c81f623aed7bbad570683eeb7b5c9e492386ebce09"
+          },
+          {
+            "path": "puppy/memory_functions/access_counter.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/puppy/memory_functions/access_counter.py",
+            "sha256": "64e0e172f941d8fdf0464a258b95dba4c06959517646f3c433d4431f93823d38"
+          },
+          {
+            "path": "data-pipeline/07-metrics.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/data-pipeline/07-metrics.py",
+            "sha256": "364e99a683ed2549c92d9359d4c4f8beb9b900c1fee2aae4c655ae85dada55e4"
+          },
+          {
+            "path": "run.py",
+            "url": "https://raw.githubusercontent.com/pipiku915/FinMem-LLM-StockTrading/be814aa47970de9bf2fdd6a1d5a60ae5cf361b46/run.py",
+            "sha256": "765539ac5ef35cac8569309f48e062a25fbae4eed0f59df40fede58c4825b67c"
+          }
+        ],
+        "license": "MIT",
+        "license_sha256": "d5009b159bf5c6c12c3d1663eb1b6a216c228079dca31fd2b83b21729fb54025",
+        "scripts_executed": false
+      },
+      "mechanism": "Fixed single-agent architecture; layered retrieval, decay and memory promotion. Training reflections receive next-day labels; test decisions mask those labels and update memory priority from delayed realized PnL.",
+      "evaluation": {
+        "objective": "single-share buy/sell/hold trading",
+        "metrics": [
+          "cumulative_return",
+          "Sharpe_ratio",
+          "max_drawdown",
+          "volatility"
+        ],
+        "split": "train2021-08-17..2022-10-05; test2022-10-06..2023-04-10",
+        "baselines": [
+          "buy-and-hold",
+          "Generative Agent",
+          "FinGPT",
+          "A2C",
+          "PPO",
+          "DQN"
+        ]
+      },
+      "adoption": {
+        "status": "reviewed_no_new_runtime_adoption",
+        "actual_upstream_code_copied_into_zenith": false,
+        "borrow_next": "Use sourced, dated error lessons; test one retrieval/context intervention through the existing candidate compiler.",
+        "defer": [
+          "layered vector memory and paid embeddings",
+          "reward-based automatic memory promotion",
+          "trading policy"
+        ]
+      },
+      "boundaries": [
+        "PnL attribution to retrieved memories is heuristic, not causal credit.",
+        "Training hindsight summaries must be segregated from forward evidence by availability time.",
+        "Chronological splits do not establish exclusion of model pretraining history or lifetime test exposure.",
+        "No study here reproduced published returns."
+      ],
+      "annexes": [
+        "arxiv-2311-13743v2-finmem",
+        "finmem-reviewed-code"
+      ]
+    },
+    {
+      "name": "fincon",
+      "paper": {
+        "title": "FinCon: A Synthesized LLM Multi-Agent System with Conceptual Verbal Reinforcement for Enhanced Financial Decision Making",
+        "authors": [
+          "Yangyang Yu",
+          "Zhiyuan Yao",
+          "Haohang Li",
+          "Zhiyang Deng",
+          "Yupeng Cao",
+          "Zhi Chen",
+          "Jordan W. Suchow",
+          "Rong Liu",
+          "Zhenyu Cui",
+          "Zhaozhuo Xu",
+          "Denghui Zhang",
+          "Koduvayur Subbalakshmi",
+          "Guojun Xiong",
+          "Yueru He",
+          "Jimin Huang",
+          "Dong Li",
+          "Qianqian Xie"
+        ],
+        "year": 2024,
+        "version": "2407.06567v3",
+        "url": "https://arxiv.org/abs/2407.06567v3",
+        "doi_url": "https://doi.org/10.48550/arXiv.2407.06567",
+        "inspected_sections": [
+          "Preliminaries §Trading objective/POMDP",
+          "Architecture §Risk-control and CVRF training Algorithm1",
+          "Architecture §Modular memory",
+          "Experiments §Experimental setup and ablation studies",
+          "Appendix §Testing algorithm"
+        ],
+        "license_url": "http://creativecommons.org/licenses/by-nc-sa/4.0/",
+        "license_evidence_url": "https://arxiv.org/abs/2407.06567v3",
+        "license_evidence_sha256": "09b511636cb2dac56a3a634c0495ad5ebbe6fcc2e5e8e999b3b4178e51a17b25"
+      },
+      "code": {
+        "url": "https://github.com/The-FinAI/FinCon",
+        "commit": "3ee6854ad6e45a86d9a858a6d5306213dcfc2003",
+        "relationship_to_paper": "official metadata-only repository; no Python implementation at inspected pin",
+        "acquisition": "selected_raw_files_not_full_checkout",
+        "inspected_files": [
+          {
+            "path": "README.md",
+            "url": "https://raw.githubusercontent.com/The-FinAI/FinCon/3ee6854ad6e45a86d9a858a6d5306213dcfc2003/README.md",
+            "sha256": "303bbea2a7273809bb3fa0cded33c7b6eb2c51c6f7a014cb554d523d3b8fc37b"
+          },
+          {
+            "path": "LICENSE",
+            "url": "https://raw.githubusercontent.com/The-FinAI/FinCon/3ee6854ad6e45a86d9a858a6d5306213dcfc2003/LICENSE",
+            "sha256": "e15c97ab813938cc71f64e619d5ac7384155fc6ef848e8c7a300aaeeac97dc54"
+          }
+        ],
+        "license": "MIT",
+        "license_sha256": "e15c97ab813938cc71f64e619d5ac7384155fc6ef848e8c7a300aaeeac97dc54",
+        "scripts_executed": false
+      },
+      "mechanism": "Fixed manager/analyst hierarchy. Compare consecutive training trajectories, turn outcome differences into conceptual beliefs, update prompts and selectively propagate beliefs to relevant agents; within-episode risk reflection remains active at test.",
+      "evaluation": {
+        "objective": "single-asset trading and portfolio management",
+        "metrics": [
+          "cumulative_return",
+          "Sharpe_ratio",
+          "max_drawdown"
+        ],
+        "split": "train2022-01-03..2022-10-04; test2022-10-05..2023-06-10",
+        "replicates": "median CR/SR from5 repeated epochs",
+        "baselines": [
+          "buy-and-hold",
+          "FinMem",
+          "FinAgent",
+          "FinGPT",
+          "Generative Agent",
+          "A2C",
+          "PPO",
+          "DQN",
+          "Markowitz MV",
+          "equal-weight ETF"
+        ]
+      },
+      "adoption": {
+        "status": "reviewed_no_new_runtime_adoption",
+        "actual_upstream_code_copied_into_zenith": false,
+        "borrow_next": "Compile one trace-grounded skill_addon lesson at the participating node; evaluate candidate against parent on matched dates.",
+        "defer": [
+          "decision-overlap heuristic as learning rate",
+          "CVaR trading controls",
+          "automatic multi-agent belief propagation"
+        ]
+      },
+      "boundaries": [
+        "Prompt/belief optimization is described; graph topology search is not.",
+        "Paper is CC-BY-NC-SA4.0; official README/license being MIT does not relicense the paper or commercial data.",
+        "Full implementation is explicitly unreleased in the inspected README; exact reproduction unavailable.",
+        "Chronological split and repeated epochs do not remove model history contamination or repeated selection risk."
+      ],
+      "annexes": [
+        "arxiv-2407-06567v3-fincon"
+      ]
+    },
+    {
+      "name": "alphaagent",
+      "paper": {
+        "title": "AlphaAgent: LLM-Driven Alpha Mining with Regularized Exploration to Counteract Alpha Decay",
+        "authors": [
+          "Ziyi Tang",
+          "Zechuan Chen",
+          "Jiarui Yang",
+          "Jiayao Mai",
+          "Yongsen Zheng",
+          "Keze Wang",
+          "Jinrui Chen",
+          "Liang Lin"
+        ],
+        "year": 2025,
+        "version": "2502.16789v2",
+        "url": "https://arxiv.org/abs/2502.16789v2",
+        "doi_url": "https://doi.org/10.48550/arXiv.2502.16789",
+        "inspected_sections": [
+          "§3.1 Problem formulation",
+          "§3.2 AST parsing,originality,complexity and hypothesis alignment",
+          "§3.3 Idea/factor/eval agents and failure memory",
+          "§4.1 Metrics,backtest splits,baselines",
+          "§4.2 Repeated evolutionary trials"
+        ],
+        "license_url": "http://creativecommons.org/licenses/by/4.0/",
+        "license_evidence_url": "https://arxiv.org/abs/2502.16789v2",
+        "license_evidence_sha256": "0bca6308559033e35b0ff8d0849dc8b9b6da57abc65e7bed076f7df226b1ee98"
+      },
+      "code": {
+        "url": "https://github.com/RndmVariableQ/AlphaAgent",
+        "commit": "b42cb397025510da44355db9dcf278304321f589",
+        "relationship_to_paper": "paper-linked URL; current implementation rewritten inJuly2026; paper-era match unverified",
+        "inspected_paths": [
+          "README.md",
+          "GitHub recursive tree",
+          "all8 visible commits"
+        ],
+        "license": null,
+        "license_sha256": null,
+        "scripts_executed": false,
+        "code_imported": false
+      },
+      "mechanism": "Fixed idea/factor/eval roles refine hypotheses and factor AST expressions using backtest feedback; categorize failed implementations and enforce expression originality, semantic alignment and complexity.",
+      "evaluation": {
+        "objective": "next-day return scores and top50 equity trading strategy",
+        "metrics": [
+          "IC",
+          "RankIC",
+          "ICIR",
+          "annualized_excess_return",
+          "information_ratio",
+          "max_drawdown"
+        ],
+        "split": "train2015-01..2019-12; validation2020; test2021-01..2025-01",
+        "selection": "20 independent trials with5 evolutionary rounds for agent comparisons",
+        "baselines": [
+          "LightGBM",
+          "LSTM",
+          "Transformer",
+          "StockMixer",
+          "TRA",
+          "AlphaForge",
+          "RD-Agent",
+          "o1 best-of10",
+          "DeepSeek-R1 best-of10"
+        ]
+      },
+      "adoption": {
+        "status": "reviewed_no_new_runtime_adoption",
+        "actual_upstream_code_copied_into_zenith": false,
+        "borrow_next": "Retain rejected candidates and mechanical rejection labels; bound intervention complexity before evaluation.",
+        "defer": [
+          "formulaic alpha DSL and AST novelty scorer",
+          "LightGBM/portfolio evaluator",
+          "LLM alignment scores as proof"
+        ]
+      },
+      "boundaries": [
+        "Factor expression AST is not an agent DAG; AST dissimilarity does not establish scientific novelty.",
+        "Cross-sectional IC measures score ordering, not numerical point forecast error.",
+        "Paper-linked current repo and absence of a root license cannot certify reproduction or authorize code copying.",
+        "Repeated historical search requires nested selection/holdout exposure controls beyond nominal date splits."
+      ],
+      "annexes": [
+        "arxiv-2502-16789v2-alphaagent"
+      ]
+    },
+    {
+      "name": "alphaforge",
+      "paper": {
+        "title": "AlphaForge: A Framework to Mine and Dynamically Combine Formulaic Alpha Factors",
+        "authors": [
+          "Hao Shi",
+          "Weili Song",
+          "Xinting Zhang",
+          "Jiahe Shi",
+          "Cuicui Luo",
+          "Xiang Ao",
+          "Hamid Arian",
+          "Luis Seco"
+        ],
+        "year": 2024,
+        "version": "2406.18394v5",
+        "url": "https://arxiv.org/abs/2406.18394v5",
+        "doi_url": "https://doi.org/10.48550/arXiv.2406.18394",
+        "inspected_sections": [
+          "Methodology §§Factor mining andAlpha combination/Algorithm2",
+          "Experiments §Data andbaseline methods"
+        ],
+        "license_url": "http://arxiv.org/licenses/nonexclusive-distrib/1.0/",
+        "license_evidence_url": "https://arxiv.org/abs/2406.18394v5",
+        "license_evidence_sha256": "8a8dd5065772b29563cc23dccf316465ca39a4b9b9cad5875e506ca2fb3937f2"
+      },
+      "code": {
+        "url": "https://github.com/DulyHao/AlphaForge",
+        "commit": "d0cfc27df23c60f271bc885fd43027b86b787746",
+        "relationship_to_paper": "paper-linked official implementation",
+        "acquisition": "selected_raw_files_not_full_checkout",
+        "inspected_files": [
+          {
+            "path": "README.md",
+            "url": "https://github.com/DulyHao/AlphaForge/blob/d0cfc27df23c60f271bc885fd43027b86b787746/README.md",
+            "sha256": "367673601b3411040a6a84543d4175166b7c8b3bc15f0eb2693e7f6e8470deb0"
+          },
+          {
+            "path": "train_AFF.py",
+            "url": "https://github.com/DulyHao/AlphaForge/blob/d0cfc27df23c60f271bc885fd43027b86b787746/train_AFF.py",
+            "sha256": "2ee15d7a209af3ba1c8514e1812a6d231f820808bc4d5e9b9e8d1b21afa77647"
+          },
+          {
+            "path": "combine_AFF.py",
+            "url": "https://github.com/DulyHao/AlphaForge/blob/d0cfc27df23c60f271bc885fd43027b86b787746/combine_AFF.py",
+            "sha256": "cdbfa6926b398166ae112384d27f4101953e2c447a17af5bbe6955f179102c41"
+          },
+          {
+            "path": "gan/utils/data.py",
+            "url": "https://github.com/DulyHao/AlphaForge/blob/d0cfc27df23c60f271bc885fd43027b86b787746/gan/utils/data.py",
+            "sha256": "90a6d8d260147c86d3ca37169fbafae7cddfce5bef76d859c968774c1a1c326c"
+          }
+        ],
+        "license": null,
+        "license_sha256": null,
+        "scripts_executed": false
+      },
+      "mechanism": "Neural generator/predictor mines factor formulas; fixed factor zoo is dynamically selected and weighted from past performance. Surrogate fitting uses weighted MSE; factor quality uses IC/correlation gates.",
+      "evaluation": {
+        "objective": "cross-sectional20day factor signal and portfolio returns",
+        "metrics": [
+          "IC",
+          "RankIC",
+          "ICIR",
+          "RankICIR",
+          "portfolio_return"
+        ],
+        "split": "annual2018..2022tests; firsttrain2010..2016,validation2017,test2018",
+        "baselines": [
+          "genetic programming",
+          "deep symbolic optimization",
+          "reinforcement-learning alpha mining"
+        ]
+      },
+      "adoption": {
+        "status": "reviewed_defer",
+        "actual_upstream_code_copied_into_zenith": false,
+        "borrow_next": "If learning dynamic edge weights later, use only matured target feedback with an explicit horizon lag.",
+        "defer": [
+          "neural surrogate/generator",
+          "automatic factor reweighting",
+          "full ANN/factor zoo runtime"
+        ]
+      },
+      "boundaries": [
+        "combine_AFF.py uses shift21 and feedback slices ending before cur-shift; this is evidence for a label lag, not an end-to-end point-in-time audit.",
+        "The train_test_split call divides candidate-formula examples for the surrogate, not dates; do not mistake it for the market temporal split.",
+        "No root license found in inspected recursive tree; selected code reviewed only, not copied into either project runtime.",
+        "AlphaForge is distinct fromAlphaForgeBench and unrelated similarly named trading products."
+      ],
+      "annexes": [],
+      "annex_disposition": "Deferred import to keep strongest selection bounded; exact paper/code metadata and sections reviewed."
+    }
+  ],
+  "related_finance_review": "finance-related-work.json",
+  "source_disposition_boundary": "Four methods are reviewed here. QuantAgent2024, TradingAgents, QuantHarness and FinRobot are separately reviewed in finance-related-work.json; root annex receipt records the combined bounded import disposition."
+}

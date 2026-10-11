@@ -1,0 +1,238 @@
+{
+  "schema": "zenith_public_source_reproduction_v1",
+  "checked_on": "2026-10-11",
+  "status": "passed",
+  "verified_commit": "01522cc83d3c9f8fb45e280dc08a9b19287021fe",
+  "coverage_boundary": "Covers committed runtime source at 01522cc before subsequent documentation additions. It does not establish that later revisions reproduce identically.",
+  "environment": {
+    "python_version": "3.12.7",
+    "source": "Fresh local Git clone of the committed standalone source on the same macOS host, detached at the verified revision.",
+    "installation": "New virtual environment, locked test dependencies, then editable source installation.",
+    "isolation": [
+      "Fresh temporary home directory.",
+      "Environment rebuilt from explicit generic controls; module-search overrides and provider credentials absent.",
+      "No private environment files copied or loaded.",
+      "User-site package loading disabled.",
+      "Native module origins checked inside the fresh checkout; standard-library and dependency paths belonged to the selected interpreter and new environment."
+    ],
+    "module_origins_checked": [
+      "zenith/runtime.py",
+      "research/cohort.py",
+      "benchmarks/stocknet_native.py",
+      "system/core/engine.py"
+    ]
+  },
+  "package_authority": {
+    "lock_file": "requirements-test.lock",
+    "lock_sha256": "d3ef6b094a0e08bb47044f68f6a207e33975f1553de2bf1d45e59312295893a6",
+    "project_file": "pyproject.toml",
+    "project_sha256": "bd6e2ec7183e06e20febea7a99317862667816e73e91689b1629559445283e97",
+    "dependency_check": "passed"
+  },
+  "command_notation": "Portable placeholders identify the fresh source checkout and its interpreter; absolute host paths and raw output are intentionally omitted. Project commands ran from the fresh checkout.",
+  "checks": [
+    {
+      "name": "clone",
+      "command": [
+        "git",
+        "clone",
+        "--no-hardlinks",
+        "--no-checkout",
+        "<local-source-repository>",
+        "<fresh-checkout>"
+      ],
+      "exit_code": 0,
+      "outcome": "Fresh local Git source clone without hardlinks; untracked files were not copied."
+    },
+    {
+      "name": "checkout",
+      "command": [
+        "git",
+        "checkout",
+        "--detach",
+        "01522cc83d3c9f8fb45e280dc08a9b19287021fe"
+      ],
+      "exit_code": 0,
+      "outcome": "Detached checkout at the exact verified commit."
+    },
+    {
+      "name": "revision",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "outcome": "Commit identity matched the requested full hash."
+    },
+    {
+      "name": "fresh_venv",
+      "command": [
+        "python3.12",
+        "-m",
+        "venv",
+        "<fresh-environment>"
+      ],
+      "exit_code": 0,
+      "outcome": "New Python 3.12 virtual environment."
+    },
+    {
+      "name": "install_locked",
+      "command": [
+        "<fresh-python>",
+        "-m",
+        "pip",
+        "--isolated",
+        "install",
+        "-r",
+        "requirements-test.lock"
+      ],
+      "exit_code": 0,
+      "outcome": "Locked test dependencies installed successfully."
+    },
+    {
+      "name": "install_editable",
+      "command": [
+        "<fresh-python>",
+        "-m",
+        "pip",
+        "--isolated",
+        "install",
+        "--no-deps",
+        "-e",
+        "."
+      ],
+      "exit_code": 0,
+      "outcome": "Editable package installed from the fresh checkout without reinstalling dependencies."
+    },
+    {
+      "name": "pip_check",
+      "command": [
+        "<fresh-python>",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "exit_code": 0,
+      "outcome": "No broken requirements found."
+    },
+    {
+      "name": "import_boundary",
+      "command": [
+        "<fresh-python>",
+        "-c",
+        "<assert native module origins and clean environment controls>"
+      ],
+      "exit_code": 0,
+      "outcome": "Native modules resolved inside the fresh checkout; no private parent checkout imports or provider credentials."
+    },
+    {
+      "name": "zenith_validate",
+      "command": [
+        "<fresh-python>",
+        "-m",
+        "zenith",
+        "validate"
+      ],
+      "exit_code": 0,
+      "outcome": "71 authored nodes; topology valid."
+    },
+    {
+      "name": "zenith_plan_lab",
+      "command": [
+        "<fresh-python>",
+        "-m",
+        "zenith",
+        "plan",
+        "lab"
+      ],
+      "exit_code": 0,
+      "outcome": "28 Lab nodes in 11 waves; offline plan only."
+    },
+    {
+      "name": "extraction",
+      "command": [
+        "<fresh-python>",
+        "scripts/check_extraction.py"
+      ],
+      "exit_code": 0,
+      "outcome": "262 extraction files matched the declared hashes."
+    },
+    {
+      "name": "node_skills",
+      "command": [
+        "<fresh-python>",
+        "scripts/build_node_skills.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "outcome": "71 node skill cards current; no stale or unexpected cards."
+    },
+    {
+      "name": "public_projection",
+      "command": [
+        "<fresh-python>",
+        "scripts/build_demo_data.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "outcome": "71 nodes and 205 edges; generated public projection current."
+    },
+    {
+      "name": "finite_semantics",
+      "command": [
+        "<fresh-python>",
+        "scripts/check_semantics.py"
+      ],
+      "exit_code": 0,
+      "outcome": "Finite typing, forward-context boundary and rank conditions passed; behavioral semantics not verified."
+    },
+    {
+      "name": "targeted_native_tests",
+      "command": [
+        "<fresh-python>",
+        "-m",
+        "pytest",
+        "tests/test_zenith_budgeted.py",
+        "tests/test_zenith_provider_setup.py",
+        "tests/test_zenith_runtime.py",
+        "tests/test_research_cohort.py",
+        "tests/test_stocknet_native.py",
+        "tests/test_predictor_graph.py",
+        "-q"
+      ],
+      "exit_code": 0,
+      "outcome": "85 targeted tests passed; mocked provider transports and synthetic test data only."
+    },
+    {
+      "name": "clean_tracked_source",
+      "command": [
+        "git",
+        "diff",
+        "--exit-code"
+      ],
+      "exit_code": 0,
+      "outcome": "No tracked source modifications."
+    }
+  ],
+  "summary": {
+    "commands_passed": 16,
+    "targeted_tests_passed": 85,
+    "targeted_test_seconds": 46.288,
+    "authored_nodes": 71,
+    "authored_edges": 205,
+    "lab_nodes": 28,
+    "lab_waves": 11,
+    "extraction_files": 262,
+    "node_skill_cards": 71,
+    "tracked_source_changed": false
+  },
+  "limits": [
+    "Same-host isolated source-install check; not independent hardware or operating-system replication.",
+    "No wheel distribution verified.",
+    "No new Lean compilation; only the finite Python semantics checker ran.",
+    "The full 453-test suite was not repeated in this environment.",
+    "No actual provider inference, funded study, live market acquisition, or budget-ledger changes.",
+    "Offline structural and synthetic execution checks do not establish forecasting accuracy, calibrated probabilities, causal explanations, or profitability."
+  ]
+}

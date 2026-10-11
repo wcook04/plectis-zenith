@@ -4,6 +4,11 @@ The verified distribution is an editable source checkout. Keep the authored
 node JSON, contracts, skills and data next to the Python packages. A wheel
 installation is not a verified substitute for this layout.
 
+The [source reproduction receipt](source-reproduction.json) records a fresh
+clone and Python environment at runtime commit `01522cc`: 16 passing checks,
+including 85 targeted tests, without private parent imports or credentials.
+It is a same-host check of that revision, not an independent-machine result.
+
 Use Python 3.12 for the pinned environment. From a fresh checkout:
 
 ```sh
