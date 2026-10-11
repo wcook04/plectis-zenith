@@ -1,0 +1,744 @@
+{
+  "schema": "zenith_data_selection_inspection_v1",
+  "date": "2026-10-11",
+  "role": "intraday and rich historical corpus inspection; no strategy/model scores",
+  "candidates": [
+    {
+      "name": "TraderHarness A-share release",
+      "dataset_url": "https://huggingface.co/datasets/ANTICH/traderharness-ashare-5y/tree/3bf5151ab3e94851bb09dd8ade815563c44b15a6",
+      "repository_url": "https://github.com/HephaestLab/TraderHarness/tree/3e18369da5a2060f9c65b27c2a63f99edd93e167",
+      "status": "actual six-table bundle downloaded and manifest verified; strongest inspected ready multi-source panel",
+      "files": [
+        {
+          "path": "announcements.parquet",
+          "bytes": 42856549,
+          "sha256": "5a167bd44c0199a48995cf495a7adc99a6c1c279bf9ec08ae39e9197e3934f90",
+          "manifest_match": true
+        },
+        {
+          "path": "daily.parquet",
+          "bytes": 77243467,
+          "sha256": "a198730637e9c199473bd69d3826bf8349d03237c282bd95f3d5a3bc05727a28",
+          "manifest_match": true
+        },
+        {
+          "path": "dividends.parquet",
+          "bytes": 235887,
+          "sha256": "19122560a1311be4641cce038a9582903d8b6dce906e29e6992a74aeca81f8bb",
+          "manifest_match": true
+        },
+        {
+          "path": "fundamentals.parquet",
+          "bytes": 9603730,
+          "sha256": "fb9ed6ec048047278fcf5d4beadd722ded3c945612e354fd5adc7ee17b611e29",
+          "manifest_match": true
+        },
+        {
+          "path": "index_300.parquet",
+          "bytes": 68815,
+          "sha256": "8df15b05312b44e5c4ad9cc6c72f2660c4af798938ba9a8d0539912ba820d625",
+          "manifest_match": true
+        },
+        {
+          "path": "news_cls.parquet",
+          "bytes": 54966243,
+          "sha256": "383d584d1e59d67beca70eafecc8235e71ab81cf7b12e173d9a001d66584c924",
+          "manifest_match": true
+        }
+      ],
+      "total_collected_bytes": 184974691,
+      "news_density": {
+        "rows": 766022,
+        "by_year": {
+          "2021": 67786,
+          "2022": 145028,
+          "2023": 140696,
+          "2024": 157270,
+          "2025": 158006,
+          "2026": 97236
+        },
+        "by_month": {
+          "2021-05": 4170,
+          "2021-06": 8386,
+          "2021-07": 9351,
+          "2021-08": 10399,
+          "2021-09": 8615,
+          "2021-10": 8694,
+          "2021-11": 8597,
+          "2021-12": 9574,
+          "2022-01": 9948,
+          "2022-02": 10086,
+          "2022-03": 14341,
+          "2022-04": 12797,
+          "2022-05": 12417,
+          "2022-06": 13062,
+          "2022-07": 12604,
+          "2022-08": 13630,
+          "2022-09": 12592,
+          "2022-10": 10544,
+          "2022-11": 11912,
+          "2022-12": 11095,
+          "2023-01": 11033,
+          "2023-02": 11939,
+          "2023-03": 12994,
+          "2023-04": 11174,
+          "2023-05": 11013,
+          "2023-06": 10630,
+          "2023-07": 12033,
+          "2023-08": 12718,
+          "2023-09": 10746,
+          "2023-10": 11855,
+          "2023-11": 12752,
+          "2023-12": 11809,
+          "2024-01": 12324,
+          "2024-02": 9969,
+          "2024-03": 12493,
+          "2024-04": 13513,
+          "2024-05": 12537,
+          "2024-06": 12524,
+          "2024-07": 15296,
+          "2024-08": 14418,
+          "2024-09": 13081,
+          "2024-10": 14008,
+          "2024-11": 13725,
+          "2024-12": 13382,
+          "2025-01": 11963,
+          "2025-02": 11256,
+          "2025-03": 13744,
+          "2025-04": 14889,
+          "2025-05": 11786,
+          "2025-06": 11792,
+          "2025-07": 14559,
+          "2025-08": 13091,
+          "2025-09": 13916,
+          "2025-10": 13790,
+          "2025-11": 12779,
+          "2025-12": 14441,
+          "2026-01": 16166,
+          "2026-02": 11507,
+          "2026-03": 17347,
+          "2026-04": 16221,
+          "2026-05": 13218,
+          "2026-06": 14697,
+          "2026-07": 8080
+        },
+        "content_sources": {
+          "derived_headline": 598976,
+          "redacted": 167046
+        },
+        "display_minus_epoch_utc_seconds": {
+          "28800.0": 766022
+        },
+        "nonempty_titles": 598976,
+        "nonempty_stock_list": 157405,
+        "time_range": [
+          "2021-05-14T23:03:10",
+          "2026-07-17T01:31:54"
+        ]
+      },
+      "daily_and_join_audit": {
+        "audit_scope": "coverage/clock join only; no model, forecast, strategy score, or outcome-based universe selection",
+        "universe_rule": "top10 mean traded amount during2021-05-17..2021-12-31, at least150 observed sessions, ordinary-main-board code prefixes; an observed-panel selection, not proof of survivorship completeness",
+        "universe": [
+          "600519",
+          "601012",
+          "002594",
+          "002466",
+          "600111",
+          "000858",
+          "601919",
+          "002460",
+          "600031",
+          "600438"
+        ],
+        "daily_rows": 5536889,
+        "daily_symbols": 5073,
+        "duplicate_symbol_dates": 0,
+        "daily_range": [
+          "2021-05-17",
+          "2026-07-16"
+        ],
+        "monthly_counts": {
+          "2021-05": 44355,
+          "2021-06": 85294,
+          "2021-07": 90333,
+          "2021-08": 91326,
+          "2021-09": 83624,
+          "2021-10": 67402,
+          "2021-11": 93409,
+          "2021-12": 98504,
+          "2022-01": 82037,
+          "2022-02": 69512,
+          "2022-03": 100465,
+          "2022-04": 83562,
+          "2022-05": 84010,
+          "2022-06": 93372,
+          "2022-07": 93962,
+          "2022-08": 103773,
+          "2022-09": 4552,
+          "2022-10": 16,
+          "2022-11": 112,
+          "2022-12": 461,
+          "2023-01": 27546,
+          "2023-02": 93363,
+          "2023-03": 107901,
+          "2023-04": 89635,
+          "2023-05": 94736,
+          "2023-06": 95258,
+          "2023-07": 100842,
+          "2023-08": 111186,
+          "2023-09": 97053,
+          "2023-10": 82680,
+          "2023-11": 107204,
+          "2023-12": 102548,
+          "2024-01": 107729,
+          "2024-02": 73594,
+          "2024-03": 103114,
+          "2024-04": 98300,
+          "2024-05": 98388,
+          "2024-06": 93538,
+          "2024-07": 113369,
+          "2024-08": 108591,
+          "2024-09": 93873,
+          "2024-10": 88985,
+          "2024-11": 103912,
+          "2024-12": 109040,
+          "2025-01": 89382,
+          "2025-02": 89579,
+          "2025-03": 104532,
+          "2025-04": 104760,
+          "2025-05": 94924,
+          "2025-06": 100064,
+          "2025-07": 115253,
+          "2025-08": 105358,
+          "2025-09": 110494,
+          "2025-10": 85478,
+          "2025-11": 100680,
+          "2025-12": 115899,
+          "2026-01": 101069,
+          "2026-02": 70848,
+          "2026-03": 111405,
+          "2026-04": 106242,
+          "2026-05": 91192,
+          "2026-06": 106490,
+          "2026-07": 60774
+        },
+        "probes": [
+          {
+            "issue_date": "2024-01-02",
+            "global_headlines_prior7days": 1966,
+            "universe_announcements_prior7days": 27,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-01-31",
+            "global_headlines_prior7days": 2539,
+            "universe_announcements_prior7days": 11,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-03-11",
+            "global_headlines_prior7days": 2247,
+            "universe_announcements_prior7days": 26,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-04-12",
+            "global_headlines_prior7days": 2646,
+            "universe_announcements_prior7days": 10,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-05-17",
+            "global_headlines_prior7days": 2403,
+            "universe_announcements_prior7days": 4,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-06-19",
+            "global_headlines_prior7days": 2566,
+            "universe_announcements_prior7days": 19,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-07-19",
+            "global_headlines_prior7days": 2486,
+            "universe_announcements_prior7days": 20,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-08-20",
+            "global_headlines_prior7days": 2496,
+            "universe_announcements_prior7days": 12,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-09-23",
+            "global_headlines_prior7days": 2130,
+            "universe_announcements_prior7days": 7,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-10-30",
+            "global_headlines_prior7days": 2871,
+            "universe_announcements_prior7days": 12,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-11-29",
+            "global_headlines_prior7days": 2437,
+            "universe_announcements_prior7days": 22,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          },
+          {
+            "issue_date": "2024-12-31",
+            "global_headlines_prior7days": 2277,
+            "universe_announcements_prior7days": 7,
+            "symbols_with_prior_facts": 10,
+            "symbols_with_issue_bar": 10
+          }
+        ]
+      },
+      "other_inspected_counts": {
+        "fundamentals": 101463,
+        "announcements": 2088367,
+        "dividends": 31131,
+        "index_300": 1254
+      },
+      "what_it_contains": "Company and general-news headlines, announcement titles with source-PDF references, publication-dated financial metrics, daily OHLCV, dividends and benchmark. Full news prose is redacted; five-minute price partitions exist but were not downloaded or validated.",
+      "rights": "Dataset card explicitly allows research use; upstream rights remain distinct. Do not redistribute raw tables in public repo or relabel them Apache/MIT. Code and data rights are separate.",
+      "clock_findings": "All766022 news display_time values equal ctime UTC+8. Publication metadata is not proof of original ingestion/vintage. Fundamentals have day-only pub_date and must be delayed conservatively.",
+      "remaining_admission_checks": [
+        "Confirm raw daily price basis and corporate-action units from source and event probes.",
+        "Historical universe/board/ST status and limit/suspension rules need explicit treatment for executable returns. A fixed observed-panel universe is not evidence of complete survivorship-free coverage.",
+        "A-share T+1 requires multi-session holding; do not reuse US same-day entry/exit evaluator.",
+        "Headline/entity templates are transformed observations, not verbatim original full news; source tags and redactions must remain visible.",
+        "News linked to current outcomes or revised fundamentals cannot be assumed original-vintage clean."
+      ],
+      "recommended_use": "Selected first historical multi-source forecast-information panel; fixed2021 liquidity universe; February2023–December2025; five-session market-relative targets with corporate-action checks. Forecast feasibility only before valid China execution model. No experiment frozen or executed.",
+      "independent_session_audit": {
+        "method": "exchange_calendars XSHG independent session comparison; data quality only; no model or strategy scores",
+        "interval": [
+          "2023-02-01",
+          "2025-12-31"
+        ],
+        "symbols": {
+          "000858": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          },
+          "002460": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          },
+          "002466": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          },
+          "002594": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          },
+          "600031": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          },
+          "600111": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          },
+          "600438": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          },
+          "600519": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          },
+          "601012": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          },
+          "601919": {
+            "expected": 711,
+            "actual": 711,
+            "missing": [],
+            "extra": []
+          }
+        }
+      },
+      "extended_session_audit": {
+        "interval": [
+          "2023-02-01",
+          "2026-06-30"
+        ],
+        "observations": {
+          "600519": {
+            "expected_sessions": 827,
+            "actual_sessions": 827,
+            "missing_sessions": [],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          },
+          "601012": {
+            "expected_sessions": 827,
+            "actual_sessions": 827,
+            "missing_sessions": [],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          },
+          "002594": {
+            "expected_sessions": 827,
+            "actual_sessions": 827,
+            "missing_sessions": [],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          },
+          "002466": {
+            "expected_sessions": 827,
+            "actual_sessions": 827,
+            "missing_sessions": [],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          },
+          "600111": {
+            "expected_sessions": 827,
+            "actual_sessions": 827,
+            "missing_sessions": [],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          },
+          "000858": {
+            "expected_sessions": 827,
+            "actual_sessions": 827,
+            "missing_sessions": [],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          },
+          "601919": {
+            "expected_sessions": 827,
+            "actual_sessions": 827,
+            "missing_sessions": [],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          },
+          "002460": {
+            "expected_sessions": 827,
+            "actual_sessions": 827,
+            "missing_sessions": [],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          },
+          "600031": {
+            "expected_sessions": 827,
+            "actual_sessions": 827,
+            "missing_sessions": [],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          },
+          "600438": {
+            "expected_sessions": 827,
+            "actual_sessions": 817,
+            "missing_sessions": [
+              "2026-02-25",
+              "2026-02-26",
+              "2026-02-27",
+              "2026-03-02",
+              "2026-03-03",
+              "2026-03-04",
+              "2026-03-05",
+              "2026-03-06",
+              "2026-03-09",
+              "2026-03-10"
+            ],
+            "extra_dates": [],
+            "bad_ohlc_rows": 0,
+            "zero_volume_rows": 0
+          }
+        },
+        "interpretation": "600438 has ten missing2026 sessions; possible suspension not independently established. Do not bridge missing rows as consecutive exchange sessions."
+      },
+      "corporate_action_probe": {
+        "source_implementation": "dividend_manager.py divides bonus/transfer/cash by10; interpretation corroborated by observed ex-date discontinuities, not independent exchange certification",
+        "records": [
+          {
+            "stock_code": "002594",
+            "ex_date": "2025-07-29",
+            "ann_date": "2025-07-22",
+            "bonus_per10": 8.0,
+            "transfer_per10": 12.0,
+            "cash_per10": 39.74,
+            "previous_close": 337.0,
+            "ex_open": 112.01,
+            "raw_open_gap": -0.6676261127596439,
+            "gross_share_adjusted_gap": 0.008913946587537191
+          }
+        ]
+      },
+      "large_open_gap_probe": {
+        "threshold_absolute": 0.25,
+        "interval": [
+          "2023-02-01",
+          "2026-07-16"
+        ],
+        "rows": [
+          {
+            "stock_code": "002594",
+            "date": "2025-07-29",
+            "prior_close": 337.0,
+            "open": 112.01,
+            "raw_gap": -0.6676261127596439,
+            "action_rows": [
+              {
+                "stock_code": "002594",
+                "ann_date": "2025-07-22",
+                "bonus_shares": 8.0,
+                "transfer_shares": 12.0,
+                "cash_dividend": 39.74,
+                "ex_date": "2025-07-29",
+                "record_date": "2025-07-28",
+                "progress": "实施"
+              }
+            ]
+          }
+        ],
+        "interpretation": "One >25% opening gap in this fixed ten-name panel; recorded share distribution explains the raw discontinuity. This is a data quality probe, not a trading result or complete corporate-action verification."
+      },
+      "announcement_precision": {
+        "rows": 2088367,
+        "midnight_rows": 1751557,
+        "midnight_fraction": 0.8387208761678383,
+        "policy": "Treat midnight as day precision absent independent publication time; eligible only next exchange session. Do not invent midnight availability."
+      },
+      "price_coverage_policy": "No September–December2022 daily rows; January2023 partial. First proposed historical interval February2023–December2025 has all ten fixed names on all independent XSHG sessions. Preserve missingness elsewhere; never bridge missing bars.",
+      "local_inspection_receipts": [
+        {
+          "path": "work/datasets/data-selection/root/harness-session-audit.json",
+          "sha256": "ec2cbd833c472d44acb54ad395065e6f7e56c113b223ac2eea852383882316e0"
+        },
+        {
+          "path": "work/datasets/data-selection/root/harness-2023-2025-session-audit.json",
+          "sha256": "7a09d7636181b891187754978ec7ca4953dc857a9c93f63cd8d464489fe93d2f"
+        },
+        {
+          "path": "work/datasets/data-selection/root/harness-action-probes.json",
+          "sha256": "f291f27718d1591bbca369c1fa5a6319a0b0db7a5ad9f7c9059695fdaabc3fec"
+        },
+        {
+          "path": "work/datasets/data-selection/root/harness-large-gap-audit.json",
+          "sha256": "58af2475adbaf9f8bda504554c22d178b2d0163e3fbaf2876d49c9b95e503bc8"
+        }
+      ]
+    },
+    {
+      "name": "MTBench",
+      "dataset_url": "https://huggingface.co/datasets/GGLabYale/MTBench_finance_aligned_pairs_long/tree/a1bcb7eda5679a0d644ff0b9910be332e350cd8b",
+      "repository_url": "https://github.com/Graph-and-Geometric-Learning/MTBench/tree/394a9d274403e93a08b24c2a0b7af461615ce302",
+      "status": "actual complete long-pair release downloaded and audited; useful diagnostic comparator, not clean ready trading panel",
+      "downloaded_bytes": 22910094,
+      "audit": {
+        "source_file_sha256": "6330da0d130c0dbfec25e61df2422487cc70cef6c38526b4692cfd7124887183",
+        "counts": {
+          "rows": 525,
+          "no_input": 0,
+          "no_output": 0,
+          "input_at_or_after_news": 0,
+          "first_output_not_after_news": 20,
+          "duplicate_input_times": 6,
+          "duplicate_output_times": 3,
+          "output_under_2_marks": 0,
+          "alignment_\"inconsistent\"": 94,
+          "alignment_\"consistent\"": 431
+        },
+        "publication_range": [
+          "2021-04-27T21:25:10Z",
+          "2023-08-31T16:48:40Z"
+        ],
+        "examples": [
+          {
+            "row": 0,
+            "published": "2022-04-21T13:40:31Z",
+            "url": "https://www.fool.com/investing/2022/04/21/is-novavax-stock-in-trouble/",
+            "input_start_end": [
+              1647956700.0,
+              1650483900.0
+            ],
+            "output_start_end": [
+              1650548700.0,
+              1651088700.0
+            ],
+            "input_marks": 137,
+            "output_marks": 33,
+            "news_fields": [
+              "article_url",
+              "content",
+              "label_sentiment",
+              "label_time",
+              "label_type",
+              "published_utc",
+              "timestamp_ms"
+            ]
+          },
+          {
+            "row": 1,
+            "published": "2021-08-05T13:06:00Z",
+            "url": "https://www.fool.com/investing/2021/08/05/1-thing-the-market-got-wrong-in-amazons-earnings/",
+            "input_start_end": [
+              1625578200.0,
+              1628103600.0
+            ],
+            "output_start_end": [
+              1628170200.0,
+              1628710200.0
+            ],
+            "input_marks": 143,
+            "output_marks": 33,
+            "news_fields": [
+              "article_url",
+              "content",
+              "label_sentiment",
+              "label_time",
+              "label_type",
+              "published_utc",
+              "timestamp_ms"
+            ]
+          },
+          {
+            "row": 2,
+            "published": "2022-04-01T13:00:00Z",
+            "url": "https://www.globenewswire.com/news-release/2022/04/01/2414848/15780/en/NBT-Bancorp-Inc-Announces-Date-of-First-Quarter-Conference-Call.html",
+            "input_start_end": [
+              1646231400.0,
+              1648753200.0
+            ],
+            "output_start_end": [
+              1648819800.0,
+              1649359800.0
+            ],
+            "input_marks": 143,
+            "output_marks": 33,
+            "news_fields": [
+              "article_url",
+              "content",
+              "label_sentiment",
+              "label_time",
+              "label_type",
+              "published_utc",
+              "timestamp_ms"
+            ]
+          },
+          {
+            "row": 3,
+            "published": "2021-12-02T13:15:00Z",
+            "url": "https://www.fool.com/investing/2021/12/02/gamestop-third-quarter-earnings-preview/",
+            "input_start_end": [
+              1635859800.0,
+              1638390600.0
+            ],
+            "output_start_end": [
+              1638455400.0,
+              1638995400.0
+            ],
+            "input_marks": 134,
+            "output_marks": 33,
+            "news_fields": [
+              "article_url",
+              "content",
+              "label_sentiment",
+              "label_time",
+              "label_type",
+              "published_utc",
+              "timestamp_ms"
+            ]
+          },
+          {
+            "row": 4,
+            "published": "2021-09-04T17:46:12Z",
+            "url": "https://www.benzinga.com/markets/cryptocurrency/21/09/22802904/if-you-invested-1-000-in-bitcoin-when-ncaa-football-had-a-bitcoin-bowl-heres-how-much-youd",
+            "input_start_end": [
+              1628185800.0,
+              1630696800.0
+            ],
+            "output_start_end": [
+              1631021400.0,
+              1631300400.0
+            ],
+            "input_marks": 139,
+            "output_marks": 26,
+            "news_fields": [
+              "article_url",
+              "content",
+              "label_sentiment",
+              "label_time",
+              "label_type",
+              "published_utc",
+              "timestamp_ms"
+            ]
+          }
+        ],
+        "audit_scope": "clock,structure andcoverage only; no model or strategy scores"
+      },
+      "short_pair_release_rows": 750,
+      "pair_fields": [
+        "input_timestamps",
+        "input_window",
+        "output_timestamps",
+        "output_window",
+        "text",
+        "trend",
+        "technical",
+        "alignment"
+      ],
+      "pit_findings": [
+        "Published pairing code consumes stock open prices; pairs export float lists and omit explicit ticker.",
+        "Technical field includes future output and overall indicators; trend/alignment use outcomes. These must be evaluator-only, never fed to predictor.",
+        "20 of525 long pairs begin output exactly at or before publication; execution needs a strictly later entry and real latency.",
+        "Six input and three output windows have duplicate timestamps.",
+        "Two separately inspected news samples published2023-09-06 contain boilerplate performance through2023-10-02, proving collected body bytes are not wholly authenticated publication-time text."
+      ],
+      "rights": "No explicit dataset redistribution license was located in inspected cards; original publisher rights remain. Keep raw research samples private.",
+      "recommended_use": "Temporal-boundary and text/series reasoning diagnostics; rebuild from source rows with instrument identity and latency before claiming event returns."
+    }
+  ],
+  "no_inference_calls": true,
+  "local_originals": "work/datasets/data-selection/root/",
+  "availability_not_overclaimed": "Price partitions not downloaded are explicitly unverified; metadata claims are separate from the six actual files and525 actual pairs."
+}

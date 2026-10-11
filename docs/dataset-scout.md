@@ -1,7 +1,10 @@
 # Public historical inputs for Zenith's feed aggregation
 
-The best next richer input is a narrow **FinMultiTime prices + article text + SEC
-facts** slice. It is now imported and timestamp-filtered locally. The original
+The initial richer input was a narrow **FinMultiTime prices + article text + SEC
+facts** slice. It is imported and timestamp-filtered locally. The deeper
+[data selection audit](data-selection.md) supersedes its priority: AAPL's news
+archive contains no 2024 rows, so date-range endpoints did not establish a
+continuous rich backtest. The original
 StockNet text-plus-price task remains a useful smaller matched ablation; a
 price-only StockNet baseline does not evaluate text aggregation. Neither slice
 supplies every live Zenith feed or establishes prospective model accuracy.
@@ -13,7 +16,10 @@ StockBench negative control. The actual text-free
 checksums and verified coverage. Findings are recorded on the existing market
 WorkItem; its authority-visible note is `wie_20261011T145617Z_1c7da9f0`.
 
-| Priority | Candidate | Actual complementary inputs | Practical use and boundary |
+The following table preserves the initial ranking; the linked data selection
+audit owns the current decision.
+
+| Initial priority | Candidate | Actual complementary inputs | Practical use and boundary |
 |---|---|---|---|
 | 1 | [FinMultiTime official release](https://huggingface.co/datasets/Wenyan0110/Multimodal-Dataset-Image_Text_Table_TimeSeries-for-Financial-Time-Series-Forecasting/tree/72d4e97b9acb92651949b8efb22c55676ff633ff) | Prices, publisher articles, financial tables; charts are also supplied | Five AAPL archive members supply a real three-channel preparation slice. The release card says MIT; publisher/platform rights remain separate. Raw data stays in ignored local work. |
 | 2 | [StockNet original corpus](https://github.com/yumoxu/stocknet-dataset/tree/330708b5ddc359961078bef469f43f48992fd6e4) | Original public tweets and Yahoo price histories | Small, dated text blobs support a matched price-versus-price-plus-text experiment. Repository MIT does not independently settle Twitter/Yahoo redistribution rights. Tweet creation time is observed, acquisition/edit availability is not. |

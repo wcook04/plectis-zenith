@@ -30,36 +30,40 @@ node-policy field for controlled replay. A historical price-only study compared
 one manually frozen persistence/scale rule with a model baseline over 20
 August and five later October 2015 dates. On the later dates, candidate mean
 relative price error was 0.8875\%, versus 0.9966\% for the model baseline and
-1.0453\% for no change. The 100-call study demonstrates pipeline feasibility and
-a descriptive intervention comparison. Previously examined history, a modern
-model and limited support prevent claims of prospective accuracy, learned
-improvement or novelty. The next question is whether a rule derived from
-measured development feedback improves later forecasts over the frozen manual
-rule under matched execution conditions.
+1.0453\% for no change. On development dates, no change outperformed both model
+policies. The 100-call study demonstrates pipeline feasibility and a descriptive
+intervention comparison. Previously examined history, a modern model and limited
+support prevent claims of prospective accuracy, learned improvement or novelty.
+The learning question is whether measured development feedback produces a
+forecast-node skill that improves later decisions over a frozen competent base
+and equally budgeted proposal controls.
 \end{abstract}
 
 \section{Question and scope}
 
-A poor forecast can reflect unavailable evidence, restricted context, an
-unsupported inference, model-response variation or an unpredictable outcome.
-Final price error does not identify which explanation applies. A useful learning
-loop must turn measured failures into a declared intervention, produce new
-forecasts through the same executor and assess them on later matched evidence.
+The intended system answers three questions. What should be forecast from
+information available at issue time? What happened at the declared horizon?
+What does the recorded attempt suggest changing? The first is a forward
+reasoning task, the second a measurement task, and the third a diagnosis and
+learning task. Price error alone cannot answer the third: a miss can reflect
+unavailable information, restricted context, an unsupported inference, response
+variation or an unpredictable event.
 
 Zenith is a standalone extraction of an existing Lab--Oracle--Refinement system.
-Lab emits a thesis checkpoint (CP1) and forecast checkpoint (CP2); Oracle
-resolves later observations. The authored inventory has 71 nodes, with 28 in the
-default Lab plan. These counts describe structure, not successful execution.
-The retained refinement runner and the newer reflection/cohort route are
-separate implementations. The completed experiment uses an explicitly admitted
-three-node price-only replacement: a stock feed, CP1 and CP2. It does not test
-the full Lab architecture.
+The original Lab combines stock and ETF prices, macro observations, news and
+other feed lanes. Reasoning nodes interpret the supplied evidence through
+instructions and typed output contracts; they can consider competing
+explanations rather than execute a fixed indicator rule. Lab emits a thesis
+checkpoint (CP1) and forecast checkpoint (CP2); Oracle resolves later observations
+and critiques the frozen attempt. A retained dossier runner and a newer
+reflection/cohort route implement different revision paths.
 
-Graph-based reasoning is established prior art \citep{got2024}. The question
-here is narrower: can measured development feedback produce a bounded node
-policy that improves later forecast loss over a frozen manual rule? The
-completed study tests a manual rule, so it establishes the execution and
-comparison boundary but does not answer that learning question.
+Graph-based reasoning is established prior art \citep{got2024}. The local
+question is whether measured development feedback can improve a persistent
+reasoning skill on later evidence under controlled replay. The completed study
+uses a three-node price-only replacement, with one manually frozen skill rule.
+It establishes execution and comparison boundaries; it does not test the full
+multi-source graph or answer the learning question.
 
 \section{Implemented mechanism and its guarantees}
 
@@ -123,7 +127,12 @@ Diagnostics bind artifact presence, validator rejection and context-delivery
 conditions to recorded bytes and receipts. Missing or unbound evidence stays
 unknown; observer failure cannot change cohort acceptance. A large final error
 can select a trace for inspection but cannot certify missing data, data-access
-failure or faulty reasoning as its cause.
+failure or faulty reasoning as its cause. A hindsight reviewer may inspect
+realized outcomes and later news to form a hypothesis. Its record must separate
+checkable defects, relevant information available before issue but omitted,
+post-issue events and unresolved explanations. Published explanations or
+reviewer labels supply no causal ground truth. Only admissible pre-issue evidence
+may enter a repaired forward run; its benefit needs a new measured comparison.
 
 The reflection route binds development membership, feedback and selected node
 artifacts plus available agent-provider exchanges. It does not consume all
@@ -165,39 +174,16 @@ The modern model may also encode historical outcomes. Valid input timestamps
 cannot remove pretrained look-ahead knowledge; anonymization controls can test
 some effects without proving absence of memorization \citep{glasserman2023}.
 
-Four compatibility pilots used 1 July 2015, excluded from both study windows.
-They retain native failures rather than converting format, length or transport
-errors into reasoning diagnoses (Table~\ref{tab:calibration}). Prompt profile v2
-increased requested word margins while preserving the validator. Its
-introduction at \code{7582bf1} is distinct from executed implementation content:
-all 105 recorded implementation hashes match \code{c4c051c} for Nova and Qwen,
-\code{aa2f8ec} for failed DeepSeek, and \code{01522cc} for the accepted
-DeepInfra pilot. The manifests do not record Git HEAD; these matches establish
-content compatibility, not an observed or unique executed revision.
-
-\begin{table}[ht]
-\caption{Excluded compatibility pilots. Native acceptance does not measure
-forecast accuracy. Charges are provider-reported USD.}
-\label{tab:calibration}
-\small
-\begin{tabularx}{\linewidth}{@{}l r >{\raggedright\arraybackslash}X r@{}}
-\toprule
-Model/route & Attempts & Native outcome & Known charge \\
-\midrule
-Nova Micro & 1 & CP1 rejected: 36 words, minimum 150; invalid references. & 0.000307895 \\
-Qwen Flash & 2 & CP1 accepted; CP2 rejected: 145 words, minimum 165. & 0.001489930 \\
-DeepSeek & 1 & HTTP 429; no response or usage; CP2 unrun. & Unknown \\
-DeepSeek/DeepInfra & 2 & CP1 and CP2 accepted. & 0.002375240 \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-The HTTP 429 retained an unknown charge and its full reservation. Explicit
-hash-bound recovery preserved the failed record and budget limits; a fresh
-pinned pilot replaced no existing attempt. The four pilots total six attempts,
-five responses and USD 0.004173065 in known charges. Their exact model,
-validation, token and hash evidence is retained in
-\code{paper/calibration-evidence.json}.
+Four compatibility pilots used 1 July 2015, excluded from the study. Nova and
+Qwen responses failed length or reference validation; an unpinned DeepSeek
+request returned HTTP 429 without usage or known charge. An audited recovery
+preserved that failed attempt and reservation. A fresh DeepSeek request through
+\code{deepinfra/fp8}, reported as DeepInfra, completed both reasoning nodes.
+These six attempts yielded five responses and USD 0.004173065 in known charges.
+Acceptance measures contract compatibility, not forecast accuracy.
+\code{paper/calibration-evidence.json} and \code{paper/README.md} retain all
+pilot outcomes, tokens, costs and implementation-hash matches; manifests record
+no Git HEAD, so matches do not establish a unique executed revision.
 
 \subsection{Complete common-support results}
 
@@ -235,9 +221,9 @@ These routing thresholds are not significance tests.
 
 Development used 80 responses at USD 0.0992369112; later assessment used 20 at
 USD 0.0244918688. The complete study cost USD 0.1237287800. With calibration,
-the settled ledger has 106 attempts, 105 responses and USD 0.1279018450 in known
-charges, plus the earlier unknown-cost HTTP 429. It retains USD 1.137895220
-in reservations and is not halted; reservations are not actual charges.
+the ledger at study close had 106 attempts, 105 responses and USD 0.1279018450 in
+known charges, plus the earlier unknown-cost HTTP 429. It retained USD 1.137895220
+in reservations and was not halted; reservations are not actual charges.
 Exact scores, paired losses, target coverage and accounting remain in the
 immutable study export. This small retrospective comparison has no
 unchanged-baseline replicates and estimates no uncertainty, profitability or
@@ -249,12 +235,13 @@ prospective forecasting advantage.
 
 QuantAgent's 2024 writer/judge loop retrieves experience, while an outer
 market-data evaluation retains signal code, scores and feedback
-\citep{quantagent2024}. Its alpha-factor information-coefficient/Sharpe task
-is different from point-price forecasting. FinCon compares training trajectories
-and selectively propagates revised beliefs to fixed financial-agent roles
-\citep{fincon2024}. These are close prior art for the entire feedback loop and
-for using outcomes to revise particular instructions. Their return and portfolio
-results are not comparable to the loss in Table~\ref{tab:results}.
+\citep{quantagent2024}. ATLAS's Adaptive-OPRO updates static trading instructions
+from prompt--performance history and recent outcome summaries while protecting
+run-time inputs and interfaces \citep{atlas2026}. These precedents already
+connect financial outcomes to persistent program or instruction changes.
+Their alpha-factor and portfolio evaluations differ from the point-price loss
+in Table~\ref{tab:results}; adjacent windows under different prompts do not
+isolate the causal effect of an edit.
 
 Trace propagates executed subgraphs and output feedback to trainable
 parameters; OptoPrime proposes prompt, code or numerical updates
@@ -306,6 +293,14 @@ control distinguishes feedback value from making another proposal. Neither is
 present here. Repeated search also needs dependence-aware uncertainty over its
 full comparison family, for which White's Reality Check is one framework
 \citep{white2000}, not a statistic implemented or estimated in this study.
+
+Planning for a later paid learning study paused after source audits found
+sparse AAPL news and incomplete price coverage despite broad date ranges.
+TraderHarness is the proposed multi-session panel from February 2023 onward,
+subject to price-basis, corporate-action and complete-support checks.
+Unknown-vintage fundamentals are excluded; day-only announcements require
+conservative availability. This selection, documented in
+\code{docs/data-selection.md}, supplies no new forecast or learning results.
 
 The repository contains executor/schema source and text-free evidence
 projections, not redistributed market text or private provider packets.

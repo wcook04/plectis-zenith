@@ -1,0 +1,286 @@
+{
+  "schema": "zenith_trading_prior_art_v1",
+  "reviewed_at": "2026-10-11",
+  "status": "source_review_and_proposed_comparator_not_an_experiment_result",
+  "decision": {
+    "main": "Keep per-date LLM interpretation and forecasting as actual reasoning nodes. Freeze common interpretation artifacts to isolate forecast-node policy revisions; separately assess the complete pipeline when claiming graph improvement.",
+    "closest_lightweight_comparator": "Outcome-summary instruction adaptation inspired by ATLAS Adaptive-OPRO, using a protected experimental forecast-node skill and unchanged return evaluator.",
+    "attribution_boundary": "This adapts a protected prompt-revision pattern. It is not an ATLAS/StockSim reproduction, and ATLAS is not specified as scalar-only feedback.",
+    "numeric_controls": "Keep no-change, historical-mean/regularized prediction and inner-fit scalar shrinkage as controls under the exact same horizon and decision accounting. A finite symbolic residual rule is an optional research-product control, not the main LLM graph.",
+    "why": "The experiment should test whether richer development feedback improves later LLM decisions beyond competent frozen instructions, calibration and equally funded search. A different executor, label or action space would obscure that question."
+  },
+  "sources": [
+    {
+      "id": "atlas",
+      "paper": {
+        "title": "ATLAS: Adaptive Trading with LLM AgentS Through Dynamic Prompt Optimization and Multi-Agent Coordination",
+        "authors": [
+          "Charidimos Papadakis",
+          "Angeliki Dimitriou",
+          "Giorgos Filandrianos",
+          "Maria Lymperaiou",
+          "Konstantinos Thomas",
+          "Giorgos Stamou"
+        ],
+        "arxiv": "2510.15949v5",
+        "revised": "2026-05-20",
+        "url": "https://arxiv.org/abs/2510.15949v5",
+        "pdf_sha256": "c648c9f58811dcad578b41d56e06760c715d3b8c6314aad01170536f62d84bf7",
+        "license": "CC-BY-NC-ND-4.0",
+        "license_evidence": "https://arxiv.org/abs/2510.15949v5 (view license)"
+      },
+      "read_sections": [
+        "3",
+        "4",
+        "5.1",
+        "6.1",
+        "F.5",
+        "F.6",
+        "J"
+      ],
+      "mechanism": "Market/news/fundamental summaries feed an order agent. Adaptive-OPRO edits only static instructions, retaining runtime placeholders and output interfaces. Section4 supplies meta-prompt, scored history and recent interaction summaries; appendixF.5 injects history_text. K=5 daily steps score clipped cumulative ROI. Accepted edits act on later windows.",
+      "evaluation": "Engineered static prompts, weekly reflection and Adaptive-OPRO share execution semantics; seven backbones and three runs/configuration over regime-specific two-month equity simulations. Deterministic execution abstracts slippage, impact, latency and intraday partial fills.",
+      "code": {
+        "repo": "https://github.com/harrypapadakis/StockSim",
+        "pin": "c1a25c195df4c93b2db4a748f80ceae0f1c9fe50",
+        "reviewed_files": [
+          {
+            "path": "README.md",
+            "url": "https://github.com/harrypapadakis/StockSim/blob/c1a25c195df4c93b2db4a748f80ceae0f1c9fe50/README.md",
+            "sha256": "647f33895a2dfd1ff8bd844d1f77a9a2558203a5f85a6c7485f114567a4b0ff7"
+          },
+          {
+            "path": "agents/llm_agent.py",
+            "url": "https://github.com/harrypapadakis/StockSim/blob/c1a25c195df4c93b2db4a748f80ceae0f1c9fe50/agents/llm_agent.py",
+            "sha256": "066cfd38650b944b08f2a9e6d55684902a53e00525c4af9d2fdcb69ca398659c"
+          },
+          {
+            "path": "templates/trading_prompt_template_full.j2",
+            "url": "https://github.com/harrypapadakis/StockSim/blob/c1a25c195df4c93b2db4a748f80ceae0f1c9fe50/templates/trading_prompt_template_full.j2",
+            "sha256": "e743a703f626f274c018d35d256df89d0966285e4184472ba080751d7e008f88"
+          },
+          {
+            "path": "utils/metrics.py",
+            "url": "https://github.com/harrypapadakis/StockSim/blob/c1a25c195df4c93b2db4a748f80ceae0f1c9fe50/utils/metrics.py",
+            "sha256": "0a9223277e17eb8e98e0aed14e200319e829df2c96a8c20813ac472c99be336e"
+          }
+        ],
+        "license": "README declares MIT; no dedicated LICENSE file present in this inspected revision",
+        "boundary": "AppendixJ names an updated environment and configs/o4-mini-adaptive-opro-config.yaml. The inspected public main/website heads lack that config and optimizer/reflection modules. Analyst/template/decision code is verified; the Adaptive-OPRO implementation is paper-described."
+      },
+      "adopt": "Protected editable instruction block, complete prompt/history records, delayed maturity, competent static and reflection controls.",
+      "defer": "StockSim services/order simulator and paper reward transform; preserve the experimental return-forecast contract and its unchanged evaluator. This is distinct from native CP1/CP2 admission."
+    },
+    {
+      "id": "qlib",
+      "paper": {
+        "title": "Qlib: An AI-oriented Quantitative Investment Platform",
+        "arxiv": "2009.11189v1",
+        "submitted": "2020-09-22",
+        "url": "https://arxiv.org/abs/2009.11189v1",
+        "pdf_sha256": "35f2eea75c9a485b175a3af7555435a366d33b2f09b3c62c3fdaef2287b76ce3",
+        "license": "arXiv non-exclusive distribution license; code license is separate"
+      },
+      "read_sections": [
+        "Background and Related Works",
+        "Qlib framework and workflow",
+        "data/expression layer",
+        "evaluation"
+      ],
+      "mechanism": "Numerical research platform separates dataset preparation, model fitting, signal records, portfolio strategy and backtest. Current workflow code explicitly separates train/valid/test; LightGBM fits train/valid, predicts features on test. RollingGen supports expanding/sliding windows and truncation.",
+      "code": {
+        "repo": "https://github.com/microsoft/qlib",
+        "pin": "54355232463878d2eebb91fe0ee5fa7fa1f5976c",
+        "license": "MIT",
+        "license_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+        "reviewed_files": [
+          {
+            "path": "examples/benchmarks/LightGBM/workflow_config_lightgbm_Alpha158.yaml",
+            "url": "https://github.com/microsoft/qlib/blob/54355232463878d2eebb91fe0ee5fa7fa1f5976c/examples/benchmarks/LightGBM/workflow_config_lightgbm_Alpha158.yaml",
+            "sha256": "0cbe1f729f43a2b8cd735759e6244c2e9f8db967555bfe24a7143fce4605d680"
+          },
+          {
+            "path": "qlib/contrib/data/handler.py",
+            "url": "https://github.com/microsoft/qlib/blob/54355232463878d2eebb91fe0ee5fa7fa1f5976c/qlib/contrib/data/handler.py",
+            "sha256": "b621481c6009c39066c67c71390fd2bea635f56daf9f2c4e38817eff268e3232"
+          },
+          {
+            "path": "qlib/contrib/model/gbdt.py",
+            "url": "https://github.com/microsoft/qlib/blob/54355232463878d2eebb91fe0ee5fa7fa1f5976c/qlib/contrib/model/gbdt.py",
+            "sha256": "a1afddb3bb965d108a916565b57e474cfddc55ce029f781765876e825623ad39"
+          },
+          {
+            "path": "qlib/workflow/task/gen.py",
+            "url": "https://github.com/microsoft/qlib/blob/54355232463878d2eebb91fe0ee5fa7fa1f5976c/qlib/workflow/task/gen.py",
+            "sha256": "4b4ab88a40da6f78443292e3b8f0d96e5a810f945e139ed534be62359c888562"
+          },
+          {
+            "path": "qlib/workflow/record_temp.py",
+            "url": "https://github.com/microsoft/qlib/blob/54355232463878d2eebb91fe0ee5fa7fa1f5976c/qlib/workflow/record_temp.py",
+            "sha256": "80eacd668e6f8475995ff67f115766c4c241a469b03419fa82a4bb41482e13de"
+          },
+          {
+            "path": "qlib/contrib/strategy/signal_strategy.py",
+            "url": "https://github.com/microsoft/qlib/blob/54355232463878d2eebb91fe0ee5fa7fa1f5976c/qlib/contrib/strategy/signal_strategy.py",
+            "sha256": "7ac8dbbbef2e0286131545ccb3fe60deb0a420748dd7477e18b1ab61cf78c1ca"
+          },
+          {
+            "path": "qlib/data/base.py",
+            "url": "https://github.com/microsoft/qlib/blob/54355232463878d2eebb91fe0ee5fa7fa1f5976c/qlib/data/base.py",
+            "sha256": "30382dd1a3c47506e61514f37533a3407f63fd01c9a9fd5a12b8c0cce85c5d5c"
+          },
+          {
+            "path": "qlib/data/ops.py",
+            "url": "https://github.com/microsoft/qlib/blob/54355232463878d2eebb91fe0ee5fa7fa1f5976c/qlib/data/ops.py",
+            "sha256": "f563394c3b4fd1130774d171ff1e0c3dac49028cdc28a64bbf42c85e4a2d3e9e"
+          }
+        ]
+      },
+      "hard_target_convention": "Alpha158 default Ref($close,-2)/Ref($close,-1)-1 is shifted close-to-close. YAML uses close execution, TopkDropout50/5 and explicit costs. None matches next-session open-to-close, three-stock long/cash automatically.",
+      "data_boundary": "Current README says official data temporarily disabled and Yahoo-derived data imperfect. Platform reuse does not authenticate point-in-time prices.",
+      "adopt": "Fit-only preprocessing, separated forecast/portfolio evaluation records and declared rolling-label maturity.",
+      "defer": "Full Qlib runtime and default benchmark task; small numerical controls should use Zenith admitted data and its declared target."
+    },
+    {
+      "id": "quantaalpha",
+      "paper": {
+        "title": "QuantaAlpha: An Evolutionary Framework for LLM-Driven Alpha Mining",
+        "arxiv": "2602.07085v3",
+        "revised": "2026-05-18",
+        "url": "https://arxiv.org/abs/2602.07085v3",
+        "pdf_sha256": "75e9c2ef5e8bb7fed78d27409e8252208e8fdacf6d10e1495dbc5b8767481848",
+        "license": "arXiv non-exclusive distribution license"
+      },
+      "read_sections": [
+        "3 problem formulation",
+        "4.1 symbolic construction and gating",
+        "4.2.2 mutation/crossover",
+        "5.1 evaluation setup"
+      ],
+      "mechanism": "Hypothesis→symbolic AST→code→backtest trajectory. Paper mutation freezes a prefix, revises a localized low-reward action and regenerates the dependent suffix. Complexity/redundancy gates constrain expressions; evaluated parents support crossover.",
+      "evaluation": "CSI300 chronological train2016–2020, valid2021, test2022–2025; roughly150 factors per agent feed the same downstream LightGBM. Factor IC/RankIC and portfolio metrics differ from three-stock point forecasting.",
+      "code": {
+        "repo": "https://github.com/QuantaAlpha/QuantaAlpha",
+        "pin": "b7ceb27b1001261d7a95b209a963664ae1f8ab23",
+        "license": "README MIT badge; dedicated LICENSE absent in inspected revision",
+        "reviewed_files": [
+          {
+            "path": "quantaalpha/pipeline/evolution/trajectory.py",
+            "url": "https://github.com/QuantaAlpha/QuantaAlpha/blob/b7ceb27b1001261d7a95b209a963664ae1f8ab23/quantaalpha/pipeline/evolution/trajectory.py",
+            "sha256": "d366febc0814a9ebc5d8a91210653b8af6e7f472bd462c0e2fd0354781b3f279"
+          },
+          {
+            "path": "quantaalpha/pipeline/evolution/mutation.py",
+            "url": "https://github.com/QuantaAlpha/QuantaAlpha/blob/b7ceb27b1001261d7a95b209a963664ae1f8ab23/quantaalpha/pipeline/evolution/mutation.py",
+            "sha256": "82ed2591ba1185ec48262c2168a02d99347d48ae38a02973ccd1cf265a3b0c86"
+          },
+          {
+            "path": "quantaalpha/pipeline/evolution/controller.py",
+            "url": "https://github.com/QuantaAlpha/QuantaAlpha/blob/b7ceb27b1001261d7a95b209a963664ae1f8ab23/quantaalpha/pipeline/evolution/controller.py",
+            "sha256": "ae9147a8aee4c0d87c8f5eabb4b65035eb72d094715fb398d2e018fdddd344f6"
+          },
+          {
+            "path": "quantaalpha/factors/regulator/factor_regulator.py",
+            "url": "https://github.com/QuantaAlpha/QuantaAlpha/blob/b7ceb27b1001261d7a95b209a963664ae1f8ab23/quantaalpha/factors/regulator/factor_regulator.py",
+            "sha256": "9902601c29d7a061083f40bcce9132999e12dc78d8a53305667dbb5f521650dc"
+          },
+          {
+            "path": "quantaalpha/factors/regulator/consistency_checker.py",
+            "url": "https://github.com/QuantaAlpha/QuantaAlpha/blob/b7ceb27b1001261d7a95b209a963664ae1f8ab23/quantaalpha/factors/regulator/consistency_checker.py",
+            "sha256": "57bfc5b371309eafdad57be1d02f9f7a674ea1a7fe46bb1aa3150689233bdba6"
+          }
+        ],
+        "boundary": "The inspected MutationOperator generates an orthogonal hypothesis from parent hypothesis/factors/metrics/feedback. It does not itself implement the paper frozen-prefix localized-action algorithm. The semantic consistency checker is LLM-mediated; structural limits are deterministic."
+      },
+      "adopt": "If testing compiled residuals, restrict operator vocabulary and size, retain full trial lineage, and compare under one downstream model.",
+      "defer": "Unrestricted coding/crossover search and its correction retries; current main study remains bounded LLM instruction revision."
+    },
+    {
+      "id": "rd-agent-quant",
+      "paper": {
+        "title": "R&D-Agent-Quant: A Multi-Agent Framework for Data-Centric Factors and Model Joint Optimization",
+        "arxiv": "2505.15155v2",
+        "revised": "2025-09-25",
+        "url": "https://arxiv.org/abs/2505.15155v2",
+        "pdf_sha256": "5df0919520ec1a9d556f6a20bc10e9d2d1dc11cada2e6913b871239df63a2df2",
+        "license": "CC-BY-NC-SA-4.0"
+      },
+      "read_sections": [
+        "Specification",
+        "Synthesis",
+        "Implementation/Co-STEER",
+        "Validation",
+        "Analysis",
+        "Experiments"
+      ],
+      "mechanism": "Research hypotheses become coding tasks, numerical backtests and feedback; factor/model directions are scheduled. Current RDLoop records experiments and failures in trace; factor feedback compares IC, cost-adjusted excess return and drawdown to current best.",
+      "code": {
+        "repo": "https://github.com/microsoft/RD-Agent",
+        "pin": "484776c211e4fbbeef03e0ec00d6bbee7362a4f4",
+        "license": "MIT",
+        "license_sha256": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+        "reviewed_files": [
+          {
+            "path": "rdagent/components/workflow/rd_loop.py",
+            "url": "https://github.com/microsoft/RD-Agent/blob/484776c211e4fbbeef03e0ec00d6bbee7362a4f4/rdagent/components/workflow/rd_loop.py",
+            "sha256": "eb858b5e258f5a0f1a8c475e852bdae87c492b2765e7f2c52cb629e4240ae901"
+          },
+          {
+            "path": "rdagent/app/qlib_rd_loop/factor.py",
+            "url": "https://github.com/microsoft/RD-Agent/blob/484776c211e4fbbeef03e0ec00d6bbee7362a4f4/rdagent/app/qlib_rd_loop/factor.py",
+            "sha256": "819bbdab43888682735766ad3842b0e15b83d9286af59b5e96072da75e5db2d0"
+          },
+          {
+            "path": "rdagent/scenarios/qlib/developer/feedback.py",
+            "url": "https://github.com/microsoft/RD-Agent/blob/484776c211e4fbbeef03e0ec00d6bbee7362a4f4/rdagent/scenarios/qlib/developer/feedback.py",
+            "sha256": "ec2fce044709e083119820d7cb2c1609df8ff429103cabe34ced640cc093bb68"
+          }
+        ]
+      },
+      "adopt": "Retain failed attempts, executable task interfaces and hypothesis/implementation/evaluation lineage.",
+      "defer": "Joint factor/model optimizer and bandit controller; they add search dimensions unnecessary for one native forecast-node change. Source inspection does not prove its evaluation meets our prospective secrecy or point-in-time conventions."
+    }
+  ],
+  "comparator_contract": {
+    "shared": "Same admitted per-date information, saved interpretation artifact, forecast functional/horizon, frozen model/provider and decoding configuration, validators, objective, candidate count and selection rule.",
+    "arms": [
+      "Competent frozen forecast-node policy, retained as unchanged option.",
+      "Trace-conditioned proposals: complete development denominator and bounded actual input/output traces, including successes and failures.",
+      "Outcome-summary proposals inspired by Adaptive-OPRO: scored policy history and declared recent outcomes, with actual retained-input/node traces withheld.",
+      "Feedback-blinded proposal generation: same declared priors/interfaces and search allowance, without outcomes, scores, selected winners or later-round winner feedback."
+    ],
+    "selection": "Freeze all proposals before a common untouched validation block; retain the whole candidate bank plus unchanged. Validation selection can use outcomes in all arms, so blinded means generator-blinded, not an entire algorithm without feedback.",
+    "conditional_vs_end_to_end": "Shared saved interpretations isolate forecast-node updates. Whole-pipeline tests are separate; identical interpretation instructions do not guarantee identical stochastic artifacts.",
+    "failures": "Retain every attempted forecast/proposal and operational failure. Declare failure treatment for economic decisions separately from predictive-loss coverage; never rank only accepted outputs.",
+    "assessment": "Hide later outcomes from proposers and selectors until final assessment; freeze chronological boundaries, label maturity, trial budget and reporting rule before calls. Historical replay with later-trained LLMs remains developmental, not contamination-free evidence.",
+    "financial_functional": "For a new next-session open-to-close target C_next/O_next-1, issue after prior completed close, keep the future open/close out of predictors, and freeze entry/exit/cost/position conventions. Existing next-close price-error study remains a different contract.",
+    "testable_claim": "Under the shared interface and research budget, trace-conditioned proposals improve later decisions more than outcome-summary and generator-blinded proposals; a negative result remains useful.",
+    "claim_not_supported": "This review establishes neither profitability nor automatic graph learning, causal attribution, differentiability or novelty.",
+    "implementation_boundary": "The proposed return reasoning graph is experimental. Its bounded skill text and return evaluator must not be described as the native CP1/CP2 policy/evaluator or as native-cohort completion."
+  },
+  "optional_compiled_control": {
+    "status": "optional_control_only",
+    "mechanism": "A small deterministic residual expression over declared past-only inputs can test whether a cheaper research product matches daily reasoning.",
+    "identifiability": "A linear residual on the same ridge features is redundant with coefficient refitting. Include ridge recalibration/scalar shrinkage, or use declared conditional/nonlinear terms if the intended hypothesis is richer structure.",
+    "boundary": "Factor/program search is already close prior art in QuantaAlpha and RD-Agent; a grammar or compiler alone is not a new learning contribution."
+  },
+  "novelty": {
+    "operator_origin": "Local operator insight is persistent reasoning skills and context selected from experience. Prior source anchors remain in docs/learning-synthesis.json; independent local articulation is not a priority claim.",
+    "overlap": "Protected prompt updates, trajectory feedback, localized revision and executable factor search have close precedents. A node/graph label does not create novelty.",
+    "remaining_question": "Does source-bound trace/context feedback improve measured later LLM decisions under a fixed task and matched budget beyond outcome-only adaptation and simple calibration? This is a falsifiable performance question, not an established unique mechanism."
+  },
+  "annex_locators": {
+    "atlas": "atlas-2510-15949-v5",
+    "qlib_parent": "qlib",
+    "qlib_pinned_source_packet": "qlib-zenith-pinned-workflow",
+    "root_receipt": "docs/zenith_trading_annex_import_receipt.json"
+  },
+  "work_boundary": {
+    "paid_calls": 0,
+    "budget_ledger_changes": 0,
+    "runtime_edits": 0,
+    "upstream_execution_or_installation": false,
+    "public_source_copies": false,
+    "not_a_candidate_policy": true
+  }
+}

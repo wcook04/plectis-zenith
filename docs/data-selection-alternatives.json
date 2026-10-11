@@ -1,0 +1,256 @@
+{
+  "schema": "zenith_data_selection_alternatives_v1",
+  "status": "bounded_source_review_not_an_experiment",
+  "reviewed_at": "2026-10-11",
+  "scope": {
+    "funded_calls": 0,
+    "runtime_changes": false,
+    "new_annexes": 0,
+    "sample_root": "work/datasets/data-selection/alternatives",
+    "sample_receipts": "work/datasets/data-selection/alternatives/sample-receipts.json",
+    "acquisition": "Unauthenticated primary public requests, bounded2MB per request; no provider credentials, API keys, order requests or rate-limit bypass."
+  },
+  "decision": {
+    "recommended_next_task": "Build a source-current coverage packet for release-conditioned cross-asset prediction before authorizing inference: official CPI/GDP/FOMC release text and vintage fields, joined to separately licensed ETF prices with a horizon fixed after document availability.",
+    "reason": "Economic report composition and policy language give interpretation nodes substantive evidence. Precise release headers prevent day-only news admission from becoming a fictitious intraday clock. Existing AAPL daily extrapolation is not the required ETF/sector task.",
+    "first_falsifiable_question": "At08:45 America/New_York after scheduled08:30 CPI/GDP releases, can a fixed interpretation\u2192forecast graph improve later open-to-close relative returns across a frozen ETF universe versus numeric-only and report-headline-only controls? For14:00 FOMC, use a separately frozen next-session horizon; do not pool incompatible clocks.",
+    "not_ready": [
+      "No licensed ETF price source with audited event/execution clock admitted in this pass.",
+      "No prediction-market historical bid/ask depth or executable-fill evidence established.",
+      "Polymarket data redistribution and AI-use terms not fully established; code MIT does not license all data.",
+      "Two macro release families and one Fed market example establish join mechanics, not study coverage, balanced outcomes, independence or performance."
+    ],
+    "fallback_question": "Before Fed releases, does prior official macro composition and a fixed history of market prices improve probability forecasts of the rate decision over the latest supplied market price? Use Brier/log scoring on event groups; do not call this a trading return backtest.",
+    "fallback_limits": "The inspected no-change contract was already priced96.15\u201398.95%; rare decisions and small meeting counts can make this a weak learning task. Require a full predefined calendar and retain missing history, all outcomes and failed forecasts."
+  },
+  "candidates": [
+    {
+      "id": "bls-cpi-release-vintages",
+      "priority": "admit primary timing/interpretation source after reproducible archive acquisition",
+      "primary_urls": [
+        "https://www.bls.gov/bls/news-release/cpi.htm",
+        "https://www.bls.gov/news.release/archives/cpi_01152025.htm",
+        "https://www.bls.gov/news.release/archives/cpi_02122025.htm"
+      ],
+      "records_inspected": [
+        {
+          "url": "https://www.bls.gov/news.release/archives/cpi_01152025.htm",
+          "period": "2024-12",
+          "release_id": "USDL-25-0021",
+          "release_at": "2025-01-15T13:30:00Z",
+          "clock_basis": "Archive embargo header08:30ET, EST at this date",
+          "headline_mom_sa_percent": 0.4,
+          "core_mom_sa_percent": 0.2,
+          "headline_yoy_nsa_percent": 2.9
+        },
+        {
+          "url": "https://www.bls.gov/news.release/archives/cpi_02122025.htm",
+          "period": "2025-01",
+          "release_id": "USDL-25-0174",
+          "release_at": "2025-02-12T13:30:00Z",
+          "clock_basis": "Archive embargo header08:30ET, EST at this date",
+          "headline_mom_sa_percent": 0.5,
+          "core_mom_sa_percent": 0.4,
+          "headline_yoy_nsa_percent": 3.0,
+          "revision_notice": "Seasonally adjusted indices for preceding5years revised with this release"
+        }
+      ],
+      "retained_sample": {
+        "path": "work/datasets/data-selection/alternatives/bls-cpi-field-observations.json",
+        "bytes": 1123,
+        "sha256": "e4202f98f2b53343bc34cda2b3dcddd04acce1914f79e6444580c2e66ad50c5e"
+      },
+      "rights": {
+        "status": "public_domain_primary_text_data",
+        "sources": [
+          "https://www.bls.gov/opub/copyright-information.htm",
+          "https://www.bls.gov/developers/termsOfService.htm"
+        ],
+        "boundary": "Cite BLS and retrieval date. BLS cannot vouch for downstream analyses; no logo endorsement. Copyrighted photographs/illustrations excluded."
+      },
+      "join_keys": [
+        "release_id",
+        "reference_month",
+        "release_at_utc",
+        "metric",
+        "seasonal_adjustment",
+        "vintage_url"
+      ],
+      "temporal_admission": "Treat explicit embargo release time as earliest documentary availability, then add declared ingestion lag. Before release, the current report and all its revised historical table cells are forbidden. Earlier archived report bytes form the input vintage.",
+      "limits": [
+        "Archive date is a release clock, not authenticated machine ingest time.",
+        "Direct local download returned403; native primary text readable. No bypass attempted; a permitted reproducible acquisition route is still needed.",
+        "Headline SA monthly and NSA12month changes are different targets.",
+        "Official economic facts and narrative are not causal labels for ETF price moves."
+      ],
+      "best_use": "Post-release interpretation of headline/core/shelter/energy composition, predicting later cross-asset returns once price authority is admitted."
+    },
+    {
+      "id": "bea-gdp-first-versus-second-vintage",
+      "priority": "admit pinned release-vintage source",
+      "primary_urls": [
+        "https://www.bea.gov/news/archive",
+        "https://www.bea.gov/news/2025/gross-domestic-product-1st-quarter-2025-advance-estimate",
+        "https://www.bea.gov/news/2025/gross-domestic-product-second-estimate-corporate-profits-preliminary-estimate-1st-quarter"
+      ],
+      "records_inspected": [
+        {
+          "reference_period": "2025Q1",
+          "estimate": "advance",
+          "release_id": "BEA25-15",
+          "release_at": "2025-04-30T12:30:00Z",
+          "real_gdp_qoq_saar_percent": -0.3,
+          "clock_basis": "08:30EDT embargo header",
+          "sample": {
+            "path": "work/datasets/data-selection/alternatives/bea-gdp-2025-q1-advance.html",
+            "bytes": 49313,
+            "sha256": "db2129893190d3e4680761dd4f95c4aa4ee1850a9bc6ccd9228274b97c8522a5"
+          }
+        },
+        {
+          "reference_period": "2025Q1",
+          "estimate": "second",
+          "release_id": "BEA25-18",
+          "release_at": "2025-05-29T12:30:00Z",
+          "real_gdp_qoq_saar_percent": -0.2,
+          "clock_basis": "08:30EDT embargo header",
+          "sample": {
+            "path": "work/datasets/data-selection/alternatives/bea-gdp-2025-q1-second.html",
+            "bytes": 48764,
+            "sha256": "a3165a6d689dec142ad5a4e9cc57a009a0f51aa3346a41b1c4fabaa20bbc31d5"
+          }
+        }
+      ],
+      "rights": {
+        "status": "public_domain_unless_otherwise_marked",
+        "sources": [
+          "https://www.bea.gov/help/faq/147"
+        ],
+        "boundary": "Cite U.S. Bureau of Economic Analysis; release HTML primary text only."
+      },
+      "join_keys": [
+        "reference_quarter",
+        "estimate_round",
+        "release_id",
+        "release_at_utc",
+        "archived_url"
+      ],
+      "temporal_admission": "Advance and second estimates are separate facts with separate availability. The May29 revision cannot replace Apr30 input or settlement labels retrospectively. Modern linked interactive tables may show latest data; pin the actual release tables/bytes.",
+      "limits": [
+        "SAAR GDP growth is not quarterly nonannualized growth or an asset return.",
+        "Release narratives distinguish imports, investment and demand, but do not certify financial causal direction.",
+        "Quarterly release frequency limits independent cases; revisions of the same quarter belong to event groups."
+      ],
+      "best_use": "Interpret growth composition versus headline contraction; assess forecast repair on chronologically separated later releases, not hindsight labels from final revised series."
+    },
+    {
+      "id": "polymarket-fed-with-official-fomc",
+      "priority": "conditional forecast-only candidate; rights and coverage unresolved",
+      "primary_urls": [
+        "https://docs.polymarket.com/api-reference/markets/get-prices-history",
+        "https://gamma-api.polymarket.com/events?slug=fed-interest-rates-january-2025",
+        "https://www.federalreserve.gov/newsevents/pressreleases/monetary20250129a.htm"
+      ],
+      "records_inspected": {
+        "event_id": "14220",
+        "market_id": "512324",
+        "question": "No change in Fed interest rates after January2025 meeting?",
+        "yes_token_id": "71366065379283985882048015988468347304730977557386250301113872372802573107404",
+        "price_history_records": 138,
+        "query_fidelity_minutes": 60,
+        "first_observation_at": "2025-01-24T00:00:03Z",
+        "first_observed_price": 0.9885,
+        "last_observation_at": "2025-01-29T17:00:04Z",
+        "last_observed_price": 0.98,
+        "price_range": [
+          0.9615,
+          0.9895
+        ],
+        "timestamps_strictly_increasing": true,
+        "official_release_at": "2025-01-29T19:00:00Z",
+        "official_rate_target_percent": [
+          4.25,
+          4.5
+        ],
+        "decision": "maintain",
+        "market_outcome_prices_post_event": [
+          1,
+          0
+        ]
+      },
+      "samples": [
+        {
+          "path": "work/datasets/data-selection/alternatives/polymarket-fed-january-2025-event.json",
+          "bytes": 23460,
+          "sha256": "06d6d13eaf5bbda48fcb54347ecacfb47cb88ecbe4e942403ee46077e6bdb5e2"
+        },
+        {
+          "path": "work/datasets/data-selection/alternatives/polymarket-fed-january-2025-predecision-history.json",
+          "bytes": 3825,
+          "sha256": "29b3faa1d6f2dde55cbb6f0bb20e80de9f5412820c719ba5323d15b7a16abbb1"
+        },
+        {
+          "path": "work/datasets/data-selection/alternatives/fed-fomc-2025-01-29.html",
+          "bytes": 82218,
+          "sha256": "c80412ec822f1493ad1927a619eabd5ce57e31997f35cdd47bc5aa9f7b157ac7"
+        }
+      ],
+      "rights": {
+        "polymarket_status": "API explicitly offered to researchers/developers; data reuse and AI-specific terms not fully verified",
+        "sources": [
+          "https://help.polymarket.com/en/articles/13364254-does-polymarket-have-an-api",
+          "https://github.com/Polymarket/agents",
+          "https://polymarket.com/tos",
+          "https://www.federalreserve.gov/disclaimer.htm"
+        ],
+        "boundary": "Public API and MIT agent code are not a blanket data redistribution license. Official Board text is public domain unless otherwise indicated. Retain API samples locally; no inference or trading was performed."
+      },
+      "join_keys": [
+        "condition_id",
+        "token_id",
+        "official_meeting_date",
+        "official_release_at_utc",
+        "price_observation_at_utc",
+        "contract_rule_hash"
+      ],
+      "temporal_admission": "Only history rows timestamped at/before issue enter predictors. Enforce a maximum quote age. Exclude current outcomePrices, resolution/closed status, final volume, updated metadata and subsequent statement. Official statement is evaluator truth for pre-release prediction; after release it becomes input only to a distinct later-horizon task.",
+      "limits": [
+        "Historical chart prices contain onlyt,p; side, spread, depth and executable liquidity are absent. Do not turn them into fills.",
+        "Metadata description namesJan30\u201331 while the actual official release isJan29; endDate12:00Z is also before actual19:00Z announcement. Official event clock must own admission.",
+        "The bounded example gives no guarantee of archive completeness, price-construction method, stable historical rules or enough independent events.",
+        "Final marketplace resolution may differ from the economic event under fallback clauses; keep contract settlement and official outcome separately."
+      ],
+      "capture": "cap_quick_bind_prediction_market_targets_to_offici_ffa5ca09db20",
+      "best_use": "Market probability as a strong forecast reference or contextual input; Brier/log comparison, never PnL without additional historical execution evidence."
+    }
+  ],
+  "excluded_or_deferred": [
+    {
+      "id": "kalshi-historical",
+      "status": "rights_blocked_without_bound_written_authorization",
+      "source": "https://kalshi-public-docs.s3.amazonaws.com/kalshi-data-terms-of-service.pdf",
+      "evidence": "Pages1\u20132 restrict software-development/cached datasets and anyAI/ML-related use, including generated outputs. Public historical CPI endpoint access does not override this.",
+      "retained_market_samples": 0,
+      "capture": "cap_quick_exclude_kalshi_public_data_from_ai_study_d00c7234bd50"
+    },
+    {
+      "id": "fred-alfred",
+      "status": "excluded_this_pass_due_known_AI_terms_boundary",
+      "evidence": "No acquisition or inference; prefer original government publishers rather than assume original public-domain status overrides intermediary terms."
+    },
+    {
+      "id": "sec-events",
+      "status": "existing_source_track_not_reacquired",
+      "evidence": "Accession/acceptance-bound official filings remain valuable for firm events; local FinMultiTime fact filed-day admission is not an exact SEC acceptance timestamp. Parent data owner handles this track."
+    }
+  ],
+  "minimal_next_protocol": [
+    "Admit permitted original release bytes and independently licensed price bytes; freeze calendar, universe, episode clocks and complete coverage before inspecting response outcomes.",
+    "For each episode separate inputfacts available byissue from laterreturnlabels and final economic revisions. A post-release report cannot also be a pre-release input.",
+    "Use shared interpretation plus boundedforecastskill changes; controls numeric-only, headline-only and nochange. Report-level narrative is evidence, not true causal explanation.",
+    "Split by entire release dates/reference periods with chronological label maturity; correlated ETF outcomes do not create independent release cases.",
+    "Manual postmortems may inspect later development-only reports to propose a skill; validation selects a frozen bank and sealed final events never enter critique.",
+    "Retain all missing documents/pricehistory/failures. Score probability forecasts with properloss; score returns only under independently supported execution/fee assumptions. Do not hide failures through an accepted-only denominator."
+  ],
+  "claim_boundary": "Source/data selection only. No study executed, no advantage/causal truth/novelty asserted; no provider call or additional annex."
+}

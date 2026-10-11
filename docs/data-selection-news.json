@@ -1,0 +1,205 @@
+{
+  "schema": "zenith_data_selection_news_v1",
+  "reviewed_at": "2026-10-11T20:58:02.030603+00:00",
+  "purpose": "Choose an information-rich, timestamped historical decision task from actual source records before any study/model calls.",
+  "prior_art_read": [
+    "docs/dataset-scout.md:58",
+    "docs/trading-prior-art.json",
+    "ai_workflow/annexes/finmem-reviewed-code/source.md (be814aa)",
+    "ai_workflow/annexes/arxiv-2311-13743v2-finmem/source.pdf"
+  ],
+  "decision": {
+    "preferred_us_news_subset": "StockBench pinned original news_by_day plus daily AAPL/SPY parquet, reconstructed from provider publication clocks. Use these data files only; omit current company-indicator caches and generated sentiment/insight fields.",
+    "not_yet_admitted": "No inspected news release establishes that all body/summary bytes existed at the declared publication instant. Publication time is not ingestion time or an immutable as-published snapshot. A source vintage assumption must remain explicit.",
+    "primary_task": "Before a declared next-session open, use matured price history and admitted company event/news context to forecast mean five-session market-relative return. For an event-first study, a dated earnings/guidance disclosure supplies the substantive event; news is dated corroboration/context. Reason about event novelty, expectations, guidance and asymmetric scenarios; do not ask a sentiment label to stand in for a return mean.",
+    "entry_and_target": "Freeze pre-open cutoff and latency allowance, next-open entry, fifth-session-close exit, SPY comparison and corporate-action/fee treatment. News containing same-day observed price moves may be used only for later targets, never to explain/predict a move already observed in the input. StockBench benchmark-relative assessment still needs independently verified continuous SPY prices; three of four sampled SPY daily paths were absent.",
+    "china_comparison": "Parent TraderHarness audit reports much broader continuous prices, prior financial facts and announcement coverage, but mostly headlines/redactions and 83.9% midnight announcement precision. Prefer that corpus for disclosure-driven Chinese-market reasoning if conservative next-session availability and execution conventions are explicit. StockBench is the clearer small US alternative with precise publication clocks and modest news text; it is not equally broad or a verified full disclosure corpus."
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "id": "stockbench_raw",
+      "repository": "https://github.com/ChenYXxxx/stockbench",
+      "pin": "ce8b2b3483590646ad3b650ac8221f43f76fd091",
+      "primary_urls": [
+        "https://github.com/ChenYXxxx/stockbench/blob/ce8b2b3483590646ad3b650ac8221f43f76fd091/storage/README.md",
+        "https://github.com/ChenYXxxx/stockbench/blob/ce8b2b3483590646ad3b650ac8221f43f76fd091/stockbench/adapters/finnhub_client.py",
+        "https://raw.githubusercontent.com/ChenYXxxx/stockbench/ce8b2b3483590646ad3b650ac8221f43f76fd091/storage/cache/news_by_day/AAPL/2025-03-03.json",
+        "https://raw.githubusercontent.com/ChenYXxxx/stockbench/ce8b2b3483590646ad3b650ac8221f43f76fd091/storage/parquet/AAPL/day/2025-03-03.parquet"
+      ],
+      "actual_records": {
+        "audit": "All122 civil dates 2025-03-01 through2025-06-30, hard64KiB/file bound; no historical provider refetch.70 nonempty files,52 HTTP404 files treated unknown,266 unique IDs and URLs.",
+        "monthly_file_date_coverage": {
+          "2025-03": {
+            "requested_civil_dates": 31,
+            "nonempty_files": 23,
+            "http404_unknown_files": 8,
+            "articles": 71
+          },
+          "2025-04": {
+            "requested_civil_dates": 30,
+            "nonempty_files": 14,
+            "http404_unknown_files": 16,
+            "articles": 65
+          },
+          "2025-05": {
+            "requested_civil_dates": 31,
+            "nonempty_files": 17,
+            "http404_unknown_files": 14,
+            "articles": 70
+          },
+          "2025-06": {
+            "requested_civil_dates": 30,
+            "nonempty_files": 16,
+            "http404_unknown_files": 14,
+            "articles": 60
+          }
+        },
+        "raw_clock_counts": {
+          "finnhub_native_unix_epoch": 249,
+          "polygon_explicit_utc_Z": 17
+        },
+        "published_utc_naive_offset_bug": "All249 Finnhub naive published_utc values equal native UTC epoch plus8hours. FinnhubClient uses datetime.fromtimestamp without timezone. Use epoch with timezone.utc; never interpret the naive field as UTC.",
+        "publication_date_differs_from_cache_filename_rows": 185,
+        "utc_publication_month_article_counts": {
+          "2025-03": 76,
+          "2025-04": 65,
+          "2025-05": 65,
+          "2025-06": 60
+        },
+        "text": "256 nonempty descriptions of266; median177characters, maximum764. Headlines/descriptions, not full articles. Sources include Yahoo, SeekingAlpha, MarketWatch, DowJones and Finnhub. No explicit mock/dummy/synthetic-news markers found; marker absence does not prove authenticity.",
+        "matched_price": "Four predetermined monthly AAPL daily parquet files decoded: March3,April1,May1,June2. March3 open241.79/high244.0272/low236.112/close238.03/volume47183985/vwap239.9029. SPY March3 decoded; SPY April1/May1/June2 paths returned404. Thus continuous market-relative price support is NOT established."
+      },
+      "construction_and_leakage": "Two raw record schemas: Polygon original publisher/URL/tickers/published_utc and Finnhub title/description/native epoch/API IDs. Drop Polygon insights/sentiment and current fundamental caches. No updated_at, ingestion_at or body-version history in inspected records. Cache date is an organization/decision key, not source availability. Missing files do not establish no-news days; this is a sparse curated snapshot, not a complete continuous feed.",
+      "price_basis": "OHLCV/vwap, date; decoded artifact lacks an adjustment flag. Polygon adapter exposes adjusted query parameter; establish collection setting and actions before economic returns. Do not mix adjusted close with unrelated opens or infer total-return treatment.",
+      "rights": "Repository Apache2.0 code license does not establish rights to redistribute Finnhub/Polygon/publisher news or prices. Keep samples private; resolve provider/source usage terms before redistributing raw payloads.",
+      "quality": "Best inspected small US replay input, conditionally admissible with raw-clock reconstruction and explicit snapshot assumptions; no claim of contamination-free historical outcomes."
+    },
+    {
+      "rank": 2,
+      "id": "fnspid_original_scrape",
+      "repository": "https://github.com/Zdong104/FNSPID_Financial_News_Dataset",
+      "pin": "4054842ec476953b30ee874d4b7e8eea786a21fa",
+      "hf_dataset": "https://huggingface.co/datasets/Zihan1004/FNSPID",
+      "hf_pin": "bf9189c41527198897d1af3e17b1a0095279fc45",
+      "actual_records": {
+        "original_AA_news": "262144-byte prefix preserves Date/Url/Text/Mark, including January17,2024 08:52am EST; original time converts13:52UTC. News also has Jan16 after-close17:51EST/17:24EST.",
+        "matched_AA_price": "Pinned raw price tail contains Jan17/18/19 OHLCV. Jan18 open27.6200008392334/close26.75. First raw price records1970 include distinct Close and AdjClose; basis cannot be silently merged.",
+        "HF_prefix": "44 complete leading records of A company,43 midnightUTC and1 intraday/hour timestamp, from2023Sep–Dec. This bound does not measure full AAPL or monthly corpus coverage."
+      },
+      "primary_urls": [
+        "https://github.com/Zdong104/FNSPID_Financial_News_Dataset/blob/4054842ec476953b30ee874d4b7e8eea786a21fa/data_processor/preprocess.py",
+        "https://github.com/Zdong104/FNSPID_Financial_News_Dataset/blob/4054842ec476953b30ee874d4b7e8eea786a21fa/data_processor/news_data_raw/aa.csv",
+        "https://github.com/Zdong104/FNSPID_Financial_News_Dataset/blob/4054842ec476953b30ee874d4b7e8eea786a21fa/data_processor/stock_price_data_raw/aa.csv",
+        "https://huggingface.co/datasets/Zihan1004/FNSPID/resolve/bf9189c41527198897d1af3e17b1a0095279fc45/Stock_news/nasdaq_exteral_data.csv"
+      ],
+      "construction_and_leakage": "preprocess.py adds -5EST/-4EDT to local time to produce UTC, reversing the required conversion. price_news_integrate normalizes dates to midnight before same-day sentiment merge, collapsing after-close availability. Processed/merged tables and summaries are not accepted prediction inputs. Reconstruct from original timezone-labelled strings; day-only rows use explicit conservative delay. Current scrape/body snapshots lack initial-versus-updated content history.",
+      "rights": "CC BY-NC4.0 LICENSE plus README prohibition of commercial code use; underlying Nasdaq/Benzinga/other publisher rights separate. Research inspection does not grant redistribution.",
+      "quality": "Larger longitudinal acquisition lead, not selected on a claimed continuous dataset span. Needs per-ticker/month coverage audit and raw-clock recovery first; huge HF files were not downloaded."
+    },
+    {
+      "rank": 3,
+      "id": "stocknet_raw_social_control",
+      "repository": "https://github.com/yumoxu/stocknet-dataset.git",
+      "pin": "330708b5ddc359961078bef469f43f48992fd6e4",
+      "code_pin": "e32147c07c1e06033fcc8f76525a0c25e8babc16",
+      "actual_records": {
+        "raw_AAPL_tweets": "Pinned2014Jan1/2/3 files contain8/33/21 records with Twitter created_at including explicit +0000 timezone, original IDs/text. Files contain whole-day streams; filter exact tweet timestamp before issue.",
+        "monthly_nonempty_file_counts": {
+          "2014-01": 29,
+          "2014-02": 28,
+          "2014-03": 31,
+          "2014-04": 30,
+          "2014-05": 31,
+          "2014-06": 29,
+          "2014-07": 31,
+          "2014-08": 29,
+          "2014-09": 25,
+          "2014-10": 31,
+          "2014-11": 17,
+          "2014-12": 30,
+          "2015-01": 31,
+          "2015-02": 28,
+          "2015-03": 30,
+          "2015-04": 30,
+          "2015-05": 31,
+          "2015-06": 28,
+          "2015-07": 30,
+          "2015-08": 30,
+          "2015-09": 28,
+          "2015-10": 31,
+          "2015-11": 29,
+          "2015-12": 29,
+          "2016-01": 31,
+          "2016-02": 28,
+          "2016-03": 29
+        },
+        "coverage_boundary": "Counts are directory metadata of nonempty files, not proof that every body is usable. Three actual files parsed, no entire corpus scan.",
+        "prices": "Existing rawAAPL CSV has Date/Open/High/Low/Close/AdjClose/Volume; sample2012Sep4 Open95.108574/Close96.424286/AdjClose87.121140."
+      },
+      "primary_urls": [
+        "https://github.com/yumoxu/stocknet-dataset/blob/330708b5ddc359961078bef469f43f48992fd6e4/README.md",
+        "https://raw.githubusercontent.com/yumoxu/stocknet-dataset/330708b5ddc359961078bef469f43f48992fd6e4/tweet/raw/AAPL/2014-01-02"
+      ],
+      "construction_and_leakage": "Use raw tweets and raw prices only. Strip engagement/favorite/retweet counts and current user attributes because their snapshot availability is not the original tweet time. Original normalized movement labels and same-day full tweet bags are not the new decision target. Strong model historical exposure risk.",
+      "rights": "Dataset/code MIT notices do not independently grant social-post redistribution rights. Treat as social-information control, not a full financial-news corpus.",
+      "quality": "Timestamped matched baseline; weaker substantive financial context than genuine filings/news."
+    }
+  ],
+  "other_sources_checked": [
+    {
+      "id": "finmem",
+      "pin": "be814aa47970de9bf2fdd6a1d5a60ae5cf361b46",
+      "url": "https://github.com/pipiku915/FinMem-LLM-StockTrading",
+      "facts": "Existing local annex reused; pipeline README explicitly separates partly private Refinitiv and Alpaca acquisition from Fake-Sample-Data.zip. Official real input folders contain gitkeep files, not inspected real news. Alpaca pipeline strips Z from created_at and groups by an ad-hoc date/09:00 transformation; later pipeline uses adjusted closes and date-level news/filings. No execution/pickle loading.",
+      "decision": "Architecture/construction prior art, not a verified public matched corpus."
+    },
+    {
+      "id": "finagent_original",
+      "pin": "17248a0b8b729ee3e093e30bb7bea7f52181f363",
+      "url": "https://github.com/DVampire/FinAgent",
+      "paper_version": "https://arxiv.org/html/2402.18485v2#A2",
+      "facts": "Original README requires FMP/Polygon keys and download/process scripts. Paper AppendixB says daily prices/news fromFMP with2022Jun–2023Jun train and2023Jun–2024Jan test. No bounded public real matched raw news payload admitted in this pass. effective-p/FinAgent is a different modern implementation; not treated as original dataset authority.",
+      "decision": "Requires an explicit source acquisition/vintage audit; paper results do not supply a PIT record contract."
+    },
+    {
+      "id": "finben",
+      "pin": "74ea6b8f8fcdee51f49281634982a8f29da52e7e",
+      "url": "https://github.com/The-FinAI/FinBen",
+      "facts": "Current README describes a benchmark suite, not one price/news stream; dataset licenses remain separate. TheFinAI/stock_trading andflare-stock metadata requests returned401; no claimed raw record inspection from those inaccessible names.",
+      "decision": "Task/QA/forecast evaluation prior art; no assumption of usable historical-news corpus from benchmark branding."
+    },
+    {
+      "id": "finrl_btc_news",
+      "hf_pin": "9c5eae6925d112a6d085a83a58c67521be1aaeb0",
+      "url": "https://huggingface.co/datasets/SecureFinAI-Lab/FinRL_BTC_news_signals",
+      "facts": "Actual262144-byte news_train.csv prefix has UTC date_time/title/URL/source/article_text plus DeepSeek-derived sentiment/risk/confidence/reasoning. First25records coverApril7,2021 and include corporate/science stories unrelated to BTC. No matched-price leaf in this dataset metadata.",
+      "decision": "Small crypto/news acquisition lead; remove generated annotations and independently pair price bars. Not selected for AAPL or continuous equity event evidence. Card claimsCDLA-Permissive2.0; publisher-content rights still need separate review."
+    },
+    {
+      "id": "finsen",
+      "github_pin": "8dc90aa6f1c5c12352bab6a17108f991114e386f",
+      "hf_pin": "24f40fecbc3ef47ca3d9b1fbeccaa5ccd9949c0f",
+      "url": "https://github.com/EagleAdelaide/FinSen_Dataset",
+      "facts": "Actual Categorized_Timestamp CSV prefix columnsTitle/Tag/Time/Content; firstTime16/07/2023 has date-only precision despite filenameTimestamp. News discusses completed market gains and country aggregates. No per-asset matched price outcomes in inspected rows. MITcode/card differs from publisher article rights.",
+      "decision": "Macro daily-text context lead, not intraday point-in-time company-event data."
+    },
+    {
+      "id": "sentarl",
+      "pin": "e8482aa8265b13f217fa8c700f53ca0107614a2e",
+      "url": "https://github.com/xicocaio/its-sentarl",
+      "facts": "Actual AAPL hourly readyCSV hasdatetime/OHLCV/currentbar close-pct/trend and news-count/sentiment aggregate columns, not retained article text. GPL3code; processed labels/currentbar observations need issue-boundary reconstruction.",
+      "decision": "Numerical/sentiment-control data, cannot test original language reasoning from news."
+    }
+  ],
+  "validation_and_boundary": {
+    "actual_prices_decoded": true,
+    "bounded_sample_manifest": "work/datasets/data-selection/news/source-sample-manifest.json",
+    "coverage_receipt": "work/datasets/data-selection/news/stockbench-aapl-2025-march-june-coverage.json",
+    "models_or_inference_calls": 0,
+    "study_execution": false,
+    "runtime_source_changes": false,
+    "public_raw_source_copies": false,
+    "claim": "Inspection establishes recorded bytes and declared construction only; no completeness, publisher-vintage certification, profitability or model-contamination immunity."
+  }
+}

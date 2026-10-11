@@ -75,6 +75,14 @@ using the same native engine, validator and evaluator. Its [systems paper](paper
 documents the method, prior art and receipt-backed evidence as the implementation
 develops. Neither artifact establishes forecasting advantage or method novelty.
 
+The [data selection audit](docs/data-selection.md) recommends the collected
+TraderHarness panel for a first multi-session test of information use and skill
+learning. The prior Apple schedule was withdrawn after finding a year without
+news. A tested, [unexecuted two-node adapter](docs/trading-study.md) prepares
+interpretation → forecast comparisons and bounded skill updates, but its US
+next-session evaluator does not implement the proposed China study. Paid
+execution is held; neither data collection nor passing tests establish an edge.
+
 ## What can change, and how it earns acceptance
 
 Each reasoning node has a [small skill card](.agents/node-skills/index.json), typed incoming context and an output contract. A frozen [reasoning policy](system/lib/reasoning_policy.py) can change its short skill rule, incoming-edge weights and context budget. [Graph variants](docs/graph-variants.md) can insert reasoning checks and rewire dependencies while preserving the base graph's required ancestry and temporal boundaries. The included variant adds an evidence check before CP1.

@@ -9,6 +9,11 @@ compatibility: Python standard library; repository-local research CLI. Read prog
 Read `program.md`, `docs/skills.md`, the proposed experiment spec and the
 native `research` command help. Choose the owner for the actual hypothesis:
 
+- `research/trading_study.py` owns the experimental interpretation → forecast
+  graph and bounded forecast-skill learning on executable next-session returns.
+  Follow `docs/trading-study.md`; rich inputs and training-only hindsight are
+  separately projected. An unchanged selected policy aliases baseline results;
+  only the declared repeat control draws another baseline sample.
 - `research/cohort.py` compares newly executed native graph runs with fixed
   issue times, targets, horizons and model identities. Use this for node skills,
   incoming context, or graph changes.
@@ -27,6 +32,11 @@ upstream autonomous shell loop is installed.
    source hashes, chronological event groups, purge/embargo, metric/common
    support, budget, stop rule and validation/holdout split **before** trials.
    A change to the frozen contract starts a new study, not an in-place edit.
+   Before choosing that study, inspect actual records and count usable evidence
+   per issue date and per split. Earliest/latest dates, file presence and a paper's
+   release claim do not establish continuous source coverage. Preserve timestamp
+   precision, source-body vintage, missing lanes and post-outcome fields. Let the
+   verified information and executable decision determine the target and horizon.
 2. Establish the baseline. Then change one declared factor per trial; record
    the hypothesis and exact change, candidate identity/hash, requested/actual
    model identity where applicable, elapsed resources and outcome. Record

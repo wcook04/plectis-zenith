@@ -2,6 +2,14 @@
 
 Optimize the existing reasoning graph through explicit, reviewable experiments. Each node has a small skill and incoming context. Candidate parameters include skill references/additions, context weights and limits, model selection, and admitted topology rewrites. Read `AGENTS.md`, `docs/experiments.md`, the affected node skills, incoming edges, and output contracts first. Execute graph reasoning through Zenith; evaluate its actual CP2 outputs through the existing feedback authority.
 
+For the explicit two-node financial experiment, use
+[`research.trading_study`](docs/trading-study.md). It has its own typed expected-return
+contract and long/cash evaluator; it is not a CP2 cohort. Its owner commands are
+`freeze`, `development`, `learn`, `select`, and `final`. The FinMultiTime profile
+adds dated news and filing facts to trailing price windows. Later review evidence
+is training-only; manual investigator notes remain a separate audit. Freeze
+runtime source through completion and preserve all proposals and provider calls.
+
 1. State one hypothesis and the affected skills/edges. Prepare an admitted reasoning policy or graph variant. Record the proposed change, source commit, proposal prompt hash, and candidate artifact hashes. Check topology ranks, typed ports, subject/truth boundaries, and availability before expensive reasoning. The Lean interface proves contract-model properties, not that an LLM obeys a skill.
 2. Declare the complete cohort before comparing results: fixed issue ids, feed snapshots, issue times, targets, horizons, development/holdout membership, week clusters, embargo, price basis, truth cutoff, loss, improvement threshold, candidate budget, and audited call ceiling. The cohort consumer evaluates matured frozen data; it does not establish prospective preregistration. Use `feedback` for live forecasts and their later maturity.
 3. Run `python -m research cohort-freeze --spec <spec.json> --study <new-directory>`. Include baseline first and every bounded candidate in the immutable specification. Every preregistered candidate spends a slot, including candidates that fail. Do not add a candidate, change the evaluator, or revise membership after seeing scores in that study.

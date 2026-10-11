@@ -2,6 +2,34 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Data-first study selection, 11 October 2026
+
+Four independent scout tracks and direct record inspection now support the
+[data decision](data-selection.md): TraderHarness is the selected first broad
+historical forecast panel, with six pinned tables collected and hash-verified
+(184,974,691 bytes). The fixed ten-name universe has all 711 expected sessions
+from February 2023 through December 2025. Dated headlines and announcement
+titles support the initial rich inputs; unknown-vintage financial facts are
+excluded. The previous AAPL schedule was withdrawn because its news archive
+has no 2024 records. Source rights, timestamp precision, gaps and corporate
+actions are recorded in the five data-selection inspection files.
+
+The proposed five-session, market-relative study is **not frozen or executed**.
+It still requires a China-specific adapter, admitted wealth labels, common
+episode support and a frozen comparison. The prepared US two-node study adds
+training-only review, bounded forecast-skill proposals, exact cache/paid-receipt
+joins and unchanged-policy aliasing. It remains an experimental adapter, not
+a replacement for the native graph or evidence of successful learning.
+
+Before the data-research hold, two excluded StockNet format-compatibility calls
+returned accepted responses at US$0.00120862 reported cost. No calls followed
+the hold, and no rich-input scores were produced. Earlier budget histories and
+paper result exports are retained. The paper remains seven pages and now
+describes the data decision as proposed work. All **540 offline tests passed**
+after source freeze, with dependency deprecation warnings only. Original paper
+result exports are byte-for-byte unchanged. Private originals and acquisition
+receipts remain under `work/`.
+
 ## Deep-pass controls, 11 October 2026
 
 The follow-on twenty-call market replay was held because five dates with

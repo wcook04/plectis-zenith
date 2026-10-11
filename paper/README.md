@@ -131,3 +131,22 @@ integration/control validation without model calls or a new market study.
 [learning-protocol-audit.json](learning-protocol-audit.json) records the final
 receipt/source hashes and interpretation boundaries; it does not duplicate the
 canonical results or alter the original study exports.
+
+The compressed main text reports all excluded compatibility pilots in one
+paragraph; their full accounting, validation and implementation-match evidence
+remain above and in calibration-evidence.json. The reviewed ATLAS v5 method
+optimizes static instructions using prompt-performance history and outcome
+summaries, while protecting runtime placeholders and output interfaces. A local
+outcome-summary arm can borrow that information pattern without constituting
+an ATLAS/StockSim reproduction. StockSim's public snapshot does not expose the
+paper's complete optimizer configuration. The new executable-return learning
+study is still being specified; this manuscript reports no results from it.
+
+Later study planning is held at data admission. The selection rationale is
+[data-selection.md](../docs/data-selection.md), with the independent cross-track
+protocol recommendation in [data-selection-design.json](../docs/data-selection-design.json).
+TraderHarness is proposed for a multi-session forecast panel from February
+2023 onward after price-basis, corporate-action and fixed-support qualification.
+Its earlier price coverage gaps prevent a min/max date range from establishing
+continuous coverage. Unknown-vintage fundamentals are omitted; announcement
+availability is conservative. No new paid learning study or result is reported.
