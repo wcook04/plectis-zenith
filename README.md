@@ -58,6 +58,14 @@ The [learning design](docs/learning-design.md) defines how graph structure, node
 
 [Historical benchmarks](docs/historical-benchmarks.md) include pinned StockNet OHLCV baselines and a matched prices-versus-prices-plus-timestamped-text experiment over 1/5/20 observed-row horizons. Each issue snapshot joins its feeds before forecasting; target observations stay in a separate evaluator. The protocols do not reproduce StockNet's published paper scores. The older [UCI benchmark](benchmark/README.md) remains a small deterministic scoring fixture. Historical LLM evaluation can be contaminated by model training; prospective predictions form a separate evidence lane.
 
+[FinMultiTime](docs/finmultitime.md) adds a richer historical input: prices, news articles and reported financial facts aligned at one cutoff. Its bounded importer fetches only five pinned Apple files, verifies their sizes, CRCs and hashes, and exports dated snapshots plus partial native feed artifacts. Missing news and stale prices stay explicit. [Dataset research](docs/dataset-scout.md) records the other candidates and the timestamp and licensing checks behind this choice.
+
+```sh
+python -m benchmarks.finmultitime import
+python -m benchmarks.finmultitime snapshot \
+  --issue-date 2025-03-28 --output work/finmultitime-example
+```
+
 [Lean semantics](docs/semantics.md) describe parameterized skills as relations, typed composition and refinement, evidence availability and graph rank conditions. The checker connects those finite conditions to the actual graph declarations. These proofs do not establish that a language model obeys its prompt or predicts markets successfully.
 
 ```sh
