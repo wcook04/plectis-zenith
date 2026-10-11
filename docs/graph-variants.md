@@ -29,3 +29,28 @@ python scripts/check_semantics.py --rank-certificate work/variant-receipt.json -
 ```
 
 The generated finite rank witness connects these exact topology edges to the Lean acyclicity checker. The formal result covers the stated graph/contract model; it does not prove market predictions, learned-rule usefulness or provider compliance.
+
+## Explicit compact predictor
+
+`variants/predictor.py` owns a distinct `zenith_predictor_replacement_v1`
+contract. Its admitted profile is `stocknet_price_only_cp1_cp2_v2`.
+It binds the complete source graph identity, then retains `global_stock_feed`,
+`lab_decide` and `lab_director`. The stock tool is unchanged; CP1 and CP2 retain
+their native schemas, with standardized price-only instructions and explicit
+dependencies replacing references to removed miners and feed lanes. The
+resulting loader still executes through `GodModeEngine`.
+
+This is a declared ablation, not a new permission to remove arbitrary base nodes
+through ordinary graph variants. Its receipt lists removed nodes, effective
+node hashes, waves and a finite rank certificate; `base_ancestry_preserved` is
+false. Each reasoning node has one attempt and no tool calls. A separate frozen
+policy can vary one short skill rule while keeping the profile fixed. See
+[the native backtest protocol](native-backtest.md). Empirical refinement of the
+default Lab and compilation of this exact replacement's Lean instance are not
+implied by its Python topology checks.
+
+The original `v1` instructions are retained in Git at `c4c051c`, together with
+their failed compatibility-run provenance. Profile `v2` makes the existing
+minimum lengths and bracketed citation format more explicit in the prompts.
+The validators and required outputs are unchanged; old attempts are not
+rewritten or resumed against the new profile.

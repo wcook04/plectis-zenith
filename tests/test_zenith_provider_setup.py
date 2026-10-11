@@ -126,6 +126,29 @@ class ProviderSetupTests(unittest.TestCase):
                 self.assertEqual(main(["provider", "doctor"]), 1)
             self.assertNotIn(SENTINEL, output.getvalue())
 
+    def test_http_failure_retains_bounded_provider_and_retry_evidence_without_raw_payload(self):
+        response = Mock(status_code=429, headers={'Retry-After': '30'})
+        response.json.return_value = {'error': {'code': 429, 'message': 'rate limited ' + SENTINEL,
+            'metadata': {'provider_name': 'Synthetic provider', 'reason': 'capacity',
+                         'raw': 'private upstream echo', 'authorization': SENTINEL}}}
+        with patch.object(api, 'requests', SimpleNamespace(post=Mock(return_value=response))):
+            with self.assertRaises(RuntimeError) as caught:
+                api._default_http_post('https://openrouter.ai/api/v1/chat/completions',
+                                       {'Authorization': 'Bearer ' + SENTINEL}, {}, 30)
+        message = str(caught.exception)
+        self.assertIn('HTTP 429', message)
+        self.assertIn('Synthetic provider', message)
+        self.assertIn('retry_after', message)
+        self.assertNotIn(SENTINEL, message)
+        self.assertNotIn('private upstream echo', message)
+
+    def test_non_json_http_failure_preserves_status(self):
+        response = Mock(status_code=503, headers={})
+        response.json.side_effect = ValueError('not JSON')
+        with patch.object(api, 'requests', SimpleNamespace(post=Mock(return_value=response))):
+            with self.assertRaisesRegex(RuntimeError, 'HTTP 503'):
+                api._default_http_post('https://openrouter.ai/api/v1/chat/completions', {}, {}, 30)
+
     def test_key_status_is_explicit_and_does_not_guess_quota(self):
         seen = []
         def get(url, headers, timeout):

@@ -22,6 +22,9 @@ def parser() -> argparse.ArgumentParser:
     provider.add_argument("--env-file", type=Path, help="explicit local dotenv file; process environment takes precedence")
     provider.add_argument("--offline", action="store_true", help="report configuration without network access")
     provider.add_argument("--check-key", action="store_true", help="explicit authenticated official key-status check; no inference")
+    recovery = commands.add_parser("budget-recover", help="explicitly account for a reserved HTTP 429 failure without resending it")
+    recovery.add_argument("--budget-dir", type=Path, required=True)
+    recovery.add_argument("--evidence", type=Path, required=True, help="authorization and exact pre-recovery ledger/call hashes")
     inspect = commands.add_parser("inspect", help="inspect a hydrated authored node")
     inspect.add_argument("node")
     commands.add_parser("validate", help="validate the authored graph offline")
@@ -51,6 +54,7 @@ def parser() -> argparse.ArgumentParser:
             run.add_argument("--max-calls", type=int, help="maximum attempted calls across the shared paid batch")
             run.add_argument("--max-output-tokens", type=int, default=4096, help="paid response token cap")
             run.add_argument("--budget-dir", type=Path, help="one shared ledger directory for the entire paid batch")
+            run.add_argument("--provider-slug", help="exact OpenRouter endpoint tag, frozen for this paid run")
     resume = commands.add_parser("resume", help="resume from durable engine artifacts and handoff manifest")
     resume.add_argument("run_id")
     status = commands.add_parser("status", help="inspect engine outcome and pending packets")
@@ -70,6 +74,9 @@ def dispatch(args) -> dict:
     if args.command == "provider":
         from .provider_setup import check
         return check(provider=args.provider, env_file=args.env_file, offline=args.offline, check_key=args.check_key)
+    if args.command == "budget-recover":
+        from .budgeted import recover_budget
+        return recover_budget(args.budget_dir, json.loads(args.evidence.read_text()))
     if args.command == "missions":
         graph = runtime.load_graph(root)
         groups = {}
@@ -101,7 +108,8 @@ def dispatch(args) -> dict:
                              subject_run=args.subject_run, truth_run=args.truth_run,
                              horizon=args.horizon, time_anchor=args.time_anchor, policy=args.policy, graph_variant=args.graph_variant, context_profile=args.context_profile,
                              max_cost_usd=getattr(args, "max_cost_usd", None), max_calls=getattr(args, "max_calls", None),
-                             max_output_tokens=getattr(args, "max_output_tokens", 4096), budget_dir=getattr(args, "budget_dir", None))
+                             max_output_tokens=getattr(args, "max_output_tokens", 4096), budget_dir=getattr(args, "budget_dir", None),
+                             provider_slug=getattr(args, "provider_slug", None))
     if args.command == "resume":
         return runtime.resume(root, args.run_id)
     if args.command == "status":

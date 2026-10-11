@@ -177,6 +177,28 @@ def _transport(url: str, headers: Mapping[str, str], timeout_s: int, payload=Non
             response = requests.post(url, headers=dict(headers), json=dict(payload), timeout=timeout_s, allow_redirects=False)
         if 300 <= response.status_code < 400:
             raise RuntimeError("OpenRouter redirects are disabled")
+        if response.status_code >= 400:
+            # Retain bounded routing/rate-limit evidence without response text,
+            # request headers, raw provider payloads, or echoed credentials.
+            details = {}
+            try:
+                body = response.json()
+                error = body.get("error", {}) if isinstance(body, Mapping) else {}
+                if isinstance(error, Mapping):
+                    for key in ("code", "message"):
+                        if isinstance(error.get(key), (str, int, float)):
+                            details[key] = str(redact(error[key], secrets=(token,)))[:512]
+                    metadata = error.get("metadata", {})
+                    if isinstance(metadata, Mapping):
+                        for key in ("provider_name", "reason", "limit_source"):
+                            if isinstance(metadata.get(key), (str, int, float)):
+                                details[key] = str(redact(metadata[key], secrets=(token,)))[:256]
+            except (ValueError, TypeError):
+                pass
+            retry_after = response.headers.get("Retry-After")
+            if isinstance(retry_after, str):
+                details["retry_after"] = str(redact(retry_after, secrets=(token,)))[:128]
+            raise RuntimeError(f"OpenRouter HTTP {response.status_code}: {json.dumps(details, sort_keys=True)}")
         response.raise_for_status()
         data = response.json()
         if not isinstance(data, Mapping):

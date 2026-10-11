@@ -61,8 +61,11 @@ class CohortTests(unittest.TestCase):
         source = (self.study / issue['feed_source']).resolve()
         manifest = read_json(run / 'zenith_run.json')
         manifest.update(schema='zenith_execution_manifest_v1', target='lab_director', model=candidate['model'],
+            provider=candidate['provider'],
             feed_source=str(source), source_hashes=runtime._source_hashes([source]), context_profile='original',
             implementation_hashes=runtime.implementation_hashes())
+        if candidate.get('provider_slug'):
+            manifest['provider_slug'] = candidate['provider_slug']
         write_json(run / 'zenith_run.json', manifest)
         cp2 = run / 'artifacts/lab_director.json'
         for node in candidate['scope']:
@@ -70,7 +73,11 @@ class CohortTests(unittest.TestCase):
                 write_json(run / 'artifacts' / f'{node}.json', {'status': 'success', 'data': {}})
         (run / 'artifacts/global_stock_feed.json').write_bytes((source / 'artifacts/global_stock_feed.json').read_bytes())
         template = read_json(run / 'handoff/receipts/fixture.json')
-        template.update(actual_model=candidate['actual_model'], requested_model=candidate['model'])
+        template.update(actual_model=candidate['actual_model'], requested_model=candidate['model'],
+                        provider=candidate['provider'], execution_kind=candidate['execution_kind'])
+        if candidate.get('provider_slug'):
+            template.update(requested_provider_slug=candidate['provider_slug'],
+                            verified_provider_name='Synthetic endpoint', actual_provider='Synthetic endpoint')
         write_json(run / 'handoff/receipts/fixture.json', template)
         for node in candidate['reasoner_scope']:
             if node != 'lab_director':
@@ -119,6 +126,41 @@ class CohortTests(unittest.TestCase):
         manifest.update(feed_source=str(source), source_hashes=runtime._source_hashes([source]))
         write_json(run / 'zenith_run.json', manifest)
         self.assertEqual(cohort.attach(self.study, candidate_id='baseline', issue_id='issue-0', run=run)['state'], 'complete')
+
+    def test_endpoint_selection_cannot_differ_between_arms(self):
+        self.prepare()
+        raw = read_json(self.base / 'spec.json')
+        for candidate, pin in zip(raw['candidates'], ('deepinfra/fp8', 'different-endpoint')):
+            candidate.update(provider='openrouter_budgeted', execution_kind='openrouter_budgeted', provider_slug=pin)
+        path = self.base / 'pinned.json'; write_json(path, raw)
+        with self.assertRaisesRegex(ValueError, 'identical declared'):
+            cohort.freeze(path, self.base / 'different-providers')
+        for candidate in raw['candidates']:
+            candidate.pop('provider_slug')
+        write_json(path, raw)
+        with self.assertRaisesRegex(ValueError, 'require an exact provider_slug'):
+            cohort.freeze(path, self.base / 'unpinned-providers')
+
+    def test_pinned_endpoint_requires_matching_manifest_and_actual_provider_receipts(self):
+        self.prepare()
+        raw = read_json(self.base / 'spec.json')
+        for candidate in raw['candidates']:
+            candidate.update(provider='openrouter_budgeted', execution_kind='openrouter_budgeted', provider_slug='deepinfra/fp8')
+        path = self.base / 'pinned.json'; write_json(path, raw)
+        self.study = self.base / 'pinned'; cohort.freeze(path, self.study)
+        self.spec = read_json(self.study / 'cohort.json')
+        run = self.run_fixture()
+        candidate, issue = cohort.select(self.spec, 'baseline', 'issue-0')
+        self.assertTrue(cohort.validate_run(self.study, self.spec, candidate, issue, run)[1])
+        manifest_path = run / 'zenith_run.json'; manifest = read_json(manifest_path)
+        manifest['provider_slug'] = 'different-endpoint'; write_json(manifest_path, manifest)
+        with self.assertRaisesRegex(ValueError, 'manifest identity'):
+            cohort.validate_run(self.study, self.spec, candidate, issue, run)
+        manifest['provider_slug'] = 'deepinfra/fp8'; write_json(manifest_path, manifest)
+        receipt_path = run / 'handoff/receipts/fixture.json'; receipt = read_json(receipt_path)
+        receipt['actual_provider'] = 'Unplanned provider'; write_json(receipt_path, receipt)
+        with self.assertRaisesRegex(ValueError, 'endpoint lineage'):
+            cohort.validate_run(self.study, self.spec, candidate, issue, run)
 
     def test_pending_native_and_truth_do_not_select_partial_support(self):
         self.prepare(2)

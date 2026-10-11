@@ -175,7 +175,8 @@ def provider_for(run_dir: Path, spec: dict):
         return NvidiaNimProvider(run_dir, spec.get("model"))
     if name == "openrouter_budgeted":
         from .budgeted import OpenRouterBudgetedProvider
-        return OpenRouterBudgetedProvider(run_dir, spec.get("model"), **spec["paid_budget"])
+        return OpenRouterBudgetedProvider(run_dir, spec.get("model"),
+                                          provider_slug=spec.get("provider_slug"), **spec["paid_budget"])
     raise ValueError(f"unknown provider {name}")
 
 
@@ -282,7 +283,8 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
           horizon: str | None = None, time_anchor: str | None = None, responses: str | None = None,
           model: str | None = None, policy: str | None = None, graph_variant: str | None = None,
           context_profile: str = "original", max_cost_usd=None, max_calls: int | None = None,
-          max_output_tokens: int = 4096, budget_dir: str | Path | None = None) -> dict:
+          max_output_tokens: int = 4096, budget_dir: str | Path | None = None,
+          provider_slug: str | None = None) -> dict:
     root = Path(root).resolve()
     if context_profile not in ("original", "compact_feeds"):
         raise ValueError("unknown context profile")
@@ -306,9 +308,10 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
         model = os.environ.get("OPENROUTER_CHAT_MODEL") or "openrouter/free"
     paid_budget = None
     if provider == "openrouter_budgeted":
-        from .budgeted import budget_options
+        from .budgeted import budget_options, normalize_provider_slug
         paid_budget = budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir)
-    elif max_cost_usd is not None or max_calls is not None or budget_dir is not None:
+        provider_slug = normalize_provider_slug(provider_slug)
+    elif max_cost_usd is not None or max_calls is not None or budget_dir is not None or provider_slug is not None:
         raise ValueError("paid budget options require --provider openrouter_budgeted")
     if provider == "captured" and not responses:
         raise ValueError("captured provider requires --responses")
@@ -338,6 +341,8 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
             "context_profile": context_profile, "implementation_hashes": implementation_hashes()}
     if paid_budget is not None:
         spec["paid_budget"] = paid_budget
+    if provider_slug is not None:
+        spec["provider_slug"] = provider_slug
     if variant_path:
         spec["graph_variant"] = variant_payload
         spec["graph_variant_source"] = str(variant_path)

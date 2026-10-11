@@ -73,9 +73,40 @@ The current study selects `deepseek/deepseek-v4.1-flash` explicitly for future p
 
 The provider requires parameter support, disables provider fallback, and receives price ceilings for prompt/completion, request and image charges. [OpenRouter provider routing](https://openrouter.ai/docs/guides/routing/provider-selection).
 
+The run option `--provider-slug deepinfra/fp8` pins a specific endpoint for this model. It is optional for an unpaired run and required when freezing new paid cohort comparisons. Before each new attempt the adapter verifies the exact tag in the public endpoint catalogue, active status, provider name, required parameters, context/output limits and prices no higher than the full model-catalogue reservation rates. The request allows only that slug, with fallback disabled. Receipts record `requested_provider_slug`, the catalogue's `verified_provider_name`, and the response's `actual_provider`; a missing or different actual provider rejects the response and halts the batch. Successful cached replies retain these checks without a metadata request. The pin is immutable within each run and frozen candidate, while all pins still share the same batch limits and reservations. [Official endpoint catalogue](https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints), [endpoint routing semantics](https://openrouter.ai/docs/guides/routing/provider-selection).
+
+The public endpoint catalogue on 11 October 2026 lists this DeepInfra FP8 endpoint with USD 0.14 / 0.42 per million prompt/completion tokens, 1,048,576 context tokens and a 131,072-token output maximum. These metadata observations establish an eligible routing target, not capacity or immunity to HTTP 429. Reservations still use the higher full model-catalogue rates; no endpoint discount or cache hit is assumed. [Official endpoint catalogue](https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints).
+
 Before sending a request, the adapter takes a process lock and atomically saves its reservation. Input tokens are conservatively bounded by UTF8 prompt bytes **plus 4096 framing tokens**; the response bound is the selected output cap. The reservation includes both token prices and any request fee. All reservations remain charged against the client cap, including successful calls. Concurrent runs cannot reserve past the shared USD or call limit.
 
 There is one network attempt per run/node. Original-engine repair prompts cannot make another paid call for that node. Successful exact responses are reused without inference or a key. Failed, interrupted or ambiguous requests are not resent. Missing/nonfinite actual cost, excessive reported tokens or cost, and transport failures halt the shared batch. Reservations remain held, and the response, requested/actual model identities, usage, reported cost and error remain auditable.
+
+### Explicit continuation after an unknown-cost HTTP 429
+
+`zenith.budgeted.recover_budget(budget_dir, evidence)` is a separate local operation, never invoked by inference or automatically on a halt. It requires a caller-declared human authorization and an exact evidence object:
+
+```json
+{
+  "schema": "zenith_budget_recovery_evidence_v1",
+  "prior_ledger_sha256": "SHA256_OF_CURRENT_BUDGET_JSON_BYTES",
+  "failed_call_id": "EXACT_FAILED_CALL_ID",
+  "failed_call_sha256": "CANONICAL_DIGEST_OF_FAILED_ENTRY",
+  "authorization_ref": "REFERENCE_TO_EXPLICIT_OPERATOR_AUTHORIZATION",
+  "reason": "WHY_NEW_ATTEMPTS_ARE_AUTHORIZED_WITH_THE_UNKNOWN_COST_RETAINED",
+  "accept_unknown_cost": true
+}
+```
+
+The hash placeholders must be lowercase 64-character SHA256 values. `failed_call_sha256` uses `zenith.providers.digest(entry)`. The operation holds the same budget lock, requires the current halt to be that exact failed unknown-cost HTTP 429, and rejects stale hashes, unfinished attempts, inconsistent accounting, reported costs above reservations, another unrecovered failure, or a second recovery of the same call. It appends an audit receipt and clears the halt flag; failed entries, unknown costs, every full reservation, call counts and original limits remain unchanged. A later distinct HTTP 429 needs new explicit evidence. The local operation records the authorization reference but does not independently authenticate human intent.
+
+Invoke the same operation from the standalone CLI:
+
+```sh
+python -m zenith budget-recover --budget-dir state/budgets/my-authorized-batch \
+  --evidence /path/to/reviewed-recovery-evidence.json
+```
+
+Continuation permits only new run/node identities within the existing shared limits. It does not resend the failed call, release its reservation, assume a zero charge, raise caps, or create another budget. Choosing a pinned endpoint is a manual reviewed decision before new calls, not a runtime fallback. The earlier USD 0.25 batch remains untouched. A caller must preserve the evidence and resulting recovery receipt alongside the experiment record.
 
 The USD limit is a **client reservation guard, not a server billing guarantee**. Token accounting, framing, provider behavior and the optional reported cost can differ from the client bounds. A response exceeding its reservation is recorded and halts further calls; the adapter cannot reverse an incurred charge. It does not infer a billed cost when OpenRouter omits `usage.cost`. [OpenRouter usage and cost fields](https://openrouter.ai/docs/api/reference/overview).
 

@@ -3,9 +3,11 @@ from __future__ import annotations
 
 import contextlib
 import fcntl
+import hashlib
 import json
 import math
 import os
+import re
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
@@ -15,6 +17,15 @@ from .providers import Provider, digest, now, text_digest, write_json
 ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 INPUT_OVERHEAD_TOKENS = 4096
 MAX_BATCH_USD = Decimal("5")
+
+
+def normalize_provider_slug(value):
+    """An explicit endpoint slug; never infer a provider from a model ID."""
+    if value is None:
+        return None
+    if not isinstance(value, str) or not re.fullmatch(r"[a-z0-9]+(?:[.-][a-z0-9]+)*(?:/[a-z0-9]+(?:[.-][a-z0-9]+)*)?", value):
+        raise ValueError("provider_slug must be an exact lowercase OpenRouter endpoint slug")
+    return value
 
 
 def durable(value):
@@ -88,6 +99,146 @@ def verified_model(model: str, *, http_get=None):
     return row, prices, min(contexts)
 
 
+def verified_endpoint(model, slug, prices, *, parameters, http_get=None):
+    """Public endpoint metadata constrains routing; it is not a quota promise."""
+    slug = normalize_provider_slug(slug)
+    url = api._official_base_url() + "/api/v1/models/" + model + "/endpoints"
+    data = (http_get or api._default_http_get)(url, {"Accept": "application/json"}, 30).get("data")
+    if not isinstance(data, dict) or data.get("id") != model or not isinstance(data.get("endpoints"), list):
+        raise RuntimeError("pinned provider endpoint metadata is malformed or for another model")
+    matches = [e for e in data["endpoints"] if isinstance(e, dict) and e.get("tag") == slug]
+    if len(matches) != 1:
+        raise RuntimeError("pinned provider must exist exactly once in current endpoint metadata")
+    endpoint = matches[0]
+    if endpoint.get("model_id") != model or type(endpoint.get("status")) is not int or endpoint["status"] != 0:
+        raise RuntimeError("pinned provider endpoint is not an active endpoint for this model")
+    name = endpoint.get("provider_name")
+    supported = endpoint.get("supported_parameters")
+    if not isinstance(name, str) or not name.strip() or not isinstance(supported, list) or not set(parameters) <= set(supported):
+        raise RuntimeError("pinned endpoint lacks provider identity or required parameter support")
+    pricing = endpoint.get("pricing")
+    if not isinstance(pricing, dict) or not {"prompt", "completion"} <= pricing.keys():
+        raise RuntimeError("pinned endpoint lacks known prompt/completion pricing")
+    # OpenRouter's endpoint discount is descriptive metadata, not a fee.
+    rates = {k: amount(v, "endpoint pricing") for k, v in pricing.items() if k != "discount"}
+    if "discount" in pricing and amount(pricing["discount"], "endpoint discount") > 1:
+        raise RuntimeError("pinned endpoint discount metadata is invalid")
+    if rates.get("input_cache_read", Decimal(0)) > rates["prompt"]:
+        raise RuntimeError("pinned endpoint cached input price exceeds full prompt price")
+    if any(v != 0 for k, v in rates.items() if k not in ("prompt", "completion", "request", "input_cache_read")):
+        raise RuntimeError("pinned endpoint has unsupported ancillary charges")
+    if any(rates.get(k, Decimal(0)) > prices.get(k, Decimal(0)) for k in ("prompt", "completion", "request")):
+        raise RuntimeError("pinned endpoint pricing exceeds model catalogue reservation rates")
+    positive_int(endpoint.get("context_length"), "endpoint context_length")
+    positive_int(endpoint.get("max_completion_tokens"), "endpoint max_completion_tokens")
+    if endpoint.get("max_prompt_tokens") is not None:
+        positive_int(endpoint["max_prompt_tokens"], "endpoint max_prompt_tokens")
+    return endpoint
+
+
+def _strict_json(raw):
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError("duplicate JSON key in budget ledger")
+            result[key] = value
+        return result
+    def nonfinite(value):
+        raise ValueError("nonfinite JSON in budget ledger")
+    return json.loads(raw, object_pairs_hook=pairs, parse_constant=nonfinite)
+
+
+def recover_budget(budget_dir, evidence):
+    """Explicit operator continuation after one unknown-cost HTTP 429.
+
+    No network calls, retries, released reservations, or changed failed entries.
+    ``authorization_ref`` records a caller-declared human authorization; it is
+    not independently authenticated by this local file operation.
+    """
+    required = {"schema", "prior_ledger_sha256", "failed_call_id", "failed_call_sha256",
+                "authorization_ref", "reason", "accept_unknown_cost"}
+    if not isinstance(evidence, dict) or set(evidence) != required or evidence.get("schema") != "zenith_budget_recovery_evidence_v1":
+        raise ValueError("recovery requires exact documented evidence fields")
+    for key in ("prior_ledger_sha256", "failed_call_id", "failed_call_sha256"):
+        if not isinstance(evidence[key], str) or not re.fullmatch(r"[0-9a-f]{64}", evidence[key]):
+            raise ValueError("recovery requires exact SHA256 ledger/call bindings")
+    if evidence["accept_unknown_cost"] is not True or any(
+            not isinstance(evidence[k], str) or not evidence[k].strip() or len(evidence[k]) > 2048
+            for k in ("authorization_ref", "reason")):
+        raise ValueError("explicit authorization and acceptance of retained unknown cost are required")
+    if api.redact(evidence) != evidence:
+        raise ValueError("recovery evidence must not contain credentials")
+    directory = Path(budget_dir).resolve()
+    with (directory / ".budget.lock").open("a+") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            path = directory / "budget.json"
+            raw = path.read_bytes()
+            if hashlib.sha256(raw).hexdigest() != evidence["prior_ledger_sha256"]:
+                raise RuntimeError("recovery prior ledger digest differs; re-observe before authorizing")
+            ledger = _strict_json(raw)
+            if not isinstance(ledger, dict):
+                raise RuntimeError("recovery budget ledger must be an object")
+            limits, entries = ledger.get("limits"), ledger.get("entries")
+            if ledger.get("schema") != "zenith_shared_budget_v1" or ledger.get("halted") is not True or not isinstance(limits, dict) or not isinstance(entries, dict) or not entries:
+                raise RuntimeError("recovery requires an existing halted shared budget")
+            if limits != budget_options("validation/model", limits.get("max_cost_usd"), limits.get("max_calls"), limits.get("max_output_tokens"), directory):
+                raise RuntimeError("recovery budget limits are malformed or bound to another directory")
+            reserved = reported = Decimal(0)
+            for call_id, entry in entries.items():
+                if not isinstance(call_id, str) or not re.fullmatch(r"[0-9a-f]{64}", call_id) or not isinstance(entry, dict) or entry.get("schema") != "zenith_api_call_v1" or entry.get("call_id") != call_id or entry.get("status") not in ("failed", "response_supplied", "attempt_started") or "cost" not in entry:
+                    raise RuntimeError("recovery ledger attempt is malformed")
+                if entry["status"] == "attempt_started":
+                    raise RuntimeError("recovery cannot proceed with an in-flight or unfinished attempt")
+                bound = amount(entry.get("reserved_cost_usd"), "stored reservation")
+                reserved += bound
+                if entry["cost"] is not None:
+                    cost = amount(entry["cost"], "stored cost")
+                    if cost > bound:
+                        raise RuntimeError("recovery rejects reported cost exceeding its reservation")
+                    reported += cost
+                elif entry["status"] == "response_supplied":
+                    raise RuntimeError("recovery successful attempt lacks known cost")
+                response = entry.get("provider_response")
+                usage = response.get("usage") if isinstance(response, dict) else None
+                if isinstance(usage, dict) and usage.get("cost") is not None and (
+                        entry["cost"] is None or amount(usage["cost"], "recorded response cost") != amount(entry["cost"])):
+                    raise RuntimeError("recovery stored cost differs from reported response accounting")
+            if reserved != amount(ledger.get("total_reserved_usd")) or reported != amount(ledger.get("total_reported_cost_usd")) or reserved > amount(limits["max_cost_usd"]) or len(entries) > limits["max_calls"]:
+                raise RuntimeError("recovery ledger accounting is inconsistent")
+            history = ledger.get("recoveries", [])
+            if not isinstance(history, list):
+                raise RuntimeError("recovery history is malformed")
+            recovered = set()
+            for event in history:
+                previous = event.get("evidence", {}) if isinstance(event, dict) else {}
+                if not isinstance(previous, dict):
+                    raise RuntimeError("recovery history evidence is malformed")
+                key = previous.get("failed_call_id")
+                if not isinstance(event, dict) or event.get("schema") != "zenith_budget_recovery_receipt_v1" or key in recovered or key not in entries or previous.get("failed_call_sha256") != digest(entries[key]):
+                    raise RuntimeError("recovery history has duplicate or changed failed attempts")
+                recovered.add(key)
+            call_id = evidence["failed_call_id"]
+            failed = entries.get(call_id)
+            if call_id in recovered or not isinstance(failed, dict) or digest(failed) != evidence["failed_call_sha256"]:
+                raise RuntimeError("recovery failed call differs or was already recovered")
+            error = failed.get("error")
+            if failed.get("status") != "failed" or failed.get("cost") is not None or not isinstance(error, str) or not re.search(r"(?:HTTPError: 429 Client Error\b|OpenRouter HTTP 429:)", error) or ledger.get("halt_reason") != error:
+                raise RuntimeError("recovery is restricted to the exact unknown-cost HTTP 429 halt")
+            if any(k != call_id and k not in recovered and e["status"] == "failed" for k, e in entries.items()):
+                raise RuntimeError("recovery cannot waive another unrecovered failed attempt")
+            receipt = {"schema": "zenith_budget_recovery_receipt_v1", "recorded_at": now(), "evidence": dict(evidence),
+                       "prior_halt_reason": ledger["halt_reason"], "retained_reserved_usd": ledger["total_reserved_usd"],
+                       "known_reported_cost_usd": ledger["total_reported_cost_usd"],
+                       "failed_reservation_usd": failed["reserved_cost_usd"], "failed_actual_cost": None}
+            ledger.update(halted=False, recoveries=history + [receipt])
+            write_json(path, ledger)
+            return receipt
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+
+
 class OpenRouterBudgetedProvider(Provider):
     """One paid attempt per run/node, with atomic worst-case batch reservations.
 
@@ -97,10 +248,11 @@ class OpenRouterBudgetedProvider(Provider):
     """
     def __init__(self, run_dir: Path, model: str, max_cost_usd, max_calls: int,
                  max_output_tokens: int = 4096, budget_dir: Path | None = None,
-                 caller=None, catalogue_get=None):
+                 caller=None, catalogue_get=None, provider_slug=None):
         super().__init__(run_dir)
         self.options = budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir)
         self.model = model
+        self.provider_slug = normalize_provider_slug(provider_slug)
         self.budget_dir = Path(self.options["budget_dir"])
         self.caller = caller or api._default_http_post
         self.catalogue_get = catalogue_get
@@ -109,6 +261,8 @@ class OpenRouterBudgetedProvider(Provider):
         handoff = self.run_dir / "handoff"
         handoff.mkdir(parents=True, exist_ok=True)
         binding = {"schema": "zenith_paid_run_binding_v1", "model": self.model, "limits": self.options}
+        if self.provider_slug is not None:
+            binding["provider_slug"] = self.provider_slug
         with self._lock, (handoff / ".budgeted.lock").open("a+") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             try:
@@ -164,11 +318,15 @@ class OpenRouterBudgetedProvider(Provider):
                 packet = previous["provider_receipt"]
                 if text_digest(packet["response_text"]) != previous["response_sha256"]:
                     raise RuntimeError("stored budgeted response hash mismatch")
+                if self.provider_slug is not None and (previous.get("requested_provider_slug") != self.provider_slug or
+                        not previous.get("verified_provider_name") or packet.get("actual_provider") != previous["verified_provider_name"]):
+                    raise RuntimeError("stored budgeted response differs from the pinned provider")
                 self.receipt(identity, provider="openrouter_budgeted", status="loaded_previous_response",
                              execution_kind="openrouter_budgeted",
                              requested_model=self.model, actual_model=packet.get("model"),
                              usage=packet.get("usage"), cost=packet.get("cost"), endpoint=ENDPOINT,
-                             budget_dir=str(self.budget_dir))
+                             budget_dir=str(self.budget_dir), requested_provider_slug=self.provider_slug,
+                             verified_provider_name=previous.get("verified_provider_name"), actual_provider=packet.get("actual_provider"))
                 return packet["response_text"]
             if previous.get("status") == "attempt_started":
                 ledger["halted"] = True
@@ -184,7 +342,10 @@ class OpenRouterBudgetedProvider(Provider):
     def ask_ai(self, prompt: str, config: dict | None = None, cancel=None) -> str:
         identity = self.identity(prompt, config)
         self._bind_run()
-        call_id = digest({**identity, "provider": "openrouter_budgeted", "requested_model": self.model})
+        call_binding = {**identity, "provider": "openrouter_budgeted", "requested_model": self.model}
+        if self.provider_slug is not None:
+            call_binding["provider_slug"] = self.provider_slug
+        call_id = digest(call_binding)
         call_path = self.run_dir / "handoff" / "api_calls" / "openrouter_budgeted" / (call_id + ".json")
         with self._ledger() as (ledger, _):
             cached = self._previous(ledger, call_id, identity)
@@ -195,6 +356,12 @@ class OpenRouterBudgetedProvider(Provider):
         api._official_base_url()
         token = api._resolve_api_key(None)
         row, prices, context_length = verified_model(self.model, http_get=self.catalogue_get)
+        endpoint = None
+        if self.provider_slug is not None:
+            parameters = ["max_tokens", "temperature"] + (["reasoning"] if "reasoning" in row["supported_parameters"] else [])
+            endpoint = verified_endpoint(self.model, self.provider_slug, prices, parameters=parameters,
+                                         http_get=self.catalogue_get)
+            context_length = min(context_length, endpoint["context_length"])
         # One token per UTF8 byte plus a disclosed conservative framing allowance.
         input_bound = len(prompt.encode("utf-8")) + INPUT_OVERHEAD_TOKENS
         output_bound = self.options["max_output_tokens"]
@@ -203,6 +370,9 @@ class OpenRouterBudgetedProvider(Provider):
         top_output = (row.get("top_provider") or {}).get("max_completion_tokens")
         if top_output is not None and output_bound > positive_int(top_output, "max_completion_tokens"):
             raise RuntimeError("output cap exceeds verified provider maximum")
+        if endpoint is not None and (output_bound > endpoint["max_completion_tokens"] or
+                endpoint.get("max_prompt_tokens") is not None and input_bound > endpoint["max_prompt_tokens"]):
+            raise RuntimeError("conservative prompt or output cap exceeds pinned endpoint maximum")
         # Cached reads are discounted alternatives, never an assumed cache hit.
         reservation = prices["prompt"] * input_bound + prices["completion"] * output_bound + prices.get("request", Decimal(0))
         record = {"schema": "zenith_api_call_v1", **identity, "call_id": call_id,
@@ -215,6 +385,9 @@ class OpenRouterBudgetedProvider(Provider):
                   "max_output_tokens": output_bound, "context_length": context_length,
                   "catalogue_pricing": {k: str(v) for k, v in prices.items()},
                   "catalogue_sha256": digest(row), "budget_dir": str(self.budget_dir)}
+        if endpoint is not None:
+            record.update(requested_provider_slug=self.provider_slug, verified_provider_name=endpoint["provider_name"],
+                          endpoint_metadata_sha256=digest(endpoint), endpoint_metadata=endpoint)
         with self._ledger() as (ledger, path):
             cached = self._previous(ledger, call_id, identity)
             if cached is not None:
@@ -240,6 +413,8 @@ class OpenRouterBudgetedProvider(Provider):
                                         "request": float(prices.get("request", Decimal(0))), "image": 0}}}
             if "reasoning" in row["supported_parameters"]:
                 payload["reasoning"] = {"enabled": False}
+            if self.provider_slug is not None:
+                payload["provider"]["only"] = [self.provider_slug]
             data = self.caller(ENDPOINT, {"Authorization": "Bearer " + token,
                                        "Content-Type": "application/json", "Accept": "application/json"}, payload, 120)
             data = api.redact(durable(data), secrets=(token,))
@@ -264,15 +439,21 @@ class OpenRouterBudgetedProvider(Provider):
             actual_model = data.get("model")
             if not isinstance(actual_model, str) or not actual_model.strip():
                 raise RuntimeError("paid response omitted actual model identity")
+            actual_provider = data.get("provider")
+            record["actual_provider"] = actual_provider
+            if endpoint is not None and actual_provider != endpoint["provider_name"]:
+                raise RuntimeError("paid response provider differs from the verified pinned endpoint")
             packet = {"response_text": content, "requested_model": self.model, "model": actual_model,
-                      "usage": usage, "cost": str(cost), "endpoint": ENDPOINT, "generation_id": data.get("id")}
+                      "usage": usage, "cost": str(cost), "endpoint": ENDPOINT, "generation_id": data.get("id"),
+                      "actual_provider": actual_provider}
             record.update(status="response_supplied", provider_receipt=packet, response_sha256=text_digest(content))
             self._settle(call_id, record, call_path)
             self.receipt(identity, provider="openrouter_budgeted", status="response_supplied",
                          execution_kind="openrouter_budgeted",
                          requested_model=self.model, actual_model=actual_model, usage=usage, cost=str(cost),
                          reserved_cost_usd=str(reservation), endpoint=ENDPOINT, budget_dir=str(self.budget_dir),
-                         response_sha256=text_digest(content))
+                         response_sha256=text_digest(content), requested_provider_slug=self.provider_slug,
+                         verified_provider_name=record.get("verified_provider_name"), actual_provider=actual_provider)
             return content
         except BaseException as exc:
             message = api.safe_error(exc, secrets=(token,))
@@ -282,7 +463,9 @@ class OpenRouterBudgetedProvider(Provider):
                          execution_kind="openrouter_budgeted",
                          actual_model=record.get("provider_response", {}).get("model"),
                          usage=record.get("provider_response", {}).get("usage"), cost=record.get("cost"),
-                         reserved_cost_usd=str(reservation), error=message, endpoint=ENDPOINT)
+                         reserved_cost_usd=str(reservation), error=message, endpoint=ENDPOINT,
+                         requested_provider_slug=self.provider_slug, verified_provider_name=record.get("verified_provider_name"),
+                         actual_provider=record.get("provider_response", {}).get("provider"))
             raise RuntimeError(message) from None
 
     def _settle(self, call_id, record, call_path, *, halt=False):

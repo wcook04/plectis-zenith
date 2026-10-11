@@ -74,7 +74,7 @@ def freeze(spec_path, study):
     for candidate in frozen['candidates']:
         keys = {'candidate_id', 'hypothesis', 'change', 'source_commit', 'model', 'execution_kind',
                 'provider', 'graph_variant', 'reasoning_policy', 'context_profile', 'prompt_sha256'}
-        if not keys <= set(candidate) or set(candidate) - keys - {'actual_model'}:
+        if not keys <= set(candidate) or set(candidate) - keys - {'actual_model', 'provider_slug'}:
             raise ValueError('candidate provenance requires documented fields')
         for key in keys - {'graph_variant', 'reasoning_policy'}:
             if not isinstance(candidate[key], str) or not candidate[key].strip():
@@ -82,6 +82,12 @@ def freeze(spec_path, study):
         candidate.setdefault('actual_model', candidate['model'])
         if not isinstance(candidate['actual_model'], str) or not candidate['actual_model'].strip():
             raise ValueError('expected actual_model must be a nonempty string')
+        if candidate['provider'] == 'openrouter_budgeted' and not candidate.get('provider_slug'):
+            raise ValueError('paid cohort candidates require an exact provider_slug')
+        if 'provider_slug' in candidate:
+            from zenith.budgeted import normalize_provider_slug
+            if candidate['provider'] != 'openrouter_budgeted' or normalize_provider_slug(candidate['provider_slug']) is None:
+                raise ValueError('provider_slug requires a pinned paid OpenRouter endpoint')
         name = candidate['candidate_id']
         if name in names or not name.replace('-', '').replace('_', '').isalnum():
             raise ValueError('candidate ids must be unique safe identifiers')
@@ -90,7 +96,7 @@ def freeze(spec_path, study):
             raise ValueError('unknown context profile')
         if len(candidate['prompt_sha256']) != 64 or any(c not in '0123456789abcdef' for c in candidate['prompt_sha256']):
             raise ValueError('candidate prompt_sha256 requires a SHA256 digest')
-        current = (candidate['model'], candidate['actual_model'], candidate['execution_kind'], candidate['provider'])
+        current = (candidate['model'], candidate['actual_model'], candidate['execution_kind'], candidate['provider'], candidate.get('provider_slug'))
         if identity is not None and current != identity:
             raise ValueError('candidates require identical declared model/provider/execution kind')
         identity = current
@@ -191,7 +197,7 @@ def validate_run(study, spec, candidate, issue, run):
     manifest = read_json(run / 'zenith_run.json')
     required = {'schema': 'zenith_execution_manifest_v1', 'mission': 'lab',
                 'time_anchor': issue['time_anchor'], 'horizon': issue['target_time'],
-                'provider': candidate['provider'], 'model': candidate['model'],
+                'provider': candidate['provider'], 'model': candidate['model'], 'provider_slug': candidate.get('provider_slug'),
                 'context_profile': candidate['context_profile']}
     if any(manifest.get(k) != v for k, v in required.items()) or manifest.get('run_id') != run.name or manifest.get('target') not in {'lab_director', 'lab_integrity'}:
         raise ValueError('native manifest identity/model/input time/horizon differs from cohort')
@@ -231,6 +237,11 @@ def validate_run(study, spec, candidate, issue, run):
     supplied = [r for r in receipts if r.get('schema') == 'zenith_provider_attempt_v1' and r.get('status') in {'response_supplied', 'replayed'}]
     if any(r.get('run_id') != run.name or r.get('actual_model') != candidate['actual_model'] or r.get('execution_kind') != candidate['execution_kind'] or r.get('provider') != candidate['provider'] for r in supplied):
         raise ValueError('node provider model lineage is not comparable')
+    if candidate.get('provider_slug') is not None and any(
+            r.get('requested_provider_slug') != candidate['provider_slug'] or
+            not isinstance(r.get('verified_provider_name'), str) or not r['verified_provider_name'] or
+            r.get('actual_provider') != r['verified_provider_name'] for r in supplied):
+        raise ValueError('node endpoint lineage differs from the pinned provider')
     if not set(candidate['reasoner_scope']) <= {r.get('node_id') for r in supplied}:
         raise ValueError('complete native reasoning node provider receipts required')
     call_count = len(calls) if calls else len(supplied)
@@ -431,6 +442,8 @@ def next_actions(study):
                     for field, flag in (('graph_variant', '--graph-variant'), ('reasoning_policy', '--policy')):
                         if candidate[field]:
                             native += [flag, str(study / candidate[field])]
+                    if candidate.get('provider_slug'):
+                        native += ['--provider-slug', candidate['provider_slug']]
                     action = 'run_native_then_attach'
                 row = {'candidate_id': candidate['candidate_id'], 'issue_id': issue['issue_id'],
                        'split': issue['split'], 'action': action, 'native_argv': native, 'attach_argv': attach_command,

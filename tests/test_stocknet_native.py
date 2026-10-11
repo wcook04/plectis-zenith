@@ -30,7 +30,7 @@ def dataset(tmp_path):
 
 def test_prepare_freezes_one_policy_change_and_native_temporal_support(tmp_path):
     data = dataset(tmp_path); study = tmp_path / 'study'
-    native.prepare(data, study, 'fixed/model')
+    native.prepare(data, study, 'fixed/model', provider_slug='fixture')
     spec = read_json(study / 'cohort/cohort.json')
     assert len(spec['issues']) == 25
     assert sum(row['split'] == 'development' for row in spec['issues']) == 20
@@ -73,10 +73,10 @@ def test_prepare_freezes_one_policy_change_and_native_temporal_support(tmp_path)
 
 def test_fresh_preparation_and_source_hashes_are_enforced(tmp_path):
     data = dataset(tmp_path); output = tmp_path / 'study'
-    native.prepare(data, output, 'fixed/model', development_count=1, holdout_count=0)
-    with pytest.raises(ValueError, match='overwrite'): native.prepare(data, output, 'fixed/model')
+    native.prepare(data, output, 'fixed/model', provider_slug='fixture', development_count=1, holdout_count=0)
+    with pytest.raises(ValueError, match='overwrite'): native.prepare(data, output, 'fixed/model', provider_slug='fixture')
     (data / 'price/raw/AAPL.csv').write_text('changed')
-    with pytest.raises(ValueError, match='source hash'): native.prepare(data, tmp_path / 'changed-study', 'fixed/model')
+    with pytest.raises(ValueError, match='source hash'): native.prepare(data, tmp_path / 'changed-study', 'fixed/model', provider_slug='fixture')
 
 
 def test_pilot_is_excluded_and_freezes_before_native_invocation(tmp_path, monkeypatch):
@@ -97,15 +97,31 @@ def test_pilot_is_excluded_and_freezes_before_native_invocation(tmp_path, monkey
 
 def test_holdout_cannot_execute_before_complete_development(tmp_path, monkeypatch):
     data = dataset(tmp_path); study = tmp_path / 'study'
-    native.prepare(data, study, 'fixed/model')
+    native.prepare(data, study, 'fixed/model', provider_slug='fixture')
     monkeypatch.setattr(native.runtime, 'start', lambda *a, **k: pytest.fail('must not execute provider'))
     with pytest.raises(ValueError, match='twenty-issue'):
         native.run(study, phase='holdout', budget_dir=tmp_path / 'budget', pause_seconds=0)
 
 
+def test_endpoint_pin_survives_freeze_and_native_dispatch(tmp_path, monkeypatch):
+    data = dataset(tmp_path); study = tmp_path / 'study'
+    native.prepare(data, study, 'fixed/model', provider_slug='deepinfra/fp8', development_count=1, holdout_count=0)
+    spec = read_json(study / 'cohort/cohort.json')
+    assert all(row['provider_slug'] == 'deepinfra/fp8' for row in spec['candidates'])
+    actions = cohort.next_actions(study / 'cohort')['actions']
+    assert all(row['native_argv'][-2:] == ['--provider-slug', 'deepinfra/fp8'] for row in actions)
+    observed = []
+    def failure(*args, **kwargs):
+        observed.append(kwargs)
+        raise RuntimeError('synthetic no-inference boundary')
+    monkeypatch.setattr(native.runtime, 'start', failure)
+    native.run(study, phase='development', budget_dir=tmp_path / 'shared', pause_seconds=0)
+    assert len(observed) == 1 and observed[0]['provider_slug'] == 'deepinfra/fp8'
+
+
 def test_run_failure_imported_once_and_stops_without_retry(tmp_path, monkeypatch):
     data = dataset(tmp_path); study = tmp_path / 'study'
-    native.prepare(data, study, 'fixed/model', development_count=2, holdout_count=0)
+    native.prepare(data, study, 'fixed/model', provider_slug='fixture', development_count=2, holdout_count=0)
     observed = []
     def failure(*args, **kwargs):
         observed.append(kwargs)

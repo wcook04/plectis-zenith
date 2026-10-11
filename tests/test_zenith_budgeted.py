@@ -1,5 +1,6 @@
 """Shared paid budgets use synthetic prices, fake credentials and mock HTTP only."""
 import copy
+import hashlib
 from decimal import Decimal
 import json
 import os
@@ -12,7 +13,9 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest.mock import Mock, patch
 
-from zenith.budgeted import OpenRouterBudgetedProvider, ENDPOINT, budget_options, verified_model
+from zenith.budgeted import (OpenRouterBudgetedProvider, ENDPOINT, budget_options, verified_model,
+                             normalize_provider_slug, recover_budget)
+from zenith.providers import digest
 from zenith.cli import parser
 
 SECRET = "sk-or-v1-FAKE_BUDGETED_SECRET_NEVER_PERSIST"
@@ -22,6 +25,11 @@ ROW = {"id": MODEL, "context_length": 131072,
        "pricing": {"prompt": "0.000001", "completion": "0.000002", "request": "0"},
        "supported_parameters": ["max_tokens", "temperature"],
        "top_provider": {"context_length": 131072, "max_completion_tokens": 4096}}
+SLUG = "synthetic-host/fp8"
+PINNED = {"model_id": MODEL, "tag": SLUG, "provider_name": "Synthetic Host", "status": 0,
+          "context_length": 131072, "max_completion_tokens": 4096, "max_prompt_tokens": None,
+          "supported_parameters": ["max_tokens", "temperature"],
+          "pricing": {"prompt": ".0000005", "completion": ".000001", "input_cache_read": ".0000001", "discount": .5}}
 
 
 def reply(cost="0.0001", **extra):
@@ -58,6 +66,206 @@ class BudgetedTests(unittest.TestCase):
 
     def ledger(self):
         return json.loads((self.root / "shared" / "budget.json").read_text())
+
+    def pinned_provider(self, run="PIN", *, endpoint=None, row=None, caller=None, slug=SLUG):
+        seen = []
+        def catalogue(url, headers, timeout):
+            self.assertNotIn("Authorization", headers)
+            seen.append(url)
+            if url == "https://openrouter.ai/api/v1/models":
+                return {"data": [row or ROW]}
+            self.assertEqual(url, f"https://openrouter.ai/api/v1/models/{MODEL}/endpoints")
+            return {"data": {"id": MODEL, "endpoints": [endpoint or PINNED]}}
+        provider = OpenRouterBudgetedProvider(self.root / run, MODEL, ".25", 40, 1024,
+            self.root / "shared", caller=caller or Mock(return_value=reply(provider="Synthetic Host")),
+            catalogue_get=catalogue, provider_slug=slug)
+        provider.catalogue_seen = seen
+        return provider
+
+    def recovery_evidence(self, call_id=None):
+        raw = (self.root / "shared/budget.json").read_bytes()
+        ledger = json.loads(raw)
+        call_id = call_id or next(k for k, e in ledger["entries"].items() if e["status"] == "failed")
+        return {"schema": "zenith_budget_recovery_evidence_v1", "prior_ledger_sha256": hashlib.sha256(raw).hexdigest(),
+                "failed_call_id": call_id, "failed_call_sha256": digest(ledger["entries"][call_id]),
+                "authorization_ref": "synthetic-human-instruction-1", "reason": "explicitly retain unknown 429 reservation",
+                "accept_unknown_cost": True}
+
+    def unknown_429(self, run="rate-limited"):
+        provider = self.provider(run, caller=Mock(side_effect=RuntimeError("OpenRouter HTTP 429: capacity unavailable")))
+        with self.assertRaisesRegex(RuntimeError, "HTTP 429"):
+            self.ask(provider)
+        return provider
+
+    def test_provider_slug_is_explicit_and_run_binding_is_immutable(self):
+        self.assertIsNone(normalize_provider_slug(None))
+        self.assertEqual(normalize_provider_slug("deepinfra/fp8"), "deepinfra/fp8")
+        for slug in ("", "DeepInfra", "deepinfra/", "/fp8", "a/b/c", " a", "a?token=x", False):
+            with self.subTest(slug=slug), self.assertRaises(ValueError):
+                normalize_provider_slug(slug)
+        plain = self.provider()
+        self.ask(plain)
+        binding = json.loads((plain.run_dir / "handoff/budgeted_binding.json").read_text())
+        self.assertNotIn("provider_slug", binding)
+        changed = self.pinned_provider(plain.run_dir.name, caller=Mock())
+        with self.assertRaisesRegex(RuntimeError, "binding is immutable"):
+            self.ask(changed)
+        changed.caller.assert_not_called()
+        self.assertEqual(changed.catalogue_seen, [])
+
+    def test_pin_checks_public_metadata_and_actual_provider_with_full_rate_reservation(self):
+        def post(url, headers, payload, timeout):
+            self.assertEqual(payload["provider"]["only"], [SLUG])
+            self.assertFalse(payload["provider"]["allow_fallbacks"])
+            self.assertEqual(payload["provider"]["max_price"]["prompt"], 1.0)
+            self.assertEqual(next(iter(self.ledger()["entries"].values()))["reserved_cost_usd"], "0.006149")
+            return reply(provider="Synthetic Host")
+        provider = self.pinned_provider(caller=post)
+        self.ask(provider)
+        self.assertEqual(len(provider.catalogue_seen), 2)
+        ledger = self.ledger()
+        self.assertNotIn("provider_slug", ledger["limits"])
+        entry = next(iter(ledger["entries"].values()))
+        self.assertEqual(entry["endpoint_metadata_sha256"], digest(PINNED))
+        self.assertEqual(entry["requested_provider_slug"], SLUG)
+        self.assertEqual(entry["actual_provider"], "Synthetic Host")
+        self.assertEqual(entry["verified_provider_name"], "Synthetic Host")
+        os.environ.pop("OPENROUTER_API_KEY")
+        cached = self.pinned_provider(caller=Mock(side_effect=AssertionError("must not send")))
+        self.ask(cached)
+        self.assertEqual(cached.catalogue_seen, [])
+        receipts = [json.loads(p.read_text()) for p in (provider.run_dir / "handoff/receipts").glob("*.json")]
+        for receipt in receipts:
+            self.assertEqual(receipt["requested_provider_slug"], SLUG)
+            self.assertEqual(receipt["verified_provider_name"], "Synthetic Host")
+            if receipt["status"] != "attempt_started":
+                self.assertEqual(receipt["actual_provider"], "Synthetic Host")
+
+    def test_unverified_pin_parameters_prices_or_bounds_never_send(self):
+        changes = [{"tag": "other"}, {"status": 1}, {"status": False}, {"model_id": "other/model"},
+                   {"provider_name": ""}, {"supported_parameters": ["max_tokens"]},
+                   {"context_length": 4500}, {"max_prompt_tokens": 4096}, {"max_completion_tokens": 1000}]
+        changes += [{"pricing": {**PINNED["pricing"], key: value}} for key, value in (
+            ("prompt", ".0000011"), ("completion", ".0000021"), ("request", ".01"),
+            ("input_cache_read", ".0000006"), ("input_cache_write", ".0000001"),
+            ("discount", 1.1), ("prompt", "NaN"))]
+        for index, change in enumerate(changes):
+            provider = self.pinned_provider(str(index), endpoint={**PINNED, **change}, caller=Mock())
+            with self.subTest(change=change), self.assertRaises((RuntimeError, ValueError)):
+                self.ask(provider)
+            provider.caller.assert_not_called()
+        row = {**ROW, "supported_parameters": ROW["supported_parameters"] + ["reasoning"]}
+        provider = self.pinned_provider("reasoning", row=row, caller=Mock())
+        with self.assertRaisesRegex(RuntimeError, "parameter support"):
+            self.ask(provider)
+        provider.caller.assert_not_called()
+        self.assertFalse((self.root / "shared/budget.json").exists())
+
+    def test_wrong_or_missing_actual_provider_halts_and_cached_pin_cannot_be_forged(self):
+        provider = self.pinned_provider(caller=Mock(return_value=reply(provider="Other Host")))
+        with self.assertRaisesRegex(RuntimeError, "provider differs"):
+            self.ask(provider)
+        ledger = self.ledger()
+        self.assertTrue(ledger["halted"])
+        entry = next(iter(ledger["entries"].values()))
+        self.assertEqual(entry["cost"], "0.0001")
+        self.assertEqual(entry["actual_provider"], "Other Host")
+        self.assertEqual(entry["status"], "failed")
+        # In a separate synthetic batch, an altered cached receipt cannot become
+        # an accepted provider match without any new network request.
+        provider = self.pinned_provider("cached")
+        provider.budget_dir = self.root / "cached-budget"
+        provider.options["budget_dir"] = str(provider.budget_dir)
+        self.ask(provider)
+        path = provider.budget_dir / "budget.json"
+        ledger = json.loads(path.read_text())
+        next(iter(ledger["entries"].values()))["provider_receipt"]["actual_provider"] = "Other Host"
+        path.write_text(json.dumps(ledger))
+        provider.caller.reset_mock()
+        with self.assertRaisesRegex(RuntimeError, "stored budgeted response differs"):
+            self.ask(provider)
+        provider.caller.assert_not_called()
+
+    def test_explicit_recovery_retains_unknown_cost_full_reservation_and_blocks_resend(self):
+        failed = self.unknown_429()
+        before = self.ledger()
+        evidence = self.recovery_evidence()
+        receipt = recover_budget(self.root / "shared", evidence)
+        after = self.ledger()
+        self.assertFalse(after["halted"])
+        self.assertEqual(after["entries"], before["entries"])
+        self.assertEqual(after["limits"], before["limits"])
+        self.assertEqual(after["total_reserved_usd"], before["total_reserved_usd"])
+        self.assertEqual(after["total_reported_cost_usd"], before["total_reported_cost_usd"])
+        self.assertEqual(after["recoveries"], [receipt])
+        self.assertIsNone(receipt["failed_actual_cost"])
+        with self.assertRaisesRegex(RuntimeError, "cannot be resent"):
+            self.ask(failed)
+        self.assertEqual(failed.caller.call_count, 1)
+        self.ask(self.pinned_provider())
+        self.assertEqual(len(self.ledger()["entries"]), 2)
+        self.assertEqual(self.ledger()["total_reserved_usd"], "0.012298")
+        self.assertEqual(self.ledger()["total_reported_cost_usd"], "0.0001")
+
+    def test_recovery_is_atomic_once_per_failed_call_and_can_record_a_later_authorized_429(self):
+        self.unknown_429()
+        evidence = self.recovery_evidence()
+        def recover(_):
+            try:
+                recover_budget(self.root / "shared", evidence)
+                return True
+            except RuntimeError:
+                return False
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            self.assertEqual(sum(pool.map(recover, range(2))), 1)
+        self.unknown_429("second-failure")
+        ids = [k for k, e in self.ledger()["entries"].items() if e["status"] == "failed"]
+        with self.assertRaisesRegex(RuntimeError, "already recovered"):
+            recover_budget(self.root / "shared", self.recovery_evidence(ids[0]))
+        recover_budget(self.root / "shared", self.recovery_evidence(ids[1]))
+        ledger = self.ledger()
+        self.assertEqual(len(ledger["recoveries"]), 2)
+        self.assertEqual(ledger["total_reserved_usd"], "0.012298")
+        self.assertEqual(ledger["total_reported_cost_usd"], "0")
+        self.assertTrue(all(e["cost"] is None for e in ledger["entries"].values()))
+
+    def test_recovery_rejects_stale_bindings_missing_authorization_and_other_failure_types(self):
+        self.unknown_429()
+        evidence = self.recovery_evidence()
+        before = (self.root / "shared/budget.json").read_bytes()
+        for change in ({"prior_ledger_sha256": "0" * 64}, {"failed_call_sha256": "0" * 64},
+                       {"authorization_ref": ""}, {"reason": ""}, {"accept_unknown_cost": False},
+                       {"extra": "not accepted"}):
+            with self.subTest(change=change), self.assertRaises((RuntimeError, ValueError)):
+                recover_budget(self.root / "shared", {**evidence, **change})
+            self.assertEqual((self.root / "shared/budget.json").read_bytes(), before)
+        ledger = self.ledger()
+        entry = next(iter(ledger["entries"].values()))
+        entry["error"] = ledger["halt_reason"] = "synthetic timeout with unknown cost"
+        (self.root / "shared/budget.json").write_text(json.dumps(ledger))
+        with self.assertRaisesRegex(RuntimeError, "restricted"):
+            recover_budget(self.root / "shared", self.recovery_evidence())
+
+    def test_recovery_rejects_inflight_overcost_or_malformed_accounting_without_mutation(self):
+        self.unknown_429()
+        original = self.ledger()
+        cases = []
+        for change in ({"status": "attempt_started"}, {"cost": "0.1"}, {"reserved_cost_usd": "NaN"}, {"schema": "wrong"}):
+            ledger = copy.deepcopy(original)
+            next(iter(ledger["entries"].values())).update(change)
+            if change.get("cost"):
+                ledger["total_reported_cost_usd"] = change["cost"]
+            cases.append(ledger)
+        for field, value in (("total_reserved_usd", "0"), ("total_reported_cost_usd", "0.1"), ("recoveries", [None])):
+            cases.append({**copy.deepcopy(original), field: value})
+        for index, ledger in enumerate(cases):
+            path = self.root / "shared/budget.json"
+            path.write_text(json.dumps(ledger))
+            evidence = self.recovery_evidence(next(iter(original["entries"])))
+            before = path.read_bytes()
+            with self.subTest(index=index), self.assertRaises((RuntimeError, ValueError)):
+                recover_budget(self.root / "shared", evidence)
+            self.assertEqual(path.read_bytes(), before)
 
     def test_explicit_caps_and_model_required_and_cli_flags(self):
         for model, cost, calls, tokens, directory in [

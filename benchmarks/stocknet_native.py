@@ -114,13 +114,17 @@ def _snapshot(prices, indices, stamp, references):
     return anchor, horizon, feed, truth
 
 
-def prepare(dataset, output, model, *, actual_model=None, development_count=20, holdout_count=5):
+def prepare(dataset, output, model, *, actual_model=None, provider_slug=None, development_count=20, holdout_count=5):
     """Freeze both graph/policy arms and native cohort before any provider call."""
     output = Path(output).resolve()
     if output.exists():
         raise ValueError("refuse to overwrite a prepared study")
     if not isinstance(model, str) or not model.strip():
         raise ValueError("a concrete model identity is required")
+    from zenith.budgeted import normalize_provider_slug
+    provider_slug = normalize_provider_slug(provider_slug)
+    if provider_slug is None:
+        raise ValueError("native paid study requires an exact provider_slug")
     if type(development_count) is not int or development_count < 1 or type(holdout_count) is not int or holdout_count < 0:
         raise ValueError("positive development/nonnegative holdout counts required")
     prices, references, exclusions, source = _sources(dataset)
@@ -175,6 +179,8 @@ def prepare(dataset, output, model, *, actual_model=None, development_count=20, 
             "context_profile": "original", "prompt_sha256": canonical_digest({
                 "profile": PROFILE, "graph": graph, "policy": policies[name],
                 "meaning": "static template identity; dated prompt bytes recorded by native provider"})})
+        if provider_slug is not None:
+            candidates[-1]["provider_slug"] = provider_slug
     raw = {"schema": cohort.SCHEMA, "issues": issues, "candidates": candidates,
            "feedback_policy": "feedback-policy.json", "truth_source": "truth.json",
            "truth_as_of": "2016-01-01T00:00:00+00:00", "max_trials": 2,
@@ -280,7 +286,7 @@ def run(study, *, phase, budget_dir, max_cost_usd="5", max_calls=128,
         outcome = None
         try:
             outcome = runtime.start(runtime.DEFAULT_ROOT, mission="lab", target="lab_director", run_id=run_id,
-                provider=candidate["provider"], model=candidate["model"],
+                provider=candidate["provider"], model=candidate["model"], provider_slug=candidate.get("provider_slug"),
                 feed_source=str(study / "cohort" / issue["feed_source"]), time_anchor=issue["time_anchor"],
                 horizon=issue["horizon_id"], graph_variant=str(study / "cohort" / candidate["graph_variant"]),
                 policy=str(study / "cohort" / candidate["reasoning_policy"]), context_profile="original",
@@ -299,7 +305,7 @@ def run(study, *, phase, budget_dir, max_cost_usd="5", max_calls=128,
             "final_seal": "Use research cohort-evaluate --final-key explicitly after heldout imports."}
 
 
-def pilot(dataset, output, model, *, budget_dir, max_cost_usd="5", max_calls=128, max_output_tokens=4096, env_file=None):
+def pilot(dataset, output, model, *, budget_dir, provider_slug=None, max_cost_usd="5", max_calls=128, max_output_tokens=4096, env_file=None):
     """One excluded July episode checks native/provider compatibility, not accuracy."""
     output = Path(output).resolve()
     if output.exists():
@@ -315,16 +321,16 @@ def pilot(dataset, output, model, *, budget_dir, max_cost_usd="5", max_calls=128
     write_json(output / "recorded/runtime_context.json", {"as_of": anchor.isoformat()})
     write_json(output / "predictor.json", build_replacement(runtime.load_graph(runtime.DEFAULT_ROOT)))
     write_json(output / "baseline-policy.json", _policy())
-    run_id = "PILOT_" + canonical_digest({"path": str(output), "model": model})[:16]
+    run_id = "PILOT_" + canonical_digest({"path": str(output), "model": model, "provider_slug": provider_slug})[:16]
     write_json(output / "pilot.json", {"schema": "stocknet_native_compatibility_pilot_v1", "model": model,
-        "issue_date": stamp, "run_id": run_id, "study_membership": "excluded from dev/holdout",
+        "issue_date": stamp, "run_id": run_id, "provider_slug": provider_slug, "study_membership": "excluded from dev/holdout",
         "maximum_calls": 2, "output_tokens_per_call": max_output_tokens,
         "source_sha256": digest(Path(__file__).read_bytes()), "accuracy_evaluation": False})
     if env_file is not None:
         from system.lib.openrouter_free_runtime import load_env_file
         load_env_file(env_file)
     result = runtime.start(runtime.DEFAULT_ROOT, mission="lab", target="lab_director", run_id=run_id,
-        provider="openrouter_budgeted", model=model, feed_source=str(output / "recorded"),
+        provider="openrouter_budgeted", model=model, provider_slug=provider_slug, feed_source=str(output / "recorded"),
         time_anchor=anchor.isoformat(), horizon="next_us_close", graph_variant=str(output / "predictor.json"),
         policy=str(output / "baseline-policy.json"), max_cost_usd=max_cost_usd, max_calls=max_calls,
         max_output_tokens=max_output_tokens, budget_dir=budget_dir)
@@ -340,6 +346,7 @@ def main():
     prepare_cmd.add_argument("--output", type=Path, required=True)
     prepare_cmd.add_argument("--model", required=True)
     prepare_cmd.add_argument("--actual-model")
+    prepare_cmd.add_argument("--provider-slug", required=True)
     plan_cmd = commands.add_parser("plan"); plan_cmd.add_argument("--study", type=Path, required=True)
     execute = commands.add_parser("run")
     execute.add_argument("--study", type=Path, required=True)
@@ -349,6 +356,7 @@ def main():
     pilot_cmd.add_argument("--dataset", type=Path, default=Path("work/datasets/stocknet"))
     pilot_cmd.add_argument("--output", type=Path, required=True)
     pilot_cmd.add_argument("--model", required=True)
+    pilot_cmd.add_argument("--provider-slug")
     for command in (execute, pilot_cmd):
         command.add_argument("--budget-dir", type=Path, required=True)
         command.add_argument("--max-cost-usd", default="5")
