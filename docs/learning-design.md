@@ -289,6 +289,37 @@ what was read, adopted, deferred and actually executed.
 
 ## What is executable today
 
+### What the first repair controls actually establish
+
+Before spending the remaining paid calls on another five-date price replay,
+we tested a narrower question: can measured training failures select a useful
+context intervention while declining unsupported repairs? The reproducible
+[`repair_controls` benchmark](../benchmarks/repair_controls.py) uses the actual
+node type, policy validator and context-view function. A fixed decimal-arithmetic
+leaf normalizes a quote for a stock split; a separately implemented rational
+oracle checks the result. It is a component integration test, not another graph
+scheduler or a language-model substitute.
+
+The selector enumerates restoration of one witnessed omitted edge, scores all
+20 training cases and keeps the unchanged policy on ties. Assessment changes
+the value and split-ratio ranges and input ordering. Restoring the relevant
+edge yields 64 correct numeric answers, versus zero for unchanged and
+irrelevant-edge controls. Missing, future and conflicting source cases retain
+unknown answers; coverage is reported separately from arithmetic error. A
+deliberately wrong calculation remains wrong after context repair. Thus an
+omission does not establish a cause, and this candidate family cannot repair
+every defect. [The complete receipt](repair-controls.json) retains every trial
+and control, including the unsuccessful ones.
+
+This validates finite routing selection under a published synthetic task.
+It does not demonstrate language-model skill learning, causal discovery,
+market prediction, or a novel optimizer. Those claims need separate tests.
+The next model experiment should preserve this discipline: a task with an
+independently checked answer, a candidate derived from training evidence,
+matched unchanged and wrong-repair controls, and genuinely later assessment.
+A small positive stock-price difference alone is insufficient to attribute
+improvement to the update procedure.
+
 | Operation | Source owner |
 |---|---|
 | Execute or pause the real graph with frozen inputs | `zenith/runtime.py` and the original engine |

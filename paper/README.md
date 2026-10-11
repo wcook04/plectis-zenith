@@ -45,7 +45,10 @@ compatibility, not forecast accuracy or a matched comparison between models.
 Calibration accounting is a subset of the shared, evolving production ledger;
 reservations are distinct from reported charges.
 
-Project existing study receipts from the repository root:
+The following command reproduces the original projection at its frozen source
+revision (01522cc), with the original native artifacts available. The completed
+export is an immutable historical snapshot; do not overwrite it for a later
+study or a shared ledger that has since acquired new calls:
 
     python3 paper/export_study_evidence.py --study work/native-deepinfra-study --budget work/stocknet-native-five-dollar-budget/budget.json --output paper/study-evidence.json
 
@@ -57,8 +60,10 @@ Comparison scores remain unavailable until the native evaluator records
 complete common support. The shared-budget section includes all calibration
 and study attempts, responses, reported costs, unknown charges and in-flight
 requests, separately from each study arm's accounting. Re-export after the
-native receipts settle; a live
+native receipts settle before creating a new study's separate export; a live
 source change during export causes an error rather than a mixed snapshot.
+Use an explicit new output path, such as paper/learning-study-evidence.json,
+for subsequent experiments.
 
 Finance grounding is recorded in docs/finance-design.md,
 docs/finance-related-work.json, docs/finance-adaptive-sources.json and
@@ -96,3 +101,33 @@ source reports remained unchanged. Calibration's final ledger locator/hash
 matches the settled study ledger; its four-pilot/six-attempt subset stays
 separate from shared totals of 106 attempts, 105 responses and one unknown
 charge.
+
+The compressed manuscript keeps the completed manual-rule study distinct from
+the proposed feedback-derived policy experiment. The original three receipt
+exports remain unchanged; any later learning study needs a separate export and
+source identities. The full reviewed bibliography is retained as metadata,
+while the manuscript cites only sources needed for its actual argument.
+
+Source owners formerly tabulated in the manuscript:
+
+| Operation | Source owner |
+| --- | --- |
+| Native execution/planning | zenith/runtime.py; system/core/engine.py |
+| Skill/context policy | system/lib/reasoning_policy.py |
+| Forecast admission/truth | feedback/engine.py |
+| Matched comparison/seals | research/cohort.py |
+| Recorded diagnostics | research/diagnosis.py |
+| Proposal compilation | research/reflection.py; research/reflection_cohort.py |
+| Conditional formal model | formal/ZenithSemantics.lean; scripts/check_semantics.py |
+| Source/data decisions | docs/architecture-sources.json; docs/data-sources.md |
+
+Controlled routing validation uses the canonical
+[repair-controls.json](../docs/repair-controls.json), bound to
+benchmarks/repair_controls.py and the native context-policy source. Its finite
+selector uses 20 training cases and 64 disjoint changed-range assessment cases
+per scenario. The main paper reports numeric answers separately from valid
+abstentions and identifies the faulty-operator negative control. This is
+integration/control validation without model calls or a new market study.
+[learning-protocol-audit.json](learning-protocol-audit.json) records the final
+receipt/source hashes and interpretation boundaries; it does not duplicate the
+canonical results or alter the original study exports.

@@ -96,6 +96,8 @@ def candidate_fragment(packet, compiled, *, study, policy_path, candidate_id,
 
     row = {key: deepcopy(source[key]) for key in (
         'model', 'actual_model', 'provider', 'execution_kind', 'context_profile')}
+    if 'provider_slug' in source:
+        row['provider_slug'] = source['provider_slug']
     row.update(candidate_id=candidate_id, hypothesis=candidate['hypothesis'],
                change=json.dumps(change, sort_keys=True, separators=(',', ':'), allow_nan=False),
                source_commit=source_commit, prompt_sha256=packet['packet_sha256'],

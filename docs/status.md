@@ -2,6 +2,43 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Deep-pass controls, 11 October 2026
+
+The follow-on twenty-call market replay was held because five dates with
+independently sampled reasoning calls would not isolate the effect of a repair.
+No additional paid inference was made. Instead,
+[`benchmarks/repair_controls.py`](../benchmarks/repair_controls.py) exercises the
+existing native context-policy function with a deterministic split-normalization
+task and an independently implemented arithmetic oracle. Measured selection on
+20 training cases restores one relevant edge; all 64 disjoint assessment cases
+then receive correct numeric answers, while unchanged and irrelevant-edge
+repairs produce none. Source-absent, future and conflicting cases stay unknown;
+a planted calculation defect remains wrong. Healthy and irrelevant-omission
+controls are distinct. These are bounded integration controls, not language-model
+learning or financial performance. [All outcomes](repair-controls.json) remain
+visible, including the unresolved calculation defect.
+
+Reflection transfer now preserves the exact provider endpoint when producing a
+new candidate row. A regression freezes both new arms and rejects a lost pin.
+Historical development transfer from a consumed final seal remains unsupported;
+its default guard has not been relaxed. The [research synthesis](learning-synthesis.json)
+records recovered operator anchors and close prior art; general graph optimization
+is not established as a novel contribution. The paper has been compressed to
+seven pages without rewriting the original empirical evidence.
+
+The offline [macro-vintage selector](../benchmarks/macro_vintage.py) parsed the
+pinned RUC workbook's 244 versions and 955 monthly periods. It selects the
+latest strictly eligible version and preserves its missing cells, with no
+cross-version filling. Availability is an explicit reconstruction policy,
+not an authenticated publication clock. Original files stay private; the
+[source record](data-learning-sources.json) binds the inputs, methodology annex
+and actual boundary checks. Parsing uses a bounded, single admitted byte buffer.
+
+Final validation passed all 471 tests after the source-binding and bounded-read
+reviews. The seven-page paper compiled without warnings and was visually
+checked. The original study/calibration exports and the shared budget ledger
+are byte-for-byte unchanged by this pass.
+
 ## Native comparison, 11 October 2026
 
 The frozen `01522cc` study completed all 40 development episodes: two policies,

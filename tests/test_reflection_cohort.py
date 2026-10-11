@@ -114,6 +114,44 @@ def test_fragment_is_read_only_and_consumed_by_new_native_freeze(prepared):
     assert (p['study'] / 'cohort-state.json').read_bytes() == before['parent-study/cohort-state.json']
 
 
+def test_pinned_provider_survives_reflection_and_new_native_cohort_freeze(prepared):
+    """A lost pin makes the new arms incomparable; no provider is contacted."""
+    p = prepared
+    raw = deepcopy(p['raw'])
+    raw['candidates'][0].update(provider='openrouter_budgeted', execution_kind='openrouter_budgeted',
+                                model='synthetic/pinned-model', actual_model='synthetic/pinned-model',
+                                provider_slug='deepinfra/fp8')
+    source, study = p['root'] / 'pinned-spec.json', p['root'] / 'pinned-parent'
+    write_json(source, raw)
+    cohort.freeze(source, study)
+    state = read_json(study / 'cohort-state.json')
+    state['attachments'] = read_json(p['study'] / 'cohort-state.json')['attachments']
+    write_json(study / 'cohort-state.json', state)
+    proposal = deepcopy(p['packet']['proposal'])
+    proposal.update(actual_model='synthetic/pinned-model', execution_kind='openrouter_budgeted')
+    proposal['proposal_id'] = digest({k: v for k, v in proposal.items() if k != 'proposal_id'})
+    proposal_path = p['root'] / 'pinned-proposal.json'
+    write_json(proposal_path, proposal)
+    packet = reflection.build_packet(proposal_path,
+        scope=reflection.scope_from_study(study, raw['truth_as_of']), source_root=p['root'])
+    compiled = reflection.compile_candidate(packet, graph=runtime.load_graph(runtime.DEFAULT_ROOT),
+        node_id='lab_director', parameter='skill_addon', value='Compare against the dated no-change baseline.',
+        hypothesis='A declared comparator improves subsequent matched forecasts.', variant_id='comparison-skill')
+    row = candidate_fragment(packet, compiled,
+        **dict(p['options'], study=study, policy_path=p['root'] / 'pinned-candidate/policy.json'))['candidate']
+    assert row['provider_slug'] == 'deepinfra/fp8'
+    write_json(Path(row['reasoning_policy']), compiled['reasoning_policy'])
+    raw['candidates'].append(row)
+    write_json(source, raw)
+    cohort.freeze(source, p['root'] / 'pinned-new-study')
+    frozen = read_json(p['root'] / 'pinned-new-study/cohort.json')
+    assert {c['provider_slug'] for c in frozen['candidates']} == {'deepinfra/fp8'}
+    raw['candidates'][1].pop('provider_slug')
+    write_json(source, raw)
+    with pytest.raises(ValueError, match='paid cohort candidates require an exact provider_slug'):
+        cohort.freeze(source, p['root'] / 'lost-pin-study')
+
+
 @pytest.mark.parametrize('candidate_id', ['baseline', '../escape', 'bad/name', '', 'other-safe-name'])
 def test_rejects_unsafe_reused_or_unbound_id(prepared, candidate_id):
     with pytest.raises(ValueError):

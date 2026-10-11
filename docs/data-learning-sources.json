@@ -1,0 +1,383 @@
+{
+  "schema": "zenith_data_learning_sources_v1",
+  "reviewed_at": "2026-10-11T18:43:39.341726+00:00",
+  "scope": {
+    "research_only": true,
+    "runtime_adoption": true,
+    "provider_calls": 0,
+    "budget_ledger_changes": false,
+    "source_originals_publication": false,
+    "runtime_adoption_boundary": "Only offline vintage eligibility adapter; no forecast, graph, provider or study change"
+  },
+  "existing_sources_checked": [
+    "docs/dataset-scout.md",
+    "docs/data-sources.md",
+    "benchmarks/stocknet.py",
+    "benchmarks/finmultitime.py",
+    "docs/finance-adaptive-sources.json",
+    "docs/finance-related-work.json"
+  ],
+  "sources": [
+    {
+      "id": "philadelphia-ruc-vintages",
+      "name": "Philadelphia Fed Real-Time Data Set: Unemployment Rate (RUC)",
+      "url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/ruc",
+      "source_kind": "original XLSX dataset plus technical documentation",
+      "version": "retrieved 2026-10-11; workbook hash is the pin",
+      "commit": null,
+      "local_source_path": "rucQvMd.xlsx",
+      "sample": {
+        "url": "https://www.philadelphiafed.org/-/media/FRBP/Assets/Surveys-And-Data/real-time-data/data-files/xlsx/rucQvMd.xlsx?hash=A96BC0C2253B04EAEB8C4DC42D4F5CBA&sc_lang=en",
+        "sha256": "d971e59d3ed5f1322a46631743508fb1ad5eee39bfbe12425a641a277fdd9b9a",
+        "bytes": 575288,
+        "acquired_at_utc": "2026-10-11T18:35:53.870276+00:00",
+        "sheet1_rows": 957
+      },
+      "documentation_files": [
+        {
+          "path": "/tmp/zenith-data-learning-review/ruc-general-notes.pdf",
+          "url": "https://www.philadelphiafed.org/-/media/FRBP/Assets/Surveys-And-Data/real-time-data/data-files/documentation/gen_doc_nonNIPA.pdf?hash=8BD09C82580BA89D3C098226605C15E8&sc_lang=en",
+          "bytes": 42733,
+          "sha256": "8ec61ac56cf1adb435274590adad09e7606e228b7915e9a893e8df2be5aa91e7",
+          "acquired_at": "2026-10-11T18:41:45.665152+00:00"
+        },
+        {
+          "path": "/tmp/zenith-data-learning-review/ruc-specific-notes.pdf",
+          "url": "https://www.philadelphiafed.org/-/media/FRBP/Assets/Surveys-And-Data/real-time-data/data-files/RUC/specific_documentation_RUC.pdf?hash=6BE5193C1647B3EDF9DBF9D719144461&sc_lang=en",
+          "bytes": 22761,
+          "sha256": "e8121b567946d81e7a9e439ed37f8369548d0ecfa5bcf4986b51877420f4c721",
+          "acquired_at": "2026-10-11T18:41:46.061081+00:00"
+        },
+        {
+          "path": "/tmp/zenith-data-learning-review/ruc-page.html",
+          "url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/ruc",
+          "bytes": 24786,
+          "sha256": "9009f2208060000eca827875a1359ba5e542d92c4f850326291a8eb0761549b3",
+          "acquired_at": "2026-10-11T18:41:46.512171+00:00"
+        },
+        {
+          "path": "/tmp/zenith-data-learning-review/philadelphia-privacy.html",
+          "url": "https://www.philadelphiafed.org/about-us/privacy-notice",
+          "bytes": 49295,
+          "sha256": "a26f1625099445c23ae2dc4a7f72d192084d878265f9d9de90c46ed1e612cca7",
+          "acquired_at": "2026-10-11T18:41:46.814012+00:00"
+        }
+      ],
+      "inspected_sections": [
+        "General notes: observation rows, vintage columns, midquarter 15th cutoff and excluded later releases",
+        "RUC specific notes: SA monthly observations, quarterly vintages, earliest 1965Q4, pre-1974 unrevised-history assumption",
+        "XLSX sheet ruc header and selected 2015 rows; inspected with stdlib ZIP/XML, no macros or upstream scripts"
+      ],
+      "clock_contract": {
+        "observed": "month in DATE row; not availability",
+        "available": "reconstructed vintage near February/May/August/November 15; documentation excludes releases after 15th; no original intraday delivery proof",
+        "acquired": "2026-10-11T18:35:53.870276+00:00",
+        "revision_id": "RUCyyQq column plus immutable workbook SHA",
+        "conservative_policy": "Following exchange-session open after vintage cutoff is a declared assumption, not observed provider delivery"
+      },
+      "verified_samples": {
+        "2015-04": {
+          "RUC15Q2": 5.4,
+          "RUC15Q3": 5.4
+        },
+        "2015-05": {
+          "RUC15Q2": "#N/A",
+          "RUC15Q3": 5.5
+        },
+        "2015-06": {
+          "RUC15Q2": "#N/A",
+          "RUC15Q3": 5.3
+        },
+        "2015-07": {
+          "RUC15Q2": "#N/A",
+          "RUC15Q3": 5.3
+        },
+        "2015-08": {
+          "RUC15Q3": "#N/A",
+          "RUC15Q4": 5.1
+        }
+      },
+      "rights": {
+        "status": "No dataset-specific reuse license located; site footer All rights reserved. Underlying BLS public-domain status does not establish redistribution rights for the Fed compilation. Preserve private original; do not bundle source workbook publicly.",
+        "notice_url": "https://www.philadelphiafed.org/about-us/privacy-notice",
+        "notice_sha256": "a26f1625099445c23ae2dc4a7f72d192084d878265f9d9de90c46ed1e612cca7",
+        "license": null
+      },
+      "adopt": "Implemented offline temporal eligibility adapter, not forecasting; unknown redistribution rights retain source workbook private.",
+      "defer": "Public redistribution of compilation and financial-performance claims; quarterly vintage is stale across many daily issues. No runtime implemented.",
+      "annex_status": "imported_private_reference",
+      "private_path_locator": "Private research acquisition under /tmp/zenith-data-learning-review; not a portable dataset dependency or public original."
+    },
+    {
+      "id": "bls-archived-employment-release",
+      "name": "BLS archived Employment Situation releases, July 2 and August 7 2015",
+      "url": "https://www.bls.gov/news.release/archives/empsit_08072015.htm",
+      "source_kind": "primary archived release text and tables",
+      "version": "USDL-15-1515, August 7 2015; comparison July 2 2015",
+      "commit": null,
+      "local_source_path": "native-web-releases.txt",
+      "inspected_sections": [
+        "Release heading embargo clock",
+        "July 2015 unemployment headline",
+        "May and June payroll revision paragraph",
+        "July 2 release revision paragraph; routine revision explanation"
+      ],
+      "verified_samples": {
+        "release_at": "2015-08-07T08:30:00-04:00",
+        "observation_period": "2015-07",
+        "first_reported_nonfarm_payroll_change": 215000,
+        "first_reported_unemployment_percent": 5.3,
+        "May_payroll_revision": {
+          "previous": 254000,
+          "revised": 260000
+        },
+        "June_payroll_revision": {
+          "previous": 223000,
+          "revised": 231000
+        }
+      },
+      "clock_contract": {
+        "observed": "survey reference month",
+        "available": "Published embargo deadline 8:30 EDT; exact client delivery/latency not known",
+        "acquired": "Reviewed through native web on 2026-10-11; direct urllib attempts returned HTTP403; no full original HTML acquired",
+        "revision_id": "release URL + publication ID; future adapter must hash full source bytes before accepting"
+      },
+      "rights": {
+        "license": "BLS textual/tabular publications public domain; copyrighted images excepted and emblem restricted",
+        "url": "https://www.bls.gov/bls/linksite.htm",
+        "inspected_section": "Copyright statement; do not infer rights for third-party embeds",
+        "license_hash": null
+      },
+      "adopt": "Preferred future openly reusable corpus with exact release clocks and explicit first/revised values, once full original files acquired through supported access.",
+      "defer": "No full-source annex packet or runtime fixture accepted from truncated native-web excerpts. Original archived bytes and historical acquisition latency not verified.",
+      "annex_status": "deferred: shell HTTP403 and only selected native-web excerpts acquired",
+      "private_path_locator": "Private research acquisition under /tmp/zenith-data-learning-review; not a portable dataset dependency or public original."
+    },
+    {
+      "id": "sec-original-filing-clock",
+      "name": "SEC filing acceptance metadata and original SGML header distinction",
+      "url": "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+      "source_kind": "primary SEC API documentation; independently pinned third-party code review",
+      "version": "SEC live documentation reviewed 2026-10-11; EdgarTools pin separate",
+      "code_url": "https://github.com/dgunning/edgartools",
+      "commit": "6dd5cb4d6cc79278b335a394e602c02aabf2c689",
+      "local_source_path": "edgartools",
+      "inspected_paths": [
+        "edgar/entity/filings.py:52-63",
+        "edgar/sgml/sgml_header.py:453-456",
+        "tests/sgml/test_filing_header.py:62,143,315",
+        "data/company_submission.json recent filing columns"
+      ],
+      "files": [
+        {
+          "path": "LICENSE.txt",
+          "url": "https://raw.githubusercontent.com/dgunning/edgartools/6dd5cb4d6cc79278b335a394e602c02aabf2c689/LICENSE.txt",
+          "sha256": "249fb5021f07689c5fb17925c4d8bcd04fd9e2cee4b4b789499fb80b1e9dfe0c",
+          "bytes": 1100
+        },
+        {
+          "path": "data/company_submission.json",
+          "url": "https://raw.githubusercontent.com/dgunning/edgartools/6dd5cb4d6cc79278b335a394e602c02aabf2c689/data/company_submission.json",
+          "sha256": "f6982120e319500d790ab38ca2f03b3c7cf97ed23bc0cd6f5051e1b6d0fb626f",
+          "bytes": 389684
+        },
+        {
+          "path": "edgar/entity/filings.py",
+          "url": "https://raw.githubusercontent.com/dgunning/edgartools/6dd5cb4d6cc79278b335a394e602c02aabf2c689/edgar/entity/filings.py",
+          "sha256": "15d43bf4f704b6527033545f811b7bc8f737a8830a62eec205ea11db5b3c0ea9",
+          "bytes": 25937
+        }
+      ],
+      "header_files": [
+        {
+          "path": "edgar/sgml/sgml_header.py",
+          "sha256": "b54fff3ab146a0fec7fc58ad8360ceccfe017983e97b91f68860bb88452343c0",
+          "bytes": 48662,
+          "url": "https://raw.githubusercontent.com/dgunning/edgartools/6dd5cb4d6cc79278b335a394e602c02aabf2c689/edgar/sgml/sgml_header.py"
+        },
+        {
+          "path": "tests/sgml/test_filing_header.py",
+          "sha256": "2bda87686624b5631e0ec13c247812132cc0943891a01021354b9c763e05d6d5",
+          "bytes": 21715,
+          "url": "https://raw.githubusercontent.com/dgunning/edgartools/6dd5cb4d6cc79278b335a394e602c02aabf2c689/tests/sgml/test_filing_header.py"
+        }
+      ],
+      "clock_contract": {
+        "observed": "reportDate/fact end, never availability",
+        "available": "Original accession SGML acceptance time interpreted America/New_York plus dissemination latency assumption; SEC submissions acceptanceDateTime should be cross-checked",
+        "acquired": "Direct Apple submissions endpoint returned HTTP403; inspected repo fixture is third-party archive, not independently acquired SEC snapshot",
+        "revision_id": "accession + exact source hash + amendment distinction"
+      },
+      "evidence_limit": "Pinned EdgarTools source warns submissions JSON timestamps labelled UTC may be hours off; this is third-party implementation evidence, not independently reproduced SEC error. SGML parser returns naive datetime; timezone normalization is caller responsibility.",
+      "rights": {
+        "code_license": "MIT",
+        "code_license_sha256": "249fb5021f07689c5fb17925c4d8bcd04fd9e2cee4b4b789499fb80b1e9dfe0c",
+        "data_rights": "MIT software license does not license issuer filing text. Public access is not blanket redistribution permission."
+      },
+      "adopt": "Proposed optional stronger filing clock, preserve original header + JSON conflict instead of silently normalizing.",
+      "defer": "No complete parser adoption, issuer filing corpus copy or direct exact-availability claim.",
+      "annex_status": "reference-only; no new packet selected",
+      "private_path_locator": "Private research acquisition under /tmp/zenith-data-learning-review; not a portable dataset dependency or public original."
+    },
+    {
+      "id": "alfred-fredapi-deferred",
+      "name": "ALFRED historical revision intervals and fredapi semantics",
+      "url": "https://alfred.stlouisfed.org/help/downloaddata",
+      "source_kind": "primary service/schema/terms documentation and pinned library code",
+      "version": "documentation/terms observed 2026-10-11",
+      "code_url": "https://github.com/mortada/fredapi",
+      "commit": "d0a0ba3001ebbbceafdcbdd3eb23828f0537cdff",
+      "local_source_path": "fredapi",
+      "files": [
+        {
+          "path": "README.md",
+          "url": "https://raw.githubusercontent.com/mortada/fredapi/d0a0ba3001ebbbceafdcbdd3eb23828f0537cdff/README.md",
+          "sha256": "1f0f85300bd55a1275b163c3701374203b61014360755476fc3ce6a94963fb42",
+          "bytes": 9035
+        },
+        {
+          "path": "LICENSE",
+          "url": "https://raw.githubusercontent.com/mortada/fredapi/d0a0ba3001ebbbceafdcbdd3eb23828f0537cdff/LICENSE",
+          "sha256": "a8ad31b1c3f40dca5a84119351b8fa8ddc868edd77fad8a8ebf6d8f2d16fa4ae",
+          "bytes": 11324
+        },
+        {
+          "path": "fredapi/fred.py",
+          "url": "https://raw.githubusercontent.com/mortada/fredapi/d0a0ba3001ebbbceafdcbdd3eb23828f0537cdff/fredapi/fred.py",
+          "sha256": "ec14f4a6508bf68f6cf24e047ddf910842f9253ec3da45bf246c716d02d3a1cd",
+          "bytes": 20463
+        }
+      ],
+      "inspected_paths": [
+        "fredapi/fred.py:180-272",
+        "LICENSE",
+        "FRED API series observations schema",
+        "FRED/ALFRED terms Scope and API Prohibited Uses (k),(l)"
+      ],
+      "schema": [
+        "date",
+        "value",
+        "realtime_start",
+        "realtime_end"
+      ],
+      "mechanics": "Observation date differs from public revision date; get_series_as_of_date filters all eligible releases and does not collapse to one latest revision per observation; get_series_all_releases omits realtime_end. First-release and latest-known are distinct policies.",
+      "rights": {
+        "software_license": "Apache-2.0",
+        "software_license_sha256": "a8ad31b1c3f40dca5a84119351b8fa8ddc868edd77fad8a8ebf6d8f2d16fa4ae",
+        "service_terms_url": "https://fred.stlouisfed.org/legal/",
+        "service_terms_sha256": "11ceec99e4183e81aa96a6008d17c078fba8b660484a31d59c182c63c58f7522",
+        "restriction": "Current FRED API terms Prohibited Uses (k) explicitly prohibit use of FRED services/content in AI or machine-learning development/training; (l) restricts archiving/incorporating. Terms scope includes ALFRED. Underlying UNRATE public-domain tag and code Apache license do not supersede service conditions."
+      },
+      "adopt": "Schema lesson only: explicit revision selection and half-open/closed intervals declared; preserve all raw clocks.",
+      "defer": "Use in graph-learning MVP pending explicit permission/applicability resolution. No API key, observations request, current FRED dataset import or license workaround.",
+      "annex_status": "not selected for data packet",
+      "private_path_locator": "Private research acquisition under /tmp/zenith-data-learning-review; not a portable dataset dependency or public original."
+    }
+  ],
+  "recommended_experiment": {
+    "status": "proposed_not_implemented",
+    "first_task": "Controlled diagnosis and repair of vintage-selection failures with independently known injected cause; keep paid StockNet forecasting study fixed and separate.",
+    "task_vs_forecast": "Macro vintages make selection mistakes falsifiable; they do not alone make future releases predictable or demonstrate improved financial forecasts.",
+    "episode": "evidenceA eligible vintage -> declared outputB (latest publicly knowable datum at issue) -> separate exact expected truthB -> selection error -> diagnosis -> proposed one-node rule; this is an information-selection benchmark, not unknown-future market truth.",
+    "arms": [
+      "frozen deliberately faulty selector",
+      "frozen correct manually authored selector (ceiling)",
+      "feedback-derived candidate repair",
+      "optional feedback-free proposal control"
+    ],
+    "known_faults": [
+      "choose latest column before cutoff instead of eligible column",
+      "use observation month as availability",
+      "replace #N/A with zero",
+      "collapse different revisions by period without source clock",
+      "treat naive header as UTC"
+    ],
+    "falsification": "Reject learning benefit if feedback repair fails held-out fault instances, does not improve over frozen faulty arm, or cannot match manual temporal invariants. Separate cause diagnosis accuracy from output accuracy and abstention.",
+    "controls": [
+      "Hold out entire vintage transitions and fault families; do not select candidates on test transitions",
+      "Version immutable source workbook and explicit cutoff policy",
+      "Use deterministic selectors and validators before any model spend; model proposals later are new evidence",
+      "Add intact negative controls; repairing intact snapshots is an error",
+      "For semantic-model tests preserve historical pretraining contamination caveat; source gating cannot eliminate memorized future knowledge"
+    ],
+    "forecast_followon": "Only after mechanism test, forecast next monthly first release with loss target and sample size fixed; persistence baseline and manual rules, later revisions tracked separately; evaluate by release event, not correlated daily replicas."
+  },
+  "proposed_adapter_contract": "Implemented offline loader/selector with the explicit reconstructed cutoff policy. No online acquisition, forecast wrapper or public raw workbook bundle.",
+  "annex_import_receipt": "ai_workflow:docs/zenith_data_learning_annex_import_receipt.json",
+  "proposed_adapter_scope": [
+    "benchmarks/macro_vintage.py",
+    "tests/test_macro_vintage.py"
+  ],
+  "adapter_implementation": {
+    "status": "implemented",
+    "paths": [
+      "benchmarks/macro_vintage.py",
+      "tests/test_macro_vintage.py"
+    ],
+    "sha256": {
+      "benchmarks/macro_vintage.py": "e27dbff0f0df1aa7fabf3275f9bbf593f56197d7e88d810c8add4490069382fc",
+      "tests/test_macro_vintage.py": "e26b06627eb20df14b1d8230e199680766fc9556240345a8a0c00e35011b3e98"
+    },
+    "tests": {
+      "command": ".venv/bin/python -m pytest tests/test_macro_vintage.py -q",
+      "passed": 9,
+      "local_receipt": "/tmp/zenith-data-learning-review/macro-bounded-tests.txt"
+    },
+    "actual_workbook_validation": {
+      "vintages": 244,
+      "periods": 955,
+      "observations": [
+        {
+          "source_url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/ruc",
+          "source_sha256": "d971e59d3ed5f1322a46631743508fb1ad5eee39bfbe12425a641a277fdd9b9a",
+          "source_basis": "Philadelphia_Fed_reconstructed_RUC_vintage",
+          "acquired_at": "2026-10-11T18:35:53.870276+00:00",
+          "availability_basis": "reconstructed_cutoff_policy_not_original_delivery",
+          "availability_policy": "first_XNYS_open_strictly_after_midquarter_15th; admit_strictly_before_issue",
+          "units": "percent",
+          "adjustment": "seasonally_adjusted",
+          "issue_at": "2015-08-14T20:00:00+00:00",
+          "observation_period": "2015-07",
+          "vintage_id": "RUC15Q2",
+          "available_at": "2015-05-18T13:30:00+00:00",
+          "value": null,
+          "status": "missing_observation"
+        },
+        {
+          "source_url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/ruc",
+          "source_sha256": "d971e59d3ed5f1322a46631743508fb1ad5eee39bfbe12425a641a277fdd9b9a",
+          "source_basis": "Philadelphia_Fed_reconstructed_RUC_vintage",
+          "acquired_at": "2026-10-11T18:35:53.870276+00:00",
+          "availability_basis": "reconstructed_cutoff_policy_not_original_delivery",
+          "availability_policy": "first_XNYS_open_strictly_after_midquarter_15th; admit_strictly_before_issue",
+          "units": "percent",
+          "adjustment": "seasonally_adjusted",
+          "issue_at": "2015-08-17T13:30:00+00:00",
+          "observation_period": "2015-07",
+          "vintage_id": "RUC15Q2",
+          "available_at": "2015-05-18T13:30:00+00:00",
+          "value": null,
+          "status": "missing_observation"
+        },
+        {
+          "source_url": "https://www.philadelphiafed.org/surveys-and-data/real-time-data-research/ruc",
+          "source_sha256": "d971e59d3ed5f1322a46631743508fb1ad5eee39bfbe12425a641a277fdd9b9a",
+          "source_basis": "Philadelphia_Fed_reconstructed_RUC_vintage",
+          "acquired_at": "2026-10-11T18:35:53.870276+00:00",
+          "availability_basis": "reconstructed_cutoff_policy_not_original_delivery",
+          "availability_policy": "first_XNYS_open_strictly_after_midquarter_15th; admit_strictly_before_issue",
+          "units": "percent",
+          "adjustment": "seasonally_adjusted",
+          "issue_at": "2015-08-17T13:30:01+00:00",
+          "observation_period": "2015-07",
+          "vintage_id": "RUC15Q3",
+          "available_at": "2015-08-17T13:30:00+00:00",
+          "value": 5.3,
+          "status": "available"
+        }
+      ]
+    },
+    "complete_runtime_suite": "Parent rerun required after bounded-read fix; prior 470-test suite predates this change.",
+    "bounded_source_read": "Single open stream reads at most 2097153 bytes; reject overflow before hashing. ZIP parsing uses only the admitted hash-bound byte buffer. Regression covers a grown stream and on-disk replacement after read."
+  }
+}

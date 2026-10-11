@@ -100,6 +100,18 @@ The [source comparison](docs/architecture-sources.md) covers textual graph
 optimization, neural learning and protection against selection overfitting.
 Source assimilation does not establish forecasting advantage or method novelty.
 
+Run the zero-inference [repair controls](docs/repair-controls.json) with:
+
+```sh
+python -m benchmarks.repair_controls --output work/repair-controls.json
+```
+
+They test measured selection of one context-edge restoration, unchanged and
+irrelevant-edge controls, and cases that must stay unresolved. This uses the
+native context-policy code with deterministic arithmetic; it is not a model
+learning result. The [deep-pass synthesis](docs/learning-synthesis.json) records
+the operator ideas, closest prior art and remaining falsifiable questions.
+
 The [finance design](docs/finance-design.md) compares the closest financial
 agent systems and keeps forecast error, investment returns, feedback maturity
 and adaptive model selection distinct. It explains which mechanisms Zenith
@@ -110,6 +122,13 @@ reuses and which safeguards still need implementation.
 [Historical benchmarks](docs/historical-benchmarks.md) include pinned StockNet OHLCV baselines and a matched prices-versus-prices-plus-timestamped-text experiment over 1/5/20 observed-row horizons. Each issue snapshot joins its feeds before forecasting; target observations stay in a separate evaluator. The protocols do not reproduce StockNet's published paper scores. The older [UCI benchmark](benchmark/README.md) remains a small deterministic scoring fixture. Historical LLM evaluation can be contaminated by model training; prospective predictions form a separate evidence lane.
 
 [FinMultiTime](docs/finmultitime.md) adds a richer historical input: prices, news articles and reported financial facts aligned at one cutoff. Its bounded importer fetches only five pinned Apple files, verifies their sizes, CRCs and hashes, and exports dated snapshots plus partial native feed artifacts. Missing news and stale prices stay explicit. [Dataset research](docs/dataset-scout.md) records the other candidates and the timestamp and licensing checks behind this choice.
+
+The offline [macro-vintage adapter](benchmarks/macro_vintage.py) selects a
+Philadelphia Fed RUC workbook version under an explicit reconstructed cutoff
+policy. It preserves missing observations and never borrows another vintage's
+value. [Source and validation records](docs/data-learning-sources.json) distinguish
+that replay assumption from authenticated publication times. Original workbooks
+are not bundled, and this adapter does not forecast releases.
 
 ```sh
 python -m benchmarks.finmultitime import
