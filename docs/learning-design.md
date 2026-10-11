@@ -36,6 +36,38 @@ Choose candidates using development evidence. Preserve the final assessment for 
 
 Cost and simplicity matter, but their acceptance rules must also be set in advance: calls, tokens, elapsed time, node/edge count and rule length belong beside accuracy. Structural validity is checked separately from empirical usefulness. Lean proves conditional composition and rank-based acyclicity; it does not select the most accurate graph.
 
+## The smallest executable learning step
+
+Keep one executor, one evaluator and one proposal interface. The executor freezes
+and runs the graph. The evaluator measures the resulting predictions. An agent
+reads a complete development feedback packet and proposes a single change; it
+does not supply its own score or overwrite the baseline.
+
+`research/reflection.py` implements that interface. It binds the original
+feedback proposal, development membership, source files, full resolved evidence,
+successes and unresolved counts. A bounded selected-node trace view adds verified
+prompt/response/output excerpts and explicit missing/truncated context without
+changing the measurement denominator. The compiler checks the measured ancestor graph
+and baseline policy, then changes one node's short skill rule, context budget, or
+one incoming-edge weight through the existing policy validator. The output is an
+ordinary native policy plus its exact before/after change and evidence hashes.
+`research/reflection_cohort.py` can carry the verified parent model, provider and
+graph identity into a native candidate row for the next study. There is no
+additional executor, optimizer dependency or model call.
+
+The agent supplies the proposed rule and its falsifiable hypothesis. The compiler
+establishes that the proposal is a bounded, attributable intervention; it cannot
+establish that the reasoning is good. A new preregistered cohort must execute the
+candidate and baseline on matched inputs. New study names do not erase repeated
+selection on the same history, and an examined final period is no longer unseen.
+
+This takes context-bearing criticism from TextGrad, evaluated trajectory
+reflection from GEPA, and parent-relative workflow changes from AFlow/ADAS.
+Reverse textual feedback, search-tree scheduling and unrestricted code generation
+remain unimplemented. They add value only if simpler native proposals are an
+observed bottleneck. The [source decisions](architecture-sources.md) distinguish
+what was read, adopted, deferred and actually executed.
+
 ## What is executable today
 
 | Operation | Source owner |
@@ -46,6 +78,7 @@ Cost and simplicity matter, but their acceptance rules must also be set in advan
 | Admit price forecasts, resolve exact truth, aggregate failures | `feedback/engine.py` |
 | Reserve bounded trials and seal a final probability-mapping assessment | `research/engine.py` |
 | Compare completed native graph runs on frozen multi-feed snapshots | `research/cohort.py` |
+| Bind development failures and compile one native policy intervention | `research/reflection.py` |
 | Reproduce dated price-only baselines and export predictor/truth packets | `benchmarks/stocknet.py` |
 | Check declared semantics and finite graph certificates | `formal/ZenithSemantics.lean` and `scripts/check_semantics.py` |
 

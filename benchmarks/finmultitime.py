@@ -295,14 +295,36 @@ def news_records(path: Path, calendar, cutoff):
 def fundamental_records(paths, calendar, cutoff):
     latest, seen, rejected, eligible = {}, set(), 0, 0
     for path in paths:
-        root = json.loads(path.read_text())
+        try:
+            root = json.loads(path.read_text())
+        except json.JSONDecodeError:
+            rejected += 1
+            continue
+        if not isinstance(root, dict) or not isinstance(root.get("filings", []), list):
+            rejected += 1
+            continue
         for filing in root.get("filings", []):
-            for concept, entry in filing.get("facts", {}).get("us-gaap", {}).items():
+            if not isinstance(filing, dict) or not isinstance(filing.get("facts", {}), dict):
+                rejected += 1
+                continue
+            taxonomy = filing.get("facts", {}).get("us-gaap", {})
+            if not isinstance(taxonomy, dict):
+                rejected += 1
+                continue
+            for concept, entry in taxonomy.items():
                 if concept not in CONCEPTS:
                     continue
+                if not isinstance(entry, dict) or not isinstance(entry.get("units", {}), dict):
+                    rejected += 1
+                    continue
                 for unit, facts in entry.get("units", {}).items():
+                    if not isinstance(facts, list):
+                        rejected += 1
+                        continue
                     for fact in facts:
                         try:
+                            if not isinstance(fact, dict):
+                                raise ValueError("Expected a financial fact object")
                             filed, end, accession = fact["filed"], fact["end"], fact["accn"]
                             date.fromisoformat(filed); date.fromisoformat(end)
                             if not re.fullmatch(r"\d{10}-\d{2}-\d{6}", accession):

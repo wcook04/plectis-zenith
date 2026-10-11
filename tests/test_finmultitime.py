@@ -83,6 +83,27 @@ class FinMultiTimeTests(unittest.TestCase):
         rows, _ = fm.price_records(self.directory / "aapl-prices.csv", self.calendar, datetime(2025, 4, 21, 20, tzinfo=timezone.utc))
         self.assertEqual(rows[-1]["session_date"], "2025-04-21")
 
+    def test_malformed_fundamental_structures_are_counted_and_siblings_survive(self):
+        cutoff = datetime(2025, 4, 21, 20, tzinfo=timezone.utc)
+        path = self.directory / "aapl-balance-sheets.json"
+        valid = {"facts": {"us-gaap": {"Assets": {"units": {"USD": [self.facts[0]]}}}}}
+        malformed = [None, {"facts": []}, {"facts": {"us-gaap": []}},
+                     {"facts": {"us-gaap": {"Assets": None}}},
+                     {"facts": {"us-gaap": {"Assets": {"units": []}}}},
+                     {"facts": {"us-gaap": {"Assets": {"units": {"USD": {}}}}}},
+                     {"facts": {"us-gaap": {"Assets": {"units": {"USD": [None]}}}}}]
+        path.write_text(json.dumps({"filings": malformed + [valid]}))
+        records, receipt = fm.fundamental_records([path], self.calendar, cutoff)
+        self.assertEqual([r["value"] for r in records], [100])
+        self.assertEqual(receipt["rejected_facts"], len(malformed))
+        self.assertEqual(receipt["eligible_unique_facts"], 1)
+        for content in ["null", "[]", '{"filings": null}', '{"filings": {}}', "{"]:
+            with self.subTest(content=content):
+                path.write_text(content)
+                records, receipt = fm.fundamental_records([path], self.calendar, cutoff)
+                self.assertEqual(records, [])
+                self.assertEqual(receipt["rejected_facts"], 1)
+
     def test_three_channels_snapshot_and_canonical_partial_native_artifacts(self):
         packet = fm.snapshot(self.directory, "2025-04-21", self.output, self.calendar)
         self.assertEqual({k: v["availability"] for k, v in packet["channels"].items()}, {"prices": "available", "text": "available", "fundamentals": "available"})

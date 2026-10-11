@@ -54,6 +54,13 @@ The [learning design](docs/learning-design.md) defines how graph structure, node
 
 [Forecast feedback](docs/forecast-feedback.md) defaults to at least 20 distinct issue times and three time buckets before producing a proposal. Ancestor participation identifies places to investigate; it is not proof that a node caused an error. [The experiment harness](docs/experiments.md) implements bounded autoresearch-style trials using the native replay evaluator. Its probability adapter adjusts frozen forecast cards; its cohort adapter imports and compares new native graph runs on identical frozen inputs and target support. `cohort-next` gives an agent the next concrete commands. Neither adapter automatically rewrites the live graph. See [program.md](program.md) for the agent operating procedure.
 
+The [reflection commands](docs/experiments.md#from-measured-failures-to-one-native-candidate)
+connect those pieces: freeze a complete development feedback packet, let an agent
+propose one node parameter change, and compile it into a validated native policy
+with an exact diff and evidence hashes. Test that policy in a new frozen cohort.
+The design adapts specific ideas from [TextGrad, GEPA, AFlow and ADAS](docs/architecture-sources.md);
+it does not import their execution engines or claim their benchmark results.
+
 ## Historical comparisons and formal semantics
 
 [Historical benchmarks](docs/historical-benchmarks.md) include pinned StockNet OHLCV baselines and a matched prices-versus-prices-plus-timestamped-text experiment over 1/5/20 observed-row horizons. Each issue snapshot joins its feeds before forecasting; target observations stay in a separate evaluator. The protocols do not reproduce StockNet's published paper scores. The older [UCI benchmark](benchmark/README.md) remains a small deterministic scoring fixture. Historical LLM evaluation can be contaminated by model training; prospective predictions form a separate evidence lane.

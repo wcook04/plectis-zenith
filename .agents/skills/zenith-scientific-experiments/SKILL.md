@@ -1,17 +1,25 @@
 ---
 name: zenith-scientific-experiments
-description: Run bounded, reproducible scientific comparisons of Zenith probability candidates through an immutable study spec, complete attempt ledger, validation selection and single-use untouched holdout. Use when improving a model or research method experimentally.
+description: Improve Zenith through source-bound failure reflection, one declared node-policy change, and frozen comparisons of actual graph outputs. Retain all attempts and keep development selection separate from the final assessment.
 compatibility: Python standard library; repository-local research CLI. Read program.md before conducting trials.
 ---
 
 # Zenith scientific experiments
 
 Read `program.md`, `docs/skills.md`, the proposed experiment spec and the
-native `research` command help. The source owners are
-`research/engine.py` (`freeze`, `verify`, `trial`, `finalize`) and
-`research/worker.py` (`evaluate`), which calls the actual
-`tools/finance/historical_replay.py` evaluator. This is the active native workflow. The
-reference-only Karpathy source pin is recorded in
+native `research` command help. Choose the owner for the actual hypothesis:
+
+- `research/cohort.py` compares newly executed native graph runs with fixed
+  issue times, targets, horizons and model identities. Use this for node skills,
+  incoming context, or graph changes.
+- `research/reflection.py` turns a complete development feedback proposal into
+  a hash-bound evidence packet and one validated node-policy candidate. It
+  makes no provider calls and does not change the baseline.
+- `research/engine.py` and `research/worker.py` compare probability mappings over
+  frozen forecasts through `tools/finance/historical_replay.py`. Use this only
+  when the mapping itself is the hypothesis.
+
+The reference-only Karpathy source pin is recorded in
 `third_party/skills/import_manifest.json`; no GPU training dependency or
 upstream autonomous shell loop is installed.
 
@@ -24,9 +32,11 @@ upstream autonomous shell loop is installed.
    model identity where applicable, elapsed resources and outcome. Record
    failed and rejected attempts as well as successes. A syntax repair is a
    recorded attempt, not permission to erase a failure.
-3. Select using validation evidence under the frozen evaluator. The candidate
-   reads the permitted forecast input interface and emits probabilities; do
-   not give it labels, final metrics, future evidence or a revised split.
+3. Select using development evidence under the frozen evaluator. Native graph
+   candidates produce new forecasts from frozen subject-side inputs; mapping
+   candidates emit probabilities through the permitted forecast interface. Do
+   not give either candidate labels, final metrics, future evidence or a revised
+   split.
 4. Prefer a simpler candidate when the preregistered comparison supports it.
    Preserve the evidence and rejected alternative rather than resetting
    unrelated working files. Stop on the declared trial/resource budget or
@@ -45,12 +55,19 @@ python -m research status --study work/research-demo
 python -m research final --study work/research-demo --key final-1
 ```
 
-The runnable candidate intervention currently maps frozen forecast
-probabilities. If a spec includes `node_skill`, `context_policy`, `topology`
-or `model` intervention tags, those tags record provenance; they do not
-cause this runner to execute or retrain the complete DAG. Review native
-plan/packet traces separately for claims about graph or prompt changes.
-Retain `promotion-proposal.json` as a review artifact when a trial improves.
+The example above uses the probability-mapping adapter. Its intervention tags
+do not execute graph changes. For the graph itself, follow `cohort-freeze`,
+`cohort-next`, native execution/import, `cohort-attach`, and `cohort-evaluate`
+in `program.md`. Candidate skills must produce new forecasts on matched inputs;
+renaming old output is not an experiment.
+
+Before proposing a change, read the cited source cases, including successes,
+and the selected node's implementation and context receipts. A node's ancestry
+establishes participation, not causal blame. Keep the entire declared feedback
+batch; reject mixed heldout evidence rather than selecting convenient failures.
+Compile one parameter change, then preregister it in a new study. Do not add
+candidates to a frozen study after seeing its results. Keep packet, exact diff,
+source pins and unsuccessful attempts so another agent can audit the inference.
 
 Use a fresh study path/key for a fresh run. Read the CLI result and durable
 ledger, not merely process exit status. The probability mapper receives JSON
@@ -60,6 +77,13 @@ trusted local code, **not an OS sandbox**: the input projection and isolated
 working directory do not prevent filesystem or network access. Inspect the
 candidate before executing it. Run the repository tests after changing the
 native evaluator or candidate contract.
+
+Run from this checkout with its own Python environment. When an external
+repository launches validation, clear its inherited `PYTHONPATH` before
+`python -m pytest tests`; a parent checkout's regular `system` package can
+otherwise shadow this checkout's modules. Freeze runtime/evaluator source
+edits for the duration of the suite: cohort tests deliberately reject source
+changes between freeze and evaluation. Documentation edits remain independent.
 
 Report the selected/rejected candidate, validation result, final result if
 consumed, all-attempt count and remaining limitations. Improvement on this

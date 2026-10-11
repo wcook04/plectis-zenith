@@ -71,7 +71,7 @@ def source_ref(path, *, root=ROOT, pointer=None):
     try:
         label = str(path.relative_to(Path(root).resolve()))
     except ValueError:
-        label = path.name
+        label = str(path)
     result = {"path": label, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()}
     if pointer is not None:
         result["pointer"] = pointer

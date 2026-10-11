@@ -121,3 +121,78 @@ python -m examples.experiments.graph_cohort --destination /tmp/zenith-cohort-dem
 ```
 
 It creates **synthetic output fixtures**; no reasoning node or model executes. Its invented target-price correction demonstrates the cohort consumer and 20-issue gate, not graph optimization or prediction skill. Real graph experiments use actual `zenith run/resume` outputs with distinct admitted policy/topology artifacts, as shown by the machine-readable commands. Freeze a new cohort after changing the evaluator, declared candidate set, truth, or membership; repeated historical development still introduces selection bias.
+
+## From measured failures to one native candidate
+
+`reflection-packet` reads a native `feedback propose` result file. It retains the
+whole proposal, including successes, unresolved counts and source references;
+it rejects mixed development/heldout membership instead of selecting favorable
+rows. Source hashes and analysis/observation cutoffs are checked again when a
+candidate is compiled. An agent reads that evidence and proposes one change.
+
+```sh
+python -m research reflection-packet \
+  --proposal work/feedback/proposals/PROPOSAL_ID.json \
+  --study work/graph-study --as-of 2026-10-11T15:00:00Z \
+  --node lab_director \
+  --output work/reflection.json
+python -m research reflection-candidate \
+  --packet work/reflection.json --edit proposed-edit.json \
+  --study work/graph-study --source-commit YOUR_REVIEWED_SOURCE_COMMIT \
+  --output work/proposed-candidate
+```
+
+These illustrative paths require actual existing evidence. The study must have
+complete native attachments and an unconsumed final seal. The scope records its
+development/heldout membership and hashes the study specification and attachment
+state. Subsequent study-state changes require a fresh packet. Alternatively,
+`--scope scope.json` accepts an explicit `zenith_reflection_scope_v1` object with
+`as_of`, `development_run_ids` and `heldout_run_ids`. This is declared membership;
+it does not prove that those observations were never used as heldout evidence.
+Neither path is an OS boundary against another process reading local data.
+
+The selected node defaults to `lab_director`. Its trace context contains up to
+three failing and two successful distinct runs, selected deterministically by
+issue time and forecast id. It includes node-output excerpts and, where present,
+the actual handoff prompt, response and native import-validation binding. Fields
+are capped at 2,048 characters and two exchanges per case, with source hashes,
+sizes, omissions, missing evidence and truncation recorded. Compilation rechecks
+the sources and excerpt contents. This is bounded search context; the complete
+measurement evidence remains in the packet. It is not a statistically
+representative sample or proof of causal responsibility.
+
+The edit is small and explicit:
+
+```json
+{
+  "node_id": "lab_director",
+  "parameter": "skill_addon",
+  "value": "Compare each target with the no-change baseline before finalizing it.",
+  "hypothesis": "An explicit baseline comparison reduces target-price error on matched inputs.",
+  "variant_id": "baseline-comparison"
+}
+```
+
+This is an example hypothesis, not a learned rule or measured improvement.
+Other supported parameters are `max_context_chars` and `incoming_weights`; the
+latter requires one `edge_id`. Supply `--baseline-policy` and `--graph-variant`
+when the measured runs used them. Every measured ancestor must match; the
+compiler preserves the rest of the baseline policy and rejects effective no-ops.
+
+The new directory contains `policy.json` and `candidate.json`. The first is
+consumable by native Zenith and the cohort's `reasoning_policy` field. The second
+records proposal/packet/policy hashes, hypothesis, exact change and review-only
+status. With `--study`, it also emits `cohort-candidate.json`, an exact native
+candidate row, and `cohort-review.json`, its separate review/provenance receipt.
+The helper copies verified parent model/provider/context/graph settings; the
+candidate id comes from the edit's `variant_id`. `--source-candidate-id` defaults
+to `baseline`. The declared source commit is provenance, while frozen source
+hashes remain the executable identity check. The helper requires a source-current
+parent study; it cannot bypass changed evaluator or graph checks.
+
+Existing outputs cannot be overwritten. No provider runs, study creation,
+score or live promotion occurs here. Preregister the candidate in a **new** cohort
+using the generated row and the usual fixed budget/support declarations. A frozen
+study cannot gain a candidate after its results have been seen. Preserve parent
+study/proposal receipts and failed trials across studies; repeated historical
+search remains adaptive even when each individual study has its own final seal.

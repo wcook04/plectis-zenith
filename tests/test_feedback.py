@@ -1,5 +1,6 @@
 """Forecast-feedback regressions. Every price/model observation is synthetic."""
 from datetime import datetime, timedelta, timezone
+import hashlib
 import importlib.metadata
 import json
 from pathlib import Path
@@ -35,6 +36,25 @@ class FeedbackTests(unittest.TestCase):
 
     def score(self, truth=None, as_of="2026-03-01T00:00:00+00:00"):
         return engine.score(self.store, truth or self.truth(), as_of)
+
+    def test_source_refs_preserve_external_identity_and_relative_local_paths(self):
+        root = self.directory / "repository"
+        internal = root / "artifacts/lab_director.json"
+        external = [self.directory / name / "lab_director.json" for name in ("first", "second")]
+        for index, path in enumerate([internal, *external]):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps({"fixture": index}))
+        local = engine.source_ref(internal, root=root, pointer="/data/predictions_t/0")
+        self.assertEqual(local["path"], "artifacts/lab_director.json")
+        self.assertEqual(local["pointer"], "/data/predictions_t/0")
+        refs = [engine.source_ref(path, root=root) for path in external]
+        self.assertNotEqual(refs[0]["path"], refs[1]["path"])
+        for path, ref in zip([internal, *external], [local, *refs]):
+            self.assertEqual(ref["sha256"], hashlib.sha256(path.read_bytes()).hexdigest())
+        for path, ref in zip(external, refs):
+            self.assertEqual(ref["path"], str(path.resolve()))
+            self.assertEqual(Path(ref["path"]).read_bytes(), path.read_bytes())
+            self.assertEqual(ref, engine.source_ref(path, root=root))
 
     def test_pending_truth_never_becomes_a_model_miss(self):
         self.register()

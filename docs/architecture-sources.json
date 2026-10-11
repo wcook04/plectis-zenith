@@ -2,12 +2,52 @@
   "schema": "zenith_architecture_sources_v1",
   "sources": [
     {
+      "name": "aflow",
+      "url": "https://github.com/FoundationAgents/AFlow",
+      "commit": "3f457218fc716093fe53f6df8a5d5e6379d66346",
+      "paper": "https://arxiv.org/abs/2410.10762v4",
+      "license": "MIT",
+      "license_sha256": "bce279a8f86499db0f9b1962884544108e4f81705d7c966ad59c66917b1131e5",
+      "inspected_paths": ["scripts/optimizer.py", "scripts/optimizer_utils/data_utils.py"],
+      "use": "pattern_transfer_to_native_reflection",
+      "decision": "Parent-relative single changes and execution evidence; defer tree search and retain native temporal evaluation.",
+      "scripts_executed": false
+    },
+    {
+      "name": "adas",
+      "url": "https://github.com/ShengranHu/ADAS",
+      "commit": "2702bee8fefda42255efc5be9f60e3bd3db96ae4",
+      "paper": "https://arxiv.org/abs/2408.08435v2",
+      "license": "Apache-2.0",
+      "license_sha256": "2591bb5c650dc96c48e4244d52c7bc179ff904e3129d65dcb9180bc726a4b3ad",
+      "inspected_paths": ["_gpqa/search.py", "_mgsm/search.py"],
+      "use": "pattern_transfer_to_native_reflection",
+      "decision": "Separate proposer and executor, preserve parent evidence; do not replace native execution with arbitrary generated code or omit failed trials.",
+      "scripts_executed": false
+    },
+    {
+      "name": "textgrad",
+      "url": "https://github.com/zou-group/textgrad",
+      "commit": "75e912e210864b61999781778cdf756d4468120f",
+      "paper": "https://www.nature.com/articles/s41586-025-08661-4",
+      "paper_version_read": "https://arxiv.org/abs/2406.07496v1",
+      "license": "MIT",
+      "license_sha256": "ed05ff64a2b47ecba690d8b6fe28d970de1f6e31b1c84daa229f21294ece9702",
+      "inspected_paths": ["textgrad/variable.py", "textgrad/autograd/llm_ops.py", "textgrad/optimizer/optimizer.py", "evaluation/prompt_optimization.py"],
+      "use": "pattern_transfer_to_native_reflection",
+      "decision": "Keep criticism attached to its measured context; defer backward traversal and textual optimizer integration.",
+      "scripts_executed": false
+    },
+    {
       "name": "gepa",
       "url": "https://github.com/gepa-ai/gepa",
       "commit": "462e437a09be67d2acb59564cc0ea59132f5777c",
+      "paper_version_read": "https://arxiv.org/abs/2507.19457v2",
       "license": "MIT",
       "license_sha256": "10c47467a961feb40adf3294fe27dd9cba79d4d1b7cf27173b1c34586d4126c3",
-      "use": "architecture_reference_only",
+      "inspected_paths": ["src/gepa/core/adapter.py", "src/gepa/proposer/reflective_mutation/reflective_mutation.py", "src/gepa/core/engine.py", "src/gepa/strategies/batch_sampler.py"],
+      "use": "pattern_transfer_to_native_reflection",
+      "decision": "Keep measured scores separate from component trajectory feedback; defer population, Pareto selection and minibatch acceptance until native proposals justify them.",
       "scripts_executed": false
     },
     {

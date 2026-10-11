@@ -11,6 +11,15 @@ Optimize the existing reasoning graph through explicit, reviewable experiments. 
 7. Retain all results. Fixed development improvement produces a candidate proposal with no live mutation permission. Read its native errors, model/call provenance, and context receipts before interpreting which intervention helped. Structural ancestry is not causal blame. New hypotheses use a new explicitly bounded candidate set/study; repeated historical selection still creates bias.
 8. Finish heldout runs before deliberately invoking `cohort-evaluate --final-key <stable-key>`. The consumer selects the development champion before opening heldout outcomes and compares only it with baseline. A pending, interrupted, or failed final spends the seal. The same key returns the same receipt; another key is refused. Development comparisons and imports then close. Promotion requires separate review; do not automatically edit live skills or dossiers.
 
+To derive the next hypothesis from development failures, use `reflection-packet`
+to bind a complete native feedback proposal and the selected node's available
+traces. Read the evidence, then `reflection-candidate` compiles one declared skill,
+context-budget or incoming-edge change. With a verified parent `--study`, it also
+emits a native candidate row preserving the measured model and graph identity.
+Preregister that row in a new study; these commands neither run nor accept the
+candidate. Follow the exact arguments and evidence boundaries in
+`docs/experiments.md`.
+
 For a probability-only hypothesis, the smaller replay adapter uses `freeze`, identity-baseline `trial`, bounded candidate `trial`, `status`, and once-only `final`. It wraps the actual admitted-event historical replay and native Brier score. Its candidate changes probabilities over frozen upstream forecasts; naming a node or topology in its provenance does not execute or optimize that graph. `recover` closes an interrupted local reservation only after its owner disappears. Candidate Python is trusted local code, not an OS sandbox.
 
 Historical model training, remembered prices, retrospective narratives, dependent weeks/assets, and repeated development selection can contaminate apparent improvements. Synthetic fixtures establish executable contracts, not forecasting ability, significance, investment returns, or causal conclusions. Instant syntax/PIT/graph checks and historical measurements do not remove the waiting horizon for live truth.

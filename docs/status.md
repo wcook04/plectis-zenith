@@ -9,10 +9,12 @@ This records implementation evidence, not a claim that the system predicts marke
 - Tiny generated node skill cards refer to canonical implementations. Frozen policies tune short rules, incoming context weights and budgets. A real graph variant inserts an evidence-check node and feeds its result into CP1.
 - CP2 feedback admits validated forecasts, resolves exact dated truth and measures price errors. Default proposal gates require 20 issue times and recurring failures across three time buckets. Multiple assets or overlapping report windows do not become independent trials.
 - The experiment harness retains failed attempts, freezes the evaluator and support, and spends a single final assessment. Its probability adapter maps frozen forecasts. A separate cohort adapter freezes candidate graphs and common inputs, imports actual native CP2 runs, measures them through feedback, and exposes the next commands for an agent.
+- Development reflection preserves the complete feedback batch and its denominators, adds bounded verified node traces, and compiles one short skill, context-budget or edge-weight change through the native policy validator. A verified parent cohort can supply a candidate row for a new study, retaining model, provider and graph identity. Reflection itself does not execute or accept the candidate.
 - Lean models conditional skill composition/refinement, evidence availability and graph acyclicity. Python projects the actual graph; explicit Lean receipts distinguish compiled proofs from ordinary Python checks.
 - StockNet historical import and price-only baselines are executable. Source pins, protocol, row exclusions, splits, predictor packets and truth packets remain separately attributable.
 - The matched StockNet input study joins prices and timestamped social text on 20 fixed development issue dates. The two input arms share assets, horizons and model; every missing or invalid response remains in coverage accounting.
 - A bounded FinMultiTime importer joins historical prices, news and per-filing financial facts. It exports partial native feed artifacts, checks exact issue-price availability, delays date-only news and filings until the next exchange session, and rejects changed source or snapshot bytes.
+- Malformed FinMultiTime filing structures are counted as rejected evidence without discarding valid siblings. Feedback references retain resolvable absolute paths for external files and relative paths for files within the checkout; existing registered records are not rewritten.
 - Explicit paid OpenRouter calls use one shared batch ledger with conservative pre-call reservations, fixed call/output limits, immutable run bindings and no retries or fallback. Unknown cost or an interrupted request halts the budget. Free-only and NVIDIA adapters remain separate.
 - Repo-local skills include pinned, licensed point-in-time research and backtest-validation references. External projects informed the architecture; their presence is not evidence that their optimizers are integrated.
 
@@ -36,11 +38,25 @@ The public OpenRouter catalogue check found 16 eligible free entries without cre
 
 No NVIDIA account call was made. A scan against locally configured secret values found no matches in candidate standalone files or existing Git history.
 
+The 11 October source-assimilation pass read the full pinned AFlow, ADAS,
+TextGrad and GEPA method/evaluation sources and their relevant implementations.
+The resulting [design](learning-design.md) adopts component-specific criticism,
+parent-relative changes and fixed external evaluation. The
+[source manifest](architecture-sources.json) records exact paper versions, code
+commits and licenses. It does not claim reproduction of their benchmark results.
+
+The integrated suite passed all 370 tests on 11 October, using this checkout's
+Python environment with inherited `PYTHONPATH` cleared. Native validation also
+accepted all 71 nodes. Reflection tests cover source drift, development/heldout
+membership, bounded trace integrity, one-parameter policies and consumption of
+the candidate row by a fresh native cohort. These are software and synthetic
+contract checks; no additional provider call or live learning result occurred.
+
 ## Remaining evidence obligations
 
 | Work | Current boundary | Next evidence needed |
 |---|---|---|
-| Full graph learning | Native graph execution, frozen cohort import/comparison and agent next actions are implemented; no automatic proposal optimizer or real model improvement is demonstrated | Run a tractable baseline/candidate cohort with actual provider receipts, complete matched support and the sealed final assessment |
+| Full graph learning | Native graph execution, frozen cohort comparison, verified development reflection and one-parameter candidate handoff are implemented; no autonomous optimizer or real model improvement is demonstrated | Execute a preregistered baseline/candidate cohort with actual provider receipts, complete matched support and the sealed final assessment |
 | Forecasting advantage | Historical baselines exist; no model advantage is established | Prospective or carefully qualified historical predictions, matched support, uncertainty analysis and a genuinely untouched assessment |
 | Automatic Evolve | Original reviewed runner retained; browser dispatch still separate | An agent/provider dispatch seam and batch-proposal consumer, with reviewed promotion kept explicit |
 | General architecture search | Current variants add nodes and reroute edges while retaining base ancestry | A separately specified ablation contract before removing baseline branches or changing acceptance outputs |
