@@ -15,7 +15,7 @@ from system.lib.hashing import hash_node
 from variants.graph import FrozenGraphLoader, build_base_identity, variant_sha256
 
 SCHEMA = "zenith_predictor_replacement_v1"
-PROFILE = "stocknet_price_only_cp1_cp2_v1"
+PROFILE = "stocknet_price_only_cp1_cp2_v2"
 FIELDS = {"schema_version", "variant_id", "base_graph_sha256", "base_node_hashes",
           "instruction_profile", "variant_sha256"}
 NODE_IDS = ("global_stock_feed", "lab_decide", "lab_director")
@@ -36,7 +36,8 @@ You are the Synthesizer. Build one dominant epicentre thesis from the recorded S
 - Thesis must be singular, specific, and falsifiable.
 - Begin: 'At T-n, the dominant force is <FORCE> operating through <PRIMARY TRANSMISSION PATH>, producing <SPECIFIC CROSS-ASSET CONSEQUENCE SET>; this thesis is false if <OBSERVABLE INVALIDATION CONDITIONS>.'
 - Include dominance justification, transmission path, consequence map by {{TARGET_TIME}} and invalidation conditions. Distinguish observed prices from hypotheses; unavailable flow or narrative data cannot support a claim.
-- Minimum 150 words; cite resolved [N] entries in evidence_dictionary.
+- epicentre_thesis must contain at least 150 words. Aim for 200-250 words inside that JSON string; count whitespace-separated words, not tokens, JSON keys or evidence_dictionary entries.
+- Cite resolved [N] entries in evidence_dictionary. ref_id values must be literal bracketed strings such as "[1]", "[2]", "[3]", never "1" or "2". Before returning, self-check that every citation uses brackets and resolves to an evidence_dictionary ref_id.
 - Ground EVERY declared target in a stock evidence entry. Copy each supplied ledger_id and subject exactly; ref_id sequential [N].
 - No cross-correlation, bifurcation or miner output was executed. Do not invent one.
 [OUTPUT]
@@ -55,6 +56,8 @@ You are the Trajectory Director. CP1 thesis is locked. Project its force into sp
 - Emit a specific finite target_price consistent with direction: UP => target_price > snapshot_price; DOWN => target_price < snapshot_price.
 - Every target needs subject==target_id and an S_ equity ledger entry, copied from the subject feed.
 - Explain force -> transmission -> each prediction consequence; dense resolved [N] citations and concrete invalidation conditions. Minimum trade_rationale length: 75 + 30N words for N targets.
+- For this three-target profile, trade_rationale must contain at least 165 words. Aim for 220-280 words inside that JSON string. Count whitespace-separated words in trade_rationale only; the inherited epicentre_thesis, evidence_dictionary and predictions_t do NOT count toward the rationale minimum.
+- Before returning, self-check the separate trade_rationale word count and literal bracketed ref_id strings such as "[1]", "[2]", "[3]". Every [N] citation must resolve to an inherited or valid added evidence_dictionary entry; unbracketed ref_id values are invalid.
 - No Phase 2 miner, cross-correlation or thesis-stress node was executed. Do not invent its findings.
 [OUTPUT]
 See Contract: codex/substrate/contracts/schema_cp2.json

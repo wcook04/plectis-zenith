@@ -8,7 +8,7 @@ import pytest
 
 from system.lib.schema_validator import validate_cp1, validate_cp2
 from variants.graph import variant_sha256
-from variants.predictor import build_replacement, apply_predictor_replacement, NODE_IDS
+from variants.predictor import build_replacement, apply_predictor_replacement, NODE_IDS, PROFILE
 from zenith import runtime
 from zenith.providers import write_json
 
@@ -83,12 +83,18 @@ def test_real_three_node_engine_handoff_and_output_validation(tmp_path):
     packet = json.loads(Path(result['pending'][0]['packet_path']).read_text())
     assert '<global_stock_feed>' in packet['prompt']
     assert 'Only the STOCK lane is supplied' in packet['prompt']
+    assert PROFILE == 'stocknet_price_only_cp1_cp2_v2'
+    assert 'at least 150 words' in packet['prompt'] and '200-250 words' in packet['prompt']
+    assert 'literal bracketed strings' in packet['prompt']
     answer = tmp_path / 'answer.txt'; answer.write_text(json.dumps(cp1()))
     result = runtime.import_response(tmp_path, packet_path=Path(result['pending'][0]['packet_path']),
                                      response_path=answer, model='synthetic-fixture')['run']
     assert [item['node_id'] for item in result['pending']] == ['lab_director']
     second = json.loads(Path(result['pending'][0]['packet_path']).read_text())
     assert '<lab_decide>' in second['prompt'] and '<global_stock_feed>' in second['prompt']
+    assert 'at least 165 words' in second['prompt'] and '220-280 words' in second['prompt']
+    assert 'do NOT count toward the rationale minimum' in second['prompt']
+    assert 'unbracketed ref_id values are invalid' in second['prompt']
     prediction = dict(cp1(), predictions_t=[{'target_id': 'XOM', 'direction': 'UP',
         'snapshot_price': 100.0, 'target_price': 101.0, 'invalidation': 'XOM below subject price by target close.'}],
         trade_rationale='[1] ' + 'Synthetic consequence remains bound to the same subject baseline and horizon. ' * 20)
