@@ -1,0 +1,25 @@
+{
+  "id": "oracle_subject_lab_director",
+  "type": "tool",
+  "group": "oracle",
+  "lane": "SPINE",
+  "dependencies": [],
+  "instruction": "@node_path:codex/substrate/nodes/oracle/oracle_subject_lab_director.json\n[ROLE] Oracle Subject Snapshot (Lab CP2)\n[TASK] Load the subject-run lab_director artifact so Oracle has an explicit T-n CP2 node in its graph.\n[OUTPUT] JSON payload copied from the paired subject run with subject provenance metadata.",
+  "config": {
+    "module": "tools.oracle.subject_snapshot",
+    "artifact_id": "lab_director"
+  },
+  "execution": {
+    "cache_policy": "standard",
+    "retries": 1,
+    "timeout": 60,
+    "tools": []
+  },
+  "is_artifact": true,
+  "teleology": "Expose the subject-run Lab CP2 artifact as explicit Oracle upstream context.",
+  "mechanism": "Python Subject Snapshot Proxy",
+  "expectation": "Output the subject-run lab_director artifact data with subject provenance metadata.",
+  "meta": {
+    "role": "tool"
+  }
+}

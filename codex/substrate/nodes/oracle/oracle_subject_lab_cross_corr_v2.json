@@ -1,0 +1,25 @@
+{
+  "id": "oracle_subject_lab_cross_corr_v2",
+  "type": "tool",
+  "group": "oracle",
+  "lane": "SPINE",
+  "dependencies": [],
+  "instruction": "@node_path:codex/substrate/nodes/oracle/oracle_subject_lab_cross_corr_v2.json\n[ROLE] Oracle Subject Snapshot (Lab Phase 2 Map)\n[TASK] Load the subject-run lab_cross_corr_v2 artifact so Oracle has an explicit T-n target/stress map in its graph.\n[OUTPUT] JSON payload copied from the paired subject run with subject provenance metadata.",
+  "config": {
+    "module": "tools.oracle.subject_snapshot",
+    "artifact_id": "lab_cross_corr_v2"
+  },
+  "execution": {
+    "cache_policy": "standard",
+    "retries": 1,
+    "timeout": 60,
+    "tools": []
+  },
+  "is_artifact": true,
+  "teleology": "Expose the subject-run Phase 2 target map as explicit Oracle upstream context.",
+  "mechanism": "Python Subject Snapshot Proxy",
+  "expectation": "Output the subject-run lab_cross_corr_v2 artifact data with subject provenance metadata.",
+  "meta": {
+    "role": "tool"
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "id": "stockgrid_direct",
+  "type": "config",
+  "meta": {
+    "standard": "std_tool_config",
+    "description": "StockGrid Ingest. Compresses dark pool & signal data into a dense matrix using name enrichment, integer-mapping, and adaptive texture filling."
+  },
+  "data": {
+    "provider": {
+      "mode": "axlfi_public",
+      "axlfi_public": {
+        "base": "https://axlfi.com/axlfi-app-backend",
+        "strategy_name": "nasdaq_mom",
+        "dark_pools_metric": "dollar_dp_position",
+        "dark_pools_sort": "desc",
+        "dark_pools_limit": 500,
+        "cluster_universe": "all"
+      }
+    },
+    "endpoints": {
+      "base": "https://stockgrid.io",
+      "signals": "https://stockgrid.io/get_signals_data",
+      "dark_pools": "https://stockgrid.io/get_dark_pool_data",
+      "clusters": "https://stockgrid.io/get_clusters_table_data"
+    },
+    "tuning": {
+      "target_kb": 60,
+      "whales_limit": 400,
+      "setups_limit": 100,
+      "texture_enabled": true,
+      "row_buffer_safety": 1.12,
+      "filters": {
+        "min_net_flow_m": 2.0,
+        "squeeze_short_vol_pct": 0.6,
+        "golden_win_rate_pct": 80
+      },
+      "texture_sample": [
+        "AAPL",
+        11,
+        50000,
+        25000,
+        65,
+        1
+      ]
+    },
+    "rich_payload": {
+      "enabled": true,
+      "limits": {
+        "movers_per_bucket": 25,
+        "signal_history_points_per_symbol": 90,
+        "period_return_points_per_family": 120
+      }
+    },
+    "definitions": {
+      "flow": {
+        "unit": "USD_Millions",
+        "window": "Snapshot_1D_Net",
+        "src": "dark_pools_position_$",
+        "sign_convention": {
+          "positive": "net_accumulation",
+          "negative": "net_distribution"
+        }
+      },
+      "sv": {
+        "unit": "Percent_0_100",
+        "src": "short_volume_%"
+      },
+      "wr": {
+        "unit": "Percent_0_100",
+        "scope": "Pooled_Strategies",
+        "zero_means": "no_applicable_signal"
+      },
+      "flg": {
+        "encoding": "Bitmask",
+        "map": {
+          "1": "Whale",
+          "2": "Setup",
+          "3": "Whale+Setup",
+          "0": "Anon/Texture"
+        }
+      },
+      "sec": {
+        "encoding": "integer_enum",
+        "note": "See sector_map for dynamic decoding"
+      },
+      "missing_data": {
+        "numeric_zero_can_mean_missing": [
+          "wr"
+        ],
+        "explicit_null_not_used": false
+      }
+    },
+    "identity_map_ref": "codex/refs/stockgrid_ticker_map.json",
+    "sec_enricher": {
+      "enabled": true,
+      "rate_limit_s": 0.13,
+      "per_run_limit": 200
+    },
+    "runtime": {
+      "timeout": 20
+    }
+  }
+}

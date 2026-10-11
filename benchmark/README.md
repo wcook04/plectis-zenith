@@ -3,14 +3,14 @@
 From repository root, using Python 3.9 or later:
 
 ```sh
-python3 -m benchmark.run --output web/data/benchmark.json
+python3 -m benchmark.run --output work/benchmark/benchmark.json
 python3 -m unittest discover -s tests -p test_benchmark.py -v
 ```
 
 No package installation, API key, model endpoint or network request is needed.
-The command writes the deterministic UI receipt and `predictions.csv` alongside
+The command writes the deterministic evaluation receipt and `predictions.csv` alongside
 it, plus exact source-manifest and attribution projections. It also projects
-this document to `web/docs/methodology.md`. Repeated builds from identical inputs
+this document to `work/benchmark/docs/methodology.md`. Repeated builds from identical inputs
 produce identical bytes. The receipt contains the source checksum, the prediction
 CSV checksum, the benchmark implementation checksum and protocol version.
 

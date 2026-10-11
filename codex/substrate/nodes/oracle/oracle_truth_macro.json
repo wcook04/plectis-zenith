@@ -1,0 +1,25 @@
+{
+  "id": "oracle_truth_macro",
+  "type": "reasoning",
+  "group": "oracle",
+  "lane": "MACRO",
+  "dependencies": [
+    "oracle_subject_index",
+    "oracle_truth_diff_macro",
+    "oracle_subject_macro_feed",
+    "global_macro_feed"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "timeout": 300,
+    "tools": []
+  },
+  "is_artifact": false,
+  "output_schema": "json",
+  "teleology": "Describe the realized macro regime at truth time.",
+  "mechanism": "LLM Realized-Lane Synthesis",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/oracle/oracle_truth_macro.json\n[SYSTEM CONSTRAINT] Return ONE valid JSON object only. No markdown fences. No prose wrapper.\n\n[ROLE]\nYou are the Oracle Truth Miner for the MACRO lane.\n\n[TASK]\nUse oracle_truth_diff_macro, oracle_subject_index, oracle_subject_macro_feed (subject-side T-n), and global_macro_feed (truth-side T) to describe the realized macro regime and its changed series.\nDistinguish stable background state from the few macro changes that actually mattered to outcomes.\n\n[CLASSIFICATION DISCIPLINE]\n- Use already_priced_candidates only for macro conditions or series changes that were clearly already expressed by T-n.\n- Use surprise_candidates only for macro conditions or series changes that were genuinely residual by T.\n- If the realized macro outcome was partly expressed at T-n but still repriced further by T, treat it as PARTIAL_REPRICING and explain that in realized_summary or key_changed_series instead of forcing it into the wrong list.\n\n[OUTPUT CONTRACT]\nReturn this JSON shape exactly:\n{\n  \"lane\": \"MACRO\",\n  \"status\": \"AVAILABLE\",\n  \"realized_summary\": \"...\",\n  \"key_changed_series\": [{\"series_id\": \"...\", \"note\": \"...\"}],\n  \"already_priced_candidates\": [\"...\"],\n  \"surprise_candidates\": [\"...\"],\n  \"subject_side_hits\": [\"...\"],\n  \"subject_side_misses\": [\"...\"]\n}\n\n[BOUNDARY]\nDo not introduce new ledger ids. This lane note is explanatory only.",
+  "expectation": "Output strict JSON realized-macro lane summary."
+}

@@ -1,45 +1,75 @@
-# Plectis Observatory
+# Plectis Zenith
 
-Inspect the evidence behind a market-model experiment: where the data came from, what was available at prediction time, and how its errors compare with simple baselines.
+An agent-native research graph for making dated market predictions, measuring their errors, and testing changes to how the graph reasons.
 
-This is a standalone, dependency-free research demo. The first benchmark uses the licensed UCI Dow Jones Index dataset from 2011. It measures next-week direction probability with Brier scores, not investment returns. Its small, fixed historical sample does not establish a profitable strategy. The private prospective collection system is optional and separate.
+Zenith extracts the existing Lab → Oracle → Evolve system into its own repository. Its 71 authored nodes, engine, typed contracts and provenance rules remain the execution authority. The previous website has been removed. This checkout contains the research system itself.
 
-## Reproduce and run
+## Start here
 
-Python 3.11 or newer; no packages or API keys required:
-
-```sh
-python3 -m benchmark.run --output web/data/benchmark.json
-python3 -m unittest discover -s tests -v
-python3 -m observatory.serve --port 8768
-```
-
-Open http://127.0.0.1:8768. Select a model or week to inspect the measured score; select a stage of the pipeline to see its evidence. The JSON and per-prediction CSV are downloadable from the page.
-
-To connect an existing private collector locally:
+Use Python 3.11 or newer from an editable checkout; the validation environment uses Python 3.12. A pinned test environment is recorded in `requirements-test.lock`:
 
 ```sh
-python3 -m observatory.export --source-root /path/to/ai_workflow --output web/data/operations.json
-python3 -m observatory.serve --port 8768 --source-root /path/to/ai_workflow
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -e '.[test]'
+python -m zenith validate
+python -m zenith plan lab
+python -m zenith inspect lab_director
+python -m pytest tests
 ```
 
-The bridge exports aggregate feed health, experiment counts and model identities. It excludes current asset probabilities, recommendations, raw market records, prompts, provider responses, credentials and private repository text. The server binds to localhost by default and serves only `web/`.
+No model or market-data credentials are needed for inspection, planning or the offline tests. For a pinned Python 3.12 setup, install `requirements-test.lock` before the editable package. `.[feeds]` adds optional acquisition dependencies. The runtime resolves contracts and assets from this checkout; a standalone wheel is not yet a verified distribution format.
 
-On macOS, keep the local preview available after login with `python3 scripts/preview_service.py install --source-root /path/to/ai_workflow`. Inspect it with `python3 scripts/preview_service.py status`; remove it with `python3 scripts/preview_service.py remove`. This only serves the local site. The collector owns the exchange schedule and API calls.
+## Execute the actual graph
 
-## What is here
+Prepare a Lab run from a recorded native feed directory and the time at which its evidence was available:
 
-- `benchmark/`: frozen historical protocol, independent label checks and deterministic baseline evaluation.
-- `data/historical/`: pinned input, source manifest and dataset attribution.
-- `observatory/`: allowlisted aggregate export and local preview server.
-- `web/`: static interface, benchmark results, evidence pipeline and source disclosures.
-- `tests/`: leakage, reproducibility, provenance and export-boundary checks.
-- `docs/research-boundary.md`: UK primary-source research and public-release considerations.
+```sh
+python -m zenith prepare lab \
+  --run-id LAB_example \
+  --feed-source /path/to/recorded/feed-run \
+  --time-anchor 2026-10-12T13:30:00Z \
+  --horizon next_us_close \
+  --context-profile compact_feeds
+python -m zenith status LAB_example
+```
 
-The historical benchmark and the private live experiment answer different questions. No historical LLM score is presented: a modern model may have seen these old observations during training. The live loop freezes predictions before later truth, records the actual OpenRouter model rather than merely the router alias, and retains failures.
+The engine executes tools and pauses when a reasoning response is needed. Its packet contains the assembled prompt and request hash. An agent can return a response through `import-response`; the original engine validates it before advancing. `run --provider openrouter_free` is an explicit alternative with zero-price eligibility checks and requested/actual model receipts. It never silently selects a paid fallback. NVIDIA hosted NIM is available with `--provider nvidia_nim --model YOUR_SELECTED_NVIDIA_MODEL` and the user’s own `NVIDIA_API_KEY`; its cost remains unknown when the service does not report it. See [provider and key setup](docs/providers.md), CLI help and [the runtime architecture](docs/architecture.md).
 
-## Data and release status
+Explicit paid experiments use `openrouter_budgeted`, a concrete model and a shared batch budget directory. It reserves conservative costs before calls, limits calls and output tokens, and retains reported usage and cost. Failed or ambiguous calls are not retried; unknown cost halts the batch. The first-trial implementation permits at most US$0.25 per shared budget. This is a client-side spending guard, not a provider billing guarantee. Keys are supplied locally through environment variables or an explicitly selected private environment file.
 
-The UCI input is CC BY 4.0; see its attribution and source manifest. Software licences do not grant rights to redistribute a provider's market data. Additional SEC or macro-vintage sources need their own availability, revision and reuse checks.
+The compact feed profile removes duplicated diagnostics from prompt context while retaining every feed data row and dated price provenance. It is recorded in the frozen run identity. It does not make large datasets fit every model automatically.
 
-This is a local preparation repository, not a publicly deployed financial service. It offers factual historical experiment results and no investment recommendations. A disclaimer alone cannot determine UK regulatory status; review the actual interface, distribution and marketing before a public launch. The working name has not undergone a trademark search.
+## What can change, and how it earns acceptance
+
+Each reasoning node has a [small skill card](.agents/node-skills/index.json), typed incoming context and an output contract. A frozen [reasoning policy](system/lib/reasoning_policy.py) can change its short skill rule, incoming-edge weights and context budget. [Graph variants](docs/graph-variants.md) can insert reasoning checks and rewire dependencies while preserving the base graph's required ancestry and temporal boundaries. The included variant adds an evidence check before CP1.
+
+The [learning design](docs/learning-design.md) defines how graph structure, node parameters and accumulated errors fit together. The learning loop is explicit:
+
+1. Freeze graph, skills, model identity, evidence and prediction time.
+2. Produce validated forecasts at declared horizons.
+3. Resolve matured forecasts against exact dated observations and compare errors with a no-change baseline.
+4. Accumulate failures across issue times and time buckets; propose a skill, context or topology intervention with supporting evidence.
+5. Evaluate the candidate with fixed data, complete trial accounting and a sealed final split. Promote it only after review.
+
+[Forecast feedback](docs/forecast-feedback.md) defaults to at least 20 distinct issue times and three time buckets before producing a proposal. Ancestor participation identifies places to investigate; it is not proof that a node caused an error. [The experiment harness](docs/experiments.md) implements bounded autoresearch-style trials using the native replay evaluator. Its probability adapter adjusts frozen forecast cards; its cohort adapter imports and compares new native graph runs on identical frozen inputs and target support. `cohort-next` gives an agent the next concrete commands. Neither adapter automatically rewrites the live graph. See [program.md](program.md) for the agent operating procedure.
+
+## Historical comparisons and formal semantics
+
+[Historical benchmarks](docs/historical-benchmarks.md) include pinned StockNet OHLCV baselines and a matched prices-versus-prices-plus-timestamped-text experiment over 1/5/20 observed-row horizons. Each issue snapshot joins its feeds before forecasting; target observations stay in a separate evaluator. The protocols do not reproduce StockNet's published paper scores. The older [UCI benchmark](benchmark/README.md) remains a small deterministic scoring fixture. Historical LLM evaluation can be contaminated by model training; prospective predictions form a separate evidence lane.
+
+[Lean semantics](docs/semantics.md) describe parameterized skills as relations, typed composition and refinement, evidence availability and graph rank conditions. The checker connects those finite conditions to the actual graph declarations. These proofs do not establish that a language model obeys its prompt or predicts markets successfully.
+
+```sh
+python scripts/build_node_skills.py --check
+python scripts/check_extraction.py
+python scripts/check_semantics.py --lean
+```
+
+Lean is pinned under `formal/`; the last command requires that toolchain. [Source pins and prior art](docs/architecture-sources.md), [imported skills and licenses](docs/skills.md), and the [extraction manifest](docs/extraction-manifest.json) record what was reused.
+
+## Evidence and scope
+
+[Current validation and remaining work](docs/status.md) distinguish synthetic execution checks, historical measurements and live collection. This is a local research repository. Credentials, collected provider data and runtime artifacts stay outside Git. The internal workstation collector continues to own market-open/close scheduling; this checkout does not silently install another daemon.
+
+There is no public deployment or demonstrated forecasting advantage. Read the existing [research and release boundary](docs/research-boundary.md) before preparing a public product; data reuse rights and the actual product behavior require review separately from software licenses.

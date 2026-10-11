@@ -1,0 +1,23 @@
+{
+  "id": "surv_micro_v2_stockgrid",
+  "type": "reasoning",
+  "dependencies": [
+    "global_stockgrid_feed",
+    "surv_micro_v1_stockgrid",
+    "surv_macro_v1_context_search"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Scan stockgrid for NUANCE and MISSED signals.",
+  "mechanism": "LLM Extraction",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/surveillance/micro_v2_stockgrid.json\nFind second-derivative contradictions and sector rotation signals.\n\n[OUTPUT]\nStream of Atomic Tiles",
+  "meta": {},
+  "lane": "STOCKGRID",
+  "expectation": "Stream of Atomic Tiles."
+}

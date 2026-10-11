@@ -1,0 +1,24 @@
+{
+  "id": "oracle_truth_poly",
+  "type": "reasoning",
+  "group": "oracle",
+  "lane": "POLYMARKET",
+  "dependencies": [
+    "oracle_subject_index",
+    "oracle_subject_poly_feed",
+    "global_polymarket_feed"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "timeout": 300,
+    "tools": []
+  },
+  "is_artifact": false,
+  "output_schema": "json",
+  "teleology": "Describe what the truth-side prediction-market lane already expressed before realization, using resolved-archive candidate sidecars when present.",
+  "mechanism": "LLM Realized-Lane Synthesis over subject/truth Polymarket rows plus metadata.sidecars.polymarket_resolved_archive_candidates",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/oracle/oracle_truth_poly.json\n[SYSTEM CONSTRAINT] Return ONE valid JSON object only. No markdown fences. No prose wrapper.\n\n[ROLE]\nYou are the Oracle Truth Miner for the POLYMARKET lane.\n\n[TASK]\nUsing oracle_subject_index, oracle_subject_poly_feed (subject-side T-n), and global_polymarket_feed (truth-side T), identify what the market was already signaling versus what still surprised price realization.\n\nWhen present, read global_polymarket_feed.metadata.sidecars.polymarket_resolved_archive_candidates first. Its rows are the contracted truth-side candidate archive for terminal or post-event Polymarket markets. Use them as evidence for key_markets, already_priced_candidates, and surprise_candidates before falling back to scanner matrix rows. The sidecar is not a standalone truth ledger and does not solve target pairing by itself.\n\n[MARKET INTERPRETATION RULE]\nEvaluate each market in terms of implied probability state at T-n versus T. Treat consensus odds already pointing to the realized direction as already_priced_candidates; use surprise_candidates only when T realized beyond what prior market pricing credibly signaled.\n\n[OUTPUT CONTRACT]\nReturn this JSON shape exactly:\n{\n  \"lane\": \"POLYMARKET\",\n  \"status\": \"AVAILABLE\",\n  \"realized_summary\": \"...\",\n  \"key_markets\": [{\"subject\": \"...\", \"note\": \"...\"}],\n  \"already_priced_candidates\": [\"...\"],\n  \"surprise_candidates\": [\"...\"],\n  \"subject_side_hits\": [\"...\"],\n  \"subject_side_misses\": [\"...\"]\n}\n\n[BOUNDARY]\nDo not introduce new ledger ids. This lane note is explanatory only. Do not treat polymarket_resolved_archive_candidates as prediction_reconciliation or as permission to emit cross-feed divergence claims.",
+  "expectation": "Output strict JSON realized-polymarket lane summary."
+}

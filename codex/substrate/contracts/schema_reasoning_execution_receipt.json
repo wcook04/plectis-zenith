@@ -1,0 +1,557 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codex/substrate/contracts/schema_reasoning_execution_receipt.json",
+  "id": "schema_reasoning_execution_receipt",
+  "artifact_kind": "contract",
+  "version": "0.1",
+  "status": "NORMATIVE",
+  "description": "JSON Schema for reasoning_execution_receipt_v0, the future post-execution proof object that must be validated against a reasoning_execution_authority_envelope_v0 before it can be trusted.",
+  "purpose": "The receipt records what actor/provider/tool ran, what context actually left the substrate, what artifacts were used and produced, what schema checks passed, what side effects occurred, and which authority/schedule/lineage/replay/plan/packet hashes the run was bound to. This schema does not authorize or execute runtime work.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "receipt_kind",
+    "node_id",
+    "timestamp",
+    "actor",
+    "provider",
+    "tool",
+    "authority",
+    "context",
+    "materials",
+    "products",
+    "side_effects",
+    "byproducts",
+    "evaluation",
+    "status",
+    "issues"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "reasoning_execution_receipt_v0"
+    },
+    "receipt_id": {
+      "$ref": "#/$defs/non_empty_string"
+    },
+    "receipt_kind": {
+      "enum": [
+        "node_execution",
+        "no_op",
+        "denied",
+        "invalid"
+      ]
+    },
+    "node_id": {
+      "$ref": "#/$defs/non_empty_string"
+    },
+    "timestamp": {
+      "$ref": "#/$defs/non_empty_string"
+    },
+    "actor": {
+      "$ref": "#/$defs/actor"
+    },
+    "provider": {
+      "$ref": "#/$defs/provider"
+    },
+    "tool": {
+      "$ref": "#/$defs/tool"
+    },
+    "authority": {
+      "$ref": "#/$defs/authority_binding"
+    },
+    "context": {
+      "$ref": "#/$defs/context_record"
+    },
+    "materials": {
+      "$ref": "#/$defs/materials"
+    },
+    "products": {
+      "$ref": "#/$defs/products"
+    },
+    "side_effects": {
+      "$ref": "#/$defs/side_effects"
+    },
+    "byproducts": {
+      "$ref": "#/$defs/byproducts"
+    },
+    "evaluation": {
+      "$ref": "#/$defs/evaluation"
+    },
+    "status": {
+      "enum": [
+        "valid",
+        "denied_record",
+        "invalid_receipt"
+      ]
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/issue"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "invalid_receipt"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "issues": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "receipt_kind": {
+            "const": "denied"
+          }
+        },
+        "required": [
+          "receipt_kind"
+        ]
+      },
+      "then": {
+        "properties": {
+          "status": {
+            "const": "denied_record"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sha256_string": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "nullable_sha256_string": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/sha256_string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "string_array": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "path",
+        "message",
+        "witness"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "message": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "witness": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "actor_type",
+        "actor_id",
+        "surface",
+        "authority_tier"
+      ],
+      "properties": {
+        "actor_type": {
+          "enum": [
+            "type_a",
+            "provider",
+            "tool",
+            "human",
+            "deterministic_local"
+          ]
+        },
+        "actor_id": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "surface": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "authority_tier": {
+          "$ref": "#/$defs/non_empty_string"
+        }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_used",
+        "provider_id",
+        "model_id",
+        "provider_receipt_ref"
+      ],
+      "properties": {
+        "provider_used": {
+          "type": "boolean"
+        },
+        "provider_id": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "model_id": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "provider_receipt_ref": {
+          "$ref": "#/$defs/nullable_string"
+        }
+      }
+    },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tool_used",
+        "tool_id",
+        "command_ref"
+      ],
+      "properties": {
+        "tool_used": {
+          "type": "boolean"
+        },
+        "tool_id": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "command_ref": {
+          "$ref": "#/$defs/nullable_string"
+        }
+      }
+    },
+    "authority_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "authority_envelope_hash",
+        "authority_decision",
+        "grant_lease_hash",
+        "grant_materialized",
+        "launch_authorized",
+        "schedule_preflight_hash",
+        "candidate_lineage_hash",
+        "replay_scope_hash",
+        "execution_plan_hash",
+        "packet_manifest_hash"
+      ],
+      "properties": {
+        "authority_envelope_hash": {
+          "$ref": "#/$defs/sha256_string"
+        },
+        "authority_decision": {
+          "enum": [
+            "no_grant_needed",
+            "grantable",
+            "denied",
+            "invalid"
+          ]
+        },
+        "grant_lease_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "grant_materialized": {
+          "type": "boolean"
+        },
+        "launch_authorized": {
+          "type": "boolean"
+        },
+        "schedule_preflight_hash": {
+          "$ref": "#/$defs/sha256_string"
+        },
+        "candidate_lineage_hash": {
+          "$ref": "#/$defs/sha256_string"
+        },
+        "replay_scope_hash": {
+          "$ref": "#/$defs/sha256_string"
+        },
+        "execution_plan_hash": {
+          "$ref": "#/$defs/sha256_string"
+        },
+        "packet_manifest_hash": {
+          "$ref": "#/$defs/sha256_string"
+        }
+      }
+    },
+    "context_record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_classes_allowed",
+        "context_classes_sent",
+        "context_classes_withheld",
+        "context_classes_forbidden",
+        "redactions_applied",
+        "leakage_check"
+      ],
+      "properties": {
+        "context_classes_allowed": {
+          "$ref": "#/$defs/string_array"
+        },
+        "context_classes_sent": {
+          "$ref": "#/$defs/string_array"
+        },
+        "context_classes_withheld": {
+          "$ref": "#/$defs/string_array"
+        },
+        "context_classes_forbidden": {
+          "$ref": "#/$defs/string_array"
+        },
+        "redactions_applied": {
+          "$ref": "#/$defs/string_array"
+        },
+        "leakage_check": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "violations"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "violations": {
+              "$ref": "#/$defs/string_array"
+            }
+          }
+        }
+      }
+    },
+    "materials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_artifacts",
+        "input_artifact_hashes",
+        "node_source_hash",
+        "packet_manifest_hash",
+        "lineage_node_replay_hash"
+      ],
+      "properties": {
+        "input_artifacts": {
+          "$ref": "#/$defs/string_array"
+        },
+        "input_artifact_hashes": {
+          "$ref": "#/$defs/string_array"
+        },
+        "node_source_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "packet_manifest_hash": {
+          "$ref": "#/$defs/sha256_string"
+        },
+        "lineage_node_replay_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        }
+      }
+    },
+    "products": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "output_artifact_kind",
+        "output_artifact_ref",
+        "output_artifact_hash",
+        "schema_or_standard",
+        "schema_validation_result"
+      ],
+      "properties": {
+        "output_artifact_kind": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "output_artifact_ref": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "output_artifact_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "schema_or_standard": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "schema_validation_result": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "validator_ref",
+            "issues"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "pass",
+                "fail",
+                "not_applicable"
+              ]
+            },
+            "validator_ref": {
+              "$ref": "#/$defs/nullable_string"
+            },
+            "issues": {
+              "$ref": "#/$defs/string_array"
+            }
+          }
+        }
+      }
+    },
+    "side_effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observed",
+        "observed_paths",
+        "commit_ref",
+        "external_refs"
+      ],
+      "properties": {
+        "observed": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "local_write",
+            "commit",
+            "external_action",
+            "provider_dispatch",
+            "model_dispatch",
+            "tool_invocation"
+          ],
+          "properties": {
+            "local_write": {
+              "type": "boolean"
+            },
+            "commit": {
+              "type": "boolean"
+            },
+            "external_action": {
+              "type": "boolean"
+            },
+            "provider_dispatch": {
+              "type": "boolean"
+            },
+            "model_dispatch": {
+              "type": "boolean"
+            },
+            "tool_invocation": {
+              "type": "boolean"
+            }
+          }
+        },
+        "observed_paths": {
+          "$ref": "#/$defs/string_array"
+        },
+        "commit_ref": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "external_refs": {
+          "$ref": "#/$defs/string_array"
+        }
+      }
+    },
+    "byproducts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stdout_ref",
+        "stderr_ref",
+        "return_code",
+        "logs_ref",
+        "trace_ref"
+      ],
+      "properties": {
+        "stdout_ref": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "stderr_ref": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "return_code": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "logs_ref": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "trace_ref": {
+          "$ref": "#/$defs/nullable_string"
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_validated",
+        "runtime_execution_recorded",
+        "writes_recorded"
+      ],
+      "properties": {
+        "receipt_validated": {
+          "type": "boolean"
+        },
+        "runtime_execution_recorded": {
+          "type": "boolean"
+        },
+        "writes_recorded": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

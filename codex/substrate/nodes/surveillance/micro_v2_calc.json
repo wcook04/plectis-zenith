@@ -1,0 +1,23 @@
+{
+  "id": "surv_micro_v2_calc",
+  "type": "reasoning",
+  "dependencies": [
+    "global_calculator_feed",
+    "surv_micro_v1_calc",
+    "surv_macro_v1_context_search"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Scan calc for NUANCE and MISSED signals (2nd Pass).",
+  "mechanism": "LLM Extraction",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/surveillance/micro_v2_calc.json\n[CONTEXT]\n1. Raw Calc Feed\n2. Your V1 Output (Already covered)\n3. Macro Context (The current story)\n\n[TASK]\nIdentify the 'Second Derivative' signal.\nScan for the next ~15-20% of data that was skipped in V1 but is CRITICAL for nuance or contradicts the Macro Context.\n\n[CONSTRAINT: REFINEMENT]\n- Ratio: 75% Semantics / 25% Data.\n- We need deeper reasoning now.\n- FORMAT: `[id:ENTITY k:v] <Deep Nuance/Contradiction/Context>`\n- Do NOT repeat V1 tiles unless reframing them entirely.\n\n[EXAMPLE]\n[id:nvda-put-vol v:50k] While the price is flat, the massive skew in put volume suggests institutional hedging is structurally higher than the V1 summary implied.\n\n[OUTPUT]\nStream of Atomic Tiles (50% Data / 50% Semantics)",
+  "meta": {},
+  "lane": "CALCULATOR",
+  "expectation": "Stream of Atomic Tiles (50% Data / 50% Semantics)."
+}

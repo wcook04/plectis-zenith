@@ -1,0 +1,112 @@
+{
+  "id": "schema_realized_hindsight_brief",
+  "type": "contract",
+  "version": "1.0",
+  "status": "NORMATIVE",
+  "description": "Realized-state contextualizer for Oracle truth synthesis.",
+  "purpose": "This contract defines `realized_hindsight_brief`, the interpretive Oracle artifact emitted by `oracle_truth_map`. It summarizes what actually happened at T, classifies the major realized drivers, and contextualizes prediction-target outcomes before critique or hindsight CP2 reconstruction begins.",
+  "schema": {
+    "status": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "AVAILABLE"
+      ]
+    },
+    "realized_dominant_force": {
+      "type": "string",
+      "required": true,
+      "constraint": "Non-empty dominant realized force."
+    },
+    "regime_summary": {
+      "type": "string",
+      "required": true,
+      "constraint": "Readable summary of the realized market regime."
+    },
+    "driver_classification": {
+      "type": "array[RealizedDriver]",
+      "required": true,
+      "constraint": "Non-empty. Each major realized package must appear exactly once."
+    },
+    "already_priced_packages": {
+      "type": "array[string]",
+      "required": true
+    },
+    "surprise_packages": {
+      "type": "array[string]",
+      "required": true
+    },
+    "partial_repricing_packages": {
+      "type": "array[string]",
+      "required": true
+    },
+    "prediction_target_outcomes": {
+      "type": "array[PredictionTargetOutcome]",
+      "required": true,
+      "constraint": "Must cover every target present in prediction_reconciliation.rows."
+    }
+  },
+  "realized_driver": {
+    "driver": {
+      "type": "string",
+      "required": true
+    },
+    "classification": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "SURPRISE",
+        "ALREADY_PRICED",
+        "PARTIAL_REPRICING"
+      ]
+    },
+    "why": {
+      "type": "string",
+      "required": true
+    },
+    "supporting_lanes": {
+      "type": "array[string]",
+      "required": true,
+      "constraint": "Non-empty lane list."
+    },
+    "affected_targets": {
+      "type": "array[string]",
+      "required": false
+    }
+  },
+  "prediction_target_outcome": {
+    "target_id": {
+      "type": "string",
+      "required": true
+    },
+    "what_happened": {
+      "type": "string",
+      "required": true
+    },
+    "pricing_judgement": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "SURPRISE",
+        "ALREADY_PRICED",
+        "PARTIAL_REPRICING"
+      ]
+    }
+  },
+  "classification_rules": {
+    "rules": [
+      "Every major realized package must be classified exactly once.",
+      "already_priced_packages, surprise_packages, and partial_repricing_packages must be mutually exclusive.",
+      "Mixed cases belong in PARTIAL_REPRICING, not dual classification."
+    ]
+  },
+  "boundary": {
+    "description": "This artifact may use truth-side context freely, but it does not create final admissible grounding claims and it does not perform critique."
+  },
+  "stage_responsibilities": {
+    "oracle_truth_map": {
+      "role": "Primary emitter."
+    }
+  },
+  "validator": "Contract-only in Batch A. Runtime prompt/output alignment lands in Batch B Oracle node upgrades."
+}

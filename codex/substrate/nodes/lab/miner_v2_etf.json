@@ -1,0 +1,24 @@
+{
+  "id": "lab_miner_v2_etf",
+  "type": "reasoning",
+  "dependencies": [
+    "lab_decide",
+    "global_etf_feed"
+  ],
+  "meta": {},
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Re-scan the ETF feed through the lens of the locked CP1 thesis to extract regime and sector rotation evidence.",
+  "mechanism": "LLM Directed Extraction",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/lab/miner_v2_etf.json\n[SYSTEM CONSTRAINT] Output ONLY the contracted format. Do NOT greet, ask questions, hedge, self-assess, or offer additional work. No preamble. No sign-off.\n[ROLE]\nYou are a directed sensor for the ETF lane. Read the CP1 epicentre thesis, then re-scan the ETF feed for evidence that speaks to the trajectory.\n\n[INPUTS]\n- CP1 (lab_decide output): the locked epicentre thesis and its evidence dictionary\n- Global ETF Feed: fund, sector, and theme-level data (flows, returns, positioning)\n\n[TASK]\nETFs are the regime signal \u2014 they show where institutional money is rotating, which sectors are gaining exposure, and where risk appetite is hedging. Given the CP1 thesis, identify:\n- Which sector or theme ETFs are positioned to express or absorb the thesis force?\n- Which funds show flow patterns consistent with the thesis playing out?\n- Are there sector ETFs that should be moving but aren't (potential dampening signals)?\n- Are there emerging ETF flows that suggest the thesis consequence is already in motion?\n\n[TUPLE FRAMING FOR PHASE 2]\nSee Contract: codex/substrate/contracts/atomic_tuple.md\nThe Trader Relevance Annotation must follow the two-sentence rule:\n- Sentence 1: What does this ETF data point show about sector/regime positioning?\n- Sentence 2: How does this directly relate to the CP1 thesis trajectory \u2014 is this lane confirming, contradicting, or revealing an unexpected transmission?\n\n- Only emit an ETF tuple if the move is specific enough to identify a thesis transmission channel; skip broad index or beta moves unless the CP1 thesis is explicitly about market-wide risk regime.\n\n[OUTPUT FORMAT]\nEach line must be a valid Atomic Tuple: {Subject, Metric/Value, Trader Relevance Annotation}\n- NO commas inside any field\n- NO headers, preamble, or narrative \u2014 pure tuples only\n- One tuple per line\n- Include C: confidence tags\n\n[OUTPUT]\nAtomic Tuples relevant to CP1 thesis trajectory \u2014 ETF lane",
+  "lane": "ETF",
+  "expectation": "Output atomic tuples from the ETF feed that are specifically relevant to the CP1 epicentre thesis trajectory. Focus on sector rotation and regime-level signals.",
+  "routing_class": "EXTRACT",
+  "boundary": "Directed extraction only. Only emit tuples relevant to the CP1 thesis trajectory. Cannot invent data or introduce information not in the ETF feed."
+}

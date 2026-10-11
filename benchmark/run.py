@@ -1,6 +1,6 @@
 """Build deterministic scores and frozen predictions from the licensed UCI CSV.
 
-python3 -m benchmark.run --output web/data/benchmark.json
+python3 -m benchmark.run --output work/benchmark/benchmark.json
 This is a historical pipeline demonstration, not an LLM or trading backtest.
 """
 from __future__ import annotations
@@ -186,7 +186,7 @@ def serialize(receipt, predictions):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=ROOT / "web/data/benchmark.json")
+    parser.add_argument("--output", type=Path, default=ROOT / "work/benchmark/benchmark.json")
     parser.add_argument("--source", type=Path, default=SOURCE)
     parser.add_argument("--manifest", type=Path, default=MANIFEST)
     args = parser.parse_args(argv)
@@ -200,7 +200,7 @@ def main(argv=None):
     (args.output.parent / "predictions.csv").write_bytes(csv_raw)
     (args.output.parent / "source_manifest.json").write_bytes(args.manifest.read_bytes())
     (args.output.parent / "ATTRIBUTION.md").write_bytes((ROOT / "data/historical/ATTRIBUTION.md").read_bytes())
-    # Standard output lives in web/data. Arbitrary output folders keep docs inside
+    # Benchmark output stays local. Arbitrary output folders keep docs inside
     # that folder, rather than writing into an unrelated filesystem parent.
     document_root = args.output.parent.parent if args.output.parent.name == "data" else args.output.parent
     docs = document_root / "docs"

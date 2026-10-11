@@ -1,0 +1,39 @@
+{
+  "id": "macro_default",
+  "type": "config",
+  "meta": {
+    "standard": "std_tool_config",
+    "description": "Macroscope Configuration: FRED-only economic series snapshot."
+  },
+  "data": {
+    "config_version": "4.5_precision_patch",
+    "runtime": {
+      "lookback_years": 2,
+      "min_data_points": 21,
+      "annualize_factor": 15.87,
+      "decimals": 4
+    },
+    "analyzers": {
+      "prices": {
+        "enabled": false
+      },
+      "fred": {
+        "enabled": true
+      }
+    },
+    "fred": {
+      "api_key_env_fallback": "FRED_API_KEY",
+      "cache_enabled": true,
+      "poll_ttl_s": 21600,
+      "stale_if_error_ttl_s": 259200,
+      "history_limit": 240,
+      "requests_per_second": 2.0,
+      "timeout_s": 10.0,
+      "max_retries_429": 4,
+      "backoff_base_s": 0.6,
+      "backoff_jitter_s": 0.25,
+      "breaker_consecutive_429": 6
+    },
+    "fred_series_ref": "codex/refs/macro_fred_series.json"
+  }
+}

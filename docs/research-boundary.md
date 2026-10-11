@@ -2,13 +2,11 @@
 
 Reviewed against the official FCA sources below on 11 October 2026. This document records the prototype's product scope and release-review questions. It is not a legal opinion, regulatory approval or a finding that public launch is cleared.
 
-## What this prototype publishes
+## Current local scope
 
-Plectis Observatory compares research methods on a documented historical UCI dataset and reports model-system operations. Historical benchmark results are statistical scores computed with the published evaluation protocol. They are not portfolio returns or profit-and-loss simulations.
+Zenith is a local research engine for agent-native market graphs and reproducible experiments. Its internal CP2 and Oracle artifacts can contain instrument-specific forecasts and trade rationale inherited from the research contracts. These are private research outputs; this repository has no public website or deployment.
 
-The public-facing telemetry contract contains only aggregate attempt counts, requested and actual model identity, cost information and source-lane health. Private live model predictions stay in the private research system. The website does not export asset probabilities or live directional calls.
-
-The prototype does not assess a visitor's finances, holdings, objectives or risk tolerance. It does not recommend buying, selling or holding investments, construct personal portfolios, execute trades, or direct visitors to brokers or affiliate offers. Keep the actual UI, exports and marketing within this scope.
+The licensed historical benchmark reports statistical forecast error, not portfolio returns or profit. There is no broker integration or trading execution. Public release of generated research would require reviewing the actual content and presentation, including instrument-specific recommendations. A research label or disclaimer alone does not establish a lawful perimeter.
 
 ## Requirements for research results
 
@@ -29,7 +27,7 @@ A communication made in the course of business that invites or induces investmen
 
 ## Review before public release
 
-The local prototype has no remote and has not been publicly deployed. Before public launch, obtain UK regulatory-perimeter review of the actual site, outputs, downloads and promotional material. Check dataset redistribution rights and any collection of personal data separately. Never claim “FCA compliant”, “FCA approved” or “legally cleared” on the basis of this research.
+This local extraction has not been publicly deployed. Before public launch, obtain UK regulatory-perimeter review of the actual product, outputs, downloads and promotional material. Check dataset redistribution rights and any collection of personal data separately. Never claim “FCA compliant”, “FCA approved” or “legally cleared” on the basis of this research.
 
 Review each shareable communication in context: a cropped score panel or social headline should retain its dataset, evaluation-period and limitation context. FCA social-media guidance addresses balanced, clear promotions and the responsibility of unauthorised communicators. [FG24/1](https://www.fca.org.uk/publications/finalised-guidance/fg24-1-finalised-guidance-financial-promotions-social-media), published 26 March 2024.
 

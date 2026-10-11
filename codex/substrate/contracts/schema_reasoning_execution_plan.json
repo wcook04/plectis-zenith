@@ -1,0 +1,508 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codex/substrate/contracts/schema_reasoning_execution_plan.json",
+  "id": "schema_reasoning_execution_plan",
+  "artifact_kind": "contract",
+  "version": "0.1",
+  "status": "NORMATIVE",
+  "description": "JSON Schema for reasoning_execution_plan_v0, the dry-run plan-level IR composed from reasoning_contract_packet_manifest_v0 node manifests before any scheduler, launcher, provider router, fan-out runner, or dossier-learning consumer may act on it.",
+  "purpose": "The execution plan lifts node-local packet manifests into a static, checkable plan with edges, ready-set policy, context partition, recovery protocol, output contract, residual routing, and proof that no model/provider/runtime dispatch occurred.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "plan_id",
+    "plan_version",
+    "source_work_item",
+    "source_refs",
+    "nodes",
+    "edges",
+    "ready_set",
+    "context_partition",
+    "recovery_protocol",
+    "plan_output_contract",
+    "residual_routing",
+    "blocked_by",
+    "issues",
+    "evaluation",
+    "dry_run",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "reasoning_execution_plan_v0"
+    },
+    "plan_id": {
+      "$ref": "#/$defs/non_empty_string"
+    },
+    "plan_version": {
+      "$ref": "#/$defs/non_empty_string"
+    },
+    "source_work_item": {
+      "$ref": "#/$defs/nullable_string"
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/non_empty_string"
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/plan_node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "ready_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy",
+        "ready_node_ids",
+        "blocked_node_ids",
+        "incomplete_node_ids",
+        "invalid_node_ids",
+        "all_node_ids"
+      ],
+      "properties": {
+        "policy": {
+          "enum": [
+            "deterministic_topological"
+          ]
+        },
+        "ready_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "blocked_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "incomplete_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "invalid_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "all_node_ids": {
+          "$ref": "#/$defs/string_array"
+        }
+      }
+    },
+    "context_partition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "execution_context_classes",
+        "reference_only_context_classes",
+        "withheld_context_classes",
+        "forbidden_context_classes",
+        "diagnostic_context_classes"
+      ],
+      "properties": {
+        "execution_context_classes": {
+          "$ref": "#/$defs/string_array"
+        },
+        "reference_only_context_classes": {
+          "$ref": "#/$defs/string_array"
+        },
+        "withheld_context_classes": {
+          "$ref": "#/$defs/string_array"
+        },
+        "forbidden_context_classes": {
+          "$ref": "#/$defs/string_array"
+        },
+        "diagnostic_context_classes": {
+          "$ref": "#/$defs/string_array"
+        }
+      }
+    },
+    "recovery_protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "local_retry",
+        "local_patch",
+        "request_replan",
+        "escalation_order"
+      ],
+      "properties": {
+        "local_retry": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "local_patch": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "request_replan": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "escalation_order": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/non_empty_string"
+          }
+        }
+      }
+    },
+    "plan_output_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_kinds",
+        "schemas_or_standards"
+      ],
+      "properties": {
+        "artifact_kinds": {
+          "$ref": "#/$defs/string_array"
+        },
+        "schemas_or_standards": {
+          "$ref": "#/$defs/string_array"
+        }
+      }
+    },
+    "residual_routing": {
+      "$ref": "#/$defs/string_array"
+    },
+    "blocked_by": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/blocked_by_item"
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/issue"
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "available_context",
+        "available_artifacts",
+        "model_dispatch",
+        "provider_dispatch",
+        "runtime_execution",
+        "writes"
+      ],
+      "properties": {
+        "available_context": {
+          "$ref": "#/$defs/string_array"
+        },
+        "available_artifacts": {
+          "$ref": "#/$defs/string_array"
+        },
+        "model_dispatch": {
+          "type": "boolean"
+        },
+        "provider_dispatch": {
+          "type": "boolean"
+        },
+        "runtime_execution": {
+          "type": "boolean"
+        },
+        "writes": {
+          "type": "boolean"
+        }
+      }
+    },
+    "dry_run": {
+      "const": true
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "blocked",
+        "incomplete",
+        "invalid_plan"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dry_run": {
+            "const": true
+          }
+        },
+        "required": [
+          "dry_run"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evaluation": {
+            "properties": {
+              "model_dispatch": {
+                "const": false
+              },
+              "provider_dispatch": {
+                "const": false
+              },
+              "runtime_execution": {
+                "const": false
+              },
+              "writes": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "blocked"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "blocked_by": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "invalid_plan"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "issues": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "string_array": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "plan_node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "node_path",
+        "manifest_status",
+        "manifest",
+        "dependencies",
+        "upstream_node_ids",
+        "join_mode",
+        "retry_policy",
+        "side_effect_level",
+        "output_artifact_kind",
+        "schema_or_standard"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "node_path": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "manifest_status": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "manifest": {
+          "type": "object",
+          "additionalProperties": true
+        },
+        "dependencies": {
+          "$ref": "#/$defs/string_array"
+        },
+        "upstream_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "join_mode": {
+          "enum": [
+            "all_upstream_ready"
+          ]
+        },
+        "retry_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "max_attempts",
+            "source"
+          ],
+          "properties": {
+            "max_attempts": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "source": {
+              "$ref": "#/$defs/non_empty_string"
+            }
+          }
+        },
+        "side_effect_level": {
+          "enum": [
+            "read_only",
+            "local_write",
+            "commit",
+            "external_action"
+          ]
+        },
+        "output_artifact_kind": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "schema_or_standard": {
+          "$ref": "#/$defs/nullable_string"
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "dependency_type"
+      ],
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "to": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "dependency_type": {
+          "enum": [
+            "node_dependency"
+          ]
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "path",
+        "code",
+        "message"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "path": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "code": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "message": {
+          "$ref": "#/$defs/non_empty_string"
+        }
+      }
+    },
+    "blocked_by_item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "kind",
+        "source_field",
+        "reason"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "kind": {
+          "enum": [
+            "context_class",
+            "artifact"
+          ]
+        },
+        "class": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "artifact": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "source_field": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "reason": {
+          "$ref": "#/$defs/non_empty_string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "context_class"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "class"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "artifact"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "artifact"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

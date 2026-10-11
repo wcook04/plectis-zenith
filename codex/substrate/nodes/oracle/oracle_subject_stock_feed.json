@@ -1,0 +1,25 @@
+{
+  "id": "oracle_subject_stock_feed",
+  "type": "tool",
+  "group": "oracle",
+  "lane": "STOCK",
+  "dependencies": [],
+  "instruction": "@node_path:codex/substrate/nodes/oracle/oracle_subject_stock_feed.json\n[ROLE] Oracle Subject Snapshot (Stock Feed)\n[TASK] Load the subject-run global_stock_feed artifact so Oracle can compare explicit T-n stock state against truth-side stock state.\n[OUTPUT] JSON payload copied from the paired subject run with subject provenance metadata.",
+  "config": {
+    "module": "tools.oracle.subject_snapshot",
+    "artifact_id": "global_stock_feed"
+  },
+  "execution": {
+    "cache_policy": "standard",
+    "retries": 1,
+    "timeout": 60,
+    "tools": []
+  },
+  "is_artifact": true,
+  "teleology": "Expose the subject-run stock feed as explicit Oracle T-n upstream context.",
+  "mechanism": "Python Subject Snapshot Proxy",
+  "expectation": "Output the subject-run global_stock_feed artifact data with subject provenance metadata.",
+  "meta": {
+    "role": "tool"
+  }
+}

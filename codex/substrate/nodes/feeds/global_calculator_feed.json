@@ -1,0 +1,27 @@
+{
+  "id": "global_calculator_feed",
+  "type": "tool",
+  "dependencies": [
+    "global_stock_feed",
+    "global_macro_feed",
+    "global_etf_feed"
+  ],
+  "meta": {
+    "is_feed": true
+  },
+  "is_artifact": true,
+  "teleology": "Derive regime, polarity, and concentration metrics from upstream STOCK, ETF, and MACRO feeds so Lab can reason about state rather than raw tables alone.",
+  "mechanism": "Runs tools.calculator.calculator after stock, macro, and ETF feeds complete, then writes cluster-level metrics including Energy, Polarity, Directional_Concentration, Dominant_Signal, deterministic explain payloads, and inert candidate forecast cards for downstream CP1/CP2 evaluation.",
+  "config": {
+    "module": "tools.calculator.calculator",
+    "config": {
+      "config": {
+        "top_n_rank": 10
+      }
+    },
+    "config_file": "codex/substrate/configs/calculator_default.json"
+  },
+  "lane": "CALCULATOR",
+  "expectation": "Return a CALCULATOR artifact with cluster payloads for stock, etf, and macro groups, including members, raw and normalized metrics, Energy, Polarity, Directional_Concentration, Dominant_Signal, explain_payload, and candidate_forecast_cards. Candidate cards are non-trading hypotheses and must not be treated as CP1 commitments until a CP1 lane admits them.",
+  "group": "feeds"
+}

@@ -1,0 +1,339 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codex/substrate/contracts/schema_reasoning_execution_replay_scope.json",
+  "id": "schema_reasoning_execution_replay_scope",
+  "artifact_kind": "contract",
+  "version": "0.1",
+  "status": "NORMATIVE",
+  "description": "JSON Schema for reasoning_execution_replay_scope_v0, the dry-run invalidation/replay-scope report over base and candidate reasoning_execution_lineage_v0 records.",
+  "purpose": "The replay-scope report compares lineage records, identifies direct replay identity changes, computes downstream affected nodes from plan edges, preserves unaffected independent branches, and blocks contaminated or invalid candidate lineages before any scheduler, launcher, provider router, fan-out runner, or dossier consumer acts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_refs",
+    "base",
+    "candidate",
+    "identity_changes",
+    "graph_impact",
+    "replay_decision",
+    "warnings",
+    "evaluation",
+    "dry_run",
+    "status",
+    "issues"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "reasoning_execution_replay_scope_v0"
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/non_empty_string"
+      }
+    },
+    "base": {
+      "$ref": "#/$defs/lineage_ref"
+    },
+    "candidate": {
+      "$ref": "#/$defs/lineage_ref"
+    },
+    "identity_changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_changed",
+        "verifier_report_changed",
+        "nodes"
+      ],
+      "properties": {
+        "plan_changed": {
+          "type": "boolean"
+        },
+        "verifier_report_changed": {
+          "type": "boolean"
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/node_change"
+          }
+        }
+      }
+    },
+    "graph_impact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "directly_changed_node_ids",
+        "downstream_affected_node_ids",
+        "replay_required_node_ids",
+        "unaffected_node_ids",
+        "invalid_node_ids",
+        "blocked_node_ids"
+      ],
+      "properties": {
+        "directly_changed_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "downstream_affected_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "replay_required_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "unaffected_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "invalid_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "blocked_node_ids": {
+          "$ref": "#/$defs/string_array"
+        }
+      }
+    },
+    "replay_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "correctness_basis",
+        "minimality_basis"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "no_replay",
+            "partial_replay",
+            "full_replay",
+            "blocked",
+            "invalid"
+          ]
+        },
+        "correctness_basis": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "minimality_basis": {
+          "$ref": "#/$defs/non_empty_string"
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/non_empty_string"
+      }
+    },
+    "evaluation": {
+      "$ref": "#/$defs/evaluation"
+    },
+    "dry_run": {
+      "const": true
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "blocked",
+        "invalid_replay_scope"
+      ]
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/issue"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dry_run": {
+            "const": true
+          }
+        },
+        "required": [
+          "dry_run"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evaluation": {
+            "properties": {
+              "model_dispatch": {
+                "const": false
+              },
+              "provider_dispatch": {
+                "const": false
+              },
+              "runtime_execution": {
+                "const": false
+              },
+              "writes": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "invalid_replay_scope"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "issues": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullable_sha256_string": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/sha256_string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "sha256_string": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "string_array": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lineage_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lineage_id",
+        "lineage_hash",
+        "status"
+      ],
+      "properties": {
+        "lineage_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "lineage_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "status": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "node_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "base_replay_hash",
+        "candidate_replay_hash",
+        "changed",
+        "change_reasons"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "base_replay_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "candidate_replay_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "changed": {
+          "type": "boolean"
+        },
+        "change_reasons": {
+          "$ref": "#/$defs/string_array"
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_dispatch",
+        "provider_dispatch",
+        "runtime_execution",
+        "writes"
+      ],
+      "properties": {
+        "model_dispatch": {
+          "type": "boolean"
+        },
+        "provider_dispatch": {
+          "type": "boolean"
+        },
+        "runtime_execution": {
+          "type": "boolean"
+        },
+        "writes": {
+          "type": "boolean"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "path",
+        "message",
+        "witness"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "message": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "witness": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

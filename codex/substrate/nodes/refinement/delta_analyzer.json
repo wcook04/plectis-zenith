@@ -1,0 +1,146 @@
+{
+    "id": "delta_analyzer",
+    "type": "reasoning",
+    "lane": "SPINE",
+    "group": "refinement",
+    "platform": "chatgpt",
+    "is_artifact": true,
+    "teleology": "Ingest the latest observation_report.json and produce a structured diff-intent summary describing which dossier sections require CRUD operations.",
+    "mechanism": "LLM reasoning over structured observation output. Outputs a JSON-serializable delta summary keyed by dossier lane (macro, etf, stock).",
+  "expectation": "A JSON object containing { lane: string, operations: [{type: 'CREATE'|'UPDATE'|'DELETE', key: string, rationale: string}] } for each affected lane.",
+  "meta": {
+    "reasoning_contract": {
+      "role_contract": {
+        "role_class": "critic",
+        "mission_role": "evolve_delta_analyzer",
+        "authority_tier": "authoring_agent",
+        "context_mode": "hindsight_truth_allowed"
+      },
+      "input_contract": {
+        "required_artifacts": [
+          "prediction_reconciliation",
+          "realized_hindsight_brief",
+          "cp2_critique",
+          "ideal_cp2",
+          "lab_cp2"
+        ],
+        "optional_artifacts": [
+          "evolve_input_readiness"
+        ],
+        "forbidden_artifacts": [
+          "raw_feed_artifacts",
+          "unvalidated_oracle_artifacts",
+          "blocked_feed_health_as_learning_signal"
+        ],
+        "freshness_requirements": [
+          "oracle_quartet_present",
+          "prediction_reconciliation.feed_health_not_blocked"
+        ],
+        "authority_requirements": [
+          "every learning candidate cites an Oracle artifact field or Lab CP2 field"
+        ]
+      },
+      "injection_contract": {
+        "inject": [
+          "mission_doctrine",
+          "standard_contract",
+          "oracle_feedback",
+          "prior_dossier_slice",
+          "recent_learning_ledger_slice"
+        ],
+        "reference_only": [
+          "subject_side_evidence",
+          "truth_side_evidence"
+        ],
+        "withhold": [],
+        "redact": [],
+        "forbidden": [],
+        "max_context_tokens": null,
+        "leakage_mode": "hindsight"
+      },
+      "output_contract": {
+        "artifact_kind": "evolve_delta_report",
+        "schema_or_standard": "codex/substrate/contracts/schema_evolve_delta.json",
+        "citation_requirements": [
+          "Oracle artifact id",
+          "Oracle artifact field path",
+          "error_class or readiness blocker"
+        ],
+        "confidence_shape": "learning entries carry scope and evidence refs rather than scalar confidence",
+        "failure_shape": "blocked_evolve_delta_with_readiness_reason"
+      },
+      "oracle_contract": {
+        "deterministic_check": [
+          "json_schema:codex/substrate/contracts/schema_evolve_delta.json",
+          "evolve_input_readiness.status"
+        ],
+        "soft_review": [
+          "review delta report before dossier patch generation"
+        ],
+        "human_review_gate": [
+          "doctrine_flags",
+          "dossier patch acceptance"
+        ],
+        "blocked_conditions": [
+          "prediction_reconciliation.feed_health_blocked",
+          "oracle_quartet_missing",
+          "artifact_schema_invalid",
+          "learning_candidate_without_oracle_citation"
+        ]
+      },
+      "topology_contract": {
+        "fan_out_reason": "none",
+        "shard_key": "none",
+        "shard_isolation": "none",
+        "fan_in_reducer": "none"
+      },
+      "learning_contract": {
+        "dossier_reads": [
+          "codex/substrate/dossiers/stock.json",
+          "codex/substrate/dossiers/etf.json",
+          "codex/substrate/dossiers/macro.json",
+          "codex/substrate/dossiers/learning_ledger.jsonl"
+        ],
+        "dossier_writes": [
+          "codex/substrate/dossiers/stock.json",
+          "codex/substrate/dossiers/etf.json",
+          "codex/substrate/dossiers/macro.json",
+          "codex/substrate/dossiers/learning_ledger.jsonl"
+        ],
+        "learning_ledger_rows": "append_after_oracle_gate",
+        "mutation_gate": "review_required",
+        "no_learning_when": [
+          "environment_blocked",
+          "feed_health_blocked",
+          "oracle_quartet_missing",
+          "schema_invalid",
+          "citation_missing"
+        ]
+      },
+      "side_effect_contract": {
+        "read_only": true,
+        "writes_allowed": [],
+        "commit_allowed": false,
+        "external_action_allowed": false
+      },
+      "trace_contract": {
+        "retained_fields": [
+          "pattern_summary",
+          "dossier_deltas",
+          "doctrine_flags",
+          "learning_entries"
+        ],
+        "fact_extraction_fields": [
+          "error_class",
+          "lane",
+          "dossier_key",
+          "learning_statement",
+          "source_artifact_ref"
+        ],
+        "residual_routing": "dossier"
+      }
+    }
+  },
+  "instruction": "See Contract: codex/substrate/contracts/evaluate_output.md\n\nYou are the Delta Analyzer for the Zenith Refinement Pipeline. Your job is to read the observation_report.json from the most recent observation run and produce a structured CRUD intent map for each dossier lane that requires updating.\n\nFor each proposed change, include:\n- type: CREATE | UPDATE | DELETE\n- key: the dossier key to operate on (e.g., 'macro.FED_RATE_TRAJECTORY')\n- rationale: single sentence justification from observation findings\n\nOutput ONLY the contracted JSON format. No preamble, no commentary.",
+    "dependencies": []
+}

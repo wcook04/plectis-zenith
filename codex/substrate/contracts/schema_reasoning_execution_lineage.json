@@ -1,0 +1,470 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codex/substrate/contracts/schema_reasoning_execution_lineage.json",
+  "id": "schema_reasoning_execution_lineage",
+  "artifact_kind": "contract",
+  "version": "0.1",
+  "status": "NORMATIVE",
+  "description": "JSON Schema for reasoning_execution_lineage_v0, the dry-run replay/provenance record over verified reasoning_execution_plan_v0 objects before any scheduler, launcher, provider router, fan-out runner, or dossier-learning consumer may act on them.",
+  "purpose": "The lineage record binds a dry-run execution plan, static verifier report, packet manifests, node source hashes, node-scoped context lineage, available context/artifacts, replay identities, and WorkItem/source refs. It is identity/provenance IR, not runtime execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "lineage_id",
+    "source_work_item",
+    "source_refs",
+    "plan",
+    "nodes",
+    "edges",
+    "replay_policy",
+    "verification_summary",
+    "evaluation",
+    "dry_run",
+    "status",
+    "issues"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "reasoning_execution_lineage_v0"
+    },
+    "lineage_id": {
+      "$ref": "#/$defs/non_empty_string"
+    },
+    "source_work_item": {
+      "$ref": "#/$defs/nullable_string"
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/non_empty_string"
+      }
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "plan_id",
+        "plan_version",
+        "plan_hash",
+        "plan_status",
+        "verifier_ok",
+        "verifier_report_hash"
+      ],
+      "properties": {
+        "plan_id": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "plan_version": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "plan_hash": {
+          "$ref": "#/$defs/sha256_string"
+        },
+        "plan_status": {
+          "enum": [
+            "ready",
+            "blocked",
+            "incomplete",
+            "invalid_plan"
+          ]
+        },
+        "verifier_ok": {
+          "type": "boolean"
+        },
+        "verifier_report_hash": {
+          "$ref": "#/$defs/sha256_string"
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/lineage_node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    },
+    "replay_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "identity_based_replay",
+        "replay_scope_mode",
+        "blocked_plan_replayable",
+        "incomplete_plan_replayable"
+      ],
+      "properties": {
+        "identity_based_replay": {
+          "const": true
+        },
+        "replay_scope_mode": {
+          "enum": [
+            "downstream_of_changed_identity"
+          ]
+        },
+        "blocked_plan_replayable": {
+          "const": false
+        },
+        "incomplete_plan_replayable": {
+          "const": false
+        }
+      }
+    },
+    "verification_summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ok",
+        "error_count",
+        "warning_count",
+        "checks"
+      ],
+      "properties": {
+        "ok": {
+          "type": "boolean"
+        },
+        "error_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "warning_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "checks": {
+          "type": "object",
+          "additionalProperties": {
+            "enum": [
+              "pass",
+              "warn",
+              "fail",
+              "not_applicable"
+            ]
+          }
+        }
+      }
+    },
+    "evaluation": {
+      "$ref": "#/$defs/evaluation"
+    },
+    "dry_run": {
+      "const": true
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "blocked",
+        "incomplete",
+        "invalid_lineage"
+      ]
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/issue"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dry_run": {
+            "const": true
+          }
+        },
+        "required": [
+          "dry_run"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evaluation": {
+            "properties": {
+              "model_dispatch": {
+                "const": false
+              },
+              "provider_dispatch": {
+                "const": false
+              },
+              "runtime_execution": {
+                "const": false
+              },
+              "writes": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "invalid_lineage"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "issues": {
+            "minItems": 1
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sha256_string": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "string_array": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "context_lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inject",
+        "reference_only",
+        "withhold",
+        "forbidden",
+        "available_context",
+        "available_artifacts",
+        "effective_context",
+        "effective_artifacts"
+      ],
+      "properties": {
+        "inject": {
+          "$ref": "#/$defs/string_array"
+        },
+        "reference_only": {
+          "$ref": "#/$defs/string_array"
+        },
+        "withhold": {
+          "$ref": "#/$defs/string_array"
+        },
+        "forbidden": {
+          "$ref": "#/$defs/string_array"
+        },
+        "available_context": {
+          "$ref": "#/$defs/string_array"
+        },
+        "available_artifacts": {
+          "$ref": "#/$defs/string_array"
+        },
+        "effective_context": {
+          "$ref": "#/$defs/string_array"
+        },
+        "effective_artifacts": {
+          "$ref": "#/$defs/string_array"
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "available_context",
+        "available_artifacts",
+        "model_dispatch",
+        "provider_dispatch",
+        "runtime_execution",
+        "writes"
+      ],
+      "properties": {
+        "available_context": {
+          "$ref": "#/$defs/string_array"
+        },
+        "available_artifacts": {
+          "$ref": "#/$defs/string_array"
+        },
+        "model_dispatch": {
+          "type": "boolean"
+        },
+        "provider_dispatch": {
+          "type": "boolean"
+        },
+        "runtime_execution": {
+          "type": "boolean"
+        },
+        "writes": {
+          "type": "boolean"
+        }
+      }
+    },
+    "lineage_node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "node_path",
+        "node_hash",
+        "manifest_hash",
+        "manifest_status",
+        "verification_status",
+        "dependencies",
+        "upstream_node_ids",
+        "output_artifact_kind",
+        "schema_or_standard",
+        "context_lineage",
+        "side_effect_level",
+        "replay_identity"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "node_path": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "node_hash": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/sha256_string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "manifest_hash": {
+          "$ref": "#/$defs/sha256_string"
+        },
+        "manifest_status": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "verification_status": {
+          "enum": [
+            "ready",
+            "blocked",
+            "incomplete",
+            "invalid"
+          ]
+        },
+        "dependencies": {
+          "$ref": "#/$defs/string_array"
+        },
+        "upstream_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "output_artifact_kind": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "schema_or_standard": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "context_lineage": {
+          "$ref": "#/$defs/context_lineage"
+        },
+        "side_effect_level": {
+          "enum": [
+            "read_only",
+            "local_write",
+            "commit",
+            "external_action"
+          ]
+        },
+        "replay_identity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "identity_material",
+            "replay_hash"
+          ],
+          "properties": {
+            "identity_material": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "$ref": "#/$defs/non_empty_string"
+              }
+            },
+            "replay_hash": {
+              "$ref": "#/$defs/sha256_string"
+            }
+          }
+        }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from",
+        "to",
+        "dependency_type"
+      ],
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "to": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "dependency_type": {
+          "enum": [
+            "node_dependency"
+          ]
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "path",
+        "message",
+        "witness"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "message": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "witness": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

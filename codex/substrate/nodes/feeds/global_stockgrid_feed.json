@@ -1,0 +1,19 @@
+{
+  "id": "global_stockgrid_feed",
+  "type": "tool",
+  "dependencies": [],
+  "meta": {
+    "is_feed": true
+  },
+  "is_artifact": true,
+  "teleology": "Capture institutional and mechanical positioning pressure at T-n so the system can privilege flow before narrative when lanes disagree.",
+  "mechanism": "Runs tools.stockgrid.stockgrid to write a normalized STOCKGRID table with ticker, sector, net flow, short volume, whale ratio, and notable-pattern flags.",
+  "config": {
+    "module": "tools.stockgrid.stockgrid",
+    "config": {},
+    "config_file": "codex/substrate/configs/stockgrid_direct.json"
+  },
+  "lane": "STOCKGRID",
+  "expectation": "Return a STOCKGRID artifact with tkr, sec, flow, sv, wr, and flg columns. Coverage gaps such as missing whale-ratio support should remain inspectable rather than masked.",
+  "group": "feeds"
+}

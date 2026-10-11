@@ -1,0 +1,271 @@
+{
+  "id": "schema_finance_variant_admission_receipt",
+  "type": "contract",
+  "version": "0.5",
+  "status": "NORMATIVE",
+  "description": "Variant-admission receipt for registry-bound finance forecast generator comparisons.",
+  "purpose": "This contract defines the shadow-only gate that compares a candidate finance forecast generator variant against the registered baseline before any optimizer or calculator mutation can be requested.",
+  "schema": {
+    "schema_version": {
+      "type": "string",
+      "required": true,
+      "constraint": "Exactly finance_variant_admission_receipt_v0."
+    },
+    "variant_gate_id": {
+      "type": "string",
+      "required": true,
+      "constraint": "Stable receipt id for this paired comparison."
+    },
+    "baseline_variant_id": {
+      "type": "string",
+      "required": true,
+      "constraint": "Known generator variant id, usually calculator:calculator.6:default."
+    },
+    "candidate_variant_id": {
+      "type": "string",
+      "required": true,
+      "constraint": "Known registry variant id being compared against baseline."
+    },
+    "experiment_refs": {
+      "type": "array[string]",
+      "required": true,
+      "constraint": "Historical replay experiment ids used by the comparison."
+    },
+    "comparison_unit": {
+      "type": "string",
+      "required": true,
+      "constraint": "v0 uses paired_forecast_loss."
+    },
+    "loss_metric": {
+      "type": "string",
+      "required": true,
+      "constraint": "v0 supports brier_score_binary_directional_event."
+    },
+    "split_policy": {
+      "type": "FinanceVariantAdmissionSplitPolicy",
+      "required": true
+    },
+    "pairing": {
+      "type": "FinanceVariantAdmissionPairing",
+      "required": true
+    },
+    "sample": {
+      "type": "FinanceVariantAdmissionSample",
+      "required": true
+    },
+    "statistics": {
+      "type": "FinanceVariantAdmissionStatistics",
+      "required": true
+    },
+    "decision": {
+      "type": "FinanceVariantAdmissionDecision",
+      "required": true
+    }
+  },
+  "finance_variant_admission_split_policy": {
+    "kind": {
+      "type": "string",
+      "required": true,
+      "constraint": "prequential, walk_forward_shadow, or purged_holdout."
+    },
+    "embargo_days": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Embargo evidence copied from historical replay."
+    },
+    "executable": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "Must be true for any admitted_shadow_variant decision."
+    }
+  },
+  "finance_variant_admission_sample": {
+    "paired_claim_count": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Number of matched resolved scorecards joined by event contract."
+    },
+    "baseline_resolved_count": {
+      "type": "integer",
+      "required": true
+    },
+    "candidate_resolved_count": {
+      "type": "integer",
+      "required": true
+    },
+    "excluded_unpaired_count": {
+      "type": "integer",
+      "required": true
+    },
+    "excluded_split_count": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Paired event rows excluded from admission statistics because split membership is purged, embargoed, or otherwise excluded."
+    },
+    "missing_split_membership_count": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Paired event rows whose replay scorecards did not carry executable split_membership binding."
+    }
+  },
+  "finance_variant_admission_pairing": {
+    "key_schema": {
+      "type": "string",
+      "required": true,
+      "constraint": "Exactly finance_comparison_event_key_v0."
+    },
+    "key_authority": {
+      "type": "string",
+      "required": true,
+      "constraint": "Exactly tools/finance/event_keys.py. The receipt must pair on the shared event-key primitive, not a local fallback hash recipe."
+    },
+    "paired_by": {
+      "type": "string",
+      "required": true,
+      "constraint": "Must be comparison_event_key. Forecast/truth identity fields are audit-only."
+    },
+    "identity_decoupled_pair_count": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Pairs where forecast_id, candidate_ref, or truth_join_key differ but comparison_event_key matches."
+    },
+    "unpaired_baseline_count": {
+      "type": "integer",
+      "required": true
+    },
+    "unpaired_candidate_count": {
+      "type": "integer",
+      "required": true
+    },
+    "excluded_from_variant_comparison": {
+      "type": "object",
+      "required": true,
+      "constraint": "Counts candidate_smoke_test, missing comparison key, missing loss, and other explicitly excluded scorecards."
+    },
+    "mismatch_reasons": {
+      "type": "object",
+      "required": true,
+      "constraint": "Best-effort event-contract mismatch counts for unpaired candidate scorecards."
+    }
+  },
+  "finance_variant_admission_statistics": {
+    "loss_differential_authority": {
+      "type": "string",
+      "required": true,
+      "constraint": "Exactly tools/finance/loss_differentials.py."
+    },
+    "mean_loss_baseline": {
+      "type": "number|null",
+      "required": true
+    },
+    "mean_loss_candidate": {
+      "type": "number|null",
+      "required": true
+    },
+    "mean_loss_delta": {
+      "type": "number|null",
+      "required": true,
+      "constraint": "candidate minus baseline; negative means lower candidate loss."
+    },
+    "loss_delta_std": {
+      "type": "number|null",
+      "required": true,
+      "constraint": "Sample standard deviation of paired candidate-minus-baseline loss differentials when at least two pairs exist."
+    },
+    "loss_delta_std_error": {
+      "type": "number|null",
+      "required": true,
+      "constraint": "Standard error of the paired loss differential mean when computable."
+    },
+    "paired_sample_size": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Number of paired losses used for statistics."
+    },
+    "paired_losses": {
+      "type": "array[object]",
+      "required": true,
+      "constraint": "Pair audit rows joined by comparison_event_key, not row order. Statistical interpretation must use loss_differential_series."
+    },
+    "loss_differential_series": {
+      "type": "FinanceLossDifferentialSeries",
+      "required": true,
+      "constraint": "Paired loss rows ordered by subject/event time and keyed by comparison_event_key."
+    },
+    "dependence_diagnostics": {
+      "type": "object",
+      "required": true,
+      "constraint": "Must include event-window overlap counts, selected lag, variance estimator, and split_binding diagnostics with bound_row_count, missing_split_membership_count, excluded_split_count, purged_pair_count, embargoed_pair_count, and usable_pair_count before any DM-style statistic is interpreted."
+    },
+    "variance_estimator": {
+      "type": "string",
+      "required": true,
+      "constraint": "v4.3 uses hac_bartlett."
+    },
+    "selected_lag": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Lag used for HAC/Bartlett long-run variance estimation."
+    },
+    "event_window_overlap_count": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Number of pairwise event-window overlaps in the loss-differential series."
+    },
+    "diebold_mariano": {
+      "type": "object",
+      "required": true,
+      "constraint": "Minimum-sample-gated paired-loss statistic block using explicit variance-estimator metadata. Status may be not_computed_minimum_sample, not_computed_zero_variance, not_requested, or computed_hac_normal_approximation."
+    },
+    "hln_small_sample_correction": {
+      "type": "object",
+      "required": true,
+      "constraint": "Reserved Harvey-Leybourne-Newbold correction block; v4.2 does not apply it."
+    },
+    "multiple_testing_adjustment": {
+      "type": "object",
+      "required": true,
+      "constraint": "Reserved data-snooping guard block."
+    }
+  },
+  "finance_model_selection_receipt_reserved": {
+    "schema_version": "finance_model_selection_receipt_v0",
+    "status": "RESERVED",
+    "purpose": "v5 statistical admission layer for multiple registry-bound variants after comparison_event_key pairing is invariant.",
+    "required_blocks": [
+      "variant_set",
+      "paired_event_sample",
+      "diebold_mariano_or_equal_predictive_accuracy",
+      "spa_or_reality_check_guard",
+      "model_confidence_set",
+      "mutation_denial_until_explicit_admission_standard"
+    ]
+  },
+  "finance_variant_admission_decision": {
+    "status": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "shadow_only",
+        "admitted_shadow_variant",
+        "eligible_for_optimizer_trial",
+        "rejected"
+      ]
+    },
+    "optimizer_permission": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "Must remain false in v4."
+    },
+    "calculator_mutation_permission": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "Must remain false in v4."
+    },
+    "reason": {
+      "type": "string",
+      "required": true,
+      "constraint": "Examples: insufficient_paired_sample, non_executable_split_policy, split_membership_unbound, paired_loss_improved_shadow_only, candidate_not_better_than_baseline."
+    }
+  }
+}

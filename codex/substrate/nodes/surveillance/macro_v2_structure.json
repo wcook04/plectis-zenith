@@ -1,0 +1,27 @@
+{
+  "id": "surv_macro_v2_structure",
+  "type": "reasoning",
+  "dependencies": [
+    "surv_macro_v1_context_search",
+    "surv_micro_v2_stock",
+    "surv_micro_v2_macro",
+    "surv_micro_v2_news",
+    "surv_micro_v2_poly",
+    "surv_micro_v2_calc",
+    "surv_micro_v2_stockgrid"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Organize total tile corpus into a Report Skeleton.",
+  "mechanism": "LLM Structuring",
+  "platform": "gemini",
+  "instruction": "@node_path:codex/substrate/nodes/surveillance/macro_v2_structure.json\n[CONTEXT]\nInputs: Enriched Narrative (V1) + Critical Nuance (V2).\n\n[TASK]\nBuild the Skeleton for the 'Market State Report'.\n\n[PROTOCOL]\n1. Re-weigh the V1 Narratives based on V2 Nuance.\n2. Structure the report into clear thematic sections.\n3. Every section MUST include `[id:...]` citations from the V1/V2 inputs to prove the point.\n\n[OUTPUT]\nJSON Outline of the report with mapped Atomic Tiles.",
+  "meta": {},
+  "lane": "MACRO",
+  "expectation": "Generate JSON Outline of the report with mapped Atomic Tiles."
+}

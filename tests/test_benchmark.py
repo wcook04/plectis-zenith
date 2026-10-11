@@ -117,14 +117,14 @@ class BenchmarkTests(unittest.TestCase):
         self.assertEqual(len(list(csv.DictReader(io.StringIO(csv_raw.decode())))), artifact["rows"])
 
     def test_cli_rerun_is_byte_identical(self):
-        output = self.root / "web/data/benchmark.json"
+        output = self.root / "work/benchmark/benchmark.json"
         args = ["--output", str(output)]
         self.assertEqual(run.main(args), 0)
         artifacts = [output, output.parent / "predictions.csv", output.parent / "source_manifest.json",
-                     output.parent / "ATTRIBUTION.md", self.root / "web/docs/methodology.md"]
+                     output.parent / "ATTRIBUTION.md", self.root / "work/benchmark/docs/methodology.md"]
         first = [p.read_bytes() for p in artifacts]
         self.assertEqual((output.parent / "source_manifest.json").read_bytes(), run.MANIFEST.read_bytes())
-        self.assertEqual((self.root / "web/docs/methodology.md").read_bytes(), (run.ROOT / "benchmark/README.md").read_bytes())
+        self.assertEqual((self.root / "work/benchmark/docs/methodology.md").read_bytes(), (run.ROOT / "benchmark/README.md").read_bytes())
         receipt = json.loads(output.read_text())
         self.assertEqual(receipt["protocol_version"], "1")
         self.assertEqual(receipt["code_hash"], hashlib.sha256(Path(run.__file__).read_bytes()).hexdigest())

@@ -1,0 +1,31 @@
+# Frozen reasoning graph variants
+
+The canonical JSON nodes remain the source. A variant overlays a cloned graph and passes a `FrozenGraphLoader` to the existing `GodModeEngine`. Scheduling, group closure, artifact persistence, provider prompts, CP1/CP2 validation and failure handling remain the engine's operations.
+
+```sh
+python -m variants --variant examples/variants/lab_evidence_check.json
+python -m zenith plan lab --target lab_decide --graph-variant examples/variants/lab_evidence_check.json
+```
+
+The example adds `lab_evidence_check` after `lab_orient` and reroutes the orient→decide edge through that check. All other Phase 1 dependencies remain. Lab gains one reasoning node and one wave; CP1, CP2 and integrity output contracts remain intact. The check's actual emitted artifact enters CP1's prompt. Its effectiveness is an experimental question, not a claimed improvement.
+
+A file has exactly `schema_version`, `variant_id`, `base_graph_sha256`, `base_node_hashes`, `operations` and `variant_sha256`. The variant hash uses canonical sorted compact UTF-8 JSON excluding its own hash field. Base identity covers all hydrated nodes, including contract metadata, instructions, configuration, dossier injection, grouping and dependencies. A changed source graph requires a newly bound experiment.
+
+Typed operations are:
+
+- `add_reasoning_node` with a full canonical `node` and `meta.reasoning_contract`.
+- `add_edge` or `remove_edge` with `dependency_id` and `node_id`.
+- `remove_experimental_node` with the id of a node added by this variant, after its dependent edges are removed.
+
+New skills declare every input, inherit the source reasoning-contract vocabulary, use an existing validated output schema or `text`/`json`, and permit no external actions, commits or tool calls. New instructions are limited to 2,048 characters. Learned rule addons belong in frozen reasoning policies and are limited to 512 characters. A graph variant changes topology; a reasoning policy changes prompt context weights and short takeaways.
+
+Validation rejects unknown fields, malformed contracts, duplicate/dangling edges, cycles, base-node replacement/removal, tool/feed topology changes and lost base dependency ancestry. A removed base edge is allowed only when another dependency path retains that source's ancestry. All Oracle/refinement ancestry is excluded from forward Lab and surveillance nodes, including through intermediaries. Output schema and other base contracts cannot be changed by these operations.
+
+The receipt records source/variant/effective graph hashes, added nodes/edges, rerouted edges, waves and a rank certificate. It does not authorize source writes or infer that a model will obey its contract. Runtime output validators still decide acceptance.
+
+```sh
+python -m variants --variant examples/variants/lab_evidence_check.json > work/variant-receipt.json
+python scripts/check_semantics.py --rank-certificate work/variant-receipt.json --lean
+```
+
+The generated finite rank witness connects these exact topology edges to the Lean acyclicity checker. The formal result covers the stated graph/contract model; it does not prove market predictions, learned-rule usefulness or provider compliance.

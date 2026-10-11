@@ -1,0 +1,23 @@
+{
+  "id": "global_macro_feed",
+  "type": "tool",
+  "dependencies": [],
+  "meta": {
+    "is_feed": true
+  },
+  "is_artifact": true,
+  "teleology": "Capture hard macro and rates-credit regime constraints at T-n so downstream reasoning has a deterministic view of the policy and growth backdrop.",
+  "mechanism": "Runs tools.macro.macro across the configured FRED series set and writes a normalized MACRO table with series proxy, window statistics, z-score, second-derivative risk, and explicit error fields.",
+  "config": {
+    "module": "tools.macro.macro",
+    "config": {
+      "config": {
+        "snapshot_period": "2y"
+      }
+    },
+    "config_file": "codex/substrate/configs/macro_default.json"
+  },
+  "lane": "MACRO",
+  "expectation": "Return a MACRO artifact with ticker, Proxy, n, start, end, pct_change, z_score, risk_d2, and error fields for each configured series. Invalid series must surface as explicit errors rather than silent omission.",
+  "group": "feeds"
+}

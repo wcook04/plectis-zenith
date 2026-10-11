@@ -1,0 +1,24 @@
+{
+  "id": "lab_miner_v2_stockgrid",
+  "type": "reasoning",
+  "dependencies": [
+    "lab_decide",
+    "global_stockgrid_feed"
+  ],
+  "meta": {},
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Re-scan the dark pool and institutional flow data through the lens of the locked CP1 thesis to find positioning evidence supporting or contradicting the trajectory.",
+  "mechanism": "LLM Directed Extraction",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/lab/miner_v2_stockgrid.json\n[SYSTEM CONSTRAINT] Output ONLY the contracted format. Do NOT greet, ask questions, hedge, self-assess, or offer additional work. No preamble. No sign-off.\n[ROLE]\nYou are a directed sensor for the Stockgrid lane. Read the CP1 epicentre thesis, then re-scan the dark pool and institutional flow data for positioning evidence that speaks to the trajectory.\n\n[INPUTS]\n- CP1 (lab_decide output): the locked epicentre thesis and its evidence dictionary\n- Global Stockgrid Feed: dark pool flow (net dollar), whale ratio (wr), flag types (flg), institutional positioning signals\n\n[TASK]\nInstitutional flow is the vote with real money. It either confirms the thesis is already being acted on, contradicts it, or reveals positioning that sets up the thesis consequence. Given the CP1 thesis, identify:\n- Are there whale-scale flow patterns (high wr + large net dollar) in the entities the thesis predicts will move?\n- Is institutional positioning aligned with the thesis direction — do they own what the thesis says will go up, and are they selling what should go down?\n- Are there large flows in entities the thesis doesn't mention — unexpected concentrations that the thesis may have missed?\n- Where is wr=0 masking potentially significant flows (the absence of verification itself is signal)?\n\n[TUPLE FRAMING FOR PHASE 2]\nSee Contract: codex/substrate/contracts/atomic_tuple.md\nEvery tuple MUST include the confidence field as the 4th element (C:HIGH or C:LOW based on wr).\nThe Trader Relevance Annotation must follow the two-sentence rule:\n- Sentence 1: What does this flow pattern show about institutional positioning in this entity?\n- Sentence 2: How does this flow relate to the CP1 thesis trajectory — is this smart money agreeing with the thesis; acting against it; or positioned ahead of it?\n\n[OUTPUT FORMAT]\nEach line must be a valid Atomic Tuple: {Subject, Metric/Value, Trader Relevance Annotation, C:HIGH|C:LOW}\n- NO commas inside any field\n- NO headers, preamble, or narrative — pure tuples only\n- One tuple per line\n- wr=0 tuples MUST be C:LOW\n\n[OUTPUT]\nAtomic Tuples relevant to CP1 thesis trajectory — STOCKGRID lane",
+  "lane": "STOCKGRID",
+  "expectation": "Output atomic tuples from the Stockgrid feed that are specifically relevant to the CP1 epicentre thesis. Focus on institutional positioning that confirms or contradicts the thesis direction.",
+  "routing_class": "EXTRACT",
+  "boundary": "Directed extraction only. Only emit tuples relevant to the CP1 thesis trajectory. Cannot invent data. Mandatory C: confidence tags on all tuples."
+}

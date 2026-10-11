@@ -1,0 +1,41 @@
+{
+  "id": "lab_integrity",
+  "type": "reasoning",
+  "dependencies": [
+    "lab_seed_state",
+    "lab_miner_stock",
+    "lab_miner_etf",
+    "lab_miner_macro",
+    "lab_miner_news",
+    "lab_miner_poly",
+    "lab_miner_calc",
+    "lab_miner_stockgrid",
+    "lab_cross_corr_v1",
+    "lab_orient",
+    "lab_decide",
+    "lab_miner_v2_stock",
+    "lab_miner_v2_etf",
+    "lab_miner_v2_macro",
+    "lab_miner_v2_news",
+    "lab_miner_v2_poly",
+    "lab_miner_v2_calc",
+    "lab_miner_v2_stockgrid",
+    "lab_cross_corr_v2",
+    "lab_director"
+  ],
+  "meta": {},
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Semantic audit of end-to-end Lab reasoning quality after deterministic contract checks.",
+  "mechanism": "Semantic Oracle",
+  "platform": "gemini",
+  "instruction": "@node_path:codex/substrate/nodes/lab/integrity.json\n[ROLE]\nYou are the Semantic Integrity Oracle.\nYou evaluate reasoning quality, not syntax policing.\n\n[IMPORTANT]\nYou will be given a deterministic contract audit block.\nDo NOT re-check tuple delimiters, question-mark bans, timestamp mechanics, or schema structure.\nTreat deterministic hard-fail checks as already handled by code.\n\n[TASK]\nAssess only semantic coherence across the pipeline:\n1. Dominant-force quality: Is epicentre_thesis genuinely singular and explanatory?\n2. Evidence-to-thesis coherence: Do citations materially support major claims?\n3. Consequence coherence: Do predictions_t follow from thesis transmission path?\n4. Trade rationale coherence: Does rationale bridge thesis -> each prediction clearly?\n5. Bifurcation reasoning quality: Are contradictions engaged substantively, not hand-waved?\n\n[GRADE RULE]\n- FIRST LINE MUST BE: GRADE_OVERRIDE: GREEN or GRADE_OVERRIDE: RED\n- RED only for semantic-critical failures (not formatting).\n\n[OUTPUT FORMAT]\nGRADE_OVERRIDE: GREEN|RED\nSEMANTIC_FINDINGS:\n- VIOLATIONS: <count>\n- <bullet list with concrete quotes/citations>\nSEMANTIC_STRENGTHS:\n- <brief bullets>\nDECISION_RATIONALE:\n- <short paragraph>\n\n[HARD CONSTRAINTS]\n- No self-assessment.\n- No preamble or sign-off.\n\n[NEW HARD-FAIL CONDITIONS (v3.0)]\n12. Director ignores material THESIS_STRESS signals surfaced by cross_corr_v2.\n13. CP1 is NARRATIVE_LED but decide does not explicitly defend the Tier 1 override.\n14. News-sourced evidence cited as dominant causal force without a pre-pricing check.\n\n[ADDITIONAL HARD-FAIL CONDITIONS (v3.1)]\n15. Any prediction is non-falsifiable (no horizon-linked trigger, target too close to snapshot noise, or outcome framed so broadly that both success and failure can be rationalized).\n16. A prediction introduces a causal driver absent from epicentre_thesis without explicit bridge in trade_rationale.\n17. The thesis cites only descriptive/retrospective evidence with no forward transmission or persistence mechanism cited.\n18. Core dominant-force claim is effectively uncited (citations decorate the paragraph but do not support the central claim).\nAll conditions 12-18 are critical failures resulting in RED.\n",
+  "lane": "SPINE",
+  "expectation": "Output semantic integrity report. FIRST LINE must be GRADE_OVERRIDE: GREEN or GRADE_OVERRIDE: RED.",
+  "boundary": "Semantic coherence audit only."
+}

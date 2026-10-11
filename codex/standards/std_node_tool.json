@@ -1,0 +1,33 @@
+{
+  "id": "std_node_tool",
+  "type": "standard",
+  "description": "Deterministic Execution Unit (The Hands)",
+  "schema": {
+    "id": "string (Unique Handle. Ex: 'global_stock_feed')",
+    "type": "const(tool)",
+    "group": "optional string (Loader Derived. Ex: 'feeds')",
+    
+    "lane": "string (Visual Vertical. Values: see VALID_LANES in system/lib/types.py. Ex: 'STOCK')",
+    "expectation": "string (Inert Success Criteria. Ex: 'Returns raw OHLCV data.')",
+    "is_artifact": "boolean (Surgery Flag. Ex: false)",
+    
+    "dependencies": "optional list(string) (The Topology. Ex: [])",
+    "instruction": "optional string (Usually empty for tools, but allowed for loader tag injection)",
+    
+    "config": {
+      "module": "string (Python Import Path. PHYSICS. Ex: 'tools.stock.stock')",
+      "config_file": "optional string (External Config Path. Ex: 'conf/stock.json')",
+      "config": "optional object (Runtime Overrides. Ex: {'snapshot_period': '3mo'})"
+    },
+    
+    "execution": "optional object (Runtime Policy. Ex: {'timeout': 60, 'cache_policy': 'volatile'})",
+
+    "teleology": "optional string (Architectural Intent. 1 sentence summary for Dashboard.)",
+    "mechanism": "optional string (Method of Action. ~4 sentences for Dashboard.)",
+
+    "meta": {
+      "role": "optional string (UI Color/Icon hint. Ex: 'source', 'miner')",
+      "is_feed": "optional boolean (Live/Lab Toggle. PHYSICS. Ex: true)"
+    }
+  }
+}

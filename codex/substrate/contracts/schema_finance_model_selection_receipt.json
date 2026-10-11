@@ -1,0 +1,440 @@
+{
+  "id": "schema_finance_model_selection_receipt",
+  "type": "contract",
+  "version": "0.5",
+  "status": "NORMATIVE",
+  "description": "Family-level model-selection receipt for finance forecast generator variants.",
+  "purpose": "This contract consumes multiple split-bound finance_variant_admission_receipt_v0 pairwise gates, builds a shared-event family loss matrix, exposes Reality Check bootstrap conformance and sample-gated SPA evidence, and prevents best-of-many variant cherry-picking from becoming mutation authority.",
+  "schema": {
+    "schema_version": {
+      "type": "string",
+      "required": true,
+      "constraint": "Exactly finance_model_selection_receipt_v0."
+    },
+    "selection_id": {
+      "type": "string",
+      "required": true,
+      "constraint": "Stable receipt id for the family-level model-selection pass."
+    },
+    "method": {
+      "type": "string",
+      "required": true,
+      "constraint": "v0 supports reserved family-selection methods plus sample-gated Reality Check bootstrap evidence."
+    },
+    "baseline_variant_id": {
+      "type": "string|null",
+      "required": true,
+      "constraint": "Must be shared across all consumed pairwise gates before family inference can be trusted."
+    },
+    "variant_set": {
+      "type": "array[string]",
+      "required": true,
+      "constraint": "Baseline plus all candidate variants represented by the consumed receipts."
+    },
+    "candidate_variant_ids": {
+      "type": "array[string]",
+      "required": true
+    },
+    "receipt_refs": {
+      "type": "array[string]",
+      "required": true,
+      "constraint": "finance_variant_admission_receipt_v0 variant_gate_id values consumed by this family receipt."
+    },
+    "loss_metric": {
+      "type": "string|null",
+      "required": true,
+      "constraint": "Must be shared across all consumed receipts."
+    },
+    "comparison_key_schema": {
+      "type": "string|null",
+      "required": true,
+      "constraint": "Must be finance_comparison_event_key_v0 for v0."
+    },
+    "split_policy": {
+      "type": "FinanceModelSelectionSplitPolicy",
+      "required": true
+    },
+    "sample": {
+      "type": "FinanceModelSelectionSample",
+      "required": true
+    },
+    "family_loss_matrix": {
+      "type": "FinanceFamilyLossMatrix",
+      "required": true,
+      "constraint": "finance_family_loss_matrix_v0 built from shared comparison_event_key rows across all candidate variants."
+    },
+    "bootstrap": {
+      "type": "FinanceModelSelectionBootstrap",
+      "required": true,
+      "constraint": "Must name method, authority, reps, seed, sample gate, and whether p-values were computed."
+    },
+    "bootstrap_conformance": {
+      "type": "FinanceBootstrapConformance",
+      "required": true,
+      "constraint": "Must make the Reality Check statistic orientation, centering, resampling plan, sample gate, null, and evidence-only authority explicit."
+    },
+    "bootstrap_reference_status": {
+      "type": "string",
+      "required": true,
+      "constraint": "Compact hook for deterministic reference-suite status. Values include not_started, pass, and fail."
+    },
+    "spa_readiness": {
+      "type": "FinanceSpaReadiness",
+      "required": true,
+      "constraint": "Must expose whether poor/irrelevant alternatives are present and whether SPA studentization/sample-dependent-null prerequisites are available or blocked."
+    },
+    "family_statistics": {
+      "type": "FinanceModelSelectionStatistics",
+      "required": true
+    },
+    "decision": {
+      "type": "FinanceModelSelectionDecision",
+      "required": true
+    }
+  },
+  "finance_family_loss_matrix": {
+    "schema_version": {
+      "type": "string",
+      "required": true,
+      "constraint": "Exactly finance_family_loss_matrix_v0."
+    },
+    "rows": {
+      "type": "array[object]",
+      "required": true,
+      "constraint": "Each row is one comparison_event_key with losses for baseline and every candidate variant retained in the shared intersection."
+    },
+    "coverage": {
+      "type": "object",
+      "required": true,
+      "constraint": "Must include shared_event_count, dropped_unshared_event_count, candidate_event_counts, and blocked_reason_counts."
+    },
+    "dependence_diagnostics": {
+      "type": "object",
+      "required": true,
+      "constraint": "Must include event_window_overlap_count, recommended_block_length, and bootstrap_method before any family statistic is interpreted."
+    }
+  },
+  "finance_model_selection_bootstrap": {
+    "status": {
+      "type": "string",
+      "required": true,
+      "constraint": "Examples: computed, sample_gated, blocked, reserved."
+    },
+    "method": {
+      "type": "string",
+      "required": true,
+      "constraint": "v0 uses stationary_bootstrap when Reality Check is computed."
+    },
+    "bootstrap_reps": {
+      "type": "integer",
+      "required": true
+    },
+    "seed": {
+      "type": "integer",
+      "required": true
+    },
+    "minimum_sample": {
+      "type": "integer",
+      "required": true
+    },
+    "p_values_computed": {
+      "type": "boolean",
+      "required": true
+    },
+    "conformance_status": {
+      "type": "string|null",
+      "required": true,
+      "constraint": "Mirrors bootstrap_conformance.status for compact operating-picture consumers."
+    },
+    "fixture_only": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "True only for explicit tiny-bootstrap fixture/test runs; never production-admissive."
+    }
+  },
+  "finance_bootstrap_conformance": {
+    "schema_version": {
+      "type": "string",
+      "required": true,
+      "constraint": "Exactly finance_bootstrap_conformance_v0."
+    },
+    "status": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "pass",
+        "sample_gated",
+        "blocked"
+      ]
+    },
+    "statistic": {
+      "type": "string",
+      "required": true,
+      "constraint": "v0 uses max_positive_baseline_improvement = max(0, -min(mean_delta_i))."
+    },
+    "loss_orientation": {
+      "type": "string",
+      "required": true,
+      "constraint": "v0 uses candidate_minus_baseline_lower_is_better."
+    },
+    "centering": {
+      "type": "string",
+      "required": true,
+      "constraint": "v0 centers candidate loss differentials by each candidate mean before bootstrap null resampling."
+    },
+    "resampling": {
+      "type": "object",
+      "required": true,
+      "constraint": "Must include method, seed, bootstrap_reps, and block_length."
+    },
+    "sample_gate": {
+      "type": "object",
+      "required": true,
+      "constraint": "Must include minimum_sample, sample_size, and passed."
+    },
+    "null": {
+      "type": "string",
+      "required": true,
+      "constraint": "v0 uses no_candidate_outperforms_baseline."
+    },
+    "decision_authority": {
+      "type": "string",
+      "required": true,
+      "constraint": "Must remain evidence_only_no_mutation_permission in v6.2."
+    }
+  },
+  "finance_spa_readiness": {
+    "status": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "reserved_ready",
+        "blocked"
+      ]
+    },
+    "reality_check_status": {
+      "type": "string",
+      "required": true
+    },
+    "poor_or_irrelevant_alternative_count": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Counts candidate variants with non-improving mean candidate-minus-baseline loss deltas; this is a warning that SPA may be more appropriate than Reality Check."
+    },
+    "studentized_loss_differentials_available": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "True when tools/finance/spa_statistics.py has run or sample-gated the SPA path; false only when blocked before the SPA kernel."
+    },
+    "sample_dependent_null_available": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "True when the SPA block includes sample-dependent-null metadata; false only when blocked before the SPA kernel."
+    },
+    "reason": {
+      "type": "string",
+      "required": true,
+      "constraint": "Explains whether SPA is blocked or reserved-ready."
+    }
+  },
+  "finance_spa_statistic": {
+    "schema_version": {
+      "type": "string",
+      "required": true,
+      "constraint": "Exactly finance_spa_statistic_v0."
+    },
+    "status": {
+      "type": "string",
+      "required": true,
+      "constraint": "Examples: computed_bootstrap, not_computed_minimum_sample, not_computed_no_studentization, or blocked/not_computed_* family blocker statuses."
+    },
+    "authority": {
+      "type": "string",
+      "required": true,
+      "constraint": "tools/finance/spa_statistics.py."
+    },
+    "studentization": {
+      "type": "object",
+      "required": true,
+      "constraint": "Must include variance estimator, minimum variance floor, studentized candidate count, dropped zero-variance count, and candidate diagnostics."
+    },
+    "sample_dependent_null": {
+      "type": "object",
+      "required": true,
+      "constraint": "Must expose poor/irrelevant alternative handling, included candidate count, and whether the sample-dependent null was computed."
+    },
+    "bootstrap": {
+      "type": "object",
+      "required": true,
+      "constraint": "Must name method, reps, seed, and block_length."
+    },
+    "observed_statistic": {
+      "type": "number|null",
+      "required": true,
+      "constraint": "Studentized max positive baseline improvement under candidate-minus-baseline lower-is-better orientation."
+    },
+    "p_value": {
+      "type": "number|null",
+      "required": true,
+      "constraint": "Null unless sample/variance gates pass."
+    },
+    "decision_authority": {
+      "type": "string",
+      "required": true,
+      "constraint": "Must remain evidence_only_no_mutation_permission."
+    }
+  },
+  "finance_model_selection_split_policy": {
+    "kind": {
+      "type": "string|null",
+      "required": true,
+      "constraint": "The single shared executable split policy kind, or null when mixed."
+    },
+    "kinds_seen": {
+      "type": "array[string]",
+      "required": true
+    },
+    "all_receipts_executable": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "False blocks family-level inference."
+    },
+    "all_receipts_split_bound": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "False blocks Reality Check / SPA / MCS interpretation."
+    },
+    "mixed_split_policy": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "True blocks family-level inference."
+    }
+  },
+  "finance_model_selection_sample": {
+    "candidate_count": {
+      "type": "integer",
+      "required": true,
+      "constraint": "At least two candidates are required before family-level selection is more than diagnostic."
+    },
+    "receipt_count": {
+      "type": "integer",
+      "required": true
+    },
+    "min_paired_event_count": {
+      "type": "integer",
+      "required": true
+    },
+    "max_paired_event_count": {
+      "type": "integer",
+      "required": true
+    },
+    "shared_event_count": {
+      "type": "integer",
+      "required": true,
+      "constraint": "Shared comparison_event_key count in the family loss matrix after split and coverage exclusions."
+    },
+    "dropped_unshared_event_count": {
+      "type": "integer",
+      "required": true
+    },
+    "blocked_variant_count": {
+      "type": "integer",
+      "required": true
+    },
+    "missing_split_membership_count": {
+      "type": "integer",
+      "required": true
+    },
+    "candidate_smoke_test_count": {
+      "type": "integer",
+      "required": true
+    },
+    "unpaired_event_count": {
+      "type": "integer",
+      "required": true
+    }
+  },
+  "finance_model_selection_statistics": {
+    "statistics_authority": {
+      "type": "string",
+      "required": true,
+      "constraint": "tools/finance/model_selection_stats.py for v0.5."
+    },
+    "family_loss_matrix_authority": {
+      "type": "string",
+      "required": true,
+      "constraint": "tools/finance/family_loss_matrix.py for v0.5."
+    },
+    "spa_statistics_authority": {
+      "type": "string",
+      "required": true,
+      "constraint": "tools/finance/spa_statistics.py for v0.5."
+    },
+    "best_mean_delta_variant_id": {
+      "type": "string|null",
+      "required": true,
+      "constraint": "Best-looking candidate by pairwise mean loss delta; this is descriptive and never mutation authority in v0."
+    },
+    "best_mean_delta": {
+      "type": "number|null",
+      "required": true
+    },
+    "retained_shadow_variants": {
+      "type": "array[string]",
+      "required": true,
+      "constraint": "Shadow candidate variants retained for diagnostic family tracking."
+    },
+    "blocked_variants": {
+      "type": "array[object]",
+      "required": true
+    },
+    "blocked_reason_counts": {
+      "type": "object",
+      "required": true
+    },
+    "reality_check": {
+      "type": "object",
+      "required": true,
+      "constraint": "Sample-gated White Reality Check block. A computed p-value is evidence only and never mutation authority in v0."
+    },
+    "spa": {
+      "type": "FinanceSpaStatistic",
+      "required": true,
+      "constraint": "Sample-gated Hansen-SPA-style statistic block. A computed p-value is evidence only and never mutation authority in v0."
+    },
+    "model_confidence_set": {
+      "type": "object",
+      "required": true,
+      "constraint": "Reserved or blocked Model Confidence Set block."
+    },
+    "family_level_inference_status": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "finance_model_selection_decision": {
+    "status": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "shadow_family_only",
+        "insufficient_variant_family"
+      ]
+    },
+    "optimizer_permission": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "Must remain false in v7."
+    },
+    "calculator_mutation_permission": {
+      "type": "boolean",
+      "required": true,
+      "constraint": "Must remain false in v7."
+    },
+    "reason": {
+      "type": "string",
+      "required": true,
+      "constraint": "Examples: family_level_selection_not_admissive, insufficient_variant_family, mixed_split_policy, split_membership_unbound, unknown_variant."
+    }
+  }
+}

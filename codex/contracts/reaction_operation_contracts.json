@@ -1,0 +1,207 @@
+{
+  "schema_version": "reaction_operation_contracts_v1",
+  "status": "lane_owned_contract_bridge",
+  "standard_ref": "codex/standards/std_launchable_operation_contract.json",
+  "lane_owner": "reactions_engine",
+  "tracked_config_ref": "reactions.yaml",
+  "purpose": "Carry result-landing contracts for operations that are automatically fired by reactions.yaml while preserving reactions.yaml as the trigger/predicate authority and system/lib/launchable_operations.py as the command allowlist authority.",
+  "authority_boundary": {
+    "reactions_yaml_owns": [
+      "reaction_id",
+      "source signal",
+      "predicate",
+      "action operation_id",
+      "gate",
+      "priority",
+      "enabled_by_default",
+      "provenance"
+    ],
+    "catalog_owns": [
+      "operation_id",
+      "command template",
+      "parameters schema",
+      "manual launch identity",
+      "execution allowlist membership"
+    ],
+    "this_sidecar_owns_temporarily": [
+      "reaction-lane automatic dispatch declaration",
+      "reaction-lane owner and output surfaces",
+      "reaction-lane satisfaction refs",
+      "reaction-lane residual routing",
+      "reaction-lane result landing contract",
+      "reaction-lane cost classes"
+    ],
+    "this_sidecar_must_not_own": [
+      "new command strings",
+      "new reaction triggers",
+      "semantic priority",
+      "operator intent",
+      "WorkItem ranking",
+      "provider dispatch policy"
+    ]
+  },
+  "migration_rule": "Keep only reaction-owned landing metadata here. Inline into a future reaction-aware contract surface or the launch catalog when the owner surface is clean; do not use this file as a central dumping ground for meta-mission or dispatch-policy contracts.",
+  "operations": [
+    {
+      "operation_id": "python_std_compliance_cycle",
+      "contract_pattern_class": "generation_scoped_reaction_cycle",
+      "automatic_dispatch_allowed": true,
+      "dispatch_modes": [
+        "manual",
+        "reaction"
+      ],
+      "owner_surface": "system.lib.python_std_compliance_findings",
+      "output_surface": [
+        "state/meta_missions/python_std_compliance_authoring/coverage.json",
+        "state/meta_missions/python_std_compliance_authoring/runs/<campaign_slug>/campaign_summary.json",
+        "tools/meta/control/reactions_ledger.jsonl"
+      ],
+      "satisfaction_refs": [
+        "reactions.yaml::python_std_compliance_preview_kickoff",
+        "reactions.yaml::python_std_compliance_drain_continue",
+        "system/lib/python_std_compliance_findings.py",
+        "tools/meta/factory/python_std_compliance_cycle.py",
+        "codex/standards/std_launchable_operation_contract.json"
+      ],
+      "residual_routing": {
+        "primary": "generation-scoped source-progress receipt plus the Python compliance coverage/campaign surfaces",
+        "stale_or_failed": "Omit deleted documentation-tree rows with typed source_validity evidence; rebuild codex/hologram/system/symbols.json before reconsidering them. Preserve nonzero execution as a reaction/operation residual instead of refiring the same generation.",
+        "owner_surface": "system.lib.python_std_compliance_findings"
+      },
+      "result_landing_contract": {
+        "produces": "One bounded idempotent preview, approval-gate, or approved apply step for the currently observed Python compliance generation.",
+        "lands_at": [
+          "state/meta_missions/python_std_compliance_authoring/coverage.json",
+          "state/meta_missions/python_std_compliance_authoring/runs/<campaign_slug>/campaign_summary.json",
+          "tools/meta/control/reactions_ledger.jsonl"
+        ],
+        "success_signal": "The operation returns zero and the synchronous source-progress evaluator records predicate_clear, progressed, or source_superseded for the admitted signal generation.",
+        "residual_signal": "The operation returns nonzero, source progress is unavailable, or the same signal generation makes no progress; replay stays suppressed until the observed generation changes."
+      },
+      "outcome_health_contract": {
+        "failure_aware": true,
+        "semantic_success_requires": "a truthful generation-scoped source-progress receipt; process exit alone is not semantic success",
+        "health_status_hint": "healthy_only_for_admitted_generation"
+      },
+      "local_cost_class": "remote_light_local_light",
+      "provider_cost_class": "conditional_provider"
+    },
+    {
+      "operation_id": "work_ledger_project",
+      "contract_pattern_class": "ledger_projection",
+      "automatic_dispatch_allowed": true,
+      "dispatch_modes": [
+        "manual",
+        "reaction"
+      ],
+      "owner_surface": "system.lib.work_ledger",
+      "output_surface": [
+        "codex/ledger/<phase_id>/work_ledger_index.json"
+      ],
+      "satisfaction_refs": [
+        "codex/standards/std_work_ledger.json",
+        "reactions.yaml::claude_stop_consolidation_trigger",
+        "codex/doctrine/paper_modules/reactions_engine.md",
+        "./repo-python tools/meta/factory/work_ledger.py project --check --all"
+      ],
+      "residual_routing": {
+        "primary": "reactions ledger entry plus work-ledger projection result",
+        "stale_or_failed": "Task Ledger note/capture under cap_quick_launchable_operations_landing_surface_contract when project --check --all remains stale or work_ledger.py exits nonzero. Session lifecycle and append obligations remain owned by Work Ledger reconcile/sweep/finalize lanes and must not refire this projection operation.",
+        "owner_surface": "system.lib.work_ledger"
+      },
+      "result_landing_contract": {
+        "produces": "Fresh deterministic work-ledger projection indexes for all family/phase buckets from append-only work_ledger.jsonl substrate.",
+        "lands_at": [
+          "codex/ledger/<phase_id>/work_ledger_index.json"
+        ],
+        "success_signal": "work_ledger.py project --all returns ok=true and project --check --all reports fresh projection rows.",
+        "residual_signal": "work_ledger.py exits nonzero, project result ok=false, or a projection row remains stale or missing. Stale session pressure is a distinct owner-visible lifecycle residual, not projection failure."
+      },
+      "outcome_health_contract": {
+        "failure_aware": true,
+        "semantic_success_requires": "projection freshness only; this operation never claims to settle session lifecycle or missing-append obligations",
+        "health_status_hint": "healthy_only_for_projection_owned_triggers"
+      },
+      "local_cost_class": "remote_light_local_light",
+      "provider_cost_class": "none"
+    },
+    {
+      "operation_id": "standard_skill_pairing_campaign",
+      "contract_pattern_class": "reaction_candidate_campaign_packet",
+      "automatic_dispatch_allowed": true,
+      "dispatch_modes": [
+        "manual",
+        "reaction"
+      ],
+      "owner_surface": "reactions_engine.standard_skill_pairing_campaign",
+      "output_surface": [
+        "state/meta_missions/standard_skill_pairing/<campaign_slug>/campaign_packet.json",
+        "tools/meta/control/reactions_ledger.jsonl",
+        "tools/meta/control/orchestration_events.jsonl"
+      ],
+      "satisfaction_refs": [
+        "reactions.yaml::standard_skill_gap_high",
+        "tools/meta/control/reactions_engine.py::fire_reaction",
+        "tools/meta/factory/build_standard_skill_pairing_campaign.py",
+        "codex/hologram/skills/standard_skill_map.json",
+        "codex/standards/std_launchable_operation_contract.json"
+      ],
+      "residual_routing": {
+        "primary": "candidate campaign packet plus reaction_fired/reaction_completed ledger rows",
+        "stale_or_failed": "Task Ledger note/capture under cap_quick_launchable_operations_landing_surface_contract when the reaction returns nonzero, emits no campaign_packet, or the standard-skill gap remains high after the candidate packet is reviewed",
+        "promotion_boundary": "controller/apply lane reviews campaign_packet.json before skill authoring, skill_registry mutation, or source edits"
+      },
+      "result_landing_contract": {
+        "produces": "A deterministic, controller-gated standard-skill pairing campaign packet in draft state.",
+        "lands_at": [
+          "state/meta_missions/standard_skill_pairing/<campaign_slug>/campaign_packet.json",
+          "tools/meta/control/reactions_ledger.jsonl",
+          "tools/meta/control/orchestration_events.jsonl"
+        ],
+        "success_signal": "reaction returncode is 0; stdout contains wrote_packet; reaction ledger records promotion_state=draft and mutation_policy=candidate_packet_only.",
+        "residual_signal": "reaction returncode is nonzero, stdout lacks wrote_packet, campaign packet is missing, or the produced draft remains unreviewed while the standard-skill gap signal stays high."
+      },
+      "local_cost_class": "remote_light_local_light",
+      "provider_cost_class": "none"
+    },
+    {
+      "operation_id": "compliance_autocure_campaign",
+      "contract_pattern_class": "reaction_candidate_campaign_packet",
+      "automatic_dispatch_allowed": true,
+      "dispatch_modes": [
+        "manual",
+        "reaction"
+      ],
+      "owner_surface": "reactions_engine.compliance_autocure_campaign",
+      "output_surface": [
+        "state/meta_missions/compliance_autocure/<campaign_slug>/campaign_packet.json",
+        "tools/meta/control/reactions_ledger.jsonl",
+        "tools/meta/control/orchestration_events.jsonl"
+      ],
+      "satisfaction_refs": [
+        "reactions.yaml::compliance_coverage_low",
+        "tools/meta/control/reactions_engine.py::fire_reaction",
+        "tools/meta/factory/build_compliance_autocure_campaign.py",
+        "codex/hologram/compliance/ledger.json",
+        "codex/standards/std_launchable_operation_contract.json"
+      ],
+      "residual_routing": {
+        "primary": "candidate campaign packet plus reaction_fired/reaction_completed ledger rows",
+        "stale_or_failed": "Task Ledger note/capture under cap_quick_launchable_operations_landing_surface_contract when the reaction returns nonzero, emits no campaign_packet, or compliance coverage remains low after the candidate packet is reviewed",
+        "promotion_boundary": "controller/apply lane reviews campaign_packet.json before compliance repairs, standard mutation, or source edits"
+      },
+      "result_landing_contract": {
+        "produces": "A deterministic, controller-gated compliance autocure campaign packet in draft state.",
+        "lands_at": [
+          "state/meta_missions/compliance_autocure/<campaign_slug>/campaign_packet.json",
+          "tools/meta/control/reactions_ledger.jsonl",
+          "tools/meta/control/orchestration_events.jsonl"
+        ],
+        "success_signal": "reaction returncode is 0; stdout contains wrote_packet; reaction ledger records promotion_state=draft and mutation_policy=candidate_packet_only.",
+        "residual_signal": "reaction returncode is nonzero, stdout lacks wrote_packet, campaign packet is missing, or the produced draft remains unreviewed while the compliance coverage signal stays low."
+      },
+      "local_cost_class": "remote_light_local_light",
+      "provider_cost_class": "none"
+    }
+  ]
+}

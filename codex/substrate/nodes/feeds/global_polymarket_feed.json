@@ -1,0 +1,23 @@
+{
+  "id": "global_polymarket_feed",
+  "type": "tool",
+  "dependencies": [],
+  "meta": {
+    "is_feed": true
+  },
+  "is_artifact": true,
+  "teleology": "Capture crowd-implied probabilities and repricing velocity at T-n so the system can detect what is already priced versus what remains open.",
+  "mechanism": "Runs tools.polymarket.polymarket and buckets markets into category tables with probability, change, volume, conviction, and slug fields.",
+  "config": {
+    "module": "tools.polymarket.polymarket",
+    "config": {
+      "config": {
+        "limit": 10
+      }
+    },
+    "config_file": "codex/substrate/configs/polymarket_scan.json"
+  },
+  "lane": "POLYMARKET",
+  "expectation": "Return a POLYMARKET artifact organized by category and bucket with q, o, p, c, v, s, and slug-style fields. Markets should preserve enough structure to test pre-pricing and crowd divergence.",
+  "group": "feeds"
+}

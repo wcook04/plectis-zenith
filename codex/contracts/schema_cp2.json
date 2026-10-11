@@ -1,0 +1,168 @@
+{
+  "id": "schema_cp2",
+  "type": "contract",
+  "version": "1.0",
+  "status": "NORMATIVE",
+  "inherits": "schema_cp1",
+  "description": "Checkpoint 2 Output Schema — Director / Trade. Extends CP1 with directional predictions and grounded trade rationale.",
+  "purpose": "CP2 is the machine-checkable schema for the Director node output in the Lab pipeline, and the corresponding Oracle node output for audit. Every CP2-producing node must emit a JSON object satisfying all CP1 constraints plus the additional constraints below. Runtime ownership split: Director emits semantic fields including snapshot_price and target_price; engine injects deterministic temporal fields and audits model-emitted snapshot_price against the subject-run equity baseline. Final enriched payload is validated by system.lib.schema_validator.validate_cp2.",
+  "schema": {
+    "evidence_dictionary": {
+      "type": "array[EvidenceUnit]",
+      "required": true,
+      "constraint": "Inherited from CP1. Must also satisfy CP2 grounding rules.",
+      "semantics": "Evidence set must include at least one equity-lane entry per prediction target_id for grounding. Valid grounding prefixes are S_ (stock) or E_ (ETF)."
+    },
+    "epicentre_thesis": {
+      "type": "string",
+      "required": true,
+      "constraint": "Inherited from CP1 + epicentre_thesis semantic contract.",
+      "semantics": "Same single-dominant-force requirement as CP1. Predictions must be consequences of this thesis."
+    },
+    "predictions_t": {
+      "type": "array[PredictionUnit]",
+      "required": true,
+      "constraint": "Non-empty. Each entry must be a valid PredictionUnit.",
+      "semantics": "Directional predictions that are EXPLICIT CONSEQUENCES of epicentre_thesis — not independent calls. Each prediction must be explainable as a transmission consequence of the dominant force."
+    },
+    "trade_rationale": {
+      "type": "string",
+      "required": true,
+      "constraint": "Word count >= trade_rationale_base_words + trade_rationale_per_prediction_words * len(predictions_t). Must contain only resolved [N] citations.",
+      "semantics": "Narrates the force -> transmission -> prediction consequence chain. Not a list of isolated trade ideas. Must explicitly connect each prediction back to the epicentre thesis causal mechanism."
+    }
+  },
+  "prediction_unit": {
+    "target_id": {
+      "type": "string",
+      "required": true,
+      "constraint": "Non-empty. For equity predictions: uppercase ticker symbol.",
+      "semantics": "The entity being predicted. Must exist in the T-n stock+ETF ticker universe when out-of-universe enforcement is active.",
+      "examples": [
+        "XLK",
+        "NVDA",
+        "TLT"
+      ]
+    },
+    "direction": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "UP",
+        "DOWN"
+      ],
+      "constraint": "Exactly 'UP' or 'DOWN' (case-sensitive).",
+      "semantics": "Expected directional move at horizon T. Must be a consequence of the epicentre thesis transmission path."
+    },
+    "snapshot_time": {
+      "type": "string",
+      "required": true,
+      "constraint": "ISO 8601 datetime string. Engine-owned deterministic field; must equal runtime snapshot anchor.",
+      "semantics": "When the T-n snapshot was taken. Enables deterministic evaluation window."
+    },
+    "target_time_iso": {
+      "type": "string",
+      "required": true,
+      "constraint": "ISO 8601 datetime string. Must be after snapshot_time. Engine-owned deterministic field; must equal resolved runtime horizon target.",
+      "semantics": "When the prediction resolves (T). Defines the falsification window."
+    },
+    "snapshot_price": {
+      "type": "number",
+      "required": true,
+      "constraint": "Finite numeric baseline price captured at snapshot_time. Model-emitted and engine-audited against T-n stock+ETF feed prices.",
+      "semantics": "Baseline for direction evaluation at target_time_iso."
+    },
+    "target_price": {
+      "type": "number",
+      "required": true,
+      "constraint": "Finite numeric projected price level at target_time_iso.",
+      "semantics": "The projected price level by target_time_iso. Must be logically consistent with snapshot_price and direction."
+    },
+    "invalidation": {
+      "type": "string",
+      "required": true,
+      "constraint": "Non-empty string. Must state a specific falsifiable condition for this individual prediction target.",
+      "semantics": "Per-prediction invalidation condition. Distinct from the global thesis invalidation in trade_rationale."
+    }
+  },
+  "consequence_coherence": {
+    "description": "CP2 predictions are not independent calls. They must be explicit consequences of epicentre_thesis.",
+    "rules": [
+      "epicentre_thesis declares one dominant force at T-n.",
+      "Each predictions_t[i] is explainable as a transmission consequence of that force.",
+      "trade_rationale must narrate force -> transmission -> prediction consequence chain.",
+      "If a prediction depends on an alternative driver, that alternative must be subordinated to (or shown as derivative of) the epicentre force — not introduced as a second co-equal thesis."
+    ]
+  },
+  "grounding_rule": {
+    "description": "Every prediction must be grounded in explicitly sourced equity lane data.",
+    "requirement": "For every PredictionUnit in predictions_t, there must exist at least one evidence_dictionary entry where: subject == target_id (case-normalized .upper().strip()) AND ledger_id starts with 'S_' or 'E_'.",
+    "rationale": "A prediction that references only MACRO or NEWS evidence without a stock/ETF grounding entry is a grounding failure."
+  },
+  "out_of_universe": {
+    "description": "When subject_run_dir is provided, every target_id must exist in the T-n stock+ETF ticker universe.",
+    "fallback": "If ticker universe cannot be loaded, MISSING_CONTEXT is emitted and OUT_OF_UNIVERSE check is skipped (degraded mode)."
+  },
+  "oracle_golden_id_guard": {
+    "description": "Oracle runs (Phase 10) additional invariant.",
+    "requirement": "Every ledger_id in evidence_dictionary must exist in the T-n snapshot ledger set from the corresponding Lab run.",
+    "enforcement": "validate_golden_ids(evidence_dictionary, subject_run_dir) — called from engine Oracle path, not from validate_cp2 itself.",
+    "error_code": "INVALID_GOLDEN_ID"
+  },
+  "trade_rationale_word_count": {
+    "formula": "trade_rationale_base_words + trade_rationale_per_prediction_words * len(predictions_t)",
+    "threshold_source": "contract_config.json",
+    "defaults": {
+      "trade_rationale_base_words": 75,
+      "trade_rationale_per_prediction_words": 30
+    }
+  },
+  "citation_rules": {
+    "description": "Same rules as CP1 epicentre_thesis, applied to both epicentre_thesis and trade_rationale.",
+    "valid_format": "[N] where N is a positive integer",
+    "malformed_rejected": [
+      "[1-3] (range)",
+      "[1, 2] (CSV)",
+      "[01] (leading zero)"
+    ],
+    "resolution_rule": "Every [N] must resolve to an evidence_dictionary entry with matching ref_id."
+  },
+  "validation_sequence": [
+    "1. validate_cp1(payload) — structural + citation + word-count for CP1 fields",
+    "2. Validate CP2-specific fields — predictions_t presence, direction enum, snapshot_price + target_price numeric validity, direction/target coherence, temporal fields, trade_rationale, and engine price-audit flags",
+    "3. Grounding checks — per-prediction evidence with S_ or E_ ledger",
+    "4. Out-of-universe checks — if subject_run_dir provided",
+    "5. [Oracle only] Golden ID guard — Phase 10, engine-level"
+  ],
+  "error_codes": {
+    "_inherited": "All CP1 error codes apply (MISSING_FIELD, INVALID_REF_ID, DUPLICATE_REF_ID, DUPLICATE_LEDGER_ID, INVALID_LEDGER_ID, MALFORMED_CITATION, CITATION_UNRESOLVED, BELOW_MIN_WORD_COUNT).",
+    "INVALID_FIELD": "A field value is present but invalid (e.g. direction not in {UP, DOWN}).",
+    "MISSING_SNAPSHOT_PRICE": "snapshot_price is missing for a prediction target.",
+    "MISSING_TARGET_PRICE": "target_price is missing for a prediction target.",
+    "INVALID_TARGET_DIRECTION": "direction and target_price are not logically consistent with snapshot_price.",
+    "SNAPSHOT_PRICE_MISMATCH": "Model-emitted snapshot_price diverges from feed baseline beyond allowed tolerance.",
+    "TEMPORAL_ORDER_INVALID": "target_time_iso is not strictly after snapshot_time.",
+    "TEMPORAL_MISMATCH": "prediction temporal fields diverge from canonical runtime values.",
+    "GROUNDING_FAILED_WRONG_LANE": "A target_id has no evidence entry with subject == target_id AND ledger_id starting with S_ or E_.",
+    "UNGROUNDED_TARGET": "A target_id is not present in the cross_corr_v2 TARGET_SWARM or SOLO_TARGET sets. Prediction was not structurally grounded by the cross-correlator.",
+    "MISSING_CONTEXT": "Ticker universe could not be loaded from subject_run_dir.",
+    "OUT_OF_UNIVERSE": "A target_id is not present in the T-n ticker set."
+  },
+  "stage_responsibilities": {
+    "lab_director": {
+      "role": "Extend locked CP1 thesis with predictions and trade rationale.",
+      "boundary": "Must ensure predictions_t are direct consequences of epicentre_thesis, emit snapshot_price + target_price per prediction, ground targets with subject-matching stock or ETF evidence, and must NOT introduce a second co-equal thesis."
+    },
+    "oracle_cp2_emitter": {
+      "role": "Emit audit-grade CP2 from T perspective with golden ID enforcement.",
+      "boundary": "Same coherence requirements as lab_director, plus golden ID guard and subject-only grounding."
+    }
+  },
+  "validator": "system.lib.schema_validator.validate_cp2",
+  "config_file": "codex/substrate/contracts/contract_config.json",
+  "deferred_contracts": {
+    "scorecard.md": "LAYERED/DEFERRED: depends on confidence/magnitude semantics removed from v0.",
+    "counter_vector.md": "Non-normative prose guide only; not validated by engine.",
+    "hypothesis_slug.md": "Non-normative prose guide only; not validated by engine."
+  }
+}

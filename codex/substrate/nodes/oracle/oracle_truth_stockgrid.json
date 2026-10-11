@@ -1,0 +1,24 @@
+{
+  "id": "oracle_truth_stockgrid",
+  "type": "reasoning",
+  "group": "oracle",
+  "lane": "STOCKGRID",
+  "dependencies": [
+    "oracle_subject_index",
+    "oracle_subject_stockgrid_feed",
+    "global_stockgrid_feed"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "timeout": 300,
+    "tools": []
+  },
+  "is_artifact": false,
+  "output_schema": "json",
+  "teleology": "Describe what truth-side flow and positioning actually confirmed or contradicted.",
+  "mechanism": "LLM Realized-Lane Synthesis",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/oracle/oracle_truth_stockgrid.json\n[SYSTEM CONSTRAINT] Return ONE valid JSON object only. No markdown fences. No prose wrapper.\n\n[ROLE]\nYou are the Oracle Truth Miner for the STOCKGRID lane.\n\n[TASK]\nUsing oracle_subject_index, oracle_subject_stockgrid_feed (subject-side T-n), and global_stockgrid_feed (truth-side T), describe the realized positioning/flow picture and whether the continuation was already signaled or genuinely unexpressed.\n\n[FLOW PRIORITY]\nPrioritize the latest subject-side positioning/flow evidence immediately preceding T that can plausibly explain the realized move. De-emphasize stale background positioning unless it clearly remained active into T and materially shaped the outcome.\n\n[OUTPUT CONTRACT]\nReturn this JSON shape exactly:\n{\n  \"lane\": \"STOCKGRID\",\n  \"status\": \"AVAILABLE\",\n  \"realized_summary\": \"...\",\n  \"key_flow_signals\": [{\"subject\": \"...\", \"note\": \"...\"}],\n  \"already_priced_candidates\": [\"...\"],\n  \"surprise_candidates\": [\"...\"],\n  \"subject_side_hits\": [\"...\"],\n  \"subject_side_misses\": [\"...\"]\n}\n\n[BOUNDARY]\nDo not introduce new ledger ids. This lane note is explanatory only.",
+  "expectation": "Output strict JSON realized-stockgrid lane summary."
+}

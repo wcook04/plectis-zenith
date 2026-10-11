@@ -1,0 +1,551 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "codex/substrate/contracts/schema_reasoning_execution_authority_envelope.json",
+  "id": "schema_reasoning_execution_authority_envelope",
+  "artifact_kind": "contract",
+  "version": "0.1",
+  "status": "NORMATIVE",
+  "description": "JSON Schema for reasoning_execution_authority_envelope_v0, the dry-run capability and attestation preflight over reasoning_execution_schedule_preflight_v0 records.",
+  "purpose": "The authority envelope maps demand-scoped schedule actions to no_grant_needed, grantable, denied, or invalid authority decisions before any scheduler, launcher, provider router, tool runner, or write-capable executor acts. It is no-dispatch/no-write IR and never materializes runtime grants.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_refs",
+    "schedule_preflight",
+    "candidate_lineage",
+    "authority_posture",
+    "node_authorities",
+    "receipt_requirements",
+    "evaluation",
+    "dry_run",
+    "status",
+    "issues"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "reasoning_execution_authority_envelope_v0"
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/non_empty_string"
+      }
+    },
+    "schedule_preflight": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "replay_order_node_ids",
+        "schedule_preflight_hash"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "replay_order_node_ids": {
+          "$ref": "#/$defs/string_array"
+        },
+        "schedule_preflight_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        }
+      }
+    },
+    "candidate_lineage": {
+      "$ref": "#/$defs/lineage_ref"
+    },
+    "authority_posture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "launch_authorized",
+        "grant_materialized",
+        "reason"
+      ],
+      "properties": {
+        "mode": {
+          "const": "dry_run_authority_preflight"
+        },
+        "launch_authorized": {
+          "const": false
+        },
+        "grant_materialized": {
+          "const": false
+        },
+        "reason": {
+          "$ref": "#/$defs/non_empty_string"
+        }
+      }
+    },
+    "node_authorities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node_authority"
+      }
+    },
+    "receipt_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required_if_executed",
+        "future_receipt_kind",
+        "must_include"
+      ],
+      "properties": {
+        "required_if_executed": {
+          "const": true
+        },
+        "future_receipt_kind": {
+          "const": "reasoning_execution_receipt_v0"
+        },
+        "must_include": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/non_empty_string"
+          }
+        }
+      }
+    },
+    "evaluation": {
+      "$ref": "#/$defs/evaluation"
+    },
+    "dry_run": {
+      "const": true
+    },
+    "status": {
+      "enum": [
+        "ready",
+        "no_op",
+        "denied",
+        "invalid_authority_envelope"
+      ]
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/issue"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "dry_run": {
+            "const": true
+          }
+        },
+        "required": [
+          "dry_run"
+        ]
+      },
+      "then": {
+        "properties": {
+          "evaluation": {
+            "properties": {
+              "model_dispatch": {
+                "const": false
+              },
+              "provider_dispatch": {
+                "const": false
+              },
+              "runtime_execution": {
+                "const": false
+              },
+              "writes": {
+                "const": false
+              }
+            }
+          },
+          "authority_posture": {
+            "properties": {
+              "launch_authorized": {
+                "const": false
+              },
+              "grant_materialized": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "invalid_authority_envelope"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "issues": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "denied"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "node_authorities": {
+            "contains": {
+              "properties": {
+                "authority_decision": {
+                  "const": "denied"
+                }
+              },
+              "required": [
+                "authority_decision"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "non_empty_string": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nullable_string": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sha256_string": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "nullable_sha256_string": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/sha256_string"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "string_array": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lineage_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lineage_id",
+        "lineage_hash",
+        "status"
+      ],
+      "properties": {
+        "lineage_id": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "lineage_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "status": {
+          "$ref": "#/$defs/nullable_string"
+        }
+      }
+    },
+    "node_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "node_id",
+        "action",
+        "authority_decision",
+        "decision_reason",
+        "requested_capabilities",
+        "granted_capabilities",
+        "denied_capabilities",
+        "context_egress",
+        "artifact_contract",
+        "side_effect_ceiling",
+        "provider_policy",
+        "provenance_materials"
+      ],
+      "properties": {
+        "node_id": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "action": {
+          "enum": [
+            "reuse",
+            "replay",
+            "skip_not_demanded",
+            "blocked",
+            "invalid"
+          ]
+        },
+        "authority_decision": {
+          "enum": [
+            "no_grant_needed",
+            "grantable",
+            "denied",
+            "invalid"
+          ]
+        },
+        "decision_reason": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "requested_capabilities": {
+          "$ref": "#/$defs/capability_array"
+        },
+        "granted_capabilities": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "denied_capabilities": {
+          "$ref": "#/$defs/capability_array"
+        },
+        "context_egress": {
+          "$ref": "#/$defs/context_egress"
+        },
+        "artifact_contract": {
+          "$ref": "#/$defs/artifact_contract"
+        },
+        "side_effect_ceiling": {
+          "$ref": "#/$defs/side_effect_ceiling"
+        },
+        "provider_policy": {
+          "$ref": "#/$defs/provider_policy"
+        },
+        "provenance_materials": {
+          "$ref": "#/$defs/provenance_materials"
+        }
+      }
+    },
+    "capability_array": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "context_read",
+          "model_dispatch",
+          "provider_dispatch",
+          "tool_invocation",
+          "local_write",
+          "commit",
+          "external_action"
+        ]
+      }
+    },
+    "context_egress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inject",
+        "reference_only",
+        "withhold",
+        "forbidden",
+        "effective_context",
+        "redaction_required"
+      ],
+      "properties": {
+        "inject": {
+          "$ref": "#/$defs/string_array"
+        },
+        "reference_only": {
+          "$ref": "#/$defs/string_array"
+        },
+        "withhold": {
+          "$ref": "#/$defs/string_array"
+        },
+        "forbidden": {
+          "$ref": "#/$defs/string_array"
+        },
+        "effective_context": {
+          "$ref": "#/$defs/string_array"
+        },
+        "redaction_required": {
+          "$ref": "#/$defs/string_array"
+        }
+      }
+    },
+    "artifact_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "output_artifact_kind",
+        "schema_or_standard",
+        "receipt_required",
+        "receipt_schema"
+      ],
+      "properties": {
+        "output_artifact_kind": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "schema_or_standard": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "receipt_required": {
+          "const": true
+        },
+        "receipt_schema": {
+          "const": "future_reasoning_execution_receipt_v0"
+        }
+      }
+    },
+    "side_effect_ceiling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "read_only",
+        "writes_allowed",
+        "commit_allowed",
+        "external_action_allowed"
+      ],
+      "properties": {
+        "read_only": {
+          "type": "boolean"
+        },
+        "writes_allowed": {
+          "$ref": "#/$defs/string_array"
+        },
+        "commit_allowed": {
+          "type": "boolean"
+        },
+        "external_action_allowed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "provider_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider_required",
+        "candidate_provider_class",
+        "provider_standard_refs"
+      ],
+      "properties": {
+        "provider_required": {
+          "type": "boolean"
+        },
+        "candidate_provider_class": {
+          "$ref": "#/$defs/nullable_string"
+        },
+        "provider_standard_refs": {
+          "$ref": "#/$defs/string_array"
+        }
+      }
+    },
+    "provenance_materials": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "packet_manifest_hash",
+        "execution_plan_hash",
+        "verifier_report_hash",
+        "lineage_hash",
+        "replay_scope_hash",
+        "schedule_preflight_hash",
+        "authority_envelope_input_hash"
+      ],
+      "properties": {
+        "packet_manifest_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "execution_plan_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "verifier_report_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "lineage_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "replay_scope_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "schedule_preflight_hash": {
+          "$ref": "#/$defs/nullable_sha256_string"
+        },
+        "authority_envelope_input_hash": {
+          "$ref": "#/$defs/sha256_string"
+        }
+      }
+    },
+    "evaluation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_dispatch",
+        "provider_dispatch",
+        "runtime_execution",
+        "writes"
+      ],
+      "properties": {
+        "model_dispatch": {
+          "type": "boolean"
+        },
+        "provider_dispatch": {
+          "type": "boolean"
+        },
+        "runtime_execution": {
+          "type": "boolean"
+        },
+        "writes": {
+          "type": "boolean"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "severity",
+        "path",
+        "message",
+        "witness"
+      ],
+      "properties": {
+        "code": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "severity": {
+          "enum": [
+            "warning",
+            "error"
+          ]
+        },
+        "path": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "message": {
+          "$ref": "#/$defs/non_empty_string"
+        },
+        "witness": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

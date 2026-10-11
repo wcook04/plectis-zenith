@@ -1,0 +1,24 @@
+{
+  "id": "lab_miner_calc",
+  "type": "reasoning",
+  "dependencies": [
+    "global_calculator_feed",
+    "lab_seed_state"
+  ],
+  "meta": {},
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Extract load-bearing raw materials from the feed.",
+  "mechanism": "LLM Extraction",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/lab/miner_calc.json\n[CONTEXT]\nInput 1: Calc Feed (schema calculator.6) — three lanes (stock/macro/etf). Each group has:\n  - Energy: L2 magnitude of normalized metric vector (sort key)\n  - Polarity: signed sum of z-scores (positive=net up; negative=net down)\n  - Directional_Concentration: 0=metrics fighting each other; 1=full agreement/conviction\n  - Dominant_Signal: metric key driving the group's movement (e.g. Stress_Short; Trend_Long; Dispersion_5d)\n  - metrics_raw: aggregated pre-normalization values\n  - metrics_norm: z-score normalized values\nOptional evaluator fields may also exist: explain_payload and candidate_forecast_cards. For this extraction node, use explain_payload only as audit context and ignore candidate_forecast_cards unless a CP1 evaluator lane explicitly admits them.\nInput 2: Data Topology (Data coverage and quality map).\n\n[ROLE]\nYou are the Sensor. Extract *Raw Materials* for the Market Physics Engine using the pre-computed Signal Profile fields. Do NOT reconstruct arithmetic from raw metrics — use the provided fields directly.\n\n[BANNED LANGUAGE]\nDo not use: percentile, decile, quartile, top X%, bottom X%. These labels are banned.\n\n[TASK]\nFor each notable group:\n- Use Energy to identify statistically elevated groups. Map to stat_dev (0–1) based on relative magnitude.\n- Use Polarity sign directly: positive → polarity=aligned (upward); negative → polarity=divergent (downward); near zero with high Energy → polarity=unclear (chaotic).\n- Use Directional_Concentration directly as ctx_coh (already 0–1 bounded).\n- Use Dominant_Signal directly as the dominant_driver provenance.\n- Interpret the combination: what kind of move is this? (stress-driven selloff; trend-driven rally; dispersion/rotation; confusion). This semantic inference is YOUR job.\n- Calculator is a derived lens — treat as cross-check, not primary signal.\n\n[OUTPUT FORMAT]\nEach line must be a valid Semantic Tuple v1: {Subject, Metric, Context}\n\nField encoding rules (semicolons inside fields — NO commas inside any field):\n  Metric required keys: signal=<slug>; stat_dev=<0.0–1.0>; ctx_coh=<0.0–1.0>; polarity=<aligned|divergent|unclear>; C:<LOW|MEDIUM|HIGH>\n  Context required keys: prov=calc:<Dominant_Signal>|<second_metric_id>; topo=<coverage_ok|sparse|stale|unknown>; as_of=<iso8601|unknown>; note=<short semantic interpretation>\n  Minimum provenance: 2 calc metric IDs OR 1 calc metric ID + 1 named topology driver.\n\nFormat rules:\n  - NO commas inside any field (use semicolons or slashes for internal lists)\n  - NO headers, preamble, or narrative — pure tuples only\n  - One tuple per line\n\nSee Contract: codex/substrate/contracts/atomic_tuple.md\n\nExample:\n{TECH-ENERGY, signal=stress_selloff; stat_dev=0.87; ctx_coh=0.72; polarity=divergent; C:HIGH, prov=calc:Stress_Short|Trend_Long; topo=coverage_ok; as_of=2026-03-02T16:00:00+00:00; note=high-conviction downward stress with Stress_Short dominant}\n\n[OUTPUT]\nAtomic Tuples {Subject, Metric, Context}",
+  "lane": "CALCULATOR",
+  "expectation": "Output Semantic Tuple v1 {Subject, Metric, Context}. Each Metric field must contain: signal, stat_dev, ctx_coh (from Directional_Concentration), polarity (from Polarity sign), C: confidence. Each Context field must contain: prov (Dominant_Signal + 1 other calc metric ID), topo, as_of, note (semantic interpretation). No percentile/decile language. No arithmetic reconstruction from raw z-scores.",
+  "routing_class": "EXTRACT",
+  "boundary": "Extraction only. No prediction synthesis. No thesis formation. Report data signals with C: confidence tags. No percentile, decile, quartile, top X%, or bottom X% language permitted."
+}

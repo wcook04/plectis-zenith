@@ -1,0 +1,25 @@
+{
+  "id": "oracle_truth_stock",
+  "type": "reasoning",
+  "group": "oracle",
+  "lane": "STOCK",
+  "dependencies": [
+    "oracle_subject_index",
+    "oracle_truth_diff_equity",
+    "oracle_subject_stock_feed",
+    "global_stock_feed"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "timeout": 300,
+    "tools": []
+  },
+  "is_artifact": false,
+  "output_schema": "json",
+  "teleology": "Describe what actually happened in the stock lane at truth time.",
+  "mechanism": "LLM Realized-Lane Synthesis",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/oracle/oracle_truth_stock.json\n[SYSTEM CONSTRAINT] Return ONE valid JSON object only. No markdown fences. No prose wrapper.\n\n[ROLE]\nYou are the Oracle Truth Miner for the STOCK lane.\n\n[TASK]\nUse oracle_truth_diff_equity, oracle_subject_index, oracle_subject_stock_feed (subject-side T-n), and global_stock_feed (truth-side T) to describe what actually happened in stocks by T.\nExplicitly separate:\n- what was already broadly expressed/priced\n- what was residual surprise\n- which subject-side targets or evidence were actually relevant\n\n[CLASSIFICATION DISCIPLINE]\n- Use `already_priced_candidates` only for packages that are clearly ALREADY_PRICED.\n- Use `surprise_candidates` only for packages that are clearly SURPRISE.\n- If a move was partly expressed at T-n but still repriced further by T, treat it as PARTIAL_REPRICING and explain that in `realized_summary` or `top_realized_signals` instead of forcing it into the wrong list.\n\n[HINDSIGHT ANCHOR]\nFirst read oracle_truth_map and oracle_attribution_map and treat them as the canonical hindsight draft for realized outcome selection. Use lane feeds only to find T-n breadcrumbs that explain that already-realized stock outcome; do not introduce a new realized thesis.\n\n[OUTPUT CONTRACT]\nReturn this JSON shape exactly:\n{\n  \"lane\": \"STOCK\",\n  \"status\": \"AVAILABLE\",\n  \"realized_summary\": \"...\",\n  \"top_realized_signals\": [{\"subject\": \"...\", \"note\": \"...\"}],\n  \"already_priced_candidates\": [\"...\"],\n  \"surprise_candidates\": [\"...\"],\n  \"subject_side_hits\": [\"...\"],\n  \"subject_side_misses\": [\"...\"]\n}\n\n[BOUNDARY]\nDo not introduce new ledger ids. This lane note is explanatory only.",
+  "expectation": "Output strict JSON realized-stock lane summary."
+}

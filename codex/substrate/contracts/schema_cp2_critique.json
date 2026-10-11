@@ -1,0 +1,115 @@
+{
+  "id": "schema_cp2_critique",
+  "type": "contract",
+  "version": "1.0",
+  "status": "NORMATIVE",
+  "description": "Structured Oracle critique of Lab CP2 versus hindsight `ideal_cp2`.",
+  "purpose": "This contract defines `cp2_critique`, the Oracle artifact emitted by `oracle_attribution_map`. It breaks critique into explicit scopes so Oracle can say what was wrong, why it was wrong, and which subject-side and realized refs support that diagnosis without collapsing into generic prose.",
+  "schema": {
+    "status": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "AVAILABLE"
+      ]
+    },
+    "root_failure_mode": {
+      "type": "string",
+      "required": true,
+      "constraint": "Primary diagnosis label for the run."
+    },
+    "critique_items": {
+      "type": "array[CritiqueItem]",
+      "required": true,
+      "constraint": "Non-empty. Each item must critique exactly one scope."
+    },
+    "comparison_to_ideal_summary": {
+      "type": "string",
+      "required": false
+    },
+    "reconstruction_guidance": {
+      "type": "CritiqueGuidance",
+      "required": false,
+      "constraint": "Optional bridge into ideal_cp2 authoring."
+    }
+  },
+  "critique_item": {
+    "scope": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "thesis",
+        "prediction",
+        "prediction_justification",
+        "citations_grounding",
+        "oracle_meta"
+      ],
+      "constraint": "Must align to schema_cp2 comparison scopes."
+    },
+    "target_or_claim": {
+      "type": "string",
+      "required": true,
+      "constraint": "Non-empty ticker, claim handle, or field description."
+    },
+    "subject_grounding_refs": {
+      "type": "array[string]",
+      "required": true,
+      "constraint": "May be empty only when the critique is explicitly about missing subject support."
+    },
+    "realized_refs": {
+      "type": "array[string]",
+      "required": true,
+      "constraint": "Refs into realized_hindsight_brief, prediction_reconciliation, or truth-side explanatory material."
+    },
+    "error_class": {
+      "type": "string",
+      "required": true,
+      "enum": [
+        "OBSERVATION_MISS",
+        "OBSERVATION_NOISE",
+        "SYNTHESIS_BLIND",
+        "SYNTHESIS_LEAP",
+        "PREDICTION_DRIFT",
+        "EXOGENOUS_SHOCK"
+      ]
+    },
+    "what_was_wrong": {
+      "type": "string",
+      "required": true,
+      "constraint": "Concrete explanation of the error."
+    },
+    "comparison_to_ideal": {
+      "type": "string",
+      "required": false,
+      "constraint": "Optional concise statement of what ideal_cp2 should have done instead."
+    }
+  },
+  "critique_guidance": {
+    "dominant_force": {
+      "type": "string",
+      "required": false
+    },
+    "prefer_targets": {
+      "type": "array[string]",
+      "required": false
+    },
+    "avoid_targets": {
+      "type": "array[string]",
+      "required": false
+    },
+    "eligible_ledger_ids": {
+      "type": "array[string]",
+      "required": false
+    }
+  },
+  "scope_rules": {
+    "thesis": "Was the dominant-force claim wrong, incomplete, or improperly ranked?",
+    "prediction": "Were the chosen targets, directions, or projected outcomes wrong?",
+    "prediction_justification": "Did the rationale mis-extrapolate from the thesis even when some evidence was real?",
+    "citations_grounding": "Were the chosen subject refs weak, missing, mismatched, or inadmissible?",
+    "oracle_meta": "Which hindsight-only influences mattered but remained outside admissible grounding?"
+  },
+  "taxonomy_source": "codex/substrate/dossiers/oracle_error_taxonomy.json",
+  "scope_source": "codex/substrate/dossiers/oracle_cp2_scope_dossier.json",
+  "validator": "Contract-only in Batch A. Runtime prompt/output alignment lands in Batch B Oracle node upgrades."
+}

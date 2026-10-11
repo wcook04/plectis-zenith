@@ -1,0 +1,21 @@
+{
+  "id": "surv_micro_v1_stockgrid",
+  "type": "reasoning",
+  "dependencies": [
+    "global_stockgrid_feed"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Convert top 1/3 of stockgrid data into Smart Atomic Tiles.",
+  "mechanism": "LLM Extraction",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/surveillance/micro_v1_stockgrid.json\nGenerate tiles with ID format [id:sg-{tkr}]. wr=0 is missing.\n\n[OUTPUT]\nStream of Atomic Tiles",
+  "meta": {},
+  "lane": "STOCKGRID",
+  "expectation": "Stream of Atomic Tiles."
+}

@@ -1,0 +1,23 @@
+{
+    "id": "evolve_dossier_updater",
+    "type": "reasoning",
+    "lane": "SPINE",
+    "group": "refinement",
+    "platform": "chatgpt",
+    "is_artifact": true,
+    "teleology": "Convert evolve_delta_report dossier operations into strict patch payloads using the unified vocabulary consumed by version_committer.",
+    "mechanism": "LLM constrained to output only the unified patch operation contract. Depends on delta_analyzer delta report.",
+    "expectation": "A JSON object with per-lane patch arrays: { lanes: { STOCK: [{op, selector, payload}], ETF: [...], MACRO: [...] } }",
+    "routing_class": "AGGREGATE",
+    "boundary": "Translate delta_analyzer operations into patch vocabulary only. Do not add operations not in the delta report. Do not modify version_committer behavior.",
+    "dependencies": [
+        "evolve_delta_analyzer"
+    ],
+    "execution": {
+        "retries": 1,
+        "cache_policy": "standard",
+        "tools": [],
+        "timeout": 300
+    },
+    "instruction": "@node_path:codex/nodes/refinement/dossier_updater.json\n[SYSTEM CONSTRAINT] Output ONLY one valid JSON object. No markdown fences. No prose wrapper.\n\n[ROLE]\nYou are the Evolve Dossier Updater. Convert evolve_delta_report.dossier_deltas into patch payloads for version_committer.\n\n[INPUT]\n- evolve_delta_report from delta_analyzer (schema: schema_evolve_delta.json)\n- Specifically: dossier_deltas[].operations[]\n\n[TASK]\nFor each dossier_delta, convert its operations[] into the unified patch vocabulary:\n\n- CREATE -> { op: \"set\", selector: \"KEY/path\", payload: <value> }\n- UPDATE -> { op: \"merge\", selector: \"KEY/path\", payload: <partial_value> }\n- DELETE -> { op: \"set\", selector: \"KEY/path\", payload: null }\n\n[UNIFIED VOCABULARY]\nEach operation must use:\n- op: \"set\" (create or overwrite), \"merge\" (partial-update a dict), or \"append\" (add to a list)\n- selector: slash-delimited path within the dossier JSON (e.g. \"INSTITUTIONAL_FLOW/reversal_signals\")\n- payload: (required) the new value. For deletion, use op=\"set\" with payload=null.\n\nBANNED:\n- Do NOT use op=\"delete\" — use set with payload=null instead.\n- Do NOT use dot-notation paths — slash selectors only.\n- Do NOT add operations not present in the delta report.\n- Do NOT modify the operation semantics (CREATE must create, not merge).\n\n[OUTPUT CONTRACT]\nReturn:\n{\n  \"lanes\": {\n    \"STOCK\": {\n      \"dossier_path\": \"codex/substrate/dossiers/stock.json\",\n      \"ops\": [\n        { \"op\": \"set\", \"selector\": \"INSTITUTIONAL_FLOW/reversal_signals\", \"payload\": { ... } }\n      ]\n    },\n    \"ETF\": {\n      \"dossier_path\": \"codex/substrate/dossiers/etf.json\",\n      \"ops\": []\n    },\n    \"MACRO\": {\n      \"dossier_path\": \"codex/substrate/dossiers/macro.json\",\n      \"ops\": []\n    }\n  },\n  \"total_ops\": 5,\n  \"summary\": \"Applied 3 CREATE, 1 UPDATE, 1 DELETE across STOCK and MACRO dossiers\"\n}\n\n[HARD CONSTRAINTS]\n- 1:1 mapping from delta_report operations to patch ops\n- Preserve operation order within each lane\n- Include lanes with empty ops[] to show completeness\n- total_ops must equal sum of all ops arrays"
+}

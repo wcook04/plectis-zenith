@@ -1,0 +1,261 @@
+{
+  "id": "calculator_default",
+  "type": "config",
+  "meta": {
+    "standard": "std_tool_config",
+    "description": "Calculator Configuration. Defines metrics, vector operations, and formatting precision."
+  },
+  "data": {
+    "config": {
+      "precision": 4,
+      "imputation_policy": "lane_median_then_zero",
+      "normalization_policy": "robust_zscore",
+      "normalization_clip": 3.0,
+      "energy_policy": "from_metrics_norm"
+    },
+    "stock_feed": "global_stock_feed.json",
+    "macro_feed": "global_macro_feed.json",
+    "etf_feed": "global_etf_feed.json",
+    "group_col_stock": "Category",
+    "group_col_macro": "Proxy",
+    "group_col_etf": "Category",
+    "stock_metrics": [
+      {
+        "key": "Stress_Short",
+        "columns": [
+          "Z_Short"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "Short-term Overbought/Oversold Stress (Z-Score)"
+      },
+      {
+        "key": "Trend_Long",
+        "columns": [
+          "Z_Long"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "Long-term Trend Strength"
+      },
+      {
+        "key": "Breadth_5d",
+        "columns": [
+          "Chg_5d"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "Average 5-day Change"
+      },
+      {
+        "key": "Dispersion_5d",
+        "columns": [
+          "Chg_5d"
+        ],
+        "op": "std",
+        "scale": 1.0,
+        "bucket": "dispersion",
+        "description": "Dispersion of 5-day moves (high = members diverging)"
+      },
+      {
+        "key": "Chg_63d",
+        "columns": [
+          "Chg_63d"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "63-day Change"
+      },
+      {
+        "key": "Vol_20d",
+        "columns": [
+          "Vol_20d"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "risk",
+        "description": "20-day Volatility"
+      },
+      {
+        "key": "Price_Level",
+        "columns": [
+          "Price"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "structural",
+        "description": "Average price level"
+      },
+      {
+        "key": "Price_Dispersion",
+        "columns": [
+          "Price"
+        ],
+        "op": "std",
+        "scale": 1.0,
+        "bucket": "structural",
+        "description": "Cross-member price dispersion"
+      },
+      {
+        "key": "Trend_Dispersion",
+        "columns": [
+          "Z_Short",
+          "Z_Long"
+        ],
+        "op": "std",
+        "scale": 1.0,
+        "bucket": "dispersion",
+        "description": "Spread between short and long trend factors"
+      }
+    ],
+    "etf_metrics": [
+      {
+        "key": "Stress_Short",
+        "columns": [
+          "Z_Short"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "Short-term Overbought/Oversold Stress (Z-Score)"
+      },
+      {
+        "key": "Trend_Long",
+        "columns": [
+          "Z_Long"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "Long-term Trend Strength"
+      },
+      {
+        "key": "Breadth_5d",
+        "columns": [
+          "Chg_5d"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "Average 5-day Change"
+      },
+      {
+        "key": "Dispersion_5d",
+        "columns": [
+          "Chg_5d"
+        ],
+        "op": "std",
+        "scale": 1.0,
+        "bucket": "dispersion",
+        "description": "Dispersion of 5-day moves (high = members diverging)"
+      },
+      {
+        "key": "Chg_63d",
+        "columns": [
+          "Chg_63d"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "63-day Change"
+      },
+      {
+        "key": "Vol_20d",
+        "columns": [
+          "Vol_20d"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "risk",
+        "description": "20-day Volatility"
+      },
+      {
+        "key": "Price_Level",
+        "columns": [
+          "Price"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "structural",
+        "description": "Average price level"
+      },
+      {
+        "key": "Price_Dispersion",
+        "columns": [
+          "Price"
+        ],
+        "op": "std",
+        "scale": 1.0,
+        "bucket": "structural",
+        "description": "Cross-member price dispersion"
+      },
+      {
+        "key": "Trend_Dispersion",
+        "columns": [
+          "Z_Short",
+          "Z_Long"
+        ],
+        "op": "std",
+        "scale": 1.0,
+        "bucket": "dispersion",
+        "description": "Spread between short and long trend factors"
+      }
+    ],
+    "macro_metrics": [
+      {
+        "key": "Anomaly_Score",
+        "columns": [
+          "z_score"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "Statistical deviation from historical mean"
+      },
+      {
+        "key": "Velocity_Score",
+        "columns": [
+          "pct_change"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "Rate of change"
+      },
+      {
+        "key": "Risk_Score",
+        "columns": [
+          "risk_d2"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "directional",
+        "description": "Risk adjusted return"
+      },
+      {
+        "key": "Sample_Size",
+        "columns": [
+          "n"
+        ],
+        "op": "mean",
+        "scale": 1.0,
+        "bucket": "structural",
+        "description": "Average sample size backing each proxy"
+      },
+      {
+        "key": "Sample_Size_Dispersion",
+        "columns": [
+          "n"
+        ],
+        "op": "std",
+        "scale": 1.0,
+        "bucket": "structural",
+        "description": "Sample-size dispersion across observations"
+      }
+    ]
+  }
+}

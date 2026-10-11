@@ -1,0 +1,53 @@
+{
+  "id": "polymarket_scan",
+  "type": "config",
+  "meta": {
+    "standard": "std_tool_config",
+    "description": "Public Polymarket adapter policy; operator topic selections removed."
+  },
+  "data": {
+    "api": {
+      "base_url": "https://gamma-api.polymarket.com/events",
+      "limit": 1000,
+      "timeout": 60
+    },
+    "tuning": {
+      "zombie": {
+        "price_floor": 0.95,
+        "max_velocity": 0.015
+      },
+      "newsbreaker": {
+        "resolved_ceiling": 0.93,
+        "resolved_floor": 0.07,
+        "min_volume": 2500,
+        "min_uncertainty": 0.08,
+        "max_abs_change": 0.85,
+        "uncertainty_power": 0.35
+      },
+      "god_mode": {
+        "min_price": 0.2,
+        "max_price": 0.8
+      },
+      "scout": {
+        "max_volume": 50000
+      }
+    },
+    "output": {
+      "top_n": 30,
+      "top_n_by_lens": {
+        "HOT SEAT": 26,
+        "NEWSBREAKER": 36,
+        "GOD MODE": 24,
+        "SCOUT": 20
+      },
+      "dedupe_slug_within_lens": true,
+      "include_slug": true,
+      "float_precision": 3
+    },
+    "routing": {
+      "kill_list": [],
+      "safety_keywords": [],
+      "topics": {}
+    }
+  }
+}

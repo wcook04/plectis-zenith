@@ -1,0 +1,21 @@
+{
+  "id": "surv_micro_v1_news",
+  "type": "reasoning",
+  "dependencies": [
+    "global_news_feed"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Convert top 1/3 of news data into Smart Atomic Tiles with 50/50 semantic split.",
+  "mechanism": "LLM Extraction",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/surveillance/micro_v1_news.json\n[CONTEXT]\nInput: News Feed (Raw Data).\n\n[TASK]\nScan the raw feed. Select the most significant ~33% of the data points (the 'Load Bearing' data).\nConvert these into Smart Atomic Tiles paired with Semantic Insight.\n\n[CONSTRAINT: SMART ATOMIC TILES]\n- DO NOT repeat the data in the sentence. The data lives in the `[...]`. The sentence explains the `why`.\n- DO NOT include `src` or `run_id` (we know the source).\n- Ratio: 50% Data (The Tile) / 50% Semantics (The Context).\n\n[FORMAT EXAMPLE]\nBad: \"Apple is up 5% to 150 [id:AAPL p:150 chg:5%]\" (Redundant)\nGood: \"[id:AAPL p:150 chg:+5% v:10m] Safe-haven flows are rotating back into mega-cap tech despite yield pressure.\"\nGood: \"[id:si-hit-100 p:0.75 c:0.15] Longer horizon restores upside optionality even if end-Jan is faded.\"\n\n[OUTPUT]\nStream of Atomic Tiles covering the top 1/3 of the feed.",
+  "meta": {},
+  "lane": "NEWS",
+  "expectation": "Stream of Atomic Tiles covering the top 1/3 of the feed."
+}

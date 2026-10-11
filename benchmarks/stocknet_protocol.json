@@ -1,0 +1,29 @@
+{
+  "schema_version": "stocknet_price_only_protocol_v1",
+  "dataset_repository": "https://github.com/yumoxu/stocknet-dataset.git",
+  "dataset_commit": "330708b5ddc359961078bef469f43f48992fd6e4",
+  "code_repository": "https://github.com/yumoxu/stocknet-code.git",
+  "code_commit": "e32147c07c1e06033fcc8f76525a0c25e8babc16",
+  "split_source": "src/config.yml",
+  "split_interval_source": "src/DataPipe.py",
+  "splits": {
+    "train": ["2014-01-01", "2015-08-01"],
+    "dev": ["2015-08-01", "2015-10-01"],
+    "test": ["2015-10-01", "2016-01-01"]
+  },
+  "horizons_observed_rows": [1, 5, 20],
+  "price_basis": "Close as supplied in the pinned Yahoo-sourced CSV; source vintage and split adjustment are not independently verified",
+  "feature_fields": ["Open", "High", "Low", "Close", "Volume"],
+  "excluded_feature_fields": ["Adj Close"],
+  "feature_lookback_observed_rows": 20,
+  "issue_availability_assumption": "All OHLCV fields of a dated row are available only after that row closes; no intraday prediction claim",
+  "label_maturity": "target date must be strictly before the half-open split end",
+  "embargo": "omit the first h observed rows in each stock's dev/test split for horizon h",
+  "window_issue_days": 20,
+  "baseline_models": ["no_change", "past_horizon_momentum"],
+  "optional_model": "ridge_ohlcv_fixed_lambda_1_train_only",
+  "primary_aggregation": "equal issue-date weight; first average errors across available stocks on that date",
+  "paper_score_reproduction": false,
+  "comparison_conditions": "New price-only regression protocol. StockNet paper uses tweets, one-day direction and movement/coverage filters; these scores are not its published-score reproduction.",
+  "data_distribution": "Raw CSV stays in ignored local work; MIT repository license does not establish independent Yahoo redistribution rights."
+}

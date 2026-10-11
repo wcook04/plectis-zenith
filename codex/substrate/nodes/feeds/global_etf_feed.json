@@ -1,0 +1,21 @@
+{
+  "id": "global_etf_feed",
+  "type": "tool",
+  "dependencies": [],
+  "meta": {
+    "is_feed": true
+  },
+  "is_artifact": true,
+  "teleology": "Capture sector, thematic, fixed-income, and cross-asset fund rotation at T-n so the system can observe regime expression beyond single names.",
+  "mechanism": "Runs tools.stock.stock against the ETF universe and writes the same normalized table shape as STOCK while keeping the instrument set ETF-only.",
+  "config": {
+    "module": "tools.stock.stock",
+    "config": {
+      "snapshot_period": "6mo"
+    },
+    "config_file": "codex/substrate/configs/etf_default.json"
+  },
+  "lane": "ETF",
+  "expectation": "Return an ETF artifact covering broad-market, sector, international, fixed-income, and thematic funds using the stock-table shape. Ticker set must remain distinct from global_stock_feed.",
+  "group": "feeds"
+}

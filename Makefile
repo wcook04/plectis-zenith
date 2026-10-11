@@ -1,10 +1,10 @@
-.PHONY: build test serve
-
-build:
-	python3 -m benchmark.run --output web/data/benchmark.json
+.PHONY: test validate benchmark
 
 test:
-	python3 -m unittest discover -s tests -v
+	python -m pytest tests
 
-serve:
-	python3 -m observatory.serve --port 8768
+validate:
+	python -m zenith validate
+
+benchmark:
+	python -m benchmark.run --output work/benchmark/benchmark.json

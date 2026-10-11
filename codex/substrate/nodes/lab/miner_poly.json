@@ -1,0 +1,24 @@
+{
+  "id": "lab_miner_poly",
+  "type": "reasoning",
+  "dependencies": [
+    "global_polymarket_feed",
+    "lab_seed_state"
+  ],
+  "meta": {},
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Extract load-bearing raw materials from the feed.",
+  "mechanism": "LLM Extraction",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/lab/miner_poly.json\n[CONTEXT]\nInput 1: Poly Feed.\nInput 2: Data Topology (Data coverage and quality map).\n[ROLE]\nYou are the Sensor. Your job is to extract the *Raw Materials* for the Market Physics Engine.\n[TASK]\nExtract live contested signal with clear information density.\n1. Rank by abs(c) (24h probability change) among markets with 0.08 <= p <= 0.92.\n2. De-duplicate by slug across lenses (keep strongest instance).\n3. Emit an adaptive number of tuples based on signal diversity (typically 30-90).\n4. Surface threshold crossings (25%; 50%; 75%), conviction/volume spikes, and major divergences from seed-state assumptions.\n5. Keep Metric concise and signal-first: direction, current probability, 24h change, and volume/conviction as needed.\n6. Do not overload Metric with every raw field token. Put second-order interpretation in Context.\n7. Context must be one to two sentences and must state implication for next 24h; optional second sentence may state cross-lane consequence.\n8. If many contracts are near-duplicates of one event family with the same implication, compress into a cluster tuple and only keep key representatives as individual tuples.\n9. Ignore mechanically noisy markets: if volume/liquidity is thin relative to the lane or the move appears single-print driven, skip it unless the contract also crossed a major threshold or has cross-source significance.\n\n[OUTPUT FORMAT]\nEach line must be a valid Atomic Tuple: {Subject, Metric/Value, Context/Implication}\n- NO commas inside any field (use semicolons or slashes for internal lists)\n- NO headers, preamble, or narrative - pure tuples only\n- One tuple per line\nSee Contract: codex/substrate/contracts/atomic_tuple.md\n\nExample:\n{bitcoin-above-70000-feb16, No 83.5% / c -29.0pp / v 82136, Probability compression implies level-sensitive squeeze risk if spot reclaims momentum}\n\n[OUTPUT]\nAtomic Tuples {Subject, Metric, Context}",
+  "lane": "POLYMARKET",
+  "expectation": "Output adaptive high-signal Atomic Tuples {Subject, Metric, Context} with concise metrics and implication-rich context.",
+  "routing_class": "EXTRACT",
+  "boundary": "Extraction only. No prediction synthesis. No thesis formation. Report data signals with C: confidence tags."
+}

@@ -1,0 +1,25 @@
+{
+  "id": "oracle_subject_calc_feed",
+  "type": "tool",
+  "group": "oracle",
+  "lane": "CALCULATOR",
+  "dependencies": [],
+  "instruction": "@node_path:codex/substrate/nodes/oracle/oracle_subject_calc_feed.json\n[ROLE] Oracle Subject Snapshot (Calculator Feed)\n[TASK] Load the subject-run global_calculator_feed artifact so Oracle can compare explicit T-n regime analytics against truth-side state.\n[OUTPUT] JSON payload copied from the paired subject run with subject provenance metadata.",
+  "config": {
+    "module": "tools.oracle.subject_snapshot",
+    "artifact_id": "global_calculator_feed"
+  },
+  "execution": {
+    "cache_policy": "standard",
+    "retries": 1,
+    "timeout": 60,
+    "tools": []
+  },
+  "is_artifact": true,
+  "teleology": "Expose the subject-run calculator feed as explicit Oracle T-n upstream context.",
+  "mechanism": "Python Subject Snapshot Proxy",
+  "expectation": "Output the subject-run global_calculator_feed artifact data with subject provenance metadata.",
+  "meta": {
+    "role": "tool"
+  }
+}

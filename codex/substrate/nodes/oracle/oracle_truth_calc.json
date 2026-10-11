@@ -1,0 +1,24 @@
+{
+  "id": "oracle_truth_calc",
+  "type": "reasoning",
+  "group": "oracle",
+  "lane": "CALCULATOR",
+  "dependencies": [
+    "oracle_subject_index",
+    "oracle_subject_calc_feed",
+    "global_calculator_feed"
+  ],
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "timeout": 300,
+    "tools": []
+  },
+  "is_artifact": false,
+  "output_schema": "json",
+  "teleology": "Describe the realized regime analytics lane at truth time.",
+  "mechanism": "LLM Realized-Lane Synthesis",
+  "platform": "chatgpt",
+  "instruction": "@node_path:codex/substrate/nodes/oracle/oracle_truth_calc.json\n[SYSTEM CONSTRAINT] Return ONE valid JSON object only. No markdown fences. No prose wrapper.\n\n[ROLE]\nYou are the Oracle Truth Miner for the CALCULATOR lane.\n\n[TASK]\nUsing oracle_subject_index, oracle_subject_calc_feed (subject-side T-n), and global_calculator_feed (truth-side T), identify the regime signals that best explain why the realized move was continuation, repricing, or surprise.\n\n[DECISION RULE]\nIn realized_summary, explicitly label the realized move as CONTINUATION, PARTIAL_REPRICING, or SURPRISE before explaining the supporting regime signals. Do not leave the continuation/repricing/surprise judgment implicit.\n\n[OUTPUT CONTRACT]\nReturn this JSON shape exactly:\n{\n  \"lane\": \"CALCULATOR\",\n  \"status\": \"AVAILABLE\",\n  \"realized_summary\": \"...\",\n  \"key_regime_signals\": [{\"subject\": \"...\", \"note\": \"...\"}],\n  \"already_priced_candidates\": [\"...\"],\n  \"surprise_candidates\": [\"...\"],\n  \"subject_side_hits\": [\"...\"],\n  \"subject_side_misses\": [\"...\"]\n}\n\n[BOUNDARY]\nDo not introduce new ledger ids. This lane note is explanatory only.",
+  "expectation": "Output strict JSON realized-calculator lane summary."
+}
