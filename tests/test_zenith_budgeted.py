@@ -1,5 +1,6 @@
 """Shared paid budgets use synthetic prices, fake credentials and mock HTTP only."""
 import copy
+from decimal import Decimal
 import json
 import os
 import tempfile
@@ -166,6 +167,37 @@ class BudgetedTests(unittest.TestCase):
                 provider.caller.assert_not_called()
         with self.assertRaisesRegex(RuntimeError, "exactly once"):
             verified_model(MODEL, http_get=lambda *args: {"data": [ROW, ROW]})
+
+    def test_discounted_or_equal_cache_read_still_reserves_every_input_at_full_price(self):
+        for index, read_price in enumerate(("0", "0.00000025", ROW["pricing"]["prompt"])):
+            row = {**ROW, "pricing": {**ROW["pricing"], "input_cache_read": read_price}}
+            def post(url, headers, payload, timeout):
+                entry = list(self.ledger()["entries"].values())[-1]
+                self.assertEqual(entry["reserved_cost_usd"], "0.006149")
+                self.assertEqual(Decimal(entry["catalogue_pricing"]["input_cache_read"]), Decimal(read_price))
+                self.assertEqual(payload["provider"]["max_price"]["prompt"], 1.0)
+                self.assertNotIn("cache_control", payload)
+                result = reply()
+                result["usage"]["prompt_tokens_details"] = {"cached_tokens": 10}
+                return result
+            provider = self.provider(run=f"cache-{index}", row=row, caller=post)
+            with self.subTest(read_price=read_price):
+                self.assertEqual(self.ask(provider), "valid synthetic output")
+        self.assertEqual(self.ledger()["total_reserved_usd"], "0.018447")
+        self.assertEqual(len(self.ledger()["entries"]), 3)
+
+    def test_unsupported_or_invalid_cache_pricing_rejects_before_inference(self):
+        for key, value in [("input_cache_read", "0.00000101"), ("input_cache_read", "NaN"),
+                           ("input_cache_read", "Infinity"), ("input_cache_read", "-0.1"),
+                           ("input_cache_read", None), ("input_cache_read", True),
+                           ("input_cache_write", "0.0000001"), ("input_cache_write_1h", "0.0000001"),
+                           ("unknown_cache_fee", "0.0000001"), ("image", "0.0000001")]:
+            row = {**ROW, "pricing": {**ROW["pricing"], key: value}}
+            provider = self.provider(row=row, caller=Mock())
+            with self.subTest(key=key, value=value), self.assertRaises((ValueError, RuntimeError)):
+                self.ask(provider)
+            provider.caller.assert_not_called()
+        self.assertFalse((self.root / "shared/budget.json").exists())
 
     def test_unknown_cost_halts_entire_batch_without_retry(self):
         data = reply()

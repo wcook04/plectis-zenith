@@ -70,8 +70,10 @@ def verified_model(model: str, *, http_get=None):
     if not isinstance(pricing, dict) or not {"prompt", "completion"} <= pricing.keys():
         raise RuntimeError("budgeted model lacks known prompt/completion pricing")
     prices = {key: amount(value, "catalogue pricing") for key, value in pricing.items()}
+    if prices.get("input_cache_read", Decimal(0)) > prices["prompt"]:
+        raise RuntimeError("cached input read price must not exceed the full prompt price")
     for key, value in prices.items():
-        if key not in ("prompt", "completion", "request") and value != 0:
+        if key not in ("prompt", "completion", "request", "input_cache_read") and value != 0:
             raise RuntimeError("budgeted adapter rejects ancillary charges")
     architecture = row.get("architecture", {})
     if architecture.get("output_modalities") != ["text"] or "text" not in architecture.get("input_modalities", []):
@@ -201,6 +203,7 @@ class OpenRouterBudgetedProvider(Provider):
         top_output = (row.get("top_provider") or {}).get("max_completion_tokens")
         if top_output is not None and output_bound > positive_int(top_output, "max_completion_tokens"):
             raise RuntimeError("output cap exceeds verified provider maximum")
+        # Cached reads are discounted alternatives, never an assumed cache hit.
         reservation = prices["prompt"] * input_bound + prices["completion"] * output_bound + prices.get("request", Decimal(0))
         record = {"schema": "zenith_api_call_v1", **identity, "call_id": call_id,
                   "provider": "openrouter_budgeted", "requested_model": self.model,
