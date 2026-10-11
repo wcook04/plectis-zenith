@@ -1,0 +1,718 @@
+{
+  "checks": [
+    {
+      "detail": "24b8f83168153d9cd0bc6121d3979bd8c70fb7b58a94b920194135cbe003090b",
+      "id": "source_hash",
+      "label": "Source checksum",
+      "status": "passed"
+    },
+    {
+      "detail": "720 available horizons checked against next-row open/close, including 30 purged rows",
+      "id": "labels",
+      "label": "Independent label reconstruction",
+      "status": "passed"
+    },
+    {
+      "detail": "Models receive only the explicit current-week feature whitelist",
+      "id": "feature_boundary",
+      "label": "Future columns excluded",
+      "status": "passed"
+    },
+    {
+      "detail": "All training labels resolve strictly before the first test issue week",
+      "id": "split_boundary",
+      "label": "Purged temporal split",
+      "status": "passed"
+    },
+    {
+      "detail": "30 stocks in each of 12 test issue weeks",
+      "id": "coverage",
+      "label": "Balanced weekly coverage",
+      "status": "passed"
+    }
+  ],
+  "code_hash": "899de24ed80e49a63bc9e9e982995382494373c632d30526b0aef2449fcf1915",
+  "dataset": {
+    "attribution": "Brown, M. (2013). Dow Jones Index [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5788V",
+    "doi": "10.24432/C5788V",
+    "id": "uci_dow_jones_312",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "missing_fields": {
+      "percent_change_volume_over_last_wk": 30,
+      "previous_weeks_volume": 30
+    },
+    "name": "UCI Dow Jones Index \u2014 weekly 2011 sample",
+    "period": {
+      "end": "2011-06-24",
+      "start": "2011-01-07"
+    },
+    "rows": 750,
+    "sha256": "24b8f83168153d9cd0bc6121d3979bd8c70fb7b58a94b920194135cbe003090b",
+    "source_url": "https://archive.ics.uci.edu/dataset/312/dow+jones+index",
+    "stocks": 30,
+    "weeks": 25
+  },
+  "downloads": {
+    "attribution": "data/ATTRIBUTION.md",
+    "manifest": "data/source_manifest.json",
+    "methodology": "docs/methodology.md",
+    "predictions": "data/predictions.csv",
+    "source": "https://archive.ics.uci.edu/static/public/312/dow+jones+index.zip"
+  },
+  "methodology": {
+    "baseline_fit": "Training frequency is fitted once on the purged Q1 split. Momentum probabilities are fixed without tuning.",
+    "comparison_unit": "week",
+    "feature_allowlist": [
+      "stock",
+      "date",
+      "percent_change_price"
+    ],
+    "feature_availability_assumption": "Current-week features become available after its last observed close. Exact historical publication timestamps are unavailable.",
+    "limitations": [
+      "Small selected historical sample; no investment performance or generalization claim.",
+      "30 assets share each market week. There are 12 holdout weeks, not 360 independent trials.",
+      "No precise historical publication timestamps, vintage data or verified corporate-action adjustment.",
+      "Historical LLM performance is not evaluated; training-data contamination is uncontrolled.",
+      "No trading execution, costs, dividends, portfolio returns or significance claims."
+    ],
+    "prohibited_features": [
+      "next_weeks_open",
+      "next_weeks_close",
+      "percent_change_next_weeks_price",
+      "days_to_next_dividend",
+      "percent_return_next_dividend"
+    ],
+    "score": "Brier = mean((probability - outcome)^2); lower is better"
+  },
+  "models": [
+    {
+      "brier": 0.25,
+      "description": "Constant probability 0.5",
+      "id": "neutral",
+      "name": "Neutral 50%",
+      "predictions": 360,
+      "probability": {
+        "kind": "constant",
+        "value": 0.5
+      },
+      "skill_vs_neutral": 0.0,
+      "weekly": [
+        {
+          "brier": 0.25,
+          "date": "2011-04-01",
+          "event_end": "2011-04-08",
+          "n": 30,
+          "positive_rate": 0.5
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-04-08",
+          "event_end": "2011-04-15",
+          "n": 30,
+          "positive_rate": 0.3333333333333333
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-04-15",
+          "event_end": "2011-04-21",
+          "n": 30,
+          "positive_rate": 0.8333333333333334
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-04-21",
+          "event_end": "2011-04-29",
+          "n": 30,
+          "positive_rate": 0.8666666666666667
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-04-29",
+          "event_end": "2011-05-06",
+          "n": 30,
+          "positive_rate": 0.23333333333333334
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-05-06",
+          "event_end": "2011-05-13",
+          "n": 30,
+          "positive_rate": 0.4666666666666667
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-05-13",
+          "event_end": "2011-05-20",
+          "n": 30,
+          "positive_rate": 0.36666666666666664
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-05-20",
+          "event_end": "2011-05-27",
+          "n": 30,
+          "positive_rate": 0.6333333333333333
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-05-27",
+          "event_end": "2011-06-03",
+          "n": 30,
+          "positive_rate": 0.0
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-06-03",
+          "event_end": "2011-06-10",
+          "n": 30,
+          "positive_rate": 0.06666666666666667
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-06-10",
+          "event_end": "2011-06-17",
+          "n": 30,
+          "positive_rate": 0.5
+        },
+        {
+          "brier": 0.25,
+          "date": "2011-06-17",
+          "event_end": "2011-06-24",
+          "n": 30,
+          "positive_rate": 0.3333333333333333
+        }
+      ]
+    },
+    {
+      "brier": 0.26001818519056147,
+      "description": "Q1 positive-label frequency with add-one smoothing",
+      "id": "train_frequency",
+      "name": "Training frequency",
+      "predictions": 360,
+      "probability": {
+        "kind": "train_only_frequency",
+        "value": 0.5512048192771084
+      },
+      "skill_vs_neutral": -0.04007274076224587,
+      "weekly": [
+        {
+          "brier": 0.25262193351720136,
+          "date": "2011-04-01",
+          "event_end": "2011-04-08",
+          "n": 30,
+          "positive_rate": 0.5
+        },
+        {
+          "brier": 0.2696902066095708,
+          "date": "2011-04-08",
+          "event_end": "2011-04-15",
+          "n": 30,
+          "positive_rate": 0.3333333333333333
+        },
+        {
+          "brier": 0.2184853873324624,
+          "date": "2011-04-15",
+          "event_end": "2011-04-21",
+          "n": 30,
+          "positive_rate": 0.8333333333333334
+        },
+        {
+          "brier": 0.21507173271398852,
+          "date": "2011-04-21",
+          "event_end": "2011-04-29",
+          "n": 30,
+          "positive_rate": 0.8666666666666667
+        },
+        {
+          "brier": 0.2799311704649925,
+          "date": "2011-04-29",
+          "event_end": "2011-05-06",
+          "n": 30,
+          "positive_rate": 0.23333333333333334
+        },
+        {
+          "brier": 0.25603558813567523,
+          "date": "2011-05-06",
+          "event_end": "2011-05-13",
+          "n": 30,
+          "positive_rate": 0.4666666666666667
+        },
+        {
+          "brier": 0.26627655199109695,
+          "date": "2011-05-13",
+          "event_end": "2011-05-20",
+          "n": 30,
+          "positive_rate": 0.36666666666666664
+        },
+        {
+          "brier": 0.23896731504330576,
+          "date": "2011-05-20",
+          "event_end": "2011-05-27",
+          "n": 30,
+          "positive_rate": 0.6333333333333333
+        },
+        {
+          "brier": 0.30382675279430976,
+          "date": "2011-05-27",
+          "event_end": "2011-06-03",
+          "n": 30,
+          "positive_rate": 0.0
+        },
+        {
+          "brier": 0.29699944355736196,
+          "date": "2011-06-03",
+          "event_end": "2011-06-10",
+          "n": 30,
+          "positive_rate": 0.06666666666666667
+        },
+        {
+          "brier": 0.25262193351720136,
+          "date": "2011-06-10",
+          "event_end": "2011-06-17",
+          "n": 30,
+          "positive_rate": 0.5
+        },
+        {
+          "brier": 0.2696902066095708,
+          "date": "2011-06-17",
+          "event_end": "2011-06-24",
+          "n": 30,
+          "positive_rate": 0.3333333333333333
+        }
+      ]
+    },
+    {
+      "brier": 0.2627777777777778,
+      "description": "Probability 0.6 after a positive current week; otherwise 0.4",
+      "id": "momentum",
+      "name": "Fixed momentum",
+      "predictions": 360,
+      "probability": {
+        "kind": "fixed_rule",
+        "otherwise": 0.4,
+        "positive_current_week": 0.6
+      },
+      "skill_vs_neutral": -0.05111111111111111,
+      "weekly": [
+        {
+          "brier": 0.29333333333333333,
+          "date": "2011-04-01",
+          "event_end": "2011-04-08",
+          "n": 30,
+          "positive_rate": 0.5
+        },
+        {
+          "brier": 0.2866666666666667,
+          "date": "2011-04-08",
+          "event_end": "2011-04-15",
+          "n": 30,
+          "positive_rate": 0.3333333333333333
+        },
+        {
+          "brier": 0.3,
+          "date": "2011-04-15",
+          "event_end": "2011-04-21",
+          "n": 30,
+          "positive_rate": 0.8333333333333334
+        },
+        {
+          "brier": 0.2066666666666667,
+          "date": "2011-04-21",
+          "event_end": "2011-04-29",
+          "n": 30,
+          "positive_rate": 0.8666666666666667
+        },
+        {
+          "brier": 0.3,
+          "date": "2011-04-29",
+          "event_end": "2011-05-06",
+          "n": 30,
+          "positive_rate": 0.23333333333333334
+        },
+        {
+          "brier": 0.24666666666666667,
+          "date": "2011-05-06",
+          "event_end": "2011-05-13",
+          "n": 30,
+          "positive_rate": 0.4666666666666667
+        },
+        {
+          "brier": 0.24666666666666667,
+          "date": "2011-05-13",
+          "event_end": "2011-05-20",
+          "n": 30,
+          "positive_rate": 0.36666666666666664
+        },
+        {
+          "brier": 0.28,
+          "date": "2011-05-20",
+          "event_end": "2011-05-27",
+          "n": 30,
+          "positive_rate": 0.6333333333333333
+        },
+        {
+          "brier": 0.2866666666666667,
+          "date": "2011-05-27",
+          "event_end": "2011-06-03",
+          "n": 30,
+          "positive_rate": 0.0
+        },
+        {
+          "brier": 0.17333333333333337,
+          "date": "2011-06-03",
+          "event_end": "2011-06-10",
+          "n": 30,
+          "positive_rate": 0.06666666666666667
+        },
+        {
+          "brier": 0.26,
+          "date": "2011-06-10",
+          "event_end": "2011-06-17",
+          "n": 30,
+          "positive_rate": 0.5
+        },
+        {
+          "brier": 0.2733333333333333,
+          "date": "2011-06-17",
+          "event_end": "2011-06-24",
+          "n": 30,
+          "positive_rate": 0.3333333333333333
+        }
+      ]
+    }
+  ],
+  "prediction_artifact": {
+    "rows": 1080,
+    "sha256": "21c75c590899b3fe1bb1e8439296ad355932466740925400c2000428f49e0c39"
+  },
+  "protocol_version": "1",
+  "schema_version": "plectis_benchmark_v1",
+  "split": {
+    "excluded": [
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "AA"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "AA"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "AXP"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "AXP"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "BA"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "BA"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "BAC"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "BAC"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "CAT"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "CAT"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "CSCO"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "CSCO"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "CVX"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "CVX"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "DD"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "DD"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "DIS"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "DIS"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "GE"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "GE"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "HD"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "HD"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "HPQ"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "HPQ"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "IBM"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "IBM"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "INTC"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "INTC"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "JNJ"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "JNJ"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "JPM"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "JPM"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "KO"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "KO"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "KRFT"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "KRFT"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "MCD"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "MCD"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "MMM"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "MMM"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "MRK"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "MRK"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "MSFT"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "MSFT"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "PFE"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "PFE"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "PG"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "PG"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "T"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "T"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "TRV"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "TRV"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "UTX"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "UTX"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "VZ"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "VZ"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "WMT"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "WMT"
+      },
+      {
+        "date": "2011-03-25",
+        "reason": "purged_cross_quarter_horizon",
+        "stock": "XOM"
+      },
+      {
+        "date": "2011-06-24",
+        "reason": "unverifiable_final_horizon",
+        "stock": "XOM"
+      }
+    ],
+    "policy": "fixed_q1_train_q2_test_with_horizon_purge",
+    "purged_rows": 30,
+    "test": {
+      "end": "2011-06-17",
+      "last_label_date": "2011-06-24",
+      "rows": 360,
+      "start": "2011-04-01",
+      "weeks": 12
+    },
+    "train": {
+      "end": "2011-03-18",
+      "last_label_date": "2011-03-25",
+      "rows": 330,
+      "start": "2011-01-07",
+      "weeks": 11
+    },
+    "unverifiable_horizon_rows": 30
+  },
+  "target": {
+    "description": "Does the following week's closing price exceed that week's opening price? Equal prices count as 0.",
+    "horizon": "following observed week",
+    "id": "next_week_open_to_close_positive",
+    "price_basis": "unadjusted source prices; corporate-action correctness is not established"
+  }
+}

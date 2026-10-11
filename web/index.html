@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fa">
+  <meta name="description" content="Plectis Observatory is an inspectable research benchmark for frozen predictions, later observations, and honest scoring.">
+  <title>Plectis Observatory — evidence before confidence</title>
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to evidence</a>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="Plectis Observatory home"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8h10l12 8-12 8H5Z"/><circle cx="15" cy="16" r="4"/></svg><span>Plectis <strong>Observatory</strong></span></a>
+    <nav aria-label="Main navigation"><a href="#evidence">Evidence</a><a href="#pipeline">Pipeline</a><a href="#operations">Operations</a><a href="#methods">Methods</a></nav>
+    <span class="research-label"><span></span>Research edition</span>
+  </header>
+  <main id="main">
+    <section class="opening" aria-labelledby="page-title">
+      <div class="opening-copy"><p class="edition">An open prediction experiment</p><h1 id="page-title">A forecast is a claim.</h1><p class="intro">Observe data. Freeze a prediction. Wait for the outcome. Score what actually happened.</p></div>
+      <aside class="opening-note"><span class="note-symbol" aria-hidden="true">↗</span><p>Start with a small, reproducible historical benchmark. Make every step inspectable before asking a model to do more.</p><a href="#pipeline">Explore the experiment</a></aside>
+    </section>
+    <div id="load-status" class="load-status" role="status">Loading the historical benchmark…</div>
+    <section id="evidence" class="evidence-section" aria-labelledby="evidence-title" hidden>
+      <div class="section-heading"><div><p class="section-kicker">Historical evidence</p><h2 id="evidence-title">Did the forecasts earn their confidence?</h2></div><span id="period-label" class="period-label"></span></div>
+      <div class="evidence-layout">
+        <div class="chart-panel">
+          <div class="chart-heading"><div><h3>Weekly Brier score</h3><p>Lower is better. A constant 50% forecast scores 0.25.</p></div><button id="chart-reset" class="text-button" type="button">Show all models</button></div>
+          <div id="chart-legend" class="chart-legend" aria-label="Models shown in chart"></div>
+          <div class="chart-scroll"><svg id="score-chart" viewBox="0 0 840 320" role="img" aria-labelledby="chart-title chart-description"><title id="chart-title">Weekly historical Brier scores</title><desc id="chart-description">Loading benchmark scores.</desc></svg></div>
+          <div id="week-inspector" class="week-inspector" aria-live="polite"></div>
+          <p class="chart-hint">Select a week to inspect its observations and model scores.</p>
+        </div>
+        <aside class="study-panel" aria-labelledby="study-title"><h3 id="study-title">The study at a glance</h3><dl id="study-facts"></dl><div class="study-boundary"><span class="boundary-icon" aria-hidden="true">i</span><p id="conclusion"></p></div><a href="#methods" class="inline-link">Read the method &amp; limitations</a></aside>
+      </div>
+      <div class="scores-heading"><h3>Whole test period</h3><p>Same outcomes, same metric, every model.</p></div>
+      <div class="table-scroll"><table class="score-table"><caption class="sr-only">Aggregate benchmark scores across the held-out test period</caption><thead><tr><th scope="col">Forecast rule</th><th scope="col">Brier score <span>↓</span></th><th scope="col">Against 50%</th><th scope="col">Interpretation</th></tr></thead><tbody id="score-table-body"></tbody></table></div>
+    </section>
+    <section id="pipeline" class="pipeline-section" aria-labelledby="pipeline-title">
+      <div class="section-heading"><div><p class="section-kicker">The evidence chain</p><h2 id="pipeline-title">Prediction and truth have different clocks.</h2></div><p class="heading-note">Select a stage to inspect what enters,<br>what leaves, and what is recorded.</p></div>
+      <div class="pipeline-surface">
+        <div class="pipeline-topline"><span class="pipeline-caption">A directed experiment</span><span class="pipeline-caption">Historical replay / no live asset signals</span></div>
+        <div class="pipeline-scroll"><svg id="pipeline-diagram" viewBox="0 0 1040 246" role="group" aria-label="Prediction evidence pipeline">
+          <defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="#a8c1ff"/></marker></defs>
+          <g class="edges" fill="none" stroke="#a8c1ff" stroke-width="1.5" marker-end="url(#arrow)"><path d="M174 90H216"/><path d="M376 90H418"/><path d="M578 90H620"/><path d="M780 90H822"/><path d="M294 120V192H901V120" stroke-dasharray="4 5"/></g>
+          <text class="edge-label" x="604" y="185" text-anchor="middle">same held-out observations</text>
+          <g class="pipeline-node" tabindex="0" role="button" aria-label="Inspect source data stage" aria-pressed="true" data-stage="data" transform="translate(14 44)"><rect width="160" height="82" rx="9"/><text class="node-number" x="16" y="24">01</text><text class="node-title" x="16" y="50">Source data</text><text class="node-small" x="16" y="69">Dated observations</text></g>
+          <g class="pipeline-node" tabindex="0" role="button" aria-label="Inspect validation stage" aria-pressed="false" data-stage="validation" transform="translate(216 44)"><rect width="160" height="82" rx="9"/><text class="node-number" x="16" y="24">02</text><text class="node-title" x="16" y="50">Validation</text><text class="node-small" x="16" y="69">Time &amp; boundary checks</text></g>
+          <g class="pipeline-node" tabindex="0" role="button" aria-label="Inspect frozen prediction stage" aria-pressed="false" data-stage="prediction" transform="translate(418 44)"><rect width="160" height="82" rx="9"/><text class="node-number" x="16" y="24">03</text><text class="node-title" x="16" y="50">Frozen forecast</text><text class="node-small" x="16" y="69">A probability on record</text></g>
+          <g class="pipeline-node" tabindex="0" role="button" aria-label="Inspect later truth stage" aria-pressed="false" data-stage="truth" transform="translate(620 44)"><rect width="160" height="82" rx="9"/><text class="node-number" x="16" y="24">04</text><text class="node-title" x="16" y="50">Later truth</text><text class="node-small" x="16" y="69">Outcome becomes known</text></g>
+          <g class="pipeline-node" tabindex="0" role="button" aria-label="Inspect scoring stage" aria-pressed="false" data-stage="score" transform="translate(822 44)"><rect width="160" height="82" rx="9"/><text class="node-number" x="16" y="24">05</text><text class="node-title" x="16" y="50">Score &amp; receipt</text><text class="node-small" x="16" y="69">Keep the full evidence</text></g>
+        </svg></div>
+        <p class="pipeline-scroll-cue">Scroll horizontally to inspect all five stages. Keyboard users can Tab between stages.</p>
+        <div id="stage-detail" class="stage-detail" aria-live="polite"></div>
+      </div>
+    </section>
+    <section id="operations" class="operations-section" aria-labelledby="operations-title">
+      <div class="section-heading"><div><p class="section-kicker">Prospective research</p><h2 id="operations-title">The collection desk</h2></div><span id="operations-state" class="status-pill">Loading state</span></div>
+      <p class="operations-intro">Aggregate collection and experiment state. Historical benchmark results above remain a separate experiment.</p>
+      <div id="operations-content" aria-live="polite"><p>Loading the dated operations receipt…</p></div>
+    </section>
+    <section id="methods" class="methods-section" aria-labelledby="methods-title">
+      <div class="section-heading"><div><p class="section-kicker">Inspect &amp; reproduce</p><h2 id="methods-title">The result is only as useful as its method.</h2></div></div>
+      <div class="methods-layout"><div><details open><summary>What does a Brier score measure?</summary><div class="detail-copy"><p>A forecast assigns a probability <var>p</var> to a binary outcome <var>y</var>. The Brier score is the average of <strong>(p − y)²</strong>. A correct, confident forecast approaches 0; an incorrect, confident forecast approaches 1.</p><p>The constant 50% forecast scores 0.25 for every observation. A model must improve on this baseline before this experiment supplies evidence of useful forecasting.</p></div></details><details><summary>Time split, leakage, and the historical replay</summary><div id="method-detail" class="detail-copy"><p>The time split and validation receipt will appear when the benchmark data loads.</p></div></details><details><summary>What this small experiment can establish</summary><div class="detail-copy"><p>This is a historical, reproducible comparison of simple forecasting rules. The sample is limited to 30 Dow Jones constituents in 2011 and does not represent the whole market or a current market regime.</p><p>A historical replay is weaker evidence than a prospectively frozen prediction. It does not establish investment performance, trading profitability, or a reliable future edge. Benchmark rules here are not claims about the capabilities of any current language model.</p></div></details><details><summary>Sources, artifacts, and receipts</summary><div id="source-detail" class="detail-copy"><p>Source and artifact links will appear when the benchmark data loads.</p></div></details></div><aside class="method-note"><div class="method-glyph" aria-hidden="true">p<span>?</span>y</div><h3>Make the uncertainty visible.</h3><p>Source dates, model identity, a fixed scoring rule, and failures belong beside the result. That is the instrument we are building.</p><a href="data/benchmark.json" download>Download benchmark JSON</a><a href="data/operations.json" download>Download operations receipt</a><a href="docs/methodology.md">Full methodology</a><a href="docs/research-boundary.md">Research boundary</a></aside></div>
+    </section>
+  </main>
+  <footer><a class="footer-brand" href="#">Plectis Observatory</a><p>Historical research demo. No investment recommendations.<br>This small sample does not establish investment performance.</p><span>Evidence before confidence.</span></footer>
+  <noscript><div class="noscript-note">JavaScript is required for the interactive benchmark. <a href="data/benchmark.json">Read the benchmark JSON</a>.</div></noscript>
+</body>
+</html>
