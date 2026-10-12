@@ -20,7 +20,7 @@ class FixtureProvider(Provider):
         node=config['meta']['node_id']
         if 'reader' in node:return json.dumps({'observation':'Synthetic test response','cross_basket_question':'Test B06 for B01'})
         if node.endswith('_plan'):return json.dumps({'queries':[{'target':'B01','source':'B06','operation':'breadth','lag':5,'reason':'fixture'}]})
-        if node.endswith('_director'):return json.dumps({'selections':{f'B{i:02}':'Q1' if i==1 else 'baseline' for i in range(1,7)}})
+        if node.endswith('_director'):return json.dumps({'selected_candidates':['Q1']})
         raise AssertionError(node)
 
 
@@ -39,8 +39,16 @@ def test_native_forward_graph_and_final_forecasts(tmp_path):
     assert final['query_count']==1
     assert not (directory/'artifacts/lab_director.json').exists()
     # The final tool rejects selective scoring or a fabricated candidate ID.
-    path=directory/'artifacts/basket_director.json';d=json.loads(path.read_text());del d['data']['selections']['B06'];write_json(path,d)
-    with pytest.raises(ValueError,match='every basket'):numeric_run({'operation':'final'},directory)
+    path=directory/'artifacts/basket_director.json'
+    write_json(path, {'data':{'selected_candidates':['Q404']}})
+    with pytest.raises(ValueError,match='unknown candidate'):numeric_run({'operation':'final'},directory)
+    write_json(path, {'data':{'selected_candidates':['Q1','Q1']}})
+    with pytest.raises(ValueError,match='same target'):numeric_run({'operation':'final'},directory)
+    write_json(path, {'data':{'selected_candidates':[]}})
+    retained=numeric_run({'operation':'final'},directory)['data']
+    assert retained['forecasts']==retained['provisional_forecasts']
+    assert set(retained['forecasts'])==set(p.groups)
+
 
 
 def test_legacy_lab_scope_is_unchanged():

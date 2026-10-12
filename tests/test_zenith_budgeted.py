@@ -97,6 +97,25 @@ class BudgetedTests(unittest.TestCase):
             self.ask(provider)
         return provider
 
+    def test_structured_output_is_bound_transmitted_and_accounted_without_search(self):
+        row=copy.deepcopy(ROW)
+        row['supported_parameters'] += ['response_format','structured_outputs']
+        row['pricing']['web_search']='.01'
+        caller=Mock(return_value=reply())
+        provider=self.provider(row=row,caller=caller)
+        shape={'type':'json_schema','json_schema':{'name':'test','strict':True,'schema':{'type':'object','properties':{},'required':[],'additionalProperties':False}}}
+        provider.ask_ai('hello',{'meta':{'session_id':'RUN','node_id':'structured'},'response_format':shape})
+        payload=caller.call_args.args[2]
+        self.assertEqual(payload['response_format'],shape)
+        self.assertNotIn('plugins',payload)
+        record=next(iter(self.ledger()['entries'].values()))
+        self.assertEqual(record['response_format_sha256'],digest(shape))
+        self.assertGreater(record['input_token_bound'],4096+len('hello'))
+        unsupported=self.provider(run='UNSUPPORTED',caller=Mock())
+        with self.assertRaisesRegex(RuntimeError,'structured output'):
+            unsupported.ask_ai('hi',{'meta':{'session_id':'UNSUPPORTED','node_id':'s'},'response_format':shape})
+        unsupported.caller.assert_not_called()
+
     def test_provider_slug_is_explicit_and_run_binding_is_immutable(self):
         self.assertIsNone(normalize_provider_slug(None))
         self.assertEqual(normalize_provider_slug("deepinfra/fp8"), "deepinfra/fp8")
@@ -363,7 +382,7 @@ class BudgetedTests(unittest.TestCase):
         rows = []
         for pricing in [None, {}, {"prompt": "1"}, {"prompt": "NaN", "completion": "0"},
                         {"prompt": True, "completion": "0"}, {"prompt": "-1", "completion": "0"},
-                        {"prompt": "0", "completion": "Infinity"}, {"prompt": "0", "completion": "0", "web_search": ".01"}]:
+                        {"prompt": "0", "completion": "Infinity"}, {"prompt": "0", "completion": "0", "image": ".01"}]:
             rows.append({**ROW, "pricing": pricing})
         rows += [{**ROW, "context_length": 100}, {**ROW, "supported_parameters": []},
                  {**ROW, "architecture": {"input_modalities": ["text"], "output_modalities": ["audio"]}}]

@@ -36,15 +36,21 @@ def run(config, run_dir=None, **kwargs):
     elif operation == "final":
         choices = artifact(run_dir, config.get("director_node", "basket_director"))
         investigation = artifact(run_dir, config.get("investigation_node", "basket_investigations"))
-        selected = choices.get("selections") if isinstance(choices, dict) else None
-        if not isinstance(selected, dict) or set(selected) != set(overview["basket_ids"]):
-            raise ValueError("CP2 must select one forecast for every basket")
+        approved = choices.get("selected_candidates") if isinstance(choices, dict) else None
+        if not isinstance(approved, list) or any(not isinstance(c, str) for c in approved):
+            raise ValueError("CP2 requires an explicit selected_candidates array")
         candidates = {r["candidate_id"]: r for r in investigation["candidates"]}
         forecasts = dict(overview["baseline"])
-        for target, choice in selected.items():
-            if choice == "baseline": continue
-            if not isinstance(choice, str) or choice not in candidates or candidates[choice]["query"]["target"] != target:
-                raise ValueError("unknown or wrong-target candidate selection")
+        selected = {b: "baseline" for b in overview["basket_ids"]}
+        assigned = set()
+        for choice in approved:
+            if choice not in candidates:
+                raise ValueError("unknown candidate selection")
+            target = candidates[choice]["query"]["target"]
+            if target in assigned:
+                raise ValueError("multiple candidates for the same target")
+            assigned.add(target)
+            selected[target] = choice
             forecasts[target] = candidates[choice]["prediction"]
         data = {"schema": "zenith_basket_cp2_v1", "cutoff": panel["cutoff"], "horizon_sessions": 5,
                 "universe_sha256": overview["universe_sha256"], "forecast_basis": "EMPIRICAL",

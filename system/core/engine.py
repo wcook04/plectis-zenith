@@ -2432,7 +2432,7 @@ class GodModeEngine:
         if context_receipt is not None:
             prompt += "\n\n[CONTEXT_POLICY_RECEIPT]\n" + json.dumps(context_receipt, separators=(",", ":"), ensure_ascii=False)
 
-        if node.id == "lab_integrity":
+        if node.id == "lab_integrity" and node.meta.get("task_profile") != "financial":
             try:
                 deterministic_audit = compute_lab_contract_audit(self.artifacts_dir)
                 prompt += (

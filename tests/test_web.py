@@ -69,7 +69,7 @@ def test_teaching_material_uses_current_sources(website):
         assert section["pdf_url"].endswith("#nameddest=" + section["id"])
         assert all(website.get(url).body for url in chapter["evidence_urls"])
     results = next(c for c in site["chapters"] if c["id"] == "results")
-    assert set(results["evidence_urls"]) == {"/api/v1/evidence/basket-result", "/api/v1/evidence/basket-trace", "/api/v1/evidence/basket-protocol"}
+    assert set(results["evidence_urls"]) == {"/api/v1/evidence/"+name for name in ("full-graph-result","full-graph-trace") if (ROOT/"examples/full-graph"/("result.json" if name.endswith("result") else "trace.json")).exists()}
     for url in site["evidence"].values():
         evidence = json.loads(website.get(url).body)
         assert evidence["data"] == json.loads((ROOT / evidence["source"]["path"]).read_text())
@@ -165,3 +165,22 @@ def test_dossier_is_current_generic_source(website):
     assert dossier["source"]["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
     assert dossier["data"]["perspective"] == "interventions"
     assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "historical_research"
+
+
+def test_basket_nodes_use_their_own_protocol(website):
+    node = json.loads(website.get('/api/v1/nodes/basket_reader_1').body)
+    assert node['dossier'] is None
+    assert node['explanation_url'] == '/api/v1/documents/experiment'
+def test_financial_graph_exposes_typed_reasoning_contracts(website):
+    for mission,count in [('lab',25),('oracle',28),('refinement',3)]:
+        graph=json.loads(website.get('/api/v1/graph?mission=financial_'+mission).body)
+        assert graph['node_count']==count
+        assert graph['task_profile']=='financial'
+        typed=[n for n in graph['nodes'] if 'reasoning_schema' in n]
+        assert typed
+        assert all(n['reasoning_schema']['properties']['node_id']['const']==n['id'] for n in typed)
+
+
+        if mission=='oracle':
+            assert all('oracle_subject_index' in n['dependencies'] for n in typed)
+            assert all(any(e['source']=='oracle_subject_index' and e['target']==n['id'] for e in graph['edges']) for n in typed)

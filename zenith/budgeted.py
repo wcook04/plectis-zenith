@@ -106,7 +106,7 @@ def verified_model(model: str, *, http_get=None):
     if prices.get("input_cache_read", Decimal(0)) > prices["prompt"]:
         raise RuntimeError("cached input read price must not exceed the full prompt price")
     for key, value in prices.items():
-        if key not in ("prompt", "completion", "request", "input_cache_read") and value != 0:
+        if key not in ("prompt", "completion", "request", "input_cache_read", "web_search") and value != 0:
             raise RuntimeError("budgeted adapter rejects ancillary charges")
     architecture = row.get("architecture", {})
     if architecture.get("output_modalities") != ["text"] or "text" not in architecture.get("input_modalities", []):
@@ -362,7 +362,12 @@ class OpenRouterBudgetedProvider(Provider):
         return None
 
     def ask_ai(self, prompt: str, config: dict | None = None, cancel=None) -> str:
+        response_format=(config or {}).get("response_format")
+        if response_format is not None:
+            if not isinstance(response_format,dict) or response_format.get("type")!="json_schema":
+                raise ValueError("only explicit JSON Schema response formats are supported")
         identity = self.identity(prompt, config)
+        if response_format is not None:identity["response_format_sha256"]=digest(response_format)
         self._bind_run()
         call_binding = {**identity, "provider": "openrouter_budgeted", "requested_model": self.model}
         if self.provider_slug is not None:
@@ -378,14 +383,16 @@ class OpenRouterBudgetedProvider(Provider):
         api._official_base_url()
         token = api._resolve_api_key(None)
         row, prices, context_length = verified_model(self.model, http_get=self.catalogue_get)
+        if response_format is not None and not {"response_format","structured_outputs"} <= set(row["supported_parameters"]):
+            raise RuntimeError("model must advertise structured output and response_format support")
         endpoint = None
         if self.provider_slug is not None:
-            parameters = ["max_tokens", "temperature"] + (["reasoning"] if "reasoning" in row["supported_parameters"] else [])
+            parameters = ["max_tokens", "temperature"] + (["response_format","structured_outputs"] if response_format is not None else []) + (["reasoning"] if "reasoning" in row["supported_parameters"] else [])
             endpoint = verified_endpoint(self.model, self.provider_slug, prices, parameters=parameters,
                                          http_get=self.catalogue_get)
             context_length = min(context_length, endpoint["context_length"])
         # One token per UTF8 byte plus a disclosed conservative framing allowance.
-        input_bound = len(prompt.encode("utf-8")) + INPUT_OVERHEAD_TOKENS
+        input_bound = len(prompt.encode("utf-8")) + (len(json.dumps(response_format).encode()) if response_format else 0) + INPUT_OVERHEAD_TOKENS
         output_bound = self.options["max_output_tokens"]
         if input_bound + output_bound > context_length:
             raise RuntimeError("conservative UTF8 input bound plus output cap exceeds verified model context")
@@ -433,6 +440,9 @@ class OpenRouterBudgetedProvider(Provider):
                                         "prompt": float(prices["prompt"] * 1000000),
                                         "completion": float(prices["completion"] * 1000000),
                                         "request": float(prices.get("request", Decimal(0))), "image": 0}}}
+            # This text-only adapter never enables web-search plugins or :online routing.
+            # A catalogue's optional web_search price therefore is not a requested charge.
+            if response_format is not None:payload["response_format"]=response_format
             if "reasoning" in row["supported_parameters"]:
                 payload["reasoning"] = {"enabled": False}
             if self.provider_slug is not None:

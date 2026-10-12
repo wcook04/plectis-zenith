@@ -19,6 +19,7 @@ DOCUMENTS = {
     "synthetic-fixture": "docs/demo.md",
     "data": "docs/data.md",
     "diagnosis": "docs/failure-diagnosis.md",
+    "reasoning-ontology": "docs/reasoning-ontology.md",
     "research-direction": "docs/research-direction.md",
     "walkthrough": "docs/zenith-walkthrough-script.md",
     "notice": "RESEARCH_NOTICE.md",
@@ -29,20 +30,24 @@ EVIDENCE = {
     "demo-result": "examples/demo/result.json",
     "basket-result": "examples/baskets/result.json",
     "basket-trace": "examples/baskets/trace.json",
+    "basket-repair": "examples/baskets/repair.json",
     "basket-protocol": "examples/baskets/protocol.json",
+    "full-graph-result": "examples/full-graph/result.json",
+    "full-graph-trace": "examples/full-graph/trace.json",
+    "reasoning-schemas": "examples/full-graph/reasoning-schemas.json",
 }
 FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail", "basket-detail", "basket-serial-detail")
 CHAPTERS = (
     ("idea", "The idea", "introduction", "replay", None, "proposed_process"),
-    ("lab", "Investigate the shared universe", "experiment", "basket-detail", "basket", "authored_mechanism"),
-    ("oracle", "Compare with later evidence", "graphs", "oracle", "oracle", "authored_mechanism"),
-    ("evolve", "Propose one change and test it", "architecture", "evolve", "refinement", "authored_mechanism"),
-    ("results", "Measured results", "results", None, "basket", "measured_experiment"),
+    ("lab", "Investigate the shared universe", "reasoning-ontology", None, "financial_lab", "authored_mechanism"),
+    ("oracle", "Decompose forecast failures", "diagnosis", None, "financial_oracle", "authored_mechanism"),
+    ("evolve", "Repair, replay and test", "reasoning-ontology", None, "financial_refinement", "authored_mechanism"),
+    ("results", "Measured results", "results", None, "financial_lab", "measured_experiment"),
     ("next", "What still needs testing", "research-direction", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
-    "idea": ("sources",), "lab": ("replacements",), "oracle": (), "evolve": (),
-    "results": ("basket-result", "basket-trace", "basket-protocol"), "next": (),
+    "idea": (), "lab": ("reasoning-schemas",), "oracle": ("full-graph-trace",), "evolve": ("full-graph-trace",),
+    "results": ("full-graph-result", "full-graph-trace"), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
                   "evolve": "trace", "results": "results", "next": "research"}
@@ -143,7 +148,7 @@ class PublicContent:
                            for lane in snapshot["lanes"] if lane["node_id"] == identifier), None)
         dossier = None
         perspective = node.lane.lower()
-        if perspective in {"measurements", "subsystems", "environment", "events", "interventions", "derived"}:
+        if not node.group.startswith("basket") and perspective in {"measurements", "subsystems", "environment", "events", "interventions", "derived"}:
             dossier_path = f"codex/substrate/dossiers/{perspective}.json"
             dossier_raw = safe_read(self.root, dossier_path)
             dossier = {"data": json.loads(dossier_raw), "source": self.source(dossier_path, dossier_raw)}
@@ -154,9 +159,42 @@ class PublicContent:
                 "dependencies": list(node.dependencies), "consumers": consumers,
                 "demo_provenance": provenance, "dossier": dossier,
                 "output_schema": node.output_schema, "source": self.source(path, raw),
-                "explanation_url": f"{API}/documents/graphs"}
+                "explanation_url": f"{API}/documents/experiment" if node.group.startswith("basket") else f"{API}/documents/graphs"}
 
     def graph(self, mission: str = "all", focus: str | None = None) -> dict:
+        if mission.startswith("financial_"):
+            underlying=mission.removeprefix("financial_")
+            if underlying not in {"lab","oracle","refinement"}: raise ValueError("unknown financial mission")
+            answer=self.graph(underlying,focus)
+            financial=runtime.load_graph(self.root,task_profile="financial")
+            from .financial_reasoning import schema_for
+            for row in answer["nodes"]:
+                node=financial[row["id"]]
+                from system.lib.hashing import hash_node
+                row["effective_node_hash"]=hash_node(node)
+                row["task_profile"]="financial"
+                row["instruction"]=node.instruction
+                row["output_schema"]=node.output_schema
+                if node.type.value=="reasoning": row["reasoning_schema"]=schema_for(node.id,persisted=True)
+            selected={n["id"] for n in answer["nodes"]}
+            edges=[{"id":f"{dep}->{nid}","source":dep,"target":nid,"kind":"declared_dependency"}
+                   for nid in sorted(selected) for dep in financial[nid].dependencies if dep in selected]
+            for row in answer["nodes"]:
+                row["dependencies"]=list(financial[row["id"]].dependencies)
+                row["consumers"]=sorted(n for n in selected if row["id"] in financial[n].dependencies)
+            def reachable(reverse):
+                seen=set();todo=[focus] if focus else []
+                while todo:
+                    current=todo.pop()
+                    for edge in edges:
+                        before,after=(edge["target"],edge["source"]) if reverse else (edge["source"],edge["target"])
+                        if before==current and after not in seen:seen.add(after);todo.append(after)
+                return sorted(seen)
+            from system.core.governance import compute_waves
+            answer.update(edges=edges,edge_count=len(edges),waves=compute_waves({n:financial[n] for n in selected}),
+                          focus={"id":focus,"ancestors":reachable(True),"descendants":reachable(False)})
+            answer.update(mission=mission,task_profile="financial",profile_source="zenith/market_graph.py")
+            return answer
         if mission == "evolve":
             mission = "refinement"
         if mission == "all":
@@ -207,13 +245,13 @@ class PublicContent:
                              "available": available, "figure_url": f"/assets/graphs/{figure}.svg" if figure else None,
                              "graph_url": f"{API}/graph?mission={mission}" if mission else None,
                              "paper_section": sections.get(PAPER_SECTIONS[identifier]),
-                             "evidence_urls": [f"{API}/evidence/{name}" for name in CHAPTER_EVIDENCE[identifier]]})
+                             "evidence_urls": [f"{API}/evidence/{name}" for name in CHAPTER_EVIDENCE[identifier] if (self.root/EVIDENCE[name]).is_file()]})
         return {"schema": "zenith_teaching_site_v1", "api_version": "1",
                 "title": paper["title"], "paper_url": f"{API}/paper", "chapters": chapters,
                 "notice": "Experimental research prototype.", "notice_url": f"{API}/documents/notice",
                 "documents": {k: f"{API}/documents/{k}" for k, v in DOCUMENTS.items() if (self.root / v).is_file()},
                 "figures": {k: f"/assets/graphs/{k}.svg" for k in FIGURES},
-                "evidence": {k: f"{API}/evidence/{k}" for k in EVIDENCE},
+                "evidence": {k: f"{API}/evidence/{k}" for k,v in EVIDENCE.items() if (self.root / v).is_file()},
                 "data_mode": "historical_research",
                 "data_note": "Published historical NEPSE observations and constructed research baskets; retrospective replay with stale-mark and availability limitations. System A remains a separate synthetic fixture. Read the result receipt for measured outcomes.",
                 "local_runs_enabled": local_runs,

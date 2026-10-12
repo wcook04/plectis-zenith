@@ -75,10 +75,14 @@ def parser() -> argparse.ArgumentParser:
     plan = commands.add_parser("plan", help="show actual engine mission scope and waves offline")
     plan.add_argument("mission", choices=runtime.MISSION_TARGETS)
     plan.add_argument("--target")
+    plan.add_argument("--task-profile", choices=("generic", "financial"), default="generic")
     plan.add_argument("--graph-variant", type=Path, help="frozen topology variant JSON")
     for name in ("run", "prepare"):
         run = commands.add_parser(name, help="execute the real graph" if name == "run" else "prepare durable agent packets through the real engine")
-        run.add_argument("mission", choices=("lab", "oracle", "feeds", "basket", "basket_serial", "basket_evolve"))
+        run.add_argument("mission", choices=("lab", "oracle", "feeds", "basket", "basket_serial", "basket_evolve", "refinement"))
+        run.add_argument("--task-profile", choices=("generic", "financial"), default="generic")
+        run.add_argument("--replay-from", help="completed source Lab run for a financial local replay")
+        run.add_argument("--replay-node", help="single changed reasoning node; only its descendants rerun")
         run.add_argument("--run-id", required=True)
         run.add_argument("--target")
         run.add_argument("--feed-source", help="recorded feed run id or directory; required for Lab")
@@ -167,7 +171,7 @@ def dispatch(args) -> dict:
         return runtime.validate(root)
     if args.command == "plan":
         return runtime.plan(root, args.mission, args.target,
-                            json.loads(args.graph_variant.read_text()) if args.graph_variant else None)
+                            json.loads(args.graph_variant.read_text()) if args.graph_variant else None, args.task_profile)
     if args.command in ("run", "prepare"):
         if getattr(args, "env_file", None):
             from system.lib.openrouter_free_runtime import load_env_file
@@ -179,7 +183,8 @@ def dispatch(args) -> dict:
                              horizon=args.horizon, time_anchor=args.time_anchor, policy=args.policy, graph_variant=args.graph_variant, context_profile=args.context_profile,
                              max_cost_usd=getattr(args, "max_cost_usd", None), max_calls=getattr(args, "max_calls", None),
                              max_output_tokens=getattr(args, "max_output_tokens", 4096), budget_dir=getattr(args, "budget_dir", None),
-                             provider_slug=getattr(args, "provider_slug", None))
+                             provider_slug=getattr(args, "provider_slug", None), task_profile=args.task_profile,
+                             replay_from=args.replay_from, replay_node=args.replay_node)
     if args.command == "resume":
         return runtime.resume(root, args.run_id)
     if args.command == "status":
