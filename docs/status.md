@@ -52,6 +52,14 @@ Oracle scores. The paper remains 14 pages; changed pages were visually checked,
 with no undefined citations or overfull boxes. Existing bibliography spacing
 and exchange-calendar deprecation warnings remain.
 
+The refreshed private [Type B packet](type-b-matchoff-packet.json) binds source
+`b14166afa11fe7f6bc95285f356dc00b3aed7093`, both latest Labs, the challenger
+Oracle, failed admission and lead review, while preserving earlier attempts
+and all 17 supplied original files byte-for-byte. The 2,890-file ZIP is
+51,854,875 bytes (49.45 MiB). All member hashes, fresh extraction, archive
+integrity and local Markdown links passed. It remains local and has not been
+uploaded; the public receipt contains metadata only.
+
 ## First ten quantile forecasts, 12 October 2026
 
 The [earlier receipt](judgmental-pilot-receipt.json) records April 28 → May 4:
