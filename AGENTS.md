@@ -3,7 +3,21 @@
 Read README.md and program.md. Preserve the original daily loop: historical
 feeds, Lab predictions, later Oracle feedback, reviewed Evolve changes and
 matched later comparison. The author requested a barebones repo and a paper
-of at most three pages. Do not restore removed benchmark/survey/UI machinery.
+of at most four pages. Do not restore removed benchmark/survey/Station machinery. The operator
+requested backend-only work for a pedagogical website; Claude owns its frontend.
+Serve the native graph, paper-linked explanations and measured evidence through
+the read-only website API. Public mode excludes saved private runs. Local run
+inspection is explicit, loopback-only and separate from provider execution.
+Do not restore the discarded viewer or redesign the frontend without a new request.
+
+Keep this a research prototype. Every public entry point, paper, viewer and
+standalone demonstration must visibly state “This is not financial advice.”
+Use RESEARCH_NOTICE.md for the full boundary. Keep limitations beside measured
+results; valid intermediate output is not evidence of improved forecasting.
+Notices do not establish legal compliance or permit unsupported financial
+claims. Do not alter historical evidence or executable node instructions just
+to insert a notice; place it in the surrounding presentation. Preserve the
+notice when rebuilding the paper or exporting a standalone view.
 
 The executable nodes, contracts and engine own behavior. Inspect their inputs
 and outputs before changing them. Preserve the full Lab and Oracle paths,

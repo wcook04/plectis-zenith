@@ -11,6 +11,12 @@ def parser() -> argparse.ArgumentParser:
     cli = argparse.ArgumentParser(description=__doc__)
     cli.add_argument("--root", type=Path, default=runtime.DEFAULT_ROOT, help="standalone substrate root")
     commands = cli.add_subparsers(dest="command", required=True)
+    website = commands.add_parser("serve", help="serve the read-only teaching website API; no provider calls")
+    website.add_argument("--host", default="127.0.0.1")
+    website.add_argument("--port", type=int, default=4175)
+    website.add_argument("--local-runs", action="store_true", help="explicitly expose saved run evidence on loopback only")
+    website.add_argument("--frontend-dir", type=Path, help="optional frontend build with index.html and zenith-public.json allowlist")
+    website.add_argument("--allow-origin", action="append", default=[], help="exact frontend development origin; repeatable")
     daily = commands.add_parser("daily", help="continue historical days through full Lab, Oracle and reviewed Evolve")
     daily_commands = daily.add_subparsers(dest="daily_command", required=True)
     init = daily_commands.add_parser("init", help="freeze daily snapshots and a baseline; no inference")
@@ -93,6 +99,10 @@ def parser() -> argparse.ArgumentParser:
 
 def dispatch(args) -> dict:
     root = args.root.resolve()
+    if args.command == "serve":
+        from .web import serve
+        return serve(root, host=args.host, port=args.port, local_runs=args.local_runs,
+                     frontend_dir=args.frontend_dir, allow_origins=tuple(args.allow_origin))
     if args.command == "daily":
         from . import daily
         if args.daily_command in {"matchoff", "retain"}:

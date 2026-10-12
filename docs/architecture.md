@@ -1,26 +1,36 @@
-# One daily loop
+# Follow one snapshot pair
 
-`zenith/daily.py` freezes historical snapshots and advances Lab → Oracle →
-reviewed Evolve. It uses the original engine in `system/core/engine.py` and the
-nodes in `codex/nodes/`. The Lab contains seven feed nodes and 21 reasoning
-nodes. Oracle runs against the original Lab and later observations.
+> **This is not financial advice.** This is experimental research. Historical
+> examples and model outputs are not investment recommendations and must not be
+> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
 
-The six acquired feeds are STOCK, ETF, MACRO, STOCKGRID, POLYMARKET and NEWS.
-CALCULATOR derives cross-asset summaries. Feed tools and contracts are retained;
-private universes and credentials are not distributed.
+1. Give Lab the saved earlier feed directory. It reads all six source feeds and
+   CALC, runs its two reasoning passes and saves the selected predictions.
+2. Give Oracle the original Lab directory and the later feed directory. Code
+   measures recorded outcomes; reasoning nodes propose explanations.
+3. Evolve reads the paired record and proposes a versioned instruction or graph
+   change. Preserve the old procedure and the exact proposed change.
+4. Compare both versions on the same later inputs before retaining a change.
 
-Lab selects assets and freezes predictions. `feedback/engine.py` measures dated
-outcomes; `feedback/selection.py` separately scores selection and full-universe
-loss. Oracle's analysis informs a proposed change; it does not establish cause.
-`tools/refinement/run_evolve.py` and the daily controller retain the reviewed
-change as a successor policy. Evolve may be the lead agent or a fixed-prompt
-worker using the same packet.
+[The diagrams](graphs.md) show the operators and their dependencies. Six feeds
+are acquired: STOCK, ETF, MACRO, STOCKGRID, POLYMARKET and NEWS. CALCULATOR derives
+summaries from stock, ETF and macro inputs. The saved feeds are inputs; replay
+does not call live acquisition tools to replace their contents.
 
-`research/daily_matchoff.py` binds incumbent and candidate to identical later
-snapshots. `research/cohort.py` executes no model calls: it gives the native
-commands, checks completed run evidence and compares results. Retention records
-the review and enforces that the next generation follows the comparison cutoff.
+| Operation | Owner |
+|---|---|
+| Load and execute the original graph | `zenith/runtime.py`, `system/core/engine.py` |
+| Score forecasts and selections | `feedback/engine.py`, `feedback/selection.py` |
+| Build the paired Evolve handoff | `tools/refinement/run_evolve.py` |
+| Freeze a reviewed successor policy | `zenith/daily.py::compile_review` |
+| Compare later versions | `research/daily_matchoff.py`, `research/cohort.py` |
+| Trace and aggregate failure hypotheses | `research/failure_windows.py` |
 
-`variants/graph.py` supports explicit graph changes. Keep the original graph as
-the baseline. Compare changed inputs separately from changed reasoning when
-attributing a result. Runtime records remain under ignored `state/` and `work/`.
+`zenith daily` is the existing controller for an adapter-backed sequence. The
+FNSPID adapter supplies prices and news only; it is separate from the original
+seven-feed example. Direct `zenith run lab` and `zenith run oracle` accept saved
+feed directories without inventing a new dataset or scheduler.
+
+An execution failure, a forecast error and a proposed explanation are different
+records. Keep all three. See [failure diagnosis](failure-diagnosis.md) for the
+original evidence-location distinctions and repeated-window analysis.

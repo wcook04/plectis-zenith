@@ -1,181 +1,315 @@
 \documentclass[11pt]{article}
-\usepackage[a4paper,margin=24mm]{geometry}
+\usepackage[a4paper,margin=23mm]{geometry}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern,microtype,amsmath,booktabs}
+\usepackage{lmodern,microtype,booktabs,array}
 \usepackage[colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage{enumitem,tikz}
-\usetikzlibrary{arrows.meta,positioning}
+\usetikzlibrary{arrows.meta,positioning,calc,backgrounds}
+\definecolor{ink}{HTML}{23343D}
+\definecolor{teal}{HTML}{246F65}
+\definecolor{wash}{HTML}{EDF5F2}
+\tikzset{record/.style={draw=ink!45,fill=white,rectangle,align=center,font=\small,text=ink,minimum height=12mm},
+operator/.style={draw=ink!50,fill=white,rounded corners=2pt,align=center,font=\small,text=ink,minimum height=12mm},
+checkpoint/.style={record,draw=teal,fill=wash},
+wire/.style={-{Stealth[length=2mm]},draw=ink!70,line width=.65pt,rounded corners=3pt},
+smallnote/.style={font=\footnotesize,text=ink!80,align=left}}
 \setlist{nosep,leftmargin=*}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt}
-\pagestyle{plain}
+\makeatletter
+\def\ps@research{%
+  \def\@oddhead{}\let\@evenhead\@oddhead
+  \def\@oddfoot{\hfil\footnotesize Research prototype. This is not financial advice.\quad\thepage\hfil}%
+  \let\@evenfoot\@oddfoot}
+\makeatother
+\pagestyle{research}
+% Preserve the author's four-page limit in the editor and exported builds.
+\AddToHook{shipout/before}{\ifnum\value{page}>4
+  \PackageError{zenith}{Paper exceeds four pages}{Shorten the paper before publishing.}\fi}
 \begin{document}
 \begin{center}
-{\Large\bfseries Zenith: learning a financial reasoning graph}\\[4pt]
+{\Large\bfseries Zenith: learning from a reasoning graph's mistakes}\\[4pt]
 Will Cook \quad\textbullet\quad 12 October 2026
 \end{center}
 
-\textbf{The idea.} Give a reasoning system the information available on a
-historical trading day. Let it choose what matters and predict what happens
-next. Compare those predictions with reality. Change the reasoning procedure,
-then test the changed version on later days. Repeat only while the evidence
-supports improvement.
+{\small\textbf{This is not financial advice.} This paper describes experimental
+research. Historical examples and model outputs are not investment
+recommendations and must not be used to make financial decisions.}
 
-The object that learns is a graph of reasoning operators. Each node transforms inputs into outputs. Learning changes its instructions,
-context, skills or connections; hosted-model weights remain fixed. Test whether
-the changed procedure makes better later predictions from the same information.
+\hypertarget{idea}{}
+We have a network of reasoning nodes. Each node is given some evidence and
+produces an analysis or prediction that later nodes read. Can that procedure
+learn from its mistakes? The aim is efficient forecasting across market regimes.
+The example below tests an execution repair, not forecasting skill.
+
+Take the actual saved feeds at an earlier time. Let \textbf{Lab} read them,
+choose the assets worth predicting and save its predictions. Then open the
+later snapshot. \textbf{Oracle} compares the predictions with what happened
+and proposes an explanation. \textbf{Evolve} proposes a change to the
+procedure. Test the changed and unchanged versions on the same later inputs
+before deciding what to keep.
+
+The model weights stay fixed. We change a node's instruction, its incoming
+context or its connections. The hard part is whether the change improves a
+later prediction, rather than just making an old mistake easier to explain.
 
 \begin{center}
-\begin{tikzpicture}[>=Stealth, every node/.style={font=\small},
- box/.style={draw,rounded corners=3pt,align=center,minimum width=34mm,minimum height=11mm},
- every path/.style={line width=.6pt}]
-\node[box,fill=blue!5] (data) at (0,0) {Historical\\six-feed snapshot};
-\node[box,fill=blue!5] (lab) at (4.5,0) {Lab graph\\select and predict};
-\node[box] (outcomes) at (9,0) {Advance time\\observe outcomes};
-\node[box] (oracle) at (9,-1.65) {Oracle\\measure and diagnose};
-\node[box,fill=blue!5] (evolve) at (4.5,-1.65) {Evolve\\propose a new version};
-\draw[->] (data) -- (lab);
-\draw[->] (lab) -- (outcomes);
-\draw[->] (outcomes) -- (oracle);
-\draw[->] (oracle) -- (evolve);
-\draw[->,dashed] (evolve) -- node[right,align=left,font=\scriptsize] {test on\\later days} (lab);
+\begin{tikzpicture}
+\node[smallnote,anchor=west] at (-1.75,.9) {READ ONLY THE EARLIER SNAPSHOT};
+\node[record,minimum width=35mm] (before) at (0,0) {Earlier feeds\\$t-n$};
+\node[operator,minimum width=37mm] (lab) at (5.2,0) {\textbf{Lab}\\select and predict};
+\node[checkpoint,minimum width=41mm] (frozen) at (10.4,0) {Frozen predictions\\+ node outputs};
+\draw[wire] (before)--(lab);
+\draw[wire] (lab)--(frozen);
+\node[smallnote,anchor=west] at (-1.75,-1.25) {OPEN THE LATER SNAPSHOT};
+\node[record,minimum width=35mm] (after) at (0,-2.15) {Later feeds\\$t$};
+\node[operator,minimum width=37mm] (oracle) at (5.2,-2.15) {\textbf{Oracle}\\measure and diagnose};
+\node[operator,minimum width=41mm] (evolve) at (10.4,-2.15) {\textbf{Evolve}\\propose one change};
+\draw[wire] (after)--(oracle);
+\draw[wire] (frozen.south)--(10.4,-.98)--(5.2,-.98)--(oracle.north);
+\draw[wire] (oracle)--(evolve);
+\node[record,draw=teal,dashed,minimum width=112mm,minimum height=17mm] (compare) at (5.2,-4.35)
+ {\textbf{Compare on another window}\\Same feeds $\longrightarrow$ old graph and changed graph\\Record both results; decide whether to keep the change};
+\draw[wire,dashed] (evolve.south)--(10.4,-3.2)--(5.2,-3.2)--(compare.north);
 \end{tikzpicture}
 \end{center}
-
-\textbf{Lab.} Run the existing graph. Its operators interpret individual feeds,
-combine evidence and produce a forecast with an explicit asset, issue time,
-horizon and numerical target. Save intermediate outputs and the evidence used.
-Lab may abstain. A smaller selected set is useful only if its selection and
-predictions improve the declared objective.
-
-\textbf{Oracle.} Advance the historical clock and measure what happened.
-Keep two things separate: the observed error and an explanation of that error.
-A wrong forecast can follow from missing evidence, a misread fact, poor
-selection, a wrong numerical consequence or unavoidable uncertainty. A later
-narrative does not identify which cause was responsible.
-
-\textbf{Evolve.} The lead agent, or a worker with a fixed prompt, reads the
-recorded experience and proposes a specific change. Save the old and new
-versions. Execute both on the same later inputs before retaining a winner.
-An attractive explanation earns a test, not automatic adoption.
+{\small The arrows show the experiment's data flow. The dashed step needs a
+separate comparison; a plausible diagnosis does not complete it.}
 
 Successive version comparisons draw on AlphaGo Zero~\cite{alphago}; bounded
-edits and evaluation draw on autoresearch~\cite{autores}.
-Finance has no equivalent of generating unlimited games against oneself:
-market outcomes are external, noisy and limited. Reusing historical outcomes
-can overfit the research process. The analogy motivates the loop; it supplies
-neither a learning guarantee nor a performance claim.
+edits followed by evaluation also appear in autoresearch~\cite{autores}.
+Here the histories are finite and externally generated.
+
+\textbf{Start with the data we already have.}
+The local archive contains the original six feeds: stocks, ETFs, macro series,
+Stockgrid, prediction markets and news. A calculator derives cross-asset
+summaries from those inputs. For the worked replay we use the saved
+20 and 21 July 2026 snapshots~\cite{feeds}. Each contains all seven artifacts. The earlier
+stock payload has 457 entries; 456 stocks have numeric prices in both snapshots.
+
+This is a retrospective replay executed now with a current hosted model.
+Its training data may contain later information. We are testing the operation
+of the procedure on saved data, not recreating what that model could have
+known in July or establishing a trading advantage.
+
+\textbf{A snapshot can contain a history.}
+A point-in-time packet may contain a state (a ``photo'') or dated histories
+(a ``video'' up to the cutoff). Either can target a later state; forecasting
+a future path needs its own horizons and loss. Future work would use authorised
+proprietary snapshots with verified availability times and revision vintages.
+Richer histories do not remove missing information or look-ahead risk.
 
 \newpage
-\textbf{The original graphs.} These diagrams group parallel nodes to show
-the reading order. The repository's \texttt{docs/graphs.md} shows every actual
-node and dependency, including the skip connections omitted here.
+\hypertarget{lab}{}
+\textbf{What happens inside the graph.}
+The Lab has 28 nodes: seven feed artifacts and 21 reasoning operators.
+Save every output to trace the first unsupported claim.
 
 \begin{center}
-\textbf{Lab: 28 nodes, including seven feeds}\\[5pt]
-\begin{tikzpicture}[>=Stealth,
- box/.style={draw,rounded corners=2pt,align=center,font=\scriptsize,minimum width=29mm,minimum height=10mm}]
-\node[box] (f) at (0,0) {7 feeds\\+ seed state};
-\node[box] (m) at (3.7,0) {7 first-pass miners\\+ cross-correlation};
-\node[box] (o) at (7.4,0) {Orient};
-\node[box,fill=blue!5] (d) at (11.1,0) {Decide\\CP1: thesis};
-\node[box] (m2) at (11.1,-1.45) {7 second-pass miners\\+ cross-correlation};
-\node[box,fill=blue!5] (p) at (7.4,-1.45) {Director\\CP2: predictions};
-\node[box] (i) at (3.7,-1.45) {Integrity check};
-\draw[->] (f)--(m); \draw[->] (m)--(o); \draw[->] (o)--(d);
-\draw[->] (d)--(m2); \draw[->] (m2)--(p); \draw[->] (p)--(i);
-\end{tikzpicture}
-
-\vspace{5pt}
-\textbf{Oracle: 31 nodes, including seven later feeds}\\[5pt]
-\begin{tikzpicture}[>=Stealth,
- box/.style={draw,rounded corners=2pt,align=center,font=\scriptsize,minimum width=29mm,minimum height=10mm}]
-\node[box] (s) at (0,0) {10 subject snapshots\\+ subject index};
-\node[box] (f) at (0,-1.5) {7 later feeds};
-\node[box] (r) at (4.1,-.75) {2 truth differences\\+ 7 lane reviews};
-\node[box] (m) at (8.2,-.75) {Truth map};
-\node[box] (a) at (12.3,-.75) {Attribution map\\+ explanation};
-\node[box,fill=blue!5] (e) at (8.2,-2.15) {CP2 emitter\\hindsight record};
-\draw[->,rounded corners=4pt] (s.east)--(2.2,0)--(2.2,-.55)--([yshift=2mm]r.west);
-\draw[->,rounded corners=4pt] (f.east)--(2.5,-1.5)--(2.5,-.95)--([yshift=-2mm]r.west);
-\draw[->] (r)--(m); \draw[->] (m)--(a);
-\draw[->,rounded corners=4pt] (a.south)--(12.3,-2.15)--(e.east);
+\begin{tikzpicture}
+\node[record,minimum width=103mm] (feeds) at (5.15,0)
+ {\textbf{Saved snapshot: six feeds + CALC}\\Stocks, ETFs, macro, news, prediction markets, flows};
+\node[operator,minimum width=37mm] (seed) at (13.6,0) {\textbf{Seed}\\data inventory};
+\draw[wire] (feeds)--(seed);
+\node[operator,minimum width=153mm,minimum height=13mm] (first) at (7.65,-1.6)
+ {\textbf{First pass: seven parallel miners}\\Stock \quad ETF \quad Macro \quad News \quad Markets \quad CALC \quad Flows};
+\draw[wire] (feeds.south)--(5.15,-.98);
+\draw[wire] (seed.south)--(13.6,-.98);
+\node[operator,minimum width=37mm] (cross) at (1.85,-3.2) {\textbf{Cross-correlation}\\shared observations};
+\node[operator,minimum width=37mm] (orient) at (7.65,-3.2) {\textbf{Orient}\\competing theses};
+\node[checkpoint,minimum width=37mm] (decide) at (13.45,-3.2) {\textbf{Decide $\cdot$ CP1}\\freeze the thesis};
+\draw[wire] (1.85,-2.25)--(cross.north);
+\draw[wire] (cross)--(orient);\draw[wire] (orient)--(decide);
+\node[operator,minimum width=153mm,minimum height=13mm] (second) at (7.65,-4.8)
+ {\textbf{Second pass: seven directed miners}\\Re-read each source feed against the frozen thesis};
+\draw[wire] (decide.south)--(13.45,-4.15);
+\node[operator,minimum width=37mm] (cross2) at (1.85,-6.4) {\textbf{Cross-correlation}\\reconcile the checks};
+\node[checkpoint,minimum width=37mm] (director) at (7.65,-6.4) {\textbf{Director $\cdot$ CP2}\\freeze predictions};
+\node[operator,minimum width=37mm] (integrity) at (13.45,-6.4) {\textbf{Integrity}\\check both passes};
+\draw[wire] (1.85,-5.45)--(cross2.north);
+\draw[wire] (cross2)--(director);\draw[wire] (director)--(integrity);
 \end{tikzpicture}
 \end{center}
 
-\textbf{Give these graphs the intended evidence.} The original six acquired
-feeds were stocks, ETFs, macro, Stockgrid, prediction markets and news; the
-calculator was derived. Recent ten-stock, title-based studies omitted much of
-that information. Start with raw FNSPID articles and prices~\cite{fnspid}, join
-ETF history and archived macro releases, and inspect a few synchronized days.
-Stockgrid equivalence remains unresolved. Preserve publication clocks and
-missingness: even original saved news includes post-cutoff items. A richer
-payload is not automatically a valid historical snapshot.
+Each wide miner box contains seven parallel analyses. The second pass re-reads
+the original feeds against the frozen thesis. In the quantile branch, CP1 also
+freezes forecast quantiles; Director must preserve them.
 
-\textbf{Measure selection and prediction separately.}
-Freeze the candidate universe $U_t$ before a run. Lab selects $S_t\subseteq U_t$.
-Report its prediction error and coverage $|S_t|/|U_t|$. To prevent apparent
-improvement by avoiding difficult cases, also score the whole universe using a
-fixed fallback forecast for unselected assets:
-\[
- L_t=\frac{1}{|U_t|}\sum_{i\in U_t}
- \ell\!\left(y_{it},\;
- \begin{cases}\hat y_{it},&i\in S_t,\\ b_{it},&i\notin S_t.\end{cases}\right).
-\]
-Here $b_{it}$ is known at issue time and $\ell$ is fixed before comparison.
-If all assets have shadow forecasts, compare the chosen subset with a uniform
-selection at the same size. This measures selection without turning hindsight
-into a deployable strategy. Distribution forecasts need a proper score, such
-as quantile loss~\cite{scores}. Forecast accuracy and trading returns are
-separate claims; a trading test also needs an executable timing and cost model.
+\hypertarget{oracle}{}
+\begin{center}
+\begin{tikzpicture}
+\node[record,minimum width=36mm] (subject) at (0,.1) {Original Lab record};
+\node[record,minimum width=36mm] (truth) at (0,-1.3) {Later feeds};
+\node[operator,minimum width=44mm,minimum height=25mm] (reviews) at (5.5,-.6)
+ {\textbf{Compare the evidence}\\Numeric differences\\+ seven lane reviews};
+\node[operator,minimum width=37mm,minimum height=25mm] (map) at (11,-.6)
+ {\textbf{Truth map}\\combined findings};
+\draw[wire] (subject.east)--(3.3,.1);
+\draw[wire] (truth.east)--(3.3,-1.3);
+\draw[wire] (reviews)--(map);
+\node[operator,minimum width=44mm] (explain) at (5.5,-3)
+ {\textbf{Attribution + explanation}\\where and why it failed};
+\node[checkpoint,minimum width=37mm] (out) at (11,-3)
+ {\textbf{Oracle CP2}\\record for review};
+\draw[wire] (map.south)--(11,-2.2)--(5.5,-2.2)--(explain.north);
+\draw[wire] (explain)--(out);
+\end{tikzpicture}
+\end{center}
+{\small Oracle compares saved arguments with later observations. Attribution
+proposes where reasoning failed; CP2 records the review without rewriting
+the forecast. The diagnosis still needs a test.}
+
+{\small Figures omit direct second-pass feed inputs, other skip connections and
+Integrity's cross-pass inputs. Exact dependencies appear in \path{docs/graphs.md}.
+Square boxes are records; rounded boxes are operations or named groups.}
+
+\hypertarget{trace}{}
+\textbf{Trace before changing.} Was useful evidence absent, overlooked, grouped
+badly or misinterpreted? Save the first node where the claim lost support.
+A repeated error motivates a test; a persuasive explanation does not prove the fix.
 
 \newpage
-\textbf{The smallest scientific loop.}
-\begin{enumerate}
-\item Assemble a short sequence of audited daily snapshots with the intended
-market breadth. Keep absent fields and source limitations visible.
-\item Run the existing Lab, save its intermediate outputs and freeze its
-forecasts. Compare against a simple price baseline and a direct predictor
-using the same inputs.
-\item Reveal matured outcomes. Score the whole declared universe and record
-validity failures and abstentions. Let Oracle propose explanations.
-\item Let Evolve make one understandable candidate change, or a small combined
-change when components depend on each other. Record why it was proposed.
-\item Compare incumbent and candidate on the same later days. Retain a change
-only under a rule set before those results. Keep failed candidates and repeat.
-\end{enumerate}
+\hypertarget{research}{}
+\textbf{Research direction: learn how each node does the same job.}
+A shared neural controller could read market conditions available at the
+cutoff and choose a few semantic settings for each reasoning node. Each
+setting in $[0,1]$ selects a small wording variation in one prompt component.
+The node's purpose, inputs, work budget and output contract stay fixed.
+This mechanism is proposed, not implemented or validated by the example.
 
-Input ablations ask whether a feed helps. Procedure comparisons ask whether
-a reasoning change helps. These are different experiments. Begin with the
-information question when the current data omits most of what the original
-graph was designed to interpret.
+\begin{center}
+\begin{tikzpicture}[font=\small]
+\node[record,minimum width=134mm,minimum height=13mm] (packet) at (7.8,0)
+ {\textbf{Saved packet at the prediction cutoff}\\Feeds and histories; available regime signals such as VIX or sentiment};
+\node[operator,draw=teal,fill=wash,minimum width=63mm,minimum height=17mm] (controller) at (4,-2.15)
+ {\textbf{Shared neural controller}\\Regime encoder + small per-node heads\\Trainable numerical parameters};
+\node[record,minimum width=58mm,minimum height=17mm] (settings) at (11.4,-2.15)
+ {\textbf{Per-node semantic settings}\\Miner: $(0.1,\ 0.2,\ \ldots)$\\Synthesis: $(0.4,\ 0.1,\ \ldots)$};
+\node[record,minimum width=46mm,minimum height=18mm] (core) at (3,-4.4)
+ {\textbf{Fixed dossier core}\\Node duty + input scope\\Evidence + output rules};
+\node[operator,minimum width=81mm,minimum height=18mm] (render) at (10,-4.4)
+ {\textbf{Compile the prompt}\\Versioned text lookup for each component\\Small wording changes within the same job};
+\node[operator,minimum width=130mm,minimum height=14mm] (graph) at (7.8,-6.65)
+ {\textbf{The same reasoning graph}\\Each node gets its compiled prompt and its own permitted inputs};
+\node[record,minimum width=63mm,minimum height=12mm] (forecast) at (4,-8.55)
+ {\textbf{Frozen forecast}\\Save settings, exact prompts and outputs};
+\node[record,minimum width=58mm,minimum height=12mm] (later) at (11.4,-8.55)
+ {\textbf{Later observations}\\Open after the forecast is frozen};
+\node[operator,minimum width=130mm,minimum height=14mm] (loss) at (7.8,-10.6)
+ {\textbf{Evaluate with fixed rules}\\Forecast error, selection coverage and cost; compare on separate later cases};
+\begin{pgfonlayer}{background}
+\draw[wire] (packet.south)--(7.8,-1.04)--(4,-1.04)--(controller.north);
+\draw[wire] (controller)--(settings);
+\draw[wire] (settings.south)--(11.4,-3.5);
+\draw[wire] (core)--(render);
+\draw[wire] (render.south)--(10,-5.95);
+\draw[wire] (packet.east)--(15.25,0)--(15.25,-6.65)--(graph.east);
+\draw[wire] (4,-7.35)--(forecast.north);
+\draw[wire] (forecast.south)--(4,-9.9);
+\draw[wire] (later.south)--(11.4,-9.9);
+\draw[wire,dashed,draw=teal] (loss.west)--(0,-10.6)--(0,-2.15)--(controller.west);
+\end{pgfonlayer}
+\node[font=\footnotesize,rotate=90,fill=white,inner sep=2pt] at (15.57,-3.8) {same feed inputs};
+\node[font=\footnotesize,text=teal,rotate=90,fill=white,inner sep=2pt] at (.3,-6.5)
+ {training cases only; freeze before later testing};
+\end{tikzpicture}
+\end{center}
+{\small Solid arrows show data flow. The dashed return fits a future controller
+from training outcomes; it does not feed a test outcome into its own forecast
+or denote a derivative through the LLM. The numbers are illustrative settings,
+not learned values. The shared encoder's internal weights are a different object.}
 
-\textbf{What exists and what remains unproved.}
-The repository contains the original graph, native Lab and Oracle execution,
-dated forecast records, outcome scoring and reviewed version changes. A
-completed two-day development example changed a price rule after feedback;
-the changed rule then lost to the unchanged rule. Later title-based experiments
-also failed to establish a predictive improvement. These runs show that the
-loop can execute, not that it learns a financial edge. Their complete records
-remain in the research archive and version history.
+\textbf{A small semantic change, not a different task.}
+The Polymarket miner still reads seed state and its feed and extracts the same
+kind of ranked signals. A component at $0.1$ might say ``consider sentiment as
+one explanation''; at $0.2$, ``give sentiment slightly more interpretive weight
+where supported.'' Factual measurements, ranking rules and required checks
+remain fixed. Other nodes have their own bounded interpretive components.
+Neither a high setting nor a high market indicator makes a claim true.
 
-The next useful result is a small, credible multi-feed historical replay in
-which the existing graph has the information it needs. Then test whether it
-interprets that evidence correctly, selects better opportunities and improves
-its later predictions. If it does not, the recorded intermediate outputs and
-matched interventions should tell us which change to test next. Synthetic
-known-signal examples can check this machinery; only financial evidence can
-support the financial claim.
+{\small \textbf{What can be trained.} Search discrete settings, or train the
+numerical controller from measured losses. Ordinary backpropagation requires
+local derivatives (see
+\href{https://github.com/karpathy/micrograd/blob/7bc720e951fe422b8f8814aa5aa1b64121d26b4c/micrograd/engine.py}{micrograd});
+hard text lookup and hosted LLM calls expose no such path.
+\href{https://github.com/stanfordnlp/dspy/blob/f1260ff14610286cb295c7d3a5ee2cbfd0ba5cb9/dspy/teleprompt/mipro_optimizer_v2.py}{DSPy}
+provides a prompt-search reference. The base LLM stays fixed. VIX and sentiment
+are incomplete regime features; robustness to every situation is not assured.
+Detailed proposal and source references: \path{docs/research-direction.md}.}
 
-\begin{thebibliography}{4}\small
+\newpage
+\hypertarget{results}{}
+\textbf{A measured failure and one change.}
+Four full Lab attempts used original snapshots from 26 June, 13 July, 20 July
+and 21 July 2026. All used DeepSeek V4.1 Flash through DeepInfra, the same graph
+and policy, complete feed data, and a 4,096-token response limit. Each completed
+the inventory and seven miners, then stopped when Cross-correlation's JSON
+response ran out of tokens~\cite{windows}.
+
+We added one instruction at that node: keep the four required arrays, at most
+three records per array, at most four subjects per record, and short summaries.
+We froze the instruction after inspecting the two earlier episodes. On the two
+later inputs, the changed node received exactly the baseline miners' saved
+outputs and went through the native validator:
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Later input & Original instruction & Changed instruction\\
+\midrule
+20 July close & truncated at 4,096 & valid JSON, 1,308 tokens\\
+21 July open capture & truncated at 4,096 & valid JSON, 1,172 tokens\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Both changed responses still exceeded the requested four-subject bound: their
+largest records had nine and eleven subjects. The native schema permits this.
+The measured gain is local execution validity, with incomplete instruction
+compliance. It says nothing yet about prediction quality.
+
+\begin{center}
+\begin{tikzpicture}
+\node[operator,minimum width=40mm] (a) at (0,0) {Cross-correlation\\valid response};
+\node[operator,minimum width=40mm] (b) at (5.25,0) {Orient\\valid response};
+\node[record,draw=ink,line width=1pt,minimum width=40mm] (c) at (10.5,0) {Decide\\\textbf{truncated at 4,096}};
+\draw[wire] (a)--(b);\draw[wire] (b)--(c);
+\end{tikzpicture}
+\end{center}
+{\small A separate conditional continuation reused the eight unchanged July 20
+ancestor outputs and seven feeds. It made three new calls with the frozen
+change. Cross-correlation and Orient passed; Decide failed. No completed CP1,
+CP2 or forecast resulted~\cite{continuation}.}
+
+\textbf{What to measure next.}
+Complete Lab first. Then measure selection and forecast error separately:
+which assets were selected, coverage, their frozen predictions and later
+observations. When scoring the whole universe, fix the same fallback for
+unselected assets. Use a proper score such as quantile loss for quantile
+forecasts~\cite{scores}; abstention must not become a zero-loss win.
+
+The later windows overlap, the analyst had already seen the July 20 failure,
+and there is one model sample per arm. These are not blind, independent trials.
+Collection times establish availability of the saved files, not the clocks
+of their underlying price bars. Until those clocks are verified, price changes
+are differences between saved values, not a clean financial backtest.
+
+An agent authored and tested this execution repair. The full Oracle/Evolve
+loop has not run, and improved forecasting remains untested.
+
+\begin{thebibliography}{6}\footnotesize
+\bibitem{feeds} Zenith. Saved original feed runs \texttt{FEEDS\_20260720\_close}
+ and \texttt{FEEDS\_20260721\_close}. Source hashes and example rows:
+\texttt{examples/replay/sources.json} and \texttt{observations.json}.
+\bibitem{windows} Zenith. Original-feed window experiment, 12 October 2026.
+\texttt{docs/original-feed-window-result.json} and \texttt{original-feed-windows.md}.
+\bibitem{continuation} Zenith. Conditional native Lab continuation, 12 October 2026.
+\texttt{examples/replay/conditional-result.json}.
 \bibitem{alphago} D. Silver and D. Hassabis. \emph{AlphaGo Zero: Starting from
 scratch}. DeepMind, 2017.
 \url{https://deepmind.google/blog/alphago-zero-starting-from-scratch/}.
 \bibitem{autores} A. Karpathy. \emph{autoresearch}. Source inspected at
-\texttt{228791fb499a}, 2026. \url{https://github.com/karpathy/autoresearch}.
-\bibitem{fnspid} FNSPID contributors. \emph{Financial News and Stock Price
-Integration Dataset}. Raw source inspected at \texttt{4054842ec476}.
-\url{https://github.com/Zdong104/FNSPID_Financial_News_Dataset}.
+\texttt{228791fb499a}. \url{https://github.com/karpathy/autoresearch}.
 \bibitem{scores} T. Gneiting and A. E. Raftery. Strictly proper scoring rules,
 prediction, and estimation. \emph{JASA} 102(477):359--378, 2007.
 \url{https://doi.org/10.1198/016214506000001437}.

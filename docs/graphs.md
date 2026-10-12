@@ -1,44 +1,91 @@
 # Actual graph diagrams
 
-These SVGs are generated from the current native node JSON. Open the linked figure
-and zoom to inspect the exact IDs. Each dependency panel shows a produced node and
-all its immediate prerequisites. Repeated cards refer to the same artifact; each
-declared edge appears once. Integrity's 20 inputs occupy two continued panels.
+> **This is not financial advice.** This is experimental research. Historical
+> examples and model outputs are not investment recommendations and must not be
+> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
 
-| View | Native nodes | Declared edges |
+The [saved-snapshot replay](graphs/replay.svg) uses the original six acquired
+feeds and derived CALC at an earlier and later time. It shows the intended
+workflow. Four baseline full-feed attempts stopped at cross-correlation; a
+conditional continuation reached Decide but did not produce CP1 or CP2.
+Two local candidate assays passed native output-shape checks but violated the
+max-subject bound; no forecast gain is established. See [current status](status.md).
+[Original payload hashes](../examples/replay/sources.json) identify the saved
+inputs. SVG metadata hashes the node definitions used to draw the graphs.
+
+![Replay workflow: earlier saved feeds and CALC through Lab and frozen CP2; later feeds through Oracle diagnosis, Evolve review and a later matched comparison](graphs/replay.svg)
+
+Read the three columns from issue time to truth time to a further test. The
+earlier saved feeds enter Lab; its CP2 forecast is frozen before the later feeds
+can be read. Oracle compares that fixed subject with later truth. Evolve can
+propose a reviewed candidate, which still needs a matched comparison on further
+inputs.
+
+The grouped views below open those stages into their native operators.
+
+![Lab: six feeds and CALC through two reasoning passes, CP1, CP2 and Integrity](graphs/lab.svg)
+
+Follow one row: the saved STOCK table enters the stock miner, which reports
+observations with source references. Cross-correlation joins all seven miner
+reports; Orient weighs them; Decide freezes CP1, including numerical forecast
+quantiles on its judgmental branch. The directed stock miner then checks that
+thesis against CP1 and the original stock feed. The second Cross and Director
+assemble CP2; Integrity checks artifacts from both passes. The second pass
+does not refit CP1's frozen estimates.
+
+![Oracle: original Lab subjects and later evidence through truth reviews to Oracle CP2](graphs/oracle.svg)
+
+Oracle reads the original Lab reasoning beside the later saved feeds. Code
+computes numerical equity and macro differences; the seven lane reviews inspect
+later evidence against the original subject. Truth map combines the reviews and
+differences, then Attribution and Explain propose a diagnosis. Oracle CP2 keeps
+the original subject targets and citation eligibility. A diagnosis is a
+hypothesis about an outcome, not a new prediction or proof of improvement.
+
+![Evolve: native dossier changes beside the separate reviewed daily policy workflow](graphs/evolve.svg)
+
+The upper row is the native Delta Analyzer → Dossier Updater → Version Committer
+dependency path. Paired Lab and Oracle records enter through runner inputs;
+mutation requires explicit application. The lower dashed path is the daily
+controller: a handoff, agent review, candidate or no-change decision, development
+Lab, later matched comparison and explicit retention review. A candidate is not
+promoted by being proposed.
+
+The compact Lab and Oracle figures draw the lane inputs and the main merges.
+They group CP1's internal Cross / Orient / Decide chain, CP2's Cross / Director
+chain, and Oracle's Attribution / Explain chain. Direct feed reuse, subject-index
+inputs and other skip edges are left to the exact views below. A shared bus
+means that the named lane outputs enter a downstream consumer; it does not mean
+that every box in one column connects to every box in another. CALC derives from
+the stock, ETF and macro feeds.
+
+| Exact dependency view | Native nodes | Declared edges |
 |---|---:|---:|
-| [Full Lab](graphs/lab.svg) | 28 | 98 |
-| [Full Oracle](graphs/oracle.svg) | 31 | 57 |
-| [Evolve and daily review](graphs/evolve.svg) | 3 | 2 |
+| [Lab detail](graphs/lab-detail.svg) | 28 | 98 |
+| [Oracle detail](graphs/oracle-detail.svg) | 31 | 57 |
+| [Evolve detail](graphs/evolve-detail.svg) | 3 | 2 |
 
-![Full native Lab dependency atlas](graphs/lab.svg)
+In each detail diagram, repeated cards name the same artifact and every declared
+edge appears once. Integrity's 20 inputs occupy two continued panels.
 
-![Full native Oracle dependency atlas](graphs/oracle.svg)
+Dependencies live under `codex/substrate/nodes/{feeds,lab,oracle,refinement}`.
+Runtime hydration is separate: Lab binds global feeds to the issue snapshot;
+Oracle binds subject mirrors to the original Lab and global feeds to later
+truth. Those bindings do not add native dependency edges. Oracle CP2 preserves
+original subject eligibility; explanations cannot admit new targets.
 
-![Native Evolve and reviewed daily workflow](graphs/evolve.svg)
+In that controller, `export_agent_handoff` exports pending analysis and
+`compile_review` freezes a candidate or no-change decision. `daily matchoff`
+compares old and new versions on the same later inputs; `daily retain` records
+the reviewed retention decision.
 
-Solid arrows are exactly the `dependencies` fields under
-`codex/substrate/nodes/{feeds,lab,oracle,refinement}`. They describe artifact
-consumption, not every injected context item or execution-time source binding.
-Lab binds feeds to its issue snapshot. Oracle binds `oracle_subject_*` tools to
-the original Lab and `global_*` tools to later truth. Its subject-grounding rules
-still govern reconstruction. See `zenith/daily.py::checked_run` and the engine's
-tool hydration; the atlas does not invent dependencies for these bindings.
-
-The Evolve figure separates the native dossier DAG from the daily controller's
-reviewed policy path. Dashed arrows connect workflow steps, not native nodes.
-`run_evolve.py::export_agent_handoff` exports pending analysis with source
-bindings. `daily.py::compile_review` freezes a candidate or no-change decision.
-The next development Lab may use that candidate; later `daily matchoff` and an
-explicit `daily retain` decision govern retention. Neither an Oracle diagnosis
-nor a candidate review establishes improvement. Native dossier mutation is a
-separate explicit application path.
-
-Regenerate without extra dependencies:
+Regenerate all seven figures without extra dependencies:
 
 ```sh
 python3 scripts/build_graphs.py
 ```
 
-The builder checks full node and edge coverage. Each SVG embeds the exact edge
-inventory and SHA-256 hashes of the source node files in its metadata.
+The builder checks full node and edge coverage in the details and verifies that
+overview groups partition the same nodes. Overview metadata records represented
+and omitted edges. Native-graph SVGs embed node hashes and exact inventories;
+the replay SVG identifies its conceptual workflow and node hashes.

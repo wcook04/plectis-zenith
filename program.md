@@ -1,20 +1,26 @@
 # The job
 
-1. Reconstruct a trading day's available evidence across the original feeds.
-2. Run the existing Lab graph; save its selected assets and predictions.
-3. Advance time and measure the outcomes, including selection and abstentions.
-4. Let Oracle propose a diagnosis and Evolve propose a versioned change.
-5. Compare both versions on the same later inputs. Keep the better supported one.
-6. Repeat.
+**This is not financial advice.** The work is experimental research, not an
+investment recommendation or a trading service. Preserve the
+[research notice](RESEARCH_NOTICE.md) across public explanations and outputs.
 
-Next: get a small coherent historical multi-feed snapshot working. Start with
-raw news and stock prices, add ETF history and archived macro releases, and
-mark unresolved lanes honestly. Then run the original graph on those inputs.
+Use the original saved feeds at t−n and t. Keep the same graph across several
+available windows, trace repeated failures, propose one change and test it on
+later windows. Keep the original inputs, predictions and unsuccessful attempts.
 
-Keep the paper at three pages. Keep this repo about this loop. Do not add another
-benchmark programme, survey, dashboard or framework without a concrete need.
+Lab selects assets and predicts. Oracle measures the outcome and proposes a
+diagnosis. Evolve changes an instruction, context or connection. A repeated
+failure is a reason to test that change; only the later comparison can tell us
+whether it helped.
 
-Freeze predictions before revealing outcomes. Keep failed attempts. An Oracle
-explanation is a hypothesis; a reviewed edit is a candidate. Neither is evidence
-of improvement until later comparisons support it. Historical research can
-overfit even when timestamps are correct. Do not reset existing study budgets.
+The example uses actual historical snapshots already on disk. Do not replace
+them with invented data or a thin substitute. Preserve the six source feeds and
+CALC, the original graph and the distinction between source availability,
+recorded price changes and a certified financial backtest.
+
+Keep the paper at four pages. Explain the actual input, output, failure,
+change and later comparison with readable diagrams. Add code only when this
+loop needs it. The website backend serves those same nodes, the paper and saved
+evidence. Claude owns the frontend; do not restore the discarded viewer. Keep
+public explanations separate from explicitly enabled private run inspection.
+No new benchmark programme, dashboard or framework.
