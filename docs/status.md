@@ -44,6 +44,13 @@ pages with no undefined citations or overfull boxes; changed pages were
 visually inspected. Exchange-calendar deprecation and bibliography underfull
 spacing warnings remain. These are implementation checks, not market evidence.
 
+The refreshed private [Type B packet receipt](type-b-quantile-daily-packet.json)
+binds source commit `74ffa134f9bee6494ff45a3c9157e743dc351748`, original notes
+and literature, the completed native attempts and the current research brief.
+The local ZIP contains 2,203 files (49,758,404 bytes); all member hashes, fresh
+extraction and local Markdown links were checked. It has not been uploaded.
+The public receipt records metadata only.
+
 ## Richer data through the native daily loop, 12 October 2026
 
 The [TraderHarness adapter](traderharness-daily.md) connects five pinned tables
