@@ -12,13 +12,18 @@ from functools import lru_cache
 import hashlib
 import importlib.metadata
 import json
+import os
 from pathlib import Path
+import shutil
+import subprocess
+import sys
+from tempfile import TemporaryDirectory
 
 import exchange_calendars as xcals
 import requests
 
 from . import traderharness as source
-from .fnspid import LANES, canonical_hash, sha, write_json
+from .fnspid import LANES, canonical_hash, write_json
 
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY = 'https://github.com/HephaestLab/TraderHarness'
@@ -68,6 +73,11 @@ def manifest_body(profit_memory=False):
     return value
 
 
+def sha(path):
+    with Path(path).open('rb') as handle:
+        return hashlib.file_digest(handle, 'sha256').hexdigest()
+
+
 def verify(directory):
     directory = Path(directory)
     manifest = json.loads((directory/'source-manifest.json').read_text())
@@ -83,6 +93,33 @@ def verify(directory):
     return manifest
 
 
+def acquire_cached_file(original, target, pin):
+    """Publish a verified independent file, sharing APFS blocks when possible."""
+    original, target = Path(original).resolve(), Path(target)
+    if original.stat().st_size != pin['bytes'] or sha(original) != pin['sha256']:
+        raise ValueError('Cached TraderHarness source failed size/hash check')
+    with TemporaryDirectory(prefix='.acquire-', dir=target.parent) as staging:
+        copied = Path(staging)/target.name
+        if sys.platform == 'darwin':
+            # A clone has its own inode and writes. Some native cp versions
+            # reject cross-volume cloning instead of falling back themselves.
+            try:
+                subprocess.run(['/bin/cp', '-c', str(original), str(copied)],
+                               check=True, capture_output=True, timeout=120)
+            except subprocess.CalledProcessError:
+                copied.unlink(missing_ok=True)
+                shutil.copyfile(original, copied)
+        else:
+            shutil.copyfile(original, copied)
+        if copied.stat().st_size != pin['bytes'] or sha(copied) != pin['sha256']:
+            raise ValueError('Copied TraderHarness source failed size/hash check')
+        with copied.open('rb') as handle:
+            os.fsync(handle.fileno())
+        # Exclusive publication preserves a destination created concurrently.
+        # Removing staging leaves one link to an inode independent of original.
+        os.link(copied, target)
+
+
 def acquire(directory, cached_source=None, *, profit_memory=False):
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=True)
@@ -94,7 +131,8 @@ def acquire(directory, cached_source=None, *, profit_memory=False):
                 raise ValueError('Existing source differs; preserve it and use another directory')
             continue
         if cached_source:
-            content = (Path(cached_source)/name).read_bytes()
+            acquire_cached_file(Path(cached_source)/name, target, pin)
+            continue
         else:
             url = f'{DATASET}/resolve/{DATA_REVISION}/{name.removeprefix("harness_")}'
             response = requests.get(url, timeout=120)

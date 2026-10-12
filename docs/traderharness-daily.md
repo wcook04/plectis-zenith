@@ -36,6 +36,12 @@ target. Answer real pending prompts through `zenith import-response`; the same
 controller later runs Oracle and emits the Evolve review. Follow [the daily
 commands](daily-replay.md). Use a new programme directory after source/runtime
 changes. `acquire --cached-source PATH` reuses pinned `harness_*.parquet` originals.
+On macOS it creates independent copy-on-write files where the filesystem supports
+cloning, avoiding another full allocation for each local dataset directory.
+Other filesystems use an ordinary copy. Cached and copied bytes must match the
+same pins before publication; existing files are preserved. Neither transport
+loads a complete cached table into memory. Point `--dataset` at an attached
+data drive to place new datasets there directly.
 Neither command buys inference or manufactures responses.
 
 ## Packet boundaries

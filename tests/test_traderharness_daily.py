@@ -4,12 +4,80 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import shutil
+import hashlib
 
 import pytest
 
 from benchmarks import traderharness_daily as adapter
 from zenith import daily, runtime
 from system.lib.run_compare import combined_prices
+
+
+def cached_pin(content):
+    return {'bytes': len(content), 'sha256': hashlib.sha256(content).hexdigest()}
+
+
+def test_cached_acquisition_keeps_independent_files_and_avoids_read_bytes(tmp_path, monkeypatch):
+    original, target = tmp_path/'original', tmp_path/'target'
+    original.write_bytes(b'pinned source')
+    def no_full_read(*args, **kwargs):
+        raise AssertionError('Cached acquisition must stream or clone')
+    monkeypatch.setattr(Path, 'read_bytes', no_full_read)
+    adapter.acquire_cached_file(original, target, cached_pin(b'pinned source'))
+    assert target.stat().st_ino != original.stat().st_ino
+    assert target.stat().st_nlink == original.stat().st_nlink == 1
+    assert not target.is_symlink()
+    target.write_bytes(b'independent change')
+    assert original.open('rb').read() == b'pinned source'
+    assert not list(tmp_path.glob('.acquire-*'))
+
+
+def test_bad_cached_source_is_not_published(tmp_path):
+    original, target = tmp_path/'original', tmp_path/'target'
+    original.write_bytes(b'bad source')
+    with pytest.raises(ValueError, match='Cached.*size/hash'):
+        adapter.acquire_cached_file(original, target, cached_pin(b'pinned source'))
+    assert not target.exists()
+    assert not list(tmp_path.glob('.acquire-*'))
+
+
+def test_cached_acquisition_preserves_existing_destination(tmp_path):
+    original, target = tmp_path/'original', tmp_path/'target'
+    original.write_bytes(b'pinned source')
+    target.write_bytes(b'existing destination')
+    with pytest.raises(FileExistsError):
+        adapter.acquire_cached_file(original, target, cached_pin(b'pinned source'))
+    assert target.read_bytes() == b'existing destination'
+    assert not list(tmp_path.glob('.acquire-*'))
+
+
+def test_cached_copy_fallback_and_corruption_detection(tmp_path, monkeypatch):
+    original, target = tmp_path/'original', tmp_path/'target'
+    original.write_bytes(b'pinned source')
+    monkeypatch.setattr(adapter.sys, 'platform', 'linux')
+    adapter.acquire_cached_file(original, target, cached_pin(b'pinned source'))
+    assert target.read_bytes() == b'pinned source'
+    target.unlink()
+    monkeypatch.setattr(adapter.shutil, 'copyfile', lambda source, dest: Path(dest).write_bytes(b'corrupt'))
+    with pytest.raises(ValueError, match='Copied.*size/hash'):
+        adapter.acquire_cached_file(original, target, cached_pin(b'pinned source'))
+    assert not target.exists()
+    assert not list(tmp_path.glob('.acquire-*'))
+
+
+def test_failed_native_clone_falls_back_from_its_partial_copy(tmp_path, monkeypatch):
+    original, target = tmp_path/'original', tmp_path/'target'
+    original.write_bytes(b'pinned source')
+    monkeypatch.setattr(adapter.sys, 'platform', 'darwin')
+    def failed_clone(argv, **kwargs):
+        Path(argv[-1]).write_bytes(b'partial copy')
+        raise adapter.subprocess.CalledProcessError(1, argv)
+    monkeypatch.setattr(adapter.subprocess, 'run', failed_clone)
+    adapter.acquire_cached_file(original, target, cached_pin(b'pinned source'))
+    assert target.read_bytes() == b'pinned source'
+    assert original.stat().st_ino != target.stat().st_ino
+    assert target.stat().st_nlink == 1
+    assert not list(tmp_path.glob('.acquire-*'))
 
 
 @pytest.fixture
