@@ -1,173 +1,92 @@
-# Zenith systems paper
+# Zenith research manuscript
 
-The manuscript is [zenith.tex](zenith.tex), its bibliography is
-[references.bib](references.bib), and paper-house-style.sty supplies shared
-typography. This standalone Zenith implementation/evaluation paper does not
-replace the Plectis system paper or the private strategy document.
+[zenith.tex](zenith.tex) and [zenith.pdf](zenith.pdf) now describe **Learning to
+Reason About Financial Change: Method and development evidence**. This is the
+standalone Zenith manuscript, separate from the Plectis system paper and private
+strategy document.
 
-The manuscript follows an empirical systems structure: problem, implemented
-method, conditional formal contracts, assessment protocol, observed evidence,
-related work and limitations. It claims no forecasting advantage, generalized
-optimizer or established novelty.
+The argument begins with actual issuer guidance changes, separates financial
+interpretation from numerical payoff, reports the measured overscaling diagnosis,
+and presents the concrete source-rich development cases. The direct/graph and
+learned-reasoning comparisons remain unexecuted. No LLM advantage, transferable
+learning, explanation fidelity, novelty or profitability is claimed.
+
+Citations appear beside borrowed mechanisms, methods, data, software and issuer
+facts. [references.bib](references.bib) retains the larger reviewed inventory;
+only sources used in this manuscript appear in its bibliography. Six primary
+issuer releases support the actual financial examples. The supplied Huang,
+Wang/Yeung and Yu papers are cited at use, with target and method differences
+stated. The two Yu uploads are duplicate page content, not independent sources.
+Parent annex provenance remains in
+[finance-adaptive-sources.json](../docs/finance-adaptive-sources.json).
 
 Build from this directory:
 
-    tectonic --keep-logs --reruns 2 zenith.tex
+```sh
+tectonic --keep-logs --reruns 2 zenith.tex
+```
 
-Tectonic runs the bibliography pass. Source/data and environment instructions
-remain in the repository's docs/reproducing.md, docs/experiments.md and
-docs/architecture-sources.json. Both native phases are complete, and the later
-assessment is sealed under native-deepinfra-final-v1. The result table is a
-projection of attributable native reports, with exact scores in
-study-evidence.json. Both arms retained their frozen graph, policy, inputs,
-model and provider identity. These small, previously examined historical
-windows support pipeline feasibility and a descriptive comparison, not
-significance, a learned update, prospective accuracy or profitability.
-Report failed attempts, matched target support, model identity, calls,
-reported/unknown cost and assessment exposure with any measured losses.
+Tectonic runs the bibliography pass. Source and bibliography are Apache-2.0.
+`paper-house-style.sty` retains Will Cook's CC-BY-4.0 header and is the exact shared
+style copy with SHA256
+`1b4630ead32bfb407a2f29f5953fbb8d4140a659f6500799282a4805ba54a883`.
 
-Compatibility calibration is supported by calibration-evidence.json, a
-text-free snapshot of four excluded July pilots. It binds original receipt
-and validation-sidecar hashes, requested/actual models and providers, native
-outcomes and reported/unknown costs. For each pilot, every manifest
-implementation hash is checked against the SHA256 of the corresponding Git
-blob bytes. A matching revision describes content compatibility, not an
-observed HEAD or a unique executed revision. Prompt-profile introduction is
-recorded separately; the v2 HTTP 429 manifest matches aa2f8ec, while its
-profile-introduction commit 7582bf1 differs in the paid adapter. Nova and Qwen
-v1 responses failed format
-or length validation. The unpinned DeepSeek v2 request returned HTTP 429 with
-no response or usage record; its unknown charge and full reservation remain.
-An authorized recovery preserved that history. A fresh DeepSeek v2 pilot,
-requested through deepinfra/fp8 and reported as DeepInfra, completed both
-reasoning nodes under the same validators. Native acceptance establishes
-compatibility, not forecast accuracy or a matched comparison between models.
-Calibration accounting is a subset of the shared, evolving production ledger;
-reservations are distinct from reported charges.
+## Current measured and compiled evidence
 
-The following command reproduces the original projection at its frozen source
-revision (01522cc), with the original native artifacts available. The completed
-export is an immutable historical snapshot; do not overwrite it for a later
-study or a shared ledger that has since acquired new calls:
+- [Development diagnosis](../docs/ashare-development-diagnosis.json): original
+  forecasts, date-equal energy/alignment, chronological calibration, common and
+  relative errors, source binding and fit boundaries. Calibration design used
+  earlier aggregate development results; there is no untouched-test claim.
+- [Guidance sources](../docs/guidance-development-sources.json) and
+  [compiler receipt](../docs/guidance-development.json): six original releases,
+  four events, 13 comparisons, clocks, hashes, rights and price-basis limitation.
+  Selected transcriptions are not full autonomous report extraction. Model
+  requests exclude the oracle and do not ask for returns.
+- [Base batch](../docs/ashare-base-plan.json): an unexecuted 21-call direct/graph candidate,
+  exact frozen cohort and conservative USD0.5860815 quote. The later operator
+  instruction dedicates remaining programme funds to research; Type B may
+  recommend replacing this candidate.
+  [Active protocol](../docs/ashare-study.md) owns commands and the spending boundary.
 
-    python3 paper/export_study_evidence.py --study work/native-deepinfra-study --budget work/stocknet-native-five-dollar-budget/budget.json --output paper/study-evidence.json
+## Historical supporting evidence
 
-The exporter uses the standard library and writes only the paper evidence
-projection. It verifies the frozen source/input identities, binds source-file
-hashes and excludes prompts, responses and market observations. It does not
-execute models, evaluate forecasts, select a candidate or seal a study.
-Comparison scores remain unavailable until the native evaluator records
-complete common support. The shared-budget section includes all calibration
-and study attempts, responses, reported costs, unknown charges and in-flight
-requests, separately from each study arm's accounting. Re-export after the
-native receipts settle before creating a new study's separate export; a live
-source change during export causes an error rather than a mixed snapshot.
-Use an explicit new output path, such as paper/learning-study-evidence.json,
-for subsequent experiments.
+The old 2015 study compared a manually frozen price-only rule with a model
+baseline. It demonstrated pipeline feasibility; it did not learn the rule from
+feedback. Its historical assessment was sealed as `native-deepinfra-final-v1`.
+Those dates had already been examined. This pilot no longer drives the abstract
+or main argument. These exports remain unchanged and do not support claims
+about the new financial reasoning system:
 
-Finance grounding is recorded in docs/finance-design.md,
-docs/finance-related-work.json, docs/finance-adaptive-sources.json and
-docs/finance-validation.md. The manuscript cites the closest mechanisms and
-evaluation controls; these manifests retain acquisition, code-pin and
-paper-versus-later-code details. QuantAgent (Wang et al., 2024) is distinct from
-the later work renamed QuantHarness. FinRobot's current strategy loop is cited
-as code, separately from its 2024 platform paper. No upstream stack is installed
-as a consequence of these citations.
+- `study-evidence.json`: complete native development/final reports and shared
+  accounting. Reproduce with `export_study_evidence.py` using the original study
+  at `work/native-deepinfra-study` and its exact original budget ledger.
+- `calibration-evidence.json`: four excluded July compatibility pilots, six
+  attempts, distinct from the shared ledger total. Raw outputs were not rewritten
+  to pass newer instructions.
+- `export-validation.json`: export rejection checks and source attribution.
+- [repair-controls.json](../docs/repair-controls.json): synthetic deterministic
+  routing/control experiments; no model or market result.
 
-The 12 October revision assimilates three supplied papers: Huang et al.
-(arXiv:2604.19476v2), Wang and Yeung (Frontiers 9:1722121), and Yu et al.
-(arXiv:2306.11025v1). The annotated/original Yu uploads contain identical
-decoded page contents and no distinguishable operator notes. Native parent
-annexes preserve identities, source passages, critical findings and transfer
-decisions. Citations occur at each adopted mechanism, economic motivation,
-dataset or software use. Future-news ROUGE is not treated as explanation
-fidelity, and financial network indicators are not mistaken for return targets.
+Keep future exports separate. Exporting projects completed authoritative receipts;
+it never executes, selects or seals a study. Unknown costs and reservations
+remain distinct from reported costs. Original shared history retains 106 attempts,
+105 responses and one unknown charge. New authorization histories do not erase it.
+Detailed historical reproduction remains in [reproducing.md](../docs/reproducing.md)
+and [experiments.md](../docs/experiments.md).
 
-The revised A-share section includes the actual negative development-only
-text-control comparison from docs/ashare-development-controls.json. The LLM
-study remains unexecuted. The first-learning profile retains all 48 assessment
-dates and allows 572 total calls including capability checks; that plan does
-not release the paid hold or expand the immutable budget.
-
-Authoring owners used:
-
-- ai_workflow/.agents/skills/route-human-authoring/SKILL.md and
-  ai_workflow/.agents/skills/humanizer/SKILL.md for systems prose.
-- ai_workflow/codex/standards/paper_register_rules.json, adopted rules
-  REG-001 through REG-003 for literal register, genre and bounded verification
-  reporting.
-- ai_workflow/.agents/skills/mathematical-reasoning/SKILL.md for the existing
-  metric definition and conditional reach of the Lean source. This document
-  introduces no new mathematical result.
-
-The typography is an exact copy of Will Cook's CC-BY-4.0 shared style at
-ai_workflow/tools/meta/dissemination/plectis_intro/paper-house-style.sty,
-SHA256 1b4630ead32bfb407a2f29f5953fbb8d4140a659f6500799282a4805ba54a883.
-Its copyright/licence header is retained. The manuscript and bibliography use
-the repository's Apache-2.0 licence. Prior-art sources are cited rather than
-copied into the manuscript.
-
-export-validation.json binds the actual complete development and sealed final
-reports. Five rejected probes on deep copies cover missing issue, missing
-target coverage, altered paired delta, altered aggregate mean and pending
-state with nonnull scores. Final validation also rejects an unregistered
-selected candidate and checks equality with the sealed state receipt. Native
-source reports remained unchanged. Calibration's final ledger locator/hash
-matches the settled study ledger; its four-pilot/six-attempt subset stays
-separate from shared totals of 106 attempts, 105 responses and one unknown
-charge.
-
-The compressed manuscript keeps the completed manual-rule study distinct from
-the proposed feedback-derived policy experiment. The original three receipt
-exports remain unchanged; any later learning study needs a separate export and
-source identities. The full reviewed bibliography is retained as metadata,
-while the manuscript cites only sources needed for its actual argument.
-
-Source owners formerly tabulated in the manuscript:
-
-| Operation | Source owner |
+| Supporting mechanism | Owner |
 | --- | --- |
-| Native execution/planning | zenith/runtime.py; system/core/engine.py |
-| Skill/context policy | system/lib/reasoning_policy.py |
-| Forecast admission/truth | feedback/engine.py |
-| Matched comparison/seals | research/cohort.py |
-| Recorded diagnostics | research/diagnosis.py |
-| Proposal compilation | research/reflection.py; research/reflection_cohort.py |
-| Conditional formal model | formal/ZenithSemantics.lean; scripts/check_semantics.py |
-| Source/data decisions | docs/architecture-sources.json; docs/data-sources.md |
+| Native execution and planning | `zenith/runtime.py`, `system/core/engine.py` |
+| Skill/context policy | `system/lib/reasoning_policy.py` |
+| Forecast admission and matured truth | `feedback/engine.py` |
+| Matched comparison and final seals | `research/cohort.py` |
+| Diagnosis and proposal compilation | `research/diagnosis.py`, `research/reflection.py`, `research/reflection_cohort.py` |
+| Conditional formal model | `formal/ZenithSemantics.lean`, `scripts/check_semantics.py` |
+| Development comparison and scaling | `research/ashare_study.py`, `research/ashare_protocol.py`, `research/ashare_text.py` |
+| Fuller-source compiler | `benchmarks/guidance_events.py` |
 
-Controlled routing validation uses the canonical
-[repair-controls.json](../docs/repair-controls.json), bound to
-benchmarks/repair_controls.py and the native context-policy source. Its finite
-selector uses 20 training cases and 64 disjoint changed-range assessment cases
-per scenario. The main paper reports numeric answers separately from valid
-abstentions and identifies the faulty-operator negative control. This is
-integration/control validation without model calls or a new market study.
-[learning-protocol-audit.json](learning-protocol-audit.json) records the final
-receipt/source hashes and interpretation boundaries; it does not duplicate the
-canonical results or alter the original study exports.
-
-The compressed main text reports all excluded compatibility pilots in one
-paragraph; their full accounting, validation and implementation-match evidence
-remain above and in calibration-evidence.json. The reviewed ATLAS v5 method
-optimizes static instructions using prompt-performance history and outcome
-summaries, while protecting runtime placeholders and output interfaces. A local
-outcome-summary arm can borrow that information pattern without constituting
-an ATLAS/StockSim reproduction. StockSim's public snapshot does not expose the
-paper's complete optimizer configuration. The new executable-return learning
-study is still being specified; this manuscript reports no results from it.
-
-The later A-share study is compiled offline; model execution remains held.
-The [protocol](../docs/ashare-study.md) and
-[admission receipt](../docs/ashare-admission.json) bind 136 admitted issue
-batches, separate forward/teacher/evaluator information, complete comparisons,
-calendar provenance and a 1,213-call maximum core plan. No new learning result
-is reported. The original study and calibration exports remain unchanged.
-The selection rationale is
-[data-selection.md](../docs/data-selection.md), with the independent cross-track
-protocol recommendation in [data-selection-design.json](../docs/data-selection-design.json).
-TraderHarness supplies the multi-session forecast panel from February
-2023 onward after explicit warm-up, corporate-action and fixed-support checks.
-Its earlier price coverage gaps prevent a min/max date range from establishing
-continuous coverage. Unknown-vintage fundamentals are omitted; announcement
-availability is conservative. No new paid learning study or result is reported.
+The formal model assumes constituent contracts; it does not certify LLM
+compliance or financial correctness. These are supporting mechanisms.
+Authoring followed the parent's route-human-authoring, humanizer and
+mathematical-reasoning skills. The square-loss identity is elementary algebra,
+not a new mathematical result.

@@ -155,3 +155,70 @@ def retrieve(packet, cases, reviews):
         if len(selected) == 3:
             break
     return selected
+
+
+def signal_diagnosis(rows, predictions, baseline=None):
+    """Date-equal square-loss identity; retrospective scale is diagnostic only."""
+    baseline = baseline or {r['sample_id']: 0. for r in rows}
+    dates = sorted({r['issue_date'] for r in rows})
+    daily = []
+    for stamp in dates:
+        batch = [r for r in rows if r['issue_date'] == stamp]
+        triples = [(r['actual_return'] - baseline[r['sample_id']],
+                    predictions[r['sample_id']] - baseline[r['sample_id']]) for r in batch]
+        if any(not math.isfinite(x) for pair in triples for x in pair):
+            raise ValueError('diagnosis requires complete finite predictions')
+        energy = math.fsum(q*q for y, q in triples) / len(batch)
+        alignment = math.fsum(y*q for y, q in triples) / len(batch)
+        daily.append({'issue_date': stamp, 'forecast_energy': energy,
+                      'outcome_alignment': alignment, 'excess_mse': energy - 2*alignment})
+    if not daily:
+        raise ValueError('diagnosis requires observations')
+    means = {key: math.fsum(r[key] for r in daily) / len(daily)
+             for key in ('forecast_energy', 'outcome_alignment', 'excess_mse')}
+    return {**means, 'retrospective_unconstrained_scale':
+            means['outcome_alignment'] / means['forecast_energy'] if means['forecast_energy'] else None,
+            'scale_boundary': 'Fitted on all displayed outcomes: diagnostic, never a later-example result.',
+            'daily': daily}
+
+
+def chronological_scale(rows, predictions, *, baseline=None, max_scale=1., min_dates=4, prior_dates=4.):
+    """One nonnegative coefficient, fitted only on strictly matured earlier dates.
+
+    Date-equal least squares with a zero-centred penalty equivalent to
+    ``prior_dates`` extra dates at the observed mean signal energy. The cap,
+    warm-up and penalty are declared development choices, not tuned here.
+    """
+    if any(r['phase'] != 'training' for r in rows):
+        raise ValueError('calibration requires development/training support')
+    if max_scale <= 0 or min_dates < 1 or prior_dates < 0:
+        raise ValueError('invalid calibration configuration')
+    baseline = baseline or {r['sample_id']: 0. for r in rows}
+    # Check complete support before fitting any coefficient.
+    signal_diagnosis(rows, predictions, baseline)
+    output, fits = {}, []
+    for stamp in sorted({r['issue_date'] for r in rows}):
+        query = [r for r in rows if r['issue_date'] == stamp]
+        clock = min(event_time(r['issue_at']) for r in query)
+        past_dates = sorted({r['issue_date'] for r in rows if r['issue_date'] < stamp})
+        # Admit entire date groups; partial maturation must not change weighting.
+        eligible = [r for d in past_dates
+                    if all(event_time(s['outcome_available_at']) < clock for s in rows if s['issue_date'] == d)
+                    for r in rows if r['issue_date'] == d]
+        n = len({r['issue_date'] for r in eligible})
+        coefficient = 0.
+        if n >= min_dates:
+            stats = signal_diagnosis(eligible, predictions, baseline)
+            denominator = stats['forecast_energy'] * (1 + prior_dates / n)
+            if denominator > 0:
+                coefficient = max(0., min(max_scale, stats['outcome_alignment'] / denominator))
+        for r in query:
+            key = r['sample_id']
+            output[key] = baseline[key] + coefficient * (predictions[key] - baseline[key])
+        fits.append({'query_issue': stamp, 'coefficient': coefficient,
+                     'fit_issue_dates': sorted({r['issue_date'] for r in eligible}),
+                     'fit_end': max((r['outcome_available_at'] for r in eligible), default=None),
+                     'warmup': n < min_dates})
+    return output, {'min_dates': min_dates, 'zero_prior_dates': prior_dates,
+                    'coefficient_bounds': [0., max_scale], 'fits': fits,
+                    'status': 'chronological_development_after_design_exposure_not_untouched_test'}

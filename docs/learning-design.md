@@ -232,10 +232,18 @@ tested on separate data. Reuse the existing skill contracts and traces for
 those parts. An intermediate validator supplies a local correctness signal;
 its score must not quietly replace the final forecasting objective.
 
-For now, optimize short skill rules and context allocations with bounded,
-single-component proposals. Small changes make comparisons easier to interpret
-and keep the candidate space constrained; they do not eliminate interactions
-or overfitting. Freeze the simplicity rule in advance, such as preferring lower
+Develop the base system using the evidence its economic task requires. Retrieval,
+prompts, intermediate representations, model choice, graph composition and
+calibration may change together in an explicitly recorded development version.
+Use a small direct-versus-graph comparison to locate recurring weaknesses before
+optimizing instructions. The current A-share path separates a supported economic
+change signal from a small mapping to later returns; both still need actual model
+outputs and comparison. A graph must justify its extra calls.
+
+Use bounded single-component proposals when attributing an improvement to one
+mechanism. Small changes make that comparison easier to interpret; they do not
+eliminate interactions or overfitting. Freeze the simplicity rule in advance,
+such as preferring lower
 call cost among candidates meeting a declared accuracy and coverage threshold.
 If evidence suggests two changes only work together, predeclare a small
 baseline/A/B/A+B comparison on the same support. That tests an interaction

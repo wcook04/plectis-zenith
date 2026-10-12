@@ -179,6 +179,71 @@ def test_verification_never_runs_missing_node(tmp_path):
         study.node(tmp_path, 'missing', 'prompt', lambda x: x, {'_cache_only': True})
 
 
+def test_change_representation_preserves_unknown_and_rejects_invalid_signal():
+    p = packet()
+    value = {'interpretation': interpretation(p), 'signals': [
+        {'asset_id': a['asset_id'], 'economic_change': None} for a in p['assets']]}
+    assert protocol.parse_change(json.dumps(value), p) == value
+    for bad in (True, 1.1, 'positive'):
+        value['signals'][0]['economic_change'] = bad
+        with pytest.raises(ValueError, match='signal'):
+            protocol.parse_change(json.dumps(value), p)
+
+
+def test_base_comparison_uses_same_packets_pilot_and_original_response_cache(tmp_path, monkeypatch):
+    from research import trading_study
+    dates = ['2023-03-01', '2023-03-08', '2023-03-15']
+    packets = {d: packet(d) for d in dates}
+    r = [dict(row, issue_at=packets[d]['issue_at']) for d in dates for row in rows(d)]
+    spec = {'budget': {}, 'authorization': {'synthetic': True}, 'symbols': ['s1', 's2'],
+            'base_comparison': {'dates': dates[1:], 'pilot_date': dates[0]}}
+    calls = []
+    def ask(directory, key, prompt, config):
+        assert 'HINDSIGHT_SECRET' not in prompt
+        payload, _ = json.JSONDecoder().raw_decode(prompt.split('EVIDENCE_JSON\n')[1])
+        calls.append(key)
+        if key.startswith('base_change_'):
+            return json.dumps({'interpretation': interpretation(payload), 'signals': [
+                {'asset_id': a['asset_id'], 'economic_change': None} for a in payload['assets']]})
+        return json.dumps(forecast(payload['packet'], payload['interpretation']))
+    monkeypatch.setattr(trading_study, 'ask', ask)
+    write_json(tmp_path / 'binding.json', {'frozen_sha256': 'synthetic'})
+    with pytest.raises(ValueError, match='observation missing'):
+        study.base_comparison(tmp_path, spec, r, packets)
+    assert not calls
+    pilot = study.base_pilot(tmp_path, spec, r, packets)
+    assert pilot['complete'] and 'scores' not in pilot
+    result = study.base_comparison(tmp_path, spec, r, packets)
+    assert len(calls) == 9 and result['scores']['direct']['issue_dates'] == 2
+    assert result['signal_missing_count'] == 4
+    assert result['scores']['economic_signal_scaled']['complete']
+    assert study.base_comparison(tmp_path, spec, r, packets) == result
+    assert len(calls) == 9
+    for group in result['observations'].values():
+        assert group['direct']['value']['packet_sha256'] == group['graph']['value']['packet_sha256']
+    write_json(tmp_path / 'final-seal.json', {})
+    with pytest.raises(ValueError, match='development closed'):
+        study.base_comparison(tmp_path, spec, r, packets)
+    assert len(calls) == 9
+
+
+@pytest.mark.parametrize('summary', ['中' * 800, '\U0001f4c8' * 800, '\u0001' * 180])
+def test_base_reservation_covers_valid_unicode_and_escaped_interpretations(summary):
+    p = packet(n=10)
+    interp = interpretation(p)
+    for row in interp['interpretations']:
+        row['summary'] = summary
+    wrapper = {'interpretation': interp, 'signals': [
+        {'asset_id': a['asset_id'], 'economic_change': None} for a in p['assets']]}
+    parsed = protocol.parse_change(json.dumps(wrapper, ensure_ascii=False), p)
+    spec = {'base_comparison': {'dates': [p['issue_date']], 'pilot_date': None}}
+    plan = study.base_plan(spec, {p['issue_date']: p})
+    actual = sum(len(prompt.encode()) + 4096 for prompt in (
+        protocol.direct_prompt(p), protocol.change_prompt(p),
+        protocol.forecast_prompt(p, parsed['interpretation'])))
+    assert actual <= plan['input_token_reservation_bound']
+
+
 @pytest.mark.parametrize('profile_name', ['full', 'first_learning'])
 def test_synthetic_full_study_executes_contracts_and_rejects_resealed_selection(tmp_path, monkeypatch, profile_name):
     """Exercise actual cache/reparse path with a declared synthetic transport."""

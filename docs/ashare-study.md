@@ -1,254 +1,213 @@
-# Learning what to notice in financial evidence
+# Developing a capable financial reasoner
 
-Zenith asks whether experience teaches a compact financial reasoning skill that
-improves later forecasts beyond ordinary outcome feedback and retrieved memories.
-The supplied evidence must support the distinctions we demand, and the comparison
-must include capable inexpensive alternatives.
+The current objective is to establish a useful base reasoner, then test whether
+experience improves its recurring financial procedures beyond numerical
+calibration. Retrieval, prompts, topology, models, event families and horizons
+are development choices. The controls of a frozen comparison apply to that
+comparison; they are not permanent limits on Zenith.
 
-**Paid inference remains on hold.** The revised [admission receipt](ashare-admission.json)
-and [first-run profile](ashare-first-run.json) describe compiled inputs and frozen
-execution choices. The [cheap-control measurement](ashare-development-controls.json)
-uses development data only. There is no new LLM, learned-skill or trading result.
-The earlier US experiment and its immutable result exports remain separate.
+**The operator has now dedicated the remaining authorized budget to the research
+programme and requested a source-rich Type B review before selecting what to do
+next.** No inference is currently running. The [reviewable candidate batch](ashare-base-plan.json)
+contains 21 calls, not the earlier 572-call learning study. No new LLM outputs,
+learned-reasoning improvement, final assessment or trading result exist.
 
-## Evidence and the reasoning job
+## The measured diagnosis
 
-At each issue, one minute after an XSHG close, both reasoning nodes receive twenty
-completed sessions, a preceding close, a numerical anchor fitted on 2021 data,
-dated evidence and the exact forecast interval. Interpretation comes first; the
-forecaster receives both the interpretation and original evidence. Only its short
-skill, at most 1,200 characters, is initially mutable. Mixed dated prices/news,
-related-stock examples and financial instruction tuning are established prior art
-in [Yu et al.](https://arxiv.org/abs/2306.11025v1). Their return bins and fine-tuning
-are different from this study's continuous target and short-skill update.
+The [current measurement](ashare-development-diagnosis.json) reproduces the
+original controls on 33 dates and 330 asset forecasts after eight initial fit
+issues. Every transformation and ridge fit uses earlier matured training data.
 
-The interpreter distinguishes reported facts, comparison with an earlier claim,
-explicit expectations, contrary evidence and the effect potentially remaining
-after entry. An issuer estimate is not market consensus; positive growth alone
-is not a surprise. Entry at next open excludes the first overnight price move.
-The initial-response/drift distinction in
-[Lopez-Lira and Tang](https://arxiv.org/abs/2304.07619v6) motivates this separation,
-without establishing predictable remaining returns in this Chinese panel.
+| Forecast | Original MSE | Chronologically scaled MSE |
+| --- | ---: | ---: |
+| Zero market-relative return | 0.0010951783 | 0.0010951783 |
+| Numerical, metadata and issuer ridge | 0.0014184998 | 0.0010872885 |
+| Same inputs plus character text | 0.0014834418 | 0.0010865439 |
 
-The revised interpreter also distinguishes the reported subject from the forecast
-issuer, direct relevance from a hypothesized indirect channel, and supported
-relationships from unknown ones. It requests short supporting spans and source
-references. [Huang et al.](https://arxiv.org/abs/2604.19476v2) retrieve candidate
-pairs and then classify relationships using disclosure evidence. That distinction
-is useful here; their disclosure graph, competitor deletion and mean-reversion
-weights are not imported. The validator checks references, shape and bounds, not
-span entailment or the validity of economic reasoning.
+The identity `MSE(q)-MSE(0)=E[q²]-2E[yq]` uses equal date weights.
+Numerical forecast energy is 0.0004857933 and alignment is 0.0000812359.
+Text energy is 0.0005650676 and alignment is 0.0000884020. Both have positive
+sample alignment and excessive scale. All-date optimal scalars, 0.1672 and
+0.1564, are retrospective diagnostics only.
 
-Fixed retrieval retains up to four issuer-tagged items and two common headlines
-from the previous seven calendar days, deduplicated by normalized content and
-capped at 600 characters each. Up to two older numerical profit claims are added
-when the candidate issuer token and fiscal-period key match a current claim,
-strictly earlier and within 180 days. The latest distinct match wins. Year inference
-is restricted to explicit intra-year periods and recorded; unsupported or ambiguous
-periods abstain. Original text, clocks, references and matching basis remain intact.
-A match is a candidate comparison, not verified entity or accounting equivalence.
+Chronological scaling fits one nonnegative coefficient capped at one. It uses
+only complete earlier date groups whose labels have strictly matured before
+the query; four mature dates are required, with a four-date zero prior.
+Warm-up predictions remain zero corrections in the complete score. Applying
+the same rule to the raw incremental text correction on top of the scaled
+numerical baseline gives MSE 0.0010865306. This tiny difference does not establish
+an incremental text advantage.
 
-Five recurring training omissions justified that patch: Moutai's Q1 and H1 updates,
-Tongwei Q1, LONGi H1 and COSCO H1. The revised full panel adds only **11** older
-items: five training, two validation, four assessment. Thirteen asset windows
-have a candidate comparison, including two with an already-retained earlier item.
-This narrow coverage is a limitation, not a rich-history claim.
+The approximately 0.7–0.8% improvement below zero is development evidence.
+Calibration was designed after the original aggregate errors had been seen;
+its settings were not retuned after this new measurement. This does not test
+LLM reasoning or an untouched holdout. The original
+[unscaled receipt](ashare-development-controls.json) remains unchanged.
 
-The corpus contains headlines and announcement titles, not full article/report
-bodies. Source tags can conflate related listed companies: inspected BYD Electronic
-news carries BYD's A-share token. Similarity or a tag cannot establish an economic
-relationship. Unverified financial-statement vintages remain excluded.
+## The concrete base comparison
 
-News epochs are UTC and independently match their Shanghai display timestamps.
-Midnight announcements are treated as day precision and become eligible at the
-following exchange open; timed announcements use the declared Shanghai-clock
-assumption. These rules qualify publication metadata, not historical wording.
-Issuer codes appear in every treatment; `asset_N` is a join key, not anonymization.
+Frozen cohort: `work/ashare-base-development-20261012/`. Its binding, exact source
+hashes, library versions, packets and selected dates are retained. Model choice:
+`deepseek/deepseek-v4.1-flash` at the exact `deepinfra/fp8` endpoint.
 
-| Treatment | Information |
-| --- | --- |
-| Price | Issuer identity, history, numerical state and anchor |
-| Metadata | Same prices plus admitted event times, types, counts and source IDs |
-| Rich | Same selected records with their retained text |
+- Excluded compatibility date: 2023-03-08, three calls.
+- Development dates: 2023-03-01, 2023-04-27, 2023-07-20, 2023-08-03,
+  2023-08-31 and 2023-12-22, three calls each.
+- Direct arm: one capable prompt reasoning over original evidence.
+- Graph arm: a supported-change interpretation, then a forecast using both
+  that interpretation and original evidence.
+- Shared information: issuer identity, prices, numerical state, weak anchor,
+  dated evidence, decision clock, target and native forecast validator.
+- Comparison limits: one versus two calls per date, not equal token budgets.
+  Provider receipts retain actual usage, identity and cost.
 
-Each treatment has its own interpretation. Named entities inside rich text still
-provide additional cues; rich-minus-metadata does not isolate every identity effect.
+Inputs guided the explicit date selection; previously exposed development
+outcomes do not become unseen by selecting a smaller batch. The pilot verifies
+actual validators before the comparison can issue calls. Any invalid response
+ends the batch after that date; invalid dependencies skip the graph call.
+Provider failures stop execution. No silent retry or automatic candidate learning
+occurs. Replays reparse original response caches. Development closes after a
+selection or final seal.
 
-## Dates and return accounting
+The interpretation separates FACT, CHANGE, CHANNEL, PRICED and UNKNOWN. Its
+additional economic-change signal is a bounded score, not a return or claimed
+market surprise. Raw unknowns remain null. An explicit numerical comparator
+maps unknowns to zero correction and learns one coefficient capped at 0.05 using
+the same mature-date rule. Direct and graph forecasts receive ordinary scaling
+as well. Six dates leave only two after the four-date calibration warm-up;
+matched raw and zero scores accompany that restricted comparison. All six dates
+remain in the full score. This is a behavior-first diagnostic, not a superiority
+or learning result.
 
-The compiler verifies the pinned [TraderHarness software](https://github.com/HephaestLab/TraderHarness/tree/3e18369da5a2060f9c65b27c2a63f99edd93e167)
+Inspect outputs against the source: right issuer, accounting period, latest
+comparable claim, contradictory evidence, unknown expectations, and effect
+remaining after entry. JSON/reference validation is not an entailment verdict.
+If either arm fails these recurring tasks, change the base and retain the
+failed version before attempting the larger learning loop.
+
+## Fuller-source replacement already compiled
+
+The [source manifest](guidance-development-sources.json) binds six original
+issuer releases, SEC clock cross-checks, table images and price support.
+The [compiler receipt](guidance-development.json) contains four Adobe/Salesforce
+updates and 13 exact range comparisons. These cases are selected for source
+feasibility, not as a representative or held-out opportunity stream.
+
+Adobe target sections come from the original PDFs. Salesforce packets contain
+visually reviewed selected annual-column transcriptions; they do not include
+all guidance measures, reconciliation tables or whole-report prose. Current-site
+navigation and later editorial additions are excluded. The task therefore tests
+financial comparison on reviewed extracts, not autonomous report extraction.
+
+The cases distinguish mixed revisions, unchanged revenue with higher margins,
+and per-metric previous publications. Adobe's March release omits annual revenue
+and segment-revenue targets; their June comparison uses December rather than
+inventing a March reaffirmation. Endpoint and width changes accompany midpoint
+direction, so an unchanged midpoint cannot hide a revised range. The exact
+oracle is outside every model request. The representation task does not ask for
+returns or receive outcome labels.
+
+Four typed packets and held requests are under
+`work/guidance-development-final-20261012/`. Acceptance plus five minutes defines
+a reconstructed decision clock; entry is the next regular open and exit the
+fifth regular close. Current mirrors are not authenticated historical snapshots.
+The source manifest distinguishes SEC clock evidence from historical byte identity.
+Twenty completed price sessions and five future sessions exist for each issuer
+and SPY. Adjustment vintage and distribution treatment remain unresolved, so
+this lane scores no returns. A modern model may remember these events.
+
+## Evidence and accounting retained from the A-share work
+
+The pinned [TraderHarness code](https://github.com/HephaestLab/TraderHarness/tree/3e18369da5a2060f9c65b27c2a63f99edd93e167)
 and [dataset](https://huggingface.co/datasets/ANTICH/traderharness-ashare-5y/tree/3bf5151ab3e94851bb09dd8ade815563c44b15a6)
-provenance, then checks historical and outcome bars against XSHG sessions. Warmup
-stays within the continuous February 2023 onward panel. Of 138 scheduled
-nonoverlapping five-session windows, two cross phase boundaries and are purged.
+supply short titles, not article bodies. Fixed retrieval keeps four issuer-tagged
+items and two common headlines within seven days, plus up to two earlier
+numerical profit claims with matching issuer/fiscal-period candidates within
+180 days. Only five older items were added to training. Tags, matches and
+inferred periods are candidate evidence, not verified issuer/accounting identity.
+News epoch clocks match Shanghai display times. Midnight announcements have day
+precision and become available at the following open; timed announcements use
+the declared Shanghai-clock assumption. These rules do not certify text vintage.
 
-| Phase | Admitted issue dates | Asset forecasts | First–last issue |
-| --- | ---: | ---: | --- |
-| Training | 41 | 410 | 2023-03-01–2023-12-22 |
-| Validation | 47 | 470 | 2024-01-08–2024-12-20 |
-| Assessment | 48 | 480 | 2025-01-06–2025-12-24 |
+All 136 admitted windows have complete stock/benchmark bars: 41 training,
+47 validation and 48 assessment dates. Of 1,360 asset windows, 452 have no
+issuer-tagged item. No final-assessment errors have been evaluated in this reset.
+The 2021 anchor is a weak price reference, not a competitive fitted language model.
 
-All 136 admitted windows have complete stock/benchmark bars. Of 1,360 asset
-windows, 452 have no issuer-tagged item; every window has two common headlines.
-`work/ashare-v2-full-bound-20261012/representative-inputs.json` retains ordinary,
-issuer-information, thin-information and action-boundary examples chosen by
-chronology/input properties, never forecast success. The original compiled study
-at `work/ashare-offline-20261011/` remains an immutable reference to its old source.
+Labels are next-open to fifth-close gross stock wealth minus CSI 300 price return.
+Pre-event share quantity determines cash entitlement; extra shares and cash enter
+terminal wealth. Buying at the ex-date open receives no old-holder entitlement.
+Past input normalization uses only actions occurring and announced by the issue.
+The [label checks](ashare-label-checks.json) retain independent entitlement tests.
+This mixed-basis target excludes costs, taxes, lots and execution constraints.
+It is not a feasible hedged portfolio return. Any trading stage must define
+holdings, cash, overlapping positions, executable benchmark, action treatment,
+entry/exit delays and costs. A decision using the realized open cannot fill at
+that same open without an independently justified execution mechanism.
 
-The label is next-session open to fifth-session close stock gross wealth return
-minus the matching CSI 300 price-index return. For holdings across an ex-date,
-cash uses the pre-event share quantity; additional shares and unreinvested gross
-cash enter the terminal wealth mark. Buying at the ex-date open receives no
-prior-holder entitlement. Cash is a receivable and shares are valued without
-claiming immediate liquidity. This mixed-basis difference is not an executable
-hedged portfolio return. Taxes, costs, lots and trading constraints are excluded.
+## Learning after the base earns it
 
-Historical OHLC is a gross wealth path rebased to one, using only actions occurring
-and announced by its issue cutoff. Future distributions cannot rewrite past
-inputs. Volume is normalized within-window after share multiplication; absolute
-units change across source eras and are not features. Missing turnover is omitted,
-not zero-filled. State includes CSI 300 past returns and volatility. Independent
-Fraction tests cover entitlement boundaries and successive distributions; five
-real checks are in [ashare-label-checks.json](ashare-label-checks.json). BYD's
-[issuer announcement](https://static.cninfo.com.cn/finalpage/2025-07-22/1224237000.PDF)
-confirms the inspected A-share event, not every archive record.
+The existing learning profiles remain implementation options, not the next run.
+Their earlier [first profile](ashare-first-run.json) allows 572 calls and the
+[full profile](ashare-admission.json) 1,259; both are historical source bindings
+and must not be executed against changed code. Never rewrite their frozen inputs.
 
-## Learning and strong comparators
+A useful learned procedure might retrieve each metric's latest publication,
+check period agreement, preserve an opposing segment, or decline unsupported
+surprise. Compare a fixed reasoner and learned reasoner under identical numerical
+adaptation, with retrieval memory as a further control. Outcome-only versus
+outcome-plus-later-reporting teachers test privileged feedback if that becomes a
+central claim. Lessons must use later forward-observable triggers. Larger coherent
+revisions are allowed during development; separate ablations are needed for
+component-level attribution. Existing native reflection provides proposal
+machinery; the inspected upstream GEPA adapter interface offers a route for
+reflective search, but a local GEPA integration is not established by these
+changes. Keep all attempts and exposure; do not invent another optimizer.
 
-Outcome and hindsight teachers receive identical complete forward traces,
-interpretations, forecasts and per-asset residuals. Hindsight alone adds reporting
-from the full completed outcome interval, including holidays. Its latest used
-report and outcome jointly determine the earliest lesson availability. Everything
-is bounded by the training cutoff. This follows the privileged-teacher pattern
-of [Vapnik and Izmailov](https://jmlr.org/papers/v16/vapnik15b.html), without importing
-their guarantees for prompt learning.
+Memory currently ranks eligible training experiences by 0.8 forward-text cosine
+plus 0.2 numerical-state proximity, with three-case/24,000-byte caps. Ranking
+uses no outcomes or review text. This is related to
+[FinMem](https://arxiv.org/abs/2311.13743v2) and numerical/narrative analogs in
+[Wang and Yeung](https://doi.org/10.3389/frai.2026.1722121), not a reproduction.
+[Cawley and Talbot](https://www.jmlr.org/papers/v11/cawley10a.html) motivate keeping
+selection exposure explicit. The manuscript cites the supplied papers at use.
 
-| Policy | Learning information | Mutable object |
-| --- | --- | --- |
-| Base | None | None |
-| Outcome | Original traces and matured outcomes | One short skill |
-| Hindsight | Same, plus later reporting | One short skill |
-| Blinded, full profile only | Protected task and base skill | One feedback-free proposal |
-| Memory | Same hindsight bank | Up to three eligible retrieved experiences |
+## Reproduction and spending boundary
 
-Each review states a trigger, conditional lesson, uncertainty, disconfirmation
-and references. Reasoning error, ignored alternative, new information, accounting
-error and unresolved outcome remain distinct. Rejected reviews stay recorded.
-One proposal per skill arm competes against unchanged on validation; unchanged
-wins ties, and incomplete support cannot win. A blinded proposal's selector still
-uses validation. Selected artifacts are frozen before assessment; one artifact
-per arm does not establish reliability across independent learning runs.
-
-Reflected experiences follow [FinMem](https://arxiv.org/abs/2311.13743v2), while
-persistent investment guidance is related to [FinCon](https://arxiv.org/abs/2407.06567v3).
-Numeric/narrative analog retrieval also appears in
-[Wang and Yeung](https://doi.org/10.3389/frai.2026.1722121), whose targets are quarterly
-network indicators. The local memory comparator is not a reproduction of these systems.
-
-Retrieval fixes `0.8 * text_cosine + 0.2 * state_proximity`. Text is character
-2–4-gram TF–IDF fitted only on eligible training packets (`min_df=1`, max 8,192
-features). Common stories are deduplicated across assets; constant issuer
-boilerplate is excluded from retrieval. State proximity is
-`exp(-0.5 * mean(standardized_squared_distance))` over panel mean five-session
-return and twenty-session volatility. Scales use the eligible training bank,
-with unit scale for zero variance. Queries contain no lessons, later reporting
-or outcomes. Ranking never rewards profit or small errors. Stable case-ID ties,
-three-case and 24,000-byte caps remain. Its larger context than a skill precludes
-an equal-token efficiency claim.
-
-Cheap controls pair numeric/metadata/issuer ridge with an otherwise matched text
-ridge. Text uses the exact retained evidence, character 2–4-grams, `min_df=2`,
-max 8,192 features and TF–IDF. Numeric scaling, vocabulary, weights and regression
-fit matured training data only. Issuer one-hot cues are shared; columns have fixed
-names/order. Ridge penalty is one, solver sparse LSQR. Fitted transform/model
-hashes and library versions are bound. [Ke, Kelly and Xiu](https://www.nber.org/papers/w26186)
-motivate supervised target-trained text modeling; this simple comparator does not
-reproduce their method. [Scikit-learn](https://www.jmlr.org/papers/v12/pedregosa11a.html)
-provides TF–IDF and ridge.
-
-The [development measurement](ashare-development-controls.json) expands fitting
-chronologically after eight warmup issues and scores the remaining 33 dates
-(330 assets). MSE: **zero 0.00109518**, **numeric/metadata/issuer 0.00141850**,
-**with text 0.00148344**. Text is worse on this fixed diagnostic. Settings were
-not tuned after seeing these scores. No validation, assessment or LLM score was
-consumed. This result neither establishes text usefulness nor rules it out.
-
-## Scores, failure behavior and behavioral checks
-
-Primary loss averages squared return errors within each issue, then weights issues
-equally. It decomposes exactly into panel-mean error and centered relative-stock
-error. Pairwise ordering is reported separately. Other numerical controls are
-zero, relative momentum, 2021 ridge, training ridge and training-fitted calibration.
-
-Missing, invalid or abstained output makes the raw aggregate unavailable. A
-separate frozen system policy substitutes zero market-relative return, retains
-failures and reports fallback frequency. That score cannot select a skill.
-For baseline `b`, realization `y` and revision `b+delta`, the exact correction
-identity is `gain = 2*(y-b)*delta - delta**2`, with the same date weights. Moving
-in the right direction can still overshoot. It diagnoses arithmetic contribution,
-not causal reasoning. Paired losses use descriptive five-issue circular-block
-intervals, not multiplicity-adjusted superiority tests.
-
-Eleven [CheckList-inspired](https://aclanthology.org/2020.acl-main.442/) probes test
-expectations, paraphrase, duplication, missing support, prior repricing, wrong
-subject, unsupported relation, indirect input-cost transmission and issuer
-estimates. They run both nodes and retain outputs for substantive review. Schema
-acceptance is not semantic success. Synthetic stories have no counterfactual
-historical labels. Future-news lexical overlap, used in Yu et al., is not adopted
-as explanation fidelity. No real model probe has run under the hold.
-
-## Execution profiles and reproduction
-
-Owners: `benchmarks/traderharness.py`, `research/ashare_protocol.py`,
-`research/ashare_text.py`, `research/ashare_study.py`. They reuse the existing
-validators, serialization, exact response cache and shared-budget provider.
-This adapter remains separate from the original 28-node Lab.
+From the standalone repository, with the declared study dependencies installed:
 
 ```sh
-python -m pip install -e '.[study]'
-python -m research.ashare_study compile --dataset work/datasets/data-selection/root --study work/ashare-study --profile first_learning
-python -m research.ashare_study plan --study work/ashare-study --input-usd-per-million 0.30 --output-usd-per-million 1.20
-python -m research.ashare_study report --study work/ashare-study --output work/admission-summary.json
-python -m research.ashare_study offline-controls --study work/ashare-study --output work/development-controls.json
+python -m research.ashare_study compile --dataset work/datasets/data-selection/root \
+  --study work/ashare-base-development-20261012 --profile first_learning \
+  --base-date 2023-03-01 --base-date 2023-04-27 --base-date 2023-07-20 \
+  --base-date 2023-08-03 --base-date 2023-08-31 --base-date 2023-12-22
+python -m research.ashare_study offline-controls \
+  --study work/ashare-base-development-20261012 --output docs/ashare-development-diagnosis.json
+python -m research.ashare_study base-plan --study work/ashare-base-development-20261012 \
+  --input-usd-per-million 0.30 --output-usd-per-million 1.20
+python -m benchmarks.guidance_events --dataset work/datasets/guidance-reset-20261012 \
+  --manifest docs/guidance-development-sources.json \
+  --output work/guidance-development-final-20261012 --receipt docs/guidance-development.json
 ```
 
-Compilation is offline and refuses overwrite. It separates packets from labels,
-binds source/data/runtime versions, preserves exclusions and records the calendar.
-Original text remains local under source terms; public receipts omit it.
+Use fresh output directories for recompilation. Both compilers refuse overwrite.
+The public base-plan receipt additionally binds the frozen hash, public pricing
+observation and existing ledger snapshots. Its conservative reservation is
+**USD 0.5860815**, using ordinary model-catalog input/output rates, a byte-based
+input token upper bound, framing/interpretation allowances, and 4,096 output
+tokens per call. Endpoint/cache discounts are not assumed; this is not an
+expected bill. Recheck live pricing before any release.
 
-The **full** profile permits 1,213 core calls, plus 22 probes and 24 additional
-development information controls: **1,259 total**. The **first_learning** profile
-retains all 41 training and 48 assessment dates, with 24 evenly spaced validation
-positions including endpoints. Rich base, outcome, hindsight and memory require
-**526 core calls + 22 probes + 24 development controls = 572 maximum calls**.
-Six evenly spaced training dates receive price/metadata/rich capability comparisons;
-the rich observations are reused in development. This profile drops blinded
-proposals, assessment price/metadata contrasts, metadata transfer and unchanged
-repeat claims. Choosing fewer validation dates preserves assessment coverage;
-this is a declared budget tradeoff, not retrospective subsampling.
-
-Stages: `capability`, complete `development` and `learn`, `select`, then `final`.
-Capability records probes and information contrasts for inspection; it does not
-automatically certify semantics. Selection and all teacher artifacts are rebuilt
-from authenticated responses before assessment. Unchanged policies reuse cached
-base draws; only the full-profile repeat gets another draw. A spent/interrupted
-final seal cannot silently resample. No automatic retries are permitted.
-
-The planner reports actual prepared prompt byte lengths, bounded intermediate
-responses and maximum outputs. Compact Unicode prompts avoid unnecessary escapes;
-canonical hash bytes stay unchanged. No expected bill is invented without actual
-model usage. The October 11 catalogue quote was $0.30/M input and $1.20/M output;
-refresh the exact provider quote before release. Schema-maximum cost bounds are
-not expected charges: the first profile's quoted ceiling is $36.46, so fitting
-under a 600-call cap does not establish affordability under the earlier $4 cap.
-The adapter retains conservative reservations rather than assuming refunded
-headroom from cheap responses. The existing immutable ledger alone determines remaining
-money/calls, including earlier reservations; 572 calls is not authorization.
-
-Every paid command requires explicit hold release bound to this frozen study,
-an exact provider tag and the same shared budget ledger. No new allowance, ledger
-or paid call was created. The three supplied papers have native annex records,
-source-level limitations and explicit adoption/deferment/rejection decisions.
-The two copies of arXiv:2306.11025v1 have identical decoded page content and no
-distinguishable operator annotations. The [source manifest](finance-adaptive-sources.json)
-and [paper](../paper/zenith.pdf) cite borrowed ideas where they are used.
+The earlier proposal was **USD 1 total, at most 21 calls**, only
+`base-pilot` and `base-comparison`. The existing USD 4 ledger has immutable
+1,024-output-token limits and cannot be silently amended or reset. All previous
+ledgers, unknown costs and reservations remain preserved. No replacement ledger
+has been initialized, account inspected or paid call made. The local
+`authorization-held.json` explicitly has `research_hold_released: false` and
+cannot execute. The later operator instruction now authorizes use of remaining programme funds;
+it supersedes the earlier request for another release. Local unused capacity
+under the USD 4 reservation cap is USD 3.9896875, not a verified live account
+balance. Before choosing and executing this or a replacement batch, verify
+funded headroom, bind its exact frozen hash/provider/scope and preserve the
+remaining programme ceiling without changing old limits or resetting history.
+The four fuller-source representation requests are outside this candidate batch.

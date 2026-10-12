@@ -111,6 +111,54 @@ def forecast_prompt(packet, interpretation, skill=BASE_SKILL, memories=()):
             'Exactly one row per asset.\nEVIDENCE_JSON\n' + render(data))
 
 
+def direct_prompt(packet):
+    return (forecast_prompt(packet, None) + '\nDIRECT REASONING PROCEDURE: Work from the original '
+            'evidence. In each reasoning field identify the supported economic change, '
+            'its same-period comparison or absence, issuer exposure, contrary evidence, '
+            'and why any effect could remain after entry. Check numerical comparisons '
+            'explicitly. Positive year-over-year growth can coexist with lower guidance. '
+            'Do not equate issuer guidance with market consensus. A price already visible '
+            'is evidence about the past, not an available execution fill. Missing change '
+            'evidence permits a near-zero conditional mean, not invented certainty. '
+            'No separate interpreter will be supplied; perform the complete reasoning yourself.')
+
+
+def change_prompt(packet):
+    return (interpret_prompt(packet) + '\nFor this development variant, return a wrapper '
+            '{"interpretation":the complete interpretation object specified above,'
+            '"signals":[{"asset_id":...,"economic_change":number in[-1,1] or null}]}. '
+            'Use the summary labels FACT / CHANGE / CHANNEL / PRICED / UNKNOWN. '
+            'CHANGE compares like fiscal periods and measures, not unrelated numbers. '
+            'The economic_change signal describes strength and direction of a supported '
+            'change in issuer economics: -1 strongly adverse, 0 no supported directional '
+            'change, +1 strongly favorable; null means insufficient evidence to judge. '
+            'Do not use neutral zero to conceal missing evidence. It is NOT a return forecast, market surprise '
+            'or claim of causation. Include exactly one signal per asset. A later small '
+            'numerical model will test whether the representation predicts remaining returns.')
+
+
+def parse_change(text, packet):
+    value = typed._json_object(text)
+    if set(value) != {'interpretation', 'signals'}:
+        raise ValueError('financial change wrapper fields differ')
+    typed.validate_interpretation(value['interpretation'], packet)
+    signals = value['signals']
+    if not isinstance(signals, list) or len(signals) != len(packet['assets']):
+        raise ValueError('financial change support differs')
+    expected = {a['asset_id'] for a in packet['assets']}
+    if {s.get('asset_id') for s in signals if isinstance(s, dict)} != expected:
+        raise ValueError('financial change asset binding differs')
+    for signal in signals:
+        if set(signal) != {'asset_id', 'economic_change'}:
+            raise ValueError('invalid economic change fields')
+        x = signal['economic_change']
+        if x is None:
+            continue
+        if isinstance(x, bool) or not isinstance(x, (int, float)) or not math.isfinite(x) or not -1 <= x <= 1:
+            raise ValueError('invalid economic change signal')
+    return value
+
+
 def teacher_case(packet, forecast, interpretation, rows, boundary, *, hindsight):
     """Same forward trace/outcomes in both treatments; only later reporting differs."""
     if any(r['phase'] != 'training' or r['issue_date'] != packet['issue_date'] for r in rows):

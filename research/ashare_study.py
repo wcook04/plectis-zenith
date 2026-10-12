@@ -161,7 +161,7 @@ def paired(candidate, baseline, *, replicates=2000):
             'replicates': replicates, 'interpretation': 'Descriptive unadjusted interval; not a superiority test or multiplicity correction.'}
 
 
-def compile_study(dataset, study, *, profile='full'):
+def compile_study(dataset, study, *, profile='full', base_dates=None):
     if study.exists():
         raise ValueError('refuse to overwrite a study')
     tables, hashes = data.read_sources(dataset)
@@ -204,6 +204,16 @@ def compile_study(dataset, study, *, profile='full'):
               'execution_hold': True, 'execution_status': 'compiled_offline_unexecuted',
               'inference_settings': 'Reuse budgeted provider temperature 0; pin exact model/provider on released authorization; no silent retry.',
               'claim_limit': 'Forecast information and learning feasibility; no portfolio, trading advantage, causal diagnosis or novelty result.'}
+    training_dates = list(groups([r for r in rows if r['phase'] == 'training']))
+    chosen = sorted(set(base_dates or spaced(training_dates, 6)))
+    if not chosen or not set(chosen) <= set(training_dates) or len(chosen) > 6:
+        raise ValueError('base comparison requires at most six admitted training dates')
+    frozen['base_comparison'] = {
+        'dates': chosen, 'pilot_date': next((d for d in training_dates if d not in chosen), None),
+        'selection': 'input-only development selection; explicit dates may target inspected recurring evidence challenges, never realized losses',
+        'arms': ['direct', 'change_graph'], 'calls_per_date': 3,
+        'signal_mapping': 'one nonnegative coefficient capped at 0.05; four mature-date warmup and four-date zero prior',
+        'scope': 'base-system development; no teacher, skill proposal, validation or assessment calls'}
     study.mkdir(parents=True)
     for name, value in [('packets.json', packets), ('evaluator.json', rows), ('admission.json', manifest), ('frozen.json', frozen)]:
         write_json(study / name, value)
@@ -221,6 +231,7 @@ def compile_study(dataset, study, *, profile='full'):
     write_json(study / 'representative-inputs.json', examples)
     plan = cost_plan(frozen, packets)
     write_json(study / 'execution-plan.json', plan)
+    write_json(study / 'base-plan.json', base_plan(frozen, packets))
     return {'study': str(study), 'frozen_sha256': data.sha(frozen), 'phase_issue_counts': counts,
             'asset_allowances': len(rows), 'excluded_windows': len(built['exclusions']),
             'inference_calls': 0, 'plan': plan}
@@ -550,6 +561,103 @@ def capability(study, spec, rows, packets):
     return result
 
 
+def base_plan(spec, packets, *, input_per_million=None, output_per_million=None):
+    config = spec['base_comparison']
+    dates = ([config['pilot_date']] if config['pilot_date'] else []) + config['dates']
+    bounds = []
+    for stamp in dates:
+        packet = protocol.project(packets[stamp], 'rich')
+        direct = len(protocol.direct_prompt(packet).encode())
+        change = len(protocol.change_prompt(packet).encode())
+        # Parser admits at most 16,000 raw JSON characters, each at most four
+        # UTF-8 bytes. Include padding for canonicalization and the nonnull hash;
+        # control-character escaping can exceed the ordinary-summary estimate.
+        forecast = len(protocol.forecast_prompt(packet, None).encode()) + 65536
+        bounds += [direct + 4096, change + 4096, forecast + 4096]
+    total = sum(bounds)
+    quote = None if input_per_million is None or output_per_million is None else (
+        total * input_per_million + len(bounds) * 4096 * output_per_million) / 1e6
+    return {'schema': 'zenith_base_development_plan_v1', 'status': 'held', **config,
+            'pilot_calls': 3 if config['pilot_date'] else 0, 'comparison_calls': 3*len(config['dates']),
+            'maximum_calls': len(bounds), 'max_output_tokens': 4096,
+            'input_token_reservation_bound': total, 'conservative_cost_usd': quote,
+            'quote_rates': {'input_per_million': input_per_million, 'output_per_million': output_per_million},
+            'expected_bill': None, 'authority': 'plan only; existing paid hold remains',
+            'stop': 'pilot before comparison; schema/provider failures retained, never silently retried',
+            'cost_comparison': 'direct uses one call/date; graph uses two, measured provider receipts retained'}
+
+
+def base_comparison(study, spec, rows, packets, *, pilot=False):
+    """Actual base outputs through the existing response and provider authority."""
+    if not spec.get('_cache_only') and ((study / 'selection.json').exists() or (study / 'final-seal.json').exists()):
+        raise ValueError('development closed')
+    config = spec['base_comparison']
+    if not config['pilot_date']:
+        raise ValueError('an excluded compatibility date is required')
+    if not pilot:
+        prior = base_comparison(study, {**spec, '_cache_only': True}, rows, packets, pilot=True)
+        if not prior['complete']:
+            raise ValueError('compatibility pilot incomplete or rejected')
+    dates = [config['pilot_date']] if pilot else config['dates']
+    selected = [r for r in rows if r['phase'] == 'training' and r['issue_date'] in dates]
+    predictions = {'direct': {}, 'change_graph': {}, 'economic_signal': {}}
+    observations = {}
+    for stamp in dates:
+        packet = protocol.project(packets[stamp], 'rich')
+        direct = node(study, 'base_direct_' + stamp, protocol.direct_prompt(packet),
+                      lambda text: typed.parse_forecast(text, packet, None), spec)
+        change = node(study, 'base_change_' + stamp, protocol.change_prompt(packet),
+                      lambda text: protocol.parse_change(text, packet), spec)
+        interpretation = (change['value'] or {}).get('interpretation')
+        graph = (node(study, 'base_graph_' + stamp, protocol.forecast_prompt(packet, interpretation),
+                      lambda text: typed.parse_forecast(text, packet, interpretation), spec)
+                 if interpretation is not None else {'value': None, 'status': 'skipped_invalid_dependency'})
+        observations[stamp] = {'direct': direct, 'change': change, 'graph': graph}
+        for name, record in [('direct', direct), ('change_graph', graph)]:
+            for f in (record['value'] or {}).get('forecasts', []):
+                symbol = spec['symbols'][int(f['asset_id'].split('_')[1])-1]
+                predictions[name][stamp + ':' + symbol] = f['mean_expected_return']
+        for signal in (change['value'] or {}).get('signals', []):
+            symbol = spec['symbols'][int(signal['asset_id'].split('_')[1])-1]
+            predictions['economic_signal'][stamp + ':' + symbol] = signal['economic_change']
+        if any(r.get('value') is None for r in observations[stamp].values()):
+            break
+    complete = len(observations) == len(dates) and all(r.get('value') is not None for group in observations.values() for r in group.values())
+    result = {'dates': dates, 'complete': complete, 'observations': observations,
+              'status': 'compatibility_only_excluded_from_scores' if pilot else 'development_only',
+              'assessment_consumed': False, 'predictions': predictions,
+              'semantic_review': 'Read FACT/CHANGE/CHANNEL/PRICED/UNKNOWN against original evidence; schema acceptance is not an entailment verdict.'}
+    if not pilot:
+        result['scores'] = {name: evaluate(selected, p) for name, p in predictions.items() if name != 'economic_signal'}
+        result['scores']['zero'] = evaluate(selected, {r['sample_id']: 0. for r in selected})
+        result['calibration'] = {}
+        signals = predictions['economic_signal']
+        result['signal_missing_count'] = sum(v is None for v in signals.values())
+        mapped = {**predictions, 'economic_signal': {k: 0. if v is None else v for k, v in signals.items()}}
+        result['signal_fallback'] = 'Unknown signals remain null in raw outputs; the numerical system applies zero correction and includes every opportunity.'
+        for name, p in mapped.items():
+            if not evaluate(selected, p)['complete']:
+                continue
+            scaled, fit = ashare_text.chronological_scale(selected, p, max_scale=.05 if name == 'economic_signal' else 1.)
+            result['scores'][name + '_scaled'] = evaluate(selected, scaled)
+            result['calibration'][name] = fit
+            later = [r for r in selected if r['issue_date'] in {f['query_issue'] for f in fit['fits'] if not f['warmup']}]
+            result['scores'][name + '_scaled_after_warmup'] = evaluate(later, scaled)
+            result.setdefault('matched_after_warmup', {})[name] = {
+                'zero': evaluate(later, {r['sample_id']: 0. for r in later}),
+                'direct': evaluate(later, predictions['direct']),
+                'change_graph': evaluate(later, predictions['change_graph']),
+                'scaled': evaluate(later, scaled)}
+        result['claim_limit'] = 'Small behavior-first development batch, selected using inputs. No superiority, learned-reasoning or trading conclusion.'
+    if not spec.get('_cache_only'):
+        save_stage(study, 'base-pilot' if pilot else 'base-comparison', result)
+    return result
+
+
+def base_pilot(study, spec, rows, packets):
+    return base_comparison(study, spec, rows, packets, pilot=True)
+
+
 def offline_controls(study):
     """Chronological development-only numeric/text comparison, never test loss."""
     spec, rows, packets = load(study)
@@ -569,14 +677,28 @@ def offline_controls(study):
             fit = ashare_text.fit_control(fitted, packets, use_text=use_text)
             predictions[name].update(ashare_text.predict_control(fit, query, packets))
             fits.append({'query_issue': stamp, 'name': name, **fit['receipt']})
+    diagnoses = {name: ashare_text.signal_diagnosis(evaluated, p)
+                 for name, p in predictions.items() if name != 'zero'}
+    diagnoses['incremental_text'] = ashare_text.signal_diagnosis(
+        evaluated, predictions['ridge_character_text'], predictions['ridge_numeric_metadata_identity'])
+    calibration = {}
+    for name in ('ridge_numeric_metadata_identity', 'ridge_character_text'):
+        predictions[name + '_scaled'], calibration[name] = ashare_text.chronological_scale(evaluated, predictions[name])
+    numeric = predictions['ridge_numeric_metadata_identity_scaled']
+    increment = {key: numeric[key] + predictions['ridge_character_text'][key]
+                 - predictions['ridge_numeric_metadata_identity'][key] for key in numeric}
+    predictions['scaled_numeric_plus_text'], calibration['incremental_text'] = ashare_text.chronological_scale(
+        evaluated, increment, baseline=numeric)
     scores = {name: evaluate(evaluated, p) for name, p in predictions.items()}
     result = {'schema': 'zenith_ashare_development_controls_v1', 'status': 'development_only_measured',
               'frozen_sha256': read_json(study / 'binding.json')['frozen_sha256'],
               'training_warmup_issues': 8, 'evaluated_issue_dates': dates[8:], 'scores': scores,
               'correction_text_vs_metadata': correction_gain(evaluated, predictions['ridge_numeric_metadata_identity'], predictions['ridge_character_text']),
+              'signal_diagnoses': diagnoses, 'calibration': calibration,
+              'design_exposure': 'Scaling designed after observing the prior 33-date aggregate losses; chronological fits do not make this an untouched test.',
               'fits': fits, 'inference_calls': 0, 'assessment_consumed': False,
               'claim_limit': 'Expanding chronological training-only diagnostic of fixed cheap comparators. No LLM, learned-skill, heldout or trading result.'}
-    save_stage(study, 'offline-controls', result)
+    save_stage(study, 'offline-controls', {**result, 'predictions': predictions})
     return result
 
 
@@ -617,7 +739,12 @@ def main():
     p.add_argument('--dataset', type=Path, required=True)
     p.add_argument('--study', type=Path, required=True)
     p.add_argument('--profile', choices=('full', 'first_learning'), default='full')
+    p.add_argument('--base-date', action='append', dest='base_dates')
     p = sub.add_parser('plan')
+    p.add_argument('--study', type=Path, required=True)
+    p.add_argument('--input-usd-per-million', type=float)
+    p.add_argument('--output-usd-per-million', type=float)
+    p = sub.add_parser('base-plan')
     p.add_argument('--study', type=Path, required=True)
     p.add_argument('--input-usd-per-million', type=float)
     p.add_argument('--output-usd-per-million', type=float)
@@ -629,14 +756,14 @@ def main():
     p = sub.add_parser('offline-controls')
     p.add_argument('--study', type=Path, required=True)
     p.add_argument('--output', type=Path, required=True)
-    for action in ('development', 'learn', 'select', 'final', 'probes', 'capability'):
+    for action in ('development', 'learn', 'select', 'final', 'probes', 'capability', 'base-pilot', 'base-comparison'):
         p = sub.add_parser(action)
         p.add_argument('--study', type=Path, required=True)
         p.add_argument('--authorization', type=Path, required=True)
         p.add_argument('--env-file', type=Path)
     args = parser.parse_args()
     if args.action == 'compile':
-        result = compile_study(args.dataset, args.study, profile=args.profile)
+        result = compile_study(args.dataset, args.study, profile=args.profile, base_dates=args.base_dates)
     else:
         spec, rows, packets = load(args.study)
         if args.action == 'offline-controls':
@@ -649,12 +776,25 @@ def main():
         elif args.action == 'plan':
             result = cost_plan(spec, packets, input_per_million=args.input_usd_per_million,
                                output_per_million=args.output_usd_per_million)
+        elif args.action == 'base-plan':
+            result = base_plan(spec, packets, input_per_million=args.input_usd_per_million,
+                               output_per_million=args.output_usd_per_million)
         else:
             auth = read_json(args.authorization)
             binding = read_json(args.study / 'binding.json')['frozen_sha256']
             if auth.get('research_hold_released') is not True or auth.get('frozen_sha256') != binding:
                 raise ValueError('paid execution held: requires explicit operator release bound to this study')
+            actions = auth.get('allowed_actions', [args.action])
+            if not isinstance(actions, list) or not all(isinstance(a, str) for a in actions):
+                raise ValueError('allowed_actions must be an explicit list')
+            if args.action not in actions:
+                raise ValueError('action outside released scope')
             budget = auth.get('budget', {})
+            if args.action in ('base-pilot', 'base-comparison'):
+                if args.action not in auth.get('allowed_actions', []):
+                    raise ValueError('base development requires an explicit action scope')
+                if budget.get('max_output_tokens') != 4096:
+                    raise ValueError('base plan requires its declared 4096 output-token cap')
             if not isinstance(budget.get('provider_slug'), str) or not budget['provider_slug'].strip():
                 raise ValueError('exact upstream provider tag is required')
             # Freeze the one released authorization across all phases. Never
@@ -667,7 +807,7 @@ def main():
             if args.env_file:
                 from dotenv import load_dotenv
                 load_dotenv(args.env_file, override=False)
-            result = globals()[args.action](args.study, spec, rows, packets)
+            result = globals()[args.action.replace('-', '_')](args.study, spec, rows, packets)
     print(json.dumps(result, sort_keys=True, indent=2, allow_nan=False))
 
 

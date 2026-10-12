@@ -60,3 +60,33 @@ def test_panel_common_text_is_counted_once_and_identity_is_not_retrieval_text():
     p = packet('2023-01-01', 'common story')
     p['assets'] *= 10
     assert text.panel_text(p) == 'common story'
+
+
+def test_signal_identity_separates_alignment_from_overshoot_date_equally():
+    r = rows(['2023-01-01', '2023-01-10'])
+    r[0]['actual_return'], r[1]['actual_return'] = .01, .02
+    p = {x['sample_id']: .06 for x in r}
+    d = text.signal_diagnosis(r, p)
+    assert d['forecast_energy'] == pytest.approx(.0036)
+    assert d['outcome_alignment'] == pytest.approx(.0009)
+    assert d['excess_mse'] == pytest.approx(.0018)
+    assert d['retrospective_unconstrained_scale'] == pytest.approx(.25)
+    duplicated = r + [{**r[0], 'sample_id': 'duplicate'}]
+    assert text.signal_diagnosis(duplicated, {**p, 'duplicate': .06})['excess_mse'] == pytest.approx(.0018)
+
+
+def test_chronological_scale_cannot_use_query_or_unmatured_outcomes():
+    r = rows(['2023-01-01', '2023-01-10', '2023-01-20', '2023-01-30'])
+    for row in r:
+        row['actual_return'] = .01
+    p = {x['sample_id']: .04 for x in r}
+    r[1]['outcome_available_at'] = '2023-02-01T00:00:00Z'
+    first, receipt = text.chronological_scale(r, p, min_dates=1, prior_dates=0)
+    assert receipt['fits'][2]['fit_issue_dates'] == ['2023-01-01']
+    assert first[r[2]['sample_id']] == pytest.approx(.01)
+    r[2]['actual_return'] = -.5
+    second, _ = text.chronological_scale(r, p, min_dates=1, prior_dates=0)
+    assert second[r[2]['sample_id']] == first[r[2]['sample_id']]
+    assert second[r[3]['sample_id']] == 0.
+    with pytest.raises(ValueError, match='training'):
+        text.chronological_scale([{**r[0], 'phase': 'test'}], p)

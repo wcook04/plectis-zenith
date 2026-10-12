@@ -1,6 +1,6 @@
 ---
 name: zenith-scientific-experiments
-description: Improve Zenith through source-bound failure reflection, one declared node-policy change, and frozen comparisons of actual graph outputs. Retain all attempts and keep development selection separate from the final assessment.
+description: Develop capable financial reasoning, diagnose actual behavior, and compare improvements using later examples. Individual comparisons are frozen; development may change evidence, prompts, graph composition, models and calibration. Retain attempts and separate selection from assessment.
 compatibility: Python standard library; repository-local research CLI. Read program.md before conducting trials.
 ---
 
@@ -8,6 +8,24 @@ compatibility: Python standard library; repository-local research CLI. Read prog
 
 Read `program.md`, `docs/skills.md`, the proposed experiment spec and the
 native `research` command help. Choose the owner for the actual hypothesis:
+
+Start with the product question: what recurring information advantage could
+the system extract, and what evidence would show that it can? A weak statistical
+proxy losing to zero does not establish failure of an unexecuted reasoner.
+Decompose forecast energy and outcome alignment before choosing a remedy.
+Compare calibration fitted only on earlier matured predictions; separately
+label any coefficient fitted to all displayed outcomes as retrospective.
+Do not let protocol completion replace model development. Get a small set of
+actual direct and graph outputs, inspect recurring errors, and repair retrieval
+or replace the task when its deciding evidence is absent. Preserve unknown
+economic states separately from neutral changes and any numerical fallback.
+
+The active base comparison uses `ashare_study base-plan`, `base-pilot` and
+`base-comparison`. Its supported-change representation and numerical adaptation
+are separate responsibilities. One-field mutation rules below apply to a
+particular attribution experiment, not every development revision. A coherent
+redesign can change several components in a fresh study; its later evaluation
+must acknowledge the earlier evidence used to choose it.
 
 - `research/ashare_study.py` owns the five-session TraderHarness forecast
   experiment. Read `docs/ashare-study.md`. `compile`, `plan` and `report` are

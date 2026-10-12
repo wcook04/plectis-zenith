@@ -2,6 +2,91 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Type B research handoff and remaining budget, 12 October 2026
+
+The operator now requests a complete source-rich Type B ZIP to challenge the
+research direction and dedicates the remaining authorized inference budget to
+the programme. This supersedes the earlier operator paid hold below; it does
+not create fresh money or authorize resetting old ledgers. The 21-call base
+comparison remains a reviewable candidate, not a compulsory next expense.
+The requested Type B review may replace its task, data, models or allocation.
+
+The existing USD 4 research ledger has reserved USD 0.0103125, leaving
+USD 3.9896875 under that conservative reservation cap. This is local ledger
+arithmetic, not a freshly checked account balance. Before paid execution,
+verify funded headroom and bind the selected batch within that remaining
+programme envelope while preserving old unknown-cost reservations and immutable
+output limits. No new provider call or budget ledger has been created.
+
+## Financial reasoning reset, 12 October 2026
+
+The active objective is competent base-system development. A failed statistical
+control does not test the unexecuted LLM. Development may change retrieval,
+prompts, graph, model or task; frozen comparison rules remain local to each run.
+The program, learning design and scientific-experiments skill now express this.
+
+The [measured diagnosis](ashare-development-diagnosis.json) reproduces 33 dates
+and 330 forecasts. Both controls have positive outcome alignment but excessive
+scale. Chronological scaling using only earlier matured predictions reduces MSE
+from 0.0014184998 to 0.0010872885 for numerical inputs, and from 0.0014834418 to
+0.0010865439 with text, versus zero at 0.0010951783. The raw text increment also
+overshoots; adding its scaled correction to the scaled numerical baseline gives
+0.0010865306. These modest differences do not establish an incremental text or
+LLM advantage. Calibration was designed after the old aggregate results were
+seen; it is exposed development, not untouched assessment.
+
+A [fuller-source replacement](guidance-development.json) is compiled: six
+original Adobe/Salesforce releases, four recurring guidance updates and 13
+range comparisons. Adobe June mixes raised and lowered annual targets;
+Salesforce May raises margin while leaving revenue unchanged. Per-metric
+previous-publication references prevent invented reaffirmations. The compiler
+keeps its oracle outside requests and preserves range endpoints and widths.
+Adobe uses original PDF target extracts; Salesforce uses visually reviewed
+selected-column transcriptions, not full report or reconciliation content.
+SEC clock evidence and historical byte-identity uncertainty remain separate.
+All four cases have issuer/SPY session support, but the price adjustment basis
+is unresolved: this lane scores no returns. No model has answered these requests.
+
+The [base comparison](ashare-base-plan.json) is now 21 calls: an excluded
+three-call pilot and six three-call development dates. Strong direct reasoning
+competes with a change-interpretation/forecast graph on identical evidence.
+A bounded signal also feeds a small chronological numerical map. Raw unknowns
+stay null; an explicit zero-correction policy preserves full scoring support.
+Post-warm-up scores include references on exactly the same restricted dates.
+No model execution or final assessment has occurred. The active source-bound
+cohort is `work/ashare-base-development-20261012/`; older frozen cohorts remain
+historical and must not be run against revised code.
+
+Public catalog prices imply a conservative USD0.5860815 reservation, not an
+expected bill. The proposed distinct release is USD 1 total and at most 21 calls,
+with 4,096 output tokens, DeepSeek V4.1 Flash at `deepinfra/fp8`, only `base-pilot`
+and `base-comparison`. Existing USD4/1024-token ledger limits remain unchanged;
+old reservations and unknown costs are retained. The held draft initializes no
+new ledger and cannot execute. That was the operator boundary before the later programme-budget instruction above.
+The four fuller-source requests are outside this paid batch.
+
+The [paper](../paper/zenith.tex) has been replaced around the economic problem,
+implemented method and actual diagnosis, with source citations at use. The old
+2015 manual pilot, accounting and conditional guarantees are supporting material.
+The immutable historical exports remain unchanged. Native reflection machinery
+exists; inspected upstream GEPA interfaces are a possible integration route,
+not evidence that a local GEPA optimizer has executed.
+
+Parent Task Ledger captures bind the diagnosis and remaining boundary:
+`cap_quick_zenith_reset_finds_forecast_overscaling_22b51c43119a` and
+`cap_quick_zenith_base_batch_needs_a_distinct_revie_06c0c1b1f2ad`.
+Reusable lessons are recorded in the scientific-experiments skill. The subsequent Type B packet request above now owns the next research decision.
+
+Validation: the final runtime passed all **584 offline tests**. The source-bound
+A-share cohort and plan reload, all four guidance inputs exclude their comparison
+oracle, and all prior spending-ledger hashes remain unchanged. The eight-page
+PDF compiles with every cited key resolved; tables and page layout were visually
+reviewed. Historical study/calibration/export-validation/repair exports are
+byte-identical to the previous commit.
+
+The following dated entries preserve historical state; their source bindings
+and former next-run plans may have been superseded above.
+
 ## Source assimilation and stronger comparisons, 12 October 2026
 
 Three papers now have reviewed annexes in the parent repository, with source
