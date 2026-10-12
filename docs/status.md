@@ -2,6 +2,40 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Real-model guidance intervention, 12 October 2026
+
+The [completed component assay](guidance-intervention.md) tested the original
+NEWS instruction with and without a prior-guidance comparison rule. The July 20
+compatibility pilot passed; August 3 and August 30 each completed matched
+ten-stock forecasts, with a direct-reasoner control on August 3. All eleven
+DeepSeek/DeepInfra calls passed on the first attempt, costing USD 0.0251692728.
+The original shared ledger reached its immutable 128-attempt ceiling without
+changing limits or discarding historical reservations.
+
+Both focus result tuples contained current and prior figures under the
+challenger, but source-ID, delta and unsupported-explanation failures remained.
+All thirty quantile values per date were exactly identical between arms; the
+direct forecast also matched. Every measured output retained rounded historical
+controls. The receipt carries all fifty model forecast rows and actual
+source-price scores. This is a fixed, input-selected component test with no
+native Lab, causal attribution, statistical superiority or policy promotion
+claim. It does not establish that news has no predictive value. The common
+prompt's supplied controls are a possible anchor, and the next-session target
+follows a full trading day after the focus result publication.
+
+Executed code is preserved at `0046fa3`. A subsequently repaired confidence-enum
+check was independently applied to the five recorded NEWS responses; all pass.
+No frozen output was rewritten. `scripts/export_guidance_intervention.py`
+verifies the original revision, seals, model receipts and numerical scores.
+Current code refuses to resume the old study after the source change.
+
+Captured follow-up: profit-memory insertion can restore an actual result after
+the earlier-guidance lookup has already run. The source scout found this for
+600111 on August 21 and 002594 on August 30. Both were excluded as focus cases
+from this interpretation test. Repairing that lookup requires a distinct source
+profile and a retrieval comparison; it must not be folded into these fixed-input
+results. The retained BYD Electronic title also requires issuer disambiguation.
+
 ## Selection and the update procedure, 12 October 2026
 
 The operator asked what can actually be learned after a run, separating stock

@@ -34,6 +34,18 @@ The [finance grounding](finance-design.md) relates this loop to QuantAgent,
 TradingAgents and other reviewed systems, with versioned sources and explicit
 forecast-versus-investment evaluation boundaries.
 
+The [executed guidance intervention](guidance-intervention.md) gives a concrete
+failure mode for this design. Adding a prior-guidance rule partly changed the
+NEWS interpretation on two real historical issues, while every downstream
+quantile remained identical to the other arm. A direct reasoner matched on the
+first issue. Therefore a changed intermediate paragraph cannot itself receive
+credit for better forecasts. Record at least three separate observations:
+whether the node followed its intended operation, whether its output changed
+the numerical forecast, and whether that forecast improved on later data.
+Here the first was partial, the second absent and the third tied. This is not
+proof that the node is generally useless or that the forecaster should be
+forced to react to uninformative news.
+
 The design direction is one trainable prediction graph `G`, evaluated on dated
 episodes. Lab names its forward execution. Oracle names evaluation and diagnosis
 of a frozen attempt. Evolve names a proposed transition from one graph version to

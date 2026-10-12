@@ -13,6 +13,72 @@ prices, historical actions, CSI300 context and selected issuer titles. Five
 other feed lanes are absent. Source revision vintages are unverified. The
 underlying LLM may remember these historical events.
 
+## Observed result, 12 October 2026
+
+All eleven calls completed on their first attempt. Actual receipts identify
+DeepSeek V4.1 Flash through DeepInfra; reported cost was **USD 0.0251692728**,
+with USD 0.2567256 conservatively reserved. The original ledger now contains
+128 of its allowed 128 attempts. That exhausts its call allowance, not the
+account's funded balance. No limit or prior unknown-cost reservation changed.
+
+The challenger put current and prior numerical claims together in both focus
+result tuples. The baseline presented the figures separately; its August 3
+result tuple did say the actual result confirmed guidance. Neither arm met the
+full comparison rubric: the challenger omitted the prior source ID from the
+comparison tuple, omitted the numerical delta, and continued to add unsupported
+explanations. For COSCO, the baseline asserted a structural earnings collapse
+and possible dividend suspension; the challenger recognized agreement with
+guidance but still invoked unsupported market expectations. The August 3
+challenger also attached an EV-margin story to a BYD Electronic profit headline
+tagged to 002594. The existing issuer-identity addon did not prevent this
+association error. These are inspected source/response failures, not a causal
+diagnosis of later returns.
+
+**Every q10/q50/q90 was identical between baseline and challenger on both dates.**
+The August 3 direct forecaster produced the same numbers too. All five numerical
+outputs equal their historical controls rounded to four decimal places; the
+largest rounding deviation is below 0.00005 return units. The prose and cited
+references changed, but the predicted quantiles did not. Tiny score differences
+from the exact historical control are rounding, not useful news reasoning.
+
+| Issue → target | Forecast | Median MAE | Mean pinball | Coverage |
+|---|---|---:|---:|---:|
+| Aug 3 → Aug 4 | Both arms and direct | 0.49243 | 0.20877 | 10/10 |
+| | Exact price-history control | 0.49406 | 0.20905 | 10/10 |
+| | Zero median, historical tails | 0.39089 | 0.19186 | 10/10 |
+| Aug 30 → Aug 31 | Both arms | 0.77740 | 0.27635 | 9/10 |
+| | Exact price-history control | 0.77722 | 0.27622 | 9/10 |
+| | Zero median, historical tails | 1.05240 | 0.32208 | 9/10 |
+
+Losses are percentage points; smaller is better. Coverage is descriptive and
+does not establish calibration. The [public receipt](guidance-intervention-receipt.json)
+contains all fifty measured forecast rows, their evidence identities, focus
+NEWS lines, outcomes, losses, provider usage/cost, source hashes and the frozen
+instructions. Inputs and full responses remain locally bound by hash.
+
+The lead-agent review recommends **no change**; no native Evolve run is claimed.
+This intervention did not earn promotion.
+The observed numerical behavior is price-control retention. Its cause is still
+uncertain: the instruction may anchor the forecaster, the model may fail to use
+the reasoning, or the supplied titles may contain little credible residual
+next-session signal after their first trading day. These explanations require
+different interventions; another identical full-graph run would not distinguish
+them. A useful next test must first demonstrate a source-grounded intermediate
+change, then separately test its numerical use. Never force a nonzero adjustment
+just to make the test look productive.
+
+The executed implementation is commit `0046fa3`. After evaluation, the optional
+fourth tuple field was tightened to the original confidence enum. All five
+original NEWS responses also passed that supplementary check; none was altered
+or rerun. The exporter verifies the executed Git revision rather than silently
+rebinding the completed experiment to newer code:
+
+```sh
+python scripts/export_guidance_intervention.py \
+  --work-dir work/guidance-intervention-20261012 --source-revision 0046fa3 \
+  --output docs/guidance-intervention-receipt.json
+```
+
 ## Frozen comparison
 
 The July 20, 2023 compatibility pilot is excluded from measurement. It tests

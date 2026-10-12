@@ -48,6 +48,12 @@ def test_format_only_does_not_claim_semantics():
     assert study.tuple_errors('Here is my result:\n{600519, value, context}')
 
 
+@pytest.mark.parametrize('confidence', ['C:HIGH', 'C:LOW', 'C:DERIVED'])
+def test_optional_confidence_uses_original_contract_enum(confidence):
+    assert study.tuple_errors('{issuer, value, conditional context, '+confidence+'}') == []
+    assert study.tuple_errors('{issuer, value, conditional context, C:CERTAIN}')
+
+
 def test_sealed_output_cannot_be_overwritten(tmp_path):
     path = tmp_path/'response.json'
     study.seal(path, {'text': 'original'})

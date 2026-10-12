@@ -24,6 +24,13 @@ is descriptive and the formal comparison was not admitted. No policy was
 promoted. The [paper](paper/zenith.pdf) distinguishes these financial attempts
 from the constructed learning result.
 
+A subsequent [real-model component experiment](docs/guidance-intervention.md)
+tested earlier-guidance comparison on two later historical issues. The revised
+NEWS operator partly improved the comparison, but every forecast quantile was
+identical between arms; a direct forecaster also matched on the first issue.
+All retained rounded price-history controls. Eleven calls completed within the
+original budget. No numerical news contribution or policy improvement was found.
+
 ## See what happens after a run
 
 After installing the checkout as below, run:

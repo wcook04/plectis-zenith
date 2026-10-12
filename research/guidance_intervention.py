@@ -152,7 +152,9 @@ def tuple_errors(text):
     return [f'Invalid tuple line {i}' for i, line in enumerate(lines, 1)
             if not re.fullmatch(r'\{[^{}\n]+\}', line.strip())
             or len(line.strip()[1:-1].split(',')) not in (3, 4)
-            or any(not field.strip() for field in line.strip()[1:-1].split(','))]
+            or any(not field.strip() for field in line.strip()[1:-1].split(','))
+            or (len(line.strip()[1:-1].split(',')) == 4
+                and line.strip()[1:-1].split(',')[-1].strip() not in ('C:HIGH', 'C:LOW', 'C:DERIVED'))]
 
 
 def envelope(raw, data):

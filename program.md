@@ -37,6 +37,18 @@ The same native graph remains the development owner; no replacement benchmark
 is selected. The [Herculean audit](docs/herculean-audit.md) records why its richer
 historical news cannot presently supply that input.
 
+The [guidance component intervention](docs/guidance-intervention.md) has now
+tested one such change with an explicitly recorded provider. On August 3 and
+August 30, 2023, the comparison instruction partly changed the NEWS analysis
+but changed none of the ten-stock forecast quantiles. The first date's direct
+reasoner matched too. These eleven calls used the existing budget and do not
+constitute native Lab completion or a promoted generation. Preserve the
+no-change result. Next work must distinguish factual interpretation from its
+numerical use, retain no-adjustment outputs, and test possible control anchoring
+separately from data relevance; do not force a return adjustment or tune these
+now-exposed outcomes. The original ledger's 128-call allowance is exhausted;
+remaining dollars do not authorize enlarging that frozen cap.
+
 Use [generations](docs/generations.md) to distinguish experimental adoption from
 selection: `daily matchoff` freezes a reviewed challenger and incumbent on the
 same later situations, the existing cohort executes and scores them, and
