@@ -210,11 +210,15 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
         "valid_prediction_targets": sorted(set(valid_prediction_targets)),
         "lab_predictions": load_predictions(subject_run_dir),
         "lab_cp1": {
+            "decision_status": lab_decide_data.get("decision_status", "FORECAST"),
+            "abstention": lab_decide_data.get("abstention"),
             "epicentre_thesis": lab_decide_data.get("epicentre_thesis"),
             "dominant_evidence_track": lab_decide_data.get("dominant_evidence_track"),
             "pre_pricing_assessment": lab_decide_data.get("pre_pricing_assessment"),
         },
         "lab_cp2": {
+            "decision_status": lab_director_data.get("decision_status", "FORECAST"),
+            "abstention": lab_director_data.get("abstention"),
             "epicentre_thesis": lab_director_data.get("epicentre_thesis"),
             "trade_rationale": lab_director_data.get("trade_rationale"),
             "predictions_t": lab_director_data.get("predictions_t"),

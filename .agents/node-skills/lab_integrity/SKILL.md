@@ -8,7 +8,7 @@ description: Apply the typed lab_integrity operation to its declared context.
 - Output contract: `text`. Mission: `lab`.
 - Implementation: `codex/substrate/nodes/lab/integrity.json`; shared contracts compile at dispatch.
 - Parameters: frozen skill rule, incoming-edge weights, context budget.
-- Version: `e0ecff751080a56c48469681388312a7dd38dcdcb3a538a5d6169723ecf95d8c`.
+- Version: `fc1cfb5d6922223d9d7c3369c77e3b2202d2972e4f90881fd0915fd5e3c6f6a7`.
 - Inspect: `python -m zenith inspect lab_integrity`.
 
 Generated projection; edit the source or a frozen experimental variant, then rebuild. These fields declare a contract; they do not prove the model follows it.

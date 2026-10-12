@@ -1,7 +1,7 @@
 {
   "id": "schema_cp2_critique",
   "type": "contract",
-  "version": "1.0",
+  "version": "1.1",
   "status": "NORMATIVE",
   "description": "Structured Oracle critique of Lab CP2 versus hindsight `ideal_cp2`.",
   "purpose": "This contract defines `cp2_critique`, the Oracle artifact emitted by `oracle_attribution_map`. It breaks critique into explicit scopes so Oracle can say what was wrong, why it was wrong, and which subject-side and realized refs support that diagnosis without collapsing into generic prose.",
@@ -21,7 +21,7 @@
     "critique_items": {
       "type": "array[CritiqueItem]",
       "required": true,
-      "constraint": "Non-empty. Each item must critique exactly one scope."
+      "constraint": "Non-empty in ERRORS_FOUND mode. Empty only with explicit NO_FINDINGS and evidence-bound no_findings_review."
     },
     "comparison_to_ideal_summary": {
       "type": "string",
@@ -31,6 +31,20 @@
       "type": "CritiqueGuidance",
       "required": false,
       "constraint": "Optional bridge into ideal_cp2 authoring."
+    },
+    "finding_status": {
+      "type": "string",
+      "required": false,
+      "enum": [
+        "ERRORS_FOUND",
+        "NO_FINDINGS"
+      ],
+      "default": "ERRORS_FOUND"
+    },
+    "no_findings_review": {
+      "type": "object",
+      "required": false,
+      "constraint": "Required only in NO_FINDINGS mode: nonempty review_summary, nonempty subject_grounding_refs of supplied subject handles, and nonempty realized_refs of canonical artifact:identifier handles. State reviewed alternatives and limits. No findings is not proof of optimality or forecasting advantage."
     }
   },
   "critique_item": {

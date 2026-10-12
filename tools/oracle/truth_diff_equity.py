@@ -37,6 +37,8 @@ from system.lib.run_compare import (
     grade_predictions,
     load_feed_prices,
 )
+from system.lib.artifacts import load_artifact
+from system.lib.schema_validator import validate_cp2
 
 
 def _require_run_dir(config: Dict[str, Any], key: str) -> Path:
@@ -160,8 +162,18 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
     reconciliation_rows = _build_prediction_reconciliation_rows(subject_run_dir, grading)
     reconciliation_summary = _build_prediction_reconciliation_summary(reconciliation_rows)
     feed_health = equity_feed_health(subject_run_dir, truth_run_dir)
+    subject_envelope = load_artifact(subject_run_dir, "lab_director") or {}
+    subject_cp2 = subject_envelope.get("data", {})
+    abstained = subject_cp2.get("decision_status") == "ABSTAIN"
+    if abstained and (subject_envelope.get("status") not in {"success", "loaded"}
+                      or not validate_cp2(subject_cp2, subject_run_dir=subject_run_dir).ok):
+        raise ValueError("Invalid subject abstention cannot become a successful reconciliation")
+    if abstained and feed_health.get("common_ticker_count", 0) > 0:
+        feed_health = {**feed_health, "status": "ABSTAINED",
+                       "diagnostics": ["Valid subject no-call; common prices support review, not forecast scoring."]}
     data = {
-        "status": "AVAILABLE",
+        "status": "ABSTAINED" if abstained else "AVAILABLE",
+        "subject_decision_status": "ABSTAIN" if abstained else "FORECAST",
         "subject_run_id": subject_run_dir.name,
         "truth_run_id": truth_run_dir.name,
         "subject_as_of": _load_as_of(subject_run_dir),

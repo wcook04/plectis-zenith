@@ -488,8 +488,14 @@ def validate_prediction_reconciliation(payload: Any) -> ValidationResult:
 
     errors: List[str] = []
     status = payload.get("status")
-    if status != "AVAILABLE":
-        errors.append(f"INVALID_FIELD: status={status!r} (must be 'AVAILABLE')")
+    if status not in ("AVAILABLE", "ABSTAINED"):
+        errors.append(f"INVALID_FIELD: status={status!r} (must be AVAILABLE or ABSTAINED)")
+    if status == "ABSTAINED" and payload.get("subject_decision_status") != "ABSTAIN":
+        errors.append("INVALID_FIELD: ABSTAINED requires subject_decision_status ABSTAIN")
+    if "subject_decision_status" in payload:
+        expected_decision = "ABSTAIN" if status == "ABSTAINED" else "FORECAST"
+        if payload["subject_decision_status"] != expected_decision:
+            errors.append("INVALID_FIELD: reconciliation and subject decision disagree")
 
     for field in ("subject_run_id", "truth_run_id"):
         value = payload.get(field)
@@ -497,7 +503,9 @@ def validate_prediction_reconciliation(payload: Any) -> ValidationResult:
             errors.append(f"MISSING_FIELD: {field}")
 
     rows = payload.get("rows")
-    if not isinstance(rows, list) or not rows:
+    if status == "ABSTAINED" and rows != []:
+        errors.append("INVALID_FIELD: ABSTAINED reconciliation must have no prediction rows")
+    if not isinstance(rows, list) or (not rows and status != "ABSTAINED"):
         errors.append("MISSING_FIELD: rows must be a non-empty list")
         rows = []
 
@@ -722,7 +730,7 @@ def validate_realized_hindsight_brief(payload: Any) -> ValidationResult:
                 seen_drivers.add(normalized_driver)
 
             classification = item.get("classification")
-            if classification not in {"SURPRISE", "ALREADY_PRICED", "PARTIAL_REPRICING"}:
+            if classification not in {"SURPRISE", "ALREADY_PRICED", "PARTIAL_REPRICING", "UNRESOLVED"}:
                 errors.append(
                     f"INVALID_FIELD: driver_classification[{idx}].classification={classification!r}"
                 )
@@ -748,11 +756,12 @@ def validate_realized_hindsight_brief(payload: Any) -> ValidationResult:
         "already_priced_packages",
         "surprise_packages",
         "partial_repricing_packages",
+        "unresolved_packages",
     )
     package_sets: Dict[str, Set[str]] = {}
     for field in package_fields:
         package_sets[field] = set(
-            _validate_string_list_field(payload.get(field), field, errors)
+            _validate_string_list_field(payload.get(field, []) if field == "unresolved_packages" else payload.get(field), field, errors)
         )
 
     for left_idx, left in enumerate(package_fields):
@@ -786,7 +795,7 @@ def validate_realized_hindsight_brief(payload: Any) -> ValidationResult:
             if not isinstance(what_happened, str) or not what_happened.strip():
                 errors.append(f"MISSING_FIELD: prediction_target_outcomes[{idx}].what_happened")
             pricing_judgement = item.get("pricing_judgement")
-            if pricing_judgement not in {"SURPRISE", "ALREADY_PRICED", "PARTIAL_REPRICING"}:
+            if pricing_judgement not in {"SURPRISE", "ALREADY_PRICED", "PARTIAL_REPRICING", "UNRESOLVED"}:
                 errors.append(
                     f"INVALID_FIELD: prediction_target_outcomes[{idx}].pricing_judgement={pricing_judgement!r}"
                 )
@@ -822,8 +831,28 @@ def validate_cp2_critique(payload: Any) -> ValidationResult:
         if summary is not None and (not isinstance(summary, str) or not summary.strip()):
             errors.append("INVALID_FIELD: comparison_to_ideal_summary must be a non-empty string when present")
 
+    finding_status = payload.get("finding_status", "ERRORS_FOUND")
+    if finding_status not in {"ERRORS_FOUND", "NO_FINDINGS"}:
+        errors.append("INVALID_FIELD: finding_status must be ERRORS_FOUND or NO_FINDINGS")
     critique_items = payload.get("critique_items")
-    if not isinstance(critique_items, list) or not critique_items:
+    if finding_status == "NO_FINDINGS":
+        if critique_items != []:
+            errors.append("INVALID_FIELD: NO_FINDINGS requires empty critique_items")
+        review = payload.get("no_findings_review")
+        if not isinstance(review, dict):
+            errors.append("MISSING_FIELD: no_findings_review")
+        else:
+            if not isinstance(review.get("review_summary"), str) or not review["review_summary"].strip():
+                errors.append("MISSING_FIELD: no_findings_review.review_summary")
+            for field in ("subject_grounding_refs", "realized_refs"):
+                values = review.get(field)
+                checker = _validate_artifact_handle_list if field == "realized_refs" else _validate_string_list_field
+                checker(values, f"no_findings_review.{field}", errors)
+                if not isinstance(values, list) or not values:
+                    errors.append(f"MISSING_FIELD: no_findings_review.{field}")
+    elif "no_findings_review" in payload:
+        errors.append("INVALID_FIELD: error critique cannot carry no_findings_review")
+    if not isinstance(critique_items, list) or (not critique_items and finding_status != "NO_FINDINGS"):
         errors.append("MISSING_FIELD: critique_items must be a non-empty list")
     else:
         for idx, item in enumerate(critique_items):
@@ -933,6 +962,35 @@ def validate_cp1(payload: Any) -> ValidationResult:
             evidence = raw_evidence
             errors.extend(_validate_evidence_dictionary(evidence, ledger_id_re))
 
+    # Abstention is an explicit, evidence-bound decision, never an empty forecast.
+    decision_status = payload.get("decision_status", "FORECAST")
+    if decision_status not in ("FORECAST", "ABSTAIN"):
+        errors.append("INVALID_FIELD: decision_status must be FORECAST or ABSTAIN")
+    if decision_status == "ABSTAIN":
+        if payload.get("dominant_evidence_track") != "INSUFFICIENT":
+            errors.append("INVALID_FIELD: abstention requires INSUFFICIENT evidence track")
+        abstention = payload.get("abstention")
+        if not isinstance(abstention, dict):
+            errors.append("MISSING_FIELD: abstention must be an object")
+        else:
+            for field in ("reason", "unsupported_claims", "missing_information", "reconsider_when"):
+                value = abstention.get(field)
+                if not isinstance(value, str) or not value.strip():
+                    errors.append(f"MISSING_FIELD: abstention.{field}")
+                elif detect_malformed_citations(value):
+                    errors.append(f"MALFORMED_CITATION: abstention.{field}")
+                else:
+                    errors.extend(validate_citations(value, evidence))
+            refs = abstention.get("evidence_refs")
+            allowed = {e["ref_id"] for e in evidence if isinstance(e, dict) and isinstance(e.get("ref_id"), str)}
+            if (not isinstance(refs, list) or not refs or
+                    any(not isinstance(ref, str) or ref not in allowed for ref in refs)):
+                errors.append("CITATION_UNRESOLVED: abstention.evidence_refs must name supplied evidence")
+        if "predictions_t" in payload and payload["predictions_t"] != []:
+            errors.append("INVALID_FIELD: abstention cannot contain predictions")
+    elif "abstention" in payload:
+        errors.append("INVALID_FIELD: forecast mode cannot carry an abstention")
+
     # --- epicentre_thesis ---
     if not payload.get("epicentre_thesis"):
         errors.append("MISSING_FIELD: epicentre_thesis")
@@ -1014,7 +1072,9 @@ def validate_cp2(
         errors.append("MISSING_FIELD: predictions_t")
     else:
         raw_preds = payload["predictions_t"]
-        if not isinstance(raw_preds, list) or len(raw_preds) == 0:
+        if payload.get("decision_status") == "ABSTAIN" and raw_preds == []:
+            pass
+        elif not isinstance(raw_preds, list) or len(raw_preds) == 0:
             errors.append("MISSING_FIELD: predictions_t must be a non-empty list")
         else:
             predictions = raw_preds

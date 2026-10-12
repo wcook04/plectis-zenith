@@ -100,3 +100,9 @@ prepares development comparisons only.
 Current implementation tests verify progression, selection bindings and timing.
 They use explicitly synthetic scores for retention boundary tests. No completed
 generation comparison or learned financial advantage is reported.
+
+An explicit native abstention is retained as a terminal `abstained` attempt. It
+contributes missing forecast coverage, never a zero-loss observation; the
+complete-support gate cannot select a version on such a comparison. The next
+action list does not ask for a second answer on that date. See
+[the decision contract](abstention.md).

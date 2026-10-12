@@ -13,6 +13,28 @@ from zenith import runtime
 
 
 class CohortTests(unittest.TestCase):
+    def test_abstention_is_retained_as_unscored_support_not_a_winner(self):
+        from test_abstention import abstain
+        self.prepare(count=1)
+        run = self.run_fixture('baseline')
+        path = run/'artifacts/lab_director.json'
+        envelope = read_json(path)
+        envelope['data'] = abstain(envelope['data'])
+        write_json(path, envelope)
+        result = cohort.attach(self.study, candidate_id='baseline', issue_id='issue-0', run=run)
+        self.assertEqual(result['state'], 'abstained', result)
+        self.assertTrue(cohort.attach(self.study, candidate_id='baseline', issue_id='issue-0', run=run)['idempotent'])
+        comparison = cohort.evaluate(self.study)
+        self.assertEqual(comparison['state'], 'pending')
+        self.assertIsNone(comparison['scores'])
+        self.assertEqual(comparison['per_issue_coverage']['baseline']['issue-0']['status'], 'abstained')
+        self.assertEqual(comparison['per_issue_coverage']['baseline']['issue-0']['scored_target_count'], 0)
+        self.assertTrue(all(a['candidate_id'] != 'baseline' for a in cohort.next_actions(self.study)['actions']))
+        envelope['data']['abstention']['reason'] = 'Unreviewed replacement'
+        write_json(path, envelope)
+        with self.assertRaisesRegex(ValueError, 'abstention outputs changed'):
+            cohort.evaluate(self.study)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

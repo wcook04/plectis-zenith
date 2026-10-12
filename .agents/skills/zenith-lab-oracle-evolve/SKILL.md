@@ -87,3 +87,12 @@ cutoff. A detached policy file loses that evidence chronology. Do not reuse
 historical pending runs after changing their frozen implementation. InvestorBench
 and FNSPID source adapters have different clock precision; retain those limits
 and never turn excluded filings or unavailable feeds into factual evidence.
+
+Use the explicit native `ABSTAIN` branch when no supported forward thesis exists;
+never manufacture a forecast to satisfy an old example. Oracle may classify a
+cause as `UNRESOLVED` and report evidence-bound `NO_FINDINGS`; Evolve may retain
+`no_change`. These are meaningful decisions, not performance wins. Cohorts
+count abstention as missing coverage and retain it without resampling. If a
+contract change is needed during a pilot, preserve its source-bound attempt and
+start a new programme. Disclose any exact response reuse as replay rather than
+independent reasoning or unseen performance evidence. See `docs/abstention.md`.

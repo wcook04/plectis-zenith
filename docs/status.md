@@ -2,6 +2,49 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Honest no-call through the native loop, 12 October 2026
+
+The [native decision contract](abstention.md) now represents evidence-bound
+`ABSTAIN`, `UNRESOLVED` hindsight and an explicit `NO_FINDINGS` review. CP1 locks
+the forward mode; CP2 has no predictions when abstaining. Oracle retains observed
+moves without a fabricated forecast score. Cohorts retain no-calls without
+resampling and count them as missing support, preventing a zero-loss win.
+
+The [bound receipt](abstention-receipt.json) records the July 1–2 InvestorBench
+development case: 28/28 Lab and 31/31 Oracle nodes, 21/11 accepted response
+imports and a reviewed Evolve `no_change`. Twenty-nine answers were exact
+reuses after contract repairs; only three final Oracle responses were newly
+authored. This is an exposed primary-agent contract replay, not an independent
+model result or performance estimate. Earlier source-bound attempts remain
+preserved. No new paid provider calls were made.
+
+All **619 tests pass**. Source custody covers 262 retained files; node skills,
+public graph and semantic checks pass. The manuscript now has ten pages and
+reports both the older forecast's unsupported cause and this no-call, with
+citations at use. The graph remains 71 nodes and 205 edges. The checked-in graph
+variant example has an owner script for refreshing its source pins; historical
+experiments must keep their originals.
+
+The repository is public at <https://github.com/wcook04/plectis-zenith>.
+The preceding published commit `a631934` passed GitHub CI and all 610 tests in a
+fresh source clone with a new environment and credentials absent. The test lock
+was regenerated to include the existing A-share numerical dependencies. The
+new abstention changes have passed local validation; publication and CI are
+recorded by the following scoped commit and GitHub run.
+
+The next empirical task remains later-day competence and a frozen comparison;
+no learned edge is demonstrated. The current complete-support generation gate
+cannot select abstaining strategies. Any selective strategy requires a separate
+coverage/utility contract. Native artifact `metadata.model` may retain an authored
+platform label; the bound response/provider receipts disclose actual agent
+identity. Aligning that legacy metadata is captured separately; do not rewrite
+historical runs or attribute this pilot to Gemini.
+
+Authority captures: `cap_quick_handle_no_supported_market_thesis_withou_90bf98bc6d6f`,
+`cap_quick_refresh_zenith_graph_variant_examples_af_20a8af21c65f`, and the
+no-findings, acceptance-review and provider-platform captures in the parent
+Task Ledger.
+
 ## Daily generations and shared historical data, 12 October 2026
 
 The standalone `zenith daily init/next/review` controller now connects the full
@@ -32,11 +75,13 @@ The revised nine-page manuscript builds without unresolved citations or
 overfull boxes and cites InvestorBench and AlphaGo Zero where used. Earlier
 standalone isolation already installed the locked environment and reached real
 native packets without parent code or provider credentials; final-source
-isolation and public publication are being recorded separately.
+isolation subsequently passed all 610 tests and the public repository was
+published at commit `a631934`, with GitHub CI passing.
 
 The 22 July forecast dates have been frozen locally under
-`work/investorbench-daily-20261012`. Native development is in progress, not
-completed evaluation. Older pending FNSPID runs below retain their original
+`work/investorbench-daily-20261012`. That original programme stopped at CP1 before forecasting; its source identity
+is retained. The no-call contract pilot above superseded it for development,
+not completed generation evaluation. Older pending FNSPID runs below retain their original
 implementation identity and are historical evidence; do not resume them under
 the revised runtime. Existing paid ledgers remain unchanged. The reusable
 chronology and source-freezing lessons are in the Lab/Oracle/Evolve skill.

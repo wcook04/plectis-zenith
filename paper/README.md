@@ -11,7 +11,7 @@ guidance remain evidence and examples, not the selected replacement programme.
 
 Citations appear at the use of external mechanisms, datasets and financial facts.
 The supplied Huang, Wang/Yeung and Yu papers retain their distinct target and
-method boundaries. Neither source assimilation nor one completed manual episode
+method boundaries. Neither source assimilation nor completed manual development episodes
 establishes novelty, forecasting advantage, transferable learning or profitability.
 The daily review importer validates structure and quotations, not semantic truth.
 
@@ -20,6 +20,8 @@ Source and bibliography are Apache-2.0; `paper-house-style.sty` retains its
 CC-BY-4.0 attribution. The standalone checkout includes the bibliography and style.
 
 ## Current measured and compiled evidence
+
+- [Native abstention](../docs/abstention.md) and [receipt](../docs/abstention-receipt.json): a completed 28/31-node Lab/Oracle contract replay, unresolved causal diagnosis and reviewed no-change. Twenty-nine reused responses are disclosed. No forecasting score or learned advantage exists for this no-call.
 
 - [InvestorBench admission](../docs/investorbench-admission.json): pinned three-equity source, 291 complete shared sessions, 4,990 summaries, date-lag assumptions and excluded filings. This is data coverage, not a new forecast result.
 - [Generation comparisons](../docs/generations.md): reviewed candidates through the existing native cohort and explicit retention with an enforced evidence cutoff. No completed generation comparison is reported. The paper cites AlphaGo Zero for the design analogy where introduced.

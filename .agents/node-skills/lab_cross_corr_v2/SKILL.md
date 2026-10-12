@@ -8,7 +8,7 @@ description: Apply the typed lab_cross_corr_v2 operation to its declared context
 - Output contract: `json`. Mission: `lab`.
 - Implementation: `codex/substrate/nodes/lab/cross_corr_v2.json`; shared contracts compile at dispatch.
 - Parameters: frozen skill rule, incoming-edge weights, context budget.
-- Version: `5d14368e15720ce633416d94bd4a5e01e0ac5d7aa088d38a6958a1d762c2cd75`.
+- Version: `cdb3ea9bf5764f6a542920596c18affcd8700c3e88cdfd055cd591f992d1f7cd`.
 - Inspect: `python -m zenith inspect lab_cross_corr_v2`.
 
 Generated projection; edit the source or a frozen experimental variant, then rebuild. These fields declare a contract; they do not prove the model follows it.

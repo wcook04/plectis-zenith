@@ -54,3 +54,9 @@ their failed compatibility-run provenance. Profile `v2` makes the existing
 minimum lengths and bracketed citation format more explicit in the prompts.
 The validators and required outputs are unchanged; old attempts are not
 rewritten or resumed against the new profile.
+
+After an intentional canonical source change, maintainers can regenerate only
+the checked-in teaching example with `python scripts/build_example_variant.py`.
+The script uses the graph owner's identity and validation functions. Frozen
+experiment variants must retain their old source pins; initialize a new
+experiment instead of applying this operation to historical evidence.

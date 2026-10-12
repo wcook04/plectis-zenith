@@ -83,3 +83,15 @@ Every `epicentre_thesis` must explicitly include:
 - `schema_cp1.json` defines structural requirements and citation/word-count checks.
 - `schema_cp2.json` extends CP1 with predictions and trade rationale.
 - This contract defines the semantic meaning of `epicentre_thesis` used by both CP1 and CP2.
+
+## Explicit abstention
+
+The causal thesis requirements above govern `decision_status: FORECAST` (also
+the legacy default). When no supported forward thesis exists, use the explicit
+`ABSTAIN` branch in schema_cp1/schema_cp2. Keep cited observed evidence and a
+150-word explanation of the unavailable support, unsupported claims and concrete
+reconsideration condition. This is an evidence-backed no-call, not a causal thesis
+made out of missingness. Director preserves it with empty predictions and a cited
+no-trade rationale. Oracle separates intentional abstention from execution failure
+and evaluates missed earlier opportunities without importing later facts as support.
+Abstention supplies no zero-error observation and cannot win a fixed-support cohort.

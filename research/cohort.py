@@ -263,10 +263,10 @@ def attach(study, *, candidate_id, issue_id, run):
             candidate, issue = select(spec, candidate_id, issue_id)
             key = f'{candidate_id}/{issue_id}'
             old = state['attachments'].get(key)
-            if old and old['state'] == 'complete':
+            if old and old['state'] in {'complete', 'abstained'}:
                 if old['run'] != str(run) or old['output_hashes'] != hashes(run):
                     raise ValueError('accepted native run outputs changed')
-                receipt.update(state='complete', attachment=old, idempotent=True)
+                receipt.update(state=old['state'], attachment=old, idempotent=True)
             else:
                 manifest, complete, calls = validate_run(study, spec, candidate, issue, run)
                 manifest_hash = digest_bytes((run / 'zenith_run.json').read_bytes())
@@ -278,13 +278,17 @@ def attach(study, *, candidate_id, issue_id, run):
                     registration = feedback.register(study / measurement_store, run,
                         study / spec['feedback_policy'], issue['horizon_id'])
                     forecasts = registration['forecasts']
-                    support = {(f['target_id'], f['issue_time'], f['target_time']) for f in forecasts}
-                    expected = {(target, issue['time_anchor'], issue['target_time']) for target in issue['target_ids']}
-                    if support != expected or any(f['subject_data_gaps'] for f in forecasts):
-                        raise ValueError('complete CP2 forecast support or prediction-time evidence differs')
-                    item.update(state='complete', output_hashes=hashes(run), forecasts=forecasts,
-                                measurement_store=measurement_store,
-                                synthetic_fixture=all(f['synthetic_fixture'] for f in forecasts))
+                    if registration.get('decision_status') == 'ABSTAIN':
+                        item.update(state='abstained', output_hashes=hashes(run), forecasts=[],
+                                    abstention=registration['abstention'])
+                    else:
+                        support = {(f['target_id'], f['issue_time'], f['target_time']) for f in forecasts}
+                        expected = {(target, issue['time_anchor'], issue['target_time']) for target in issue['target_ids']}
+                        if support != expected or any(f['subject_data_gaps'] for f in forecasts):
+                            raise ValueError('complete CP2 forecast support or prediction-time evidence differs')
+                        item.update(state='complete', output_hashes=hashes(run), forecasts=forecasts,
+                                    measurement_store=measurement_store,
+                                    synthetic_fixture=all(f['synthetic_fixture'] for f in forecasts))
                 state['attachments'][key] = item
                 receipt.update(state=item['state'], attachment=item)
         except (ValueError, OSError, KeyError, TypeError) as exc:
@@ -330,6 +334,12 @@ def _compare(study, spec, state, phase):
                         'scored_target_count': 0, 'scored_target_ids': [],
                         'missing_target_ids': sorted(issue['target_ids']), 'status': 'forecast_pending'}
             per_issue_coverage[candidate_id][issue_id] = coverage
+            if item and item['state'] == 'abstained':
+                if item['output_hashes'] != hashes(item['run']):
+                    raise ValueError('accepted abstention outputs changed')
+                coverage['status'] = 'abstained'
+                pending.append(key + ':abstained')
+                continue
             if not item or item['state'] != 'complete':
                 pending.append(key)
                 continue
@@ -423,7 +433,7 @@ def next_actions(study):
             for issue in spec['issues']:
                 key = f"{candidate['candidate_id']}/{issue['issue_id']}"
                 item = state['attachments'].get(key)
-                if item and item['state'] == 'complete':
+                if item and item['state'] in {'complete', 'abstained'}:
                     continue
                 run_id = 'COHORT_' + state['spec_hash'][:12] + '_' + candidate['candidate_id'] + '_' + issue['issue_id']
                 run = Path(item['run']) if item else runtime.runs_root(runtime.DEFAULT_ROOT) / run_id

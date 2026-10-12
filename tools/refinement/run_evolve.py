@@ -331,6 +331,8 @@ def _oracle_input_readiness(manifest: Dict[str, Any]) -> Dict[str, Any]:
             if diagnostics:
                 warning += ": " + "; ".join(diagnostics)
             warnings.append(warning)
+        elif feed_status == "ABSTAINED":
+            warnings.append("Subject deliberately abstained; review the no-call and earlier opportunities. No forecast loss or successful prediction exists.")
         elif feed_status != "READY":
             warnings.append(
                 "prediction_reconciliation.feed_health status is "

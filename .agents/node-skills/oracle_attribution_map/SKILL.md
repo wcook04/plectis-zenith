@@ -8,7 +8,7 @@ description: Apply the typed oracle_attribution_map operation to its declared co
 - Output contract: `schema_cp2_critique`. Mission: `oracle`.
 - Implementation: `codex/substrate/nodes/oracle/oracle_attribution_map.json`; shared contracts compile at dispatch.
 - Parameters: frozen skill rule, incoming-edge weights, context budget.
-- Version: `30a478e35382f67704d238eb139bfdf44e31ad86b7499160748b1b3b101365d6`.
+- Version: `dc86435c47a15f1dd9f9e3f368ec089403e0c5dfb5e99037d8d77241f9fabe99`.
 - Inspect: `python -m zenith inspect oracle_attribution_map`.
 
 Generated projection; edit the source or a frozen experimental variant, then rebuild. These fields declare a contract; they do not prove the model follows it.

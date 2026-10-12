@@ -1,7 +1,7 @@
 {
   "id": "schema_cp2",
   "type": "contract",
-  "version": "1.1",
+  "version": "1.2",
   "status": "NORMATIVE",
   "inherits": "schema_cp1",
   "description": "Checkpoint 2 output schema for forward Lab CP2 and Oracle hindsight reconstruction. Preserves one shared CP2-core contract while allowing Oracle-only meta trace fields.",
@@ -41,6 +41,16 @@
       "constraint": "Optional Oracle-only additive object at the shared-schema level. Present only on hindsight `ideal_cp2`. Never used as admissible grounding and never required for Lab CP2. Oracle runtime requires it when validating `ideal_cp2`.",
       "comparison_scope": "oracle_meta",
       "semantics": "Trace layer recording how realized T evidence informed the hindsight reconstruction without changing the admissibility law for CP2-core fields."
+    },
+    "decision_status": {
+      "type": "string",
+      "required": false,
+      "constraint": "FORECAST (default) or ABSTAIN; unknown values rejected"
+    },
+    "abstention": {
+      "type": "object",
+      "required": false,
+      "constraint": "Required only for ABSTAIN; forbidden in FORECAST; see decision_mode_contract"
     }
   },
   "prediction_unit": {
@@ -98,7 +108,11 @@
     "confidence": {
       "type": "string",
       "required": false,
-      "enum": ["HIGH", "MEDIUM", "LOW"],
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ],
       "constraint": "Optional confidence level for this prediction. When present, must be one of HIGH, MEDIUM, LOW.",
       "semantics": "Strength of evidence supporting this specific prediction target. HIGH = multi-lane convergence with strong thesis link. MEDIUM = directional agreement with some uncertainty. LOW = single-lane or weak thesis link. Evolve uses this for learning: which confidence levels track actual hit rates."
     },
@@ -216,7 +230,7 @@
       "epicentre_thesis declares one dominant force at T-n.",
       "Each predictions_t[i] is explainable as a transmission consequence of that force.",
       "trade_rationale must narrate force -> transmission -> prediction consequence chain.",
-      "If a prediction depends on an alternative driver, that alternative must be subordinated to (or shown as derivative of) the epicentre force — not introduced as a second co-equal thesis."
+      "If a prediction depends on an alternative driver, that alternative must be subordinated to (or shown as derivative of) the epicentre force \u2014 not introduced as a second co-equal thesis."
     ]
   },
   "grounding_rule": {
@@ -231,7 +245,7 @@
   "oracle_golden_id_guard": {
     "description": "Oracle runs add an additional invariant over the CP2-core grounding set.",
     "requirement": "Every ledger_id in evidence_dictionary must exist in the T-n snapshot ledger set from the corresponding Lab run.",
-    "enforcement": "validate_golden_ids(evidence_dictionary, subject_run_dir) — called from engine Oracle path, not from validate_cp2 itself.",
+    "enforcement": "validate_golden_ids(evidence_dictionary, subject_run_dir) \u2014 called from engine Oracle path, not from validate_cp2 itself.",
     "error_code": "INVALID_GOLDEN_ID"
   },
   "trade_rationale_word_count": {
@@ -253,11 +267,11 @@
     "resolution_rule": "Every [N] must resolve to an evidence_dictionary entry with matching ref_id."
   },
   "validation_sequence": [
-    "1. validate_cp1(payload) — structural + citation + word-count for CP1 fields",
-    "2. Validate CP2-specific fields — predictions_t presence, direction enum, snapshot_price + target_price numeric validity, direction/target coherence, temporal fields, trade_rationale, and engine price-audit flags",
-    "3. Grounding checks — per-prediction evidence with S_ or E_ ledger",
-    "4. Out-of-universe checks — if subject_run_dir provided",
-    "5. [Oracle only] Golden ID guard — Phase 10, engine-level",
+    "1. validate_cp1(payload) \u2014 structural + citation + word-count for CP1 fields",
+    "2. Validate CP2-specific fields \u2014 predictions_t presence, direction enum, snapshot_price + target_price numeric validity, direction/target coherence, temporal fields, trade_rationale, and engine price-audit flags",
+    "3. Grounding checks \u2014 per-prediction evidence with S_ or E_ ledger",
+    "4. Out-of-universe checks \u2014 if subject_run_dir provided",
+    "5. [Oracle only] Golden ID guard \u2014 Phase 10, engine-level",
     "6. [Oracle ideal_cp2 only] Require oracle_meta and validate Oracle handle syntax for truth_influence_refs, realized_diff_refs, and explicit_exclusions[].ref",
     "7. Ignore additive Oracle-meta keys outside Oracle-specific validation"
   ],
@@ -291,5 +305,27 @@
     "scorecard.md": "LAYERED/DEFERRED: depends on confidence/magnitude semantics removed from v0.",
     "counter_vector.md": "Non-normative prose guide only; not validated by engine.",
     "hypothesis_slug.md": "Non-normative prose guide only; not validated by engine."
+  },
+  "decision_mode_contract": {
+    "default": "FORECAST",
+    "allowed": [
+      "FORECAST",
+      "ABSTAIN"
+    ],
+    "abstention": {
+      "required_fields": [
+        "reason",
+        "evidence_refs",
+        "unsupported_claims",
+        "missing_information",
+        "reconsider_when"
+      ],
+      "evidence_refs": "Nonempty references resolving to the supplied evidence dictionary",
+      "semantics": "Explain why no supported forward thesis was selected; not a successful prediction or zero loss",
+      "thesis": "Keep the cited 150-word explanation in epicentre_thesis; causal dominance requirements apply only to FORECAST",
+      "cp2": "predictions_t must be exactly []; trade_rationale remains required with citations and at least 75 words",
+      "track": "INSUFFICIENT",
+      "propagation": "Forward Director preserves locked CP1 status. Oracle may reconsider only from genuinely available subject-side evidence."
+    }
   }
 }

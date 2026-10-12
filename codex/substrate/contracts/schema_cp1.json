@@ -1,7 +1,7 @@
 {
   "id": "schema_cp1",
   "type": "contract",
-  "version": "1.0",
+  "version": "1.2",
   "status": "NORMATIVE",
   "description": "Checkpoint 1 Output Schema \u2014 Spine / Epicentre. Machine-checkable structural contract with embedded semantic guidance.",
   "purpose": "CP1 is the foundational checkpoint for the Lab reasoning pipeline. Every CP1-producing node must emit a JSON object satisfying all structural constraints below. Validated at runtime via system.lib.schema_validator.validate_cp1.",
@@ -35,6 +35,16 @@
       "required": false,
       "constraint": "Required if news-sourced evidence is cited.",
       "semantics": "States whether the event was pre-priced by Polymarket/price action."
+    },
+    "decision_status": {
+      "type": "string",
+      "required": false,
+      "constraint": "FORECAST (default) or ABSTAIN; unknown values rejected"
+    },
+    "abstention": {
+      "type": "object",
+      "required": false,
+      "constraint": "Required only for ABSTAIN; forbidden in FORECAST; see decision_mode_contract"
     }
   },
   "bifurcation_resolution": {
@@ -163,5 +173,27 @@
     "prediction_vector.md": "Superseded by CP1/CP2 schemas.",
     "evaluate_output.md": "Superseded by ObservationReport + trace.",
     "exemplar_state.md": "Oracle CP2 is the exemplar."
+  },
+  "decision_mode_contract": {
+    "default": "FORECAST",
+    "allowed": [
+      "FORECAST",
+      "ABSTAIN"
+    ],
+    "abstention": {
+      "required_fields": [
+        "reason",
+        "evidence_refs",
+        "unsupported_claims",
+        "missing_information",
+        "reconsider_when"
+      ],
+      "evidence_refs": "Nonempty references resolving to the supplied evidence dictionary",
+      "semantics": "Explain why no supported forward thesis was selected; not a successful prediction or zero loss",
+      "thesis": "Keep the cited 150-word explanation in epicentre_thesis; causal dominance requirements apply only to FORECAST",
+      "cp2": "predictions_t must be exactly []; trade_rationale remains required with citations and at least 75 words",
+      "track": "INSUFFICIENT",
+      "propagation": "Forward Director preserves locked CP1 status. Oracle may reconsider only from genuinely available subject-side evidence."
+    }
   }
 }

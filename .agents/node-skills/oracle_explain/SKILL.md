@@ -8,7 +8,7 @@ description: Apply the typed oracle_explain operation to its declared context.
 - Output contract: `json`. Mission: `oracle`.
 - Implementation: `codex/substrate/nodes/oracle/oracle_explain.json`; shared contracts compile at dispatch.
 - Parameters: frozen skill rule, incoming-edge weights, context budget.
-- Version: `0ec8c3a9be69cbe6c96bbf533ac8e8ac6eb5ce1b1efc0cbcc4caa254ec50222a`.
+- Version: `ad7e7072b231d190ca7533add24ba4c14df2152ac090a8c3a7126488d2325d8f`.
 - Inspect: `python -m zenith inspect oracle_explain`.
 
 Generated projection; edit the source or a frozen experimental variant, then rebuild. These fields declare a contract; they do not prove the model follows it.

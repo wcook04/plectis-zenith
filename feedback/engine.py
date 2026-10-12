@@ -374,7 +374,10 @@ def register(store, subject_run, policy_path, horizon_id, *, root=ROOT):
             else:
                 db.execute("INSERT INTO forecasts VALUES (?,?,?)", (record["forecast_id"], key, canonical(record)))
                 admitted.append(record)
-    return {"schema": "zenith_forecast_registration_v1", "forecasts": admitted, "count": len(admitted)}
+    result = {"schema": "zenith_forecast_registration_v1", "forecasts": admitted, "count": len(admitted)}
+    if payload.get("decision_status") == "ABSTAIN":
+        result.update(decision_status="ABSTAIN", abstention=payload["abstention"])
+    return result
 
 
 def truth_files(path):

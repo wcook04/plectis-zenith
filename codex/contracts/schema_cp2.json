@@ -1,7 +1,7 @@
 {
   "id": "schema_cp2",
   "type": "contract",
-  "version": "1.0",
+  "version": "1.2",
   "status": "NORMATIVE",
   "inherits": "schema_cp1",
   "description": "Checkpoint 2 Output Schema — Director / Trade. Extends CP1 with directional predictions and grounded trade rationale.",
@@ -30,6 +30,16 @@
       "required": true,
       "constraint": "Word count >= trade_rationale_base_words + trade_rationale_per_prediction_words * len(predictions_t). Must contain only resolved [N] citations.",
       "semantics": "Narrates the force -> transmission -> prediction consequence chain. Not a list of isolated trade ideas. Must explicitly connect each prediction back to the epicentre thesis causal mechanism."
+    },
+    "decision_status": {
+      "type": "string",
+      "required": false,
+      "constraint": "FORECAST (default) or ABSTAIN; unknown values rejected"
+    },
+    "abstention": {
+      "type": "object",
+      "required": false,
+      "constraint": "Required only for ABSTAIN; forbidden in FORECAST; see decision_mode_contract"
     }
   },
   "prediction_unit": {
@@ -164,5 +174,27 @@
     "scorecard.md": "LAYERED/DEFERRED: depends on confidence/magnitude semantics removed from v0.",
     "counter_vector.md": "Non-normative prose guide only; not validated by engine.",
     "hypothesis_slug.md": "Non-normative prose guide only; not validated by engine."
+  },
+  "decision_mode_contract": {
+    "default": "FORECAST",
+    "allowed": [
+      "FORECAST",
+      "ABSTAIN"
+    ],
+    "abstention": {
+      "required_fields": [
+        "reason",
+        "evidence_refs",
+        "unsupported_claims",
+        "missing_information",
+        "reconsider_when"
+      ],
+      "evidence_refs": "Nonempty references resolving to the supplied evidence dictionary",
+      "semantics": "Explain why no supported forward thesis was selected; not a successful prediction or zero loss",
+      "thesis": "Keep the cited 150-word explanation in epicentre_thesis; causal dominance requirements apply only to FORECAST",
+      "cp2": "predictions_t must be exactly []; trade_rationale remains required with citations and at least 75 words",
+      "track": "INSUFFICIENT",
+      "propagation": "Forward Director preserves locked CP1 status. Oracle may reconsider only from genuinely available subject-side evidence."
+    }
   }
 }

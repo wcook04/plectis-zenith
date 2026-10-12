@@ -3013,6 +3013,12 @@ class GodModeEngine:
                 expected_target_time_iso=self._target_time_iso,
             )
             if not self._oracle_mode:
+                if node.id == "lab_director" and isinstance(parsed, dict):
+                    cp1 = (load_artifact(self.run_dir, "lab_decide") or {}).get("data", {})
+                    if (cp1.get("decision_status", "FORECAST") !=
+                            parsed.get("decision_status", "FORECAST")):
+                        return ValidationResult.failure(cp2_result.errors + [
+                            "DECISION_STATUS_MISMATCH: Director must preserve the locked CP1 decision status"])
                 return cp2_result
 
             evidence = (

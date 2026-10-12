@@ -1,6 +1,6 @@
 # Plectis Zenith
 
-Zenith learns how to reason about markets by repeating the same job on historical days:
+Zenith is built to learn financial reasoning by repeating the same job on historical days:
 
 **Daily feeds → Lab forecast → later observations → Oracle diagnosis → reviewed Evolve change → next day.**
 
@@ -69,6 +69,11 @@ engine. Repeating the command does not purchase inference or create a chat.
 [Agent instructions](AGENTS.md), [operating programme](program.md) and the
 [daily guide](docs/daily-replay.md) explain the full workflow.
 
+Lab can issue a cited [abstention](docs/abstention.md) when the available evidence
+does not support a forward call. Oracle can leave a cause unresolved and report
+no evidenced error; Evolve can make no change. These outcomes preserve honest
+experience without counting no-calls as forecast wins.
+
 ## Compare and retain a generation
 
 A reviewed change is a candidate. `daily matchoff` freezes that candidate and
@@ -95,6 +100,11 @@ reasoning remained inadequate. One following-day policy candidate was prepared;
 there is no demonstrated learning gain. The [episode receipt](docs/daily-replay-receipt.json)
 records the distinction. Some historical execution files remain local; their
 hashes in a receipt do not make them publicly reproducible results.
+
+A separate InvestorBench [contract replay](docs/abstention-receipt.json) completed
+28/28 Lab and 31/31 Oracle nodes with an explicit no-call, unresolved cause and
+reviewed no-change. It reused 29 earlier answers and is not an independent
+forecasting result. All 619 regression tests pass.
 
 The daily controller connects stage progression and reviewed policy transitions.
 Its synthetic tests verify the plumbing, not forecasting ability. The next
