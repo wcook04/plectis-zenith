@@ -35,6 +35,8 @@ def parser() -> argparse.ArgumentParser:
     matchoff.add_argument("--output", type=Path, required=True)
     matchoff.add_argument("--model", required=True)
     matchoff.add_argument("--minimum-improvement", type=float, required=True, help="predeclared absolute reduction in mean relative target-price error")
+    matchoff.add_argument("--max-calls-per-run", type=int, default=21,
+                         help="pre-freeze per-arm response allowance including rejected corrections; minimum/default 21")
     retain = daily_commands.add_parser("retain", help="record reviewed winner from a complete native development matchoff")
     retain.add_argument("--matchoff", type=Path, required=True)
     retain.add_argument("--reviewer", required=True)
@@ -102,7 +104,7 @@ def dispatch(args) -> dict:
             if args.daily_command == "retain":
                 return daily_matchoff.retain(root, args.matchoff, args.reviewer)
             return daily_matchoff.freeze(root, args.work_dir, args.episode, args.dataset, args.start, args.end,
-                                         args.output, args.model, args.minimum_improvement)
+                                         args.output, args.model, args.minimum_improvement, args.max_calls_per_run)
         if args.daily_command == "init":
             return daily.initialize(root, args.work_dir, args.dataset, args.start, args.end, args.policy, args.retention)
         return daily.advance(root, args.work_dir, getattr(args, "response", None), getattr(args, "reviewer", None))

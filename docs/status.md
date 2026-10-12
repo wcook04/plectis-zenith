@@ -2,58 +2,78 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
-## Ten forecasts through the original graph, 12 October 2026
+## Later quantile comparison, 12 October 2026
 
-The [judgmental forecast branch](judgmental-forecasts.md) extends native CP1/CP2
-with q10/q50/q90 returns, honest zero medians, cited source identities and exact
-next-session close targets. Director and Oracle freeze the whole proposal.
-Oracle and feedback share quantile scoring; the existing cohort selection
-metric remains unchanged. New validation covers citation substitution, changed
-quantiles, crossed/nonfinite values, holidays, wrong truth dates/bases and FLAT
-median reconciliation. This is an interface and evaluation repair, not learning.
+The [May 5 → May 8 diagnostic](judgmental-matchoff-receipt.json) completed two
+28-node Labs on identical ten-stock inputs and the same profit-state retrieval.
+The original and revised instructions differed only at `lab_decide`. Ten
+current-day upstream responses were deliberately shared, with the same primary
+author; both complete forecasts were frozen before truth inspection. This is
+exposed historical development, not an independent model performance study.
 
-The [completed episode](judgmental-pilot-receipt.json) used April 28 inputs and
-May 4 truth: all 28 Lab and 31 Oracle nodes, ten predictions and 32 accepted
-primary-agent responses. One Oracle enum error was retained and corrected.
-No prior-run response was reused; no new paid provider call occurred. Mean
-absolute median error was 1.1985 percentage points versus 1.2685 for unchanged
-prices and 1.1592 for the preceding twenty returns' median. Mean three-quantile
-pinball loss was 0.3954 versus 0.3536 for historical quantiles. The judgmental
-intervals covered ten outcomes versus eight, but were wider and scored worse.
-These are one-date arithmetic comparisons, not independently executed graph arms.
+The revised instruction retained the historical quantiles, with zero text
+adjustments. Its median return MAE was **1.5597 percentage points**, versus
+**1.2413** for the original zero-median forecast. Mean pinball was 0.5087 versus
+0.4557. Eight stocks rose despite their recent negative medians. Both versions
+used identical tails, covering seven outcomes. Reporting a reference and
+choosing a forecasting rule are separate decisions; this revision improved
+explicitness without improving these numbers.
 
-Evolve reviewed a candidate that makes the earlier-price quantiles and every
-evidence-based adjustment explicit, retaining source uncertainty and zero
-medians. It has no later run or generation-retention result. Separately,
-the [retrieval audit](profit-state-retrieval-audit.json) verifies recovery of
-COSCO's eligible April 10 profit guidance in the original April 28 input,
-with prices unchanged. The optional `issuer_profit_state_v1` profile preserves
-original timestamps and leaves the default archived manifest unchanged.
+The native comparison **failed admission**: a baseline target-ID correction
+created 22 supplied responses against the frozen allowance of 21. The
+challenger used 21. The failed cohort and its original limit remain preserved;
+these losses are descriptive, not an accepted comparison or generation win.
+The challenger's 31-node Oracle then completed with 11 accepted responses,
+retaining all original quantiles. The primary reviewed the source-bound fixed
+Evolve packet and recommended no change. That lead review is recorded separately
+from the legacy export's pending status; it is not a bridge completion or daily
+controller review receipt. There were 53 accepted native responses plus one
+rejected baseline submission, no historical response replay and no paid calls.
 
-Next scientific work: hold retrieval and dates fixed while comparing the
-reviewed quantile-reference instruction with the preceding instruction;
-then test retrieval separately. Use later days, original frozen responses,
-the same model and complete ten-stock support. A direct reasoner and the
-arithmetic reference are necessary comparators before attributing value to the
-graph. Calendar-correct native execution is demonstrated; useful transferable
-forecasting improvement remains unestablished.
+Two operational repairs follow from the actual run. XSHG matchoffs now pass the
+adapter's exact next-session close, covering holidays and weekends, instead of
+an unsupported native horizon shortcut. Future comparisons can predeclare
+`--max-calls-per-run` above the default 21 to allow corrections; rejected
+responses still count and an existing frozen allowance cannot be enlarged.
+The [operating skill](../.agents/skills/zenith-lab-oracle-evolve/SKILL.md) now
+clarifies issuer IDs versus evidence IDs and requires both forecasts to be
+frozen before evaluation can reveal either arm's outcome.
 
-Validation: all 671 full-suite tests pass after the retrieval profile addition.
-The source extraction checks cover 264 files. The manuscript compiles to 14
-pages with no undefined citations or overfull boxes; changed pages were
-visually inspected. Exchange-calendar deprecation and bibliography underfull
-spacing warnings remain. These are implementation checks, not market evidence.
+Next work is a later controlled comparison of reference selection and numerical
+text adjustments, with a direct reasoner on identical inputs. Count unchanged
+reference outputs when testing text value. Keep retrieval fixed separately from
+instruction changes; retain all failures and no-adjustment cases. No policy,
+dossier or generation was promoted from this diagnostic.
 
-The refreshed private [Type B packet receipt](type-b-quantile-daily-packet.json)
-binds source commit `74ffa134f9bee6494ff45a3c9157e743dc351748`, original notes
-and literature, the completed native attempts and the current research brief.
-The local ZIP contains 2,204 files (49,760,216 bytes); all member hashes, fresh
-extraction and local Markdown links were checked. It has not been uploaded.
-The public receipt records metadata only. The supplied historical budget
-summary is preserved separately from the current budget projection; all supplied
-notes, papers and training attachments were checked for byte identity.
-GitHub offline CI passed on `296794d`, including the unchanged implementation
-commit; this later correction changes packet metadata only.
+Validation: **678 tests passed**, including XSHG holiday/weekend horizons and
+immutable predeclared response allowances. All 264 extraction hashes pass.
+The diagnostic exporter reconstructs the frozen controls and matches native
+Oracle scores. The paper remains 14 pages; changed pages were visually checked,
+with no undefined citations or overfull boxes. Existing bibliography spacing
+and exchange-calendar deprecation warnings remain.
+
+## First ten quantile forecasts, 12 October 2026
+
+The [earlier receipt](judgmental-pilot-receipt.json) records April 28 → May 4:
+28 Lab nodes, 31 Oracle nodes, ten predictions and 32 accepted primary-agent
+responses, plus one retained Oracle correction. Median return MAE was 1.1985
+percentage points versus 1.2685 for unchanged prices and 1.1592 for historical
+medians. Mean pinball was 0.3954 versus 0.3536 for historical quantiles. Wider
+judgmental intervals covered all ten outcomes without better loss. These
+arithmetic controls were not separate native arms.
+
+The native JUDGMENTAL branch freezes q10/q50/q90, honest zero medians, source
+citations and exact exchange-close targets. Oracle and feedback share scoring;
+the cohort objective remains relative target-price error. The separate
+[retrieval audit](profit-state-retrieval-audit.json) recovered COSCO's eligible
+April 10 guidance in the April 28 input while leaving quotes unchanged. The
+optional profile preserves original timestamps and the default archive manifest.
+
+The existing private [Type B packet receipt](type-b-quantile-daily-packet.json)
+binds source `74ffa134f9bee6494ff45a3c9157e743dc351748`, original attachments
+and the first completed quantile episode. Its 2,204-file local ZIP was checked
+for hashes, extraction and local Markdown links; it was not uploaded. It
+predates the later comparison above. GitHub offline CI passed on `296794d`.
 
 ## Richer data through the native daily loop, 12 October 2026
 

@@ -395,53 +395,70 @@ The candidate codifies behavior already partly present; later benefit is unknown
 The receipt is \code{docs/traderharness-native-receipt.json}. No generation
 selection or new paid provider call occurred.
 
-\subsection{Ten numerical forecasts and a retrieval repair}
-The next development episode used the 28 April 2023 close and the next XSHG
-session, 4 May. It completed the original 28-node Lab and 31-node Oracle with
-32 accepted primary-agent responses and one retained schema correction.
-The inputs contained 21 closing-price observations per stock and 22 text
-items. Lab froze ten judgmental quantile forecasts before the later truth
-was inspected. These dates remain exposed historical development; this is
-neither a held-out assessment nor evidence about an unseen model history.
+\subsection{Numerical forecasts and a later instruction comparison}
+On the TraderHarness data \citep{traderharnessdata2026}, the 28 April 2023
+snapshot supplied 21 prices per stock and 22 text items. Lab froze ten
+judgmental forecasts for the next XSHG close, 4 May: eight zero medians and
+small negative medians for Ganfeng Lithium and LONGi. All 28 Lab and 31 Oracle
+nodes completed. The numerical adjustments were uncalibrated judgments;
+missing expectations and price responses already observed limited their
+interpretation. A frozen reference used each stock's twenty prior returns'
+median and inclusive, linearly interpolated 10th and 90th percentiles.
 
-Eight medians were zero. The other two were $-0.4\%$ for Ganfeng Lithium
-(\code{002460}) and $-0.3\%$ for LONGi (\code{601012}). The first rationale
-considered the reported profit decline and the price fall already observed;
-the second considered continuing weakness despite reported profit growth.
-Both acknowledged missing expectations and the risk of counting information
-already reflected in prices. The numerical increments were judgments, not
-estimates of identified causal effects. At issue time, each stock's preceding
-twenty returns also supplied a frozen arithmetic reference: their median and
-linearly interpolated inclusive 10th and 90th percentiles.
+Lab's median error beat persistence but lost to that historical reference;
+its wider intervals covered every outcome while scoring worse
+(Table~\ref{tab:judgmental}). Evolve's reviewed candidate therefore asked
+Lab to state its historical reference and every evidence-based adjustment,
+without widening tails merely because a feed was absent. The source-bound
+record is \code{docs/judgmental-pilot-receipt.json}.
+
+The later 5 May snapshot tested that instruction against its predecessor,
+with identical retrieval in both arms. The same primary agent deliberately
+shared ten newly authored upstream responses through Orient, then completed
+both 28-node Labs and froze their forecasts before inspecting 8 May truth.
+The original instruction produced zero medians; the revised instruction
+retained all historical quantiles, including ten negative medians, with no
+news adjustments. Eight stocks rose. The revised forecast had greater median
+and pinball loss, while tail endpoints and coverage were identical.
 
 \begin{table}[ht]
 \centering
-\begin{tabular}{lrrrr}
+\begin{tabular}{llrrrr}
 \toprule
-Forecast & Median MAE & Pinball & Coverage & Width \\
+Issue & Forecast & MAE & Pinball & Coverage & Width \\
 \midrule
-Lab judgments & 1.1985 & 0.3954 & 10/10 & 5.8700 \\
-Historical quantiles & 1.1592 & 0.3536 & 8/10 & 4.2198 \\
-Unchanged price & 1.2685 & --- & --- & --- \\
+28 Apr & Lab judgment & 1.1985 & 0.3954 & 10/10 & 5.8700 \\
+       & History & 1.1592 & 0.3536 & 8/10 & 4.2198 \\
+       & Zero return & 1.2685 & --- & --- & --- \\
+5 May & Original instruction & 1.2413 & 0.4557 & 7/10 & 4.1743 \\
+      & Revised (= history) & 1.5597 & 0.5087 & 7/10 & 4.1743 \\
 \bottomrule
 \end{tabular}
-\caption{One issue date, ten stocks, next-session raw closing returns.
-MAE, mean three-quantile pinball loss and interval width are in percentage
-points; smaller loss is better. Coverage is the count within the nominal
-80\% interval. Arithmetic controls use the same issue-time prices and are
-not independently executed graph arms.}
+\caption{Ten stocks per issue, next-session raw closing returns. Median MAE,
+mean three-quantile pinball loss and interval width are in percentage points;
+smaller loss is better. Coverage counts outcomes in the nominal 80\% interval.
+The May original medians equal zero-return predictions. April controls are
+arithmetic; May arms completed the graph, but formal admission failed as
+described in the text. These are exposed development diagnostics.}
 \label{tab:judgmental}
 \end{table}
 
-The Lab beat persistence on central error but lost to historical quantiles
-on both reported losses (Table~\ref{tab:judgmental}). Its wider intervals
-covered every outcome without improving the quantile score. Ten correlated
-stocks on one date do not establish calibration or a reliable ranking.
-The reviewed Evolve candidate asks Lab to state its price-only reference and
-the exact evidence-based change to each quantile, without widening tails
-merely because a feed is absent. Its later benefit is untested. Original
-forecasts, comparison calculations and the reviewed candidate are preserved
-in \code{docs/judgmental-pilot-receipt.json}.
+A baseline target-identity correction consumed a 22nd response against its
+frozen allowance of 21. The cohort rejected that arm; the limit and rejection
+were retained. Thus the May numbers describe frozen forecasts, not an
+accepted generation comparison. The revised arm's 31-node Oracle preserved
+all original quantiles. A lead-agent review of the fixed Evolve packet
+recommended no further change; it was not imported as a bridge or daily
+controller completion. The public diagnostic and exact losses are in
+\code{docs/judgmental-matchoff-receipt.json}.
+
+This example separates reporting a reference from selecting a predictive
+rule. Neither day establishes the better default. The shared author, shared
+upstream analysis, correlated targets and historical exposure prevent an
+independent performance claim. No numerical text contribution was present
+in the revised forecast. Later comparisons must retain such no-adjustment
+cases and test text-conditioned estimates against both price references and
+a direct reasoner on the same inputs.
 
 Oracle also revealed a concrete input defect. COSCO's 10 April headline
 projecting first-quarter profit of RMB6.933 billion and a 74.91\% annual

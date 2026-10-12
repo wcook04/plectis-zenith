@@ -35,6 +35,8 @@ citation is not evidence of causal identification or calibrated numerical effect
 Explain why a result is new or already known, whose cash flows it describes,
 what expectations are missing, and how these limits affect the estimate. Retain
 uncertainty about economic state separately from a numerical forecast.
+`target_id` is the source issuer symbol (`000858` in the example), while
+`ledger_id` is the cited evidence identity (`S_...`). Preserve both separately.
 
 Validators check original evidence identities, opaque issuer codes, raw closing
 quotes, exact median arithmetic, target coverage and the source exchange clock.
@@ -86,8 +88,8 @@ matched graph arms. Ten stocks on one date cannot establish calibration.
 The result motivates restraint: Lab beat persistence but lost to the price-only
 reference on both losses. The reviewed Evolve candidate requires an explicit
 historical reference and the exact evidence-based change to each quantile.
-Missing feeds alone do not justify wider tails. That candidate has not run on
-a later day or passed generation retention.
+Missing feeds alone do not justify wider tails. The later diagnostic below
+tested that candidate; it did not pass generation retention.
 
 Oracle also exposed an omitted earlier COSCO profit-guidance claim. The
 [separate retrieval profile](traderharness-daily.md#retaining-earlier-issuer-state)
@@ -107,3 +109,55 @@ truth, the pre-truth freeze and independently reconstructed price controls.
 It exports numeric results and provenance hashes, not raw licensed headlines
 or private reasoning transcripts. The receipt is reviewable from a cold clone;
 full re-export requires the ignored original execution artifacts.
+
+## The later instruction comparison
+
+The [May 5 → May 8 receipt](judgmental-matchoff-receipt.json) records two complete
+28-node Labs using the same ten-stock snapshot and profit-state retrieval
+profile. Only the `lab_decide` instruction differed. The same primary agent
+authored both versions, deliberately sharing ten current-day upstream responses
+through Orient, then freezing both full forecasts before inspecting later truth.
+This isolates the authored decision difference but is not an access-isolated,
+independent model trial. No historical forecast response was replayed.
+
+The original instruction produced zero medians with historical tail endpoints.
+The revised instruction retained all historical quantiles, including ten
+negative medians, with zero news adjustments. Eight stocks subsequently rose.
+
+| Native forecast | Median MAE | Mean pinball | Coverage | Mean width |
+| --- | ---: | ---: | ---: | ---: |
+| Original instruction | 1.2413 | 0.4557 | 7/10 | 4.1743 |
+| Revised instruction (= historical quantiles) | 1.5597 | 0.5087 | 7/10 | 4.1743 |
+
+Loss and width use percentage points of return. The original median coincides
+with unchanged-price prediction. The corresponding relative target-price
+errors were 1.2232% and 1.5369%; that metric divides absolute return error by
+one plus realized return and must not be called return MAE.
+
+The formal comparison **failed admission**. A baseline target-ID correction
+created 22 supplied responses against the frozen allowance of 21; the challenger
+used 21. The rejection and original limit remain intact. The table is a
+descriptive reconstruction of already-frozen forecasts, not an accepted cohort
+result. The exporter checks original locks, dates, source histories and Oracle
+scores. A source-only reader can inspect the numeric rows; full regeneration
+requires the ignored original runs.
+
+The challenger's 31-node Oracle completed with 11 accepted responses and
+preserved every original quantile. The primary agent then reviewed the existing
+fixed Evolve prompt and its source-bound artifacts, recommending **no change**.
+This is a recorded lead-agent review, not an imported bridge run or daily
+controller receipt. No policy or dossier was promoted and no paid call occurred.
+
+The useful distinction is between **reporting a reference** and **choosing a
+forecast**. This revision reported its assumptions more clearly but did not
+improve the day's numbers. Neither this result nor the previous day establishes
+the best default. A later comparison should keep reference-only cases, compare
+zero and historical medians, and test whether evidence-conditioned adjustments
+improve losses against a direct reasoner on the same inputs. Merely citing news
+does not demonstrate that it contributed to a forecast.
+
+```sh
+python scripts/export_judgmental_matchoff.py \
+  --work-dir work/quantile-matchoff-20261012 \
+  --output docs/judgmental-matchoff-receipt.json
+```

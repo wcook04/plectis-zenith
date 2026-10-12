@@ -7,6 +7,7 @@ from zenith import daily, runtime
 from zenith.providers import AgentProvider, ResponsePending
 from benchmarks import investorbench as ib
 from test_investorbench import source
+from test_traderharness_daily import source_index, native_source
 
 
 def teacher(tmp_path, monkeypatch, matured='2020-06-30T20:00:00+00:00'):
@@ -46,6 +47,52 @@ def test_matchoff_cannot_use_teacher_period(source, tmp_path, monkeypatch):
     with pytest.raises(ValueError, match='follow the teacher'):
         daily_matchoff.freeze(runtime.DEFAULT_ROOT, tmp_path, 0, source,
                               '2020-07-01', '2020-07-01', tmp_path/'bad', 'synthetic', 0)
+
+
+def test_response_allowance_is_frozen_before_execution(source, tmp_path, monkeypatch):
+    teacher(tmp_path, monkeypatch)
+    output = tmp_path/'allowance'
+    result = daily_matchoff.freeze(runtime.DEFAULT_ROOT, tmp_path, 0, source,
+                                  '2020-07-01', '2020-07-01', output, 'synthetic', 0,
+                                  max_calls_per_run=23)
+    assert result['reasoning_responses_planned'] == 42
+    assert result['response_allowance_total'] == 46
+    assert daily.read(output/'cohort/cohort.json')['max_calls_per_run'] == 23
+    assert all(a['call_budget'] == 23 for a in cohort.next_actions(output/'cohort')['actions'])
+    # A failed run cannot retroactively enlarge its original allowance.
+    with pytest.raises(ValueError, match='Matchoff exists'):
+        daily_matchoff.freeze(runtime.DEFAULT_ROOT, tmp_path, 0, source,
+                             '2020-07-01', '2020-07-01', output, 'synthetic', 0, 24)
+    assert daily.read(output/'cohort/cohort.json')['max_calls_per_run'] == 23
+
+
+@pytest.mark.parametrize('allowance', [20, 0, True, 21.5])
+def test_response_allowance_rejects_invalid_values_before_writes(tmp_path, allowance):
+    output = tmp_path/'invalid'
+    with pytest.raises(ValueError, match='Response allowance'):
+        daily_matchoff.freeze(runtime.DEFAULT_ROOT, tmp_path, 0, tmp_path/'unused',
+                              '2020-07-01', '2020-07-01', output, 'synthetic', 0, allowance)
+    assert not output.exists()
+
+
+@pytest.mark.parametrize('issue,target', [('2023-04-28', '2023-05-04'), ('2023-05-05', '2023-05-08')])
+def test_xshg_matchoff_resolves_native_horizon_across_holiday_and_weekend(native_source, tmp_path, monkeypatch, issue, target):
+    teacher(tmp_path, monkeypatch, '2023-04-27T07:01:00+00:00')
+    output = tmp_path/'xshg-matchoff'
+    daily_matchoff.freeze(runtime.DEFAULT_ROOT, tmp_path, 0, native_source,
+                          issue, issue, output, 'synthetic-agent', 0)
+    spec = daily.read(output/'cohort/cohort.json')
+    row = spec['issues'][0]
+    assert row['time_anchor'] == issue+'T07:01:00+00:00'
+    assert row['target_time'] == target+'T07:00:00+00:00'
+    assert row['horizon_id'] == row['target_time']
+    assert row['target_ids'] == ['600438']
+    policy = daily.read(output/'cohort'/spec['feedback_policy'])
+    assert (policy['calendar_id'], policy['currency']) == ('XSHG', 'CNY')
+    actions = cohort.next_actions(output/'cohort')
+    for action in actions['actions']:
+        argv = action['native_argv']
+        assert argv[argv.index('--horizon')+1] == row['target_time']
 
 
 def test_agent_receipt_discloses_native_execution_kind(tmp_path):

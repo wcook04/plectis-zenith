@@ -119,3 +119,14 @@ Oracle. Evolve receives the original quantiles and deterministic pinball loss.
 Do not judge uncertainty by interval coverage alone or treat one covered event
 as calibration. Compare the frozen judgment with earlier-price controls before
 claiming that text reasoning helped; do not change the cohort objective silently.
+
+`target_id` is the original issuer symbol, such as `000858`; an `S_...` value is
+its evidence ledger ID, not its target ID. Check the actual source dictionary
+and schema before import. Rejected responses consume the frozen cohort allowance.
+Declare any correction allowance with `daily matchoff --max-calls-per-run`
+before execution; never enlarge an active cohort to admit a rejected arm.
+Freeze both arms before `cohort-evaluate`: evaluation can score a complete arm
+even while its counterpart is pending. Shared current-day upstream responses
+must be disclosed and cannot be counted as independent reasoning samples.
+Reporting a historical reference does not validate using it as the forecast;
+retain no-adjustment cases when measuring the added value of text.

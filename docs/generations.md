@@ -24,6 +24,8 @@ challenger through `research/cohort.py`. Both receive identical snapshots,
 assets, issue times, forecast horizons, context profile and disclosed model
 identity, and execute the complete 21-reasoner Lab scope. The existing feedback
 engine supplies the score. There is no second execution or scoring engine.
+XSHG issues use the adapter's exact next-session timestamp, including holidays
+and weekends; the native engine does not accept a `next_xshg_close` shortcut.
 
 ## Run a comparison
 
@@ -45,11 +47,20 @@ requires an explicit choice. The metric is mean issue-level mean target-price
 relative error; 0.001 is an absolute reduction of 0.001 in that loss. Each issue
 weights its three targets equally, then each issue receives equal weight.
 
+The default response allowance is exactly 21 per run. Rejected corrections also
+count. If a run needs room for corrections, declare, for example,
+`--max-calls-per-run 23` when freezing it. This permits at most two additional
+responses per arm, does not schedule retries, and cannot amend an existing
+comparison. It does not change any separate paid-spending authorization.
+
 Follow `cohort-next`'s exact `native_argv`; answer its packets through
 `zenith import-response`, resume the run, and execute the returned `attach_argv`.
 Repeat until the cohort is complete. All supplied node responses must disclose
 the same actual model as the frozen comparison. This identity is declared
 metadata for agent imports, not cryptographic proof of which agent reasoned.
+Freeze both forecasts for an issue before evaluation. `cohort-evaluate` can
+score a completed arm while the other arm is still pending; seeing those
+outcomes before writing the other forecast would contaminate the comparison.
 
 The twenty-session example requires **840 reasoning responses**: two versions
 times twenty days times twenty-one reasoning nodes. Snapshot acquisition and
@@ -100,6 +111,11 @@ prepares development comparisons only.
 Current implementation tests verify progression, selection bindings and timing.
 They use explicitly synthetic scores for retention boundary tests. No completed
 generation comparison or learned financial advantage is reported.
+
+The [May 5 quantile diagnostic](judgmental-forecasts.md#the-later-instruction-comparison)
+completed both native Labs, but one correction took the baseline above its
+frozen 21-response allowance. Its descriptive losses are published alongside
+the admission failure; they do not constitute an accepted generation comparison.
 
 An explicit native abstention is retained as a terminal `abstained` attempt. It
 contributes missing forecast coverage, never a zero-loss observation; the

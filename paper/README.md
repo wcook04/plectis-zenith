@@ -47,15 +47,16 @@ CC-BY-4.0 attribution. The standalone checkout includes the bibliography and sty
   recommend replacing this candidate.
   [Active protocol](../docs/ashare-study.md) owns commands and the spending boundary.
 
-The latest numerical episode is described in
-[judgmental forecasts](../docs/judgmental-forecasts.md), with a
-[verified receipt](../docs/judgmental-pilot-receipt.json) and
-[retrieval audit](../docs/profit-state-retrieval-audit.json). Ten next-close
-forecasts completed the full graph; both point and quantile losses were worse
-than the same-input historical-quantile reference. The revised paper introduces
-the quantile method with its scoring citation, reports the negative comparison,
-and separates the reviewed prompt candidate from the verified retrieval repair.
-Neither change has a later performance result.
+The latest [quantile comparison](../docs/judgmental-forecasts.md) includes a
+[verified later diagnostic](../docs/judgmental-matchoff-receipt.json). Both
+instructions completed the native Lab on May 5 inputs; the revised instruction
+retained historical quantiles and had worse May 8 median and pinball losses.
+Its baseline correction exceeded the frozen response allowance, so the formal
+cohort remained incomplete. The paper reports this admission failure beside
+the descriptive numbers. A completed Oracle and recorded lead-agent Evolve
+review produced no promotion. The [earlier episode](../docs/judgmental-pilot-receipt.json)
+and separate [retrieval repair](../docs/profit-state-retrieval-audit.json) remain
+source-bound evidence. No learned forecasting advantage has been established.
 
 ## Historical supporting evidence
 

@@ -16,7 +16,8 @@ from research import cohort
 from zenith import daily, runtime
 
 
-def freeze(root, directory, episode, dataset, start, end, output, model, minimum_improvement):
+def freeze(root, directory, episode, dataset, start, end, output, model, minimum_improvement,
+           max_calls_per_run=21):
     root, directory, output = Path(root).resolve(), Path(directory).resolve(), Path(output).resolve()
     if root != runtime.DEFAULT_ROOT.resolve():
         raise ValueError('Native cohort currently uses this source checkout root')
@@ -24,6 +25,8 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
         raise ValueError('Matchoff exists; retain its frozen evidence')
     if not model.strip():
         raise ValueError('Disclose the agent identity for both arms')
+    if type(max_calls_per_run) is not int or max_calls_per_run < 21:
+        raise ValueError('Response allowance must be an integer of at least 21 for the full Lab')
     manifest, packet, decision, incumbent_path, challenger_path = daily.reviewed_episode(root, directory, episode)
     if decision['status'] != 'reviewed_candidate':
         raise ValueError('No-change does not create a challenger')
@@ -54,10 +57,13 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
             raise ValueError('Complete identical asset support required across an episode')
         for row in subject_rows+truth_rows:
             basis.add(row['price_basis']); currency.add(row['currency'])
+        target_time = after[1].get('observation_at_utc', after[1]['issue_at_utc'])
+        # The native engine accepts next_us_close or an exact timestamp. The
+        # source adapter already resolved other exchanges' holidays and closes.
         issues.append({'issue_id': 'day-'+dates[i].replace('-', ''), 'feed_source': str(before[0]),
                        'time_anchor': before[1]['issue_at_utc'],
-                       'target_time': after[1].get('observation_at_utc', after[1]['issue_at_utc']),
-                       'horizon_id': 'next_us_close' if calendar.name == 'XNYS' else 'next_'+calendar.name.lower()+'_close',
+                       'target_time': target_time,
+                       'horizon_id': 'next_us_close' if calendar.name == 'XNYS' else target_time,
                        'target_ids': targets, 'split': 'development'})
         truth.extend({'target_id': r['target_id'], 'date': r['observed'], 'price': r['price'],
                       'source': r['source']} for r in truth_rows)
@@ -82,7 +88,7 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
                      'prompt_sha256': packet['packet_sha256']})
     spec = {'schema': cohort.SCHEMA, 'issues': issues, 'candidates': rows,
             'feedback_policy': str(output/'feedback-policy.json'), 'truth_source': str(output/'truth.json'),
-            'truth_as_of': snapshots[-1][1]['issue_at_utc'], 'max_trials': 2, 'max_calls_per_run': 21,
+            'truth_as_of': snapshots[-1][1]['issue_at_utc'], 'max_trials': 2, 'max_calls_per_run': max_calls_per_run,
             'minimum_improvement': minimum_improvement, 'embargo_days': 0}
     daily.immutable(output/'spec.json', spec)
     cohort.freeze(output/'spec.json', output/'cohort')
@@ -92,6 +98,8 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
                'cohort_sha256': daily.file_hash(output/'cohort/cohort.json'),
                'incumbent': daily.read(incumbent_path), 'challenger': daily.read(challenger_path),
                'issues': len(issues), 'reasoning_responses_planned': 2*21*len(issues),
+               'max_calls_per_run': max_calls_per_run,
+               'response_allowance_total': 2*max_calls_per_run*len(issues),
                'comparison': 'development; no untouched or prospective assessment claim',
                'selection': 'complete common support; at least twenty issues; declared target-price error margin; separate review'}
     binding['matchoff_sha256'] = daily.digest(binding)
