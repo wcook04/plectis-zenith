@@ -2,6 +2,53 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Actual Evolve change used on the next day, 12 October 2026
+
+The [two-issue empirical sequence](empirical-forecasts.md#the-completed-two-day-sequence)
+completed two full 28-node Labs and two full 31-node Oracles, with 64 accepted
+primary-agent reasoning responses. Evolve reduced a five-return rule's scale
+from 0.25 to 0.125 after its first loss. The next Lab's actual prompt and frozen
+targets contain that change. The candidate's later mean absolute error was
+0.62531 percentage points of return, compared with unchanged-rule arithmetic
+0.59575 and persistence 0.65488. It did not beat the unchanged rule. The second
+review proposed no further change; no generation winner was selected.
+
+The [receipt](empirical-pilot-receipt.json) verifies source bindings, the complete
+native missions, reviewed policy lineage and the actual successor prompt.
+One Oracle response was rejected for an enum-format error and corrected; the
+rejection remains recorded. No paid calls or prior-run response replays were
+used. These are two historical development dates, not independent or prospective
+performance evidence. The full graph reads both available feeds, but its
+numerical control is price-only: no added value from news has been measured.
+
+The explicit empirical branch permits a declared prediction with an unresolved
+cause, while preserving causal forecasts and abstention. The engine checks
+source issuer identity, history, dates, arithmetic and immutable rule transfer
+through Director and Oracle. All **638 tests pass** after regenerating the
+public graph projection. Extraction covers 263 files; node skills and semantic
+graph checks pass. The topology remains 71 nodes and 205 edges.
+
+The [preceding July 23–24 diagnostic](experience-diagnostic.json) remains a
+separate completed abstention at its original source identity. It exposed both
+an earnings notice without actual results and the causal-only admission limit;
+its next episode was not resumed under changed source.
+
+A [richer public database audit](herculean-audit.md) found future-year financial
+results in two December 2024 news rows. Those are concrete counterexamples,
+not a measured corpus-wide error rate. Continue with the admitted InvestorBench
+development stream; do not replace it with those contaminated summaries.
+
+The next useful experiment must measure an auditable contribution from issuer
+information beyond recent prices. A larger native run of the same price formula
+would not establish that contribution. Preserve these two exposed dates, keep
+both policies unselected, and compare any genuinely new mapping with the
+unchanged pipeline, a direct reasoner and simple price controls on later data.
+
+Authority: parent Task Ledger captures for the empirical-contract limit,
+issuer/arithmetic validation, rejected Oracle format and Herculean contamination.
+The skills now carry the reusable distinction between testable prediction and
+causal explanation, and the requirement to inspect dated source content.
+
 ## Honest no-call through the native loop, 12 October 2026
 
 The [native decision contract](abstention.md) now represents evidence-bound

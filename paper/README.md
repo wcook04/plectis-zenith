@@ -21,6 +21,9 @@ CC-BY-4.0 attribution. The standalone checkout includes the bibliography and sty
 
 ## Current measured and compiled evidence
 
+- [Empirical sequence](../docs/empirical-forecasts.md) and [receipt](../docs/empirical-pilot-receipt.json): two complete Lab/Oracle pairs, one reviewed scale change used by the next Lab, and a later loss against unchanged-rule arithmetic. Sixty-four accepted primary-agent responses and one retained correction; no new paid calls. This demonstrates an actual transition without a learning advantage or measured news contribution.
+- [Herculean audit](../docs/herculean-audit.md): two dated news counterexamples verified against original issuer releases. The paper cites the database and releases where the finding is used. News remains quarantined; no global contamination rate is inferred.
+
 - [Native abstention](../docs/abstention.md) and [receipt](../docs/abstention-receipt.json): a completed 28/31-node Lab/Oracle contract replay, unresolved causal diagnosis and reviewed no-change. Twenty-nine reused responses are disclosed. No forecasting score or learned advantage exists for this no-call.
 
 - [InvestorBench admission](../docs/investorbench-admission.json): pinned three-equity source, 291 complete shared sessions, 4,990 summaries, date-lag assumptions and excluded filings. This is data coverage, not a new forecast result.

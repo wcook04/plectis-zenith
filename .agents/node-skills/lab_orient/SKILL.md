@@ -8,7 +8,7 @@ description: Apply the typed lab_orient operation to its declared context.
 - Output contract: `text`. Mission: `lab`.
 - Implementation: `codex/substrate/nodes/lab/orient.json`; shared contracts compile at dispatch.
 - Parameters: frozen skill rule, incoming-edge weights, context budget.
-- Version: `0f4ac900248878ed4c71f49260f223fb9f2fa8604d02a664aa758a78917ed19e`.
+- Version: `ae3ac51c06328f8e615f230ad3a82959ec3c48a74a89e94a13d460fb74c06191`.
 - Inspect: `python -m zenith inspect lab_orient`.
 
 Generated projection; edit the source or a frozen experimental variant, then rebuild. These fields declare a contract; they do not prove the model follows it.

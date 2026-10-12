@@ -46,6 +46,7 @@ from typing import Any, List, Optional, Set
 
 from system.lib.citations import detect_malformed_citations, extract_citations, validate_citations
 from system.lib.artifacts import load_equity_universe, load_snapshot_ledger_ids
+from system.lib.empirical_forecast import rule_errors, target_errors
 
 # ---------------------------------------------------------------------------
 # Format constants
@@ -962,6 +963,7 @@ def validate_cp1(payload: Any) -> ValidationResult:
             evidence = raw_evidence
             errors.extend(_validate_evidence_dictionary(evidence, ledger_id_re))
 
+    errors.extend(rule_errors(payload))
     # Abstention is an explicit, evidence-bound decision, never an empty forecast.
     decision_status = payload.get("decision_status", "FORECAST")
     if decision_status not in ("FORECAST", "ABSTAIN"):
@@ -1233,6 +1235,8 @@ def validate_cp2(
                     errors.append(f"OUT_OF_UNIVERSE: target_id={target} not in T-n ticker set")
 
     # --- Engine price-audit mismatches ---
+    errors.extend(target_errors(payload, subject_run_dir, expected_snapshot_time,
+                                expected_target_time_iso))
     audit_errors = payload.get("_engine_audit_errors")
     if isinstance(audit_errors, list):
         for raw in audit_errors:

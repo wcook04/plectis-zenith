@@ -93,6 +93,16 @@ has yet demonstrated a financial learning advantage.
 
 ## What works, and what remains unproved
 
+The latest [two-day development run](docs/empirical-forecasts.md#the-completed-two-day-sequence)
+completed **two full Labs, two full Oracles, and a reviewed Evolve change that
+was used by the next day's Lab**. After the first price-history rule lost to
+unchanged-price persistence, Evolve halved its scale. On the next day the
+changed rule beat persistence but lost to the unchanged rule. The candidate was
+not promoted. The [source-bound receipt](docs/empirical-pilot-receipt.json)
+includes actual predictions, errors, reviews and the successor prompt binding.
+This is a price-only numerical control inside the full multi-feed graph;
+the contribution of news and the graph's reasoning remains to be demonstrated.
+
 One exposed historical episode completed **28/28 Lab and 31/31 Oracle nodes**
 through primary-agent native imports. A separate cheap-model attempt failed and
 is retained. The completed forecast had the correct direction, but its causal
@@ -104,13 +114,16 @@ hashes in a receipt do not make them publicly reproducible results.
 A separate InvestorBench [contract replay](docs/abstention-receipt.json) completed
 28/28 Lab and 31/31 Oracle nodes with an explicit no-call, unresolved cause and
 reviewed no-change. It reused 29 earlier answers and is not an independent
-forecasting result. All 619 regression tests pass.
+forecasting result.
 
 The daily controller connects stage progression and reviewed policy transitions.
-Its synthetic tests verify the plumbing, not forecasting ability. The next
-research objective is repeated competent execution, followed by comparisons of
+Its synthetic tests verify the plumbing; the two-day run exercises an actual
+reviewed transition without demonstrating improvement. The next research
+objective is useful source-grounded prediction, followed by comparisons of
 unchanged and revised pipelines on matched later evidence. Historical model
 contamination, revised data and adaptive selection remain material limitations.
+An inspected [richer GitHub dataset](docs/herculean-audit.md) had future-year
+results in historical news rows; those summaries were not admitted.
 
 The [paper](paper/zenith.pdf) ([source](paper/zenith.tex)) explains this system,
 its actual evidence and the sources used. It makes no novelty, profitability or

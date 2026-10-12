@@ -13,6 +13,19 @@ The repeatable entry is `python -m zenith daily init`, then `daily next`, native
 or a fixed-prompt worker performs the reasoning; the controller handles source
 binding and progression. It never fabricates completion or purchases inference.
 
+The [two-issue empirical pilot](docs/empirical-forecasts.md#the-completed-two-day-sequence)
+now demonstrates an actual reviewed procedure change reaching a later full Lab.
+Both Labs and Oracles completed. The shrinkage candidate lost to unchanged-rule
+arithmetic on the later issue and remains unselected. Do not turn this wiring
+result into a financial-learning claim or spend a large cohort merely to repeat
+a price-only formula through many reasoning nodes. The next useful question is
+whether the admitted issuer news supports a reproducible forecast input beyond
+recent prices. Require cited underlying facts, explicit missing expectations,
+a declared numerical mapping and a direct-reasoner/price-only comparison.
+The same native graph remains the development owner; no replacement benchmark
+is selected. The [Herculean audit](docs/herculean-audit.md) records why its richer
+historical news cannot presently supply that input.
+
 Use [generations](docs/generations.md) to distinguish experimental adoption from
 selection: `daily matchoff` freezes a reviewed challenger and incumbent on the
 same later situations, the existing cohort executes and scores them, and

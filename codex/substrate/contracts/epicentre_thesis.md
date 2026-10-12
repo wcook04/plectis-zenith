@@ -1,3 +1,10 @@
+# Empirical branch
+
+[EMPIRICAL FORECAST CONTRACT]
+This explicit branch takes precedence over causal-only requirements below. Legacy forecasts have forecast_basis="CAUSAL". A FORECAST may instead set forecast_basis="EMPIRICAL" and dominant_evidence_track="EMPIRICAL" to test an outcome mapping without claiming an identified market cause. The first supported control is empirical_rule={method:"trailing_mean_return_v1",lookback_returns:<integer 1..19>,scale:<nonzero number -1..1>,max_abs_return:<positive fraction <=0.1>,target_ids:[<stock symbols>],evidence_refs:[<exact [N] refs grounding every target>],selection_basis:<why this rule was selected before truth>,calibration_status:"UNVALIDATED"}. All fields are required; no extra rule fields. For each target take the last lookback_returns+1 consecutive as-of scalar prices, calculate the arithmetic mean of their simple returns (p[i]/p[i-1]-1), multiply by scale, clip to +/-max_abs_return, and set target_price=last_price*(1+clipped_return). Horizon is the next XNYS close. The engine independently checks the calculation, history boundary, source IDs and exact target set. Zero return is not an epsilon directional forecast; abstain if the rule cannot produce supported nonzero targets. These parameters are an experimental control, not fitted skill or a claim of edge. The full Lab still reviews all available feeds; this control's numeric mapping uses prices only and cannot establish the value of news. Retain evidence citations and ordinary word counts. In EMPIRICAL, epicentre_thesis states the testable predictive hypothesis, its input limits, rule selection and falsification, rather than inventing a dominant cause. Missing causal identification alone does not force ABSTAIN. Use ABSTAIN if usable inputs or an explicit supported mapping are absent. Do not change the rule after seeing later outcomes. Ordinary CAUSAL forecasts retain their existing requirements.
+
+The causal thesis contract below applies to CAUSAL forecasts. An empirical thesis must describe and test its declared rule instead.
+
 # Epicentre Thesis Contract v1.0
 
 ## Purpose

@@ -1,16 +1,16 @@
 {
   "id": "schema_cp1",
   "type": "contract",
-  "version": "1.2",
+  "version": "1.3",
   "status": "NORMATIVE",
-  "description": "Checkpoint 1 Output Schema — Spine / Epicentre. Machine-checkable structural contract with embedded semantic guidance.",
+  "description": "Checkpoint 1 Output Schema \u2014 Spine / Epicentre. Machine-checkable structural contract with embedded semantic guidance.",
   "purpose": "CP1 is the foundational checkpoint for the Lab reasoning pipeline. Every CP1-producing node must emit a JSON object satisfying all structural constraints below. Validated at runtime via system.lib.schema_validator.validate_cp1.",
   "schema": {
     "evidence_dictionary": {
       "type": "array[EvidenceUnit]",
       "required": true,
       "constraint": "Non-empty. Each entry must be a valid EvidenceUnit object.",
-      "semantics": "The curated evidence set that supports the epicentre thesis. Not a dump of all available data — only evidence that structurally contributes to the dominant force identification."
+      "semantics": "The curated evidence set that supports the epicentre thesis. Not a dump of all available data \u2014 only evidence that structurally contributes to the dominant force identification."
     },
     "epicentre_thesis": {
       "type": "string",
@@ -33,6 +33,16 @@
       "type": "object",
       "required": false,
       "constraint": "Required only for ABSTAIN; forbidden in FORECAST; see decision_mode_contract"
+    },
+    "forecast_basis": {
+      "type": "string",
+      "required": false,
+      "constraint": "CAUSAL (default) or EMPIRICAL; declared empirical branch overrides causal-only semantic requirements."
+    },
+    "empirical_rule": {
+      "type": "object",
+      "required": false,
+      "constraint": "Required only in EMPIRICAL; exact supported rule validated by system/lib/empirical_forecast.py; locked from CP1 through CP2 and Oracle."
     }
   },
   "bifurcation_resolution": {
@@ -110,7 +120,7 @@
       },
       "invalidation_conditions": {
         "description": "State concrete conditions that would break the thesis.",
-        "semantics": "Must be falsifiable — vague hedges like 'unless conditions change' are insufficient."
+        "semantics": "Must be falsifiable \u2014 vague hedges like 'unless conditions change' are insufficient."
       }
     },
     "completeness_rule": "If any of the five components are missing, the thesis is contract-incomplete even if it passes JSON and citation validation."
@@ -151,7 +161,7 @@
       "boundary": "Must NOT finalize the thesis; only prepare candidate force structure."
     },
     "lab_decide": {
-      "role": "Synthesize one dominant epicentre from ALL Phase 1 evidence. The thesis emerges from total synthesis — it is the singular gravitational point, not the winner of a hypothesis tournament.",
+      "role": "Synthesize one dominant epicentre from ALL Phase 1 evidence. The thesis emerges from total synthesis \u2014 it is the singular gravitational point, not the winner of a hypothesis tournament.",
       "output": "Locks CP1: evidence_dictionary + epicentre_thesis prose (>= min_words with [N] citations)."
     }
   },
@@ -183,5 +193,11 @@
       "track": "INSUFFICIENT",
       "propagation": "Forward Director preserves locked CP1 status. Oracle may reconsider only from genuinely available subject-side evidence."
     }
+  },
+  "empirical_forecast_contract": {
+    "precedence": "EMPIRICAL replaces causal-only thesis requirements; ordinary CAUSAL remains unchanged.",
+    "instruction": "[EMPIRICAL FORECAST CONTRACT]\nThis explicit branch takes precedence over causal-only requirements below. Legacy forecasts have forecast_basis=\"CAUSAL\". A FORECAST may instead set forecast_basis=\"EMPIRICAL\" and dominant_evidence_track=\"EMPIRICAL\" to test an outcome mapping without claiming an identified market cause. The first supported control is empirical_rule={method:\"trailing_mean_return_v1\",lookback_returns:<integer 1..19>,scale:<nonzero number -1..1>,max_abs_return:<positive fraction <=0.1>,target_ids:[<stock symbols>],evidence_refs:[<exact [N] refs grounding every target>],selection_basis:<why this rule was selected before truth>,calibration_status:\"UNVALIDATED\"}. All fields are required; no extra rule fields. For each target take the last lookback_returns+1 consecutive as-of scalar prices, calculate the arithmetic mean of their simple returns (p[i]/p[i-1]-1), multiply by scale, clip to +/-max_abs_return, and set target_price=last_price*(1+clipped_return). Horizon is the next XNYS close. The engine independently checks the calculation, history boundary, source IDs and exact target set. Zero return is not an epsilon directional forecast; abstain if the rule cannot produce supported nonzero targets. These parameters are an experimental control, not fitted skill or a claim of edge. The full Lab still reviews all available feeds; this control's numeric mapping uses prices only and cannot establish the value of news. Retain evidence citations and ordinary word counts. In EMPIRICAL, epicentre_thesis states the testable predictive hypothesis, its input limits, rule selection and falsification, rather than inventing a dominant cause. Missing causal identification alone does not force ABSTAIN. Use ABSTAIN if usable inputs or an explicit supported mapping are absent. Do not change the rule after seeing later outcomes. Ordinary CAUSAL forecasts retain their existing requirements.\n",
+    "source_owner": "system/lib/empirical_forecast.py",
+    "cp1_lock": "Director preserves forecast_basis and empirical_rule; Oracle cannot refit an empirical subject to later truth."
   }
 }

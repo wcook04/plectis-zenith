@@ -169,3 +169,10 @@ Report the selected/rejected candidate, validation result, final result if
 consumed, all-attempt count and remaining limitations. Improvement on this
 fixed research score does not authorize automatic live prompt/dossier
 promotion, a public deployment, or a trading performance claim.
+
+Source admission must inspect content, not just calendar coverage. A bounded
+Herculean audit found 2025/2026 Microsoft results inside December2024 news rows;
+`docs/herculean-audit.md` preserves the exact counterexamples and primary-source
+cross-checks. A next-day lag cannot fix future-year text contamination. Reject
+the affected source lane without claiming a global corruption rate or invalidating
+separately authenticated price/filing records.

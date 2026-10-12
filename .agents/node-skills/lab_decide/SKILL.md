@@ -8,7 +8,7 @@ description: Apply the typed lab_decide operation to its declared context.
 - Output contract: `isomorphic_cp1`. Mission: `lab`.
 - Implementation: `codex/substrate/nodes/lab/decide.json`; shared contracts compile at dispatch.
 - Parameters: frozen skill rule, incoming-edge weights, context budget.
-- Version: `5bffd22668ae4811ef7190f04e16e80a1cfab6b0d4f0c763e48ad92181817690`.
+- Version: `3063f319885c662bc77a916af2a84b4a2222eec02c08d90a78c319a6f976bd8e`.
 - Inspect: `python -m zenith inspect lab_decide`.
 
 Generated projection; edit the source or a frozen experimental variant, then rebuild. These fields declare a contract; they do not prove the model follows it.

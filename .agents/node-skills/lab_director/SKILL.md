@@ -8,7 +8,7 @@ description: Apply the typed lab_director operation to its declared context.
 - Output contract: `isomorphic_cp2`. Mission: `lab`.
 - Implementation: `codex/substrate/nodes/lab/director.json`; shared contracts compile at dispatch.
 - Parameters: frozen skill rule, incoming-edge weights, context budget.
-- Version: `f58b1cce32dc9991b1757772b2dc0bfa75dd34dd6fc11cdbca21a1e440bdf570`.
+- Version: `bb5fdbdfe5bb2beea98a8f3799498f09f3d894fb83a32f86677e72f0cf28848d`.
 - Inspect: `python -m zenith inspect lab_director`.
 
 Generated projection; edit the source or a frozen experimental variant, then rebuild. These fields declare a contract; they do not prove the model follows it.

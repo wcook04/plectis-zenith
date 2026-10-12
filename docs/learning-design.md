@@ -1,5 +1,12 @@
 # Learning a reasoning graph
 
+The latest concrete sequence is the [two-day native pilot](empirical-forecasts.md#the-completed-two-day-sequence):
+forecast, observed loss, one reviewed skill change, then a later forecast using
+that change. The candidate did not beat the unchanged-rule control. This gives
+the design an executed transition and a negative comparison, not evidence of
+an improving reasoner. Unknown causality does not prohibit a declared empirical
+prediction; its input mapping, parameters and targets must remain frozen.
+
 ## One predictor, one experiment, successive versions
 
 The [finance grounding](finance-design.md) relates this loop to QuantAgent,

@@ -96,3 +96,10 @@ count abstention as missing coverage and retain it without resampling. If a
 contract change is needed during a pilot, preserve its source-bound attempt and
 start a new programme. Disclose any exact response reuse as replay rather than
 independent reasoning or unseen performance evidence. See `docs/abstention.md`.
+
+For a predictive hypothesis without an identified cause, use the explicit native
+EMPIRICAL branch in `docs/empirical-forecasts.md`, not a fabricated causal story
+or an epsilon directional call. The initial supported rule is a price-history
+control within the full graph. Freeze its inputs, parameters and target set in
+CP1; independently checked target arithmetic and Oracle's no-refit boundary
+remain binding. Distinguish interface repairs from a learned policy improvement.

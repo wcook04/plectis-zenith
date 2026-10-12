@@ -3019,8 +3019,19 @@ class GodModeEngine:
                             parsed.get("decision_status", "FORECAST")):
                         return ValidationResult.failure(cp2_result.errors + [
                             "DECISION_STATUS_MISMATCH: Director must preserve the locked CP1 decision status"])
+                    if (cp1.get("forecast_basis", "CAUSAL") != parsed.get("forecast_basis", "CAUSAL")
+                            or cp1.get("empirical_rule") != parsed.get("empirical_rule")):
+                        return ValidationResult.failure(cp2_result.errors + [
+                            "FORECAST_RULE_MISMATCH: Director must preserve CP1 forecast basis and rule"])
                 return cp2_result
 
+            if node.id == "oracle_cp2_emitter" and isinstance(parsed, dict):
+                subject = (load_artifact(self._subject_run_dir, "lab_director") or {}).get("data", {})
+                if "EMPIRICAL" in (subject.get("forecast_basis"), parsed.get("forecast_basis")) and (
+                        parsed.get("forecast_basis", "CAUSAL") != subject.get("forecast_basis", "CAUSAL") or
+                        parsed.get("empirical_rule") != subject.get("empirical_rule")):
+                    return ValidationResult.failure(cp2_result.errors + [
+                        "FORECAST_RULE_MISMATCH: Oracle must not fit an empirical rule to later truth"])
             evidence = (
                 parsed.get("evidence_dictionary", [])
                 if isinstance(parsed, dict)

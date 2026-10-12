@@ -8,7 +8,7 @@ description: Apply the typed oracle_truth_map operation to its declared context.
 - Output contract: `schema_realized_hindsight_brief`. Mission: `oracle`.
 - Implementation: `codex/substrate/nodes/oracle/oracle_truth_map.json`; shared contracts compile at dispatch.
 - Parameters: frozen skill rule, incoming-edge weights, context budget.
-- Version: `deaf04fa58430aa4c34ee8cf30e751b672a4764d25358b1ccd15000719ec53ea`.
+- Version: `fc694521b3d4a74cf2bf0ea4b5d7a523aae36b53465df39451777a01ca534356`.
 - Inspect: `python -m zenith inspect oracle_truth_map`.
 
 Generated projection; edit the source or a frozen experimental variant, then rebuild. These fields declare a contract; they do not prove the model follows it.
