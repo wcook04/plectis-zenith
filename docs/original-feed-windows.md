@@ -1,5 +1,9 @@
 # An original-feed window experiment
 
+> **This is not financial advice.** This is experimental research. Historical
+> examples and model outputs are not investment recommendations and must not be
+> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
+
 The intended loop is simple: run the same graph on several earlier snapshots,
 trace repeated failures to a specific operation, change one thing, then compare
 the original and changed versions on later snapshots. This page records a small

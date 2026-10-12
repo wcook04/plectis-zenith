@@ -1,5 +1,9 @@
 # Trace a failure before changing the graph
 
+> **This is not financial advice.** This is experimental research. Historical
+> examples and model outputs are not investment recommendations and must not be
+> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
+
 Start with the original loop: save the feeds at the issue time, run the full
 Lab, freeze its selection and forecasts, then compare with later observations.
 The object being learned is the procedure that turns that information into a

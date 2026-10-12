@@ -1,5 +1,9 @@
 # Get the original information back
 
+> **This is not financial advice.** This is experimental research. Historical
+> examples and model outputs are not investment recommendations and must not be
+> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
+
 The original system acquired stocks, ETFs, macro series, Stockgrid, prediction
 markets and news, then derived calculator summaries. Saved original snapshots
 contain hundreds of stocks, ETFs and macro series. The recent A-share studies
