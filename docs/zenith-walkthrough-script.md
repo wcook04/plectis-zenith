@@ -1,6 +1,6 @@
 # Zenith: spoken walkthrough
 
-Draft for Will, 12 October 2026. About eight minutes of speech, plus time to
+Draft for Will, 12 October 2026. About eleven to twelve minutes of speech, plus time to
 inspect the graphs. Read the spoken sections; headings and screen cues are not
 narration. The architecture describes the intended complete loop.
 The measured example states how far execution has actually reached.
@@ -37,6 +37,12 @@ summaries from those inputs.
 The idea is to take a snapshot from an earlier time and give the graph that
 information. It chooses a subset of assets and makes predictions. We freeze
 what it said before opening the later snapshot.
+
+But a snapshot doesn't have to mean one still image of the market. It can
+contain a history: price movements, news and other observations up to that
+point. So it's more like a video so far, saved at a cutoff. We could try to
+predict a later state, or a whole future path. Those are different tasks and
+need different ways of measuring the result.
 
 That gives us two questions. Did it choose a useful subset to examine? And
 how close were its predictions? We need to measure both. Choosing fewer easy
@@ -132,20 +138,69 @@ overlap, some later information had already been seen, and our source clocks
 need checking. A current model may also have seen later events during
 training. These are real historical inputs, but this isn't a clean backtest.
 
-## 7. What comes next
+## 7. The larger idea
 
-The next step is to get the full graph completing, then evaluate actual frozen
-predictions. We need more consistent snapshots, clearer timestamps and more
-later cases, with the evaluation decided before we look at their outcomes.
+The bigger idea is still theoretical. Eventually, we'd want to run this with
+properly licensed financial snapshots, including proprietary data, with much
+better records of what was actually available at each point.
 
-Then we can test whether a repeated diagnosis leads to a change that helps
-across those cases, including what happens to the assets it doesn't select.
-We keep the failed attempts and rejected changes too.
+Then the graph itself could adapt to the conditions it's reasoning about.
+Think of each reasoning node as having a dossier: the common rules, its
+specific job, and the prompt that tells it how to do that job.
 
-That's what I want this to become: a way to inspect a reasoning procedure,
-learn which changes actually help, and keep improving it on evidence we can
-check. The repository shows the graph and the experiment so someone else
-can follow that argument.
+That prompt can have parts. Each part can have a setting between zero and
+one, and each setting corresponds to slightly different wording.
+
+Take the Polymarket miner. It still reads the seed state and the Polymarket
+data. It still extracts the interesting signals under the same rules and
+returns the same kind of output. The setting makes a small change to how it
+interprets those signals. If there is evidence of an unusually greedy market,
+for example, how much emphasis should it give to sentiment as an explanation
+for apparent consensus? That doesn't mean the consensus must be wrong.
+
+So zero point one and zero point two could be very similar instructions,
+with a slight difference in emphasis. The job stays the same. The factual
+evidence, ranking rules and required checks stay the same. The number tells
+us which wording to put in that part of the prompt.
+
+And that generalises across the reasoning nodes. A miner has its own
+interpretive choices. A node bringing several feeds together has different
+ones. We can keep one shared set of market-condition signals, then have a
+small controller choose the settings for each node.
+
+VIX could be one signal, or we could examine a separate sentiment index.
+Neither tells us everything about the regime. We'd have to learn whether
+those signals help choose the settings at all, using only information
+available before the prediction.
+
+The controller could be an actual neural network with learned weights. Its
+outputs would determine the wording used by the reasoning graph. The language
+model's own weights would stay fixed.
+
+There is a limit to the backpropagation comparison, though. Ordinary
+backpropagation works through numerical operations with known derivatives.
+A change in wording and a hosted model response don't give us that directly.
+We can search over the settings, or train the numerical controller from
+measured results. Tracing an explanation backwards through the graph doesn't,
+by itself, tell us the right parameter update.
+
+## 8. What comes next
+
+First, we need the existing graph to complete and produce predictions we can
+actually score. Then we can compare fixed instructions with these small,
+condition-dependent variations on more later cases. The evaluation needs to
+be decided before we see their outcomes, and the judging rules stay fixed.
+
+The aim is a graph that reasons usefully across very different situations
+without wasting work. We'd want to measure performance in different regimes
+and through changes between them, including the cases where it does badly.
+We can't promise a graph that predicts every possible future. Sometimes the
+available information just won't distinguish what happens next.
+
+That's the vision: learn how the same reasoning jobs should be carried out
+under different conditions, keep the versions that earn their place, and
+preserve enough evidence to see why we kept them. It's a research direction,
+not a forecasting capability we've demonstrated yet.
 
 And again, this is not financial advice. It's an experimental research
 prototype. None of the examples or model outputs should be used to make
@@ -153,7 +208,7 @@ financial decisions.
 
 ## Screen cues and recording notes
 
-Use the existing [diagrams](graphs.md) or [graph viewer](graph-viewer.md).
+Use the existing [diagrams](graphs.md) and [research-direction diagram](research-direction.md#external-signals-choose-the-settings).
 These are optional visuals, not a claim that a live execution will complete.
 
 | Spoken section | Show | Cue words |
@@ -164,6 +219,7 @@ These are optional visuals, not a claim that a live execution will complete.
 | Failure types | One node's inputs, instruction and saved output | absent · not surfaced · misread |
 | Repeat and compare | Overview's later-comparison step | same graph · one change · later |
 | Measured result | [Experiment results](original-feed-windows.md) | four failures · two valid · Decide failed |
+| Larger idea | [Shared controller diagram](research-direction.md#external-signals-choose-the-settings) | same job · small wording change · learned settings |
 | Next steps | Full Lab graph | complete · score · repeat |
 
 Keep “Research prototype. This is not financial advice.” legible on screen,
@@ -191,6 +247,8 @@ Suggested description, with the notice before any collapsed text:
 ## Factual anchors for revision
 
 - [Graph architecture](architecture.md) and [exact dependencies](graphs.md).
+- [Proposed semantic settings and neural controller](research-direction.md),
+  including pinned GitHub references and the limits of the backpropagation analogy.
 - [Failure classification](failure-diagnosis.md), including source visibility
   and the distinction between diagnosis and tested cause.
 - [Original-feed experiment](original-feed-windows.md) and its
