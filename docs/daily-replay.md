@@ -5,6 +5,13 @@ forecast, confront the later observations, diagnose the attempt, and carry a
 reviewed improvement into a later day. `program.md` owns this direction.
 The current work reconnects that loop to the existing full graph.
 
+For a longer shared panel, use [InvestorBench](investorbench.md): three equities
+and 291 complete daily price dates, with date-only summaries delayed by a day.
+Pass `--dataset work/datasets/investorbench` to the same controller. This page
+also preserves the original FNSPID episode and its sharper article clocks.
+Use [generation comparisons](generations.md) to test reviewed changes against
+the incumbent rather than treating next-day experimental adoption as success.
+
 The first source is the **original AA slice of FNSPID**, pinned at
 [`4054842`](https://github.com/Zdong104/FNSPID_Financial_News_Dataset/tree/4054842ec476953b30ee874d4b7e8eea786a21fa).
 It provides a daily Alcoa price series and full market/company article bodies.
@@ -13,6 +20,55 @@ and [price CSV](https://github.com/Zdong104/FNSPID_Financial_News_Dataset/blob/4
 are only 8.66 MB together. This is a practical starting slice, not the full
 research universe. Filename assignment does not establish that every article
 is specifically about Alcoa.
+
+## Continue the programme with one native controller
+
+After acquisition, freeze an inclusive range of forecast sessions:
+
+```sh
+python -m zenith daily init --work-dir work/daily-demo \
+  --start 2024-01-16 --end 2024-01-17 \
+  --policy examples/daily/sparse-policy.json
+python -m zenith daily next --work-dir work/daily-demo
+```
+
+The controller creates snapshots through the session after `--end`, which supplies
+truth for the final forecast. It freezes source bytes, graph/contracts/configuration,
+implementation and baseline policy. It uses the complete existing missions and
+returns native pending packets. Answer these through `zenith import-response`;
+`daily next` checks their state and advances Lab → Oracle → Evolve → later Lab.
+It never buys inference, starts a chat or invents responses. Use a fresh work directory
+when code, source assets or the declared programme changes.
+
+At Evolve, read `episodes/N/review-packet.json`, its fixed instructions and complete
+bound originals. Return exactly its response contract: a diagnosis, uncertainty,
+a later test, exact JSON evidence references and either a candidate skill change
+or `no_change` with `change: null`. Evidence uses a named source and an RFC6901
+JSON pointer, with the exact JSON value at that pointer. There is no requirement
+to manufacture a lesson every day.
+
+```sh
+python -m zenith daily review --work-dir work/daily-demo \
+  --response reviewed-answer.json --reviewer DISCLOSED_REVIEWER_IDENTITY
+python -m zenith daily next --work-dir work/daily-demo
+```
+
+The reviewing agent explicitly accepts this development proposal by importing it.
+The importer checks source identity, quotations and native policy validity; it
+cannot verify the quality of the diagnosis. One skill addon of at most 512
+characters replaces the selected Lab node's addon, preserving its other parameters
+and every other node. Retain any earlier rule that is still needed in that text.
+The successor is saved under `policies/after-N.json`; the next Lab freezes it in
+its native manifest. Rejected responses remain under `episodes/N/attempts/`.
+Accepted reviews include reviewer disclosure and identity hashes. No live dossier
+or learning-ledger entry is automatically rewritten. Broader policy/topology
+experiments remain available through the existing research interfaces.
+
+This historical close-to-close sequence treats outcomes at the next close as
+matured before the following forecast. A live implementation needs the actual
+data-availability and review delay; it cannot promise execution at that same
+closing price. Local source separation is not an operating-system sandbox: an
+agent with unrestricted filesystem access must respect the forward packet.
 
 ## What a day contains
 
@@ -107,9 +163,9 @@ The lead agent reads the packet and complete bound sources, identifies one
 transferable change with exact evidence, or recommends no change. Review and
 version the proposal before the next Lab; retain the previous version. A fixed
 worker prompt can perform the same analysis. No separate scheduler or second
-forecasting framework is necessary. This export has no semantic response
-import or automatic patch application: the runner/substrate Evolve contracts
-need reconciliation before that is added.
+forecasting framework is necessary. The legacy export alone has no response importer. The daily controller above
+wraps it with a narrower, explicit reviewed skill-policy transition; it does not
+pretend to implement the legacy dossier-patch schema or certify semantic quality.
 
 The point is to make this loop useful, then broaden daily coverage and test
 whether accumulated changes help on later days. A forecast, critique or

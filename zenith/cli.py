@@ -11,6 +11,33 @@ def parser() -> argparse.ArgumentParser:
     cli = argparse.ArgumentParser(description=__doc__)
     cli.add_argument("--root", type=Path, default=runtime.DEFAULT_ROOT, help="standalone substrate root")
     commands = cli.add_subparsers(dest="command", required=True)
+    daily = commands.add_parser("daily", help="continue historical days through full Lab, Oracle and reviewed Evolve")
+    daily_commands = daily.add_subparsers(dest="daily_command", required=True)
+    init = daily_commands.add_parser("init", help="freeze daily snapshots and a baseline; no inference")
+    init.add_argument("--work-dir", type=Path, required=True)
+    init.add_argument("--dataset", type=Path, default=runtime.DEFAULT_ROOT / "work/datasets/fnspid-aa")
+    init.add_argument("--start", required=True, help="first forecast session, YYYY-MM-DD")
+    init.add_argument("--end", required=True, help="last forecast session; the next session supplies its truth")
+    init.add_argument("--policy", type=Path, help="initial frozen native reasoning policy")
+    init.add_argument("--retention", type=Path, help="verified matchoff retention receipt; enforces its evidence cutoff")
+    for name in ("next", "review"):
+        step = daily_commands.add_parser(name)
+        step.add_argument("--work-dir", type=Path, required=True)
+        if name == "review":
+            step.add_argument("--response", type=Path, required=True)
+            step.add_argument("--reviewer", required=True, help="disclosed reviewing agent or human identity")
+    matchoff = daily_commands.add_parser("matchoff", help="freeze matched incumbent/challenger native cohort; no inference")
+    matchoff.add_argument("--work-dir", type=Path, required=True)
+    matchoff.add_argument("--episode", type=int, required=True)
+    matchoff.add_argument("--dataset", type=Path, required=True)
+    matchoff.add_argument("--start", required=True)
+    matchoff.add_argument("--end", required=True)
+    matchoff.add_argument("--output", type=Path, required=True)
+    matchoff.add_argument("--model", required=True)
+    matchoff.add_argument("--minimum-improvement", type=float, required=True, help="predeclared absolute reduction in mean relative target-price error")
+    retain = daily_commands.add_parser("retain", help="record reviewed winner from a complete native development matchoff")
+    retain.add_argument("--matchoff", type=Path, required=True)
+    retain.add_argument("--reviewer", required=True)
     commands.add_parser("missions", help="list authored mission groups")
     serve = commands.add_parser("serve", help="serve reviewed graph metadata through a read-only local HTTP API")
     serve.add_argument("--host", default="127.0.0.1")
@@ -68,6 +95,17 @@ def parser() -> argparse.ArgumentParser:
 
 def dispatch(args) -> dict:
     root = args.root.resolve()
+    if args.command == "daily":
+        from . import daily
+        if args.daily_command in {"matchoff", "retain"}:
+            from research import daily_matchoff
+            if args.daily_command == "retain":
+                return daily_matchoff.retain(root, args.matchoff, args.reviewer)
+            return daily_matchoff.freeze(root, args.work_dir, args.episode, args.dataset, args.start, args.end,
+                                         args.output, args.model, args.minimum_improvement)
+        if args.daily_command == "init":
+            return daily.initialize(root, args.work_dir, args.dataset, args.start, args.end, args.policy, args.retention)
+        return daily.advance(root, args.work_dir, getattr(args, "response", None), getattr(args, "reviewer", None))
     if args.command == "serve":
         from .api import serve
         return serve(root, args.host, args.port, args.allow_origin)

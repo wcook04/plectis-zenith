@@ -2,6 +2,47 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Daily generations and shared historical data, 12 October 2026
+
+The standalone `zenith daily init/next/review` controller now connects the full
+Lab, Oracle and existing Evolve handoff. It freezes the source snapshots,
+implementation, authored graph/contracts/configuration and baseline policy;
+reviews quote exact original evidence, retain rejected attempts and compile a
+bounded native successor without changing live dossiers.
+
+[InvestorBench admission](investorbench-admission.json) records the pinned
+MSFT/HON/JNJ panel: 291 shared prices per symbol covering every expected XNYS
+session from 12 March 2020 to 6 May 2021, and 4,990 news summaries. The adapter
+delays date-only summaries, excludes unclocked filing summaries and preserves
+five unavailable lanes. Publication/capture clocks, adjustment vintages and
+historical model contamination remain unresolved. This is usable reconstructed
+development data, not clean prospective evidence.
+
+[Generation comparisons](generations.md) reuse the existing native cohort and
+feedback engine. Both arms execute identical later issues with different frozen
+policies. Retention requires complete support and at least twenty dates, uses
+the predeclared error margin and binds the final truth cutoff. Next-generation
+initialization consumes that receipt and rejects overlapping dates. Synthetic
+retention tests cover both challenger and incumbent selection; no generation
+comparison or learning gain is reported.
+
+All **610 regression tests pass**. Extraction checks cover 262 source files;
+node-skill and public-graph projections are current; semantic graph checks pass.
+The revised nine-page manuscript builds without unresolved citations or
+overfull boxes and cites InvestorBench and AlphaGo Zero where used. Earlier
+standalone isolation already installed the locked environment and reached real
+native packets without parent code or provider credentials; final-source
+isolation and public publication are being recorded separately.
+
+The 22 July forecast dates have been frozen locally under
+`work/investorbench-daily-20261012`. Native development is in progress, not
+completed evaluation. Older pending FNSPID runs below retain their original
+implementation identity and are historical evidence; do not resume them under
+the revised runtime. Existing paid ledgers remain unchanged. The reusable
+chronology and source-freezing lessons are in the Lab/Oracle/Evolve skill.
+
+Authority capture: `cap_quick_land_native_daily_generations_and_a_shar_d637f9bfb5ee`.
+
 ## Native daily replay, 12 October 2026
 
 The [daily operating guide](daily-replay.md) and [bound receipt](daily-replay-receipt.json)
@@ -28,8 +69,9 @@ recomputed self-hash is insufficient. The primary agent reviewed the actual
 quartet and proposed one director-skill change separating measured pattern,
 causal mechanism and target-size rule. No dossier changed. The Jan17→18 full
 Lab is prepared with that candidate and awaits genuine responses; improvement
-is untested. Its canonical continuation is
-`FNSPID_DAILY_20240117_EVOLVED_AGENT_V3`. Earlier failed/pending attempts are
+is untested. Its historical pending run is
+`FNSPID_DAILY_20240117_EVOLVED_AGENT_V3`; newer runtime changes require a new
+programme rather than resuming that frozen run. Earlier failed/pending attempts are
 retained with their reasons in the receipt. The paper now cites FNSPID at use
 and reports these boundaries. All 594 tests pass; the nine-page PDF builds
 without unresolved citations or overfull boxes.

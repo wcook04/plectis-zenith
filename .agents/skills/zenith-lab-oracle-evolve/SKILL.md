@@ -69,3 +69,21 @@ runtime boundary instead of inventing a command or invoking a private
 checkout's tools. No successful experiment or critique automatically changes
 live prompts, dossiers, doctrine or deployment state. Scientific comparisons
 use the separately governed `zenith-scientific-experiments` skill.
+
+
+For historical daily work, prefer `zenith daily init/next/review` described in
+`docs/daily-replay.md`. This wraps the same native missions and original Evolve
+packet, not a second reasoner. Read all bound sources before reviewing a candidate;
+exact quotations and schema acceptance do not certify its reasoning. Explicit
+no-change is valid. Preserve prior skills when replacing an addon, retain rejected
+attempts, and test accepted development changes on later episodes. Programme
+identity freezes authored graph/contracts/configuration as well as Python code.
+
+For repeated generations, use `daily matchoff/retain` and `docs/generations.md`.
+Trying a reviewed successor on the next development day is not competitive
+selection. Require complete matched native outcomes before retaining a version;
+carry the selection with `daily init --retention`, including its final truth
+cutoff. A detached policy file loses that evidence chronology. Do not reuse
+historical pending runs after changing their frozen implementation. InvestorBench
+and FNSPID source adapters have different clock precision; retain those limits
+and never turn excluded filings or unavailable feeds into factual evidence.

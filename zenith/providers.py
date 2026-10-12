@@ -84,12 +84,12 @@ class AgentProvider(Provider):
                 write_json(packet_path, packet)
         response_path = self.run_dir / "handoff" / "responses" / (packet_id + ".json")
         if not response_path.exists():
-            self.receipt(identity, provider="agent", status="pending_response", packet_id=packet_id,
+            self.receipt(identity, provider="agent", execution_kind="agent", status="pending_response", packet_id=packet_id,
                          requested_model=None, actual_model=None, usage=None, cost=None)
             raise ResponsePending(f"Agent response pending: {packet_path}")
         response = json.loads(response_path.read_text())
         verify_response(packet, response)
-        self.receipt(identity, provider="agent", status="response_supplied", packet_id=packet_id,
+        self.receipt(identity, provider="agent", execution_kind="agent", status="response_supplied", packet_id=packet_id,
                      requested_model=response.get("requested_model"), actual_model=response.get("actual_model"),
                      usage=response.get("usage"), cost=response.get("cost"),
                      response_sha256=text_digest(response["response_text"]))

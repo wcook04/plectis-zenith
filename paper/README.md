@@ -1,37 +1,28 @@
 # Zenith research manuscript
 
-[zenith.tex](zenith.tex) and [zenith.pdf](zenith.pdf) now describe **Learning to
-Reason About Financial Change: Method and development evidence**. This is the
-standalone Zenith manuscript, separate from the Plectis system paper and private
-strategy document.
+[zenith.tex](zenith.tex) and [zenith.pdf](zenith.pdf) describe **Zenith: Learning a
+Financial Reasoning Pipeline from Daily Experience**. This is the standalone
+Zenith paper, separate from the Plectis system paper and private strategy.
 
-The argument begins with actual issuer guidance changes, separates financial
-interpretation from numerical payoff, reports the measured overscaling diagnosis,
-and presents the concrete source-rich development cases. The active daily loop now has a full native Lab/Oracle development execution and a reviewed, untested next-day skill candidate. The direct/graph and
-learned-reasoning comparisons remain unexecuted. No LLM advantage, transferable
-learning, explanation fidelity, novelty or profitability is claimed.
+The argument follows the original daily Lab → Oracle → Evolve loop: available
+feeds, the full native forward graph, frozen forecasts, later diagnosis, reviewed
+procedure changes and later evaluation. Supporting A-share calibration and issuer
+guidance remain evidence and examples, not the selected replacement programme.
 
-Citations appear beside borrowed mechanisms, methods, data, software and issuer
-facts. [references.bib](references.bib) retains the larger reviewed inventory;
-only sources used in this manuscript appear in its bibliography. Six primary
-issuer releases support the actual financial examples. The supplied Huang,
-Wang/Yeung and Yu papers are cited at use, with target and method differences
-stated. The two Yu uploads are duplicate page content, not independent sources.
-Parent annex provenance remains in
-[finance-adaptive-sources.json](../docs/finance-adaptive-sources.json).
+Citations appear at the use of external mechanisms, datasets and financial facts.
+The supplied Huang, Wang/Yeung and Yu papers retain their distinct target and
+method boundaries. Neither source assimilation nor one completed manual episode
+establishes novelty, forecasting advantage, transferable learning or profitability.
+The daily review importer validates structure and quotations, not semantic truth.
 
-Build from this directory:
-
-```sh
-tectonic --keep-logs --reruns 2 zenith.tex
-```
-
-Tectonic runs the bibliography pass. Source and bibliography are Apache-2.0.
-`paper-house-style.sty` retains Will Cook's CC-BY-4.0 header and is the exact shared
-style copy with SHA256
-`1b4630ead32bfb407a2f29f5953fbb8d4140a659f6500799282a4805ba54a883`.
+Build from this directory with `tectonic --keep-logs --reruns 2 zenith.tex`.
+Source and bibliography are Apache-2.0; `paper-house-style.sty` retains its
+CC-BY-4.0 attribution. The standalone checkout includes the bibliography and style.
 
 ## Current measured and compiled evidence
+
+- [InvestorBench admission](../docs/investorbench-admission.json): pinned three-equity source, 291 complete shared sessions, 4,990 summaries, date-lag assumptions and excluded filings. This is data coverage, not a new forecast result.
+- [Generation comparisons](../docs/generations.md): reviewed candidates through the existing native cohort and explicit retention with an enforced evidence cutoff. No completed generation comparison is reported. The paper cites AlphaGo Zero for the design analogy where introduced.
 
 - [Daily replay](../docs/daily-replay.md) and [receipt](../docs/daily-replay-receipt.json): pinned FNSPID raw AA sources, rejected paid trial, complete primary-agent Lab/Oracle, exact outcome comparison and one reviewed next-day policy candidate. The manuscript cites the dataset where used. No learned performance gain is established.
 

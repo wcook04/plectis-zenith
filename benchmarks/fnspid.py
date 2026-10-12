@@ -219,7 +219,12 @@ def snapshot(directory, issue_date, output):
         diagnostics = {"coverage": {"availability": data["availability"], "unavailable_feed_lanes": missing}}
         if lane == "STOCK":
             diagnostics["price_observations"] = {"AA": {"provider": "FNSPID", "session_date": issue_date, "interval": "1d", "auto_adjust": None, "price_basis": "dataset_close_vintage_unverified", "source_hash": FILES["aa-prices.csv"]["sha256"]}}
-        feeds[node] = {"metadata": {**metadata, "diagnostics": diagnostics}, "data": data}
+        lane_metadata = {**metadata, "diagnostics": diagnostics}
+        if lane == "STOCK":
+            # Acquisition status describes this observed price table, not other lanes.
+            # Vintage uncertainty remains explicit and must match the scoring policy.
+            lane_metadata.update(status="success", currency="USD", price_basis="dataset_close_vintage_unverified")
+        feeds[node] = {"metadata": lane_metadata, "data": data}
     artifacts = {"issue-packet.json": packet, "runtime_context.json": {"as_of": cutoff.isoformat(), "time_anchor": cutoff.isoformat(), "adapter_only": True},
                  **{f"artifacts/{node}.json": value for node, value in feeds.items()}}
     if output.exists() and any(output.iterdir()):

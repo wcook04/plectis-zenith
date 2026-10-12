@@ -54,6 +54,11 @@ def test_native_snapshot_all_lanes_and_tamper_rejection(tmp_path):
             env = json.loads((output/'artifacts'/f'{node}.json').read_text())
             if lane not in {'NEWS','STOCK'}:
                 assert env['data']['availability'] == 'unavailable' and env['data']['rows'] == []
+        from feedback.engine import dated_rows
+        observations = dated_rows(output/'artifacts/global_stock_feed.json')
+        assert len(observations) == 1
+        assert observations[0]['currency'] == 'USD'
+        assert observations[0]['price_basis'] == 'dataset_close_vintage_unverified'
         from zenith.runtime import forward_preflight
         forward_preflight(fn.ROOT, output, datetime(2024,1,16,21,tzinfo=timezone.utc))
         assert fn.snapshot(d, '2024-01-16', output) == packet

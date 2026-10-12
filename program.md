@@ -1,12 +1,25 @@
-# Zenith scientific experiment program
+# Zenith daily learning programme
 
 Develop a financial reasoner that identifies useful economic changes and learns how to act on them. Establish a competent base before asking whether reasoning updates improve it. The graph, retrieval, prompts, evidence sources, numerical mapping and task definition are development choices. Retain each materially different version and what informed its selection. Evaluation supports this objective; completing an experiment protocol is not evidence of a capable reasoner.
 
 The active product is the existing **historical daily Lab → Oracle → Evolve loop**. Reconstruct a trading day's available feeds; run Lab and retain its actual forecasts; advance the historical clock to obtain outcomes and later evidence; use Oracle to score and diagnose; let the lead agent or a worker with fixed instructions propose a reviewed, versioned improvement; continue on later days. Reuse the native graph, provider, contracts, run records and refinement machinery. Dataset adaptation serves this loop. It does not replace the product with a new quarterly-forecast benchmark.
 
-Start with the closest usable open dataset through a native feed adapter. The [daily replay](docs/daily-replay.md) uses pinned FNSPID original prices and full article bodies for a contiguous AA slice, with explicit missing lanes and the full authored Lab. The inspected FinMultiTime article bodies failed URL/body checks and are not admitted to this replay. The prior A-share and compact price-only comparisons remain development evidence. Full Lab execution, later Oracle and a real Evolve change must each be demonstrated through their native receipts; preparing data alone is not completion.
+Start with the closest usable open dataset through a native feed adapter. The [InvestorBench panel](docs/investorbench.md) now supplies three equities, 291 complete shared trading dates and 4,990 date-bucketed summaries. Publication clocks and adjustment vintages remain unverified; summaries are delayed and filings excluded. The [FNSPID replay](docs/daily-replay.md) retains original prices and full timestamped article bodies for a small AA slice. Both preserve missing lanes and the full authored Lab. Prior A-share and compact price-only comparisons remain development evidence. Full Lab execution, later Oracle and a real Evolve change must each be demonstrated through native receipts; preparing data alone is not completion.
 
 The [returned research audit](docs/fundamental-research.md) is supporting analysis and an unselected alternative. Its scorer and numerical findings remain valid; the proposed fundamental-forecast pivot is not adopted. The remaining programme-budget authorization persists, with existing costs, unknown reservations and immutable limits preserved.
+
+The repeatable entry is `python -m zenith daily init`, then `daily next`, native
+`import-response`, and `daily review`. Read `docs/daily-replay.md`. The lead agent
+or a fixed-prompt worker performs the reasoning; the controller handles source
+binding and progression. It never fabricates completion or purchases inference.
+
+Use [generations](docs/generations.md) to distinguish experimental adoption from
+selection: `daily matchoff` freezes a reviewed challenger and incumbent on the
+same later situations, the existing cohort executes and scores them, and
+`daily retain` binds the reviewed choice to all comparison evidence. Initialize
+the next generation with `daily init --retention`; its first issue must be after
+the comparison's final truth cutoff. Repeated development selection is still
+exposed historical research, not independent self-play or an untouched test.
 
 The rules below govern individual controlled comparisons. They do not make one mutable field, one proposal, two nodes or a fixed data archive permanent project constraints. Coherent development revisions may change several components when needed; record their combined effect and use later ablations if attribution matters. Never modify a frozen study in place or rename repeatedly inspected development data as an untouched test. Read `AGENTS.md`, `docs/experiments.md`, the affected node skills, incoming edges and output contracts first. Native CP2 experiments still execute through Zenith and use its existing feedback authority.
 
