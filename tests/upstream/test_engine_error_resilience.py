@@ -130,17 +130,17 @@ def _make_node(
     return node
 
 
-def _make_tool_node(node_id: str = "global_stockgrid_feed") -> CodexNode:
+def _make_tool_node(node_id: str = "global_stock_feed") -> CodexNode:
     return CodexNode(
         id=node_id,
         type=NodeType.TOOL,
         group="feeds",
-        lane="STOCKGRID",
+        lane="STOCK",
         teleology="test",
         expectation="",
         is_artifact=True,
         meta={"is_feed": True},
-        config={"module": "tools.stockgrid.stockgrid"},
+        config={"module": "tools.stock.stock"},
     )
 
 
@@ -311,17 +311,17 @@ def test_tool_failure_artifact_preserves_reported_metadata_and_data(tmp_path: Pa
 
     failure_meta = {
         "status": "failure",
-        "tool": "stockgrid",
+        "tool": "stock",
         "schema_version": "1.0",
-        "data_schema_version": "stockgrid.1",
-        "error": "No data fetched from StockGrid. Check Endpoints.",
+        "data_schema_version": "stock.1",
+        "error": "No data fetched from stock source. Check Endpoints.",
         "definitions": {"sec": {"encoding": "integer_enum"}},
         "diagnostics": {
             "input_rows": 0,
             "output_rows": 0,
             "dropped_rows": 0,
             "warnings": [
-                "No data fetched from StockGrid. Check Endpoints.",
+                "No data fetched from stock source. Check Endpoints.",
                 "signals error: DNS failure",
             ],
         },
@@ -329,16 +329,16 @@ def test_tool_failure_artifact_preserves_reported_metadata_and_data(tmp_path: Pa
     failure_data = {"source_diagnostics": {"errors": ["signals error: DNS failure"]}}
 
     with patch.object(engine, "_exec_tool", return_value=(failure_meta, failure_data)):
-        with pytest.raises(LogicalFailure, match="No data fetched from StockGrid"):
+        with pytest.raises(LogicalFailure, match="No data fetched from stock source"):
             engine._execute_node(node.id)
 
     artifact = json.loads((engine.artifacts_dir / f"{node.id}.json").read_text(encoding="utf-8"))
     assert artifact["status"] == StepStatus.FAILURE.value
-    assert artifact["metadata"]["tool"] == "stockgrid"
-    assert artifact["metadata"]["error"] == "No data fetched from StockGrid. Check Endpoints."
+    assert artifact["metadata"]["tool"] == "stock"
+    assert artifact["metadata"]["error"] == "No data fetched from stock source. Check Endpoints."
     assert artifact["metadata"]["definitions"] == {"sec": {"encoding": "integer_enum"}}
     assert artifact["metadata"]["diagnostics"]["warnings"] == [
-        "No data fetched from StockGrid. Check Endpoints.",
+        "No data fetched from stock source. Check Endpoints.",
         "signals error: DNS failure",
     ]
     assert artifact["data"] == failure_data
@@ -351,15 +351,15 @@ def test_run_failure_from_node_is_not_logged_as_engine_crash(tmp_path: Path) -> 
 
     failure_meta = {
         "status": "failure",
-        "tool": "stockgrid",
+        "tool": "stock",
         "schema_version": "1.0",
-        "data_schema_version": "stockgrid.1",
-        "error": "No data fetched from StockGrid. Check Endpoints.",
+        "data_schema_version": "stock.1",
+        "error": "No data fetched from stock source. Check Endpoints.",
         "diagnostics": {
             "input_rows": 0,
             "output_rows": 0,
             "dropped_rows": 0,
-            "warnings": ["No data fetched from StockGrid. Check Endpoints."],
+            "warnings": ["No data fetched from stock source. Check Endpoints."],
         },
     }
 
@@ -374,8 +374,8 @@ def test_run_failure_from_node_is_not_logged_as_engine_crash(tmp_path: Path) -> 
     assert summary["node_outcomes"][node.id] == StepStatus.FAILURE.value
     assert "Engine Crash" not in engine_log
     assert (
-        "Run failed because node global_stockgrid_feed failed: "
-        "No data fetched from StockGrid. Check Endpoints."
+        "Run failed because node global_stock_feed failed: "
+        "No data fetched from stock source. Check Endpoints."
     ) in engine_log
 
 

@@ -1,0 +1,121 @@
+{
+  "schema": "zenith_mixed_demo_v1",
+  "data_mode": "mixed",
+  "notice": "This is not financial advice.",
+  "snapshots": [
+    {
+      "id": "earlier",
+      "as_of": "2026-07-20T20:00:00+00:00",
+      "lanes": [
+        {
+          "node_id": "global_stock_feed",
+          "input_origin": "real_saved_input",
+          "source_sha256": "77ecbc236f86b069c12cb224f5990fd1ff56b95e3e9a8286c263794df265cfde",
+          "input_sha256": "77ecbc236f86b069c12cb224f5990fd1ff56b95e3e9a8286c263794df265cfde",
+          "public_payload": "withheld_pending_permissions_review",
+          "permission_status": "not_cleared_by_this_receipt"
+        },
+        {
+          "node_id": "global_etf_feed",
+          "input_origin": "real_saved_input",
+          "source_sha256": "cf13eee49972ac250d6046e51fac47700fec399d7025ab2e80664ee9a3cb8dd6",
+          "input_sha256": "cf13eee49972ac250d6046e51fac47700fec399d7025ab2e80664ee9a3cb8dd6",
+          "public_payload": "withheld_pending_permissions_review",
+          "permission_status": "not_cleared_by_this_receipt"
+        },
+        {
+          "node_id": "global_polymarket_feed",
+          "input_origin": "real_saved_input",
+          "source_sha256": "65a17085249a3b6d2f929a0bb720020799318a2aed51c2d0846053a184f8e5c9",
+          "input_sha256": "65a17085249a3b6d2f929a0bb720020799318a2aed51c2d0846053a184f8e5c9",
+          "public_payload": "withheld_pending_permissions_review",
+          "permission_status": "not_cleared_by_this_receipt"
+        },
+        {
+          "node_id": "global_macro_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "c34df6741907c751f948dbf67da63bc72aa8e5881f71ddee54a1fc3376ef3356",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_news_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "dcb9de9f31af047bcc1f3e184a2ed135df369838cec95163900b358afd62ddb3",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_calculator_feed",
+          "input_origin": "derived_mixed_inputs",
+          "input_sha256": "1e6025c65b5ace4d14500e0380c50f030c4386543459775a690e6b72a8885243",
+          "public_payload": "withheld_pending_upstream_permissions_review",
+          "dependencies": [
+            "global_stock_feed",
+            "global_etf_feed",
+            "global_macro_feed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "later",
+      "as_of": "2026-07-21T13:30:00+00:00",
+      "lanes": [
+        {
+          "node_id": "global_stock_feed",
+          "input_origin": "real_saved_input",
+          "source_sha256": "a3108f3b1feb27bba904454d9be95ce5c5819cde78b9e1ff218d16d410c8d21b",
+          "input_sha256": "a3108f3b1feb27bba904454d9be95ce5c5819cde78b9e1ff218d16d410c8d21b",
+          "public_payload": "withheld_pending_permissions_review",
+          "permission_status": "not_cleared_by_this_receipt"
+        },
+        {
+          "node_id": "global_etf_feed",
+          "input_origin": "real_saved_input",
+          "source_sha256": "50149c2399c86986bdce9d5fb678db8883d76bc8340cac5b6c5ce4e6aaca53b7",
+          "input_sha256": "50149c2399c86986bdce9d5fb678db8883d76bc8340cac5b6c5ce4e6aaca53b7",
+          "public_payload": "withheld_pending_permissions_review",
+          "permission_status": "not_cleared_by_this_receipt"
+        },
+        {
+          "node_id": "global_polymarket_feed",
+          "input_origin": "real_saved_input",
+          "source_sha256": "0b8e9b99b16b320a2680aea344dc2fd640bccba924fd770e3ce39ffe3347f945",
+          "input_sha256": "0b8e9b99b16b320a2680aea344dc2fd640bccba924fd770e3ce39ffe3347f945",
+          "public_payload": "withheld_pending_permissions_review",
+          "permission_status": "not_cleared_by_this_receipt"
+        },
+        {
+          "node_id": "global_macro_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "c3827342510a63cdc42e9e07c8e6ae84b27049d4b3203c105493f0935d6db567",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_news_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "48b6c4332d695596a20162adb771b3da9825262cc0bfd796ec267a0e8bf65b37",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_calculator_feed",
+          "input_origin": "derived_mixed_inputs",
+          "input_sha256": "66722bb6ea938baf078935bda9036458ac1b337794212624f3dbf24aec46de6a",
+          "public_payload": "withheld_pending_upstream_permissions_review",
+          "dependencies": [
+            "global_stock_feed",
+            "global_etf_feed",
+            "global_macro_feed"
+          ]
+        }
+      ]
+    }
+  ],
+  "model_calls": 0,
+  "execution_status": "inputs_prepared",
+  "claim_boundary": "Real inputs are retained; only macro and news are synthetic replacements. Preparation does not establish forecasting skill or permission to redistribute real payloads.",
+  "clock_boundary": "Saved snapshot anchors and copied artifact clocks are retained. Underlying observation availability and model training leakage remain unverified."
+}

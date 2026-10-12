@@ -4,14 +4,12 @@
 > examples and model outputs are not investment recommendations and must not be
 > used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
 
-The [saved-snapshot replay](graphs/replay.svg) uses the original six acquired
-feeds and derived CALC at an earlier and later time. It shows the intended
-workflow. Four baseline full-feed attempts stopped at cross-correlation; a
-conditional continuation reached Decide but did not produce CP1 or CP2.
-Two local candidate assays passed native output-shape checks but violated the
-max-subject bound; no forecast gain is established. See [current status](status.md).
-[Original payload hashes](../examples/replay/sources.json) identify the saved
-inputs. SVG metadata hashes the node definitions used to draw the graphs.
+The [saved-snapshot replay](graphs/replay.svg) shows the intended workflow.
+The current example keeps real stock, ETF and prediction-market inputs; macro
+and news are labelled synthetic replacements, and CALC is recomputed.
+It has prepared the first reasoning request, with no forecast yet.
+See [current status](status.md) and [per-feed provenance](../examples/demo/provenance.json).
+SVG metadata hashes the node definitions used to draw the graphs.
 
 ![Replay workflow: earlier saved feeds and CALC through Lab and frozen CP2; later feeds through Oracle diagnosis, Evolve review and a later matched comparison](graphs/replay.svg)
 
@@ -23,10 +21,10 @@ inputs.
 
 The grouped views below open those stages into their native operators.
 
-![Lab: six feeds and CALC through two reasoning passes, CP1, CP2 and Integrity](graphs/lab.svg)
+![Lab: five feeds and CALC through two reasoning passes, CP1, CP2 and Integrity](graphs/lab.svg)
 
 Follow one row: the saved STOCK table enters the stock miner, which reports
-observations with source references. Cross-correlation joins all seven miner
+observations with source references. Cross-correlation joins all six miner
 reports; Orient weighs them; Decide freezes CP1, including numerical forecast
 quantiles on its judgmental branch. The directed stock miner then checks that
 thesis against CP1 and the original stock feed. The second Cross and Director
@@ -36,7 +34,7 @@ does not refit CP1's frozen estimates.
 ![Oracle: original Lab subjects and later evidence through truth reviews to Oracle CP2](graphs/oracle.svg)
 
 Oracle reads the original Lab reasoning beside the later saved feeds. Code
-computes numerical equity and macro differences; the seven lane reviews inspect
+computes numerical equity and macro differences; the six lane reviews inspect
 later evidence against the original subject. Truth map combines the reviews and
 differences, then Attribution and Explain propose a diagnosis. Oracle CP2 keeps
 the original subject targets and citation eligibility. A diagnosis is a
@@ -61,8 +59,8 @@ the stock, ETF and macro feeds.
 
 | Exact dependency view | Native nodes | Declared edges |
 |---|---:|---:|
-| [Lab detail](graphs/lab-detail.svg) | 28 | 98 |
-| [Oracle detail](graphs/oracle-detail.svg) | 31 | 57 |
+| [Lab detail](graphs/lab-detail.svg) | 25 | 86 |
+| [Oracle detail](graphs/oracle-detail.svg) | 28 | 53 |
 | [Evolve detail](graphs/evolve-detail.svg) | 3 | 2 |
 
 In each detail diagram, repeated cards name the same artifact and every declared

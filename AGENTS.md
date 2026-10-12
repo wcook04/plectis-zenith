@@ -1,11 +1,11 @@
 # Working in Zenith
 
-Read README.md and program.md. Preserve the original daily loop: historical
+Read README.md and program.md. Preserve the original daily loop: earlier
 feeds, Lab predictions, later Oracle feedback, reviewed Evolve changes and
 matched later comparison. The author requested a barebones repo and a paper
 of at most four pages. Do not restore removed benchmark/survey/Station machinery. The operator
 requested backend-only work for a pedagogical website; Claude owns its frontend.
-Serve the native graph, paper-linked explanations and measured evidence through
+Serve the native graph, paper-linked explanations and accurately labelled evidence through
 the read-only website API. Public mode excludes saved private runs. Local run
 inspection is explicit, loopback-only and separate from provider execution.
 Do not restore the discarded viewer or redesign the frontend without a new request.
@@ -32,3 +32,10 @@ Run graph validation and the relevant offline tests. Run the full retained suite
 after runtime changes. Regenerate graph diagrams with scripts/build_graphs.py;
 keep extraction hashes accurate. Commit only owned changes and preserve other
 work. Historical studies and private originals live in the research archive.
+
+The public demo is mixed: real stock/ETF/prediction-market inputs, labelled
+synthetic macro/news and recomputed CALC. See docs/data.md. Keep real payloads
+and old run records outside public responses; no blanket synthetic relabelling.
+
+Derive runtime response counts and budget minima from the native graph; changing
+a lane must update downstream scopes, prompts, examples and publication receipts.

@@ -25,8 +25,9 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
         raise ValueError('Matchoff exists; retain its frozen evidence')
     if not model.strip():
         raise ValueError('Disclose the agent identity for both arms')
-    if type(max_calls_per_run) is not int or max_calls_per_run < 21:
-        raise ValueError('Response allowance must be an integer of at least 21 for the full Lab')
+    reasoner_count = sum(node['type'] == 'reasoning' for node in runtime.plan(root, 'lab')['nodes'])
+    if type(max_calls_per_run) is not int or max_calls_per_run < reasoner_count:
+        raise ValueError(f'Response allowance must be an integer of at least {reasoner_count} for the full Lab')
     manifest, packet, decision, incumbent_path, challenger_path = daily.reviewed_episode(root, directory, episode)
     if decision['status'] != 'reviewed_candidate':
         raise ValueError('No-change does not create a challenger')
@@ -97,7 +98,7 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
                'packet_sha256': packet['packet_sha256'], 'source_commit': source_commit,
                'cohort_sha256': daily.file_hash(output/'cohort/cohort.json'),
                'incumbent': daily.read(incumbent_path), 'challenger': daily.read(challenger_path),
-               'issues': len(issues), 'reasoning_responses_planned': 2*21*len(issues),
+               'issues': len(issues), 'reasoning_responses_planned': 2*reasoner_count*len(issues),
                'max_calls_per_run': max_calls_per_run,
                'response_allowance_total': 2*max_calls_per_run*len(issues),
                'comparison': 'development; no untouched or prospective assessment claim',

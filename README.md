@@ -1,60 +1,38 @@
 # Zenith
 
-> **This is not financial advice.** Zenith is an experimental research
-> prototype. Historical examples and model outputs are not investment
-> recommendations and must not be used to make financial decisions.
-> [Read the research notice](RESEARCH_NOTICE.md).
+> **This is not financial advice.** Zenith is an experimental research prototype.
+> See the [research notice](RESEARCH_NOTICE.md).
 
-Give a graph of reasoning nodes the saved market feeds at an earlier time.
-Let it choose assets and predict. Open the later snapshot, measure what happened,
-trace the mistakes and propose one change. Test that change on later inputs.
+Give a graph of reasoning nodes several feeds from an earlier time. Let it choose
+assets and predict. Open the later snapshot, measure what happened, trace the
+mistakes and propose one change. Test that change on later inputs.
 
 **Lab → Oracle → Evolve → compare again.** The model weights stay fixed.
 We change the instructions, context or connections in the reasoning graph.
 
-[Read the four-page paper](paper/zenith.pdf) · [See the diagrams](docs/graphs.md) ·
-[Website backend](docs/website-backend.md) ·
-[Spoken walkthrough script](docs/zenith-walkthrough-script.md) ·
-[The research direction](docs/research-direction.md)
+[Read the paper](paper/zenith.pdf) · [See the diagrams](docs/graphs.md) ·
+[Website backend](docs/website-backend.md) · [Walkthrough](docs/zenith-walkthrough-script.md)
 
-![Saved feeds through Lab, Oracle, Evolve and a later comparison](docs/graphs/replay.svg)
+![Earlier inputs through Lab, Oracle, Evolve and a later comparison](docs/graphs/replay.svg)
 
-## The example
+## The demonstration
 
-We found the original **20 and 21 July 2026** feed snapshots on disk. Each has
-stocks, ETFs, macro, Stockgrid, prediction markets and news, plus a derived
-calculator. The earlier stock table has 457 entries; 456 have prices in both
-snapshots. These are the actual saved payloads.
+This is a **mixed-data** prototype. Saved stock, ETF and prediction-market inputs
+remain real. Only the macro and news lanes use explicitly invented examples.
+CALC is recomputed from the resulting stock, ETF and macro inputs.
+[Per-feed provenance](examples/demo/provenance.json) distinguishes each case.
+Real payloads stay local while their publication permissions are reviewed;
+withholding a payload does not turn the computation input into synthetic data.
 
-[Three original price rows](examples/replay/observations.json) show what the
-before/after data looks like. They are illustrations; the Lab receives the full
-payloads. [Source hashes](examples/replay/sources.json) identify all fourteen
-original artifacts. Full private inputs and provider records stay in the local
-replay bundle.
+The current graph has 25 nodes in Lab. It loads all six input artifacts and
+prepares the first reasoning request. There are **no model calls or completed
+forecasts for this configuration yet**. The [preparation receipt](examples/demo/result.json)
+records that boundary. Earlier experiments used different inputs and are not
+results for this version.
 
-Four real LLM attempts stopped at the same cross-correlation output limit.
-One instruction change produced valid output on both later inputs. A conditional
-continuation then reached Decide, which hit the same limit. No final forecast
-yet. [The measured example](docs/original-feed-windows.md) and
-[current result](docs/status.md) keep the successful local repair and the next
-failure visible. This retrospective prototype establishes no financial advantage.
+## Run it
 
-## The theoretical aim
-
-A point-in-time packet can contain histories, not just one state. Future work
-would use authorised proprietary snapshots to test forecasts of later states
-or paths, with verified information cutoffs. A proposed shared neural
-controller would use available regime signals to choose small semantic
-variations in each reasoning node's prompt. Every node keeps the same job,
-inputs and output contract. Numerical settings select exact text; they are
-not direct gradients through the language model. This is a proposal, not a
-trained capability or evidence of robustness to every regime. The
-[research direction](docs/research-direction.md) explains the mechanism and
-links the inspected neural-network and prompt-optimisation code.
-
-## Run the original graph
-
-Use a source checkout with Python 3.12:
+Use Python 3.12 from a source checkout:
 
 ```sh
 python3 -m venv .venv
@@ -64,44 +42,42 @@ python -m zenith validate
 python -m zenith plan lab
 ```
 
-A feed directory contains `artifacts/global_*_feed.json` and its original
-`runtime_context.json`. Prepare a Lab from the earlier directory:
+Prepare mixed inputs from your own authorised saved snapshots:
 
 ```sh
-python -m zenith run lab --run-id example-lab \
-  --feed-source /path/to/earlier-snapshot \
-  --time-anchor 2026-07-20T20:01:39+00:00 \
-  --horizon 2026-07-21T20:00:00+00:00 --context-profile compact_feeds
+python -m zenith prepare-demo --earlier-source /path/to/earlier \
+  --later-source /path/to/later --output state/demo/my-pair
 ```
 
-The default agent mode writes prompts. Import answers with
-`python -m zenith import-response --packet <request.json> --response <answer.json> --model <author>`.
-For explicit API execution, `run --help` lists the model, provider and shared
-budget options. Credentials and paid calls are never implicit.
-
-Once Lab completes, run Oracle against it and the later directory:
+This command copies the three retained real feeds exactly, constructs the two
+labelled replacements and runs the existing calculator. It makes no network or
+model calls. [The demo guide](docs/demo.md) shows how to pass these inputs through
+Lab and Oracle. Public exports contain provenance and invented examples only.
+[Data boundaries](docs/data.md) explain the distinction.
 
 ```sh
-python -m zenith run oracle --run-id example-oracle \
-  --subject-run example-lab --truth-run /path/to/later-snapshot \
-  --context-profile compact_feeds
+python -m zenith serve --port 4175
 ```
 
-[The daily controller](docs/architecture.md) connects completed Lab/Oracle
-pairs to reviewed Evolve changes and later comparisons.
-[Failure diagnosis](docs/failure-diagnosis.md) explains how to trace repeated
-errors without treating an explanation as proof.
+The read-only backend serves the graph, node instructions, paper and public
+examples. Claude owns the frontend. Private saved-run inspection is an explicit
+local option, not part of the public site.
 
-## Where to look
+## The research question
+
+Can a recurring mistake identify a useful change to a reasoning node? A diagnosis
+suggests an experiment. Only a matched comparison on later cases can show whether
+the change helped. The [research direction](docs/research-direction.md) also
+proposes a controller that chooses small prompt variations from available context;
+that controller has not been trained or evaluated.
 
 | Purpose | Files |
 |---|---|
-| Original nodes and their instructions | `codex/substrate/nodes/` |
+| Node instructions and dependencies | `codex/substrate/nodes/` |
 | Execute Lab and Oracle | `zenith/`, `system/core/` |
-| Read feeds and apply reviewed changes | `tools/` |
-| Score predictions and selections | `feedback/` |
-| Compare versions and diagnose repeated failures | `research/` |
-| Inspect this example | `examples/replay/`, `docs/status.md` |
-| Read the argument and see the graphs | `paper/`, `docs/graphs.md` |
+| Score forecasts and selections | `feedback/` |
+| Compare versions and diagnose failures | `research/` |
+| Inspect the mixed demonstration | `examples/demo/`, `docs/demo.md` |
+| Paper and diagrams | `paper/`, `docs/graphs.md` |
 
 Run `python -m pytest tests` for the offline checks. Keep the prototype small.

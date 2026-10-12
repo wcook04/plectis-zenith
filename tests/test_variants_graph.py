@@ -44,14 +44,14 @@ class GraphVariantTests(unittest.TestCase):
     def test_full_graph_scope_contracts_and_rank_certificate(self):
         loader = FrozenGraphLoader(self.loader, self.example)
         graph = loader.load_all_nodes()
-        self.assertEqual(len(graph), 56)
+        self.assertEqual(len(graph), 51)
         self.assertIn("lab_evidence_check", graph["lab_decide"].dependencies)
         self.assertNotIn("lab_orient", graph["lab_decide"].dependencies)
         for node_id in ("lab_decide", "lab_director", "lab_integrity"):
             self.assertEqual(replace(graph[node_id], dependencies=self.graph[node_id].dependencies), self.graph[node_id])
         scope = SimpleNamespace(_universe=graph, logger=SimpleNamespace(info=lambda *args: None))
         GodModeEngine._resolve_execution_scope(scope, "lab_decide")
-        self.assertEqual(len(scope._execution_scope), 29)
+        self.assertEqual(len(scope._execution_scope), 26)
         self.assertIn("lab_integrity", scope._execution_scope)
         self.assertEqual(len(loader.receipt["waves"]), 12)
         cert = loader.receipt["acyclic_certificate"]

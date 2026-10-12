@@ -8,9 +8,9 @@
 complete source, including diagrams and references. Build with
 `tectonic paper/zenith.tex` from the repository root.
 
-The paper follows the original idea through actual earlier/later feed snapshots,
-the native reasoning graphs and the measured execution result. It distinguishes
-runtime repairs from improved forecasts. Update its example from saved results;
+The paper follows the original idea through mixed earlier/later feed packets and the native
+reasoning graphs. The current receipt records preparation only. It distinguishes
+runtime repairs from improved forecasts. Update its example from configuration-bound receipts;
 keep borrowed methods and data cited where used. Keep it within four pages.
 
 The paper uses *language-model program*, *discrete prompt optimisation* and

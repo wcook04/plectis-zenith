@@ -37,7 +37,7 @@ def request(server, path, method="GET", headers=None):
 
 
 def test_native_scopes_sources_and_focus(website):
-    for mission, count, edges in (("lab", 28, 98), ("oracle", 31, 57), ("evolve", 3, 2)):
+    for mission, count, edges in (("lab", 25, 86), ("oracle", 28, 53), ("evolve", 3, 2)):
         graph = json.loads(website.get(f"/api/v1/graph?mission={mission}").body)
         assert (graph["node_count"], graph["edge_count"]) == (count, edges)
         ids = {node["id"] for node in graph["nodes"]}
@@ -54,7 +54,7 @@ def test_native_scopes_sources_and_focus(website):
 def test_teaching_material_uses_current_sources(website):
     site = json.loads(website.get("/api/v1/site").body)
     assert [chapter["id"] for chapter in site["chapters"]] == ["idea", "lab", "oracle", "evolve", "results", "next"]
-    assert next(c for c in site["chapters"] if c["id"] == "results")["evidence_kind"] == "measured_execution"
+    assert next(c for c in site["chapters"] if c["id"] == "results")["evidence_kind"] == "verified_preparation"
     for url in site["documents"].values():
         doc = json.loads(website.get(url).body)
         assert doc["content"] == (ROOT / doc["source"]["path"]).read_text()
@@ -69,8 +69,8 @@ def test_teaching_material_uses_current_sources(website):
         assert section["pdf_url"].endswith("#nameddest=" + section["id"])
         assert all(website.get(url).body for url in chapter["evidence_urls"])
     results = next(c for c in site["chapters"] if c["id"] == "results")
-    assert set(results["evidence_urls"]) == {"/api/v1/evidence/window-result", "/api/v1/evidence/conditional-result"}
-    assert "windows" in results["paper_section"]["citation_ids"]
+    assert set(results["evidence_urls"]) == {"/api/v1/evidence/demo-result"}
+    assert "demo" in results["paper_section"]["citation_ids"]
     for url in site["evidence"].values():
         evidence = json.loads(website.get(url).body)
         assert evidence["data"] == json.loads((ROOT / evidence["source"]["path"]).read_text())

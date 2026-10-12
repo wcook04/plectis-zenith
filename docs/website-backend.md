@@ -1,7 +1,7 @@
 # Website backend
 
 Claude owns the frontend. This Python backend supplies the real graph, the paper
-and its citations, explanations, measured results, and optional local run
+and its citations, explanations, the preparation receipt, and optional local run
 evidence. It has no model-execution or editing endpoints.
 
 **This is not financial advice.** Keep the [research notice](../RESEARCH_NOTICE.md)
@@ -52,12 +52,12 @@ default without `--local-runs`, behind its usual TLS reverse proxy.
 ## Build the reading experience from these sources
 
 Fetch `/api/v1/site` first. Its ordered chapters cover the idea, Lab, Oracle,
-Evolve, measured results and future research. Each points to the owning document,
+Evolve, preparation status and future research. Each points to the owning document,
 diagram and native mission graph, plus a `paper_section` with manuscript hash,
 source lines, PDF named destination and citation IDs. `evidence_urls` bind the
 relevant recorded evidence directly to the chapter; an empty list means no
 measured result is attached to that chapter. `evidence_kind` separates a proposed process,
-an authored mechanism, a measured execution and a research proposal.
+an authored mechanism, verified preparation and a research proposal.
 
 `/api/v1/paper` reads the current title and bibliography, including PDF and LaTeX
 hashes, citation IDs, URLs and the manuscript lines where citations are used.
@@ -136,3 +136,25 @@ python -m pytest tests/test_web.py tests/test_web_runs.py
 Checks cover native topology, manuscript links, result receipts, HTTP/ETags,
 private/public separation, CORS/Host/method rejection, traversal, symlinks,
 oversized and malformed evidence, and mounting a future frontend build.
+
+## Current mixed-data edition
+
+Use `site.data_mode`, `site.data_note` and each node's `demo_provenance`.
+The graph has 50 nodes: Lab includes 25 nodes/86 edges, Oracle 28/53.
+The five source lanes plus derived CALC are the current graph; do not hardcode
+historical counts or lanes in the frontend.
+
+`evidence/sources` now returns `zenith_mixed_demo_v1`: real saved stock, ETF and
+prediction-market inputs, synthetic macro/news, recomputed CALC. Input retention
+and public visibility are separate fields. The raw real inputs remain private.
+`evidence/replacements` contains the complete invented macro/news examples.
+`evidence/demo-result` records six loaded inputs, the pending Seed request and
+zero model calls. Results have evidence kind `verified_preparation`.
+
+The old `observations`, `window-result` and `conditional-result` routes return
+404. Do not copy their old payloads into a frontend fixture. Fetch the current
+site manifest and follow its evidence URLs. Keep labels visible when opening
+nodes. A missing output means not run; never fill it with a fabricated response.
+The current source instructions are available for every node. Recorded private
+run inputs/outputs are a separate opt-in local capability and are not public
+example data. See [data boundaries](data.md) and [the current demo](demo.md).

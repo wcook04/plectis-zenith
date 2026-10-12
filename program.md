@@ -1,26 +1,20 @@
 # The job
 
-**This is not financial advice.** The work is experimental research, not an
-investment recommendation or a trading service. Preserve the
-[research notice](RESEARCH_NOTICE.md) across public explanations and outputs.
+**This is not financial advice.** Preserve the [research notice](RESEARCH_NOTICE.md).
 
-Use the original saved feeds at t−n and t. Keep the same graph across several
-available windows, trace repeated failures, propose one change and test it on
-later windows. Keep the original inputs, predictions and unsuccessful attempts.
+Keep the original idea: earlier multi-feed inputs → Lab predictions → later
+Oracle feedback → one reviewed Evolve change → a matched later comparison.
+Preserve failed attempts and distinguish a proposed explanation from evidence
+that a change helped. Do not invent performance results.
 
-Lab selects assets and predicts. Oracle measures the outcome and proposes a
-diagnosis. Evolve changes an instruction, context or connection. A repeated
-failure is a reason to test that change; only the later comparison can tell us
-whether it helped.
+The current demonstration is mixed, not wholly synthetic. Retain real saved
+stock, ETF and prediction-market inputs. Use independently invented, labelled
+macro/news replacements pending their data-permission review, and recompute
+CALC from the actual mixed inputs. Raw real payloads are private; their absence
+from a public API must not silently replace the underlying inputs.
+`examples/demo/provenance.json` owns this edition's input labels. Historical
+measurements belong to their historical graph and inputs, never this edition.
 
-The example uses actual historical snapshots already on disk. Do not replace
-them with invented data or a thin substitute. Preserve the six source feeds and
-CALC, the original graph and the distinction between source availability,
-recorded price changes and a certified financial backtest.
-
-Keep the paper at four pages. Explain the actual input, output, failure,
-change and later comparison with readable diagrams. Add code only when this
-loop needs it. The website backend serves those same nodes, the paper and saved
-evidence. Claude owns the frontend; do not restore the discarded viewer. Keep
-public explanations separate from explicitly enabled private run inspection.
-No new benchmark programme, dashboard or framework.
+Keep the paper within four pages. Keep diagrams aligned with the native graph.
+Claude owns the frontend; the backend serves the paper, instructions and truthful
+evidence. No implicit model calls, live data collection or new dashboard framework.

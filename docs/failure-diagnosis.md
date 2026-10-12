@@ -188,8 +188,7 @@ cause of every forecast error.
 
 An execution failure can stop this loop before any prediction exists. Keep its
 mechanism separate from the epistemic matrix: output truncation at a grouping
-node does not by itself establish a grouping or reasoning error. The
-[original-feed window example](original-feed-windows.md) demonstrates this
-boundary with four native Lab attempts, one instruction change and two later
-component comparisons. A native schema pass, obedience to the new instruction,
-complete graph execution and forecast benefit are separate outcomes.
+node does not by itself establish a grouping or reasoning error. A native schema pass,
+obedience to an instruction, complete graph execution and forecast benefit are
+separate outcomes. The [current demo](demo.md) stops at preparation and makes no
+claim about a completed reasoning or intervention test.

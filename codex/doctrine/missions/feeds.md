@@ -1,14 +1,13 @@
 ---
 id: "feeds_mission"
 kind: "mission"
-summary: "Mission doctrine for deterministic seven-lane feed generation and artifact contracts."
+summary: "Mission doctrine for deterministic six-lane feed generation and artifact contracts."
 focus_paths:
   - codex/substrate/nodes/feeds/global_stock_feed.json
   - codex/substrate/nodes/feeds/global_etf_feed.json
   - codex/substrate/nodes/feeds/global_macro_feed.json
   - codex/substrate/nodes/feeds/global_news_feed.json
   - codex/substrate/nodes/feeds/global_polymarket_feed.json
-  - codex/substrate/nodes/feeds/global_stockgrid_feed.json
   - codex/substrate/nodes/feeds/global_calculator_feed.json
   - run_tools6.py
   - tools/stock/stock.py
@@ -22,7 +21,7 @@ last_verified_at: "2026-05-16"
 ---
 <!-- DOCTRINE_STRUCTURED_BLOCK -->
 ## Purpose
-Mission doctrine for deterministic seven-lane feed generation and artifact contracts.
+Mission doctrine for deterministic six-lane feed generation and artifact contracts.
 
 ## Scope
 - This doctrine file is `codex/doctrine/missions/feeds.md`. [focus:codex/substrate/nodes/feeds/global_stock_feed.json]
@@ -83,12 +82,11 @@ Wave 0 (parallel):
   global_macro_feed
   global_news_feed
   global_polymarket_feed
-  global_stockgrid_feed
 
   global_calculator_feed  ← runs after stock/etf/macro complete (dependency)
 ```
 
-Seven feed nodes. Six base feeds are root nodes (no dependencies). `global_calculator_feed` depends on stock + macro + ETF feeds, making it the last feed to execute in wave 0.
+Six feed nodes. Five base feeds are root nodes (no dependencies). `global_calculator_feed` depends on stock + macro + ETF feeds, making it the last feed to execute in wave 0.
 
 The dependency pattern is: **independent raw lanes first, derived analytic lane second**.
 
@@ -103,7 +101,6 @@ The dependency pattern is: **independent raw lanes first, derived analytic lane 
 | MACRO | `global_macro_feed` | `tools.macro.macro` | `codex/substrate/configs/macro_default.json` | Hard economic constraints and rate/credit regime |
 | NEWS | `global_news_feed` | `tools.news.news` | `codex/substrate/configs/news_frequency.json` | Contextual and narrative; usually lagging |
 | POLYMARKET | `global_polymarket_feed` | `tools.polymarket.polymarket` | `codex/substrate/configs/polymarket_scan.json` | Pre-pricing probability sensors |
-| STOCKGRID | `global_stockgrid_feed` | `tools.stockgrid.stockgrid` | `codex/substrate/configs/stockgrid_direct.json` | Gamma exposure, options positioning, mechanical flow |
 | CALCULATOR | `global_calculator_feed` | `tools.calculator.calculator` | `codex/substrate/configs/calculator_default.json` | Derived cross-feed analytics, regime classification, normalization |
 
 **Stock vs ETF split:** Both use the same base `tools.stock.stock` module but operate on separate instrument universes. This separation is intentional to prevent mixed-lane ambiguity when a Lab miner annotates a signal — it must be clear whether an observation is individual-equity vs sector/cross-asset.

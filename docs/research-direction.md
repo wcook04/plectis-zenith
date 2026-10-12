@@ -6,8 +6,7 @@
 
 The aim is to learn an efficient reasoning graph that remains useful across
 different market conditions. The proposal below is not implemented or validated
-by the [current execution experiment](original-feed-windows.md). That experiment
-tested one fixed instruction change and did not produce a completed forecast.
+by the [current preparation example](demo.md). It has no completed forecast.
 Robustness to every possible regime is an ambition, not a result or guarantee.
 
 The proposed design is one shared controller that reads current conditions,

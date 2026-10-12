@@ -49,7 +49,7 @@ def test_native_snapshot_all_lanes_and_tamper_rejection(tmp_path):
         output = tmp_path/'feeds'
         packet = fn.snapshot(d, '2024-01-16', output)
         assert len(packet['prices']) == 1 and packet['prices'][0]['close'] == 30
-        assert len(list((output/'artifacts').glob('*.json'))) == 7
+        assert len(list((output/'artifacts').glob('*.json'))) == 6
         for lane,node in fn.LANES.items():
             env = json.loads((output/'artifacts'/f'{node}.json').read_text())
             if lane not in {'NEWS','STOCK'}:

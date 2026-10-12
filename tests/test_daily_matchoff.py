@@ -52,12 +52,12 @@ def test_freeze_uses_same_native_issues_and_distinct_policies(source, tmp_path, 
     output = tmp_path/'matchoff'
     result = daily_matchoff.freeze(runtime.DEFAULT_ROOT, tmp_path, 0, source,
                                    '2020-07-01', '2020-07-01', output, 'synthetic-agent', 0.001)
-    assert result['reasoning_responses_planned'] == 42
+    assert result['reasoning_responses_planned'] == 38
     spec = daily.read(output/'cohort/cohort.json')
     assert [c['candidate_id'] for c in spec['candidates']] == ['baseline', 'challenger']
     assert spec['issues'][0]['target_ids'] == ['AA']
     assert {c['model'] for c in spec['candidates']} == {'synthetic-agent'}
-    assert all(len(c['reasoner_scope']) == 21 for c in spec['candidates'])
+    assert all(len(c['reasoner_scope']) == 19 for c in spec['candidates'])
     result = cohort.evaluate(output/'cohort')
     assert result['state'] == 'pending'
     with pytest.raises(ValueError, match='Complete matched'):
@@ -78,7 +78,7 @@ def test_response_allowance_is_frozen_before_execution(source, tmp_path, monkeyp
     result = daily_matchoff.freeze(runtime.DEFAULT_ROOT, tmp_path, 0, source,
                                   '2020-07-01', '2020-07-01', output, 'synthetic', 0,
                                   max_calls_per_run=23)
-    assert result['reasoning_responses_planned'] == 42
+    assert result['reasoning_responses_planned'] == 38
     assert result['response_allowance_total'] == 46
     assert daily.read(output/'cohort/cohort.json')['max_calls_per_run'] == 23
     assert all(a['call_budget'] == 23 for a in cohort.next_actions(output/'cohort')['actions'])
@@ -89,7 +89,7 @@ def test_response_allowance_is_frozen_before_execution(source, tmp_path, monkeyp
     assert daily.read(output/'cohort/cohort.json')['max_calls_per_run'] == 23
 
 
-@pytest.mark.parametrize('allowance', [20, 0, True, 21.5])
+@pytest.mark.parametrize('allowance', [18, 0, True, 21.5])
 def test_response_allowance_rejects_invalid_values_before_writes(tmp_path, allowance):
     output = tmp_path/'invalid'
     with pytest.raises(ValueError, match='Response allowance'):

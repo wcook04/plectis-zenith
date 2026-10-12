@@ -15,17 +15,17 @@ DOCUMENTS = {
     "architecture": "docs/architecture.md",
     "graphs": "docs/graphs.md",
     "results": "docs/status.md",
-    "experiment": "docs/original-feed-windows.md",
+    "experiment": "docs/demo.md",
+    "data": "docs/data.md",
     "diagnosis": "docs/failure-diagnosis.md",
     "research-direction": "docs/research-direction.md",
     "walkthrough": "docs/zenith-walkthrough-script.md",
     "notice": "RESEARCH_NOTICE.md",
 }
 EVIDENCE = {
-    "sources": "examples/replay/sources.json",
-    "observations": "examples/replay/observations.json",
-    "window-result": "docs/original-feed-window-result.json",
-    "conditional-result": "examples/replay/conditional-result.json",
+    "sources": "examples/demo/provenance.json",
+    "replacements": "examples/demo/replacements.json",
+    "demo-result": "examples/demo/result.json",
 }
 FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail")
 CHAPTERS = (
@@ -33,12 +33,12 @@ CHAPTERS = (
     ("lab", "Read earlier evidence and freeze a prediction", "graphs", "lab", "lab", "authored_mechanism"),
     ("oracle", "Compare with later evidence", "graphs", "oracle", "oracle", "authored_mechanism"),
     ("evolve", "Propose one change and test it", "architecture", "evolve", "refinement", "authored_mechanism"),
-    ("results", "What actually ran", "results", None, "lab", "measured_execution"),
+    ("results", "What has been prepared", "results", None, "lab", "verified_preparation"),
     ("next", "What still needs testing", "research-direction", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
-    "idea": ("sources",), "lab": ("observations",), "oracle": (), "evolve": (),
-    "results": ("window-result", "conditional-result"), "next": (),
+    "idea": ("sources",), "lab": ("replacements",), "oracle": (), "evolve": (),
+    "results": ("demo-result",), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
                   "evolve": "trace", "results": "results", "next": "research"}
@@ -134,11 +134,15 @@ class PublicContent:
         node = self.nodes[identifier]
         path, raw, authored = self.sources[identifier]
         consumers = sorted(n.id for n in self.nodes.values() if identifier in n.dependencies)
+        demo = self.evidence("sources")["data"]
+        provenance = next((lane for snapshot in demo["snapshots"] if snapshot["id"] == "earlier"
+                           for lane in snapshot["lanes"] if lane["node_id"] == identifier), None)
         return {"id": node.id, "type": node.type.value, "group": node.group, "lane": node.lane,
                 "purpose": node.teleology, "mechanism": node.mechanism, "expectation": node.expectation,
                 "boundary": authored.get("boundary", ""), "instruction": node.instruction,
                 "instruction_kind": "current_authored_definition_not_run_override",
                 "dependencies": list(node.dependencies), "consumers": consumers,
+                "demo_provenance": provenance,
                 "output_schema": node.output_schema, "source": self.source(path, raw),
                 "explanation_url": f"{API}/documents/graphs"}
 
@@ -200,6 +204,8 @@ class PublicContent:
                 "documents": {k: f"{API}/documents/{k}" for k, v in DOCUMENTS.items() if (self.root / v).is_file()},
                 "figures": {k: f"/assets/graphs/{k}.svg" for k in FIGURES},
                 "evidence": {k: f"{API}/evidence/{k}" for k in EVIDENCE},
+                "data_mode": "mixed",
+                "data_note": "Real saved stocks, ETFs and prediction markets; synthetic macro/news; recomputed CALC. Real payloads withheld from public responses. No forecast result for this configuration.",
                 "local_runs_enabled": local_runs,
                 "run_index_url": f"{API}/runs" if local_runs else None,
                 "capabilities": {"read_graph": True, "read_paper": True, "read_local_runs": local_runs,

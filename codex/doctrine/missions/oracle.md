@@ -178,7 +178,7 @@ These tools are the low-hallucination substrate. They replace the legacy same-ru
 
 ### 3. Truth Miners
 
-Seven `oracle_truth_<lane>` nodes read truth-side feeds plus deterministic diff outputs where relevant and answer one question per lane:
+Six `oracle_truth_<lane>` nodes read truth-side feeds plus deterministic diff outputs where relevant and answer one question per lane:
 
 What actually happened here, and was it already priced or genuinely surprising?
 

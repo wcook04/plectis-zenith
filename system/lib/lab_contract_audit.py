@@ -46,7 +46,6 @@ PHASE1_MINERS: Tuple[str, ...] = (
     "lab_miner_news",
     "lab_miner_poly",
     "lab_miner_calc",
-    "lab_miner_stockgrid",
 )
 
 PHASE2_MINERS: Tuple[str, ...] = (
@@ -56,7 +55,6 @@ PHASE2_MINERS: Tuple[str, ...] = (
     "lab_miner_v2_news",
     "lab_miner_v2_poly",
     "lab_miner_v2_calc",
-    "lab_miner_v2_stockgrid",
 )
 
 QUESTION_MARK_SCAN_NODES: Tuple[str, ...] = (

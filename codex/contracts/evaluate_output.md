@@ -29,7 +29,7 @@ DRIVER: <the key realized driver that determined the outcome, one line>
 - **`<< >>` (Bifurcation) predictions**: Two sub-predictions in one vector. Evaluate BOTH legs. If one leg hits and the other misses, verdict is PARTIAL regardless of individual magnitudes.
 - **`===` (Short-Circuit) predictions**: These are conditional (IF trigger fires THEN violent move). If the trigger did NOT fire: verdict is N/A (not MISS). If the trigger fired: grade normally against the predicted magnitude.
 - **`>|` (Dampening) predictions**: The predictor claimed a force was being absorbed. If reality shows a BREAKOUT (the absorption failed), verdict is MISS with DRIVER noting "dampening mechanism failed."
-- **Dynamic-universe lanes (Polymarket/StockGrid)**:
+- **Dynamic-universe lane (Polymarket)**:
   - `EXPIRED`: Entity naturally resolved/aged out before comparable T+1 measurement.
   - `DROPPED`: Entity dropped out of the measurable leaderboard/universe at T+1.
   - `EXPIRED`/`DROPPED` are state outcomes, not directional misses.

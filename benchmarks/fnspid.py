@@ -1,4 +1,4 @@
-"""Pinned FNSPID AA raw prices/news -> native seven-lane daily feed snapshots.
+"""Pinned FNSPID AA raw prices/news -> native six-lane daily feed snapshots.
 
 No upstream preprocessing is executed. In particular, parse original EST/EDT
 publication strings instead of upstream's incorrectly shifted UTC column.
@@ -29,7 +29,7 @@ FILES = {
 }
 LANES = {"STOCK": "global_stock_feed", "ETF": "global_etf_feed", "MACRO": "global_macro_feed",
          "NEWS": "global_news_feed", "POLYMARKET": "global_polymarket_feed",
-         "CALCULATOR": "global_calculator_feed", "STOCKGRID": "global_stockgrid_feed"}
+         "CALCULATOR": "global_calculator_feed"}
 POLICY = {
     "prices": "last 20 actual XNYS daily Close/OHLCV rows ending at issue close; no Adj Close substitution",
     "news": "all unique substantive original bodies within previous 7 calendar days, original timezone checked; never use preprocessed UTC",

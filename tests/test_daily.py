@@ -55,7 +55,7 @@ def answer(packet):
 def test_first_day_uses_native_full_lab_without_future_source(programme):
     root, directory = programme
     result = daily.advance(root, directory)
-    assert (result['stage'], result['status'], result['completed_count'], result['scope_count']) == ('lab', 'awaiting_agent', 7, 28)
+    assert (result['stage'], result['status'], result['completed_count'], result['scope_count']) == ('lab', 'awaiting_agent', 6, 25)
     assert [p['node_id'] for p in result['pending']] == ['lab_seed_state']
     spec = daily.read(runtime.runs_root(root)/result['run_id']/'zenith_run.json')
     assert spec['feed_source'].endswith('2024-01-16') and spec['truth_run'] is None

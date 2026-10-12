@@ -11,6 +11,10 @@ def parser() -> argparse.ArgumentParser:
     cli = argparse.ArgumentParser(description=__doc__)
     cli.add_argument("--root", type=Path, default=runtime.DEFAULT_ROOT, help="standalone substrate root")
     commands = cli.add_subparsers(dest="command", required=True)
+    demo = commands.add_parser("prepare-demo", help="assemble local real inputs with explicit macro/news replacements; no network or model calls")
+    demo.add_argument("--earlier-source", type=Path, required=True)
+    demo.add_argument("--later-source", type=Path, required=True)
+    demo.add_argument("--output", type=Path, required=True)
     website = commands.add_parser("serve", help="serve the read-only teaching website API; no provider calls")
     website.add_argument("--host", default="127.0.0.1")
     website.add_argument("--port", type=int, default=4175)
@@ -42,7 +46,7 @@ def parser() -> argparse.ArgumentParser:
     matchoff.add_argument("--model", required=True)
     matchoff.add_argument("--minimum-improvement", type=float, required=True, help="predeclared absolute reduction in mean relative target-price error")
     matchoff.add_argument("--max-calls-per-run", type=int, default=21,
-                         help="pre-freeze per-arm response allowance including rejected corrections; minimum/default 21")
+                         help="pre-freeze per-arm response allowance including rejected corrections; default 21, minimum follows the graph")
     retain = daily_commands.add_parser("retain", help="record reviewed winner from a complete native development matchoff")
     retain.add_argument("--matchoff", type=Path, required=True)
     retain.add_argument("--reviewer", required=True)
@@ -99,6 +103,9 @@ def parser() -> argparse.ArgumentParser:
 
 def dispatch(args) -> dict:
     root = args.root.resolve()
+    if args.command == "prepare-demo":
+        from .demo import prepare
+        return prepare(root, args.earlier_source, args.later_source, args.output)
     if args.command == "serve":
         from .web import serve
         return serve(root, host=args.host, port=args.port, local_runs=args.local_runs,

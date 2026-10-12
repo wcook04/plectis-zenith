@@ -10,7 +10,6 @@ focus_paths:
   - codex/substrate/nodes/lab/miner_news.json
   - codex/substrate/nodes/lab/miner_poly.json
   - codex/substrate/nodes/lab/miner_stock.json
-  - codex/substrate/nodes/lab/miner_stockgrid.json
   - codex/substrate/nodes/lab/cross_corr_v1.json
   - codex/substrate/nodes/lab/orient.json
   - codex/substrate/nodes/lab/decide.json
@@ -20,7 +19,6 @@ focus_paths:
   - codex/substrate/nodes/lab/miner_v2_news.json
   - codex/substrate/nodes/lab/miner_v2_poly.json
   - codex/substrate/nodes/lab/miner_v2_stock.json
-  - codex/substrate/nodes/lab/miner_v2_stockgrid.json
   - codex/substrate/nodes/lab/cross_corr_v2.json
   - codex/substrate/nodes/lab/director.json
   - codex/substrate/nodes/lab/integrity.json
@@ -40,13 +38,13 @@ Mission doctrine for Lab forward reasoning and CP1/CP2 contract-producing execut
 ## Scope
 - This doctrine file is `codex/doctrine/missions/lab.md`. [focus:codex/substrate/nodes/lab/orient.json]
 - Source of truth includes the Phase 1 Lab spine from `lab_seed_state` through `lab_decide`. [focus:codex/substrate/nodes/lab/seed_state.json] [focus:codex/substrate/nodes/lab/cross_corr_v1.json] [focus:codex/substrate/nodes/lab/orient.json] [focus:codex/substrate/nodes/lab/decide.json]
-- Source of truth includes the Phase 1 lane miners. [focus:codex/substrate/nodes/lab/miner_calc.json] [focus:codex/substrate/nodes/lab/miner_etf.json] [focus:codex/substrate/nodes/lab/miner_macro.json] [focus:codex/substrate/nodes/lab/miner_news.json] [focus:codex/substrate/nodes/lab/miner_poly.json] [focus:codex/substrate/nodes/lab/miner_stock.json] [focus:codex/substrate/nodes/lab/miner_stockgrid.json]
-- Source of truth includes the Phase 2 lane miners plus the final sink and integrity checks. [focus:codex/substrate/nodes/lab/miner_v2_calc.json] [focus:codex/substrate/nodes/lab/miner_v2_etf.json] [focus:codex/substrate/nodes/lab/miner_v2_macro.json] [focus:codex/substrate/nodes/lab/miner_v2_news.json] [focus:codex/substrate/nodes/lab/miner_v2_poly.json] [focus:codex/substrate/nodes/lab/miner_v2_stock.json] [focus:codex/substrate/nodes/lab/miner_v2_stockgrid.json] [focus:codex/substrate/nodes/lab/cross_corr_v2.json] [focus:codex/substrate/nodes/lab/director.json] [focus:codex/substrate/nodes/lab/integrity.json]
+- Source of truth includes the Phase 1 lane miners. [focus:codex/substrate/nodes/lab/miner_calc.json] [focus:codex/substrate/nodes/lab/miner_etf.json] [focus:codex/substrate/nodes/lab/miner_macro.json] [focus:codex/substrate/nodes/lab/miner_news.json] [focus:codex/substrate/nodes/lab/miner_poly.json] [focus:codex/substrate/nodes/lab/miner_stock.json]
+- Source of truth includes the Phase 2 lane miners plus the final sink and integrity checks. [focus:codex/substrate/nodes/lab/miner_v2_calc.json] [focus:codex/substrate/nodes/lab/miner_v2_etf.json] [focus:codex/substrate/nodes/lab/miner_v2_macro.json] [focus:codex/substrate/nodes/lab/miner_v2_news.json] [focus:codex/substrate/nodes/lab/miner_v2_poly.json] [focus:codex/substrate/nodes/lab/miner_v2_stock.json] [focus:codex/substrate/nodes/lab/cross_corr_v2.json] [focus:codex/substrate/nodes/lab/director.json] [focus:codex/substrate/nodes/lab/integrity.json]
 - Source of truth includes the Lab checkpoint contracts. [focus:codex/substrate/contracts/schema_cp1.json] [focus:codex/substrate/contracts/schema_cp2.json]
 
 ## Claims
 - Canonical claim paths include the full Phase 1 Lab reasoning chain. [focus:codex/substrate/nodes/lab/seed_state.json] [focus:codex/substrate/nodes/lab/cross_corr_v1.json] [focus:codex/substrate/nodes/lab/orient.json] [focus:codex/substrate/nodes/lab/decide.json]
-- Canonical claim paths include the full Phase 1 and Phase 2 miner families. [focus:codex/substrate/nodes/lab/miner_calc.json] [focus:codex/substrate/nodes/lab/miner_etf.json] [focus:codex/substrate/nodes/lab/miner_macro.json] [focus:codex/substrate/nodes/lab/miner_news.json] [focus:codex/substrate/nodes/lab/miner_poly.json] [focus:codex/substrate/nodes/lab/miner_stock.json] [focus:codex/substrate/nodes/lab/miner_stockgrid.json] [focus:codex/substrate/nodes/lab/miner_v2_calc.json] [focus:codex/substrate/nodes/lab/miner_v2_etf.json] [focus:codex/substrate/nodes/lab/miner_v2_macro.json] [focus:codex/substrate/nodes/lab/miner_v2_news.json] [focus:codex/substrate/nodes/lab/miner_v2_poly.json] [focus:codex/substrate/nodes/lab/miner_v2_stock.json] [focus:codex/substrate/nodes/lab/miner_v2_stockgrid.json]
+- Canonical claim paths include the full Phase 1 and Phase 2 miner families. [focus:codex/substrate/nodes/lab/miner_calc.json] [focus:codex/substrate/nodes/lab/miner_etf.json] [focus:codex/substrate/nodes/lab/miner_macro.json] [focus:codex/substrate/nodes/lab/miner_news.json] [focus:codex/substrate/nodes/lab/miner_poly.json] [focus:codex/substrate/nodes/lab/miner_stock.json] [focus:codex/substrate/nodes/lab/miner_v2_calc.json] [focus:codex/substrate/nodes/lab/miner_v2_etf.json] [focus:codex/substrate/nodes/lab/miner_v2_macro.json] [focus:codex/substrate/nodes/lab/miner_v2_news.json] [focus:codex/substrate/nodes/lab/miner_v2_poly.json] [focus:codex/substrate/nodes/lab/miner_v2_stock.json]
 - Canonical claim paths include the final Phase 2 sinks and contracts. [focus:codex/substrate/nodes/lab/cross_corr_v2.json] [focus:codex/substrate/nodes/lab/director.json] [focus:codex/substrate/nodes/lab/integrity.json] [focus:codex/substrate/contracts/schema_cp1.json] [focus:codex/substrate/contracts/schema_cp2.json]
 
 ## Interfaces
@@ -58,7 +56,6 @@ Mission doctrine for Lab forward reasoning and CP1/CP2 contract-producing execut
   - `codex/substrate/nodes/lab/miner_news.json`
   - `codex/substrate/nodes/lab/miner_poly.json`
   - `codex/substrate/nodes/lab/miner_stock.json`
-  - `codex/substrate/nodes/lab/miner_stockgrid.json`
   - `codex/substrate/nodes/lab/cross_corr_v1.json`
   - `codex/substrate/nodes/lab/orient.json`
   - `codex/substrate/nodes/lab/decide.json`
@@ -68,7 +65,6 @@ Mission doctrine for Lab forward reasoning and CP1/CP2 contract-producing execut
   - `codex/substrate/nodes/lab/miner_v2_news.json`
   - `codex/substrate/nodes/lab/miner_v2_poly.json`
   - `codex/substrate/nodes/lab/miner_v2_stock.json`
-  - `codex/substrate/nodes/lab/miner_v2_stockgrid.json`
   - `codex/substrate/nodes/lab/cross_corr_v2.json`
   - `codex/substrate/nodes/lab/director.json`
   - `codex/substrate/nodes/lab/integrity.json`
@@ -149,7 +145,6 @@ When lanes disagree, this is the default resolution order. Overrides are allowed
 
 | Tier | Lane(s) | Role |
 |------|---------|------|
-| 1 - Primary | Stockgrid, Calc | Leading mechanical state and regime structure |
 | 2 - Confirmatory | ETF, Macro | Cross-asset flow and hard economic constraints |
 | 3 - Probabilistic | Polymarket, Stock | Pre-pricing and realized tape confirmation |
 | 4 - Contextual | News | Explanatory layer, usually lagging |

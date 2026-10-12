@@ -22,22 +22,17 @@ qualified professional for decisions about your own circumstances.
 
 ## What the evidence supports
 
-The worked example uses real historical feed snapshots and real model calls.
-It is a small retrospective software experiment, not a validated financial
-backtest or evidence of a profitable strategy. In the reported comparison,
-one instruction change made an intermediate node's output pass validation
-on two later inputs. A conditional continuation then failed at another node.
-No completed forecast from these attempts, improvement in prediction accuracy,
-or financial advantage has been established. See the
-[experiment and its limitations](docs/original-feed-windows.md).
+The current demonstration uses real saved stock, ETF and prediction-market
+inputs, labelled synthetic macro/news replacements and recomputed calculator
+summaries. The reduced graph loads these inputs and prepares its first reasoning
+request. It has made no model calls or completed forecasts. This preparation is
+not a financial backtest or evidence of prediction improvement. See the
+[current receipt](docs/status.md) and [per-feed boundaries](docs/data.md).
 
-Historical examples, simulated results and model outputs do not predict or
-guarantee future performance. Inputs may be missing, inaccurate, stale or
-inconsistently timestamped. Windows overlap; some later information was seen
-before the comparison was designed; and a current model may have learned
-about events after the historical cutoff. Saving an earlier input snapshot
-does not remove those limitations. Output validity does not establish that
-an analysis is true. There is no guarantee of accuracy, completeness or profit.
+Historical examples, simulated results and model outputs do not guarantee
+future performance. Saved collection clocks do not verify every underlying
+observation's availability, and a current model may know later historical events.
+Results from other configurations must not be relabelled as this edition's results.
 
 ## Publishing and reuse
 

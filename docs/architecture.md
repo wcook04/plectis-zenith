@@ -4,7 +4,7 @@
 > examples and model outputs are not investment recommendations and must not be
 > used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
 
-1. Give Lab the saved earlier feed directory. It reads all six source feeds and
+1. Give Lab the saved earlier feed directory. It reads all five source feeds and
    CALC, runs its two reasoning passes and saves the selected predictions.
 2. Give Oracle the original Lab directory and the later feed directory. Code
    measures recorded outcomes; reasoning nodes propose explanations.
@@ -12,8 +12,8 @@
    change. Preserve the old procedure and the exact proposed change.
 4. Compare both versions on the same later inputs before retaining a change.
 
-[The diagrams](graphs.md) show the operators and their dependencies. Six feeds
-are acquired: STOCK, ETF, MACRO, STOCKGRID, POLYMARKET and NEWS. CALCULATOR derives
+[The diagrams](graphs.md) show the operators and their dependencies. Five source lanes
+are present: STOCK, ETF, MACRO, POLYMARKET and NEWS. CALCULATOR derives
 summaries from stock, ETF and macro inputs. The saved feeds are inputs; replay
 does not call live acquisition tools to replace their contents.
 
@@ -28,9 +28,12 @@ does not call live acquisition tools to replace their contents.
 
 `zenith daily` is the existing controller for an adapter-backed sequence. The
 FNSPID adapter supplies prices and news only; it is separate from the original
-seven-feed example. Direct `zenith run lab` and `zenith run oracle` accept saved
+six-input mixed example. Direct `zenith run lab` and `zenith run oracle` accept saved
 feed directories without inventing a new dataset or scheduler.
 
 An execution failure, a forecast error and a proposed explanation are different
 records. Keep all three. See [failure diagnosis](failure-diagnosis.md) for the
 original evidence-location distinctions and repeated-window analysis.
+
+The current [demo](demo.md) retains real stock/ETF/prediction-market inputs and
+uses labelled replacements only for macro/news. CALC is recomputed.

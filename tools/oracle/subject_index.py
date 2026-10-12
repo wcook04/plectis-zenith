@@ -44,7 +44,6 @@ _PHASE2_IDS = {
     "news": "lab_miner_v2_news",
     "poly": "lab_miner_v2_poly",
     "calc": "lab_miner_v2_calc",
-    "stockgrid": "lab_miner_v2_stockgrid",
 }
 
 

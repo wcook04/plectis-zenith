@@ -1,7 +1,7 @@
 """
 [PURPOSE]
 - Teleology: Shared, compatibility-focused helpers that every deterministic feed lane
-  (stock / etf / macro / news / polymarket / stockgrid / calculator) uses to build
+  (stock / etf / macro / news / polymarket / calculator) uses to build
   status, diagnostics, and envelope metadata consistently without breaking per-lane ABI.
 - Mechanism: Narrow utility functions (no framework, no class hierarchy) for UTC timestamp
   derivation, `as_of` / `run_id` resolution, diagnostics normalisation, bounded warning
@@ -149,7 +149,7 @@ def resolve_run_id(
 
     Preserves the existing `str(getattr(run_dir, "name", str(run_dir)))` semantics
     used across the feed lanes. Callers may override `default` to match their
-    lane's current literal (e.g. stockgrid uses `"manual"`).
+    lane's current literal (e.g. a replay uses `"manual"`).
     """
     if isinstance(runtime, Mapping):
         rid = runtime.get("run_id")
@@ -384,7 +384,7 @@ def build_metadata(
 
     Preserves per-lane polymorphism on `timestamp`:
       - Default (timestamp=None) writes `now.iso` — matches stock / macro / calculator.
-      - Pass `timestamp=now.epoch` for news / polymarket / stockgrid legacy-epoch shape.
+      - Pass `timestamp=now.epoch` for news / polymarket legacy-epoch shape.
       - Pass any other value to preserve existing literal (e.g. the anchor string).
 
     `timestamp_iso` / `timestamp_epoch_s` default to `now.iso` / `now.epoch`, but can

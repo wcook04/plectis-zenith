@@ -40,10 +40,11 @@ recommendations and must not be used to make financial decisions.}
 \textbf{Abstract.} Zenith studies whether recurring failures in a multi-stage
 language-model program can guide useful revisions. It records intermediate
 outputs, diagnoses errors and compares one revision with the original on later
-inputs. Four historical-feed runs exposed the same truncated response. One
-instruction change passed local validation on two later inputs, but execution
-then failed downstream. We report this limited result and propose a controller
-that selects small prompt variations from market context.
+inputs. This edition prepares a mixed demonstration: real saved stock, ETF and
+prediction-market inputs, synthetic macro and news, and recomputed calculator
+summaries. The native graph loads the inputs and prepares its first reasoning
+request. No completed forecast or learned improvement is claimed. We also
+propose a controller that selects small prompt variations from context.
 
 \textbf{1. Evaluation protocol.}
 Nodes read supplied evidence or earlier outputs and produce records for later
@@ -82,37 +83,38 @@ Freeze one revision and compare it with the baseline on matched later cases.
 Cases used to select a revision become development data for subsequent work.
 
 \textbf{Data and cutoffs.}
-The archive contains stocks, ETFs, macro series, Stockgrid, prediction markets
-and news, plus calculator summaries. The July 20--21 replay retains all seven
-artifacts~\cite{feeds}. A packet may contain a current state or dated histories:
-a ``video so far'' at the cutoff. Predicting a later state and predicting a
-path require separate targets and scores. Future proprietary snapshots need
-verified availability times and revision vintages. Historical inputs alone
-cannot exclude later knowledge in a current model's training data.
+The demonstration keeps real stock, ETF and prediction-market inputs unchanged.
+Only macro and news are independently invented replacements; calculator summaries
+are recomputed from the actual mixed inputs. Per-feed hashes and labels identify
+this construction~\cite{demo}. Real payloads remain private pending publication
+review. A packet can contain a current state or dated histories available at a
+cutoff. Predicting a later state and predicting a path need different targets
+and scores. Saved collection times do not verify every underlying availability
+time, and historical inputs cannot exclude later knowledge in model training.
 
 \textbf{Prior work.}
 DSPy composes LM modules~\cite{dspy}; MIPRO optimises their instructions and
 examples against a downstream metric~\cite{mipro}. These are direct precedents
 for prompt optimisation. AlphaGo Zero~\cite{alphago} and autoresearch~\cite{autores}
 motivated successive version comparisons. Zenith uses finite external histories;
-its execution study establishes no forecasting advantage.
+this prototype establishes no forecasting advantage.
 
 \typeout{ZENITH-END-PAGE-ONE: \thepage}
 \newpage
 \hypertarget{lab}{}
 \textbf{2. The executable graph and failure diagnosis.}
-The Lab has 28 nodes: seven feed artifacts and 21 reasoning operators.
+The Lab has 25 nodes: six feed artifacts and 19 reasoning operators.
 Each miner is a feed-specific analysis step. Saved intermediate records let a
 reviewer locate an unsupported claim and inspect the evidence it received.
 
 \begin{center}
 \begin{tikzpicture}
 \node[record,minimum width=103mm] (feeds) at (5.15,0)
- {\textbf{Saved snapshot: six feeds + CALC}\\Stocks, ETFs, macro, news, prediction markets, flows};
+ {\textbf{Saved packet: five feeds + CALC}\\Stocks, ETFs, macro, news, prediction markets};
 \node[operator,minimum width=37mm] (seed) at (13.6,0) {\textbf{Seed}\\data inventory};
 \draw[wire] (feeds)--(seed);
 \node[operator,minimum width=153mm,minimum height=13mm] (first) at (7.65,-1.6)
- {\textbf{First pass: seven parallel miners}\\Stock \quad ETF \quad Macro \quad News \quad Markets \quad CALC \quad Flows};
+ {\textbf{First pass: six parallel miners}\\Stock \quad ETF \quad Macro \quad News \quad Markets \quad CALC};
 \draw[wire] (feeds.south)--(5.15,-.98);
 \draw[wire] (seed.south)--(13.6,-.98);
 \node[operator,minimum width=37mm] (cross) at (1.85,-3.2) {\textbf{Synthesis}\\combine observations};
@@ -121,7 +123,7 @@ reviewer locate an unsupported claim and inspect the evidence it received.
 \draw[wire] (1.85,-2.25)--(cross.north);
 \draw[wire] (cross)--(orient);\draw[wire] (orient)--(decide);
 \node[operator,minimum width=153mm,minimum height=13mm] (second) at (7.65,-4.8)
- {\textbf{Directed evidence pass}\\Seven miners re-read the feeds; a second synthesis reconciles their findings};
+ {\textbf{Directed evidence pass}\\Six miners re-read the feeds; a second synthesis reconciles their findings};
 \draw[wire] (decide.south)--(13.45,-4.15);
 \node[checkpoint,minimum width=58mm] (director) at (4.3,-6.4)
  {\textbf{Director $\cdot$ CP2}\\freeze predictions};
@@ -143,7 +145,7 @@ freezes forecast quantiles, which Director must preserve at CP2.}
 \node[record,minimum width=36mm] (subject) at (0,.1) {Original Lab record};
 \node[record,minimum width=36mm] (truth) at (0,-1.3) {Later feeds};
 \node[operator,minimum width=44mm,minimum height=25mm] (reviews) at (5.5,-.6)
- {\textbf{Compare the evidence}\\Numeric differences\\+ seven lane reviews};
+ {\textbf{Compare the evidence}\\Numeric differences\\+ six lane reviews};
 \node[operator,minimum width=37mm,minimum height=25mm] (map) at (11,-.6)
  {\textbf{Evidence summary}\\combined findings};
 \draw[wire] (subject.east)--(3.3,.1);
@@ -251,59 +253,60 @@ classification. Later test outcomes must remain outside development.
 \typeout{ZENITH-END-PAGE-THREE: \thepage}
 \newpage
 \hypertarget{results}{}
-\textbf{4. Execution study and limitations.}
-Four full Lab attempts used original snapshots from June 26, July 13, July 20
-and July 21, 2026. The graph, policy, full feed data and 4,096-token response
-limit were fixed, using DeepSeek V4.1 Flash through Deepinfra. Each completed
-Seed and seven miners, then failed when the first synthesis response ran out
-of tokens before finishing its JSON~\cite{windows}.
-
-After inspecting the two earlier episodes, we froze one added instruction:
-preserve all four required arrays, with at most three records per array,
-four subjects per record and short summaries. The changed node received the
-same saved upstream outputs on each later input:
+\textbf{4. What the demonstration establishes.}
+The preparation command reads two saved input directories. It copies the real
+stock, ETF and prediction-market artifacts byte for byte, creates the labelled
+macro/news examples without reading their originals, and executes the existing
+calculator on the assembled inputs. The public manifest records source and
+input hashes; the public examples contain only the invented replacements~\cite{demo}.
 
 \begin{center}
-\begin{tabular}{lrr}
+\begin{tabular}{lll}
 \toprule
-Later input & Original instruction & Changed instruction\\
+Lane & Computation input & Public payload\\
 \midrule
-20 July close & truncated at 4,096 & valid JSON, 1,308 tokens\\
-21 July open capture & truncated at 4,096 & valid JSON, 1,172 tokens\\
+Stocks, ETFs & Real saved tables & Withheld\\
+Prediction markets & Real saved input & Withheld\\
+Macro, news & Authored synthetic examples & Included\\
+Calculator & Derived from mixed inputs & Withheld\\
 \bottomrule
 \end{tabular}
 \end{center}
 
-Both changed responses passed the native schema but violated the new
-four-subject limit: their largest records contained nine and eleven subjects.
-Thus local validity improved from 0/2 to 2/2, with incomplete instruction
-compliance. This comparison measures execution, not forecast accuracy.
+Withholding a real payload from the website does not replace it in the actual
+computation. Synthetic examples are not anonymised observations and do not
+establish what happened in the historical market. The real-data source rights
+and permitted downstream uses remain under review; source-code availability
+alone does not settle those questions.
 
-A separate continuation reused the eight unchanged July 20 ancestor outputs
-and all seven feeds. Synthesis and Orient passed; Decide truncated. Those
-three calls produced no completed CP1, CP2 or forecast~\cite{continuation}.
-
-\textbf{Limits of the comparison.}
-The later windows overlap, the analyst had seen the July 20 failure, and
-each arm has one model sample. Collection times do not verify underlying
-price-bar or news clocks; current-model training leakage is unresolved.
-An agent authored the repair. The full Oracle/Evolve loop has not run, and
-these retrospective comparisons are not blind, independent trials.
+\textbf{Verified boundary.}
+The reduced graph passes topology validation. Native Lab execution loads all
+six artifacts and prepares the Seed request, where it awaits an agent response.
+The preparation uses zero model calls. It produces no completed CP1 or CP2,
+forecast, Oracle diagnosis or Evolve comparison. This is an executable input and
+handoff demonstration, not a financial backtest. Historical measurements from
+other configurations are not results for this one.
 
 \textbf{Next evaluation.}
+First fix an authorised data and model setup, with reliable observation clocks.
 Complete Lab, then measure selection coverage, forecast error and cost under
 fixed rules. Use the same fallback for unselected assets and a predeclared
-score, such as quantile loss at fixed levels~\cite{scores}. Compare fixed prompts
-with the proposed controller on later cases, including regime changes and
-regressions. These experiments could test robustness across sampled conditions;
-they cannot establish reliable prediction in every possible regime.
+score, such as quantile loss at fixed levels~\cite{scores}. Compare one revision
+with the baseline on matched later cases. A selected subset can look accurate
+while missing useful targets; selection and conditional prediction error must
+both remain visible. Freeze the change before opening the comparison outcomes.
 
-\begin{thebibliography}{10}\footnotesize
+The proposed controller adds a further hypothesis: whether context-dependent
+prompt choices outperform fixed prompts. Test it on later cases, including
+regime changes, costs and regressions. A mixed-input demonstration cannot
+establish forecasting performance using real macro/news, and a finite later
+sample cannot establish reliability in every possible regime.
+
+\begin{thebibliography}{8}\footnotesize
 \setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}\setlength{\parsep}{0pt}
-\bibitem{feeds} Zenith. Original feed replay: \href{https://github.com/wcook04/plectis-zenith/blob/main/examples/replay/sources.json}{source hashes}
-and \href{https://github.com/wcook04/plectis-zenith/blob/main/examples/replay/observations.json}{example observations}, 2026.
-\bibitem{windows} Zenith. \href{https://github.com/wcook04/plectis-zenith/blob/main/docs/original-feed-windows.md}{Original-feed window experiment}, 12 October 2026.
-\bibitem{continuation} Zenith. \href{https://github.com/wcook04/plectis-zenith/blob/main/examples/replay/conditional-result.json}{Conditional native Lab continuation}, 12 October 2026.
+\bibitem{demo} Zenith. \href{https://github.com/wcook04/plectis-zenith/blob/main/docs/demo.md}{Mixed-input demonstration},
+\href{https://github.com/wcook04/plectis-zenith/blob/main/examples/demo/provenance.json}{per-feed provenance} and
+\href{https://github.com/wcook04/plectis-zenith/blob/main/examples/demo/result.json}{preparation receipt}, 2026.
 \bibitem{alphago} D. Silver et al. Mastering the game of Go without human
 knowledge. \emph{Nature} 550:354--359, 2017.
 \href{https://doi.org/10.1038/nature24270}{doi:10.1038/nature24270}.

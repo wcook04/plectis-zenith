@@ -1,9 +1,9 @@
 # Zenith: spoken walkthrough
 
-Draft for Will, 12 October 2026. About eleven to twelve minutes of speech, plus time to
+Draft for Will, 12 October 2026. About ten to eleven minutes of speech, plus time to
 inspect the graphs. Read the spoken sections; headings and screen cues are not
 narration. The architecture describes the intended complete loop.
-The measured example states how far execution has actually reached.
+The preparation example states how far execution has actually reached.
 
 **This is not financial advice.** The [research notice](../RESEARCH_NOTICE.md)
 applies to this script and any recording or excerpt made from it.
@@ -28,11 +28,15 @@ What I want to do is run the same graph over different periods, see what
 happened afterwards, and trace the failures backwards. Then we can look for
 the failures that keep repeating, make one change, and actually test it.
 
-## 2. Start with the original feeds
+## 2. Start with the inputs
 
-We already have saved snapshots from six feeds: stocks, ETFs, macro data,
-news, prediction markets and Stockgrid. There's also a calculator that derives
-summaries from those inputs.
+This example keeps the real saved stock, ETF and prediction-market data.
+Only macro and news are invented replacements, clearly labelled as such.
+The calculator recomputes its summaries from the resulting inputs.
+
+The real inputs stay in the computation even where their raw payloads aren't
+on the public website. We show their provenance separately from the invented
+examples. That is a mixed-data demonstration, not a fully synthetic one.
 
 The idea is to take a snapshot from an earlier time and give the graph that
 information. It chooses a subset of assets and makes predictions. We freeze
@@ -52,9 +56,9 @@ or left out.
 ## 3. Lab, Oracle and Evolve
 
 Lab is the part that reads the earlier information and forms the prediction.
-The original Lab has twenty-eight nodes, including the seven feed inputs.
+The current Lab has twenty-five nodes, including six input artifacts.
 
-First, it inventories the data. Then seven miners examine their own lanes.
+First, it inventories the data. Then six miners examine their own lanes.
 A cross-correlation step brings their observations together. Orient develops
 competing explanations, and Decide saves the working thesis at a checkpoint.
 
@@ -73,8 +77,8 @@ A wrong answer doesn't tell us, by itself, which step caused it.
 
 Evolve proposes a change based on that diagnosis. It could change an
 instruction, the context a node receives, or a connection between nodes.
-The model weights stay fixed. In the experiment so far, an agent made and
-tested the change; the complete Oracle and Evolve loop hasn't run.
+The model weights stay fixed. That is the intended loop; this version has
+not yet completed a forecast or an Oracle and Evolve comparison.
 
 ## 4. What kind of failure was it?
 
@@ -113,30 +117,25 @@ the self-play comparison: successive versions have to earn their place.
 Here we have finite historical records and imperfect feedback, so the
 comparison is much less controlled.
 
-## 6. What we've actually measured
+## 6. What has actually run
 
-In the first example, four attempts using the original feeds stopped at the
-same cross-correlation step. The responses reached the output limit before
-finishing the required JSON, which is the structured record the next node
-needs to read.
+The preparation command makes an earlier and later packet. It copies the
+three retained real feeds exactly, adds the invented macro and news examples,
+and runs the existing calculator again. It doesn't fetch new data or call a model.
 
-We added one instruction asking that node to keep its required structure but
-return fewer, shorter records. On two later inputs, using the same saved
-upstream outputs, both responses passed the native output validator. Both
-original attempts had failed there.
+We have checked the reduced graph and loaded all six inputs through the native
+Lab engine. It prepares the first reasoning request and then waits for a response.
+That is how far this configuration has reached. There is no completed forecast
+or measured improvement yet.
 
-That's a local execution improvement. The responses still missed one of the
-new brevity instructions. And when we continued the changed graph, it got
-through that step and Orient, then ran out of output space at Decide.
+Older results belong to their original graph and inputs. Changing the inputs
+doesn't let us reuse those numbers as evidence for this version. We need to
+run and evaluate the actual configuration we are describing.
 
-So these attempts haven't produced a final forecast. We haven't demonstrated
-better predictions or a financial advantage. We've found a repeated failure,
-tested one repair, and exposed the next failure.
-
-This isn't a clean scientific validation. The sample is tiny. Some windows
-overlap, some later information had already been seen, and our source clocks
-need checking. A current model may also have seen later events during
-training. These are real historical inputs, but this isn't a clean backtest.
+The saved clocks also need care. A collection time doesn't necessarily tell
+us when each underlying observation first became available. And a current
+model may already know later events. Those questions have to be addressed
+before calling a result a clean historical test.
 
 ## 7. The larger idea
 
@@ -214,11 +213,11 @@ These are optional visuals, not a claim that a live execution will complete.
 | Spoken section | Show | Cue words |
 |---|---|---|
 | The idea | Overview diagram | input · step · output |
-| Original feeds | Six feed lanes and CALC | earlier · freeze · later |
+| Inputs | Per-feed provenance and five lanes plus CALC | real · synthetic replacement · derived |
 | Lab, Oracle and Evolve | Lab, then Oracle, then Evolve diagrams | first pass · thesis · check |
 | Failure types | One node's inputs, instruction and saved output | absent · not surfaced · misread |
 | Repeat and compare | Overview's later-comparison step | same graph · one change · later |
-| Measured result | [Experiment results](original-feed-windows.md) | four failures · two valid · Decide failed |
+| Prepared example | [Current status](status.md) | six inputs loaded · awaiting Seed · no forecast |
 | Larger idea | [Paper, page 3](../paper/zenith.pdf) and [controller detail](research-direction.md#external-signals-choose-the-settings) | same job · small wording change · learned settings |
 | Next steps | Full Lab graph | complete · score · repeat |
 
@@ -239,7 +238,7 @@ Suggested description, with the notice before any collapsed text:
 > This is not financial advice. Zenith is an experimental research prototype.
 > Historical examples and model outputs are not investment recommendations and
 > must not be used to make financial decisions. This walkthrough explains the
-> Lab, Oracle and Evolve architecture, a measured execution repair, and the
+> Lab, Oracle and Evolve architecture, a mixed-input preparation example, and the
 > limits of the current evidence. Improved forecasting has not been established.
 > [Repository](https://github.com/wcook04/plectis-zenith) ·
 > [Research notice](https://github.com/wcook04/plectis-zenith/blob/main/RESEARCH_NOTICE.md)
@@ -251,10 +250,8 @@ Suggested description, with the notice before any collapsed text:
   including pinned GitHub references and the limits of the backpropagation analogy.
 - [Failure classification](failure-diagnosis.md), including source visibility
   and the distinction between diagnosis and tested cause.
-- [Original-feed experiment](original-feed-windows.md) and its
-  [machine-readable result](original-feed-window-result.json).
-- [Conditional continuation](../examples/replay/conditional-result.json):
-  Cross-correlation and Orient completed; Decide failed; no final forecast.
+- [Mixed demo](demo.md), [input provenance](../examples/demo/provenance.json)
+  and [preparation result](../examples/demo/result.json).
 
-Refresh the measured-result section against these records before recording
+Refresh the preparation/result section against these records before recording
 after any new experiment. Keep future plans in future tense.

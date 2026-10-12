@@ -170,7 +170,7 @@ def _minimal_cross_corr_v1_payload() -> Dict[str, Any]:
             {
                 "id": "ca_1",
                 "name": "Confidence Mix",
-                "lanes": ["STOCK", "STOCKGRID"],
+                "lanes": ["STOCK", "ETF"],
                 "subjects": ["NVDA"],
                 "summary": "Lanes disagree on confidence strength.",
             }
@@ -195,7 +195,7 @@ def _minimal_cross_corr_v2_payload() -> Dict[str, Any]:
                 "id": "dc_1",
                 "name": "Defense Conflict",
                 "tickers": ["RTX"],
-                "lanes": ["STOCK", "STOCKGRID"],
+                "lanes": ["STOCK", "ETF"],
                 "direction_consensus": "CONTESTED",
                 "summary": "Lanes disagree on direction for RTX.",
             }

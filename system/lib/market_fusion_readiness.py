@@ -4,7 +4,7 @@
   readiness gate before any Lab, Oracle, or Station consumer turns raw feed
   presence into cross-feed interpretation.
 - Mechanism: Deterministic lane rows and candidate situation gates over the
-  seven feed lanes, using the three mature lifecycle specimens as evidence
+  six feed lanes, using the three mature lifecycle specimens as evidence
   while keeping relation/Oracle gaps explicit.
 - Non-goal: This is not a MarketEvidenceObject runtime schema and not an
   operator-facing divergence card generator.
@@ -55,8 +55,6 @@ LANE_ALIASES: Mapping[str, str] = {
     "POLY": "global_polymarket_feed",
     "POLYMARKET": "global_polymarket_feed",
     "GLOBAL_POLYMARKET_FEED": "global_polymarket_feed",
-    "STOCKGRID": "global_stockgrid_feed",
-    "GLOBAL_STOCKGRID_FEED": "global_stockgrid_feed",
     "CALC": "global_calculator_feed",
     "CALCULATOR": "global_calculator_feed",
     "GLOBAL_CALCULATOR_FEED": "global_calculator_feed",
@@ -241,28 +239,6 @@ LANE_READINESS: tuple[LaneReadiness, ...] = (
             "tools/polymarket/clob_snapshot.py",
             "tools/polymarket/resolved_archive.py",
             "codex/nodes/oracle/oracle_truth_poly.json",
-        ),
-    ),
-    LaneReadiness(
-        lane_id="global_stockgrid_feed",
-        source_authority_state="shipped",
-        identity_state="half_built_provider_ids_not_normalized",
-        lifecycle_state="half_built",
-        measurement_evidence_state="shipped",
-        freshness_quality_state="shipped_half_built",
-        provenance_as_of_state="shipped",
-        oracle_attach_state="half_built_explanatory_truth_miner",
-        cross_feed_relation_state="present_not_regime_conditioned",
-        safe_use_level="feed_observation_only",
-        refusal_reasons=(
-            "stockgrid_provider_identity_normalization_missing",
-            "sector_rotation_concentration_dispersion_lifecycle_missing",
-            "deterministic_flow_truth_diff_missing",
-        ),
-        next_gap_refs=("stockgrid_regime_flow_lifecycle_v0",),
-        evidence_refs=(
-            "tools/stockgrid/stockgrid.py",
-            "codex/nodes/oracle/oracle_truth_stockgrid.json",
         ),
     ),
     LaneReadiness(

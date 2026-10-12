@@ -111,7 +111,6 @@ VALID_LANES = frozenset({
     "ETF",
     "POLYMARKET",
     "NEWS",
-    "STOCKGRID",
     "CALCULATOR"
 })
 

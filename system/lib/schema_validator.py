@@ -64,7 +64,6 @@ _DEFAULT_CONFIG = {
         "S": "STOCK",
         "M": "MACRO",
         "P": "POLYMARKET",
-        "G": "STOCKGRID",
         "N": "NEWS",
         "E": "ETF",
         "C": "CALCULATOR",

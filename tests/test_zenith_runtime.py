@@ -68,16 +68,16 @@ def response_for(node_id: str) -> str:
 
 class ZenithGraphTests(unittest.TestCase):
     def test_exact_authored_graph_and_offline_scope(self):
-        self.assertEqual(runtime.validate(ROOT)["node_count"], 55)
+        self.assertEqual(runtime.validate(ROOT)["node_count"], 50)
         self.assertTrue(runtime.validate(ROOT)["ok"])
         lab = runtime.plan(ROOT, "lab", "lab_decide")
         oracle = runtime.plan(ROOT, "oracle")
-        self.assertEqual((lab["node_count"], lab["wave_count"]), (28, 11))
-        self.assertEqual((oracle["node_count"], oracle["wave_count"]), (31, 7))
+        self.assertEqual((lab["node_count"], lab["wave_count"]), (25, 11))
+        self.assertEqual((oracle["node_count"], oracle["wave_count"]), (28, 7))
         # Even an early target includes its mission siblings, as the real engine does.
         self.assertIn("lab_integrity", {node["id"] for node in lab["nodes"]})
         self.assertEqual(lab["waves"][3], ["lab_miner_calc", "lab_miner_etf", "lab_miner_macro", "lab_miner_news",
-                                            "lab_miner_poly", "lab_miner_stock", "lab_miner_stockgrid"])
+                                            "lab_miner_poly", "lab_miner_stock"])
 
     def test_offline_inspection_does_not_construct_engine_or_create_state(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -119,14 +119,14 @@ class ZenithHandoffTests(unittest.TestCase):
         completed_responses = 0
         saw_sibling_wave = False
         while result["status"] == "awaiting_agent" and completed_responses < 35:
-            saw_sibling_wave = saw_sibling_wave or len(result["pending"]) == 7
+            saw_sibling_wave = saw_sibling_wave or len(result["pending"]) == 6
             imported = self.import_pending(result["pending"][0])
             self.assertTrue(imported["import"]["engine_accepted"], imported)
             result = imported["run"]
             completed_responses += 1
         self.assertEqual(result["status"], "completed", result)
         self.assertTrue(saw_sibling_wave)
-        self.assertEqual(result["completed_count"], 28)
+        self.assertEqual(result["completed_count"], 25)
         run_dir = self.root / "state/runs/SYNTHETIC_LAB"
         decide = json.loads((run_dir / "artifacts/lab_decide.json").read_text())
         director = json.loads((run_dir / "artifacts/lab_director.json").read_text())
@@ -150,11 +150,11 @@ class ZenithHandoffTests(unittest.TestCase):
         path = self.root / "variant.json"
         write_json(path, variant)
         expected = runtime.plan(self.root, "lab", graph_variant=variant)
-        self.assertEqual((expected["node_count"], expected["wave_count"]), (29, 12))
+        self.assertEqual((expected["node_count"], expected["wave_count"]), (26, 12))
         self.assertIn("lab_evidence_check", {node["id"] for node in expected["nodes"]})
         result = runtime.start(self.root, mission="lab", run_id="VARIANT", feed_source=str(self.source),
                                horizon=HORIZON, time_anchor=ANCHOR, graph_variant=str(path))
-        self.assertEqual(result["scope_count"], 29)
+        self.assertEqual(result["scope_count"], 26)
         spec = json.loads((self.root / "state/runs/VARIANT/zenith_run.json").read_text())
         self.assertEqual(spec["graph_variant"]["variant_sha256"], variant["variant_sha256"])
         effective = runtime.graph_for_manifest(self.root, spec)
@@ -191,7 +191,7 @@ class ZenithHandoffTests(unittest.TestCase):
         result = runtime.start(self.root, mission="oracle", run_id="SYNTHETIC_ORACLE",
                                subject_run=str(subject), truth_run=str(truth))
         self.assertEqual(result["status"], "awaiting_agent", result)
-        self.assertEqual(len(result["pending"]), 7)
+        self.assertEqual(len(result["pending"]), 6)
         oracle_dir = self.root / "state/runs/SYNTHETIC_ORACLE"
         reconciliation = json.loads((oracle_dir / "artifacts/prediction_reconciliation.json").read_text())["data"]
         self.assertEqual(reconciliation["subject_run_id"], "SYNTHETIC_FEEDS")
