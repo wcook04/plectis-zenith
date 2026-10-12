@@ -4,7 +4,7 @@
 // target column. Each edge has its own slot, so parallel routes separate.
 import { BaseEdge, type EdgeProps } from 'reactflow';
 
-export type RoutedEdgeData = { channelY: number; slot: number };
+export type RoutedEdgeData = { channelY: number; slot: number; outLane: number };
 
 function rounded(points: Array<[number, number]>, radius: number): string {
   let d = `M${points[0][0]} ${points[0][1]}`;
@@ -32,8 +32,11 @@ function rounded(points: Array<[number, number]>, radius: number): string {
 export function RoutedEdge({ id, sourceX, sourceY, targetX, targetY, data, style, markerEnd }: EdgeProps<RoutedEdgeData>) {
   const slot = data?.slot ?? 0;
   const channelY = data?.channelY ?? Math.min(sourceY, targetY) - 40;
-  const out = sourceX + 12 + 4 * (slot % 7);
-  const into = targetX - 12 - 4 * (slot % 7);
+  // Column gaps are 64px and expanded-group frames take 10px on each side,
+  // so the vertical runs stay between 18px and 38px from the cards.
+  const out = sourceX + 18 + 7 * ((data?.outLane ?? 0) % 4);
+  const into = targetX - 18;
+  void slot;
   const path = rounded(
     [
       [sourceX, sourceY],
@@ -55,7 +58,9 @@ export type StackEdgeData = { width: number; slot: number };
 export function StackEdge({ id, sourceX, sourceY, targetX, targetY, data, style, markerEnd }: EdgeProps<StackEdgeData>) {
   const w = data?.width ?? 200;
   const left = sourceX - w;
-  const x0 = Math.min(left, targetX) - 12 - 4 * ((data?.slot ?? 0) % 5);
+  // Inside the group frame's 10px padding, never on its border; every edge
+  // into one target shares this trunk.
+  const x0 = Math.min(left, targetX) - 5;
   const path = rounded([[left, sourceY], [x0, sourceY], [x0, targetY], [targetX, targetY]], 8);
   return <BaseEdge id={id} path={path} style={style} markerEnd={markerEnd} />;
 }

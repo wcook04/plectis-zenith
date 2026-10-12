@@ -2,8 +2,8 @@
 // its citations and the receipts bound to the chapter by /api/v1/site.
 import type { Chapter, Paper } from '../api';
 import { apiUrl } from '../api';
-import { EVIDENCE_KIND_LABEL, SECTION_LABEL } from '../content/copy';
-import { latexToText } from '../lib/latex';
+import { SECTION_LABEL } from '../content/copy';
+import { sectionTitle, shortCitation } from '../lib/latex';
 
 const EVIDENCE_LABEL: Record<string, string> = {
   sources: 'Source hashes for the saved feeds',
@@ -14,23 +14,17 @@ const EVIDENCE_LABEL: Record<string, string> = {
   'demo-result': 'Preparation receipt',
 };
 
-export function PaperAside({ chapter, paper }: { chapter: Chapter; paper: Paper | null }) {
+export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper: Paper | null; latex: string | null }) {
   const section = chapter.paper_section;
-  const kind = EVIDENCE_KIND_LABEL[chapter.evidence_kind];
   const citations = section && paper ? paper.citations.filter((c) => section.citation_ids.includes(c.id)) : [];
   return (
     <aside className="paper-aside" aria-label={`Sources for ${chapter.title}`}>
-      {kind && (
-        <p className={`kind kind--${chapter.evidence_kind}`}>
-          <span className="kind__label">{kind.label}.</span> {kind.note}
-        </p>
-      )}
       {section && (
         <div className="paper-aside__block">
           <h3 className="paper-aside__head">In the paper</h3>
           <p>
             <a href={apiUrl(section.pdf_url)} target="_blank" rel="noreferrer">
-              {SECTION_LABEL[section.id] ?? 'Paper section'}
+              {(latex && sectionTitle(latex, section.start_line, section.end_line)) ?? SECTION_LABEL[section.id] ?? 'Paper section'}
             </a>
             <span className="paper-aside__quiet">
               {' '}
@@ -45,18 +39,13 @@ export function PaperAside({ chapter, paper }: { chapter: Chapter; paper: Paper 
       {citations.length > 0 && (
         <div className="paper-aside__block">
           <h3 className="paper-aside__head">Cited here</h3>
-          <ol className="refs">
+          <ul className="refs refs--short">
             {citations.map((citation) => (
-              <li key={citation.id} id={`ref-${chapter.id}-${citation.id}`}>
-                {latexToText(citation.latex)}
-                {citation.urls.map((url) => (
-                  <a key={url} className="refs__link" href={url} target="_blank" rel="noreferrer">
-                    {linkLabel(url)}
-                  </a>
-                ))}
+              <li key={citation.id}>
+                <a href={`#ref-${citation.id}`}>{shortCitation(citation.latex)}</a>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       )}
       {chapter.evidence_urls.length > 0 && (

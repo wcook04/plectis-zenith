@@ -13,8 +13,8 @@ import { nodeFamily, type Family } from '../../lib/naming';
 
 export const NODE_W = 200;
 export const NODE_H = 94;
-export const GROUP_H = 98;
-export const COL_W = 244;
+export const GROUP_H = 100;
+export const COL_W = 264;
 const ROW_H = NODE_H + 18;
 const MAX_BAND_COLUMNS = 7;
 const BAND_LABEL_H = 44;
@@ -76,7 +76,11 @@ export type LayoutEdge = {
   // original GraphViewer's showAllDependencies switch.
   redundant: boolean;
   channelY: number;
+  // Edges into the same target share one trunk: one exit lane per target in
+  // the source column's gap and one channel row per target, so a bundle reads
+  // as a bus with branches instead of parallel near-duplicate lines.
   slot: number;
+  outLane: number;
   rawIds: string[];
 };
 
@@ -251,10 +255,10 @@ export function layoutGraph(graph: Graph, expanded: ReadonlySet<string>): GraphL
           id,
           family: entry.family,
           members: entry.members,
-          x: x - 12,
-          y: top - 34,
-          w: NODE_W + 24,
-          h: bottom - top + 46,
+          x: x - 10,
+          y: top - 32,
+          w: NODE_W + 20,
+          h: bottom - top + 42,
         });
       }
     });
@@ -284,6 +288,7 @@ export function layoutGraph(graph: Graph, expanded: ReadonlySet<string>): GraphL
       redundant: false,
       channelY: 0,
       slot: 0,
+      outLane: 0,
       rawIds: [edge.id],
     });
   });
@@ -318,12 +323,20 @@ export function layoutGraph(graph: Graph, expanded: ReadonlySet<string>): GraphL
   // Each band has a channel above it; routed edges run there, one slot each.
   const bandCount = breakAt > 0 ? 2 : 1;
   const slotsInBand = Array.from({ length: bandCount }, () => 0);
+  const slotOfTarget = new Map<string, number>();
+  const lanesInColumn = new Map<number, Map<string, number>>();
   edges
     .filter((e) => e.routed)
-    .sort((a, b) => (columnOf.get(a.source) ?? 0) - (columnOf.get(b.source) ?? 0) || a.id.localeCompare(b.id))
+    .sort((a, b) => (columnOf.get(a.target) ?? 0) - (columnOf.get(b.target) ?? 0) || a.target.localeCompare(b.target))
     .forEach((edge) => {
       const band = bandOfItem.get(edge.target) ?? 0;
-      edge.slot = slotsInBand[band]++;
+      if (!slotOfTarget.has(edge.target)) slotOfTarget.set(edge.target, slotsInBand[band]++);
+      edge.slot = slotOfTarget.get(edge.target)!;
+      const column = columnOf.get(edge.source) ?? 0;
+      if (!lanesInColumn.has(column)) lanesInColumn.set(column, new Map());
+      const lanes = lanesInColumn.get(column)!;
+      if (!lanes.has(edge.target)) lanes.set(edge.target, lanes.size);
+      edge.outLane = lanes.get(edge.target)!;
     });
   const channelHeight = slotsInBand.map((n) => (n === 0 ? 0 : CHANNEL_PAD * 2 + CHANNEL_STEP * Math.min(n, MAX_SLOTS)));
 

@@ -11,11 +11,41 @@ import { Results } from './components/Results';
 import { RunPicker, type RunChoice } from './components/RunPicker';
 import type { RunContext } from './components/Inspector';
 import { latexToText } from './lib/latex';
-import { SiteEvidenceContext } from './lib/siteContext';
+import { SiteEvidenceContext, SiteFiguresContext } from './lib/siteContext';
 import { Preparation, preparationSummary } from './components/Preparation';
 import { nodeName } from './lib/naming';
 import { useAsync } from './lib/hooks';
 import { ThemeToggle } from './components/ThemeToggle';
+import { CopyButton } from './components/CopyButton';
+
+const RECEIPT_LABEL: Record<string, string> = {
+  sources: 'Input provenance and hashes',
+  replacements: 'Synthetic macro and news examples',
+  'demo-result': 'Preparation receipt',
+  observations: 'Example stored prices',
+  'window-result': 'Window experiment receipt',
+  'conditional-result': 'Conditional continuation receipt',
+};
+
+const FIGURE_LABEL: Record<string, string> = {
+  replay: 'The full loop',
+  lab: 'Lab overview',
+  oracle: 'Oracle overview',
+  evolve: 'Evolve overview',
+  'lab-detail': 'Lab, every node',
+  'oracle-detail': 'Oracle, every node',
+  'evolve-detail': 'Evolve, every node',
+};
+
+// Each chapter's figure gets the track its content needs.
+const FIGURE_TRACK: Record<string, string> = {
+  idea: 'wide',
+  lab: 'full',
+  oracle: 'full',
+  evolve: 'compact',
+  results: 'full',
+  next: 'wide',
+};
 
 const NAV_LABEL: Record<string, string> = {
   idea: 'The idea',
@@ -53,8 +83,29 @@ export default function App() {
   return <Page site={site.value} paper={paper.status === 'ready' ? paper.value : null} />;
 }
 
+function useCurrentChapter(ids: string[]): string | null {
+  const [current, setCurrent] = useState<string | null>(null);
+  useEffect(() => {
+    if (ids.length === 0 || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setCurrent(visible[0].target.id);
+      },
+      { rootMargin: '-120px 0px -60% 0px' },
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [ids.join('|')]); // eslint-disable-line react-hooks/exhaustive-deps
+  return current;
+}
+
 function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
   const [noticeOpen, setNoticeOpen] = useState(false);
+  const current = useCurrentChapter(site ? [...site.chapters.map((c) => c.id), 'paper'] : []);
   return (
     <>
       <a className="skip" href="#main">
@@ -79,11 +130,13 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
           {site && (
             <nav aria-label="Chapters" className="nav">
               {site.chapters.map((chapter) => (
-                <a key={chapter.id} href={`#${chapter.id}`}>
+                <a key={chapter.id} href={`#${chapter.id}`} aria-current={current === chapter.id ? 'true' : undefined}>
                   {NAV_LABEL[chapter.id] ?? chapter.title}
                 </a>
               ))}
-              <a href="#paper">Paper</a>
+              <a href="#paper" aria-current={current === 'paper' ? 'true' : undefined}>
+                Paper
+              </a>
             </nav>
           )}
           <ThemeToggle />
@@ -133,9 +186,11 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
   const lab = useGraph(byId.get('lab')?.graph_url ?? '/api/v1/graph?mission=lab');
   const deepLink = useMemo(() => new URLSearchParams(window.location.search).get('node'), []);
   const byline = useByline(site);
+  const latex = usePaperLatex(site);
 
   return (
     <SiteEvidenceContext.Provider value={site.evidence}>
+    <SiteFiguresContext.Provider value={site.figures}>
     <Shell site={site}>
       <section className="hero wrap" id="top" aria-labelledby="title">
         <div className="hero__main">
@@ -174,6 +229,7 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           chapter={chapter}
           index={index}
           paper={paper}
+          latex={latex}
           paragraphs={
             chapter.id === 'lab'
               ? labParagraphs(lab.status === 'ready' && lab.value ? graphFacts(lab.value) : null)
@@ -208,6 +264,7 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
         </div>
       </footer>
     </Shell>
+    </SiteFiguresContext.Provider>
     </SiteEvidenceContext.Provider>
   );
 }
@@ -257,6 +314,11 @@ function titleParts(title: string) {
   );
 }
 
+function usePaperLatex(site: Site): string | null {
+  const doc = useAsync(() => api.document(site.documents.paper ?? '/api/v1/documents/paper'), [site]);
+  return doc.status === 'ready' ? doc.value.content : null;
+}
+
 function useByline(site: Site): string | null {
   const doc = useAsync(() => api.document(site.documents.paper ?? '/api/v1/documents/paper'), [site]);
   if (doc.status !== 'ready') return null;
@@ -281,12 +343,14 @@ function ChapterSection({
   chapter,
   index,
   paper,
+  latex,
   paragraphs,
   children,
 }: {
   chapter: Chapter;
   index: number;
   paper: Paper | null;
+  latex: string | null;
   paragraphs?: string[];
   children: React.ReactNode;
 }) {
@@ -295,15 +359,19 @@ function ChapterSection({
     <section className={`chapter chapter--${chapter.id}`} id={chapter.id} aria-labelledby={`${chapter.id}-title`}>
       <div className="wrap chapter__grid">
         <div className="chapter__text">
-          <h2 id={`${chapter.id}-title`}>
-            <span className="chapter__num" aria-hidden="true">{index + 1}</span>
-            {chapter.title}
-          </h2>
+          <p className={`chapter__status status--${chapter.evidence_kind}`}>
+            <span className="chapter__num">{String(index + 1).padStart(2, '0')}</span>
+            <span>{EVIDENCE_KIND_LABEL[chapter.evidence_kind]?.label ?? chapter.evidence_kind}</span>
+          </p>
+          <h2 id={`${chapter.id}-title`}>{chapter.title}</h2>
+          {EVIDENCE_KIND_LABEL[chapter.evidence_kind] && (
+            <p className="chapter__boundary">{EVIDENCE_KIND_LABEL[chapter.evidence_kind].note}</p>
+          )}
           {(paragraphs ?? copy?.paragraphs)?.map((p) => <p key={p}>{p}</p>)}
         </div>
-        <PaperAside chapter={chapter} paper={paper} />
+        <PaperAside chapter={chapter} paper={paper} latex={latex} />
       </div>
-      <div className="wrap chapter__figure">{children}</div>
+      <div className={`wrap chapter__figure chapter__figure--${FIGURE_TRACK[chapter.id] ?? 'wide'}`}>{children}</div>
       {chapter.document_url && <SourceDocument url={chapter.document_url} />}
     </section>
   );
@@ -532,20 +600,25 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
             </a>
           </p>
           {paper && (
-            <p className="paper-band__hash">
-              PDF SHA-256 <code className="hash">{paper.pdf_sha256}</code>
-              <br />
+            <div className="paper-band__hash">
               <a href={paper.source.url} target="_blank" rel="noreferrer">
-                LaTeX source
+                LaTeX source on GitHub
               </a>
-            </p>
+              <details>
+                <summary>Verify the PDF</summary>
+                <p>
+                  SHA-256 <code className="hash">{paper.pdf_sha256}</code>
+                </p>
+                <CopyButton text={paper.pdf_sha256} label="Copy hash" />
+              </details>
+            </div>
           )}
           <h3 className="paper-aside__head">Receipts</h3>
           <ul className="plain-list">
             {Object.entries(site.evidence).map(([id, url]) => (
               <li key={id}>
                 <a href={apiUrl(url)} target="_blank" rel="noreferrer">
-                  {id.replace(/-/g, ' ')}
+                  {RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}
                 </a>
               </li>
             ))}
@@ -555,7 +628,7 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
             {Object.entries(site.figures).map(([id, url]) => (
               <li key={id}>
                 <a href={apiUrl(url)} target="_blank" rel="noreferrer">
-                  {id.replace(/-/g, ' ')} (SVG)
+                  {FIGURE_LABEL[id] ?? id.replace(/-/g, ' ')} (SVG)
                 </a>
               </li>
             ))}
@@ -566,7 +639,7 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
           {paper ? (
             <ol className="refs refs--full">
               {paper.citations.map((citation) => (
-                <li key={citation.id}>
+                <li key={citation.id} id={`ref-${citation.id}`}>
                   {latexToText(citation.latex)}
                   {citation.urls.map((url) => (
                     <a key={url} className="refs__link" href={url} target="_blank" rel="noreferrer">
