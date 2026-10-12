@@ -28,7 +28,7 @@ smallnote/.style={font=\footnotesize,text=ink!80,align=left}}
   \PackageError{zenith}{Paper exceeds four pages}{Shorten the paper before publishing.}\fi}
 \begin{document}
 \begin{center}
-{\Large\bfseries Zenith: learning from a reasoning graph's mistakes}\\[4pt]
+{\Large\bfseries Zenith: evaluating revisions to a reasoning graph}\\[4pt]
 Will Cook \quad\textbullet\quad 12 October 2026
 \end{center}
 
@@ -37,73 +37,73 @@ research. Historical examples and model outputs are not investment
 recommendations and must not be used to make financial decisions.}
 
 \hypertarget{idea}{}
-We have a network of reasoning nodes. Each node is given some evidence and
-produces an analysis or prediction that later nodes read. Can that procedure
-learn from its mistakes? The aim is efficient forecasting across market regimes.
-The example below tests an execution repair, not forecasting skill.
+\textbf{Abstract.} Zenith studies whether recurring failures in a multi-stage
+language-model program can guide useful revisions. It records intermediate
+outputs, diagnoses errors and compares one revision with the original on later
+inputs. Four historical-feed runs exposed the same truncated response. One
+instruction change passed local validation on two later inputs, but execution
+then failed downstream. We report this limited result and propose a controller
+that selects small prompt variations from market context.
 
-Take the actual saved feeds at an earlier time. Let \textbf{Lab} read them,
-choose the assets worth predicting and save its predictions. Then open the
-later snapshot. \textbf{Oracle} compares the predictions with what happened
-and proposes an explanation. \textbf{Evolve} proposes a change to the
-procedure. Test the changed and unchanged versions on the same later inputs
-before deciding what to keep.
-
-The model weights stay fixed. We change a node's instruction, its incoming
-context or its connections. The hard part is whether the change improves a
-later prediction, rather than just making an old mistake easier to explain.
+\textbf{1. Evaluation protocol.}
+Nodes read supplied evidence or earlier outputs and produce records for later
+nodes. \textbf{Lab} selects assets and forecasts from a saved information cutoff.
+\textbf{Oracle} compares the frozen forecast with later observations and
+proposes a diagnosis; \textbf{Evolve} proposes an instruction, context or
+dependency change. The base language model stays fixed during comparison.
 
 \begin{center}
 \begin{tikzpicture}
 \node[smallnote,anchor=west] at (-1.75,.9) {READ ONLY THE EARLIER SNAPSHOT};
-\node[record,minimum width=35mm] (before) at (0,0) {Earlier feeds\\$t-n$};
+\node[record,minimum width=35mm] (before) at (0,0) {Earlier inputs\\at the cutoff};
 \node[operator,minimum width=37mm] (lab) at (5.2,0) {\textbf{Lab}\\select and predict};
 \node[checkpoint,minimum width=41mm] (frozen) at (10.4,0) {Frozen predictions\\+ node outputs};
 \draw[wire] (before)--(lab);
 \draw[wire] (lab)--(frozen);
 \node[smallnote,anchor=west] at (-1.75,-1.25) {OPEN THE LATER SNAPSHOT};
-\node[record,minimum width=35mm] (after) at (0,-2.15) {Later feeds\\$t$};
+\node[record,minimum width=35mm] (after) at (0,-2.15) {Later observations\\after the cutoff};
 \node[operator,minimum width=37mm] (oracle) at (5.2,-2.15) {\textbf{Oracle}\\measure and diagnose};
 \node[operator,minimum width=41mm] (evolve) at (10.4,-2.15) {\textbf{Evolve}\\propose one change};
 \draw[wire] (after)--(oracle);
 \draw[wire] (frozen.south)--(10.4,-.98)--(5.2,-.98)--(oracle.north);
 \draw[wire] (oracle)--(evolve);
 \node[record,draw=teal,dashed,minimum width=112mm,minimum height=17mm] (compare) at (5.2,-4.35)
- {\textbf{Compare on another window}\\Same feeds $\longrightarrow$ old graph and changed graph\\Record both results; decide whether to keep the change};
+ {\textbf{Compare on another window}\\Same later inputs: original graph and one revision\\Predeclare the score; record gains and regressions};
 \draw[wire,dashed] (evolve.south)--(10.4,-3.2)--(5.2,-3.2)--(compare.north);
 \end{tikzpicture}
 \end{center}
-{\small The arrows show the experiment's data flow. The dashed step needs a
-separate comparison; a plausible diagnosis does not complete it.}
+{\small Figure 1. Proposed evaluation loop. Preserve the original record before
+revealing the outcome. The dashed step is a separate comparison, not evidence
+that a diagnosis or revision is correct.}
 
-Successive version comparisons draw on AlphaGo Zero~\cite{alphago}; bounded
-edits followed by evaluation also appear in autoresearch~\cite{autores}.
-Here the histories are finite and externally generated.
+Collect runs with the graph held fixed. Group failures across sliding windows
+and several widths, counting unique cases rather than overlapping windows.
+Freeze one revision and compare it with the baseline on matched later cases.
+Cases used to select a revision become development data for subsequent work.
 
-\textbf{Start with the data we already have.}
-The local archive contains the original six feeds: stocks, ETFs, macro series,
-Stockgrid, prediction markets and news. A calculator derives cross-asset
-summaries from those inputs. For the worked replay we use the saved
-20 and 21 July 2026 snapshots~\cite{feeds}. Each contains all seven artifacts. The earlier
-stock payload has 457 entries; 456 stocks have numeric prices in both snapshots.
+\textbf{Data and cutoffs.}
+The archive contains stocks, ETFs, macro series, Stockgrid, prediction markets
+and news, plus calculator summaries. The July 20--21 replay retains all seven
+artifacts~\cite{feeds}. A packet may contain a current state or dated histories:
+a ``video so far'' at the cutoff. Predicting a later state and predicting a
+path require separate targets and scores. Future proprietary snapshots need
+verified availability times and revision vintages. Historical inputs alone
+cannot exclude later knowledge in a current model's training data.
 
-This is a retrospective replay executed now with a current hosted model.
-Its training data may contain later information. We are testing the operation
-of the procedure on saved data, not recreating what that model could have
-known in July or establishing a trading advantage.
+\textbf{Prior work.}
+DSPy composes LM modules~\cite{dspy}; MIPRO optimises their instructions and
+examples against a downstream metric~\cite{mipro}. These are direct precedents
+for prompt optimisation. AlphaGo Zero~\cite{alphago} and autoresearch~\cite{autores}
+motivated successive version comparisons. Zenith uses finite external histories;
+its execution study establishes no forecasting advantage.
 
-\textbf{A snapshot can contain a history.}
-A point-in-time packet may contain a state (a ``photo'') or dated histories
-(a ``video'' up to the cutoff). Either can target a later state; forecasting
-a future path needs its own horizons and loss. Future work would use authorised
-proprietary snapshots with verified availability times and revision vintages.
-Richer histories do not remove missing information or look-ahead risk.
-
+\typeout{ZENITH-END-PAGE-ONE: \thepage}
 \newpage
 \hypertarget{lab}{}
-\textbf{What happens inside the graph.}
+\textbf{2. The executable graph and failure diagnosis.}
 The Lab has 28 nodes: seven feed artifacts and 21 reasoning operators.
-Save every output to trace the first unsupported claim.
+Each miner is a feed-specific analysis step. Saved intermediate records let a
+reviewer locate an unsupported claim and inspect the evidence it received.
 
 \begin{center}
 \begin{tikzpicture}
@@ -115,25 +115,27 @@ Save every output to trace the first unsupported claim.
  {\textbf{First pass: seven parallel miners}\\Stock \quad ETF \quad Macro \quad News \quad Markets \quad CALC \quad Flows};
 \draw[wire] (feeds.south)--(5.15,-.98);
 \draw[wire] (seed.south)--(13.6,-.98);
-\node[operator,minimum width=37mm] (cross) at (1.85,-3.2) {\textbf{Cross-correlation}\\shared observations};
+\node[operator,minimum width=37mm] (cross) at (1.85,-3.2) {\textbf{Synthesis}\\combine observations};
 \node[operator,minimum width=37mm] (orient) at (7.65,-3.2) {\textbf{Orient}\\competing theses};
 \node[checkpoint,minimum width=37mm] (decide) at (13.45,-3.2) {\textbf{Decide $\cdot$ CP1}\\freeze the thesis};
 \draw[wire] (1.85,-2.25)--(cross.north);
 \draw[wire] (cross)--(orient);\draw[wire] (orient)--(decide);
 \node[operator,minimum width=153mm,minimum height=13mm] (second) at (7.65,-4.8)
- {\textbf{Second pass: seven directed miners}\\Re-read each source feed against the frozen thesis};
+ {\textbf{Directed evidence pass}\\Seven miners re-read the feeds; a second synthesis reconciles their findings};
 \draw[wire] (decide.south)--(13.45,-4.15);
-\node[operator,minimum width=37mm] (cross2) at (1.85,-6.4) {\textbf{Cross-correlation}\\reconcile the checks};
-\node[checkpoint,minimum width=37mm] (director) at (7.65,-6.4) {\textbf{Director $\cdot$ CP2}\\freeze predictions};
-\node[operator,minimum width=37mm] (integrity) at (13.45,-6.4) {\textbf{Integrity}\\check both passes};
-\draw[wire] (1.85,-5.45)--(cross2.north);
-\draw[wire] (cross2)--(director);\draw[wire] (director)--(integrity);
+\node[checkpoint,minimum width=58mm] (director) at (4.3,-6.4)
+ {\textbf{Director $\cdot$ CP2}\\freeze predictions};
+\node[operator,minimum width=58mm] (integrity) at (11,-6.4)
+ {\textbf{Integrity}\\check both passes};
+\draw[wire] (4.3,-5.45)--(director.north);
+\draw[wire] (director)--(integrity);
 \end{tikzpicture}
 \end{center}
 
-Each wide miner box contains seven parallel analyses. The second pass re-reads
-the original feeds against the frozen thesis. In the quantile branch, CP1 also
-freezes forecast quantiles; Director must preserve them.
+{\small Figure 2. Lab's two passes. ``Synthesis'' denotes the nodes named
+Cross-correlation in the implementation; the second synthesis is grouped with
+the directed pass. CP1 is the saved thesis; in the quantile branch it also
+freezes forecast quantiles, which Director must preserve at CP2.}
 
 \hypertarget{oracle}{}
 \begin{center}
@@ -143,114 +145,123 @@ freezes forecast quantiles; Director must preserve them.
 \node[operator,minimum width=44mm,minimum height=25mm] (reviews) at (5.5,-.6)
  {\textbf{Compare the evidence}\\Numeric differences\\+ seven lane reviews};
 \node[operator,minimum width=37mm,minimum height=25mm] (map) at (11,-.6)
- {\textbf{Truth map}\\combined findings};
+ {\textbf{Evidence summary}\\combined findings};
 \draw[wire] (subject.east)--(3.3,.1);
 \draw[wire] (truth.east)--(3.3,-1.3);
 \draw[wire] (reviews)--(map);
 \node[operator,minimum width=44mm] (explain) at (5.5,-3)
- {\textbf{Attribution + explanation}\\where and why it failed};
+ {\textbf{Failure hypothesis}\\locate and explain the error};
 \node[checkpoint,minimum width=37mm] (out) at (11,-3)
  {\textbf{Oracle CP2}\\record for review};
 \draw[wire] (map.south)--(11,-2.2)--(5.5,-2.2)--(explain.north);
 \draw[wire] (explain)--(out);
 \end{tikzpicture}
 \end{center}
-{\small Oracle compares saved arguments with later observations. Attribution
-proposes where reasoning failed; CP2 records the review without rewriting
-the forecast. The diagnosis still needs a test.}
-
-{\small Figures omit direct second-pass feed inputs, other skip connections and
-Integrity's cross-pass inputs. Exact dependencies appear in \path{docs/graphs.md}.
-Square boxes are records; rounded boxes are operations or named groups.}
+{\small Figure 3. Oracle reviews the saved run against later evidence. Its
+attribution is a hypothesis about a failure, not a causal identification.
+Square boxes are records; rounded boxes are operations or groups. Exact feed,
+skip and cross-pass dependencies are retained in \path{docs/graphs.md}.}
 
 \hypertarget{trace}{}
-\textbf{Trace before changing.} Was useful evidence absent, overlooked, grouped
-badly or misinterpreted? Save the first node where the claim lost support.
-A repeated error motivates a test; a persuasive explanation does not prove the fix.
+Diagnosis first asks what information was available:
+\begin{center}\small
+\begin{tabular}{@{}p{40mm}p{116mm}@{}}\toprule
+Candidate failure & Question for the saved record \\\midrule
+Evidence unavailable & Was the relevant information absent from the saved input universe?\\
+Evidence not supplied & Was it in that universe but missing from the node's actual input?\\
+Reasoning error & Did the node receive the evidence but draw an unsupported conclusion?\\
+Execution failure & Did truncation, parsing or another runtime error prevent a usable output?\\\bottomrule
+\end{tabular}\end{center}
+Keep unresolved cases unknown. Research performed after the outcome can help
+explain an event, but cannot become evidence the earlier run supposedly had.
+A repeated failure motivates an intervention test; frequency alone does not
+identify its cause.
 
+\typeout{ZENITH-END-PAGE-TWO: \thepage}
 \newpage
 \hypertarget{research}{}
-\textbf{Research direction: learn how each node does the same job.}
-A shared neural controller could read market conditions available at the
-cutoff and choose a few semantic settings for each reasoning node. Each
-setting in $[0,1]$ selects a small wording variation in one prompt component.
-The node's purpose, inputs, work budget and output contract stay fixed.
-This mechanism is proposed, not implemented or validated by the example.
+\textbf{3. Proposed context-conditioned prompts.}
+Each reasoning node would keep a fixed task, input scope, output contract and
+work budget. A shared neural controller would read market-condition features
+available at the cutoff and select small wording variations for that node.
+We call its outputs \emph{prompt settings}: numbers in $[0,1]$ that index an
+ordered catalogue of text variants. They are distinct from the controller's
+learned numerical weights. This extension has not been implemented or tested.
 
 \begin{center}
-\begin{tikzpicture}[font=\small]
-\node[record,minimum width=134mm,minimum height=13mm] (packet) at (7.8,0)
- {\textbf{Saved packet at the prediction cutoff}\\Feeds and histories; available regime signals such as VIX or sentiment};
-\node[operator,draw=teal,fill=wash,minimum width=63mm,minimum height=17mm] (controller) at (4,-2.15)
- {\textbf{Shared neural controller}\\Regime encoder + small per-node heads\\Trainable numerical parameters};
-\node[record,minimum width=58mm,minimum height=17mm] (settings) at (11.4,-2.15)
- {\textbf{Per-node semantic settings}\\Miner: $(0.1,\ 0.2,\ \ldots)$\\Synthesis: $(0.4,\ 0.1,\ \ldots)$};
-\node[record,minimum width=46mm,minimum height=18mm] (core) at (3,-4.4)
- {\textbf{Fixed dossier core}\\Node duty + input scope\\Evidence + output rules};
-\node[operator,minimum width=81mm,minimum height=18mm] (render) at (10,-4.4)
- {\textbf{Compile the prompt}\\Versioned text lookup for each component\\Small wording changes within the same job};
-\node[operator,minimum width=130mm,minimum height=14mm] (graph) at (7.8,-6.65)
- {\textbf{The same reasoning graph}\\Each node gets its compiled prompt and its own permitted inputs};
-\node[record,minimum width=63mm,minimum height=12mm] (forecast) at (4,-8.55)
- {\textbf{Frozen forecast}\\Save settings, exact prompts and outputs};
-\node[record,minimum width=58mm,minimum height=12mm] (later) at (11.4,-8.55)
- {\textbf{Later observations}\\Open after the forecast is frozen};
-\node[operator,minimum width=130mm,minimum height=14mm] (loss) at (7.8,-10.6)
- {\textbf{Evaluate with fixed rules}\\Forecast error, selection coverage and cost; compare on separate later cases};
+\begin{tikzpicture}
+\node[smallnote,anchor=west] at (.15,1) {A. ONE NODE AT PREDICTION TIME; CONTROLLER ALREADY FROZEN};
+\node[record,minimum width=51mm,minimum height=15mm] (signals) at (2.7,0)
+ {\textbf{Available context}\\VIX, sentiment, other features};
+\node[operator,draw=teal,fill=wash,minimum width=78mm,minimum height=15mm] (controller) at (10,0)
+ {\textbf{Neural prompt controller}\\Shared encoder + a small output head per node};
+\node[record,minimum width=78mm,minimum height=13mm] (settings) at (10,-2)
+ {\textbf{Settings for this node}\\One number per component: $(0.1,\ 0.2,\ldots)$};
+\node[record,minimum width=51mm,minimum height=17mm] (core) at (2.7,-4)
+ {\textbf{Fixed task specification}\\Job, evidence rules, ranking\\and required output};
+\node[operator,minimum width=78mm,minimum height=17mm] (prompt) at (10,-4)
+ {\textbf{Assemble the prompt}\\Fixed instructions + selected text variants\\Save the exact text and version};
+\node[record,minimum width=51mm,minimum height=15mm] (input) at (2.7,-6.1)
+ {\textbf{Permitted node inputs}\\Its feed + earlier node outputs};
+\node[operator,minimum width=78mm,minimum height=15mm] (node) at (10,-6.1)
+ {\textbf{Perform the same reasoning task}\\Base language model weights stay fixed};
+\node[checkpoint,minimum width=78mm,minimum height=12mm] (output) at (10,-8)
+ {\textbf{Saved node output}\\Passed to the next nodes in the graph};
 \begin{pgfonlayer}{background}
-\draw[wire] (packet.south)--(7.8,-1.04)--(4,-1.04)--(controller.north);
+\draw[wire] (signals)--(controller);
 \draw[wire] (controller)--(settings);
-\draw[wire] (settings.south)--(11.4,-3.5);
-\draw[wire] (core)--(render);
-\draw[wire] (render.south)--(10,-5.95);
-\draw[wire] (packet.east)--(15.25,0)--(15.25,-6.65)--(graph.east);
-\draw[wire] (4,-7.35)--(forecast.north);
-\draw[wire] (forecast.south)--(4,-9.9);
-\draw[wire] (later.south)--(11.4,-9.9);
-\draw[wire,dashed,draw=teal] (loss.west)--(0,-10.6)--(0,-2.15)--(controller.west);
+\draw[wire] (settings)--(prompt);
+\draw[wire] (core)--(prompt);
+\draw[wire] (prompt)--(node);
+\draw[wire] (input)--(node);
+\draw[wire] (node)--(output);
 \end{pgfonlayer}
-\node[font=\footnotesize,rotate=90,fill=white,inner sep=2pt] at (15.57,-3.8) {same feed inputs};
-\node[font=\footnotesize,text=teal,rotate=90,fill=white,inner sep=2pt] at (.3,-6.5)
- {training cases only; freeze before later testing};
+\node[smallnote,align=left,text width=49mm,anchor=north west] at (.15,-7.45)
+ {For the Polymarket miner:\\seed state + its market feed.\\Other nodes have their own\\inputs and prompt components.};
 \end{tikzpicture}
 \end{center}
-{\small Solid arrows show data flow. The dashed return fits a future controller
-from training outcomes; it does not feed a test outcome into its own forecast
-or denote a derivative through the LLM. The numbers are illustrative settings,
-not learned values. The shared encoder's internal weights are a different object.}
+{\small Figure 4. Settings select text; they do not multiply evidence or directly
+scale the model's reasoning. For example, 0.1 could select ``consider sentiment
+as one explanation'' and 0.2 ``give sentiment slightly more interpretive weight
+where supported''. Factual filters and ranking rules stay fixed. Nearby settings
+need not produce smoothly varying behaviour.}
 
-\textbf{A small semantic change, not a different task.}
-The Polymarket miner still reads seed state and its feed and extracts the same
-kind of ranked signals. A component at $0.1$ might say ``consider sentiment as
-one explanation''; at $0.2$, ``give sentiment slightly more interpretive weight
-where supported.'' Factual measurements, ranking rules and required checks
-remain fixed. Other nodes have their own bounded interpretive components.
-Neither a high setting nor a high market indicator makes a claim true.
+\begin{center}
+\begin{tikzpicture}
+\node[smallnote,anchor=west] at (-2.3,.95) {B. DEVELOPMENT BEFORE LATER EVALUATION};
+\node[record,minimum width=46mm,minimum height=14mm] (runs) at (0,0)
+ {Context, configurations\\and observed losses};
+\node[operator,minimum width=46mm,minimum height=14mm] (fit) at (5.3,0)
+ {Fit or select the controller\\on development cases};
+\node[checkpoint,minimum width=46mm,minimum height=14mm] (freeze) at (10.6,0)
+ {Freeze the controller\\then test on later cases};
+\draw[wire] (runs)--(fit);\draw[wire] (fit)--(freeze);
+\end{tikzpicture}
+\end{center}
+A first implementation could search a small catalogue, following discrete
+prompt optimisation~\cite{mipro}. A neural controller could instead learn
+from measured configuration losses. Backpropagation would train that
+controller; hard text selection and hosted LM calls provide no ordinary
+end-to-end derivative. ProTeGi~\cite{protegi} and TextGrad~\cite{textgrad}
+use verbal feedback as a gradient analogy. Such feedback can suggest a
+revision, but is neither a numerical derivative nor proof of its benefit.
+VIX and sentiment are incomplete context features, not a complete regime
+classification. Later test outcomes must remain outside development.
 
-{\small \textbf{What can be trained.} Search discrete settings, or train the
-numerical controller from measured losses. Ordinary backpropagation requires
-local derivatives (see
-\href{https://github.com/karpathy/micrograd/blob/7bc720e951fe422b8f8814aa5aa1b64121d26b4c/micrograd/engine.py}{micrograd});
-hard text lookup and hosted LLM calls expose no such path.
-\href{https://github.com/stanfordnlp/dspy/blob/f1260ff14610286cb295c7d3a5ee2cbfd0ba5cb9/dspy/teleprompt/mipro_optimizer_v2.py}{DSPy}
-provides a prompt-search reference. The base LLM stays fixed. VIX and sentiment
-are incomplete regime features; robustness to every situation is not assured.
-Detailed proposal and source references: \path{docs/research-direction.md}.}
-
+\typeout{ZENITH-END-PAGE-THREE: \thepage}
 \newpage
 \hypertarget{results}{}
-\textbf{A measured failure and one change.}
-Four full Lab attempts used original snapshots from 26 June, 13 July, 20 July
-and 21 July 2026. All used DeepSeek V4.1 Flash through DeepInfra, the same graph
-and policy, complete feed data, and a 4,096-token response limit. Each completed
-the inventory and seven miners, then stopped when Cross-correlation's JSON
-response ran out of tokens~\cite{windows}.
+\textbf{4. Execution study and limitations.}
+Four full Lab attempts used original snapshots from June 26, July 13, July 20
+and July 21, 2026. The graph, policy, full feed data and 4,096-token response
+limit were fixed, using DeepSeek V4.1 Flash through Deepinfra. Each completed
+Seed and seven miners, then failed when the first synthesis response ran out
+of tokens before finishing its JSON~\cite{windows}.
 
-We added one instruction at that node: keep the four required arrays, at most
-three records per array, at most four subjects per record, and short summaries.
-We froze the instruction after inspecting the two earlier episodes. On the two
-later inputs, the changed node received exactly the baseline miners' saved
-outputs and went through the native validator:
+After inspecting the two earlier episodes, we froze one added instruction:
+preserve all four required arrays, with at most three records per array,
+four subjects per record and short summaries. The changed node received the
+same saved upstream outputs on each later input:
 
 \begin{center}
 \begin{tabular}{lrr}
@@ -263,55 +274,55 @@ Later input & Original instruction & Changed instruction\\
 \end{tabular}
 \end{center}
 
-Both changed responses still exceeded the requested four-subject bound: their
-largest records had nine and eleven subjects. The native schema permits this.
-The measured gain is local execution validity, with incomplete instruction
-compliance. It says nothing yet about prediction quality.
+Both changed responses passed the native schema but violated the new
+four-subject limit: their largest records contained nine and eleven subjects.
+Thus local validity improved from 0/2 to 2/2, with incomplete instruction
+compliance. This comparison measures execution, not forecast accuracy.
 
-\begin{center}
-\begin{tikzpicture}
-\node[operator,minimum width=40mm] (a) at (0,0) {Cross-correlation\\valid response};
-\node[operator,minimum width=40mm] (b) at (5.25,0) {Orient\\valid response};
-\node[record,draw=ink,line width=1pt,minimum width=40mm] (c) at (10.5,0) {Decide\\\textbf{truncated at 4,096}};
-\draw[wire] (a)--(b);\draw[wire] (b)--(c);
-\end{tikzpicture}
-\end{center}
-{\small A separate conditional continuation reused the eight unchanged July 20
-ancestor outputs and seven feeds. It made three new calls with the frozen
-change. Cross-correlation and Orient passed; Decide failed. No completed CP1,
-CP2 or forecast resulted~\cite{continuation}.}
+A separate continuation reused the eight unchanged July 20 ancestor outputs
+and all seven feeds. Synthesis and Orient passed; Decide truncated. Those
+three calls produced no completed CP1, CP2 or forecast~\cite{continuation}.
 
-\textbf{What to measure next.}
-Complete Lab first. Then measure selection and forecast error separately:
-which assets were selected, coverage, their frozen predictions and later
-observations. When scoring the whole universe, fix the same fallback for
-unselected assets. Use a proper score such as quantile loss for quantile
-forecasts~\cite{scores}; abstention must not become a zero-loss win.
+\textbf{Limits of the comparison.}
+The later windows overlap, the analyst had seen the July 20 failure, and
+each arm has one model sample. Collection times do not verify underlying
+price-bar or news clocks; current-model training leakage is unresolved.
+An agent authored the repair. The full Oracle/Evolve loop has not run, and
+these retrospective comparisons are not blind, independent trials.
 
-The later windows overlap, the analyst had already seen the July 20 failure,
-and there is one model sample per arm. These are not blind, independent trials.
-Collection times establish availability of the saved files, not the clocks
-of their underlying price bars. Until those clocks are verified, price changes
-are differences between saved values, not a clean financial backtest.
+\textbf{Next evaluation.}
+Complete Lab, then measure selection coverage, forecast error and cost under
+fixed rules. Use the same fallback for unselected assets and a predeclared
+score, such as quantile loss at fixed levels~\cite{scores}. Compare fixed prompts
+with the proposed controller on later cases, including regime changes and
+regressions. These experiments could test robustness across sampled conditions;
+they cannot establish reliable prediction in every possible regime.
 
-An agent authored and tested this execution repair. The full Oracle/Evolve
-loop has not run, and improved forecasting remains untested.
-
-\begin{thebibliography}{6}\footnotesize
-\bibitem{feeds} Zenith. Saved original feed runs \texttt{FEEDS\_20260720\_close}
- and \texttt{FEEDS\_20260721\_close}. Source hashes and example rows:
-\texttt{examples/replay/sources.json} and \texttt{observations.json}.
-\bibitem{windows} Zenith. Original-feed window experiment, 12 October 2026.
-\texttt{docs/original-feed-window-result.json} and \texttt{original-feed-windows.md}.
-\bibitem{continuation} Zenith. Conditional native Lab continuation, 12 October 2026.
-\texttt{examples/replay/conditional-result.json}.
-\bibitem{alphago} D. Silver and D. Hassabis. \emph{AlphaGo Zero: Starting from
-scratch}. DeepMind, 2017.
-\url{https://deepmind.google/blog/alphago-zero-starting-from-scratch/}.
+\begin{thebibliography}{10}\footnotesize
+\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}\setlength{\parsep}{0pt}
+\bibitem{feeds} Zenith. Original feed replay: \href{https://github.com/wcook04/plectis-zenith/blob/main/examples/replay/sources.json}{source hashes}
+and \href{https://github.com/wcook04/plectis-zenith/blob/main/examples/replay/observations.json}{example observations}, 2026.
+\bibitem{windows} Zenith. \href{https://github.com/wcook04/plectis-zenith/blob/main/docs/original-feed-windows.md}{Original-feed window experiment}, 12 October 2026.
+\bibitem{continuation} Zenith. \href{https://github.com/wcook04/plectis-zenith/blob/main/examples/replay/conditional-result.json}{Conditional native Lab continuation}, 12 October 2026.
+\bibitem{alphago} D. Silver et al. Mastering the game of Go without human
+knowledge. \emph{Nature} 550:354--359, 2017.
+\href{https://doi.org/10.1038/nature24270}{doi:10.1038/nature24270}.
 \bibitem{autores} A. Karpathy. \emph{autoresearch}. Source inspected at
-\texttt{228791fb499a}. \url{https://github.com/karpathy/autoresearch}.
+\href{https://github.com/karpathy/autoresearch/tree/228791fb499a}{\texttt{228791fb499a}} (code).
 \bibitem{scores} T. Gneiting and A. E. Raftery. Strictly proper scoring rules,
 prediction, and estimation. \emph{JASA} 102(477):359--378, 2007.
-\url{https://doi.org/10.1198/016214506000001437}.
+\href{https://doi.org/10.1198/016214506000001437}{doi:10.1198/016214506000001437}.
+\bibitem{dspy} O. Khattab et al. DSPy: Compiling Declarative Language Model Calls
+into Self-Improving Pipelines. \emph{ICLR}, 2024.
+\href{https://arxiv.org/abs/2310.03714}{arXiv:2310.03714}.
+\bibitem{mipro} K. Opsahl-Ong et al. Optimizing Instructions and Demonstrations
+for Multi-Stage Language Model Programs. \emph{EMNLP}, 2024.
+\href{https://arxiv.org/abs/2406.11695v2}{arXiv:2406.11695v2}.
+\bibitem{protegi} R. Pryzant et al. Automatic Prompt Optimization with
+``Gradient Descent'' and Beam Search. \emph{EMNLP}, 2023.
+\href{https://arxiv.org/abs/2305.03495}{arXiv:2305.03495}.
+\bibitem{textgrad} M. Yuksekgonul et al. TextGrad: Automatic
+``Differentiation'' via Text. 2024.
+\href{https://arxiv.org/abs/2406.07496v1}{arXiv:2406.07496v1}.
 \end{thebibliography}
 \end{document}

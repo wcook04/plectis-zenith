@@ -1,4 +1,4 @@
-# Research direction: prompts controlled by learned settings
+# Research direction: context-conditioned prompt selection
 
 > **This is not financial advice.** This is a theoretical research proposal.
 > Historical examples and model outputs are not investment recommendations and
@@ -15,6 +15,43 @@ small per-node outputs that select semantic settings, and a renderer that turns
 those settings into exact prompt text. Each reasoning node does the same job
 under slightly different interpretive guidance. Later measured errors train or
 select the controller, with the language model and evaluation rules held fixed.
+
+## Terminology and closest prior work
+
+The proposal is **context-conditioned prompt selection**: observed conditions
+determine which text variants a node receives. This is a description of the
+proposed mechanism, not a claim to have introduced a new established method.
+A **language-model program** is the broader literature's term for the composed
+calls and their data flow. Here the existing node graph is such a program.
+
+| Term | Meaning in this proposal |
+|---|---|
+| Prompt setting | A scalar in `[0,1]` used to select a text variant for one component. Settings need not sum to one. |
+| Controller parameters | The trainable numerical weights inside the shared encoder and its per-node output heads. |
+| Fixed task specification | The node's job, permitted evidence, ranking rules, required checks and output contract; the fixed part of its dossier. |
+| Discrete prompt optimisation | Searching or selecting actual text, evaluated through model calls and a declared metric. |
+| Failure attribution | A hypothesis about where an error arose, requiring an intervention test before a causal claim. |
+
+Calling a setting a “prompt weight” can obscure the difference between an
+instruction selector and a neural-network parameter. Neither a selected scalar
+nor an emphatic sentence directly multiplies the model's attention. The proposed
+text lookup also differs from [soft prompt tuning](https://arxiv.org/abs/2104.08691v2),
+which learns continuous prompt representations by backpropagation while keeping
+the language model frozen. Here the adjustable prompt components are discrete text.
+
+Four primary papers provide the closest methodological grounding:
+
+| Source and passage | Relevant method | Boundary of the comparison |
+|---|---|---|
+| Khattab et al., [DSPy](https://arxiv.org/abs/2310.03714), §§2–3 | Composes LM modules with input/output signatures and optimises a program against a metric. | The abstraction helps separate each node's task from its prompt. DSPy also supports methods, including fine-tuning, that this proposal does not adopt. |
+| Opsahl-Ong et al., [MIPRO](https://arxiv.org/abs/2406.11695v2), §§2–4, Algorithm 1 | Proposes per-module instructions and demonstrations, then uses measured downstream scores to search their combinations. | A reference for discrete configuration search and credit assignment. Zenith's regime-conditioned selection and chronological evaluation remain separate, untested design choices. |
+| Pryzant et al., [ProTeGi](https://arxiv.org/abs/2305.03495), §2 | Uses error descriptions to propose prompt edits, with beam search and candidate selection. | “Textual gradients” are an analogy for verbal feedback. They supply neither derivatives through the API nor evidence that a particular diagnosis is causally correct. |
+| Yuksekgonul et al., [TextGrad](https://arxiv.org/abs/2406.07496v1), §2 | Propagates textual feedback through a computation graph to revise selected variables. | A close precedent for graph-based feedback. The paper explicitly treats differentiation as a metaphor; its reported task results do not establish financial forecasting performance here. |
+
+These papers support the terminology and method comparisons. They do not prove
+the usefulness, novelty or robustness of Zenith's proposed controller. AlphaGo
+Zero and autoresearch remain earlier motivations for successive comparisons;
+they are not substitutes for this nearer prompt-optimisation literature.
 
 ## A snapshot can contain a history
 
@@ -43,7 +80,7 @@ The present archived captures do not establish all of these clocks. More data
 alone does not repair that limitation, or a current model's possible knowledge
 of later events. Private licences and raw payloads stay outside the public repo.
 
-## What a prompt weight would mean
+## What a prompt setting controls
 
 Each node would receive a dossier assembled from a shared core, its own task
 contract, and several adjustable text components. **The node keeps the same
@@ -92,7 +129,7 @@ same prompt are the same textual intervention, not two different treatments.
 
 ## Generalise across the reasoning graph
 
-Use one shared regime encoder and a small output head for each reasoning node.
+Use one shared context encoder and a small output head for each reasoning node.
 The shared encoder reads the declared cutoff-available signals; each head
 selects settings for that node's few, named semantic components. A renderer
 then compiles the node's dossier from the common core, its unchanged task
@@ -137,16 +174,21 @@ Thus the prompt varies with the observed conditions; it is not one fixed prompt
 with a different number mentioned in it.
 
 ```mermaid
-flowchart LR
-    S[Signals available at cutoff] --> C[Shared regime encoder]
-    C --> H[Small per-node heads]
-    H --> W[Semantic settings from 0 to 1]
-    W --> R[Versioned text lookup]
-    R --> P[Per-node dossier and prompt]
-    P --> G[Lab graph and frozen forecast]
-    G --> L[Later outcome and declared loss]
-    L -. training cases only .-> C
+flowchart TD
+    S[Condition signals available at cutoff] --> C[Shared encoder and per-node heads]
+    C --> W[Prompt settings from 0 to 1]
+    W --> P[Fixed instructions plus selected text variants]
+    F[Fixed task specification] --> P
+    P --> N[Same reasoning task with fixed base model]
+    I[Permitted feed and earlier node outputs] --> N
+    N --> O[Save output and pass it to the next nodes]
 ```
+
+This is the prediction-time path for one node; its controller has already been
+fitted and frozen. Development is a separate sequence: evaluate configurations
+on development cases, fit or select a controller from their measured losses,
+then freeze it before testing later cases. There is no arrow from a test
+outcome back into the controller that produced that same forecast.
 
 VIX estimates expected 30-day S&P 500 volatility from option quotations. It is
 one possible feature, not a complete measurement of market stress, a direction

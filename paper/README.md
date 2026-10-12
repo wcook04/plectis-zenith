@@ -12,3 +12,11 @@ The paper follows the original idea through actual earlier/later feed snapshots,
 the native reasoning graphs and the measured execution result. It distinguishes
 runtime repairs from improved forecasts. Update its example from saved results;
 keep borrowed methods and data cited where used. Keep it within four pages.
+
+The paper uses *language-model program*, *discrete prompt optimisation* and
+*context-conditioned prompt selection* to distinguish the graph, its adjustable
+text and the proposed controller. DSPy, MIPRO, ProTeGi and TextGrad are cited at
+their specific uses. Page 3 separates prediction-time prompt assembly from
+development-time fitting; prompt settings and learned controller weights are
+different objects. The [research direction](../docs/research-direction.md)
+contains the fuller terminology and source comparisons.
