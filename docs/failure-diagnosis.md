@@ -181,3 +181,11 @@ the next cycle starts after that comparison's outcomes have matured. Preserve
 rejected changes too. This is the original Lab → Oracle → Evolve loop with a
 testable link between diagnosis and intervention, not an oracle that knows the
 cause of every forecast error.
+
+An execution failure can stop this loop before any prediction exists. Keep its
+mechanism separate from the epistemic matrix: output truncation at a grouping
+node does not by itself establish a grouping or reasoning error. The
+[original-feed window example](original-feed-windows.md) demonstrates this
+boundary with four native Lab attempts, one instruction change and two later
+component comparisons. A native schema pass, obedience to the new instruction,
+complete graph execution and forecast benefit are separate outcomes.
