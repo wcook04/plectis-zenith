@@ -117,8 +117,8 @@ def policy_from(path):
     if policy["observation_precision"] not in {"timestamp", "session_close"}:
         raise ValueError("observation_precision must be timestamp or session_close")
     if policy["observation_precision"] == "session_close":
-        if policy.get("calendar_id") != "XNYS":
-            raise ValueError("session_close currently requires the native XNYS calendar")
+        if policy.get("calendar_id") not in {"XNYS", "XSHG"}:
+            raise ValueError("session_close requires the native XNYS or XSHG calendar")
         actual = importlib.metadata.version("exchange_calendars")
         if policy.get("calendar_version") != actual:
             raise ValueError("session_close requires the exact installed exchange_calendars version")
@@ -133,8 +133,14 @@ def observation_time(raw, policy):
     day = date.fromisoformat(raw)
     if importlib.metadata.version("exchange_calendars") != policy["calendar_version"]:
         raise ValueError("frozen calendar version changed")
-    from system.core.engine import _xnys_calendar
-    calendar = _xnys_calendar(day.year)
+    if policy['calendar_id'] == 'XNYS':
+        from system.core.engine import _xnys_calendar
+        calendar = _xnys_calendar(day.year)
+    elif policy['calendar_id'] == 'XSHG':
+        import exchange_calendars
+        calendar = exchange_calendars.get_calendar('XSHG', start=f'{day.year}-01-01', end=f'{day.year}-12-31')
+    else:
+        raise ValueError('Unsupported session calendar')
     session = calendar.date_to_session(day.isoformat(), direction="none")
     return calendar.session_close(session).to_pydatetime().astimezone(timezone.utc)
 
@@ -317,6 +323,19 @@ def register(store, subject_run, policy_path, horizon_id, *, root=ROOT):
             resolved = timestamp(GodModeEngine.resolve_horizon(horizon_id, issue)["target_time"])
             if resolved != horizon:
                 raise ValueError("next_us_close horizon_id disagrees with the native exchange calendar")
+        elif horizon_id == 'next_xshg_close':
+            if policy.get('calendar_id') != 'XSHG':
+                raise ValueError('next_xshg_close requires the declared XSHG calendar')
+            import exchange_calendars
+            from zoneinfo import ZoneInfo
+            local_day = issue.astimezone(ZoneInfo('Asia/Shanghai')).date()
+            calendar = exchange_calendars.get_calendar('XSHG', start=local_day.isoformat(), end=(local_day+timedelta(days=31)).isoformat())
+            session = calendar.date_to_session(local_day.isoformat(), direction='next')
+            resolved = calendar.session_close(session).to_pydatetime()
+            if resolved <= issue:
+                resolved = calendar.session_close(calendar.next_session(session)).to_pydatetime()
+            if resolved != horizon:
+                raise ValueError('next_xshg_close horizon_id disagrees with the native exchange calendar')
         if (target, issue.isoformat(), horizon.isoformat()) in pairs:
             raise ValueError("duplicate target/issue/horizon in CP2")
         pairs.add((target, issue.isoformat(), horizon.isoformat()))

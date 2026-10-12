@@ -2,6 +2,35 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Richer data through the native daily loop, 12 October 2026
+
+The [TraderHarness adapter](traderharness-daily.md) connects five pinned tables
+and ten stocks to the existing Lab/Oracle/Evolve. Original bars support 696
+complete trailing windows and 695 adjacent next-close pairs. Text stops at the
+observed XSHG close; the packet becomes available one minute later. Raw CNY
+quotes remain separate from rebased wealth. A regression found numeric ticker
+coercion in the native price join; identifiers now retain leading zeros.
+
+The [verified receipt](traderharness-native-receipt.json) records an April27 →
+April28, 2023 episode: 28/28 Lab nodes, 31/31 Oracle nodes, 32 accepted primary
+responses and one retained/corrected Oracle handle syntax error. No prior
+responses were replayed and no new paid provider call was made. The Lab
+abstained, so no forecast loss, hit rate or learned advantage exists. Evolve
+created an explicit claim-owner/entity/listing check for the NEWS miner. It is
+a reviewed candidate, not a selected generation or tested improvement.
+
+Follow-up: test richer numerical forecast hypotheses and the NEWS candidate on
+later matched inputs. The current empirical formula only admits XNYS, while
+native stock-miner wording still uses a dollar glyph; this CNY run explicitly
+preserved its source currency. Change those interfaces in a new source version
+and preserve this completed programme. A separate primary-source issuer audit
+is documented in the daily guide and cited at its use in the paper.
+
+Validation: 647 tests passed, including holiday timing, post-close text
+exclusion, raw-quote/wealth separation, leading-zero stock identities and exact
+XSHG next-close registration. Source clocks and archive revision vintages remain
+unverified; these are implementation and development receipts.
+
 ## Actual Evolve change used on the next day, 12 October 2026
 
 The [two-issue empirical sequence](empirical-forecasts.md#the-completed-two-day-sequence)

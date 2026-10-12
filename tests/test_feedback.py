@@ -56,6 +56,31 @@ class FeedbackTests(unittest.TestCase):
             self.assertEqual(Path(ref["path"]).read_bytes(), path.read_bytes())
             self.assertEqual(ref, engine.source_ref(path, root=root))
 
+    def test_xshg_numeric_cny_target_uses_actual_close_not_packet_availability(self):
+        issue = datetime(2023, 9, 28, 7, 1, tzinfo=timezone.utc)
+        horizon = datetime(2023, 10, 9, 7, tzinfo=timezone.utc)
+        run = fixture_run(self.directory/'LAB_CNY', issue, horizon)
+        for path in (run/'artifacts').glob('*.json'):
+            path.write_text(path.read_text().replace('XOM', '600438').replace('USD', 'CNY'))
+        policy = engine.read_object(self.policy)
+        policy.update(currency='CNY', observation_precision='session_close', calendar_id='XSHG',
+                      calendar_version=importlib.metadata.version('exchange_calendars'))
+        write_json(self.policy, policy)
+        feed_path = run/'artifacts/global_stock_feed.json'
+        feed = engine.read_object(feed_path)
+        feed['data'] = {'columns': ['Ticker', 'Price', 'date'], 'rows': [['600438', 100., '2023-09-28']]}
+        write_json(feed_path, feed)
+        engine.register(self.store, run, self.policy, 'next_xshg_close')
+        truth = self.truth([{'target_id': '600438', 'date': '2023-10-09', 'price': 99.}], currency='CNY',
+                           fetch_time='2023-10-09T07:01:00+00:00')
+        result = engine.score(self.store, truth, '2023-10-09T07:01:00+00:00')['evaluations'][0]
+        self.assertEqual(result['status'], 'scored')
+        self.assertEqual(result['metrics']['target_price_absolute_error'], 2.)
+        self.assertEqual(engine.observation_time('2023-10-09', policy), horizon)
+        wrong = fixture_run(self.directory/'LAB_WRONG_CLOSE', issue, horizon+timedelta(days=1))
+        with self.assertRaisesRegex(ValueError, 'next_xshg_close horizon_id disagrees'):
+            engine.register(self.directory/'wrong-ledger', wrong, self.policy, 'next_xshg_close')
+
     def test_pending_truth_never_becomes_a_model_miss(self):
         self.register()
         result = self.score(as_of=self.issue.isoformat())["evaluations"][0]

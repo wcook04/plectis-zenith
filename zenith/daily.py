@@ -45,6 +45,9 @@ def dataset_adapter(dataset):
     if schema == 'investorbench_source_v1':
         from benchmarks import investorbench
         return investorbench
+    if schema == 'traderharness_daily_source_v1':
+        from benchmarks import traderharness_daily
+        return traderharness_daily
     raise ValueError('No native daily adapter for this source manifest')
 
 
@@ -63,9 +66,9 @@ def initialize(root, directory, dataset, start, end, policy=None, retention=None
     first, last = date.fromisoformat(start), date.fromisoformat(end)
     if last < first or (last-first).days > 366:
         raise ValueError("Use an ordered daily range of at most one year")
-    calendar = fnspid.calendar_for(start, (last + timedelta(days=14)).isoformat())
+    calendar = adapter.calendar_for(start, (last + timedelta(days=14)).isoformat())
     if not calendar.is_session(start) or not calendar.is_session(end):
-        raise ValueError("Start and end must be XNYS sessions")
+        raise ValueError("Start and end must be source exchange sessions")
     retention_receipt = None
     if policy and retention:
         raise ValueError('Choose a baseline policy or a retained generation receipt, not both')
@@ -91,6 +94,7 @@ def initialize(root, directory, dataset, start, end, policy=None, retention=None
             path = directory/'feeds'/session
             snapshot = adapter.snapshot(dataset, session, path)
             snapshots.append({"date": session, "anchor": snapshot['issue_at_utc'],
+                              "observation_at": snapshot.get('observation_at_utc', snapshot['issue_at_utc']),
                               "path": str(path), "snapshot_sha256": snapshot['snapshot_sha256'],
                               "files": read(path/'artifact-manifest.json')['files']})
         immutable(directory/'policies/baseline.json', baseline)
@@ -137,7 +141,7 @@ def checked_run(root, manifest, index, mission, policy_path):
     before, after = manifest['snapshots'][index:index+2]
     run_id = lab_id if mission == 'lab' else oracle_id
     expected = {'mission': mission, 'provider': 'agent', 'time_anchor': before['anchor'],
-                'horizon': after['anchor'], 'context_profile': manifest['context_profile']}
+                'horizon': after.get('observation_at', after['anchor']), 'context_profile': manifest['context_profile']}
     if mission == 'lab':
         expected.update(feed_source=before['path'], policy=str(policy_path))
     else:

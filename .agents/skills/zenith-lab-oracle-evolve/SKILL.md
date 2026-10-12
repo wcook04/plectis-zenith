@@ -6,6 +6,13 @@ compatibility: Python 3.11 or newer; run commands from repository root. Use --ro
 
 # Zenith Lab → Oracle → Evolve operation
 
+Historical adapters must preserve opaque issuer IDs (including leading zeros),
+quote currency/basis and separate observation/availability clocks. Daily and
+matchoff calendars belong to the source. Text used to explain an outcome must
+not extend beyond that outcome's timestamp, even when its feed is available
+later. Keep rebased wealth context separate from raw quote targets. The richer
+native A-share adapter is documented in `docs/traderharness-daily.md`.
+
 Start with `AGENTS.md` and `docs/skills.md`. Read the actual mission and
 artifact contracts selected by the CLI. Disk receipts determine whether a
 run completed; a prepared packet is pending work.

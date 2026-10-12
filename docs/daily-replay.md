@@ -5,7 +5,10 @@ forecast, confront the later observations, diagnose the attempt, and carry a
 reviewed improvement into a later day. `program.md` owns this direction.
 The current work reconnects that loop to the existing full graph.
 
-For a longer shared panel, use [InvestorBench](investorbench.md): three equities
+For richer daily inputs, use [TraderHarness](traderharness-daily.md): ten equities,
+headlines, announcement titles, corporate-action history and CSI300 context.
+It targets the next XSHG-session raw CNY close, separating packet availability
+from price observation time. For a smaller panel, use [InvestorBench](investorbench.md): three equities
 and 291 complete daily price dates, with date-only summaries delayed by a day.
 Pass `--dataset work/datasets/investorbench` to the same controller. This page
 also preserves the original FNSPID episode and its sharper article clocks.

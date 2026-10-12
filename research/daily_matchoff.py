@@ -31,7 +31,7 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
     first, last = date.fromisoformat(start), date.fromisoformat(end)
     if last < first or (last-first).days > 366:
         raise ValueError('Use an ordered matchoff range of at most one year')
-    calendar = daily.fnspid.calendar_for(start, (last+timedelta(days=14)).isoformat())
+    calendar = adapter.calendar_for(start, (last+timedelta(days=14)).isoformat())
     if not calendar.is_session(start) or not calendar.is_session(end):
         raise ValueError('Matchoff boundaries must be exchange sessions')
     dates = [s.date().isoformat() for s in calendar.sessions_in_range(start, end)]
@@ -55,8 +55,10 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
         for row in subject_rows+truth_rows:
             basis.add(row['price_basis']); currency.add(row['currency'])
         issues.append({'issue_id': 'day-'+dates[i].replace('-', ''), 'feed_source': str(before[0]),
-                       'time_anchor': before[1]['issue_at_utc'], 'target_time': after[1]['issue_at_utc'],
-                       'horizon_id': 'next_us_close', 'target_ids': targets, 'split': 'development'})
+                       'time_anchor': before[1]['issue_at_utc'],
+                       'target_time': after[1].get('observation_at_utc', after[1]['issue_at_utc']),
+                       'horizon_id': 'next_us_close' if calendar.name == 'XNYS' else 'next_'+calendar.name.lower()+'_close',
+                       'target_ids': targets, 'split': 'development'})
         truth.extend({'target_id': r['target_id'], 'date': r['observed'], 'price': r['price'],
                       'source': r['source']} for r in truth_rows)
     if len(basis) != 1 or None in basis or len(currency) != 1 or None in currency:
@@ -64,7 +66,7 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
     price_basis, price_currency = next(iter(basis)), next(iter(currency))
     policy = {'schema': 'zenith_forecast_feedback_policy_v1', 'policy_id': 'daily-matchoff-v1',
               'price_basis': price_basis, 'currency': price_currency, 'observation_precision': 'session_close',
-              'calendar_id': 'XNYS', 'calendar_version': importlib.metadata.version('exchange_calendars'),
+              'calendar_id': calendar.name, 'calendar_version': importlib.metadata.version('exchange_calendars'),
               'relative_error_threshold': 0.05}
     daily.immutable(output/'feedback-policy.json', policy)
     daily.immutable(output/'truth.json', {'metadata': {'status': 'success', 'price_basis': price_basis, 'currency': price_currency},

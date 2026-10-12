@@ -23,17 +23,26 @@ git clone https://github.com/wcook04/plectis-zenith.git
 cd plectis-zenith
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install -e '.[test]'
+python -m pip install -e '.[test,study]'
 python -m zenith validate
-python -m benchmarks.investorbench acquire
+python -m benchmarks.traderharness_daily acquire
 python -m zenith daily init --work-dir work/daily-demo \
-  --dataset work/datasets/investorbench \
-  --start 2020-07-01 --end 2020-07-31 \
+  --dataset work/datasets/traderharness-daily \
+  --start 2023-04-27 --end 2023-04-27 \
   --policy examples/daily/sparse-policy.json
 python -m zenith daily next --work-dir work/daily-demo
 ```
 
-The pinned [InvestorBench panel](docs/investorbench.md) supplies **MSFT, HON and
+The [TraderHarness daily adapter](docs/traderharness-daily.md) supplies **ten
+stocks, daily OHLCV, issuer headlines, announcement titles, historical corporate
+actions and CSI300 context** to the same full Lab. Its five pinned tables total
+175 MB. Raw CNY prices remain separate from rebased wealth history; financial
+facts with unresolved revisions are excluded. Text stops at the close, packet
+availability is reconstructed one minute later, and the target is the next
+XSHG-session close. Five native feed lanes remain explicitly unavailable.
+Source vintages are unverified.
+
+The smaller pinned [InvestorBench panel](docs/investorbench.md) supplies **MSFT, HON and
 JNJ prices on all 291 trading days from 12 March 2020 through 6 May 2021**, plus
 4,990 news summaries. The adapter delays date-only summaries by one calendar day,
 excludes unclocked filing summaries and retains five unavailable feed lanes.

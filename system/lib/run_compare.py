@@ -88,7 +88,9 @@ def load_feed_prices(run_dir: Path | str, feed_name: str) -> Dict[str, Dict[str,
             if not isinstance(row, list):
                 continue
             record = {
-                str(col): _coerce_scalar(row[idx]) if idx < len(row) else None
+                # Issuer identifiers are opaque strings, including leading-zero
+                # A-share codes. Numeric coercion belongs to measurements only.
+                str(col): (row[idx] if str(col).lower() == 'ticker' else _coerce_scalar(row[idx])) if idx < len(row) else None
                 for idx, col in enumerate(columns)
             }
             ticker = record.get("Ticker") or record.get("ticker")
