@@ -42,12 +42,6 @@ def dataset_adapter(dataset):
     schema = read(Path(dataset)/'source-manifest.json').get('schema')
     if schema == 'fnspid_raw_source_v1':
         return fnspid
-    if schema == 'investorbench_source_v1':
-        from benchmarks import investorbench
-        return investorbench
-    if schema == 'traderharness_daily_source_v1':
-        from benchmarks import traderharness_daily
-        return traderharness_daily
     raise ValueError('No native daily adapter for this source manifest')
 
 

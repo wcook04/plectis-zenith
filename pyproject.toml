@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "plectis-zenith"
 version = "0.1.0"
-description = "Agent-native market research graphs and reproducible experiments"
+description = "Historical daily feeds, Lab forecasts, Oracle feedback and reviewed Evolve changes"
 readme = "README.md"
 license = {file = "LICENSE"}
 authors = [{name = "Will Cook"}]
@@ -13,8 +13,7 @@ requires-python = ">=3.11"
 dependencies = ["requests>=2.32,<3", "exchange-calendars>=4.13,<5", "python-dotenv>=1.0,<2"]
 
 [project.optional-dependencies]
-study = ["numpy>=1.26,<3", "pandas>=2.2,<3", "pyarrow>=18,<24", "scikit-learn>=1.6,<2"]
-test = ["pytest>=8,<9", "numpy>=1.26,<3", "pandas>=2.2,<3", "jsonschema>=4.25,<5", "scikit-learn>=1.6,<2"]
+test = ["pytest>=8,<9", "numpy>=1.26,<3", "pandas>=2.2,<3", "jsonschema>=4.25,<5"]
 feeds = ["numpy>=1.26,<3", "pandas>=2.2,<3", "yfinance>=0.2.65,<1", "telethon>=1.40,<2", "exchange-calendars>=4.13,<5"]
 browser = ["websocket-client>=1.8,<2", "pyperclip>=1.9,<2"]
 
@@ -26,6 +25,3 @@ namespaces = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
-
-[tool.setuptools.package-data]
-benchmarks = ["stocknet_protocol.json"]

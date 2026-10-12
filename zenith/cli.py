@@ -41,10 +41,6 @@ def parser() -> argparse.ArgumentParser:
     retain.add_argument("--matchoff", type=Path, required=True)
     retain.add_argument("--reviewer", required=True)
     commands.add_parser("missions", help="list authored mission groups")
-    serve = commands.add_parser("serve", help="serve reviewed graph metadata through a read-only local HTTP API")
-    serve.add_argument("--host", default="127.0.0.1")
-    serve.add_argument("--port", type=int, default=8765)
-    serve.add_argument("--allow-origin", action="append", default=[], help="exact frontend origin allowed by CORS; repeatable")
     provider = commands.add_parser("provider", help="own-key metadata-only setup checks")
     provider.add_argument("provider_command", choices=("doctor", "models"))
     provider.add_argument("--provider", choices=("openrouter_free", "nvidia_nim"), default="openrouter_free")
@@ -108,9 +104,6 @@ def dispatch(args) -> dict:
         if args.daily_command == "init":
             return daily.initialize(root, args.work_dir, args.dataset, args.start, args.end, args.policy, args.retention)
         return daily.advance(root, args.work_dir, getattr(args, "response", None), getattr(args, "reviewer", None))
-    if args.command == "serve":
-        from .api import serve
-        return serve(root, args.host, args.port, args.allow_origin)
     if args.command == "provider":
         from .provider_setup import check
         return check(provider=args.provider, env_file=args.env_file, offline=args.offline, check_key=args.check_key)

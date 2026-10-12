@@ -30,12 +30,8 @@ def _graph_loader(root: Path, graph_variant: dict | None = None):
     if graph_variant is not None:
         if not isinstance(graph_variant, dict):
             raise ValueError("graph variant must be an object")
-        from variants.predictor import SCHEMA, PredictorLoader
-        if graph_variant.get("schema_version") == SCHEMA:
-            loader = PredictorLoader(loader, graph_variant)
-        else:
-            from variants.graph import FrozenGraphLoader
-            loader = FrozenGraphLoader(loader, graph_variant)
+        from variants.graph import FrozenGraphLoader
+        loader = FrozenGraphLoader(loader, graph_variant)
     return loader
 
 

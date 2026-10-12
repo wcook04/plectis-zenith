@@ -966,9 +966,6 @@ def validate_cp1(payload: Any) -> ValidationResult:
 
     errors.extend(rule_errors(payload))
     errors.extend(quantile_rule_errors(payload))
-    if 'economic_state' in payload or 'learned_head_derivation' in payload:
-        from system.lib.learned_composition import rule_errors as learned_rule_errors
-        errors.extend(learned_rule_errors(payload))
     # Abstention is an explicit, evidence-bound decision, never an empty forecast.
     decision_status = payload.get("decision_status", "FORECAST")
     if decision_status not in ("FORECAST", "ABSTAIN"):
@@ -1246,10 +1243,6 @@ def validate_cp2(
                                 expected_target_time_iso))
     errors.extend(quantile_target_errors(payload, subject_run_dir, expected_snapshot_time,
                                         expected_target_time_iso))
-    if 'learned_head_derivation' in payload:
-        from system.lib.learned_composition import replay_errors
-        issue = expected_snapshot_time or next((p.get('snapshot_time') for p in payload.get('predictions_t',[]) if isinstance(p,dict)),None)
-        errors.extend(replay_errors(payload, subject_run_dir, issue))
     audit_errors = payload.get("_engine_audit_errors")
     if isinstance(audit_errors, list):
         for raw in audit_errors:

@@ -2448,13 +2448,6 @@ class GodModeEngine:
         policy = getattr(self, "_reasoning_policy", None)
         if policy is not None:
             inputs, skill_addon, context_receipt = apply_reasoning_policy(node, inputs, policy)
-            if 'learned_head' in policy['nodes'].get(node.id, {}):
-                from system.lib.learned_head import ENCODER
-                prompt += ('\n[FITTED_HEAD_COMPOSITION]\nA frozen fitted operator supplies the numerical quantiles. '
-                    'Return normal JUDGMENTAL CP1 fields and economic_state, but omit forecast_quantiles and learned_head_derivation. '
-                    'economic_state follows this encoding contract (place its array inside the CP1 object, not at top level):\n'
-                    + ENCODER + '\nThe engine records your original response and derives quantiles before CP1 validation. '
-                    'The representation is authored here; the fitted weights supply its numerical mapping.\n[/FITTED_HEAD_COMPOSITION]\n')
             if skill_addon:
                 prompt += (
                     "\n\n[LEARNED_SKILL_TAKEAWAY]\n"
@@ -2796,18 +2789,9 @@ class GodModeEngine:
 
             # Schema validation / deterministic JSON contract checks
             if output_schema in _STRUCTURED_JSON_OUTPUT_SCHEMAS:
-                learned_model = (getattr(self, '_reasoning_policy', None) or {}).get('nodes',{}).get(node.id,{}).get('learned_head')
-                composition_error = None
-                if learned_model is not None:
-                    from system.lib.learned_composition import materialize
-                    try:
-                        parsed = materialize(parsed,learned_model,self.run_dir,self._run_anchor_iso)
-                    except (ValueError,KeyError,TypeError,IndexError,OSError) as exc:
-                        composition_error = str(exc)
                 if output_schema == "isomorphic_cp2":
                     parsed = self._audit_cp2_predictions(parsed)
-                result = (ValidationResult.failure(['INVALID_LEARNED_HEAD: '+composition_error]) if composition_error
-                          else self._validate_schema_output(node, output_schema, parsed))
+                result = self._validate_schema_output(node, output_schema, parsed)
                 if not result.ok:
                     attempt_error_class = "SCHEMA_VALIDATION"
                     errors = list(result.errors)
@@ -3012,13 +2996,7 @@ class GodModeEngine:
     def _validate_schema_output(self, node: CodexNode, output_schema: str, parsed: Any) -> ValidationResult:
         """Dispatch CP validation based on output_schema."""
         if output_schema == "isomorphic_cp1":
-            result = validate_cp1(parsed)
-            if isinstance(parsed,dict) and 'learned_head_derivation' in parsed:
-                from system.lib.learned_composition import replay_errors
-                errors = replay_errors(parsed,self.run_dir,self._run_anchor_iso)
-                if errors:
-                    return ValidationResult.failure(result.errors+errors)
-            return result
+            return validate_cp1(parsed)
         elif output_schema == "json":
             if node.id == "lab_cross_corr_v1":
                 return validate_cross_corr_v1(parsed)
@@ -3045,8 +3023,6 @@ class GodModeEngine:
                     if (cp1.get("forecast_basis", "CAUSAL") != parsed.get("forecast_basis", "CAUSAL")
                             or cp1.get("empirical_rule") != parsed.get("empirical_rule")
                             or cp1.get("forecast_quantiles") != parsed.get("forecast_quantiles")
-                            or cp1.get('economic_state') != parsed.get('economic_state')
-                            or cp1.get('learned_head_derivation') != parsed.get('learned_head_derivation')
                             or locked_evidence(cp1) != locked_evidence(parsed)):
                         return ValidationResult.failure(cp2_result.errors + [
                             "FORECAST_RULE_MISMATCH: Director must preserve CP1 forecast basis and rule"])
@@ -3058,8 +3034,6 @@ class GodModeEngine:
                         parsed.get("forecast_basis", "CAUSAL") != subject.get("forecast_basis", "CAUSAL") or
                         parsed.get("empirical_rule") != subject.get("empirical_rule") or
                         parsed.get("forecast_quantiles") != subject.get("forecast_quantiles") or
-                        parsed.get('economic_state') != subject.get('economic_state') or
-                        parsed.get('learned_head_derivation') != subject.get('learned_head_derivation') or
                         locked_evidence(parsed) != locked_evidence(subject)):
                     return ValidationResult.failure(cp2_result.errors + [
                         "FORECAST_RULE_MISMATCH: Oracle must not fit an empirical rule to later truth"])

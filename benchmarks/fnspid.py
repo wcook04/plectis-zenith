@@ -17,8 +17,6 @@ import shutil
 import urllib.request
 from zoneinfo import ZoneInfo
 
-from benchmarks.finmultitime import calendar_for, canonical_hash, write_json
-
 ROOT = Path(__file__).resolve().parents[1]
 REVISION = "4054842ec476953b30ee874d4b7e8eea786a21fa"
 REPOSITORY = "https://github.com/zGeneral/fnspid"
@@ -40,6 +38,20 @@ POLICY = {
     "publication": "original publisher timestamps are asserted publication times; historical capture and revision vintages remain unverified",
     "rights": "local research custody only; repository license does not establish redistribution rights in publisher articles",
 }
+
+
+def write_json(path: Path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, indent=2, sort_keys=True, allow_nan=False) + "\n")
+
+
+def canonical_hash(value) -> str:
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+
+
+def calendar_for(start: str, end: str):
+    import exchange_calendars
+    return exchange_calendars.get_calendar("XNYS", start=start, end=end)
 
 
 def sha(path):

@@ -1,13 +1,36 @@
 """Matched-generation adapter tests, using a synthetic reviewed teacher."""
-import json
-from pathlib import Path
+import csv
 import pytest
 from research import daily_matchoff, cohort
 from zenith import daily, runtime
 from zenith.providers import AgentProvider, ResponsePending
-from benchmarks import investorbench as ib
-from test_investorbench import source
-from test_traderharness_daily import source_index, native_source
+from benchmarks import fnspid as fn
+
+
+@pytest.fixture
+def source(tmp_path, monkeypatch):
+    """Real FNSPID adapter over pinned synthetic AA CSV observations."""
+    dataset = tmp_path/'source'
+    dataset.mkdir()
+    calendar = fn.calendar_for('2020-05-01', '2020-08-10')
+    with (dataset/'aa-prices.csv').open('w', newline='') as stream:
+        writer = csv.writer(stream)
+        writer.writerow(['Date', 'Open', 'High', 'Low', 'Close', 'Adj Close', 'Volume'])
+        for i, session in enumerate(calendar.sessions_in_range('2020-05-01', '2020-08-07')):
+            price = 100+i
+            writer.writerow([session.date().isoformat(), price, price+1, price-1, price, price, 1000+i])
+    with (dataset/'aa-news.csv').open('w', newline='') as stream:
+        writer = csv.writer(stream)
+        writer.writerow(['Date', 'Url', 'Text', 'Mark'])
+        writer.writerow(['July 1, 2020 — 03:00 pm EDT', 'https://example.invalid/aa',
+                         'Synthetic AA source text for native adapter tests.', 1])
+    files = {name: {'upstream': name, 'bytes': (dataset/name).stat().st_size,
+                    'sha256': fn.sha(dataset/name)} for name in fn.FILES}
+    monkeypatch.setattr(fn, 'FILES', files)
+    manifest = {'schema': 'fnspid_raw_source_v1', 'repository': fn.REPOSITORY,
+                'revision': fn.REVISION, 'files': files, 'policy': fn.POLICY}
+    fn.write_json(dataset/'source-manifest.json', {**manifest, 'manifest_sha256': fn.canonical_hash(manifest)})
+    return dataset
 
 
 def teacher(tmp_path, monkeypatch, matured='2020-06-30T20:00:00+00:00'):
@@ -32,7 +55,7 @@ def test_freeze_uses_same_native_issues_and_distinct_policies(source, tmp_path, 
     assert result['reasoning_responses_planned'] == 42
     spec = daily.read(output/'cohort/cohort.json')
     assert [c['candidate_id'] for c in spec['candidates']] == ['baseline', 'challenger']
-    assert spec['issues'][0]['target_ids'] == ['HON', 'JNJ', 'MSFT']
+    assert spec['issues'][0]['target_ids'] == ['AA']
     assert {c['model'] for c in spec['candidates']} == {'synthetic-agent'}
     assert all(len(c['reasoner_scope']) == 21 for c in spec['candidates'])
     result = cohort.evaluate(output/'cohort')
@@ -75,26 +98,6 @@ def test_response_allowance_rejects_invalid_values_before_writes(tmp_path, allow
     assert not output.exists()
 
 
-@pytest.mark.parametrize('issue,target', [('2023-04-28', '2023-05-04'), ('2023-05-05', '2023-05-08')])
-def test_xshg_matchoff_resolves_native_horizon_across_holiday_and_weekend(native_source, tmp_path, monkeypatch, issue, target):
-    teacher(tmp_path, monkeypatch, '2023-04-27T07:01:00+00:00')
-    output = tmp_path/'xshg-matchoff'
-    daily_matchoff.freeze(runtime.DEFAULT_ROOT, tmp_path, 0, native_source,
-                          issue, issue, output, 'synthetic-agent', 0)
-    spec = daily.read(output/'cohort/cohort.json')
-    row = spec['issues'][0]
-    assert row['time_anchor'] == issue+'T07:01:00+00:00'
-    assert row['target_time'] == target+'T07:00:00+00:00'
-    assert row['horizon_id'] == row['target_time']
-    assert row['target_ids'] == ['600438']
-    policy = daily.read(output/'cohort'/spec['feedback_policy'])
-    assert (policy['calendar_id'], policy['currency']) == ('XSHG', 'CNY')
-    actions = cohort.next_actions(output/'cohort')
-    for action in actions['actions']:
-        argv = action['native_argv']
-        assert argv[argv.index('--horizon')+1] == row['target_time']
-
-
 def test_agent_receipt_discloses_native_execution_kind(tmp_path):
     run = tmp_path/'SYNTHETIC'
     provider = AgentProvider(run)
@@ -106,21 +109,10 @@ def test_agent_receipt_discloses_native_execution_kind(tmp_path):
 
 
 @pytest.mark.parametrize('decision,selected', [('candidate_proposal', 'challenger'), ('discard', 'incumbent')])
-def test_retention_binds_selection_and_next_generation_cutoff(tmp_path, monkeypatch, decision, selected):
+def test_retention_binds_selection_and_next_generation_cutoff(source, tmp_path, monkeypatch, decision, selected):
     """Stub only scores; real source adaptation, freeze, retention and init boundaries."""
     teacher(tmp_path, monkeypatch)
-    raw = tmp_path/'raw'
-    raw.mkdir()
-    calendar = daily.fnspid.calendar_for('2020-07-01', '2020-08-10')
-    rows = {s.date().isoformat(): {'prices': 100+i, 'news': [], '10k': [], '10q': []}
-            for i, s in enumerate(calendar.sessions_in_range('2020-07-01', '2020-08-07'))}
-    pins = {}
-    for name in ib.FILES:
-        daily.write_json(raw/name, rows)
-        pins[name] = ib.sha(raw/name)
-    monkeypatch.setattr(ib, 'FILES', pins)
-    dataset = tmp_path/'admitted'
-    ib.acquire(dataset, raw)
+    dataset = source
     output = tmp_path/'matchoff'
     daily_matchoff.freeze(runtime.DEFAULT_ROOT, tmp_path, 0, dataset,
                           '2020-07-01', '2020-07-29', output, 'synthetic-agent', 0.001)

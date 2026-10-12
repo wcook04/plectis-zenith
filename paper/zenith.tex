@@ -1,746 +1,183 @@
-% SPDX-FileCopyrightText: 2026 Will Cook
-% SPDX-License-Identifier: Apache-2.0
-\documentclass[11pt,a4paper]{article}
-\usepackage{booktabs,tabularx}
-\usepackage{paper-house-style}
-\usepackage[numbers,sort&compress]{natbib}
-\usepackage{hyperref}
-\hypersetup{colorlinks=true,linkcolor=linkinternal,citecolor=linkinternal,
-  urlcolor=linkexternal,pdftitle={Zenith: Learning a Financial Reasoning Pipeline from Daily Experience},
-  pdfauthor={Will Cook}}
-\urlstyle{same}
-\title{Zenith: Learning a Financial Reasoning\\Pipeline from Daily Experience}
-\subtitle{The Lab, Oracle and Evolve system}
-\author{Will Cook}
-\date{Development report, 12 October 2026}
-\runninghead{Zenith: daily experience}
-\newcommand{\code}[1]{\texttt{\detokenize{#1}}}
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=24mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype,amsmath,booktabs}
+\usepackage[colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
+\usepackage{enumitem,tikz}
+\usetikzlibrary{arrows.meta,positioning}
+\setlist{nosep,leftmargin=*}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+\pagestyle{plain}
 \begin{document}
-\maketitle
-\provenancenote{AI agents researched, implemented and drafted this work under
-Will Cook's direction. Recorded source material and execution evidence delimit its claims.}
+\begin{center}
+{\Large\bfseries Zenith: learning a financial reasoning graph}\\[4pt]
+Will Cook \quad\textbullet\quad 12 October 2026
+\end{center}
 
-\begin{abstract}
-Zenith is a financial reasoning system built around repeated experience. A
-historical trading day's available feeds enter Lab, an inspectable reasoning
-graph that produces a cited forecast or an explicit no-call. After the forecast horizon,
-Oracle compares the frozen attempt with later observations and investigates
-which earlier evidence could have supported a better decision. Evolve uses
-that comparison to propose a transferable change to the reasoning pipeline;
-a reviewed successor then faces later days. The learning object is the
-pipeline's instructions, context, skills and eventually structure. The current
-implementation retains the original full Lab and Oracle, source-bound agent
-handoffs, output contracts and versioned policies in a standalone source
-checkout. A pinned ten-stock public source supplies 695 adjacent daily pairs
-with prices, dated headlines and announcement titles. Completed native episodes
-demonstrate forecasts, later scoring and a reviewed change reaching a subsequent
-Lab. The tested revisions have not established a financial learning advantage.
-A paid component intervention on two later historical issues changed the NEWS
-analysis but left all downstream quantiles identical between arms; a direct
-forecaster matched on the first issue. This distinguishes changes in an
-intermediate explanation from changes in numerical belief.
-A separate constructed experiment isolates interpretation, selection and
-numerical forecasting. It scores the whole original universe, retaining
-unselected names at a declared fallback. Among twelve supplied procedures,
-bounded search finds a combination that improves later synthetic loss, while
-strictly improving single-edit search stops at zero forecasts. Removing the
-predictive term makes zero forecasts the selected rule. This known-world
-example demonstrates an interaction between reasoning components and the
-update procedure; it is neither language-model discovery nor market evidence.
-The financial question remains whether reviewed changes improve later
-reasoning and forecasts beyond an unchanged pipeline and simple references.
-\end{abstract}
+\textbf{The idea.} Give a reasoning system the information available on a
+historical trading day. Let it choose what matters and predict what happens
+next. Compare those predictions with reality. Change the reasoning procedure,
+then test the changed version on later days. Repeat only while the evidence
+supports improvement.
 
-\section{The system we want to learn}
-The design starts from the job a financial reasoner should repeatedly perform:
-inspect the available information, explain a view, make commitments, confront
-what happens and improve the procedure. Historical data supplies many dated
-instances of that job. It should preserve the shape of the intended live
-inputs rather than determine an unrelated research task simply because a
-benchmark is convenient to score.
+The object that learns is a graph of reasoning operators. Each node transforms inputs into outputs. Learning changes its instructions,
+context, skills or connections; hosted-model weights remain fixed. Test whether
+the changed procedure makes better later predictions from the same information.
 
-Lab, Oracle and Evolve implement three distinct responsibilities. Lab commits
-using the information available at the issue time. Oracle receives both that
-frozen attempt and later evidence. Evolve decides whether the experience
-justifies a change that can be used without future information on a subsequent
-attempt. The investigator may be the lead agent or a worker given a fixed
-prompt and the same bound evidence. A scheduled chat is not required by the
-algorithm; it is one possible execution service.
+\begin{center}
+\begin{tikzpicture}[>=Stealth, every node/.style={font=\small},
+ box/.style={draw,rounded corners=3pt,align=center,minimum width=34mm,minimum height=11mm},
+ every path/.style={line width=.6pt}]
+\node[box,fill=blue!5] (data) at (0,0) {Historical\\six-feed snapshot};
+\node[box,fill=blue!5] (lab) at (4.5,0) {Lab graph\\select and predict};
+\node[box] (outcomes) at (9,0) {Advance time\\observe outcomes};
+\node[box] (oracle) at (9,-1.65) {Oracle\\measure and diagnose};
+\node[box,fill=blue!5] (evolve) at (4.5,-1.65) {Evolve\\propose a new version};
+\draw[->] (data) -- (lab);
+\draw[->] (lab) -- (outcomes);
+\draw[->] (outcomes) -- (oracle);
+\draw[->] (oracle) -- (evolve);
+\draw[->,dashed] (evolve) -- node[right,align=left,font=\scriptsize] {test on\\later days} (lab);
+\end{tikzpicture}
+\end{center}
 
-Here, learning initially means changing durable reasoning procedures and
-context policies, not updating the underlying language model's weights.
-Useful changes might make a miner recover the last comparable disclosure,
-require a synthesis node to confront a contrary observation, or make a
-forecaster disclose how it converted a qualitative view into a target price.
-Graph changes are a broader development option. One short skill update is the
-first implemented daily transition, not a permanent limit on the programme.
+\textbf{Lab.} Run the existing graph. Its operators interpret individual feeds,
+combine evidence and produce a forecast with an explicit asset, issue time,
+horizon and numerical target. Save intermediate outputs and the evidence used.
+Lab may abstain. A smaller selected set is useful only if its selection and
+predictions improve the declared objective.
 
-The central distinction is between improving a historical answer and improving
-the procedure that produces later answers. A hindsight explanation may expose
-a missed earlier signal, but it may also depend entirely on information that
-arrived afterward. That difference must survive into the proposed lesson.
+\textbf{Oracle.} Advance the historical clock and measure what happened.
+Keep two things separate: the observed error and an explanation of that error.
+A wrong forecast can follow from missing evidence, a misread fact, poor
+selection, a wrong numerical consequence or unavoidable uncertainty. A later
+narrative does not identify which cause was responsible.
 
-The operator's generation analogy comes from AlphaGo Zero: experience generated
-by a current system informs an improved policy, which supports subsequent
-experience \citep{silverhassabis2017}. Here the policy is a reasoning procedure,
-and its candidate version is compared with the incumbent on the same later
-market situations. This is a design analogy, not an implementation of neural
-self-play or tree search. Market outcomes must come from external observations;
-replaying a historical date cannot create a new independent market realization.
+\textbf{Evolve.} The lead agent, or a worker with a fixed prompt, reads the
+recorded experience and proposes a specific change. Save the old and new
+versions. Execute both on the same later inputs before retaining a winner.
+An attractive explanation earns a test, not automatic adoption.
 
-\section{One native graph, three stages}
-The standalone checkout contains the existing loader, executor, authored node
-JSON, contracts and policy machinery. It does not depend on the parent
-workspace's kernel, Task Ledger, private dossiers or interactive Station.
-The physical registry has 71 nodes across all retained mission families.
-The daily path executes the full 28-node Lab and 31-node Oracle; it does not
-substitute the earlier three-node price-only experiment.
+Successive version comparisons draw on AlphaGo Zero~\cite{alphago}; bounded
+edits and evaluation draw on autoresearch~\cite{autores}.
+Finance has no equivalent of generating unlimited games against oneself:
+market outcomes are external, noisy and limited. Reusing historical outcomes
+can overfit the research process. The analogy motivates the loop; it supplies
+neither a learning guarantee nor a performance claim.
 
-\begin{table}[htbp]
-\centering\small
-\begin{tabularx}{\linewidth}{@{}lXX@{}}
-\toprule
-Stage & Evidence and work & Persistent result \\
-\midrule
-Snapshot & Completed prices and eligible news at one trading-day boundary & Immutable feeds, clocks, source hashes and missingness \\
-Lab & Two mining passes, cross-lane synthesis, CP1 thesis, CP2 forecasts and integrity review & Frozen predictions, supporting trace and validation results \\
-Oracle & Original attempt, original evidence and separate later observations & Reconciliation, hindsight brief, critique and ideal CP2 \\
-Evolve & Bound Lab/Oracle pair and current policy & Reviewed no-change decision or versioned candidate \\
-Later Lab & A later snapshot and selected policy & New forecasts whose behavior can be assessed \\
-\bottomrule
-\end{tabularx}
-\caption{The daily loop. Completion of a stage and quality of its reasoning are separate facts.}
-\end{table}
+\newpage
+\textbf{The original graphs.} These diagrams group parallel nodes to show
+the reading order. The repository's \texttt{docs/graphs.md} shows every actual
+node and dependency, including the skip connections omitted here.
 
-The original engine assembles prompts, validates dependency order and accepts
-reasoning responses through its native importer. A missing response creates a
-pending packet; it is not successful reasoning. The daily controller advances
-only after the preceding mission is complete. Lab output remains fixed while
-Oracle examines it. Rejected responses, failed provider attempts and uncertain
-cost reservations remain part of the record.
+\begin{center}
+\textbf{Lab: 28 nodes, including seven feeds}\\[5pt]
+\begin{tikzpicture}[>=Stealth,
+ box/.style={draw,rounded corners=2pt,align=center,font=\scriptsize,minimum width=29mm,minimum height=10mm}]
+\node[box] (f) at (0,0) {7 feeds\\+ seed state};
+\node[box] (m) at (3.7,0) {7 first-pass miners\\+ cross-correlation};
+\node[box] (o) at (7.4,0) {Orient};
+\node[box,fill=blue!5] (d) at (11.1,0) {Decide\\CP1: thesis};
+\node[box] (m2) at (11.1,-1.45) {7 second-pass miners\\+ cross-correlation};
+\node[box,fill=blue!5] (p) at (7.4,-1.45) {Director\\CP2: predictions};
+\node[box] (i) at (3.7,-1.45) {Integrity check};
+\draw[->] (f)--(m); \draw[->] (m)--(o); \draw[->] (o)--(d);
+\draw[->] (d)--(m2); \draw[->] (m2)--(p); \draw[->] (p)--(i);
+\end{tikzpicture}
 
-The temporal handoff between versions is not a cycle inside a single forward
-graph. The first Lab cannot acquire Oracle's later inputs through an ordinary
-edge. Oracle keeps the original issue anchor and the later target time;
-Evolve's successor is used only on the next eligible issue. Historical replay
-still does not simulate the wall-clock time required to obtain and review real
-closing data. A live system needs a corresponding execution delay.
+\vspace{5pt}
+\textbf{Oracle: 31 nodes, including seven later feeds}\\[5pt]
+\begin{tikzpicture}[>=Stealth,
+ box/.style={draw,rounded corners=2pt,align=center,font=\scriptsize,minimum width=29mm,minimum height=10mm}]
+\node[box] (s) at (0,0) {10 subject snapshots\\+ subject index};
+\node[box] (f) at (0,-1.5) {7 later feeds};
+\node[box] (r) at (4.1,-.75) {2 truth differences\\+ 7 lane reviews};
+\node[box] (m) at (8.2,-.75) {Truth map};
+\node[box] (a) at (12.3,-.75) {Attribution map\\+ explanation};
+\node[box,fill=blue!5] (e) at (8.2,-2.15) {CP2 emitter\\hindsight record};
+\draw[->,rounded corners=4pt] (s.east)--(2.2,0)--(2.2,-.55)--([yshift=2mm]r.west);
+\draw[->,rounded corners=4pt] (f.east)--(2.5,-1.5)--(2.5,-.95)--([yshift=-2mm]r.west);
+\draw[->] (r)--(m); \draw[->] (m)--(a);
+\draw[->,rounded corners=4pt] (a.south)--(12.3,-2.15)--(e.east);
+\end{tikzpicture}
+\end{center}
 
-\subsection{A prediction can be tested before its cause is known}
-The original causal thesis contract prevented a forecast when a dominant
-market force was unresolved. That is appropriate for rejecting a fabricated
-causal explanation, but it also prevented testing a separately declared
-empirical mapping. The explicit \code{EMPIRICAL} branch now permits that test
-alongside the existing causal and abstention modes.
+\textbf{Give these graphs the intended evidence.} The original six acquired
+feeds were stocks, ETFs, macro, Stockgrid, prediction markets and news; the
+calculator was derived. Recent ten-stock, title-based studies omitted much of
+that information. Start with raw FNSPID articles and prices~\cite{fnspid}, join
+ETF history and archived macro releases, and inspect a few synchronized days.
+Stockgrid equivalence remains unresolved. Preserve publication clocks and
+missingness: even original saved news includes post-cutoff items. A richer
+payload is not automatically a valid historical snapshot.
 
-The first implemented operator is deliberately a price-only control. For each
-declared stock, it averages the last five daily simple returns, multiplies the
-mean by a frozen scale and clips the result at a declared magnitude cap.
-Multiplying the last observed price by one plus that return gives the next-close
-target. The full graph still processes the available news; that text does not
-silently enter this formula. Thus the control tests execution and parameter
-transfer, not the incremental value of news or complex reasoning.
-
-CP1 declares the input citations, target set, history length, scale and cap;
-the engine recomputes the result from the original source history and checks
-consecutive XNYS dates, issuer identity and the next-session horizon. The
-Director cannot alter that rule after CP1. Oracle also retains its parameters
-and numeric forecast rather than replacing them with a hindsight optimum.
-The status remains explicitly unvalidated. Richer empirical operators require
-their own declared input mapping; this initial rule is not a general financial
-model or a restriction on future development.
-
-\section{Historical feeds that fit the actual system}
-The richer daily adapter reconnects the acquired TraderHarness archive to the
-original full graph \citep{traderharness2026,traderharnessdata2026}. Five pinned
-tables provide daily OHLCV, announcement titles and PDF links, entity-templated
-news headlines, corporate actions and CSI300 history for ten stocks fixed using
-2021 turnover. The adapter reuses the source loader and timestamp/selection
-rules without invoking the separate five-session study's label builder. Full
-article bodies and announcement PDFs are not supplied. Financial facts remain
-excluded because revision history and accounting definitions are unresolved.
-
-The target is the next session's raw CNY closing quote. Twenty historical
-gross-wealth bars are separately rebased context, never that quote. Only already
-ex-dated, announcement-eligible actions enter this context; pending future terms
-from the final archive are excluded. XSHG is a common-session proxy for the
-Shanghai/Shenzhen panel. Text stops at the observed close, while reconstructed
-packet availability is one minute later. Oracle therefore cannot explain the
-close using a headline from that extra minute. The next forecast targets the
-actual next close; Evolve maturity retains the later availability timestamp.
-These rules do not certify source vintages or executable trading returns.
-
-The longer development adapter uses three JSON files from InvestorBench
-\citep{li2025investorbench,investorbenchdata2025}. The pinned MSFT, HON and JNJ
-files share all 291 XNYS sessions from 12 March 2020 through 6 May 2021. They
-contain 3,636, 444 and 910 news summaries respectively. Our source audit finds
-no missing shared price sessions; all three symbols have news on 196 dates.
-These counts describe the selected files, not reproduced benchmark performance.
-
-A snapshot contains twenty observed scalar prices per symbol and the preceding
-seven calendar days of complete upstream summaries. Summary date buckets lack
-publication and capture clocks, so the adapter assumes availability at midnight
-in New York on the following calendar day and excludes the current date. It
-excludes all filing summaries because their availability is unestablished.
-This is a reconstructed development stream: the lag does not prove historical
-availability, issuer relevance, adjustment vintage or immunity to model memory.
-The source repository's MIT license also does not independently establish rights
-to redistribute every publisher-derived item. Public code supplies the pins
-and adapter; downloaded text remains in local storage.
-
-The initial adapter uses the original AA price and article files in FNSPID,
-pinned to source revision \code{4054842} \citep{fnspidraw2025}.
-For each selected XNYS session it emits the last 20 completed daily price bars
-and full eligible article bodies from the preceding seven calendar days.
-The source is a practical starting slice: two small files, approximately
-8.66 MB together. It does not supply a complete multi-asset research universe.
-
-STOCK and NEWS contain observations. ETF, MACRO, POLYMARKET, CALCULATOR and
-STOCKGRID retain their native artifact names but explicitly contain no supplied
-observations. Their absence limits support; it is not an economic event.
-A market article discussing macro conditions does not become an independently
-observed macro series. Preserving these distinctions permits the full graph
-to run while making the cost of sparse coverage visible.
-
-Source admission uses original publication strings rather than blindly trusting
-upstream preprocessing. For example, a January article marked 17:51 EST is
-22:51 UTC and must not enter that day's 21:00 UTC close snapshot. The inspected
-upstream converter shifted that offset in the wrong direction. Literal
-\code{Text=0} is missing text, not neutral news. Invalid or conflicting clocks
-are excluded and counted. The adapter retains original body hashes and stable
-evidence identifiers; an AA filename does not establish that every article
-concerns Alcoa specifically.
-
-The Jan16,17,18 2024 snapshots contain 1,7,7 eligible article bodies,
-respectively. Jan18 has no fresh article in this slice; repeated context is
-not new evidence. Source prices use \code{Close} consistently. Corporate-action
-vintages, original capture times and later article revisions are unverified.
-Filtering a publisher clock alone cannot establish complete point-in-time
-integrity. Modern language models may also remember historical events
-\citep{glasserman2023}.
-
-Other data candidates remain available for investigation. An inspected
-FinMultiTime article slice had body/date/URL mismatches and was not admitted
-to this replay; that observation does not invalidate separately sourced price
-or filing tables \citep{finmultitimedata}. Data acquisition remains explicit.
-The public code does not redistribute these article bodies.
-
-A richer candidate, the public Herculean database, contains 2,656 price rows,
-3,888 news summaries and 73 filing excerpts; its eight issuers share 332 XNYS
-dates \citep{herculeandata2026}. A fixed inspection of the earliest three MSFT
-dates found two temporal counterexamples. News row 2432, dated 2 December 2024,
-reports \$77.7 billion revenue and \$3.72 EPS matching Microsoft's October 2025
-release. Row 2433, dated 3 December 2024, explicitly describes FY2026 Q2 and
-\$81.3 billion revenue announced in January 2026
-\citep{microsoft2025q1,microsoft2026q2}. A one-day lag cannot repair future-year
-content. These rows justify quarantining this news source, not an estimate of
-its global contamination rate or rejection of every price and filing record.
-The pinned file hash, queries and row identities are in
-\code{docs/herculean-audit.json}.
-
-\section{Oracle: outcome, explanation and earlier opportunity}
-Oracle first asks a mechanical question: what happened to each declared target
-over its declared horizon? Exact later observations score the frozen forecast.
-It then asks interpretive questions: which original claims were supported,
-which information was missed, what appeared only afterward, and which proposed
-causes remain uncertain? A correct direction does not validate the explanation
-that accompanied it.
-
-An ideal historical answer is useful only when its earlier citations are
-actually available at the earlier boundary. Later reporting may direct the
-investigation toward a neglected earlier signal, but it cannot itself become
-a Lab citation. A surprising event with no earlier support should remain an
-unforecastable or uncertain component rather than an instruction that earlier
-miners ought to have discovered the future. Outcome-only and richer hindsight
-teachers are distinct experimental conditions, related to learning with
-privileged information \citep{vapnik2015}.
-
-A useful teacher must also be able to report no evidenced error. The native
-contracts now distinguish a cited Lab abstention, an unexplained realized move
-and a review that finds no concrete earlier mistake. CP1 locks the forward
-decision mode; an abstained CP2 has no predictions. Oracle retains observed
-price changes without creating prediction errors or a hit rate. Its explicit
-no-findings review must name the alternatives examined and the limits of its
-evidence. None of these outcomes proves optimality. They permit Evolve to
-retain a procedure instead of accumulating invented lessons.
-
-Abstention is different from a forecast centred at zero. The implemented
-\code{JUDGMENTAL} branch records return quantiles $q_{.1},q_{.5},q_{.9}$,
-their original evidence identifiers and a numerical rationale. Its central
-target is the observed price times $(1+q_{.5})$: a median, not a mean return.
-Zero is a valid median with a nonzero uncertainty interval. The Director and
-Oracle must preserve the entire forecast and its cited source identities;
-validators also require the next actual exchange close and matching truth
-date, currency and price basis. No identified market cause is required.
-
-For realized simple return $y$, each quantile receives the unscaled pinball
-loss $\ell_p(y,q)=\max\{p(y-q),(p-1)(y-q)\}$. We average over
-$p\in\{.1,.5,.9\}$, using the standard consistent quantile score
-\citep{gneitingraftery2007}. Coverage and width of $[q_{.1},q_{.9}]$ are
-additional diagnostics. Three quantiles do not specify a full distribution,
-and high interval coverage alone does not establish calibration. These scores
-reach the existing Oracle and feedback reports; they do not silently replace
-the cohort's declared selection objective.
-
-\subsection{Selection is part of the forecast decision}
-If Lab selects a subset of the available companies, prediction accuracy on
-that subset is only a conditional score. Selecting fewer easy cases can lower
-it without improving the overall decision. The risk--coverage distinction is
-standard in selective prediction \citep{geifman2019selectivenet}; here we use a
-declared fallback to make the unselected cases explicit.
-
-Freeze a universe $U$, a selection $S\subseteq U$, forecasts $f_i$ for selected
-names and fallback forecasts $b_i$ for the others. For later outcomes $y_i$,
-the implemented full-universe loss is
+\textbf{Measure selection and prediction separately.}
+Freeze the candidate universe $U_t$ before a run. Lab selects $S_t\subseteq U_t$.
+Report its prediction error and coverage $|S_t|/|U_t|$. To prevent apparent
+improvement by avoiding difficult cases, also score the whole universe using a
+fixed fallback forecast for unselected assets:
 \[
-  \frac{1}{|U|}\left(\sum_{i\in S}\ell(f_i,y_i)
-                 +\sum_{\substack{i\in U\\i\notin S}}\ell(b_i,y_i)\right).
+ L_t=\frac{1}{|U_t|}\sum_{i\in U_t}
+ \ell\!\left(y_{it},\;
+ \begin{cases}\hat y_{it},&i\in S_t,\\ b_{it},&i\notin S_t.\end{cases}\right).
 \]
-The evaluator reports selected-only loss and coverage alongside this quantity,
-then weights issue dates equally. It supports squared error for mean forecasts
-and absolute error for medians. Missing truth anywhere leaves the panel pending.
-With a zero-return fallback, selecting nothing obtains the reference loss,
-not zero error. This additive evaluator does not change the existing native
-cohort's admission or objective.
+Here $b_{it}$ is known at issue time and $\ell$ is fixed before comparison.
+If all assets have shadow forecasts, compare the chosen subset with a uniform
+selection at the same size. This measures selection without turning hindsight
+into a deployable strategy. Distribution forecasts need a proper score, such
+as quantile loss~\cite{scores}. Forecast accuracy and trading returns are
+separate claims; a trading test also needs an executable timing and cost model.
 
-When an experiment freezes shadow forecasts for every name, it can also
-compare the chosen subset with uniform selection of the same size, holding
-those forecasts fixed. A further score finds the best realized loss reduction
-from choosing up to the declared budget. This is a hindsight bound: neither
-it nor a missed large move establishes earlier predictability. Without the
-shadow forecasts, these ranking comparisons remain unknown. Their computation
-must be counted in the experiment's resource cost.
+\newpage
+\textbf{The smallest scientific loop.}
+\begin{enumerate}
+\item Assemble a short sequence of audited daily snapshots with the intended
+market breadth. Keep absent fields and source limitations visible.
+\item Run the existing Lab, save its intermediate outputs and freeze its
+forecasts. Compare against a simple price baseline and a direct predictor
+using the same inputs.
+\item Reveal matured outcomes. Score the whole declared universe and record
+validity failures and abstentions. Let Oracle propose explanations.
+\item Let Evolve make one understandable candidate change, or a small combined
+change when components depend on each other. Record why it was proposed.
+\item Compare incumbent and candidate on the same later days. Retain a change
+only under a rule set before those results. Keep failed candidates and repeat.
+\end{enumerate}
 
-\subsection{An intermediate claim is not yet a price effect}
-Financial interpretation must also distinguish familiar facts from changes.
-For example, Salesforce's May 2023 release preserved annual revenue guidance
-while raising non-GAAP operating-margin guidance \citep{salesforce2023march,salesforce2023may}.
-That supports a profitability revision, not a revenue revision or an assertion
-about analyst surprise. Adobe's June release raised some annual targets while
-lowering a segment revenue range \citep{adobe2022december,adobe2023march,adobe2023june}.
-These supporting cases test a recurring reasoning skill; they are not the
-selected replacement for the daily system.
+Input ablations ask whether a feed helps. Procedure comparisons ask whether
+a reasoning change helps. These are different experiments. Begin with the
+information question when the current data omits most of what the original
+graph was designed to interpret.
 
-The remaining price effect is a further question. A public announcement may
-already be reflected in the price at which a decision could be executed.
-Headline-return work motivates separating observed response from later
-predictability \citep{lopezlira2023}. Economic relationships can motivate
-indirect transmission \citep{cohen2008}; shared words alone do not establish one.
+\textbf{What exists and what remains unproved.}
+The repository contains the original graph, native Lab and Oracle execution,
+dated forecast records, outcome scoring and reviewed version changes. A
+completed two-day development example changed a price rule after feedback;
+the changed rule then lost to the unchanged rule. Later title-based experiments
+also failed to establish a predictive improvement. These runs show that the
+loop can execute, not that it learns a financial edge. Their complete records
+remain in the research archive and version history.
 
-\section{Evolve: reviewed transitions between versions}
-The existing Evolve runner exports its fixed analysis instructions, original
-Lab CP2 and Oracle quartet with source bindings. The daily controller adds a
-small response contract: diagnosis, uncertainty, proposed later test, exact
-source quotations, and either one Lab skill change or an explicit no-change
-decision. The lead agent can perform this review directly. A worker receives
-the same packet and returns the same shape.
+The next useful result is a small, credible multi-feed historical replay in
+which the existing graph has the information it needs. Then test whether it
+interprets that evidence correctly, selects better opportunities and improves
+its later predictions. If it does not, the recorded intermediate outputs and
+matched interventions should tell us which change to test next. Synthetic
+known-signal examples can check this machinery; only financial evidence can
+support the financial claim.
 
-Import checks the packet identity, reconstructs source bindings, resolves each
-quoted JSON field against its original artifact, validates the permitted node
-and compiles a native reasoning policy. It retains rejected attempts. An
-accepted candidate is a new policy file; the next day's Lab freezes that file
-in its execution manifest. The original policy and dossiers remain available.
-Repeated continuation reads recheck the decision and candidate instead of
-trusting a success label alone.
-
-These checks establish provenance, structure and an explicit review decision.
-They cannot establish that a quoted fact supports the proposed generalization.
-The reviewing agent's identity is a disclosure, not authenticated expertise.
-No-change is a legitimate outcome when the episode supplies no convincing
-lesson. The transition is development adoption for later testing, not promotion
-to a proven live trading policy.
-
-TextGrad and GEPA provide relevant precedents for textual feedback and
-reflective prompt search \citep{textgrad2024,gepa2025}; Trace and multi-stage
-instruction optimization motivate inspecting intermediate computations
-\citep{trace2024,mipro2024}. Financial agent systems provide precedents for
-layered memory and persistent guidance \citep{finmem2023,fincon2024}.
-Zenith uses these sources to sharpen its own explicit transition and controls.
-It does not claim that implementing a loop establishes a new optimization
-method or inherits their reported results.
-
-\subsection{A constructed test of the update procedure}
-To examine the hard step between diagnosis and useful change, we implemented
-a small deterministic analogue beside the native graph. It has three
-parameterized operations: interpret company disclosures, map the interpretation
-to a return, and select two of eight names. Consider profit of 100 last year,
-prior guidance of 180 and new guidance of 150. Growth is positive, but the
-guidance revision is negative. The synthetic generator makes returns depend
-on that revision, with shared and company noise. Missing prior guidance stays
-unknown and receives a zero forecast. In a market, this comparison would still
-need an independently supported mapping to the remaining price response.
-
-The supplied bank has two comparison rules, two ranking rules and three scales,
-including zero. Sixty-four synthetic dates select one of these twelve
-procedures. The next 32 accept it only if its full-universe squared loss beats
-the incumbent by 10\%; the last 64 measure the frozen choice. Evolve is finite
-search in this example. Its bounded change, fixed evaluation and retained
-attempts follow the practical pattern of autoresearch \citep{karpathy2026autores}.
-No model is invoked, and the generator and correct rule are deliberately known.
-Thus the experiment isolates the mechanism rather than testing autonomous
-discovery or an independently hidden market process.
-
-\begin{table}[htbp]
-\centering\small
-\begin{tabular}{lrrr}
-\toprule
-Constructed condition & Initial & Zero fallback & Selected \\
-\midrule
-Guidance signal & 0.009324797 & 0.000295698 & 0.000166406 \\
-Noise only & 0.008959609 & 0.000041172 & 0.000041172 \\
-\bottomrule
-\end{tabular}
-\caption{Later full-universe mean squared return loss, seed 1729. Every
-unselected name receives the frozen fallback. These are constructed operator
-results, not native Lab, language-model or financial performance.}
-\label{tab:constructed-learning}
-\end{table}
-
-The signal case selects comparison with prior guidance, ranking by absolute
-forecast and scale 0.08. Its later loss is 43.7\% below the fallback. The
-noise-only control selects scale zero. More revealingly, greedy search over
-strictly improving single edits stops at zero even in the signal case. Once
-scale is zero, changing the comparison or rank has no effect; restoring a
-positive scale under the wrong comparison makes forecasts worse. Joint search
-crosses this plateau. Ranking stronger signals under a miscalibrated mapping
-can also increase loss. These examples show why an operation's measured value
-depends on its neighbors and why a neutral intervention cannot establish its
-irrelevance. They motivate bounded coupled proposals and later tests, not
-causal blame from one forecast miss. The standalone commands, all trial losses
-and source bindings are in \code{docs/learning-design.md} and its linked receipt.
-
-\section{What has actually executed}
-The two-issue sequence used the three-equity InvestorBench snapshots at the
-24 and 27 July 2020 closes, with outcomes at the 27 and 28 July closes.
-Both Labs completed all 28 nodes and both Oracles all 31, using 64 accepted
-primary-agent reasoning responses in total. No prior-run responses were replayed
-and no paid provider calls were made. One Oracle response used prose in an enum
-field; it was rejected, retained and corrected. This was a disclosed historical
-development sequence, not an independent evaluation of an automated provider.
-
-The initial rule used five returns, scale 0.25, cap 0.02 and all three stocks.
-After its error exceeded persistence, Evolve proposed halving only the scale.
-The reviewed addon appears in the next Lab's actual Decide prompt, and its
-frozen numerical forecasts use scale 0.125. The agent then inspected the next
-outcomes. Table~\ref{tab:empirical} reports the resulting errors.
-
-\begin{table}[htbp]
-\centering\small
-\begin{tabular}{@{}llrrr@{}}
-\toprule
-Issue $\to$ outcome & Native scale & Native & Unchanged & Persistence \\
-\midrule
-24 $\to$ 27 July & 0.25 & 0.98649 & 0.98649 & 0.93047 \\
-27 $\to$ 28 July & 0.125 & 0.62531 & 0.59575 & 0.65488 \\
-\bottomrule
-\end{tabular}
-\caption{Mean absolute error in percentage points of return:
-$100\,|\widehat P-P_{\mathrm{later}}|/P_{\mathrm{issue}}$, averaged across the
-three stocks. Unchanged scale 0.25 and persistence are deterministic arithmetic
-controls on the same inputs, not separately executed native arms.}
-\label{tab:empirical}
-\end{table}
-
-The first issue had one correct direction; the second had two. The changed
-rule beat persistence on the second issue but lost to the unchanged rule.
-Shrinkage helped the wrong-direction HON forecast and reduced useful magnitude
-for both correct directions. These are three correlated assets on each of only
-two dates. The second Evolve review made no further change and selected no
-winner. Its no-change receipt preserves experimental lineage, not a promotion
-of the current candidate. No generation-retention command was run.
-The source-bound receipt, \code{docs/empirical-pilot-receipt.json}, includes
-the forecasts, outcomes, reviews and successor prompt binding.
-
-This is an actual feedback-to-procedure transition with a negative comparison.
-It establishes neither useful news inference nor an advantage of the full
-graph over the transparent formula. Executing a larger cohort of the same
-formula through many reasoning nodes would not by itself address those gaps.
-
-\subsection{The richer native daily episode}
-The TraderHarness source supports 696 complete 21-session price windows and
-695 adjacent next-close pairs from 22 February 2023 through 31 December 2025.
-This is source coverage, not forecast performance or a declared evaluation
-split. The input-selected 27 April 2023 training episode supplied ten stocks,
-19 headlines and two announcement titles to Lab. The 28 April snapshot supplied
-later quotes and 22 text items. All 28 Lab and 31 Oracle nodes completed with
-32 accepted primary-agent responses and one retained syntax correction.
-
-Lab compared reported growth with earlier issuer guidance, distinguished a
-financing proposal from known dilution, and rejected fund/issuer and
-supplier/buyer confusions. It issued an explicit no-call. Oracle compared all
-ten quotes without manufacturing a hit rate or a hindsight target. Later text
-tagged to \code{002594} referred to an electronics-named entity, prompting an
-explicit claim-owner, corporate-entity and listing check in the reviewed NEWS
-candidate. An external audit subsequently matched its 154.85\% growth figure
-to the filing of BYD Electronic, HKEX stock code 285
-\citep{bydelectronic2023q1}. That external source did not enter native grounding.
-The candidate codifies behavior already partly present; later benefit is unknown.
-The receipt is \code{docs/traderharness-native-receipt.json}. No generation
-selection or new paid provider call occurred.
-
-\subsection{Numerical forecasts and a later instruction comparison}
-On the TraderHarness data \citep{traderharnessdata2026}, the 28 April 2023
-snapshot supplied 21 prices per stock and 22 text items. Lab froze ten
-judgmental forecasts for the next XSHG close, 4 May: eight zero medians and
-small negative medians for Ganfeng Lithium and LONGi. All 28 Lab and 31 Oracle
-nodes completed. The numerical adjustments were uncalibrated judgments;
-missing expectations and price responses already observed limited their
-interpretation. A frozen reference used each stock's twenty prior returns'
-median and inclusive, linearly interpolated 10th and 90th percentiles.
-
-Lab's median error beat persistence but lost to that historical reference;
-its wider intervals covered every outcome while scoring worse
-(Table~\ref{tab:judgmental}). Evolve's reviewed candidate therefore asked
-Lab to state its historical reference and every evidence-based adjustment,
-without widening tails merely because a feed was absent. The source-bound
-record is \code{docs/judgmental-pilot-receipt.json}.
-
-The later 5 May snapshot tested that instruction against its predecessor,
-with identical retrieval in both arms. The same primary agent deliberately
-shared ten newly authored upstream responses through Orient, then completed
-both 28-node Labs and froze their forecasts before inspecting 8 May truth.
-The original instruction produced zero medians; the revised instruction
-retained all historical quantiles, including ten negative medians, with no
-news adjustments. Eight stocks rose. The revised forecast had greater median
-and pinball loss, while tail endpoints and coverage were identical.
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{llrrrr}
-\toprule
-Issue & Forecast & MAE & Pinball & Coverage & Width \\
-\midrule
-28 Apr & Lab judgment & 1.1985 & 0.3954 & 10/10 & 5.8700 \\
-       & History & 1.1592 & 0.3536 & 8/10 & 4.2198 \\
-       & Zero return & 1.2685 & --- & --- & --- \\
-5 May & Original instruction & 1.2413 & 0.4557 & 7/10 & 4.1743 \\
-      & Revised (= history) & 1.5597 & 0.5087 & 7/10 & 4.1743 \\
-\bottomrule
-\end{tabular}
-\caption{Ten stocks per issue, next-session raw closing returns. Median MAE,
-mean three-quantile pinball loss and interval width are in percentage points;
-smaller loss is better. Coverage counts outcomes in the nominal 80\% interval.
-The May original medians equal zero-return predictions. April controls are
-arithmetic; May arms completed the graph, but formal admission failed as
-described in the text. These are exposed development diagnostics.}
-\label{tab:judgmental}
-\end{table}
-
-A baseline target-identity correction consumed a 22nd response against its
-frozen allowance of 21. The cohort rejected that arm; the limit and rejection
-were retained. Thus the May numbers describe frozen forecasts, not an
-accepted generation comparison. The revised arm's 31-node Oracle preserved
-all original quantiles. A lead-agent review of the fixed Evolve packet
-recommended no further change; it was not imported as a bridge or daily
-controller completion. The public diagnostic and exact losses are in
-\code{docs/judgmental-matchoff-receipt.json}.
-
-This example separates reporting a reference from selecting a predictive
-rule. Neither day establishes the better default. The shared author, shared
-upstream analysis, correlated targets and historical exposure prevent an
-independent performance claim. No numerical text contribution was present
-in the revised forecast. Later comparisons must retain such no-adjustment
-cases and test text-conditioned estimates against both price references and
-a direct reasoner on the same inputs.
-
-Oracle also revealed a concrete input defect. COSCO's 10 April headline
-projecting first-quarter profit of RMB6.933 billion and a 74.91\% annual
-decline in the pinned source \citep{traderharnessdata2026} was absent from
-the 28 April Lab input. It appeared in later retrieval
-only after a matching results headline triggered the prior-period selector.
-The source timestamp made the earlier guidance eligible at issue time; its
-omission was a retrieval failure, not unavailable future information. A new
-optional source profile retains at most two latest distinct issuer
-profit-period claims within 187 days, with original timestamps. Rebuilding
-the original issue snapshot recovered that one item and left quotes unchanged.
-This is a verified source-selection repair, not a new performance result.
-It remains separate from the forecasting candidate so a later comparison can
-distinguish a better input packet from a better reasoning instruction.
-
-\subsection{A paid intervention on NEWS interpretation}
-We next tested a bounded part of the same daily job using the pinned
-TraderHarness inputs \citep{traderharness2026,traderharnessdata2026}. A NEWS
-component used the original node instruction and its issuer-identity addon;
-the challenger added a rule to compare new profit results with earlier
-same-issuer, same-period guidance. A common downstream forecaster received
-the identical raw input in both arms, the respective NEWS output and the
-price-history quantile control. It could retain that control or make an
-evidence-conditioned adjustment. This was a component assay, not a completed
-native Lab or a structural replacement for it.
-
-The two issues were selected from their available text before opening later
-prices. At the 3 August 2023 close, issuer 600519's H1 profit was
-35.98 billion CNY versus earlier guidance of approximately 35.6 billion,
-about 1.07\% higher. At the 30 August close, issuer 601919's H1 profit decline
-of 74.46\% essentially matched its prior warning of approximately 74.47\%
-\citep{traderharnessdata2026}. Both packets followed a full trading session
-after the results publication. Title-level accounting comparability remained
-incomplete, and issuer guidance did not establish analyst consensus.
-
-A preliminary component check on 20 July was excluded from measurement.
-DeepSeek V4.1 Flash through the pinned DeepInfra endpoint completed all eleven
-attempts without retries: two pilot calls, five 3 August calls including a
-direct forecaster, and four 30 August calls. Reported cost was
-USD~0.0251692728. The original shared ledger and its 128-attempt limit were
-preserved. Both arms on both dates were sealed before any target-price scoring;
-the same instruction was fixed before both dates, with no tuning between them.
-
-The challenger included both current and prior numerical claims in each focus
-result tuple; the baseline placed the figures in separate tuples, although
-its August result did state that actual profit confirmed guidance. The
-challenger still omitted the prior source identifier from the comparison
-tuple and did not calculate the requested numerical delta. Unsupported market
-explanations persisted in both arms. Structural acceptance therefore did not
-establish correct execution of the intended reasoning operation.
-
-More decisively, every $q_{.1},q_{.5},q_{.9}$ was identical between arms for all
-ten stocks on both dates. The direct forecaster also matched on 3 August.
-All five measured forecasts retained the supplied historical quantiles rounded
-to four decimal places. On 3 August, mean median absolute error and mean
-pinball loss were 0.49243 and 0.20877 percentage points; on 30 August they
-were 0.77740 and 0.27635. The exact price-history controls yielded
-0.49406/0.20905 and 0.77722/0.27622 respectively. These tiny differences reflect
-rounding. The existing quantile score remains the evaluation rule
-\citep{gneitingraftery2007}. Full forecasts, identities, provider costs and
-recomputed losses are retained in \code{docs/guidance-intervention-receipt.json}.
-
-The lead-agent recommendation is no change; no native Evolve execution is
-claimed. This fixed intervention partially changed
-the intermediate analysis without changing numerical forecasts. It does not
-establish that news is uninformative: control anchoring, unsuccessful use of
-the intermediate analysis and weak residual next-session signal remain
-different hypotheses. There was one response per arm, two input-selected
-historical dates, correlated stocks and possible model exposure. No policy,
-calibration or general performance claim follows. The next experiment must
-distinguish faithful intermediate reasoning, numerical sensitivity and later
-forecast benefit; forcing a nonzero reaction would not solve that problem.
-
-\subsection{Earlier development evidence}
-A paid full-graph development attempt using DeepSeek V4.1 Flash stopped at
-CP1 after 17 of 28 Lab nodes and 11 reasoning calls. Its responses confused
-artifact names with valid evidence identifiers, misstated numerical facts and
-turned missing lanes into market narrative. The attempt and its accounting
-remain preserved; it is not counted as a completed prediction.
-
-A separate primary-agent attempt completed all 28 Lab nodes through 21 native
-reasoning imports. Its paired Oracle completed all 31 nodes through 11 accepted
-reasoning imports. The original forecast was down from approximately
-\$27.87 to \$27.50; the later close was approximately \$27.18, producing
-absolute price error of \$0.32. Direction was correct. Semantic review remained
-red because an observed trend did not establish a forward causal mechanism.
-This is one exposed, manually reasoned development episode, not a performance
-estimate for the failed paid model or the wider system.
-
-The primary review proposed that the director distinguish the measured pattern,
-proposed mechanism and numerical target rule, and avoid increasing causal
-confidence after one directional hit. A following-day Lab was prepared with
-that policy but has no completed successor forecast. The newer daily controller
-makes the same kind of review and transition repeatable. Native hydration and
-synthetic transition tests establish its wiring; they do not supply additional
-historical forecast results. The original episode is recorded in
-\code{docs/daily-replay-receipt.json}.
-
-A second development case used the three-equity InvestorBench snapshot at the
-1 July 2020 close and later prices from 2 July. The earlier packet contained
-73 summaries; inspection separated reported operating facts from summary
-sentiment, duplicate reports and indirect company mentions. It did not
-establish a supported next-session directional thesis. The old contracts
-nevertheless required a dominant cause and forecast, and Oracle later required
-a nonempty critique. These were engineering defects exposed by the pilot,
-not learned market discoveries.
-
-The explicit abstention, unresolved-cause and no-findings branches permit the
-full native loop to represent this case honestly. The final execution completed
-28 Lab and 31 Oracle nodes with 21 and 11 accepted response imports. Twenty-nine
-answers were exact reuses from the preceding development attempts; three Oracle
-responses were newly authored under the repaired contracts. The record is a
-contract replay, not 32 independent model samples or an untouched assessment.
-MSFT, HON and JNJ scalar prices rose approximately 0.7621, 0.6315 and 0.4203
-percent. No prediction loss or hit rate exists because Lab abstained. Oracle
-retained the no-call and Evolve recorded a reviewed no-change decision. The
-source-bound receipt is \code{docs/abstention-receipt.json}. Neither this review
-nor the contract repair establishes a financial edge.
-
-Earlier A-share numerical and text controls remain useful negative development
-evidence \citep{traderharness2026,traderharnessdata2026}. On 33 exposed dates,
-raw mean squared errors were 0.00141850 and 0.00148344 versus a
-zero-relative-return reference of 0.00109518. Chronological scaling produced
-0.00108729 and 0.00108654. The design followed earlier aggregate inspection;
-the small differences do not establish an LLM or incremental text advantage.
-Their retained diagnosis concerns forecast magnitude, not completion of the
-full daily learning loop.
-
-\section{The next useful experiment}
-The immediate objective is competent repeated execution with enough genuine
-information for the reasoning job. The newly admitted longer panel now supports
-this work, alongside review of missing and stale evidence and a model that consistently meets the
-existing contracts. Increasing the number of agents does not repair a weak
-source packet or an unsupported target rule.
-
-The implemented generation adapter freezes a reviewed challenger and the exact
-policy that produced its teacher episode, using the existing native cohort
-executor and feedback evaluator. Both run the full Lab on identical later
-snapshots and target support with the same disclosed model identity. The
-selection loss is mean issue-level mean target-price relative error. Its
-improvement margin is declared before execution. Complete support and at least
-twenty issue dates are required; these are decision gates, not significance
-guarantees. An abstention is a retained terminal attempt with missing forecast
-coverage, never a zero-loss success; this gate therefore cannot select an
-abstaining strategy. A selective strategy would require a separately declared
-comparison using an objective such as the full-universe loss above. A twenty-date two-version comparison requires 840 reasoning
-responses before retries, which makes base competence a practical prerequisite.
-
-A separately reviewed retention receipt binds the comparison, selected policy
-and final truth cutoff. The challenger is retained only if it clears the
-declared margin; otherwise the incumbent remains. The next generation's first
-issue must follow that cutoff. Historical development remains exposed, even
-when these chronology and provenance checks pass. No such generation comparison
-has yet completed; synthetic retention tests establish the control boundary only.
-
-Once the base works, compare an unchanged pipeline with a pipeline that receives
-reviewed updates, on identical later snapshots and target support. Preserve
-all attempts and separate source failure, invalid output, abstention, forecast
-error and reasoning quality. Include simple price references and a strong
-direct reasoner before attributing benefit to graph complexity. Numerical
-calibration, experience retrieval and learned procedures need separate controls.
-Repeated selection on the same history creates optimism
-\citep{white2000,cawley2010,dwork2015}; later untouched and prospective episodes
-are stronger evidence than another explanation of an inspected result.
-
-The supplied temporal forecasting paper motivates combining time-series context
-and text \citep{yu2023temporal}; explanatory prose still needs a fidelity test.
-Cross-stock semantic work suggests candidate relationships to verify
-\citep{huang2026semantic}. Financial-network forecasting motivates numerical
-and narrative analogs, but its targets differ from stock returns
-\citep{wang2026network}. Their ideas can improve source selection and diagnostic
-questions without turning their benchmarks into Zenith's objective.
-
-A trading claim would additionally require an executable entry rule, delays,
-positions, overlapping exposures, distributions and costs. Neither the one-day
-manual replay nor the supporting A-share labels establish profitability.
-The current deliverable is a self-contained implementation of the original
-learning loop and an auditable place to improve it. Whether its changes produce
-better later financial reasoning remains the research question.
-
-\paragraph{Reproduction.}
-Start with \code{README.md} and \code{docs/daily-replay.md}. The source checkout
-supports editable installation on macOS/Linux; wheel and Windows distribution
-are not verified. \code{zenith daily init} freezes the daily inputs;
-\code{zenith daily next} exposes the next actual native task;
-\code{zenith import-response} validates Lab/Oracle answers;
-\code{zenith daily review} records the reviewed Evolve decision.
-\code{zenith daily matchoff} freezes a native comparison and
-\code{zenith daily retain} records its reviewed selection; the next initializer
-consumes \code{--retention}. See \code{docs/generations.md}.
-No command in this controller purchases inference or starts a separate chat.
-Datasets are reacquired by pinned source identity. Historical execution custody
-remains local where source rights prevent bundling full inputs and transcripts.
-\code{paper/README.md} maps the evidence and limitations.
-
-\begingroup
-\small
-\setlength{\bibsep}{5pt}
-\bibliographystyle{plainnat}
-\bibliography{references}
-\endgroup
+\begin{thebibliography}{4}\small
+\bibitem{alphago} D. Silver and D. Hassabis. \emph{AlphaGo Zero: Starting from
+scratch}. DeepMind, 2017.
+\url{https://deepmind.google/blog/alphago-zero-starting-from-scratch/}.
+\bibitem{autores} A. Karpathy. \emph{autoresearch}. Source inspected at
+\texttt{228791fb499a}, 2026. \url{https://github.com/karpathy/autoresearch}.
+\bibitem{fnspid} FNSPID contributors. \emph{Financial News and Stock Price
+Integration Dataset}. Raw source inspected at \texttt{4054842ec476}.
+\url{https://github.com/Zdong104/FNSPID_Financial_News_Dataset}.
+\bibitem{scores} T. Gneiting and A. E. Raftery. Strictly proper scoring rules,
+prediction, and estimation. \emph{JASA} 102(477):359--378, 2007.
+\url{https://doi.org/10.1198/016214506000001437}.
+\end{thebibliography}
 \end{document}

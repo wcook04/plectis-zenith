@@ -1,10 +1,8 @@
-.PHONY: test validate benchmark
+.PHONY: test validate
 
 test:
 	python -m pytest tests
 
 validate:
 	python -m zenith validate
-
-benchmark:
-	python -m benchmark.run --output work/benchmark/benchmark.json
+	python scripts/check_extraction.py

@@ -44,7 +44,7 @@ class GraphVariantTests(unittest.TestCase):
     def test_full_graph_scope_contracts_and_rank_certificate(self):
         loader = FrozenGraphLoader(self.loader, self.example)
         graph = loader.load_all_nodes()
-        self.assertEqual(len(graph), 72)
+        self.assertEqual(len(graph), 56)
         self.assertIn("lab_evidence_check", graph["lab_decide"].dependencies)
         self.assertNotIn("lab_orient", graph["lab_decide"].dependencies)
         for node_id in ("lab_decide", "lab_director", "lab_integrity"):
@@ -54,8 +54,8 @@ class GraphVariantTests(unittest.TestCase):
         self.assertEqual(len(scope._execution_scope), 29)
         self.assertIn("lab_integrity", scope._execution_scope)
         self.assertEqual(len(loader.receipt["waves"]), 12)
-        from scripts.check_semantics import validate_rank_certificate
-        validate_rank_certificate(loader.receipt["acyclic_certificate"])
+        cert = loader.receipt["acyclic_certificate"]
+        self.assertTrue(all(cert["ranks"][edge["dependency_id"]] < cert["ranks"][edge["node_id"]] for edge in cert["edges"]))
         graph["lab_evidence_check"].meta["reasoning_contract"]["role_contract"]["role_class"] = "changed"
         self.assertEqual(loader.load_node("lab_evidence_check").meta["reasoning_contract"]["role_contract"]["role_class"], "critic")
 
