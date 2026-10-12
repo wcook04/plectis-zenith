@@ -219,7 +219,7 @@ These are optional visuals, not a claim that a live execution will complete.
 | Failure types | One node's inputs, instruction and saved output | absent · not surfaced · misread |
 | Repeat and compare | Overview's later-comparison step | same graph · one change · later |
 | Measured result | [Experiment results](original-feed-windows.md) | four failures · two valid · Decide failed |
-| Larger idea | [Shared controller diagram](research-direction.md#external-signals-choose-the-settings) | same job · small wording change · learned settings |
+| Larger idea | [Paper, page 3](../paper/zenith.pdf) and [controller detail](research-direction.md#external-signals-choose-the-settings) | same job · small wording change · learned settings |
 | Next steps | Full Lab graph | complete · score · repeat |
 
 Keep “Research prototype. This is not financial advice.” legible on screen,

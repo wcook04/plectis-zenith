@@ -236,7 +236,7 @@ compatible with the same past. The target is useful, efficient forecasting
 with honest uncertainty across diverse conditions, not guaranteed prediction
 in every possible situation.
 
-The [paper](../paper/zenith.pdf) summarises this direction and the
-[spoken walkthrough](zenith-walkthrough-script.md) explains it in plain language.
+Page 3 of the [four-page paper](../paper/zenith.pdf) diagrams this mechanism.
+The [spoken walkthrough](zenith-walkthrough-script.md) explains it in plain language.
 The implementation references above were inspected on 12 October 2026; their
 ideas are credited without claiming that their results transfer to this task.
