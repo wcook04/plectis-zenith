@@ -11,6 +11,15 @@ def parser() -> argparse.ArgumentParser:
     cli = argparse.ArgumentParser(description=__doc__)
     cli.add_argument("--root", type=Path, default=runtime.DEFAULT_ROOT, help="standalone substrate root")
     commands = cli.add_subparsers(dest="command", required=True)
+    basket = commands.add_parser("basket", help="licensed shared-universe data and native basket experiment")
+    basket.add_argument("action", choices=("fetch", "ingest", "prepare", "run", "report"))
+    basket.add_argument("--source", type=Path)
+    basket.add_argument("--output", type=Path)
+    basket.add_argument("--through", default="2025-12-31")
+    basket.add_argument("--data", type=Path)
+    basket.add_argument("--study", type=Path)
+    basket.add_argument("--env-file", type=Path)
+    basket.add_argument("--model", default="inclusionai/ling-3.0-flash")
     demo = commands.add_parser("prepare-demo", help="construct independently authored synthetic system observations; no network or model calls")
     demo.add_argument("--earlier-source", type=Path)
     demo.add_argument("--later-source", type=Path)
@@ -69,7 +78,7 @@ def parser() -> argparse.ArgumentParser:
     plan.add_argument("--graph-variant", type=Path, help="frozen topology variant JSON")
     for name in ("run", "prepare"):
         run = commands.add_parser(name, help="execute the real graph" if name == "run" else "prepare durable agent packets through the real engine")
-        run.add_argument("mission", choices=("lab", "oracle", "feeds"))
+        run.add_argument("mission", choices=("lab", "oracle", "feeds", "basket", "basket_serial", "basket_evolve"))
         run.add_argument("--run-id", required=True)
         run.add_argument("--target")
         run.add_argument("--feed-source", help="recorded feed run id or directory; required for Lab")
@@ -103,6 +112,17 @@ def parser() -> argparse.ArgumentParser:
 
 def dispatch(args) -> dict:
     root = args.root.resolve()
+    if args.command == "basket":
+        required = {"fetch": ("output",), "ingest": ("source", "output"), "prepare": ("data", "study"), "run": ("study", "env_file"), "report": ("study",)}
+        for field in required[args.action]:
+            if getattr(args, field) is None: raise ValueError(f"basket {args.action} requires --{field.replace(chr(95), chr(45))}")
+        from . import market_data
+        from research import basket_study
+        if args.action == "fetch": return market_data.fetch(args.output)
+        if args.action == "ingest": return market_data.ingest(args.source, args.output, args.through)
+        if args.action == "prepare": return basket_study.prepare(args.data, args.study, args.model)
+        if args.action == "run": return basket_study.run_study(args.study, args.env_file)
+        return basket_study.report(args.study)
     if args.command == "prepare-demo":
         from .demo import prepare
         return prepare(root, args.earlier_source, args.later_source, args.output)

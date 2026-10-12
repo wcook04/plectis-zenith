@@ -1,0 +1,23 @@
+{
+  "id": "basket_director",
+  "type": "reasoning",
+  "group": "basket",
+  "lane": "SPINE",
+  "dependencies": [
+    "basket_investigations"
+  ],
+  "meta": {},
+  "is_artifact": true,
+  "teleology": "Cutoff-bound shared-universe basket investigation",
+  "output_schema": "json",
+  "instruction": "Return JSON {\"selections\":{\"B01\":\"baseline\",\"B02\":\"Q1\",\"B03\":\"baseline\",\"B04\":\"baseline\",\"B05\":\"baseline\",\"B06\":\"baseline\"},\"reason\":\"brief explanation\"}. Include EVERY actual basket exactly once. Each selection must be \"baseline\" or a candidate_id belonging to that target. Select only from the numerical results; never invent a forecast. Small historical validation gains may be noise or overfitting. Consider sample size and stable evidence; keeping the baseline is valid. These are research forecasts, not causal claims or trading advice.",
+  "platform": "chatgpt",
+  "execution": {
+    "retries": 0,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 120
+  },
+  "routing_class": "SYNTHESIZE",
+  "boundary": "Use only supplied cutoff data. Do not infer physical causality or invent numerical results."
+}

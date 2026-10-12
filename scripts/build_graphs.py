@@ -92,7 +92,7 @@ def panel(nodes, identifier, dependencies, x, y, part=""):
     return pieces, body_height + 80
 
 
-def render(slug, title, description, nodes, hashes, scope, order, notes, extra=None):
+def render(slug, title, description, nodes, hashes, scope, order, notes, extra=None, notice=RESEARCH_NOTICE):
     expected = {(dep, identifier) for identifier in scope
                 for dep in nodes[identifier].get("dependencies", [])}
     rows = []
@@ -125,7 +125,7 @@ def render(slug, title, description, nodes, hashes, scope, order, notes, extra=N
     contents += [f'<path d="M 36 {y} H 1404" stroke="#cbd5e1"/>',
                  text(36, y + 28, "TOOL: source or deterministic operation     REASONING: model operator     Green: frozen Lab/Oracle checkpoints", 14),
                  text(36, y + 54, "Repeated cards name the same artifact. Each declared edge appears once; no skip edges are omitted.", 14),
-                 text(36, y + 80, RESEARCH_NOTICE, 14, color="#64748b")]
+                 text(36, y + 80, notice, 14, color="#64748b")]
     height = y + 106
     metadata = {"node_ids": sorted(scope), "edges": sorted(expected), "source_sha256": hashes}
     svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{WIDTH}" height="{height}" '
@@ -452,8 +452,28 @@ def main():
         ("Later matched comparison", "Same inputs, both versions"),
         ("Retention review", "Record an explicit decision"),
     ])
+    # Basket profiles have their own source and evidence class; legacy figures remain separate.
+    basket_nodes = {}
+    basket_hashes = {}
+    for source in sorted((ROOT / "codex/substrate/nodes/basket").glob("*.json")):
+        raw = source.read_bytes()
+        node = json.loads(raw)
+        basket_nodes[node["id"]] = node
+        basket_hashes[str(source.relative_to(ROOT))] = hashlib.sha256(raw).hexdigest()
+    for slug, target in (("basket-detail", "basket_final"), ("basket-serial-detail", "basket_serial_final")):
+        scope = closure(basket_nodes, [target])
+        render(slug, "Basket research · exact native dependencies", "Shared-universe empirical forecasting.",
+               basket_nodes, basket_hashes, scope, sorted(scope),
+               ["Every target may use the entire universe. Query tools use only cutoff-valid history.",
+                "CP1 is an immutable provisional plan; CP2 validates and freezes all six forecasts."],
+               notice="Research prototype. Published historical observations; constructed baskets.")
     replay(hashes)
     (ROOT / "docs/graphs.md").write_text(f"""# Actual graph diagrams
+
+The active basket profiles are [the directed graph](graphs/basket-detail.svg) and
+[the serial controller](graphs/basket-serial-detail.svg). Their numerical evaluator
+and development-only Evolve comparison are described in [the basket protocol](baskets.md).
+The diagrams below describe the separate legacy System A profile.
 
 > **Experimental research prototype.** The example uses invented observations.
 > See the [research notice](../RESEARCH_NOTICE.md).
@@ -531,7 +551,7 @@ In that controller, `export_agent_handoff` exports pending analysis and
 compares old and new versions on the same later inputs; `daily retain` records
 the reviewed retention decision.
 
-Regenerate all seven figures without extra dependencies:
+Regenerate all nine figures without extra dependencies:
 
 ```sh
 python3 scripts/build_graphs.py

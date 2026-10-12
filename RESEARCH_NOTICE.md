@@ -1,9 +1,9 @@
 # Research boundary
 
-**Experimental research prototype.** The public example uses synthetic observations of a disclosed toy generator. No predictive improvement has been demonstrated.
+Zenith is an experimental research prototype. Its active basket study uses published historical financial observations and constructed research indices. The [data record](docs/data.md) states the dataset licence, provenance and missing-data conventions; the [result record](docs/status.md) states what was measured.
 
-Zenith records cutoff-bound predictions and evaluates them against later evidence. Its public example is an invented abstract System A: it is not a physically validated simulation or evidence about an actual system. General input contracts do not establish reliable prediction for arbitrary scientific or physical systems.
+Retrospective forecasting results are not investment recommendations or evidence of trading profitability. Publisher-adjusted data lack certified historical release timestamps and adjustment vintages; carried-forward prices are not executable prices. The small date sample and possible model pretraining exposure limit generalisation claims.
 
-Synthetic observations are invented for teaching, not anonymised historical measurements. Preparation, schema validity and intermediate reasoning do not establish forecast accuracy. Oracle diagnoses are hypotheses. A revision requires a separate, matched comparison on held-out later cases with a score fixed in advance. Preserve failed attempts, missing outcomes and uncertainty.
+A proposed instruction is a hypothesis until separately tested. Preserve failed runs, missing values, complete target coverage, costs and uncertainty. Reusing inspected test results to design another revision makes those dates development data.
 
-Real deployments need appropriate source permissions, reliable observation and availability clocks, and evaluation for their own targets. Keep credentials and private runs outside publication. The proposed prompt controller has not been implemented or evaluated.
+The older System A example contains invented observations of a disclosed toy generator. It is a synthetic protocol fixture, not a physical simulation or a result for the basket experiment. No historical data is relabelled as synthetic. Credentials and private runtime artifacts remain outside publication.

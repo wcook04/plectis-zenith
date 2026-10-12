@@ -66,7 +66,7 @@ class Website:
                 f"{API}/site": "Ordered teaching chapters, document/figure/evidence links and capabilities.",
                 f"{API}/paper": "Current manuscript title, PDF/source hashes, bibliography and citation-use lines.",
                 f"{API}/documents/{{id}}": {"ids": list(DOCUMENTS), "returns": "Exact Markdown or LaTeX, source hash, heading line numbers and link base."},
-                f"{API}/graph": {"query": {"mission": "all|lab|oracle|refinement (evolve alias)", "focus": "optional node ID"}, "returns": "Native scoped nodes, directed edges, execution waves, ancestor/descendant IDs."},
+                f"{API}/graph": {"query": {"mission": "all|basket|basket_serial|basket_evolve|lab|oracle|refinement (evolve alias)", "focus": "optional node ID"}, "returns": "Native scoped nodes, directed edges, execution waves, ancestor/descendant IDs."},
                 f"{API}/nodes/{{id}}": "Current authored operator, purpose, instruction, expected output, inputs/consumers, source. Not a historical run override.",
                 f"{API}/evidence/{{id}}": {"ids": list(EVIDENCE), "returns": "Public measured-result JSON with source hash; not private run files."},
                 f"{API}/runs": {"enabled": self.local_runs, "query": {"q": "substring", "mission": "optional native mission", "limit": "1..100, default40", "offset": "nonnegative, default0"}, "returns": "Paginated saved-run summaries; loaded and success remain distinct."},

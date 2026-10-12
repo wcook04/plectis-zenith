@@ -79,3 +79,9 @@ Typefaces (STIX Two Text and Source Sans 3, SIL OFL, licences in
 `public/fonts/`) and the paper and night grounds come from the Plectis site.
 Lane colours are a categorical palette checked for lightness, chroma and
 colour-blind separation in both themes.
+
+## Basket research API
+
+The shared-universe backend adds `basket`, `basket_serial` and `basket_evolve` mission scopes to `/api/v1/graph`. `/api/v1/documents/experiment` describes the numerical protocol; `/api/v1/evidence/basket-result`, `basket-protocol` and `basket-trace` expose reviewed research evidence. `/api/v1/documents/synthetic-fixture` retains the earlier System A instructions.
+
+The site metadata labels the active data as `historical_research`. Public mode serves allowlisted evidence only; it does not expose the downloaded panel, local credentials or arbitrary run files. Model execution stays in the explicit CLI. No frontend redesign is required to use these endpoints.

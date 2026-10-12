@@ -68,7 +68,7 @@ def response_for(node_id: str) -> str:
 
 class ZenithGraphTests(unittest.TestCase):
     def test_exact_authored_graph_and_offline_scope(self):
-        self.assertEqual(runtime.validate(ROOT)["node_count"], 50)
+        self.assertEqual(runtime.validate(ROOT)["node_count"], 75)
         self.assertTrue(runtime.validate(ROOT)["ok"])
         lab = runtime.plan(ROOT, "lab", "lab_decide")
         oracle = runtime.plan(ROOT, "oracle")

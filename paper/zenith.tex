@@ -1,258 +1,207 @@
 \documentclass[11pt]{article}
 \usepackage[a4paper,margin=23mm]{geometry}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern,microtype,booktabs,array}
+\usepackage{lmodern,microtype,booktabs,amsmath,array}
 \usepackage[colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage{enumitem,tikz}
-\usetikzlibrary{arrows.meta,positioning,calc,backgrounds}
-\definecolor{ink}{HTML}{23343D}
-\definecolor{teal}{HTML}{246F65}
-\definecolor{wash}{HTML}{EDF5F2}
-\tikzset{record/.style={draw=ink!45,fill=white,rectangle,align=center,font=\small,text=ink,minimum height=12mm},
-operator/.style={draw=ink!50,fill=white,rounded corners=2pt,align=center,font=\small,text=ink,minimum height=12mm},
-checkpoint/.style={record,draw=teal,fill=wash},
-wire/.style={-{Stealth[length=2mm]},draw=ink!70,line width=.65pt,rounded corners=3pt},
-smallnote/.style={font=\footnotesize,text=ink!80,align=left}}
+\usetikzlibrary{arrows.meta,positioning}
 \setlist{nosep,leftmargin=*}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt}
-\makeatletter
-\def\ps@research{%
-  \def\@oddhead{}\let\@evenhead\@oddhead
-  \def\@oddfoot{\hfil\footnotesize Experimental research prototype.\quad\thepage\hfil}%
-  \let\@evenfoot\@oddfoot}
-\makeatother
-\pagestyle{research}
-% Preserve the author's three-page limit in the editor and exported builds.
 \AddToHook{shipout/before}{\ifnum\value{page}>3
   \PackageError{zenith}{Paper exceeds three pages}{Shorten the paper before publishing.}\fi}
 \begin{document}
 \begin{center}
-{\Large\bfseries Zenith: evaluating revisions to a reasoning graph}\\[4pt]
+{\Large\bfseries Zenith: learning what to investigate before forecasting}\\[4pt]
 Will Cook \quad\textbullet\quad 12 October 2026
 \end{center}
-
-{\small\textbf{Experimental research prototype.} The public example uses synthetic observations of a disclosed toy generator. No predictive improvement has been demonstrated.}
-
 \hypertarget{idea}{}
-\textbf{Abstract.} Zenith studies forecasting a changing, partially observed
-system through heterogeneous, incomplete and delayed observations. Lab freezes
-predictions; Oracle evaluates later evidence; Evolve proposes one revision for
-a held-out matched comparison. The synthetic fixture prepares the first request
-with zero model calls, no completed forecast and no demonstrated improvement.
+\textbf{Abstract.}
+Zenith treats reasoning as a policy for choosing useful numerical investigations.
+An initial forecast may miss a distinction between sources, feature families or
+times. A language-model programme proposes a small set of questions, numerical
+tools answer them using earlier data, and a final decision may revise the
+forecast. Later errors guide one reusable instruction change, evaluated on
+separate dates. We implement this loop for six research baskets sharing the
+histories of 147 financial instruments and 17 market indices. Comparisons include
+an all-universe numerical model, fixed investigations and a single controller
+with the same data and tools. The study is a small retrospective execution test;
+its question is whether selective investigation earns its additional computation.
 
-\textbf{1. Evaluation protocol.}
-Reasoning reconciles meanings and clocks, distinguishes missing from conflicting
-evidence, proposes competing explanations and selects explicit forecast targets.
-The DAG records computational dependencies, not physical causality or independent
-votes. Keep the model, targets, score and budget fixed during comparison.
-\begin{center}
-\begin{tikzpicture}
-\node[smallnote,anchor=west] at (-1.75,.9) {READ ONLY THE EARLIER SNAPSHOT};
-\node[record,minimum width=35mm] (before) at (0,0) {Earlier inputs\\at the cutoff};
-\node[operator,minimum width=37mm] (lab) at (5.2,0) {\textbf{Lab}\\select and predict};
-\node[checkpoint,minimum width=41mm] (frozen) at (10.4,0) {Frozen predictions\\+ node outputs};
-\draw[wire] (before)--(lab);
-\draw[wire] (lab)--(frozen);
-\node[smallnote,anchor=west] at (-1.75,-1.25) {OPEN THE LATER SNAPSHOT};
-\node[record,minimum width=35mm] (after) at (0,-2.15) {Later observations\\after the cutoff};
-\node[operator,minimum width=37mm] (oracle) at (5.2,-2.15) {\textbf{Oracle}\\measure and diagnose};
-\node[operator,minimum width=41mm] (evolve) at (10.4,-2.15) {\textbf{Evolve}\\propose one change};
-\draw[wire] (after)--(oracle);
-\draw[wire] (frozen.south)--(10.4,-.98)--(5.2,-.98)--(oracle.north);
-\draw[wire] (oracle)--(evolve);
-\node[record,draw=teal,dashed,minimum width=112mm,minimum height=17mm] (compare) at (5.2,-4.35)
- {\textbf{Compare on another window}\\Same later inputs: original graph and one revision\\Predeclare the score; record gains and regressions};
-\draw[wire,dashed] (evolve.south)--(10.4,-3.2)--(5.2,-3.2)--(compare.north);
-\end{tikzpicture}
-\end{center}
-{\small Figure 1. Proposed evaluation loop. Preserve the original record before
-revealing the outcome. The dashed step is a separate comparison, not evidence
-that a diagnosis or revision is correct.}
+\textbf{1. The task.}
+At each cutoff, predict the five-market-session return of every basket using the
+entire declared universe. A basket's own members are only one possible source of
+information: breadth in another group, lagged returns or changing volume may be
+worth testing. Such patterns are empirical hypotheses. Neither correlated prices
+nor a dependency between computations identifies an economic cause.
 
+The source is the adjusted-instrument and index history published by SocrateAI
+under a dataset-specific MIT-form licence~\cite{nepse}. We pin its repository
+commit and import through 31 December 2025. The audited panel contains 447,243
+instrument observations and 59,319 index observations; 2,319 rows with missing
+index prices are quarantined. Optional blank volume values remain missing.
 
-\textbf{Synthetic observations.}
-Five source perspectives describe the same abstract System A: measurements,
-subsystems, environment, events and interventions. A sixth derives summaries
-from their supplied values. The disclosed generator uses dimensionless values,
-seed 17 and the prescribed recurrence
-$x_{n+1}=0.7x_n+0.2c_n+u_n+\epsilon_n$, with seeded noise.
-This is a toy construction, not a learned model or physically validated simulation.
-Provenance and receipts identify the inputs~\cite{demo}.
+Membership is fixed on 29 December 2021, using only preceding observations:
+at least 95\% quote coverage over 252 sessions, a quote at formation and positive
+median volume. We sort the 147 eligible instruments by their preceding
+126-session beta to the equal-weight universe and form six balanced groups.
+These are constructed research baskets, not historical sectors or traded ETFs.
+Each begins at 100 with equal initial value in its members and keeps fixed shares.
+Missing quotes retain the last observed price, with quote ages and stale fractions
+reported. For basket index $V_b$, the target is
+\[
+  r_{b,t}=V_b(t+5)/V_b(t)-1,
+\]
+where the offset counts available market sessions. No future-survival screen or
+future price fill determines membership or the target.
 
-\textbf{Physical motivation.} Sensors expose different aspects of a changing
-state; history may recover information absent from one instant, but some state
-can remain unobservable~\cite{tedrake}. Heat-transfer observations could support
-a six-hour temperature target; position, acceleration and force histories could
-support a one-second vibration target. Known forces, boundaries and interventions
-condition the forecast. Proposed reasoning aligns clocks, units and source
-dependence, compares sensor-fault and state-change explanations, and selects an
-appropriate physical model or numerical tool. Solver integration is unimplemented
-and untested; narrative cannot substitute for equations. System A remains a
-separate toy. Match entity, target, horizon and later truth.
-
-Collect runs with the graph fixed; count unique cases across overlapping
-windows. Freeze one revision before opening comparison outcomes. Cases used to
-choose it become development data. The fixture does not establish that reasoning adds value over direct or numerical
-baselines.
-
-\textbf{Prior work.} DSPy composes LM modules~\cite{dspy}; MIPRO optimises their
-instructions and examples against a metric~\cite{mipro}. AlphaGo Zero~\cite{alphago}
-and autoresearch~\cite{autores} motivated successive comparisons. Their results do not establish a forecasting advantage here.
-\newpage
 \hypertarget{lab}{}
-\textbf{2. The executable graph and failure diagnosis.}
-Six feed-specific miners analyse the permitted inputs. Saved outputs let a
-reviewer trace an unsupported claim to its first occurrence and actual evidence.
+\textbf{2. Investigations produce candidates, not stories.}
+A deterministic store exposes returns, volatility, volume, quote age, basket
+breadth and dispersion, and market-index returns. The common provisional forecast
+is a ridge regression over all features, fitted on at most 252 earlier origins
+whose labels have matured. Training-only scaling, clipping and a fixed penalty
+are shared by the baseline and candidate fits. Arithmetic stays in numerical code.
+
+Six first-pass readers inspect different slices of the same universe. A planner
+combines their observations and freezes an investigation plan (CP1). A query
+chooses a target basket, any source basket or the whole universe or index group,
+a feature family and a lag of 0, 1, 5 or 20 sessions. Up to six queries are allowed.
+The tool fits the selected feature subset and reports a candidate forecast plus
+its gain over the common baseline on eight earlier rolling validation origins.
+Every validation fit excludes labels maturing after that validation cutoff.
+\newpage
+
+\textbf{Revision within a forecast.}
+A final model selects one eligible candidate or the baseline for each basket.
+The complete vector is frozen at CP2. CP1 remains an immutable record, but its
+hypotheses need not survive investigation. Uninvestigated targets retain their
+baseline. The tool validates candidate identity and target coverage; the language
+model cannot supply an unsupported numerical forecast. A validation gain may
+reflect selection noise, so retaining the baseline is a legitimate decision.
+
 \begin{center}
-\begin{tikzpicture}
-\node[record,minimum width=103mm] (feeds) at (5.15,0)
- {\textbf{Saved packet: five feeds + derived values}\\Measurements, subsystems, environment, events, interventions};
-\node[operator,minimum width=37mm] (seed) at (13.6,0) {\textbf{Seed}\\data inventory};
-\draw[wire] (feeds)--(seed);
-\node[operator,minimum width=153mm,minimum height=13mm] (first) at (7.65,-1.6)
- {\textbf{First pass: six parallel miners}\\Measurements \quad Subsystems \quad Environment \quad Events \quad Actions \quad Derived};
-\draw[wire] (feeds.south)--(5.15,-.98);
-\draw[wire] (seed.south)--(13.6,-.98);
-\node[operator,minimum width=37mm] (cross) at (1.85,-3.2) {\textbf{Synthesis}\\combine observations};
-\node[operator,minimum width=37mm] (orient) at (7.65,-3.2) {\textbf{Orient}\\competing theses};
-\node[checkpoint,minimum width=37mm] (decide) at (13.45,-3.2) {\textbf{Decide $\cdot$ CP1}\\freeze the thesis};
-\draw[wire] (1.85,-2.25)--(cross.north);
-\draw[wire] (cross)--(orient);\draw[wire] (orient)--(decide);
-\node[operator,minimum width=153mm,minimum height=13mm] (second) at (7.65,-4.8)
- {\textbf{Directed evidence pass}\\Six miners re-read the feeds; a second synthesis reconciles their findings};
-\draw[wire] (decide.south)--(13.45,-4.15);
-\node[checkpoint,minimum width=58mm] (director) at (4.3,-6.4)
- {\textbf{Director $\cdot$ CP2}\\freeze predictions};
-\node[operator,minimum width=58mm] (integrity) at (11,-6.4)
- {\textbf{Integrity}\\check both passes};
-\draw[wire] (4.3,-5.45)--(director.north);
-\draw[wire] (director)--(integrity);
+\begin{tikzpicture}[node distance=7mm,>=Stealth,
+  box/.style={draw,rounded corners=2pt,align=center,font=\small,minimum height=11mm,text width=43mm}]
+\node[box] (read) {Shared history\\six source readers};
+\node[box,right=of read] (plan) {CP1\\choose investigations};
+\node[box,right=of plan] (tool) {Numerical tools\\up to six queries};
+\node[box,below=of tool] (final) {CP2\\freeze every forecast};
+\node[box,left=of final] (score) {Later outcomes\\full-universe loss};
+\node[box,left=of score] (revise) {One instruction revision\\then later comparison};
+\draw[->] (read)--(plan);\draw[->] (plan)--(tool);
+\draw[->] (tool)--(final);\draw[->] (final)--(score);\draw[->] (score)--(revise);
 \end{tikzpicture}
 \end{center}
-
-{\small Figure 2. Lab's two passes. ``Synthesis'' denotes the nodes named
-Cross-correlation in the implementation; the second synthesis is grouped with
-the directed pass. CP1 is the saved thesis; CP2 freezes the declared target predictions.}
+{\small Figure 1. The executable basket loop. Forecast-time numerical tools
+see only cutoff-valid data. Development outcomes can guide a revision; later
+test outcomes cannot enter its instruction.}
 
 \hypertarget{oracle}{}
-\begin{center}
-\begin{tikzpicture}
-\node[record,minimum width=36mm] (subject) at (0,.1) {Original Lab record};
-\node[record,minimum width=36mm] (truth) at (0,-1.3) {Later feeds};
-\node[operator,minimum width=44mm,minimum height=25mm] (reviews) at (5.5,-.6)
- {\textbf{Compare the evidence}\\Numeric differences\\+ six lane reviews};
-\node[operator,minimum width=37mm,minimum height=25mm] (map) at (11,-.6)
- {\textbf{Evidence summary}\\combined findings};
-\draw[wire] (subject.east)--(3.3,.1);
-\draw[wire] (truth.east)--(3.3,-1.3);
-\draw[wire] (reviews)--(map);
-\node[operator,minimum width=44mm] (explain) at (5.5,-3)
- {\textbf{Failure hypothesis}\\locate and explain the error};
-\node[checkpoint,minimum width=37mm] (out) at (11,-3)
- {\textbf{Oracle CP2}\\record for review};
-\draw[wire] (map.south)--(11,-2.2)--(5.5,-2.2)--(explain.north);
-\draw[wire] (explain)--(out);
-\end{tikzpicture}
-\end{center}
-{\small Figure 3. Oracle reviews the saved run against later evidence. Its
-attribution is a hypothesis about a failure, not a causal identification.
-Square boxes are records; rounded boxes are operations or groups. Exact feed,
-skip and cross-pass dependencies are retained in \path{docs/graphs.md}.}
-
+\textbf{3. Comparison and learning.}
+Four development dates in 2023 compare directed investigation with an undirected
+control. The latter runs the same reader/planner architecture but substitutes
+six predeclared own-basket trend queries. Both have the same maximum query
+allowance. Their first-pass model calls are independent, so the pilot does not
+isolate all sampling variability.
 
 \hypertarget{trace}{}
-Diagnosis separates evidence absent from the packet, evidence omitted from a
-node's inputs, unsupported reasoning, incorrect prediction and execution
-failure. Keep unresolved cases unknown. Post-outcome research may explain an
-event but cannot become earlier evidence. Recorded interventions and repeated
-failures do not by themselves identify causes.
+Evolve reads development losses and saved traces, then proposes one addition of
+at most 512 characters to the planner instruction. The revision is hashed and
+frozen before held-out execution. This learns a procedural instruction;
+it does not change model weights, fit a neural controller or identify market
+causality. One proposal is tested, including the possibility of no change.
 
-Evolve proposes a bounded instruction, context or dependency change. Compare
-original and revised graphs on the same further cases with the model and budget
-fixed. Report selection coverage, forecast error, failures and cost separately,
-with a score suited to the declared forecast~\cite{scores}. A selected subset
-may look accurate while missing useful targets; declare how abstentions count.
-\newpage
-\hypertarget{research}{}
-\textbf{3. Proposed context-conditioned prompts.}
-A shared neural controller would use variability, missingness, disagreement and
-event density available at the cutoff to select small text variants for each
-node. Its outputs are \emph{prompt settings}: numbers in $[0,1]$ indexing a
-versioned catalogue, distinct from learned controller weights. The node's task,
-permitted inputs, output contract and work budget stay fixed. This extension
-has not been implemented or evaluated.
+Six later dates in 2024 compare the incumbent, its revision, the undirected arm
+and a serial controller. The serial controller receives all first-pass numerical
+rows and the same query catalogue. It chooses investigations and then selects
+forecasts in two calls, versus eight for each graph arm. The same inexpensive
+base model is used throughout. Numerical ridge and zero-return baselines require
+no language-model calls. A serial programme could execute the same computation
+graph; exclusive expressive capability is not the claim.
 
-\begin{center}
-\begin{tikzpicture}
-\node[record,minimum width=65mm] (signals) at (0,0)
- {Cutoff-bound context\\Variability, missingness, disagreement};
-\node[operator,minimum width=70mm,draw=teal,fill=wash] (controller) at (8,0)
- {Shared controller\\Select settings for this node};
-\node[record,minimum width=65mm] (fixed) at (0,-1.8)
- {Fixed task and evidence rules\\Permitted feed + earlier outputs};
-\node[operator,minimum width=70mm] (prompt) at (8,-1.8)
- {Assemble exact prompt\\Fixed instructions + chosen variants};
-\node[checkpoint,minimum width=70mm] (output) at (8,-3.6)
- {Same reasoning task; fixed base model\\Save output, prompt and version};
-\draw[wire] (signals)--(controller);
-\draw[wire] (controller)--(prompt);
-\draw[wire] (fixed)--(prompt);
-\draw[wire] (prompt)--(output);
-\end{tikzpicture}
-\end{center}
-{\small Figure 4. Prediction-time selection with a previously frozen controller.
-For the interventions miner, settings may vary caution about attribution while
-keeping seed state, interventions and evidence rules fixed. Temporal association
-alone is not causal proof. Settings select text, not numerical attention weights.}
-
-Development is separate: measure configurations on development cases, fit or
-select the controller, then freeze it before later testing. Search a small
-catalogue first, following discrete prompt optimisation~\cite{mipro}.
-Backpropagation could train the numerical controller from measured losses;
-hard text selection and hosted LM calls expose no ordinary end-to-end derivative.
-ProTeGi~\cite{protegi} and TextGrad~\cite{textgrad} use verbal feedback as a
-gradient analogy. A critique suggests a revision; it is not a derivative or
-proof of benefit. Nearby settings need not behave smoothly or monotonically.
+Every arm commits all six forecasts before the evaluator opens that date's
+outcome. Squared fractional return error is averaged equally over targets and
+origins. A failed run retains the entire numerical baseline vector, stays in the
+score and is separately reported. The revision is retained only if it lowers
+mean held-out loss, does not increase worst-origin loss and no model arm fails.
+A shared cap of \$2 and 260 attempted calls bounds the whole experiment.
 
 \hypertarget{results}{}
-\textbf{Verified boundary and next evaluation.}
-The native graph loads the six synthetic artifacts and prepares the Seed request
-with zero model calls~\cite{demo}. There is no completed CP1, CP2, forecast, Oracle diagnosis
-or Evolve comparison. Historical results belong to their original configurations.
-Complete Lab, score the frozen predictions against later observations and compare
-one revision on further matched cases. Test any controller against fixed prompts
-under the same information and budget, including regressions and uncertainty.
-Synthetic preparation establishes neither real-world predictive performance nor
-universal reliability. Detailed protocol and controller choices remain in
-\path{docs/research-direction.md}.
+\textbf{Measured result.}
+The comparison completed 221 calls to Ling 3.0 Flash for a reported
+\$0.021791. Directed, revised and serial held-out forecasts equalled the ridge
+baseline: mean squared return error 0.00065565, versus 0.00065196 for undirected
+investigations and 0.00064589 for zero return. Eight of 32 model arms failed
+candidate-to-target validation and retained the predeclared baseline fallback.
+The proposed instruction was not retained. There is no observed advantage for
+the directed graph or revision in this pilot. The complete forecast and failure
+records are published in \path{examples/baskets/}; the proposed diagnosis remains
+unverified model output.
+\newpage
 
-\begin{thebibliography}{8}\footnotesize
-\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}\setlength{\parsep}{0pt}
-\bibitem{tedrake} R. Tedrake. \emph{Underactuated Robotics}, Output Feedback.
-\href{https://underactuated.mit.edu/output_feedback.html}{underactuated.mit.edu/output\_feedback.html}.
-\bibitem{demo} Zenith. \href{https://github.com/wcook04/plectis-zenith/blob/main/docs/demo.md}{Synthetic observation demonstration},
-\href{https://github.com/wcook04/plectis-zenith/blob/main/examples/demo/provenance.json}{per-feed provenance} and
-\href{https://github.com/wcook04/plectis-zenith/blob/main/examples/demo/result.json}{preparation receipt}, 2026.
-\bibitem{alphago} D. Silver et al. Mastering the game of Go without human
-knowledge. \emph{Nature} 550:354--359, 2017.
-\href{https://doi.org/10.1038/nature24270}{doi:10.1038/nature24270}.
-\bibitem{autores} A. Karpathy. \emph{autoresearch}. Source inspected at
-\href{https://github.com/karpathy/autoresearch/tree/228791fb499a}{\texttt{228791fb499a}} (code).
-\bibitem{scores} T. Gneiting and A. E. Raftery. Strictly proper scoring rules,
-prediction, and estimation. \emph{JASA} 102(477):359--378, 2007.
-\href{https://doi.org/10.1198/016214506000001437}{doi:10.1198/016214506000001437}.
+\hypertarget{research}{}
+\textbf{4. What this experiment can establish.}
+A completed run demonstrates a reproducible sequence from historical data through
+provisional reasoning, targeted computation, forecast revision, later scoring
+and one tested instruction change. A lower observed loss would be a descriptive
+result on these dates. Six held-out dates are not 36 independent experiments:
+baskets share constituents' market environment and errors within a date are
+dependent. The present sample does not support a claim of statistical superiority.
+
+The open financial system need not be fully observed for forecasting to be
+scored. It does, however, limit explanations. Prices and volume alone omit many
+possible causes. The published data have unknown historical release timestamps
+and adjustment vintages; stale marks are not executable prices; instrument types
+and historical classifications are incomplete. Consequently the target is a
+retrospective last-quote research index, not trading returns or a certified
+point-in-time backtest. Pretrained models may also have encountered the historical
+period. A prospective test is needed to address that limitation.
+
+The architecture must survive stronger comparisons. An adaptive serial model can
+read the same data and ask the same questions; a numerical model can summarise
+many histories cheaply. Zenith is useful only if its investigation policy adds
+value at an acceptable cost. Larger chronological tests should include repeated
+unchanged controls, broader numerical baselines, cost-matched alternatives and
+predeclared uncertainty estimates at the forecast-date level. Any procedure
+selected after inspecting the current test results belongs to development in
+its next evaluation.
+
+\textbf{Related work and scope.}
+DSPy composes language-model modules and optimises programmes against a
+metric~\cite{dspy}. MIPRO optimises instructions and demonstrations across
+multi-stage programmes~\cite{mipro}. Zenith applies the same general principle
+of measured programme revision to a bounded forecasting investigation policy.
+The specific contribution of this prototype is the executable comparison:
+all-source access, numerical candidate generation, immutable provisional and
+final records, full-target scoring, an inexpensive serial competitor, and a
+separate test of one proposed instruction. Prompt revision alone is not novel,
+and the structure of the workflow does not establish predictive benefit.
+
+\textbf{Reproduction and evidence.}
+The backend uses the existing native graph engine and its budgeted OpenRouter
+adapter. Source files, import outputs, numerical snapshots, forecast commitments
+and policy revisions carry hashes. Failed imports and paid attempts are retained;
+no failed forecast is silently removed or replaced by a fresh attempt. The
+numerical store is separate from the bounded text shown to readers. The query
+catalogue, ridge specification, exact dates and data qualifications are documented
+in \path{docs/baskets.md}; \path{docs/status.md} owns current results.
+
+The previous invented System A example remains a synthetic protocol fixture.
+Its preparation receipt is not evidence for this financial experiment.
+Source and reproduction commands are in the
+\href{https://github.com/wcook04/plectis-zenith}{Zenith repository}.
+
+\begin{thebibliography}{3}\small
+\setlength{\itemsep}{3pt}\setlength{\parskip}{0pt}
+\bibitem{nepse} SocrateAI. \emph{NEPSE Open Data}, pinned source
+\href{https://github.com/socrateai-official/nepse-open-data/tree/497e27238a107de00c6f435a4f4f76983205577d}{\texttt{497e27238a10}}, 2026.
+Dataset-specific MIT-form licence; copyright 2025 SocrateAI.
 \bibitem{dspy} O. Khattab et al. DSPy: Compiling Declarative Language Model Calls
 into Self-Improving Pipelines. \emph{ICLR}, 2024.
 \href{https://arxiv.org/abs/2310.03714}{arXiv:2310.03714}.
 \bibitem{mipro} K. Opsahl-Ong et al. Optimizing Instructions and Demonstrations
 for Multi-Stage Language Model Programs. \emph{EMNLP}, 2024.
-\href{https://arxiv.org/abs/2406.11695v2}{arXiv:2406.11695v2}.
-\bibitem{protegi} R. Pryzant et al. Automatic Prompt Optimization with
-``Gradient Descent'' and Beam Search. \emph{EMNLP}, 2023.
-\href{https://arxiv.org/abs/2305.03495}{arXiv:2305.03495}.
-\bibitem{textgrad} M. Yuksekgonul et al. TextGrad: Automatic
-``Differentiation'' via Text. 2024.
-\href{https://arxiv.org/abs/2406.07496v1}{arXiv:2406.07496v1}.
+\href{https://arxiv.org/abs/2406.11695}{arXiv:2406.11695}.
 \end{thebibliography}
 \end{document}

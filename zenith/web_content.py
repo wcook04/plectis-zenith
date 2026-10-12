@@ -15,7 +15,8 @@ DOCUMENTS = {
     "architecture": "docs/architecture.md",
     "graphs": "docs/graphs.md",
     "results": "docs/status.md",
-    "experiment": "docs/demo.md",
+    "experiment": "docs/baskets.md",
+    "synthetic-fixture": "docs/demo.md",
     "data": "docs/data.md",
     "diagnosis": "docs/failure-diagnosis.md",
     "research-direction": "docs/research-direction.md",
@@ -26,19 +27,22 @@ EVIDENCE = {
     "sources": "examples/demo/provenance.json",
     "replacements": "examples/demo/replacements.json",
     "demo-result": "examples/demo/result.json",
+    "basket-result": "examples/baskets/result.json",
+    "basket-trace": "examples/baskets/trace.json",
+    "basket-protocol": "examples/baskets/protocol.json",
 }
-FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail")
+FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail", "basket-detail", "basket-serial-detail")
 CHAPTERS = (
     ("idea", "The idea", "introduction", "replay", None, "proposed_process"),
-    ("lab", "Read earlier evidence and freeze a prediction", "graphs", "lab", "lab", "authored_mechanism"),
+    ("lab", "Investigate the shared universe", "experiment", "basket-detail", "basket", "authored_mechanism"),
     ("oracle", "Compare with later evidence", "graphs", "oracle", "oracle", "authored_mechanism"),
     ("evolve", "Propose one change and test it", "architecture", "evolve", "refinement", "authored_mechanism"),
-    ("results", "What has been prepared", "results", None, "lab", "verified_preparation"),
+    ("results", "Measured results", "results", None, "basket", "measured_experiment"),
     ("next", "What still needs testing", "research-direction", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
     "idea": ("sources",), "lab": ("replacements",), "oracle": (), "evolve": (),
-    "results": ("demo-result",), "next": (),
+    "results": ("basket-result", "basket-trace", "basket-protocol"), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
                   "evolve": "trace", "results": "results", "next": "research"}
@@ -79,7 +83,7 @@ class PublicContent:
                 self.sources[source["id"]] = (path.relative_to(self.root).as_posix(), raw, source)
         if set(self.sources) != set(self.nodes):
             raise ValueError("Native nodes lack source bindings")
-        self.plans = {name: runtime.plan(self.root, name) for name in ("lab", "oracle", "refinement")}
+        self.plans = {name: runtime.plan(self.root, name) for name in ("lab", "oracle", "refinement", "basket", "basket_serial", "basket_evolve")}
 
     def source(self, path: str, data: bytes) -> dict:
         return {"path": path, "sha256": digest(data),
@@ -210,8 +214,8 @@ class PublicContent:
                 "documents": {k: f"{API}/documents/{k}" for k, v in DOCUMENTS.items() if (self.root / v).is_file()},
                 "figures": {k: f"/assets/graphs/{k}.svg" for k in FIGURES},
                 "evidence": {k: f"{API}/evidence/{k}" for k in EVIDENCE},
-                "data_mode": "synthetic",
-                "data_note": "Invented observations of System A through five source perspectives and computed summaries. All payloads are public. Preparation only; no demonstrated predictive improvement.",
+                "data_mode": "historical_research",
+                "data_note": "Published historical NEPSE observations and constructed research baskets; retrospective replay with stale-mark and availability limitations. System A remains a separate synthetic fixture. Read the result receipt for measured outcomes.",
                 "local_runs_enabled": local_runs,
                 "run_index_url": f"{API}/runs" if local_runs else None,
                 "capabilities": {"read_graph": True, "read_paper": True, "read_local_runs": local_runs,

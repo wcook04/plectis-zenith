@@ -37,7 +37,7 @@ def request(server, path, method="GET", headers=None):
 
 
 def test_native_scopes_sources_and_focus(website):
-    for mission, count, edges in (("lab", 25, 86), ("oracle", 28, 53), ("evolve", 3, 2)):
+    for mission, count, edges in (("lab", 25, 86), ("oracle", 28, 53), ("evolve", 3, 2), ("basket", 18, 26), ("basket_serial", 6, 8), ("basket_evolve", 2, 1)):
         graph = json.loads(website.get(f"/api/v1/graph?mission={mission}").body)
         assert (graph["node_count"], graph["edge_count"]) == (count, edges)
         ids = {node["id"] for node in graph["nodes"]}
@@ -54,13 +54,13 @@ def test_native_scopes_sources_and_focus(website):
 def test_teaching_material_uses_current_sources(website):
     site = json.loads(website.get("/api/v1/site").body)
     assert [chapter["id"] for chapter in site["chapters"]] == ["idea", "lab", "oracle", "evolve", "results", "next"]
-    assert next(c for c in site["chapters"] if c["id"] == "results")["evidence_kind"] == "verified_preparation"
+    assert next(c for c in site["chapters"] if c["id"] == "results")["evidence_kind"] == "measured_experiment"
     for url in site["documents"].values():
         doc = json.loads(website.get(url).body)
         assert doc["content"] == (ROOT / doc["source"]["path"]).read_text()
     paper = json.loads(website.get(site["paper_url"]).body)
     assert paper["pdf_sha256"] == hashlib.sha256((ROOT / "paper/zenith.pdf").read_bytes()).hexdigest()
-    assert {c["id"] for c in paper["citations"]} >= {"alphago", "autores", "scores"}
+    assert {c["id"] for c in paper["citations"]} >= {"nepse", "dspy", "mipro"}
     assert all(c["used_at"] for c in paper["citations"])
     for chapter in site["chapters"]:
         section = chapter["paper_section"]
@@ -69,8 +69,7 @@ def test_teaching_material_uses_current_sources(website):
         assert section["pdf_url"].endswith("#nameddest=" + section["id"])
         assert all(website.get(url).body for url in chapter["evidence_urls"])
     results = next(c for c in site["chapters"] if c["id"] == "results")
-    assert set(results["evidence_urls"]) == {"/api/v1/evidence/demo-result"}
-    assert "demo" in results["paper_section"]["citation_ids"]
+    assert set(results["evidence_urls"]) == {"/api/v1/evidence/basket-result", "/api/v1/evidence/basket-trace", "/api/v1/evidence/basket-protocol"}
     for url in site["evidence"].values():
         evidence = json.loads(website.get(url).body)
         assert evidence["data"] == json.loads((ROOT / evidence["source"]["path"]).read_text())
@@ -165,4 +164,4 @@ def test_dossier_is_current_generic_source(website):
     assert dossier["data"] == json.loads(path.read_text())
     assert dossier["source"]["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
     assert dossier["data"]["perspective"] == "interventions"
-    assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "synthetic"
+    assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "historical_research"

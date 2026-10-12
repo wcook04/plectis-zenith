@@ -1,0 +1,29 @@
+{
+  "id": "basket_plan",
+  "type": "reasoning",
+  "group": "basket",
+  "lane": "SPINE",
+  "dependencies": [
+    "basket_inventory",
+    "basket_reader_1",
+    "basket_reader_2",
+    "basket_reader_3",
+    "basket_reader_4",
+    "basket_reader_5",
+    "basket_reader_6"
+  ],
+  "meta": {},
+  "is_artifact": true,
+  "teleology": "Cutoff-bound shared-universe basket investigation",
+  "output_schema": "json",
+  "instruction": "Return JSON {\"queries\": [{\"target\":\"B01\",\"source\":\"B02\",\"operation\":\"breadth\",\"lag\":0,\"reason\":\"specific testable question\"}]}. Query at most six times, choosing from the supplied query_contract. Every target can use ANY basket, ALL, or INDEX. You may issue multiple candidates for a target or no query. Do not output forecasts or arithmetic. The deterministic tools fit regularised forecasts on eligible earlier history and report a historical validation gain. Form competing empirical hypotheses from differences across the readers. CP1 is provisional; final forecasts can retain the baseline.",
+  "platform": "chatgpt",
+  "execution": {
+    "retries": 0,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 120
+  },
+  "routing_class": "SYNTHESIZE",
+  "boundary": "Use only supplied cutoff data. Do not infer physical causality or invent numerical results."
+}

@@ -1,6 +1,6 @@
 # Zenith research programme
 
-**Research direction, 12 October 2026.** Forecast every research basket from the shared history of all baskets and all their constituents. Study whether learning which cross-source investigations to perform improves forecasts at a fixed computation budget. This is the selected experiment, not a completed result. The checked-in System A demonstration remains a protocol fixture.
+**Research direction, 12 October 2026.** Forecast every research basket from the shared history of all baskets and all their constituents. Study whether learning which cross-source investigations to perform improves forecasts at a fixed computation budget. The executable implementation is documented in [the basket protocol](docs/baskets.md); [status](docs/status.md) owns measured results. The checked-in System A demonstration remains a separate protocol fixture.
 
 ## Question and task
 
@@ -51,16 +51,10 @@ Historical replay with a pretrained model cannot rule out memorisation merely by
 
 Retain a revision only under a predeclared full-universe comparison, with uncertainty, failures, regressions and costs visible. If a numerical or single-controller baseline matches the graph more cheaply, the current graph has not earned its complexity. A serial programme can execute the same DAG; exclusive computational capability is not the claim.
 
-## Verified implementation work remaining
+## Implementation and research boundary
 
-The following findings were checked against local source at `ec1592111ddeccf5b0351f29f23615ad6676d322`, after reading the three supplied decision/source audits and four accompanying responses. Those returns are proposals, not execution receipts.
+The native basket profile now implements a cutoff-bound numerical store, an all-universe ridge baseline, an empirical CP1 investigation plan, validated all-target CP2 forecasts, directed/undirected comparisons, a serial controller and a development-only Evolve instruction. It uses the existing engine, provider budget, artifact storage and reasoning-policy loader. The exact bounded operations and evaluation rules live in [the implementation protocol](docs/baskets.md).
 
-| Current source | Required change |
-|---|---|
-| `lab/seed_state.json` depends on all six feeds; `zenith/context.py` preserves full feed data | Add a deterministic inventory and cutoff-enforcing query interface while preserving the source records. |
-| CP1/CP2 contracts and Decide/Director prompts require a dominant causal thesis | Introduce empirical, target-specific hypotheses consistently across contracts, prompts and validation. |
-| `GodModeEngine._validate_schema_output` locks Director's status, basis and rule to CP1 | Permit explicit, cutoff-valid provisional revisions; keep CP1 immutable and protect final CP2 from hindsight changes. |
-| `system/lib/judgmental_forecast.py` has a stub `locked_evidence` | Do not claim every numeric CP2 value is already mechanically frozen to CP1. |
-| Native provider budgeting, saved artifacts, feedback and matched-comparison machinery exist | Extend these owners instead of building a second experiment engine. |
+The earlier causal-thesis constraints remain in the legacy Lab profile. Basket nodes have their own empirical contracts and do not relax historical validation rules. Numerical evaluation replaces subjective accuracy judgments in this profile. Evolve changes one instruction; it does not train model weights or a neural controller.
 
-Implement the data interface and full-universe numerical baselines first, then the directed-pass comparison, then one policy revision. Provider selection and permissions are tracked in [data](docs/data.md). The public paper still describes the earlier generic fixture; revise it when the implemented protocol is concrete, preserving its three-page limit and result boundary. Website design is outside the current task.
+The first pilot samples four development and six later test origins. It can establish that the loop executes and expose useful or harmful revisions. Its dependent basket errors and small date sample cannot establish broad superiority. Larger chronological comparisons, repeated unchanged controls and prospective evaluation remain research requirements. The selected data source and its qualifications live in [data](docs/data.md). Website design is outside the task.

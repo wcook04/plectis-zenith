@@ -1,20 +1,25 @@
-# Observations in this edition
+# Research data
 
-## Selected research data route
+## Selected and imported: NEPSE Open Data
 
-The [active programme](../program.md) requires histories for a shared universe of constituents and research baskets. Source observations stay private unless their licence permits publication. Each imported dataset needs its provider, product, retrieval date, terms reference, adjustment convention, availability rule and hashes recorded. Historical membership and delistings need explicit treatment; choosing today's survivors does not recreate the historical universe. Source dates alone do not establish point-in-time availability.
+The executable basket experiment uses [SocrateAI NEPSE Open Data](https://github.com/socrateai-official/nepse-open-data/tree/497e27238a107de00c6f435a4f4f76983205577d), pinned to `497e27238a107de00c6f435a4f4f76983205577d`. Its [MIT-form licence](https://github.com/socrateai-official/nepse-open-data/blob/497e27238a107de00c6f435a4f4f76983205577d/LICENSE) expressly covers “this dataset and associated documentation files.” The publisher grants use, copying, modification, publication and distribution subject to retaining the copyright and permission notice. This is the publisher's grant, not an independent certification of every upstream right. The import preserves the full licence and attribution.
 
-GitHub and provider checks on 12 October 2026 found reusable infrastructure, but did not clear a downloaded price panel:
+The downloader retrieves only the pinned adjusted-instrument and index CSV directories. It does not execute scraping scripts. The experiment imports records through 31 December 2025, using 2023 development and 2024 test origins. A first strict import exposed conflicting duplicate records in March 2026; no conflicting value was chosen or averaged. Failed imports remain local diagnostic evidence and cannot be loaded as a completed panel.
 
-| Source | Use and boundary |
-|---|---|
-| [Qlib](https://github.com/microsoft/qlib/tree/54355232463878d2eebb91fe0ee5fa7fa1f5976c) | Reusable feature, model and evaluation workflows. Its MIT code licence is not a licence for linked price data or Yahoo collection. |
-| [MASTER](https://github.com/SJTU-DMTai/MASTER/tree/de8f58557096abde4216a701b35fc4368158d111) | A relevant cross-stock numerical comparator. The README documents earlier validation/test preprocessing defects. Its cross-section-normalised labels are not directly calibrated basket-return targets; reproduce our target and split rules when adapting it. |
-| [FinTSB](https://github.com/TongjiFinLab/FinTSB/tree/a48fef9baf368160b23abd8e91935910140f445f) | Its README directs users to Eastmoney QuantAPI for data. The repository does not itself settle permission for our processing or publication. |
-| [Twelve Data](https://support.twelvedata.com/en/articles/5332349-commercial-and-personal-usage) | Individual plans explicitly include academic research and prohibit redistribution. This article does not establish permission to transmit the chosen feed to a hosted model. |
-| [Norgate EULA 20261002](https://norgatedata.com/subscribe/eula.php) | Explicitly permits personal academic research and third-party processing on the subscriber's behalf, provided the processor receives no independent-use rights. Public extracts require express permission. A model endpoint's own data terms must satisfy that condition. |
+| Import audit | Count |
+|---|---:|
+| Adjusted instrument observations | 447,243 |
+| Index observations | 59,319 |
+| Instrument identifiers / index identifiers | 420 / 17 |
+| Invalid source rows quarantined | 2,319 |
+| Missing optional volume values preserved | 26,994 |
+| Instruments eligible at the fixed formation date | 147 |
 
-Norgate is the clearest conditional hosted-processing route among those checked; Twelve Data is another explicit research-use route. Neither is a selected or purchased dataset. Check the exact product's coverage, costs, retention and processing terms before acquisition. No financial data was downloaded or sent to model providers for this audit. A derived statistic does not automatically become unrestricted data.
+Every source file has a checksum. Date/filename mismatches and conflicting duplicates stop ingestion. Exact duplicates are recorded and deduplicated. Missing or invalid close values are quarantined with their original rows; optional blank values remain missing. The database, licence, universe and per-cutoff numerical stores are hashed. A partial import without its final audit is rejected.
+
+These are genuine historical financial observations. They have not been called synthetic. The baskets are constructed research indices with a disclosed formation rule; they are not actual ETFs. Price adjustment vintages and historical publication times are unavailable. Instrument types and historical sector classifications are not supplied. The evaluation is a retrospective replay of the published snapshot, not a certified point-in-time or survivorship-free trading backtest. Carried-forward quotes have explicit ages and are not treated as executable liquidation prices. See [the full basket protocol](baskets.md).
+
+The earlier provider audit did not settle rights to Yahoo-derived data. This dataset-specific licence provides the selected route; yfinance, news feeds, macro releases and Polymarket are not used in the basket experiment. Source code licences for other repositories do not substitute for data permission.
 
 ## Existing public fixture
 

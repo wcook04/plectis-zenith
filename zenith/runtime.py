@@ -23,6 +23,7 @@ from .providers import AgentProvider, CapturedProvider, OpenRouterFreeProvider, 
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
 MISSION_TARGETS = {"lab": "lab_integrity", "oracle": "oracle_cp2_emitter", "feeds": "global_derived_feed", "refinement": "version_committer"}
+MISSION_TARGETS.update(basket="basket_final", basket_serial="basket_serial_final", basket_evolve="basket_evolve")
 
 
 def _graph_loader(root: Path, graph_variant: dict | None = None):
@@ -284,7 +285,7 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
     run_dir = runs_root(root) / safe_run_id(run_id)
     if run_dir.exists():
         raise ValueError("run already exists; use resume with its frozen manifest")
-    if mission == "lab":
+    if mission in ("lab", "basket", "basket_serial", "basket_evolve"):
         if subject_run or truth_run:
             raise ValueError("Lab is forward-only; subject/truth pairing belongs to Oracle")
         if not feed_source:

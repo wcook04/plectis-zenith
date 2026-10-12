@@ -1,5 +1,10 @@
 # Actual graph diagrams
 
+The active basket profiles are [the directed graph](graphs/basket-detail.svg) and
+[the serial controller](graphs/basket-serial-detail.svg). Their numerical evaluator
+and development-only Evolve comparison are described in [the basket protocol](baskets.md).
+The diagrams below describe the separate legacy System A profile.
+
 > **Experimental research prototype.** The example uses invented observations.
 > See the [research notice](../RESEARCH_NOTICE.md).
 
@@ -76,7 +81,7 @@ In that controller, `export_agent_handoff` exports pending analysis and
 compares old and new versions on the same later inputs; `daily retain` records
 the reviewed retention decision.
 
-Regenerate all seven figures without extra dependencies:
+Regenerate all nine figures without extra dependencies:
 
 ```sh
 python3 scripts/build_graphs.py

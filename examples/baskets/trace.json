@@ -1,0 +1,1058 @@
+{
+  "selection": "first chronological holdout origin; every model arm",
+  "traces": [
+    {
+      "arm": "directed",
+      "cutoff": "2024-02-01",
+      "commitment_sha256": "5639df281deee21993939521c80d0fc06d9e56d113a7990fee0a2a3b22be1905",
+      "nodes": {
+        "basket_plan": {
+          "queries": [
+            {
+              "target": "B01",
+              "source": "B02",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether B01's negative relative_volume and return1 pattern matches B02's observed snapshot"
+            },
+            {
+              "target": "B01",
+              "source": "B03",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether B01's return1 and relative_volume signs align with B03's negative-return1/negative-relative_volume cluster"
+            },
+            {
+              "target": "B01",
+              "source": "B04",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether B01 contains positive return20 and positive relative_volume outliers like BARUN and RADHI in B04"
+            },
+            {
+              "target": "B01",
+              "source": "B05",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether the sign of relative_volume predicts the sign of return1 in B01 as observed in B05"
+            },
+            {
+              "target": "B01",
+              "source": "B06",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether B01's negative relative_volume cluster shows a similar wide spread in return20 as B06"
+            },
+            {
+              "target": "B01",
+              "source": "ALL",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "aggregate cross-basket comparison of relative_volume and return1 patterns against B01"
+            }
+          ]
+        },
+        "basket_investigations": {
+          "cutoff": "2024-02-01",
+          "baseline": {
+            "B01": 0.00010839303610308908,
+            "B02": 1.3536329267599487e-05,
+            "B03": 0.0006876053143429219,
+            "B04": 0.004412062323652809,
+            "B05": 0.00374368387308554,
+            "B06": 0.004930774316969812
+          },
+          "candidates": [
+            {
+              "candidate_id": "Q1",
+              "query": {
+                "target": "B01",
+                "source": "B02",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "test whether B01's negative relative_volume and return1 pattern matches B02's observed snapshot"
+              },
+              "prediction": 0.0009525910462607183,
+              "validation_gain": -1.6788693694219413e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 52,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q2",
+              "query": {
+                "target": "B01",
+                "source": "B03",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "test whether B01's return1 and relative_volume signs align with B03's negative-return1/negative-relative_volume cluster"
+              },
+              "prediction": -5.250569164363191e-05,
+              "validation_gain": 3.4591819847127525e-07,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 52,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q3",
+              "query": {
+                "target": "B01",
+                "source": "B04",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "test whether B01 contains positive return20 and positive relative_volume outliers like BARUN and RADHI in B04"
+              },
+              "prediction": -0.0012735746957431447,
+              "validation_gain": -5.664591410928905e-06,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 50,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q4",
+              "query": {
+                "target": "B01",
+                "source": "B05",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "test whether the sign of relative_volume predicts the sign of return1 in B01 as observed in B05"
+              },
+              "prediction": -0.0007399061773640926,
+              "validation_gain": -7.197301439635191e-06,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 50,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q5",
+              "query": {
+                "target": "B01",
+                "source": "B06",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "test whether B01's negative relative_volume cluster shows a similar wide spread in return20 as B06"
+              },
+              "prediction": -0.00201705110413445,
+              "validation_gain": -1.1400556926462449e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 50,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q6",
+              "query": {
+                "target": "B01",
+                "source": "ALL",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "aggregate cross-basket comparison of relative_volume and return1 patterns against B01"
+              },
+              "prediction": -0.00047032523281139815,
+              "validation_gain": -4.39833073321337e-06,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 306,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            }
+          ],
+          "cp1_sha256": "5dba344856f20fc7f0528b975a78c818e071100e088c5c2be3fc0fa514c935f9",
+          "executed_queries": [
+            {
+              "target": "B01",
+              "source": "B02",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether B01's negative relative_volume and return1 pattern matches B02's observed snapshot"
+            },
+            {
+              "target": "B01",
+              "source": "B03",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether B01's return1 and relative_volume signs align with B03's negative-return1/negative-relative_volume cluster"
+            },
+            {
+              "target": "B01",
+              "source": "B04",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether B01 contains positive return20 and positive relative_volume outliers like BARUN and RADHI in B04"
+            },
+            {
+              "target": "B01",
+              "source": "B05",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether the sign of relative_volume predicts the sign of return1 in B01 as observed in B05"
+            },
+            {
+              "target": "B01",
+              "source": "B06",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "test whether B01's negative relative_volume cluster shows a similar wide spread in return20 as B06"
+            },
+            {
+              "target": "B01",
+              "source": "ALL",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "aggregate cross-basket comparison of relative_volume and return1 patterns against B01"
+            }
+          ],
+          "query_count": 6,
+          "mode": "directed",
+          "forecast_basis": "EMPIRICAL",
+          "note": "Validation gains are training-history diagnostics, not held-out performance."
+        },
+        "basket_director": {
+          "selections": {
+            "B01": "baseline",
+            "B02": "baseline",
+            "B03": "baseline",
+            "B04": "baseline",
+            "B05": "baseline",
+            "B06": "baseline"
+          },
+          "reason": "All validation gains are negative or negligible; small historical gains are noise or overfitting. Keeping the baseline for all baskets is the conservative, evidence-supported choice."
+        }
+      },
+      "cp2": {
+        "schema": "zenith_basket_cp2_v1",
+        "cutoff": "2024-02-01",
+        "horizon_sessions": 5,
+        "universe_sha256": "224b1018dadbcbccfdb68d8923cbfd4dcb40cd87b869209d47a27b2660ad6a9b",
+        "forecast_basis": "EMPIRICAL",
+        "forecasts": {
+          "B01": 0.00010839303610308908,
+          "B02": 1.3536329267599487e-05,
+          "B03": 0.0006876053143429219,
+          "B04": 0.004412062323652809,
+          "B05": 0.00374368387308554,
+          "B06": 0.004930774316969812
+        },
+        "provisional_forecasts": {
+          "B01": 0.00010839303610308908,
+          "B02": 1.3536329267599487e-05,
+          "B03": 0.0006876053143429219,
+          "B04": 0.004412062323652809,
+          "B05": 0.00374368387308554,
+          "B06": 0.004930774316969812
+        },
+        "selections": {
+          "B01": "baseline",
+          "B02": "baseline",
+          "B03": "baseline",
+          "B04": "baseline",
+          "B05": "baseline",
+          "B06": "baseline"
+        },
+        "cp1_sha256": "5dba344856f20fc7f0528b975a78c818e071100e088c5c2be3fc0fa514c935f9",
+        "investigation_sha256": "1aefd241ecc298a0192b79741fab30ac80b11b28a96c04598c0cc4e7d19a6627",
+        "changes": {
+          "B01": 0.0,
+          "B02": 0.0,
+          "B03": 0.0,
+          "B04": 0.0,
+          "B05": 0.0,
+          "B06": 0.0
+        },
+        "query_count": 6
+      }
+    },
+    {
+      "arm": "undirected",
+      "cutoff": "2024-02-01",
+      "commitment_sha256": "550505b54d4098b2fff88813bf0a4997d4b6dd291a03db9d1545cae79e85e523",
+      "nodes": {
+        "basket_plan": {
+          "queries": [
+            {
+              "target": "B01",
+              "source": "B02",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "Does B01 exhibit the same negative return1 and relative_volume pattern as B02?"
+            },
+            {
+              "target": "B01",
+              "source": "B03",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "Does a more negative relative_volume in B03 predict a more negative return1 in B01 for the same symbol set?"
+            },
+            {
+              "target": "B01",
+              "source": "B04",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "Does B01 contain symbols with positive return20 and positive relative_volume similar to BARUN and RADHI in B04?"
+            },
+            {
+              "target": "B01",
+              "source": "B05",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "Does the relationship between relative_volume and return20 in B05 hold in B01, or does the sign of the association differ?"
+            },
+            {
+              "target": "B01",
+              "source": "B06",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "Does the sign of relative_volume predict the sign of return20 in B01?"
+            },
+            {
+              "target": "B01",
+              "source": "B02",
+              "operation": "breadth",
+              "lag": 1,
+              "reason": "Does B01 exhibit the same negative return1 and relative_volume pattern as B02 at lag 1?"
+            }
+          ]
+        },
+        "basket_investigations": {
+          "cutoff": "2024-02-01",
+          "baseline": {
+            "B01": 0.00010839303610308908,
+            "B02": 1.3536329267599487e-05,
+            "B03": 0.0006876053143429219,
+            "B04": 0.004412062323652809,
+            "B05": 0.00374368387308554,
+            "B06": 0.004930774316969812
+          },
+          "candidates": [
+            {
+              "candidate_id": "Q1",
+              "query": {
+                "target": "B01",
+                "source": "B01",
+                "operation": "trend",
+                "lag": 0,
+                "reason": "Predeclared undirected own-basket trend inspection"
+              },
+              "prediction": 0.0018454222893815354,
+              "validation_gain": -7.483729186927754e-06,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 78,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q2",
+              "query": {
+                "target": "B02",
+                "source": "B02",
+                "operation": "trend",
+                "lag": 0,
+                "reason": "Predeclared undirected own-basket trend inspection"
+              },
+              "prediction": 0.001377744377311223,
+              "validation_gain": -5.831579281740362e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 78,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q3",
+              "query": {
+                "target": "B03",
+                "source": "B03",
+                "operation": "trend",
+                "lag": 0,
+                "reason": "Predeclared undirected own-basket trend inspection"
+              },
+              "prediction": 0.0016533469078925471,
+              "validation_gain": -5.3586017685588865e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 78,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q4",
+              "query": {
+                "target": "B04",
+                "source": "B04",
+                "operation": "trend",
+                "lag": 0,
+                "reason": "Predeclared undirected own-basket trend inspection"
+              },
+              "prediction": 0.004491430780975139,
+              "validation_gain": -5.213383722740326e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 75,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q5",
+              "query": {
+                "target": "B05",
+                "source": "B05",
+                "operation": "trend",
+                "lag": 0,
+                "reason": "Predeclared undirected own-basket trend inspection"
+              },
+              "prediction": 0.003940577007379161,
+              "validation_gain": -7.685693033715598e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 75,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q6",
+              "query": {
+                "target": "B06",
+                "source": "B06",
+                "operation": "trend",
+                "lag": 0,
+                "reason": "Predeclared undirected own-basket trend inspection"
+              },
+              "prediction": 0.005242596327971518,
+              "validation_gain": -7.681771573681489e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 75,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            }
+          ],
+          "cp1_sha256": "fd2223fb4733fc08915e4cbedd1c22edc8a7e56220e8434647e323308fc9b02a",
+          "executed_queries": [
+            {
+              "target": "B01",
+              "source": "B01",
+              "operation": "trend",
+              "lag": 0,
+              "reason": "Predeclared undirected own-basket trend inspection"
+            },
+            {
+              "target": "B02",
+              "source": "B02",
+              "operation": "trend",
+              "lag": 0,
+              "reason": "Predeclared undirected own-basket trend inspection"
+            },
+            {
+              "target": "B03",
+              "source": "B03",
+              "operation": "trend",
+              "lag": 0,
+              "reason": "Predeclared undirected own-basket trend inspection"
+            },
+            {
+              "target": "B04",
+              "source": "B04",
+              "operation": "trend",
+              "lag": 0,
+              "reason": "Predeclared undirected own-basket trend inspection"
+            },
+            {
+              "target": "B05",
+              "source": "B05",
+              "operation": "trend",
+              "lag": 0,
+              "reason": "Predeclared undirected own-basket trend inspection"
+            },
+            {
+              "target": "B06",
+              "source": "B06",
+              "operation": "trend",
+              "lag": 0,
+              "reason": "Predeclared undirected own-basket trend inspection"
+            }
+          ],
+          "query_count": 6,
+          "mode": "undirected",
+          "forecast_basis": "EMPIRICAL",
+          "note": "Validation gains are training-history diagnostics, not held-out performance."
+        },
+        "basket_director": {
+          "selections": {
+            "B01": "baseline",
+            "B02": "baseline",
+            "B03": "baseline",
+            "B04": "baseline",
+            "B05": "baseline",
+            "B06": "baseline"
+          },
+          "reason": "All six candidate trend predictions have negative validation gains against their own basket's historical data; keeping the baseline avoids noise and overfitting."
+        }
+      },
+      "cp2": {
+        "schema": "zenith_basket_cp2_v1",
+        "cutoff": "2024-02-01",
+        "horizon_sessions": 5,
+        "universe_sha256": "224b1018dadbcbccfdb68d8923cbfd4dcb40cd87b869209d47a27b2660ad6a9b",
+        "forecast_basis": "EMPIRICAL",
+        "forecasts": {
+          "B01": 0.00010839303610308908,
+          "B02": 1.3536329267599487e-05,
+          "B03": 0.0006876053143429219,
+          "B04": 0.004412062323652809,
+          "B05": 0.00374368387308554,
+          "B06": 0.004930774316969812
+        },
+        "provisional_forecasts": {
+          "B01": 0.00010839303610308908,
+          "B02": 1.3536329267599487e-05,
+          "B03": 0.0006876053143429219,
+          "B04": 0.004412062323652809,
+          "B05": 0.00374368387308554,
+          "B06": 0.004930774316969812
+        },
+        "selections": {
+          "B01": "baseline",
+          "B02": "baseline",
+          "B03": "baseline",
+          "B04": "baseline",
+          "B05": "baseline",
+          "B06": "baseline"
+        },
+        "cp1_sha256": "fd2223fb4733fc08915e4cbedd1c22edc8a7e56220e8434647e323308fc9b02a",
+        "investigation_sha256": "cd328a3549ce7070ec8709e2bbbd5c0e1e29914be2b534b324f18ca38de567e8",
+        "changes": {
+          "B01": 0.0,
+          "B02": 0.0,
+          "B03": 0.0,
+          "B04": 0.0,
+          "B05": 0.0,
+          "B06": 0.0
+        },
+        "query_count": 6
+      }
+    },
+    {
+      "arm": "revised",
+      "cutoff": "2024-02-01",
+      "commitment_sha256": "feb185ca6fe5c7b2cd916e93f8eda24416ddc8be810e115c6484c63cafbfe932",
+      "nodes": {
+        "basket_plan": {
+          "queries": [
+            {
+              "target": "B01",
+              "source": "B02",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B02 shows negative return1 and relative_volume (e.g., PCBL return1=-0.018049, relative_volume=-0.549885); test if B01 shares this pattern."
+            },
+            {
+              "target": "B01",
+              "source": "B03",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B03 SKBBL shows decelerating decline (return1=-0.014943, return5=-0.003836) with low relative_volume=-0.409354; check if B01 has similar deceleration."
+            },
+            {
+              "target": "B01",
+              "source": "B04",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B04 BARUN and RADHI have positive return20 (0.1675, 0.1913) and positive relative_volume (0.2875); test if B01 has any positive return20 with positive relative_volume."
+            },
+            {
+              "target": "B01",
+              "source": "B05",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B05 negative relative_volume symbols (RHPL -0.448538, MDB -0.719577) have negative return1; test if B01 shows the same sign relationship."
+            },
+            {
+              "target": "B01",
+              "source": "B06",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B06 negative relative_volume symbols show mixed return20 (-0.019 to 0.263) with no monotonic relationship; test if B01 exhibits similar non-monotonicity."
+            },
+            {
+              "target": "B01",
+              "source": "ALL",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B01 has 24/25 negative relative_volume with mean return1=-0.0104; compare this stale_fraction and sign pattern against ALL other baskets."
+            }
+          ]
+        },
+        "basket_investigations": {
+          "cutoff": "2024-02-01",
+          "baseline": {
+            "B01": 0.00010839303610308908,
+            "B02": 1.3536329267599487e-05,
+            "B03": 0.0006876053143429219,
+            "B04": 0.004412062323652809,
+            "B05": 0.00374368387308554,
+            "B06": 0.004930774316969812
+          },
+          "candidates": [
+            {
+              "candidate_id": "Q1",
+              "query": {
+                "target": "B01",
+                "source": "B02",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "B02 shows negative return1 and relative_volume (e.g., PCBL return1=-0.018049, relative_volume=-0.549885); test if B01 shares this pattern."
+              },
+              "prediction": 0.0009525910462607183,
+              "validation_gain": -1.6788693694219413e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 52,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q2",
+              "query": {
+                "target": "B01",
+                "source": "B03",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "B03 SKBBL shows decelerating decline (return1=-0.014943, return5=-0.003836) with low relative_volume=-0.409354; check if B01 has similar deceleration."
+              },
+              "prediction": -5.250569164363191e-05,
+              "validation_gain": 3.4591819847127525e-07,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 52,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q3",
+              "query": {
+                "target": "B01",
+                "source": "B04",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "B04 BARUN and RADHI have positive return20 (0.1675, 0.1913) and positive relative_volume (0.2875); test if B01 has any positive return20 with positive relative_volume."
+              },
+              "prediction": -0.0012735746957431447,
+              "validation_gain": -5.664591410928905e-06,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 50,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q4",
+              "query": {
+                "target": "B01",
+                "source": "B05",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "B05 negative relative_volume symbols (RHPL -0.448538, MDB -0.719577) have negative return1; test if B01 shows the same sign relationship."
+              },
+              "prediction": -0.0007399061773640926,
+              "validation_gain": -7.197301439635191e-06,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 50,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q5",
+              "query": {
+                "target": "B01",
+                "source": "B06",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "B06 negative relative_volume symbols show mixed return20 (-0.019 to 0.263) with no monotonic relationship; test if B01 exhibits similar non-monotonicity."
+              },
+              "prediction": -0.00201705110413445,
+              "validation_gain": -1.1400556926462449e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 50,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q6",
+              "query": {
+                "target": "B01",
+                "source": "ALL",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "B01 has 24/25 negative relative_volume with mean return1=-0.0104; compare this stale_fraction and sign pattern against ALL other baskets."
+              },
+              "prediction": -0.00047032523281139815,
+              "validation_gain": -4.39833073321337e-06,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 306,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            }
+          ],
+          "cp1_sha256": "83e1a34caee9426d36c087fb065183f59c249c2fbd263a9e45035c2309ec192d",
+          "executed_queries": [
+            {
+              "target": "B01",
+              "source": "B02",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B02 shows negative return1 and relative_volume (e.g., PCBL return1=-0.018049, relative_volume=-0.549885); test if B01 shares this pattern."
+            },
+            {
+              "target": "B01",
+              "source": "B03",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B03 SKBBL shows decelerating decline (return1=-0.014943, return5=-0.003836) with low relative_volume=-0.409354; check if B01 has similar deceleration."
+            },
+            {
+              "target": "B01",
+              "source": "B04",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B04 BARUN and RADHI have positive return20 (0.1675, 0.1913) and positive relative_volume (0.2875); test if B01 has any positive return20 with positive relative_volume."
+            },
+            {
+              "target": "B01",
+              "source": "B05",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B05 negative relative_volume symbols (RHPL -0.448538, MDB -0.719577) have negative return1; test if B01 shows the same sign relationship."
+            },
+            {
+              "target": "B01",
+              "source": "B06",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B06 negative relative_volume symbols show mixed return20 (-0.019 to 0.263) with no monotonic relationship; test if B01 exhibits similar non-monotonicity."
+            },
+            {
+              "target": "B01",
+              "source": "ALL",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "B01 has 24/25 negative relative_volume with mean return1=-0.0104; compare this stale_fraction and sign pattern against ALL other baskets."
+            }
+          ],
+          "query_count": 6,
+          "mode": "directed",
+          "forecast_basis": "EMPIRICAL",
+          "note": "Validation gains are training-history diagnostics, not held-out performance."
+        },
+        "basket_director": {
+          "selections": {
+            "B01": "baseline",
+            "B02": "baseline",
+            "B03": "baseline",
+            "B04": "baseline",
+            "B05": "baseline",
+            "B06": "baseline"
+          },
+          "reason": "All validation gains are small and negative or near-zero; no candidate shows stable evidence of improvement over baseline. Keeping baseline for all baskets is the conservative, evidence-supported choice."
+        }
+      },
+      "cp2": {
+        "schema": "zenith_basket_cp2_v1",
+        "cutoff": "2024-02-01",
+        "horizon_sessions": 5,
+        "universe_sha256": "224b1018dadbcbccfdb68d8923cbfd4dcb40cd87b869209d47a27b2660ad6a9b",
+        "forecast_basis": "EMPIRICAL",
+        "forecasts": {
+          "B01": 0.00010839303610308908,
+          "B02": 1.3536329267599487e-05,
+          "B03": 0.0006876053143429219,
+          "B04": 0.004412062323652809,
+          "B05": 0.00374368387308554,
+          "B06": 0.004930774316969812
+        },
+        "provisional_forecasts": {
+          "B01": 0.00010839303610308908,
+          "B02": 1.3536329267599487e-05,
+          "B03": 0.0006876053143429219,
+          "B04": 0.004412062323652809,
+          "B05": 0.00374368387308554,
+          "B06": 0.004930774316969812
+        },
+        "selections": {
+          "B01": "baseline",
+          "B02": "baseline",
+          "B03": "baseline",
+          "B04": "baseline",
+          "B05": "baseline",
+          "B06": "baseline"
+        },
+        "cp1_sha256": "83e1a34caee9426d36c087fb065183f59c249c2fbd263a9e45035c2309ec192d",
+        "investigation_sha256": "1385b7120bbb176af5b6c81ddad7686a5b514b48f9130fb7346e670760b34878",
+        "changes": {
+          "B01": 0.0,
+          "B02": 0.0,
+          "B03": 0.0,
+          "B04": 0.0,
+          "B05": 0.0,
+          "B06": 0.0
+        },
+        "query_count": 6
+      }
+    },
+    {
+      "arm": "serial",
+      "cutoff": "2024-02-01",
+      "commitment_sha256": "be3bf241da771ef3f67c7841e7a17472c53f4d8483c1dffb9f12de7b0abcc65e",
+      "nodes": {
+        "basket_serial_plan": {
+          "queries": [
+            {
+              "target": "B01",
+              "source": "B02",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "compare basket-level return5 between B01 and B02 to test relative momentum"
+            },
+            {
+              "target": "B03",
+              "source": "B04",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "compare basket-level return5 between B03 and B04 to test relative momentum"
+            },
+            {
+              "target": "B05",
+              "source": "B06",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "compare basket-level return5 between B05 and B06 to test relative momentum"
+            },
+            {
+              "target": "B01",
+              "source": "INDEX",
+              "operation": "trend",
+              "lag": 5,
+              "reason": "assess B01 trend against the index over a 5-session lag"
+            },
+            {
+              "target": "B03",
+              "source": "INDEX",
+              "operation": "trend",
+              "lag": 5,
+              "reason": "assess B03 trend against the index over a 5-session lag"
+            },
+            {
+              "target": "B06",
+              "source": "ALL",
+              "operation": "volume",
+              "lag": 0,
+              "reason": "evaluate B06 volume characteristics relative to the full universe"
+            }
+          ]
+        },
+        "basket_serial_investigations": {
+          "cutoff": "2024-02-01",
+          "baseline": {
+            "B01": 0.00010839303610308908,
+            "B02": 1.3536329267599487e-05,
+            "B03": 0.0006876053143429219,
+            "B04": 0.004412062323652809,
+            "B05": 0.00374368387308554,
+            "B06": 0.004930774316969812
+          },
+          "candidates": [
+            {
+              "candidate_id": "Q1",
+              "query": {
+                "target": "B01",
+                "source": "B02",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "compare basket-level return5 between B01 and B02 to test relative momentum"
+              },
+              "prediction": 0.0009525910462607183,
+              "validation_gain": -1.6788693694219413e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 52,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q2",
+              "query": {
+                "target": "B03",
+                "source": "B04",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "compare basket-level return5 between B03 and B04 to test relative momentum"
+              },
+              "prediction": 0.00017623652579421218,
+              "validation_gain": -0.00013938551708548316,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 50,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q3",
+              "query": {
+                "target": "B05",
+                "source": "B06",
+                "operation": "breadth",
+                "lag": 0,
+                "reason": "compare basket-level return5 between B05 and B06 to test relative momentum"
+              },
+              "prediction": 0.003707945905915189,
+              "validation_gain": -3.0378225492611745e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 50,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q4",
+              "query": {
+                "target": "B01",
+                "source": "INDEX",
+                "operation": "trend",
+                "lag": 5,
+                "reason": "assess B01 trend against the index over a 5-session lag"
+              },
+              "prediction": 0.0021611264697392555,
+              "validation_gain": -2.6593667069405763e-06,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 51,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q5",
+              "query": {
+                "target": "B03",
+                "source": "INDEX",
+                "operation": "trend",
+                "lag": 5,
+                "reason": "assess B03 trend against the index over a 5-session lag"
+              },
+              "prediction": 0.0037752963762271254,
+              "validation_gain": -8.010266102304874e-05,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 51,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            },
+            {
+              "candidate_id": "Q6",
+              "query": {
+                "target": "B06",
+                "source": "ALL",
+                "operation": "volume",
+                "lag": 0,
+                "reason": "evaluate B06 volume characteristics relative to the full universe"
+              },
+              "prediction": 0.004110023034544861,
+              "validation_gain": 0.00019590476053723803,
+              "validation_cases": 8,
+              "validation_last_label_date": "2024-02-01",
+              "feature_count": 147,
+              "data_sha256": "dc490fbe57453054224f0b2b92d59a0d734bf158ce0f2ef60039de9c59db1581",
+              "cutoff": "2024-02-01"
+            }
+          ],
+          "cp1_sha256": "7524c714ec69c0823cbe54c5ca8bec68637fd1069af02277f144fa5d01ae7092",
+          "executed_queries": [
+            {
+              "target": "B01",
+              "source": "B02",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "compare basket-level return5 between B01 and B02 to test relative momentum"
+            },
+            {
+              "target": "B03",
+              "source": "B04",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "compare basket-level return5 between B03 and B04 to test relative momentum"
+            },
+            {
+              "target": "B05",
+              "source": "B06",
+              "operation": "breadth",
+              "lag": 0,
+              "reason": "compare basket-level return5 between B05 and B06 to test relative momentum"
+            },
+            {
+              "target": "B01",
+              "source": "INDEX",
+              "operation": "trend",
+              "lag": 5,
+              "reason": "assess B01 trend against the index over a 5-session lag"
+            },
+            {
+              "target": "B03",
+              "source": "INDEX",
+              "operation": "trend",
+              "lag": 5,
+              "reason": "assess B03 trend against the index over a 5-session lag"
+            },
+            {
+              "target": "B06",
+              "source": "ALL",
+              "operation": "volume",
+              "lag": 0,
+              "reason": "evaluate B06 volume characteristics relative to the full universe"
+            }
+          ],
+          "query_count": 6,
+          "mode": "directed",
+          "forecast_basis": "EMPIRICAL",
+          "note": "Validation gains are training-history diagnostics, not held-out performance."
+        },
+        "basket_serial_director": {
+          "selections": {
+            "B01": "baseline",
+            "B02": "Q1",
+            "B03": "baseline",
+            "B04": "baseline",
+            "B05": "baseline",
+            "B06": "baseline"
+          },
+          "reason": "Q1 shows a positive validation gain (+0.000196) for B06 volume, but the gain is small and based on 8 validation cases; all other candidates have negative or negligible gains. Keeping B01, B03, B04, B05, and B06 at baseline avoids overfitting to noise. Q1 is retained for B02 as the only candidate with a positive gain, though evidence is thin."
+        }
+      },
+      "cp2": null
+    }
+  ],
+  "revision": {
+    "variant_id": "basket-development-revision-v1",
+    "nodes": {
+      "basket_plan": {
+        "skill_addon": "Before each breadth query, require the reason to cite a specific observed pattern (e.g., sign, magnitude, or stale_fraction) from the target or source basket in the current cutoff's development traces. If no pattern is cited, the query is rejected and the budget is not consumed."
+      }
+    },
+    "policy_sha256": "c4be94335e49bbd7aee4dc19c7201dd98686c3dfde5c13abb6b778d71892cc6a"
+  },
+  "revision_proposal": {
+    "skill_addon": "Before each breadth query, require the reason to cite a specific observed pattern (e.g., sign, magnitude, or stale_fraction) from the target or source basket in the current cutoff's development traces. If no pattern is cited, the query is rejected and the budget is not consumed.",
+    "diagnosis": "Across four development cutoffs, 18 of 24 breadth queries had reasons that did not cite a specific observed pattern from the current cutoff's traces, and 6 of those 18 had validation gains near zero or negative, suggesting unconstrained queries waste budget.",
+    "expected_effect": "Later comparison should test whether enforcing pattern-citation in reasons reduces wasted queries and improves validation gain per query within the six-query budget."
+  }
+}
