@@ -2,6 +2,64 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Native daily replay, 12 October 2026
+
+The [daily operating guide](daily-replay.md) and [bound receipt](daily-replay-receipt.json)
+now ground the programme in the original full Lab → Oracle → Evolve loop.
+Pinned FNSPID original AA prices and full article bodies produce three daily
+snapshots with real STOCK/NEWS and five explicitly unavailable lanes. Source-bound
+evidence IDs and deterministic five-session arithmetic repair the first pilot's
+citation and numerical failures. Original clocks, missing bodies, future articles,
+immutable snapshots and absent lanes have regression coverage.
+
+The paid DeepSeek/DeepInfra full-graph attempt stopped at CP1 after 11 calls;
+reported cost was USD0.0150599400, conservative reservation USD0.136247100, in
+the existing immutable ledger. No fresh budget or reset was created. Its failed
+outputs remain. A separate primary-agent execution completed 28/28 Lab nodes
+and 31/31 Oracle nodes through the native response importer. AA forecast $27.50
+versus next close $27.18 had the correct direction and $0.32 absolute error. The
+semantic grade remains red because a measured past trend did not establish a
+forward causal mechanism. This is a development demonstration, not a measured
+advantage for the paid model or the learned policy.
+
+Evolve now exports an immutable pending packet rather than a no-analysis success.
+Verification reconstructs its fixed prompt and complete source bindings; a
+recomputed self-hash is insufficient. The primary agent reviewed the actual
+quartet and proposed one director-skill change separating measured pattern,
+causal mechanism and target-size rule. No dossier changed. The Jan17→18 full
+Lab is prepared with that candidate and awaits genuine responses; improvement
+is untested. Its canonical continuation is
+`FNSPID_DAILY_20240117_EVOLVED_AGENT_V3`. Earlier failed/pending attempts are
+retained with their reasons in the receipt. The paper now cites FNSPID at use
+and reports these boundaries. All 594 tests pass; the nine-page PDF builds
+without unresolved citations or overfull boxes.
+
+Next useful work is later-day execution and broader source coverage within this
+same loop. Automatic semantic Evolve import/patching remains separate work;
+reviewed lead-agent operation is implemented. Do not replace the daily programme
+with the returned quarterly-fundamentals proposal.
+
+## Daily-loop grounding and returned-source audit, 12 October 2026
+
+The operator clarified the product: historical daily multi-feed snapshots
+through the existing Lab → Oracle → Evolve cycle. [program.md](../program.md)
+owns that direction. The quarterly fundamental-forecast proposal is an
+[unselected alternative](fundamental-research.md), not the new programme.
+
+Its [numerical audit](fundamental-research-audit.json) and
+[pinned source audit](fundamental-source-audit.json) remain useful: they reproduce
+the weak A-share anchor, the five active text-correction dates, guidance-range
+arithmetic and the EDGAR percentage/multiple-candidate scorer defects. These
+findings guide better data and evaluation inside the original loop. They do
+not establish a newly executed forecasting result. No inference was purchased
+for this research review.
+
+The grounding correction is captured in
+`cap_quick_ground_zenith_research_in_the_operators_4182cf2899e6`.
+Source findings remain in
+`cap_quick_zenith_return_confirms_weak_anchor_and_o_80965d6c3c3b` and
+`cap_quick_zenith_fundamental_research_source_audit_c776c5a9219f`.
+
 ## Type B research handoff and remaining budget, 12 October 2026
 
 The completed [packet receipt](type-b-research-packet.json) binds

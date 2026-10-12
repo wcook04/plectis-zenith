@@ -26,17 +26,18 @@ outlook than an earlier disclosure. A useful reasoner must recover that
 comparison, identify its economic channel and distinguish it from a return
 still available after entry. Zenith develops this capability through dated
 evidence, an inspectable change representation and feedback on subsequent
-outcomes. Its implemented development route compares direct reasoning with an
-interpretation--forecast graph, and separates reasoning from numerical
-calibration. On 33 previously examined A-share development dates, two fixed
+outcomes. The active system replays historical trading days through the existing
+Lab forecast, Oracle evaluation and Evolve revision loop. Supporting comparison
+interfaces separate reasoning from numerical calibration. On 33 previously examined A-share development dates, two fixed
 statistical controls had positive outcome alignment but excessive forecast
 magnitudes. Scaling fitted only on earlier matured predictions reduced their
 mean squared errors below a zero-relative-return reference by approximately
 0.7--0.8\%. This modest, design-exposed result does not establish an LLM advantage.
 Four newly compiled guidance-update cases, drawn from six original issuer
 releases, supply richer comparisons, including mixed revisions and unchanged
-revenue guidance alongside higher margins. The model comparison and learned
-reasoning experiment remain unexecuted. The research hypothesis is that
+revenue guidance alongside higher margins. A source-bound daily replay now executes the full Lab and Oracle; its first
+reviewed skill revision has only been prepared for the next day. Controlled
+model and learned-reasoning comparisons remain unexecuted. The research hypothesis is that
 feedback improves the recognition and use of financial changes enough to
 improve later decisions beyond fixed reasoning, retrieval and calibration.
 \end{abstract}
@@ -66,8 +67,9 @@ The proposed learning contribution is specific: experience should improve the
 system's representation and use of financially meaningful changes, with later
 decision gains beyond a strong fixed reasoner and numerical adaptation. This
 claim is untested. The work reported here establishes an executable development
-route, a measured calibration diagnosis and a concrete source-rich replacement
-task.
+route, a measured calibration diagnosis and source-rich supporting cases.
+Dataset adaptation serves the daily learning loop rather than selecting a new
+product merely because its outcomes are easier to score.
 
 \section{Separating interpretation from payoff}
 Let $E_t$ contain evidence available by the decision time and $X_t$ contain
@@ -243,8 +245,50 @@ Four requests are compiled and held; none has a model answer. The price gap
 does not prevent this representation test, but prevents a credible trading
 result from these cases.
 
+\section{A native daily replay}
+The operational unit is a trading day: admit its available feeds, execute Lab,
+freeze the forecast, advance the evidence clock, execute Oracle, and review a
+versioned Evolve proposal for later days. A small original AA slice from FNSPID
+supplies daily prices and complete dated articles \citep{fnspidraw2025}.
+The adapter preserves original publication strings, verifies pinned source
+bytes and emits all seven native feed envelopes. STOCK and NEWS contain real
+observations; the other five lanes explicitly report unavailable coverage.
+The January 16--18, 2024 close snapshots contain twenty completed price bars
+and one, seven and seven eligible articles, respectively. The last day has no
+new article. Source publication clocks do not establish historical capture
+vintages or exclude model-training contamination.
+
+An unmodified full-graph model trial stopped at CP1 after eleven paid reasoning
+calls: it used artifact names as evidence identifiers, misstated a five-session
+return and invented a long-window figure from twenty bars. Its trace also
+promoted absent lanes into a market narrative. The rejected output and cost
+remain recorded. The adapter was then given source-bound evidence identifiers
+and explicit five-session arithmetic. A sparse-source reasoning policy treats
+missing lanes as limits on inference rather than observed economic forces.
+This is development repair, not a controlled attribution of the repair's effect.
+
+A primary-agent execution, imported through the native response validator,
+completed all 28 Lab nodes and all 31 Oracle nodes. The frozen AA forecast was
+\$27.50 against an observed \$27.87 baseline; the later close was \$27.18.
+Direction was correct and absolute price error was \$0.32. Semantic review
+nevertheless remained red: the observed trend did not establish a forward
+causal mechanism. Oracle preserved that distinction instead of treating one
+hit as proof of the explanation. These rounded figures describe one exposed,
+manually reasoned development episode, not a model-performance estimate.
+
+Evolve now exports its existing instructions and actual paired evidence as a
+pending packet, binding their source hashes. The lead agent reviewed this
+packet and proposed one change to the director's short skill: distinguish the
+measured pattern, proposed mechanism and numerical target rule, and do not
+increase causal confidence from one directional hit. The next day's full Lab
+has been prepared with this candidate policy; it has no completed forecast or
+measured improvement. The original no-bridge path's no-analysis placeholder is
+no longer recorded as completed learning. Automatic semantic validation and application of agent-returned Evolve proposals
+remain separate unfinished work. The execution and review
+receipt is \code{docs/daily-replay-receipt.json}.
+
 \section{Developing a base, then testing learning}
-The next A-share batch contains an excluded compatibility date and six
+An unexecuted A-share comparison candidate contains an excluded compatibility date and six
 development dates selected from their inputs. Each date requires one direct
 call, one change-interpretation call and one graph-forecast call: at most 21
 calls in total. The pilot verifies the actual contracts before comparison.
@@ -297,7 +341,7 @@ the declared information and execution delay.
 
 The existing A-share label mixes stock wealth and index price returns and
 omits costs, taxes, lots and execution restrictions. The guidance cohort has
-an unresolved price basis. Neither supports a profitability claim. The current
+an unresolved price basis. Neither supports a profitability claim. The daily replay establishes execution mechanics only. The current
 evidence supports a narrower conclusion: baseline forecasts can contain useful
 alignment obscured by scaling, and recurring disclosures supply testable
 financial distinctions absent from short titles. Whether LLM reasoning extracts

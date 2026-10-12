@@ -20,7 +20,7 @@
 - Internal: tools.refinement.version_committer.VersionCommitter via _apply_patches.
 
 [CONSTRAINTS]
-- Bridge use is optional; non-bridge mode returns a synthetic AVAILABLE delta report and skips LLM analysis.
+- Bridge use is optional; non-bridge mode exports a pending source-bound agent handoff and never records analysis completion.
 - Dossier mutations stay confined to DOSSIER_ALLOWLIST and route through VersionCommitter.
 - Debug payloads are persisted inside tools/refinement for later inspection when parsing or patch generation fails.
 - When-needed: Open when a refinement pass needs the end-to-end runner that turns paired subject/truth runs into delta reports, dossier patch payloads, and optional dossier commits.
@@ -31,6 +31,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import logging
 import sys
@@ -661,6 +662,77 @@ def _persist_run_scoped_evolve_artifacts(
     return {artifact_id: str(path) for artifact_id, path in paths.items()}
 
 
+def _agent_handoff_packet(subject_run_dir: Path, truth_run_dir: Path) -> Dict[str, Any]:
+    """Export existing Evolve instructions/evidence for lead-agent or worker review.
+
+    This is a pending analysis packet, not an imported result or patch approval.
+    No dossiers, run artifacts or learning ledger entries are mutated.
+    """
+    subject_run_dir, truth_run_dir = subject_run_dir.resolve(), truth_run_dir.resolve()
+    artifacts, cp2, manifest, readiness = _load_evolve_inputs(subject_run_dir, truth_run_dir)
+    if readiness.get("status") == "BLOCKED":
+        return {"error": "evolve_inputs_not_ready", "oracle_input_readiness": readiness}
+    paths = [subject_run_dir / "artifacts" / (LAB_CP2_ARTIFACT + ".json"), DELTA_NODE, UPDATER_NODE]
+    paths.extend(Path(row["source_path"]) for row in manifest["artifacts"] if row.get("source_path"))
+    paths.append(REPO_ROOT / "codex/substrate/contracts/schema_evolve_delta.json")
+    paths.append(Path(__file__).resolve())
+    paths.extend(run / "artifacts/feed_readiness_summary.json" for run in (subject_run_dir, truth_run_dir))
+    paths.extend(REPO_ROOT / name for name in sorted(DOSSIER_ALLOWLIST))
+    bindings = {str(path.resolve()): hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None for path in paths}
+    packet = {
+        "schema": "zenith_evolve_agent_handoff_v1", "status": "awaiting_agent_analysis",
+        "subject_run": str(subject_run_dir), "truth_run": str(truth_run_dir),
+        "source_hashes": bindings, "oracle_input_readiness": readiness,
+        "prompt": _build_delta_prompt(artifacts, cp2, subject_run_dir.name, truth_run_dir.name,
+                                      oracle_input_manifest=manifest, oracle_input_readiness=readiness),
+        "review_contract": {
+            "instruction_owner": str(DELTA_NODE),
+            "evidence": "Use the source-bound original files when the prompt excerpts are incomplete. Cite artifact and field for each diagnosis.",
+            "outcome": "Propose one transferable change or explicitly recommend no change. A single outcome does not establish a general rule.",
+            "next_day": "Only evidence matured by the next forecast anchor may inform its policy; retain this version and compare on later days.",
+            "application": "Lead-agent review and a separate versioned change are required. This handoff has no automatic import, semantic validation or apply route.",
+            "completion": "Packet export is not analysis, training, improvement, or a completed Evolve run.",
+        },
+    }
+    packet["packet_sha256"] = hashlib.sha256(json.dumps(packet, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+    return packet
+
+
+def export_agent_handoff(subject_run_dir: Path, truth_run_dir: Path, output: Path) -> Dict[str, Any]:
+    """Write an immutable pending packet; never claim analysis or apply patches."""
+    packet = _agent_handoff_packet(subject_run_dir, truth_run_dir)
+    if packet.get("error"):
+        return packet
+    if output.exists():
+        if json.loads(output.read_text()) != packet:
+            raise ValueError("Existing Evolve handoff differs; retain it and use a new output path")
+    else:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(packet, indent=2, ensure_ascii=False, allow_nan=False) + "\n")
+    return {"status": packet["status"], "packet_path": str(output.resolve()), "packet_sha256": packet["packet_sha256"]}
+
+
+def verify_agent_handoff(path: Path) -> Dict[str, Any]:
+    """Reject changed source/prompt bytes before a lead agent reviews the packet."""
+    packet = json.loads(path.read_text())
+    required = {"schema", "status", "subject_run", "truth_run", "source_hashes", "oracle_input_readiness", "prompt", "review_contract", "packet_sha256"}
+    if not isinstance(packet, dict) or set(packet) != required or not isinstance(packet["source_hashes"], dict) or not packet["source_hashes"]:
+        raise ValueError("Malformed Evolve handoff: complete source-bound packet required")
+    expected = packet.pop("packet_sha256")
+    actual = hashlib.sha256(json.dumps(packet, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+    if packet.get("schema") != "zenith_evolve_agent_handoff_v1" or actual != expected:
+        raise ValueError("Evolve handoff identity mismatch")
+    for name, expected_hash in packet["source_hashes"].items():
+        source = Path(name)
+        actual_hash = hashlib.sha256(source.read_bytes()).hexdigest() if source.is_file() else None
+        if actual_hash != expected_hash:
+            raise ValueError(f"Evolve handoff source changed: {name}")
+    reconstructed = _agent_handoff_packet(Path(packet["subject_run"]), Path(packet["truth_run"]))
+    if reconstructed != {**packet, "packet_sha256": expected}:
+        raise ValueError("Evolve handoff differs from the fixed prompt and expected source bindings")
+    return {"status": "verified_pending_analysis", "packet_sha256": expected}
+
+
 def run_evolve(
     subject_run_dir: Path,
     truth_run_dir: Path,
@@ -675,7 +747,7 @@ def run_evolve(
     - Mechanism: Load paired artifacts, run delta analysis, optionally run dossier patch synthesis, preview or apply patch ops, and append the learning ledger.
     - Reads: subject_run_dir/artifacts, truth_run_dir/artifacts, refinement node instructions, and bridge responses when use_bridge is enabled.
     - Writes: _last_delta_response.txt on parse failure, _last_delta_report.json, _last_patch_payload.json, truth-run artifacts/evolve_*.json, learning_ledger.jsonl, and allowlisted dossier JSON files indirectly when auto_apply and live mode are both enabled.
-    - Guarantee: Returns a summary dict containing either an `error` key or the completed delta_report, patch_payload, apply_results, delta_path, patch_path, and run_artifact_paths surfaces.
+    - Guarantee: Returns an error, a pending source-bound agent packet when no bridge is selected, or completed bridge analysis/application surfaces.
     - Fails: Does not raise for normal bridge or parse failures; those cases return structured `error` payloads for the caller.
     - When-needed: Open when you need the exact control flow and write surfaces for an Evolve run instead of inspecting the helper functions individually.
     - Escalates-to: tools/refinement/version_committer.py::VersionCommitter.commit; tools/refinement/__init__.py
@@ -762,15 +834,8 @@ def run_evolve(
             debug_path.write_text(delta_response[:10000], encoding="utf-8")
             return {"error": "delta_analyzer_parse_failed", "debug_path": str(debug_path)}
     else:
-        print("  SKIPPED (bridge disabled)")
-        delta_report = {
-            "status": "AVAILABLE",
-            "run_pair": {"subject_run_id": subject_run_id, "truth_run_id": truth_run_id},
-            "pattern_summary": {"root_failure_mode": "UNKNOWN", "error_class_distribution": {}, "directional_accuracy": {}, "regime_classification": "unknown", "systematic_patterns": []},
-            "dossier_deltas": [],
-            "doctrine_flags": [],
-            "learning_entries": ["Evolve ran without bridge; no analysis performed."],
-        }
+        return export_agent_handoff(subject_run_dir, truth_run_dir,
+                                    truth_run_dir / "evolve_handoff" / "delta-analysis.json")
 
     print(f"  Delta report status: {delta_report.get('status', 'UNKNOWN')}")
     print(f"  Dossier deltas: {len(delta_report.get('dossier_deltas', []))}")
@@ -890,6 +955,9 @@ def main():
     parser.add_argument("--auto-apply", action="store_true", help="Skip proof/approval gate and apply patches directly")
     parser.add_argument("--input-check", action="store_true", help="Only validate Evolve input readiness and print JSON")
 
+    parser.add_argument("--export-agent-packet", type=Path, help="Export pending fixed-prompt analysis for the lead agent or worker; no inference or live writes")
+    parser.add_argument("--verify-agent-packet", type=Path, help="Verify an exported packet and all source bindings")
+
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
@@ -904,6 +972,14 @@ def main():
         print(f"ERROR: Truth run not found: {truth}")
         sys.exit(1)
 
+    if args.export_agent_packet or args.verify_agent_packet:
+        if args.bridge or args.live or args.auto_apply or args.input_check or (args.export_agent_packet and args.verify_agent_packet):
+            parser.error("Agent handoff export/verification is exclusive with execution/application flags")
+        payload = (verify_agent_handoff(args.verify_agent_packet) if args.verify_agent_packet
+                   else export_agent_handoff(subject, truth, args.export_agent_packet))
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        sys.exit(1 if payload.get("error") else 0)
+
     if args.input_check:
         payload = build_input_readiness_payload(subject, truth)
         print(json.dumps(payload, indent=2, ensure_ascii=False))
@@ -917,6 +993,9 @@ def main():
         dry_run=not args.live,
         auto_apply=args.auto_apply,
     )
+
+    if result.get("status") == "awaiting_agent_analysis":
+        print(json.dumps(result, indent=2, ensure_ascii=False))
 
     if result.get("error"):
         print(f"\nEVOLVE FAILED: {result['error']}")

@@ -7,7 +7,7 @@ strategy document.
 
 The argument begins with actual issuer guidance changes, separates financial
 interpretation from numerical payoff, reports the measured overscaling diagnosis,
-and presents the concrete source-rich development cases. The direct/graph and
+and presents the concrete source-rich development cases. The active daily loop now has a full native Lab/Oracle development execution and a reviewed, untested next-day skill candidate. The direct/graph and
 learned-reasoning comparisons remain unexecuted. No LLM advantage, transferable
 learning, explanation fidelity, novelty or profitability is claimed.
 
@@ -32,6 +32,8 @@ style copy with SHA256
 `1b4630ead32bfb407a2f29f5953fbb8d4140a659f6500799282a4805ba54a883`.
 
 ## Current measured and compiled evidence
+
+- [Daily replay](../docs/daily-replay.md) and [receipt](../docs/daily-replay-receipt.json): pinned FNSPID raw AA sources, rejected paid trial, complete primary-agent Lab/Oracle, exact outcome comparison and one reviewed next-day policy candidate. The manuscript cites the dataset where used. No learned performance gain is established.
 
 - [Development diagnosis](../docs/ashare-development-diagnosis.json): original
   forecasts, date-equal energy/alignment, chronological calibration, common and
@@ -69,8 +71,7 @@ about the new financial reasoning system:
 
 Keep future exports separate. Exporting projects completed authoritative receipts;
 it never executes, selects or seals a study. Unknown costs and reservations
-remain distinct from reported costs. Original shared history retains 106 attempts,
-105 responses and one unknown charge. New authorization histories do not erase it.
+remain distinct from reported costs. The historical export retains its original 106 attempts, 105 responses and one unknown charge. Subsequent daily-development calls remain in the same immutable ledger and are reported separately in the daily replay receipt. New authorization histories do not erase it.
 Detailed historical reproduction remains in [reproducing.md](../docs/reproducing.md)
 and [experiments.md](../docs/experiments.md).
 

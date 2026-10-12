@@ -20,13 +20,25 @@ actual direct and graph outputs, inspect recurring errors, and repair retrieval
 or replace the task when its deciding evidence is absent. Preserve unknown
 economic states separately from neutral changes and any numerical fallback.
 
-The active base comparison uses `ashare_study base-plan`, `base-pilot` and
+The A-share base comparison uses `ashare_study base-plan`, `base-pilot` and
 `base-comparison`. Its supported-change representation and numerical adaptation
-are separate responsibilities. One-field mutation rules below apply to a
+are separate responsibilities. The product direction lives in `program.md`: retain the daily multi-feed
+Lab → Oracle → Evolve loop when adapting historical data. Alternative dataset
+or target proposals do not supersede that vision merely because their scoring
+is easier. A transcript archive alone does not establish linked outcomes or
+historical availability. One-field mutation rules below apply to a
 particular attribution experiment, not every development revision. A coherent
 redesign can change several components in a fresh study; its later evaluation
 must acknowledge the earlier evidence used to choose it.
 
+- `benchmarks/fnspid.py` and `docs/daily-replay.md` own the small full-native daily
+  replay. Preserve the full graph and explicit missing lanes. Source-clock parsing,
+  original body/URL checks, valid evidence IDs and computed numerical facts precede
+  paid execution. Missing coverage is not an economic force. Verify a complete
+  Lab/Oracle run separately from its semantic quality. Evolve packet export is
+  pending work; reviewed analysis and later candidate evaluation are separate.
+  A self-hash is not enough: reconstruct the fixed prompt and expected source
+  bindings before treating a handoff as verified.
 - `research/ashare_study.py` owns the five-session TraderHarness forecast
   experiment. Read `docs/ashare-study.md`. `compile`, `plan` and `report` are
   offline; execution remains held until an explicit hash-bound release uses
@@ -81,6 +93,20 @@ upstream autonomous shell loop is installed.
    Cite borrowed mechanisms at their use, retaining source contradictions and
    target differences in the source manifest; a bibliography entry is not
    evidence that a method was reproduced.
+   Audit a borrowed numerical scorer with plainly wrong forecasts, unit changes
+   and multiple-number answers before treating its scores as evidence. Canonical
+   units and tolerance units must transform together. A permissive best-candidate
+   parser can reward a list of guesses or accept zero against a percentage.
+   Separate answer-aware target selection from a target chosen before outcomes.
+   Preserve guidance endpoints when deriving remaining-period quantities; a
+   midpoint increase can accompany a lower upper boundary. Treat range arithmetic
+   as an envelope unless a joint probability model is actually supplied.
+   Admit Q&A only after call completion and transcript availability, never merely
+   at the earlier earnings-release timestamp. First-reported outcomes and
+   historical inputs need accession/availability checks rather than latest-fact
+   API lookups. Distinguish partly realized next-quarter estimates from fully
+   future business-period forecasts. One learned candidate per arm supports that
+   candidate comparison, not general superiority over the proposal process.
 2. Establish the baseline. Then change one declared factor per trial; record
    the hypothesis and exact change, candidate identity/hash, requested/actual
    model identity where applicable, elapsed resources and outcome. Record
