@@ -1,48 +1,119 @@
 {
-  "schema": "zenith_demo_preparation_result_v1",
-  "data_mode": "mixed",
-  "native_graph": {
-    "nodes": 50,
-    "lab_nodes": 25,
-    "lab_edges": 86,
-    "oracle_nodes": 28,
-    "oracle_edges": 53
-  },
-  "status": "awaiting_agent",
+  "schema": "zenith_demo_preparation_v1",
+  "data_mode": "authored_synthetic",
+  "execution_status": "awaiting_agent",
+  "run_id": "SYSTEM_A_PREPARATION",
   "completed_count": 6,
+  "scope_count": 25,
+  "model_calls": 0,
+  "forecast_complete": false,
+  "completed_forecasts": 0,
   "pending_nodes": [
     "lab_seed_state"
   ],
-  "model_calls": 0,
-  "forecast_complete": false,
-  "claim_boundary": "Native feed loading and prompt preparation only. No model prediction, Oracle diagnosis, learned improvement or financial result is claimed.",
-  "time_anchor": "2026-07-20T20:01:39+00:00",
-  "horizon": "2026-07-21T13:30:00+00:00",
-  "node_hashes": {
-    "global_calculator_feed": "a336f1e34beaf7d4ffc9b3255f1785c7c8c082871068cdb3811dd72c0cd08340",
-    "global_etf_feed": "6211606fd6756a35290a7d68f926087deabc95547efd1afc695def8302f88959",
-    "global_macro_feed": "20179fa730bbb8a89e6c3b555e9e0c0ae8cef7b984dc176991abf1fcd1cd360c",
-    "global_news_feed": "380b9c44926456eaa203251f5ec9bd39cff4c8ecad1d1f4021821019fa97c4bf",
-    "global_polymarket_feed": "bbc774a91b7364b38b78d5dc99ec481dd5907bf7e1cf6580a155c758bdbb7807",
-    "global_stock_feed": "48dc106236a4547eee917ca065578c36c436b329d88a829b1368527b4000379d",
-    "lab_cross_corr_v1": "0126a8aaa98dc43d9ed0b8c0cc4b4de9e7964c8d3c42eccc7419bdbcbe54b300",
-    "lab_cross_corr_v2": "3d930459147f607e9f7bc5810b82e4d341dedb679a124f2fe098444906d3a75d",
-    "lab_decide": "1baa16f7bc81f55aca3adf3850b1ff27243d2d3e0baf5de935754d3d468c7657",
-    "lab_director": "8e9c19972fad2dc46d6392e2639b09090c746562547d72a1447b8b961f87dfc7",
-    "lab_integrity": "02d8c201020a25a2ebc81d0f25f622205a8fc3b61db720601d26b120796c0e47",
-    "lab_miner_calc": "55136052e877dc3704f05efbaaf3f2d9166d98c19ab9d69f34158516fb77ea45",
-    "lab_miner_etf": "1faf59ab0dde6155390dc3fc6dfa08a845638ba568d6ad7451606ff519ed1c6f",
-    "lab_miner_macro": "95838200edb346f0d6f1e300a6fbf6e400a7cc55a13d8d8e769a3fc55417e8cb",
-    "lab_miner_news": "4c6c21eb5be9ab23d2184358c34ae76e1909742adb32081bbfde3da88359c97f",
-    "lab_miner_poly": "a2dee388aff652da74fa5d08bca3356e9470db07fea0d68098c86e92820a2b71",
-    "lab_miner_stock": "24ef8d3ee15cae7a079948a1098e6837ef870eb5e42e0200a4dee08e2f3a8090",
-    "lab_miner_v2_calc": "6d1367a8fa92c467a73c8575faad51f81bcf2b5e7c86edd72f814da434434f1e",
-    "lab_miner_v2_etf": "2cbcbd5b2a3b26e56070768ae47a0eeafccf079ee2f89a3c708c72ea25edb94d",
-    "lab_miner_v2_macro": "2d7cf3ae79d602461ae9b5ced55de3a48e4b76e4a211acc5f6e97b02aadf9ff1",
-    "lab_miner_v2_news": "2ef8879feb92641e7a1f98f8bb842e3c2fc79e54ae2a95e249d583ce5e6229f8",
-    "lab_miner_v2_poly": "dbb7d1fbebbfe01a112b29f4d02d1a39592b8b5783b97325b47ed207660970bd",
-    "lab_miner_v2_stock": "702d7b7a8badbc074d261998bd1fd60dfa8b6208f09435f665c45f375c3a5871",
-    "lab_orient": "3835fe9c56a47e435823bce76479a3712f3c457aaf30e8d3a003940cf0a32e04",
-    "lab_seed_state": "6b1cd974571117f3f45eb4a06e7fd5b6fcdb61b5c6266c1ab8fcc02933e42bfa"
-  }
+  "input_artifacts_loaded": 6,
+  "native_request": {
+    "node_id": "lab_seed_state",
+    "packet_id": "45a565b518bac84d4c16cb2dbf57a59fc2f6c6f0df850909602571d746fda0f2",
+    "prompt_sha256": "40350f7ab52bb369bdde97addaacc417fd16e8441273813347723d00ed2b3133"
+  },
+  "input_sources": [
+    {
+      "id": "earlier",
+      "as_of": "2026-07-20T12:00:00+00:00",
+      "lanes": [
+        {
+          "node_id": "global_measurements_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "b44639725ac831553d3c99d76195266f21fab8ecf93d810b5dada56a377f6bb6",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_subsystems_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "cd9f82f14a2d4f5a9350fb8ce5c2449c0890e0d49dcc0717a76c3b2c02e53c78",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_environment_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "d5dd1b21cb2c1906cdc807806e36a389c3b2ad6eff8943b1f34a94361d50550b",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_events_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "aa022251daa736428e1d0c7a65f41a163c1997a8e9d5b291e72d73c96b6017d5",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_interventions_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "f99256dfc9e907dbedb4ef74e56a4e023db2279b6e23f84f1340a156a80b6a8e",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_derived_feed",
+          "input_origin": "derived_synthetic_inputs",
+          "input_sha256": "b7ed2f98f13b243ad2f69bf512aa691d7aaf0ef7e6cc0dc6f65a36e58ca88fb1",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        }
+      ]
+    },
+    {
+      "id": "later",
+      "as_of": "2026-07-21T12:00:00+00:00",
+      "lanes": [
+        {
+          "node_id": "global_measurements_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "e8222214fc1cb98d30acfb9563a404d8f134912a8846c7e89a4bc4d8543b4924",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_subsystems_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "1775d29f6b2137678d003e1d1667a86f42846084053e8c9ae03dfc3693292a91",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_environment_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "363a7ad1eb5a5bfa0ee12ec403fb1361e13cfaaf3a6e4b240f5ac81b8f8f8dc7",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_events_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "34ad744c0aad3d7b90d04814d244e1a73f1b80dabc62a52f1f62b49e12852a89",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_interventions_feed",
+          "input_origin": "authored_synthetic",
+          "input_sha256": "792f0ab024e8b9c240a93b01e9202625439545d81c56bc57c122fae62d8f8641",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        },
+        {
+          "node_id": "global_derived_feed",
+          "input_origin": "derived_synthetic_inputs",
+          "input_sha256": "0a0e2c36ab7948677399c492a98b65342083b7e6debf26e75eeaed7af316c45f",
+          "public_payload": "included",
+          "permission_status": "original_fixture"
+        }
+      ]
+    }
+  ],
+  "claim_boundary": "Six authored synthetic artifacts loaded; native Seed awaits an agent response. No model call, completed forecast or forecasting-improvement evidence."
 }

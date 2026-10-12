@@ -58,6 +58,6 @@ This contract is guidance for cross-node traceability. It is not a runtime schem
 
 ## Example
 
-- `[H:rates_reprice_growth_duration]`
+- `[H:rates_revalue_growth_duration]`
 - `[H:ai_capex_supply_chain_bifurcation]`
 - `[H:election_odds_policy_risk_spread]`

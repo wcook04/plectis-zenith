@@ -3,20 +3,20 @@
   "type": "standard",
   "description": "Deterministic Execution Unit (The Hands)",
   "schema": {
-    "id": "string (Unique Handle. Ex: 'global_stock_feed')",
+    "id": "string (Unique Handle. Ex: 'global_measurements_feed')",
     "type": "const(tool)",
     "group": "optional string (Loader Derived. Ex: 'feeds')",
     
-    "lane": "string (Visual Vertical. Values: see VALID_LANES in system/lib/types.py. Ex: 'STOCK')",
-    "expectation": "string (Inert Success Criteria. Ex: 'Returns raw OHLCV data.')",
+    "lane": "string (Visual Vertical. Values: see VALID_LANES in system/lib/types.py. Ex: 'MEASUREMENTS')",
+    "expectation": "string (Inert Success Criteria. Ex: 'Returns timestamped observation records.')",
     "is_artifact": "boolean (Surgery Flag. Ex: false)",
     
     "dependencies": "optional list(string) (The Topology. Ex: [])",
     "instruction": "optional string (Usually empty for tools, but allowed for loader tag injection)",
     
     "config": {
-      "module": "string (Python Import Path. PHYSICS. Ex: 'tools.stock.stock')",
-      "config_file": "optional string (External Config Path. Ex: 'conf/stock.json')",
+      "module": "string (Python Import Path. PHYSICS. Ex: 'tools.measurements.measurements')",
+      "config_file": "optional string (External Config Path. Ex: 'conf/measurements.json')",
       "config": "optional object (Runtime Overrides. Ex: {'snapshot_period': '3mo'})"
     },
     

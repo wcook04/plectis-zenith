@@ -7,7 +7,7 @@
   deciding signal rather than the existing 5KB tool-size gate.
 
 [INTERFACE]
-- Tests GodModeEngine._calculate_run_grade with _GradeHarness and synthetic stock artifacts.
+- Tests GodModeEngine._calculate_run_grade with _GradeHarness and synthetic measurements artifacts.
 
 [FLOW]
 - Mechanism: Write a tool artifact above the legacy size gate, set quality block/warn tones, and assert red/amber grade and reason.
@@ -31,14 +31,14 @@ from system.lib.types import CodexNode, NodeType
 class _GradeHarness:
     def __init__(self, artifacts_dir: Path) -> None:
         self.artifacts_dir = artifacts_dir
-        self._node_outcomes = {"global_stock_feed": "success"}
-        self._execution_scope = {"global_stock_feed"}
+        self._node_outcomes = {"global_measurements_feed": "success"}
+        self._execution_scope = {"global_measurements_feed"}
         self._universe = {
-            "global_stock_feed": CodexNode(
-                id="global_stock_feed",
+            "global_measurements_feed": CodexNode(
+                id="global_measurements_feed",
                 type=NodeType.TOOL,
                 group="feeds",
-                lane="STOCK",
+                lane="MEASUREMENTS",
                 teleology="test",
                 expectation="",
                 is_artifact=True,
@@ -51,10 +51,10 @@ class _GradeHarness:
 
 def _write_tool_artifact(artifacts_dir: Path, tone: str, reason: str) -> None:
     artifacts_dir.mkdir(parents=True, exist_ok=True)
-    (artifacts_dir / "global_stock_feed.json").write_text(
+    (artifacts_dir / "global_measurements_feed.json").write_text(
         json.dumps(
             {
-                "id": "global_stock_feed",
+                "id": "global_measurements_feed",
                 "status": "success",
                 "metadata": {
                     "status": "success",
@@ -87,7 +87,7 @@ def test_engine_grade_turns_amber_on_feed_quality_warn(tmp_path: Path) -> None:
     _write_tool_artifact(
         artifacts_dir,
         "warn",
-        "legacy provider fallback used; stock stayed usable but is degraded",
+        "legacy provider fallback used; measurements stayed usable but is degraded",
     )
     harness = _GradeHarness(artifacts_dir)
 

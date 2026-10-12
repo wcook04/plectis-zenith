@@ -235,6 +235,15 @@ function Definition({
         )}
       </section>
 
+      {node.dossier && (
+        <section className="inspector__section">
+          <h4>Feed dossier</h4>
+          <p className="inspector__quiet">The perspective, evidence rules and limits used by this lane.</p>
+          <JsonView label="Dossier" value={node.dossier.data} />
+          <a href={node.dossier.source.url} target="_blank" rel="noreferrer">Dossier source</a>
+        </section>
+      )}
+
       <details className="inspector__section inspector__provenance">
         <summary>Source and provenance</summary>
         <dl>

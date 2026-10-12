@@ -92,7 +92,7 @@ class GraphVariantTests(unittest.TestCase):
     def test_mandatory_ancestry_and_feed_tool_mutation_refused(self):
         for operation in [
             {"op": "remove_edge", "dependency_id": "lab_orient", "node_id": "lab_decide"},
-            {"op": "add_edge", "dependency_id": "lab_orient", "node_id": "global_calculator_feed"},
+            {"op": "add_edge", "dependency_id": "lab_orient", "node_id": "global_derived_feed"},
             {"op": "remove_experimental_node", "node_id": "lab_integrity"},
         ]:
             with self.subTest(operation=operation), self.assertRaises(ValueError):

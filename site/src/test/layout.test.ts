@@ -51,7 +51,7 @@ describe('graph layout', () => {
   it('expands a family into its native members', () => {
     const layout = layoutGraph(lab, new Set(['miners']));
     const miners = layout.items.filter((i) => i.kind === 'node' && i.id.startsWith('lab_miner_') && !i.id.includes('v2'));
-    expect(miners).toHaveLength(7);
+    expect(miners).toHaveLength(6);
     expect(layout.frames.map((f) => f.id)).toContain('frame:miners');
   });
 
@@ -59,7 +59,7 @@ describe('graph layout', () => {
     const n = neighbourhood(lab, 'lab_cross_corr_v1');
     expect([...n.inputs].every((id) => id.startsWith('lab_miner_'))).toBe(true);
     expect(n.consumers.has('lab_orient')).toBe(true);
-    expect(n.ancestors.has('global_stock_feed')).toBe(true);
+    expect(n.ancestors.has('global_measurements_feed')).toBe(true);
     expect(n.descendants.has('lab_integrity')).toBe(true);
   });
 });

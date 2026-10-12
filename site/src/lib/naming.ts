@@ -4,19 +4,16 @@
 import { laneLabel, laneName } from './lanes';
 
 const LANE_TOKEN: Record<string, string> = {
-  stock: 'STOCK',
-  etf: 'ETF',
-  macro: 'MACRO',
-  news: 'NEWS',
-  poly: 'POLYMARKET',
-  polymarket: 'POLYMARKET',
-  calc: 'CALCULATOR',
-  calculator: 'CALCULATOR',
-  stockgrid: 'STOCKGRID',
+  measurements: 'MEASUREMENTS',
+  subsystems: 'SUBSYSTEMS',
+  environment: 'ENVIRONMENT',
+  events: 'EVENTS',
+  interventions: 'INTERVENTIONS',
+  derived: 'DERIVED',
 };
 
 const FIXED: Record<string, string> = {
-  global_calculator_feed: 'Calculator',
+  global_derived_feed: 'Derived summaries',
   lab_seed_state: 'Seed state',
   lab_cross_corr_v1: 'Synthesis 1',
   lab_cross_corr_v2: 'Synthesis 2',
@@ -28,8 +25,8 @@ const FIXED: Record<string, string> = {
   oracle_subject_lab_cross_corr_v2: 'Saved Synthesis 2',
   oracle_subject_lab_decide: 'Saved CP1',
   oracle_subject_lab_director: 'Saved CP2',
-  oracle_truth_diff_equity: 'Equity differences',
-  oracle_truth_diff_macro: 'Macro differences',
+  oracle_truth_diff_observations: 'Observation differences',
+  oracle_truth_diff_environment: 'Environment differences',
   oracle_truth_map: 'Evidence summary',
   oracle_attribution_map: 'Failure hypothesis',
   oracle_explain: 'Later context',
@@ -64,7 +61,7 @@ export type Family = { key: string; label: string; summary: string };
 const FAMILIES: Array<{ test: RegExp; family: Family }> = [
   {
     test: /^global_\w+_feed$/,
-    family: { key: 'feeds', label: 'Saved feeds', summary: 'Data feeds and the calculator' },
+    family: { key: 'feeds', label: 'Saved feeds', summary: 'Source observations and computed summaries' },
   },
   {
     test: /^lab_miner_v2_/,
@@ -87,7 +84,7 @@ const FAMILIES: Array<{ test: RegExp; family: Family }> = [
     family: { key: 'diffs', label: 'Numeric differences', summary: 'Before and after, computed without a model' },
   },
   {
-    test: /^oracle_truth_(stock|etf|macro|news|poly|calc|stockgrid)$/,
+    test: /^oracle_truth_(measurements|subsystems|environment|events|interventions|derived)$/,
     family: { key: 'lane_reviews', label: 'Source reviews', summary: 'What each data source shows after the cutoff' },
   },
 ];
@@ -102,7 +99,7 @@ export function nodeFamily(id: string, mission = 'lab'): Family | null {
 
 // One plain line under each card, paraphrasing the node's authored purpose.
 const ROLE: Record<string, string> = {
-  global_calculator_feed: 'Regime metrics from stocks, ETFs, macro',
+  global_derived_feed: 'Summaries computed from the earlier observations',
   lab_seed_state: 'Maps what data exists and what is missing',
   lab_cross_corr_v1: 'Where the miners agree and conflict',
   lab_cross_corr_v2: 'Where evidence converges on targets',
@@ -114,8 +111,8 @@ const ROLE: Record<string, string> = {
   oracle_subject_lab_cross_corr_v2: 'The Lab’s second synthesis',
   oracle_subject_lab_decide: 'The Lab’s frozen thesis',
   oracle_subject_lab_director: 'The Lab’s frozen predictions',
-  oracle_truth_diff_equity: 'Stock and ETF before and after',
-  oracle_truth_diff_macro: 'Macro before and after',
+  oracle_truth_diff_observations: 'Target values before and after',
+  oracle_truth_diff_environment: 'Environment before and after',
   oracle_truth_map: 'Combines the source reviews',
   oracle_attribution_map: 'Maps what happened onto the Lab’s evidence',
   oracle_explain: 'Optional later context for misses',

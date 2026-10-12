@@ -22,7 +22,7 @@
 - Read-only over subject-run artifact files; no writes or network calls occur here.
 - When-needed: Open when Oracle needs to re-expose one subject-run artifact with explicit provenance instead of re-reading artifact JSON directly.
 - Escalates-to: tools/oracle/subject_snapshot.py::run; tools/oracle/subject_index.py::run
-- Navigation-group: market_intelligence
+- Navigation-group: system_intelligence
 """
 from __future__ import annotations
 
@@ -72,7 +72,7 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
     - Guarantee: Returns `metadata.status="success"` plus `subject_run_id`, `source_artifact_id`, `hydrated_from_subject`, and the original artifact data payload.
     - Fails: Raises ValueError for missing subject run dir, missing artifact id, missing artifact file, or invalid artifact JSON shape.
     - When-needed: Open when wiring a single subject artifact into Oracle and you need the exact metadata hydration contract.
-    - Escalates-to: tools/oracle/subject_index.py::run; tools/oracle/truth_diff_equity.py::run
+    - Escalates-to: tools/oracle/subject_index.py::run; tools/oracle/truth_diff_observations.py::run
     """
     del run_dir
     subject_run_dir = _require_subject_run_dir(config)

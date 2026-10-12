@@ -39,7 +39,7 @@ export function SettingsIllustration({ doc }: { doc: Doc }) {
       <div className="settings__grid">
         <div className="settings__control">
           <label htmlFor={id} className="settings__label">
-            Caution about sentiment-driven consensus, for the Polymarket miner
+            Caution about attributing a change to an intervention
           </label>
           <input
             id={id}
@@ -67,8 +67,8 @@ export function SettingsIllustration({ doc }: { doc: Doc }) {
         <div className="settings__prompt">
           <p className="settings__fixed">
             <span className="settings__tag">Fixed at every setting</span>
-            Same inputs (seed state and the Polymarket feed), same probability filters, ranking by absolute
-            probability change, deduplication and output structure.
+            Same inputs (Seed state and the interventions feed), timestamp checks, source references,
+            deduplication and output structure. A recorded intervention alone does not prove its effect.
           </p>
           <p className="settings__variant" aria-live="polite">
             <span className="settings__tag">Interpretation guidance at {chosen.setting.toFixed(1)}</span>
@@ -89,7 +89,7 @@ export function SettingsIllustration({ doc }: { doc: Doc }) {
 }
 
 const MECH = [
-  { id: 'context', x: 20, title: 'Available context', lines: ['VIX, sentiment and other', 'features at the cutoff'] },
+  { id: 'context', x: 20, title: 'Available context', lines: ['Variability, missingness', 'and feed disagreement'] },
   { id: 'controller', x: 200, title: 'Prompt controller', lines: ['Shared encoder and a', 'small head per node'] },
   { id: 'settings', x: 380, title: 'Settings for one node', lines: ['One number per', 'component: 0.1, 0.2 …'] },
   { id: 'assemble', x: 560, title: 'Assemble the prompt', lines: ['Fixed task + chosen', 'variants; save exact text'] },
@@ -182,8 +182,8 @@ export function MechanismDiagram() {
       </svg>
       <figcaption>
         After the paper’s Figure 4. Settings select text; they do not scale evidence or the model’s reasoning.
-        Backpropagation could train the controller, but no gradient passes through the language model or the text
-        choice, and later test outcomes stay out of development.
+        Fitting the controller requires measured outcomes and a suitable optimisation method. No gradient passes
+        through the language model or the text choice, and later test outcomes stay out of development.
       </figcaption>
     </figure>
   );

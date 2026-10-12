@@ -25,8 +25,8 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 QUARTET = [
     {
         "canonical_artifact_id": "prediction_reconciliation",
-        "source_node_id": "oracle_truth_diff_equity",
-        "runner_target_id": "oracle_truth_diff_equity",
+        "source_node_id": "oracle_truth_diff_observations",
+        "runner_target_id": "oracle_truth_diff_observations",
     },
     {
         "canonical_artifact_id": "realized_hindsight_brief",

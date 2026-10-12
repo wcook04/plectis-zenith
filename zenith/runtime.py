@@ -22,7 +22,7 @@ from system.lib.utils import resolve_runs_dir
 from .providers import AgentProvider, CapturedProvider, OpenRouterFreeProvider, NvidiaNimProvider, digest, text_digest, verify_packet, verify_response, write_json
 
 DEFAULT_ROOT = Path(__file__).resolve().parents[1]
-MISSION_TARGETS = {"lab": "lab_integrity", "oracle": "oracle_cp2_emitter", "feeds": "global_calculator_feed", "refinement": "version_committer"}
+MISSION_TARGETS = {"lab": "lab_integrity", "oracle": "oracle_cp2_emitter", "feeds": "global_derived_feed", "refinement": "version_committer"}
 
 
 def _graph_loader(root: Path, graph_variant: dict | None = None):
@@ -127,22 +127,16 @@ def forward_preflight(root: Path, source: Path, anchor: datetime) -> None:
         for key in ("as_of", "timestamp_iso"):
             if metadata.get(key) and stamp(str(metadata[key])) > anchor:
                 raise ValueError(f"Lab feed {node.id}.{key} is later than the prediction anchor")
-        observations = (metadata.get("diagnostics") or {}).get("price_observations", {})
-        if isinstance(observations, dict):
-            # These equity feed contracts use US exchange daily bars. Acquisition time
-            # cannot turn a future provider bar into admissible forward evidence.
-            latest_date = anchor.astimezone(ZoneInfo("America/New_York")).date()
-            for symbol, observation in observations.items():
-                if not isinstance(observation, dict):
-                    continue
-                for key in ("bar_date", "session_date"):
-                    if observation.get(key):
-                        try:
-                            bar_date = date.fromisoformat(str(observation[key]))
-                        except ValueError:
-                            raise ValueError(f"invalid provider {key} for {symbol}") from None
-                        if bar_date > latest_date:
-                            raise ValueError(f"future provider {key} for {symbol} cannot enter Lab")
+        data = envelope.get("data", {})
+        rows = data.get("observations", []) + data.get("items", []) if isinstance(data, dict) else []
+        for row in rows:
+            if not isinstance(row, dict):
+                raise ValueError("observation row must be an object")
+            for key in ("observed_at", "available_at"):
+                if not row.get(key) or stamp(str(row[key])) > anchor:
+                    raise ValueError(f"Lab observation {key} missing or later than cutoff")
+            if stamp(row["available_at"]) < stamp(row["observed_at"]):
+                raise ValueError("observation availability precedes observation")
 
 
 @contextlib.contextmanager
@@ -229,7 +223,7 @@ def status(root: Path, run_id: str) -> dict:
             "status": outcome, "completed_count": len(complete), "scope_count": len(spec["scope"]),
             "failed_nodes": failed, "pending": pending, "engine_failure_nodes": engine_failure_nodes, "run_summary": summary,
             "execution_kind": "captured_replay" if spec["provider"] == "captured" else spec["provider"],
-            "claim_boundary": "Execution and contract validation do not establish forecasting accuracy or market usefulness."}
+            "claim_boundary": "Execution and contract validation do not establish forecasting accuracy or usefulness for the observed system."}
 
 
 def _source_hashes(directories: list[Path]) -> dict:

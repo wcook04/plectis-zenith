@@ -137,12 +137,18 @@ class PublicContent:
         demo = self.evidence("sources")["data"]
         provenance = next((lane for snapshot in demo["snapshots"] if snapshot["id"] == "earlier"
                            for lane in snapshot["lanes"] if lane["node_id"] == identifier), None)
+        dossier = None
+        perspective = node.lane.lower()
+        if perspective in {"measurements", "subsystems", "environment", "events", "interventions", "derived"}:
+            dossier_path = f"codex/substrate/dossiers/{perspective}.json"
+            dossier_raw = safe_read(self.root, dossier_path)
+            dossier = {"data": json.loads(dossier_raw), "source": self.source(dossier_path, dossier_raw)}
         return {"id": node.id, "type": node.type.value, "group": node.group, "lane": node.lane,
                 "purpose": node.teleology, "mechanism": node.mechanism, "expectation": node.expectation,
                 "boundary": authored.get("boundary", ""), "instruction": node.instruction,
                 "instruction_kind": "current_authored_definition_not_run_override",
                 "dependencies": list(node.dependencies), "consumers": consumers,
-                "demo_provenance": provenance,
+                "demo_provenance": provenance, "dossier": dossier,
                 "output_schema": node.output_schema, "source": self.source(path, raw),
                 "explanation_url": f"{API}/documents/graphs"}
 
@@ -200,12 +206,12 @@ class PublicContent:
                              "evidence_urls": [f"{API}/evidence/{name}" for name in CHAPTER_EVIDENCE[identifier]]})
         return {"schema": "zenith_teaching_site_v1", "api_version": "1",
                 "title": paper["title"], "paper_url": f"{API}/paper", "chapters": chapters,
-                "notice": "This is not financial advice.", "notice_url": f"{API}/documents/notice",
+                "notice": "Experimental research prototype.", "notice_url": f"{API}/documents/notice",
                 "documents": {k: f"{API}/documents/{k}" for k, v in DOCUMENTS.items() if (self.root / v).is_file()},
                 "figures": {k: f"/assets/graphs/{k}.svg" for k in FIGURES},
                 "evidence": {k: f"{API}/evidence/{k}" for k in EVIDENCE},
-                "data_mode": "mixed",
-                "data_note": "Real saved stocks, ETFs and prediction markets; synthetic macro/news; recomputed CALC. Real payloads withheld from public responses. No forecast result for this configuration.",
+                "data_mode": "synthetic",
+                "data_note": "Invented observations of System A through five source perspectives and computed summaries. All payloads are public. Preparation only; no demonstrated predictive improvement.",
                 "local_runs_enabled": local_runs,
                 "run_index_url": f"{API}/runs" if local_runs else None,
                 "capabilities": {"read_graph": True, "read_paper": True, "read_local_runs": local_runs,

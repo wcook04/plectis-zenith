@@ -585,9 +585,9 @@ function Legend({
       {hasOrigin && (
         <span className="legend__group">
           <span className="legend__group-label">Feed data</span>
-          <span className="z-origin z-origin--real_saved_input">Real data</span>
+
           <span className="z-origin z-origin--authored_synthetic">Synthetic data</span>
-          <span className="z-origin z-origin--derived_mixed_inputs">Computed</span>
+          <span className="z-origin z-origin--derived_synthetic_inputs">Computed</span>
         </span>
       )}
     </div>

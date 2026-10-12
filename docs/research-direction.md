@@ -1,11 +1,13 @@
 # Research direction: context-conditioned prompt selection
 
-> **This is not financial advice.** This is a theoretical research proposal.
-> Historical examples and model outputs are not investment recommendations and
-> must not be used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
+> **Experimental research proposal.** No controller has been implemented or evaluated.
+
+The application class is forecasting a changing, partially observed system from heterogeneous, incomplete, overlapping and time-delayed perspectives. Reasoning reconciles meanings and availability clocks, separates missing from conflicting evidence, proposes competing explanations, selects explicit targets and saves the support chain. Feeds are not independent votes. Observations must share system/entity/time linkage, and declared targets and horizons must have later measurable truth. The disclosed recurrence is a protocol fixture, not evidence that language-model reasoning is necessary or outperforms direct or numerical baselines.
+
+A greenhouse is a concrete motivating case: sensors report temperature and humidity, soil readings describe another subsystem, weather supplies context, door logs record events, and irrigation or ventilation records describe planned/executed controls. Declare a six-hour temperature or humidity target and later measure that same quantity. The graph should distinguish an outage from conflicting readings and recognise that two weather summaries may repeat one source. Equipment networks and laboratory experiments offer other candidate applications. None has been evaluated, and the disclosed System A recurrence is not a simulator of these systems.
 
 The aim is to learn an efficient reasoning graph that remains useful across
-different market conditions. The proposal below is not implemented or validated
+different observed system conditions. The proposal below is not implemented or validated
 by the [current preparation example](demo.md). It has no completed forecast.
 Robustness to every possible regime is an ambition, not a result or guarantee.
 
@@ -45,7 +47,7 @@ Four primary papers provide the closest methodological grounding:
 | Khattab et al., [DSPy](https://arxiv.org/abs/2310.03714), §§2–3 | Composes LM modules with input/output signatures and optimises a program against a metric. | The abstraction helps separate each node's task from its prompt. DSPy also supports methods, including fine-tuning, that this proposal does not adopt. |
 | Opsahl-Ong et al., [MIPRO](https://arxiv.org/abs/2406.11695v2), §§2–4, Algorithm 1 | Proposes per-module instructions and demonstrations, then uses measured downstream scores to search their combinations. | A reference for discrete configuration search and credit assignment. Zenith's regime-conditioned selection and chronological evaluation remain separate, untested design choices. |
 | Pryzant et al., [ProTeGi](https://arxiv.org/abs/2305.03495), §2 | Uses error descriptions to propose prompt edits, with beam search and candidate selection. | “Textual gradients” are an analogy for verbal feedback. They supply neither derivatives through the API nor evidence that a particular diagnosis is causally correct. |
-| Yuksekgonul et al., [TextGrad](https://arxiv.org/abs/2406.07496v1), §2 | Propagates textual feedback through a computation graph to revise selected variables. | A close precedent for graph-based feedback. The paper explicitly treats differentiation as a metaphor; its reported task results do not establish financial forecasting performance here. |
+| Yuksekgonul et al., [TextGrad](https://arxiv.org/abs/2406.07496v1), §2 | Propagates textual feedback through a computation graph to revise selected variables. | A close precedent for graph-based feedback. The paper explicitly treats differentiation as a metaphor; its reported task results do not establish predictive performance here. |
 
 These papers support the terminology and method comparisons. They do not prove
 the usefulness, novelty or robustness of Zenith's proposed controller. AlphaGo
@@ -55,8 +57,8 @@ they are not substitutes for this nearer prompt-optimisation literature.
 ## A snapshot can contain a history
 
 “Point in time” describes the information cutoff, not the number of observations
-inside the packet. A saved packet could hold one current state, or price paths,
-dated news, flows and other histories available by that cutoff. In the photo/video
+inside the packet. A saved packet could hold one current state, or measurement paths,
+dated events, interventions and other histories available by that cutoff. In the photo/video
 analogy, a history-bearing snapshot contains a bounded video up to that moment.
 It remains a finite, sampled record, not complete continuous knowledge.
 
@@ -71,13 +73,14 @@ several horizons do not, by themselves, specify a joint distribution over future
 paths. Select the target, sampling interval, horizon and score before comparing
 versions. Keep analysis-window width separate from forecast horizon.
 
-A future study would use authorised proprietary financial snapshots with
+A future study would use authorised observation snapshots with
 reliable historical availability records. Each observation needs its event time,
 publication or availability time, collection time, and revision vintage where
 applicable. Later corrections must not silently appear in earlier inputs.
-The present archived captures do not establish all of these clocks. More data
-alone does not repair that limitation, or a current model's possible knowledge
-of later events. Private licences and raw payloads stay outside the public repo.
+The synthetic example provides declared clocks for teaching; it does not certify
+availability in a real deployment. More data alone does not repair unreliable
+clocks or a model's possible knowledge of later events. Private payloads stay
+outside the public repo.
 
 ## What a prompt setting controls
 
@@ -89,23 +92,24 @@ not select a different task, add extra investigation or change the required
 amount of work. The shared core fixes evidence boundaries and uncertainty
 reporting; optimisation cannot weaken those requirements.
 
-The existing [Polymarket miner](../codex/substrate/nodes/lab/miner_poly.json)
-reads the Polymarket feed and seed-state data topology. It extracts ranked
-signals as atomic tuples. Its current instruction fixes probability filters,
-ranking by absolute probability change, deduplication and output structure.
-A proposed semantic component would vary the interpretive guidance for the
-same signals, particularly their Context/Implication field, while preserving
-those extraction rules. It would not turn this miner into a forecaster.
+The interventions miner reads its feed and the seed-state inventory. Its fixed task
+preserves timestamp admissibility, source references, relevance ranking,
+deduplication and output structure. A proposed semantic component would vary
+interpretation of changes following recorded interventions without changing those rules.
 
-For example, one axis could control **caution about sentiment-driven apparent
-consensus**. These are illustrative fragments appended to the same fixed task:
+For example, one axis could control **caution about attributing a change to an
+intervention**. These fragments accompany the same fixed task and inputs:
 
 | Setting | Small variation in the interpretation guidance |
 |---|---|
-| `0.0` | Interpret the reported probability change in its supplied context; retain the stated uncertainty. |
-| `0.1` | Interpret the same change with mild caution about sentiment-driven consensus where the evidence supports it. |
-| `0.2` | Give slightly more interpretive weight to sentiment-driven consensus as a possible explanation, where supported. |
-| `1.0` | Give that explanation the strongest emphasis allowed by this component, without assuming consensus is wrong or overriding the supplied evidence. |
+| `0.0` | Describe the recorded intervention and nearby observations; retain uncertainty about attribution. |
+| `0.1` | Treat temporal association as a possible explanation while noting that it does not prove an effect. |
+| `0.2` | Give slightly more emphasis to alternative explanations for the observed change where supported. |
+| `1.0` | Give those alternatives the strongest emphasis allowed by this component without overriding supplied evidence. |
+
+The permitted inputs remain seed state and the interventions feed. Timestamp
+admissibility, source references, deduplication and output structure are fixed.
+Temporal association alone is not causal proof.
 
 The endpoint is the end of a bounded interpretive range, not unlimited
 scepticism. Every variant still reports the same factual measurements and
@@ -133,12 +137,12 @@ The shared encoder reads the declared cutoff-available signals; each head
 selects settings for that node's few, named semantic components. A renderer
 then compiles the node's dossier from the common core, its unchanged task
 contract and the selected wording. This is a proposal for all suitable
-reasoning nodes, not a Polymarket-only mechanism.
+reasoning nodes, not an interventions-only mechanism.
 
 | Node role | Same job throughout | Example of a bounded interpretive axis |
 |---|---|---|
 | Seed | Describe data coverage and quality | Emphasis on possible regime dependence of a quality concern; factual coverage unchanged |
-| Feed miner | Extract that lane's signals under its fixed rules | Interpretation of an observed move as durable information versus sentiment-sensitive evidence |
+| Feed miner | Extract that lane's signals under its fixed rules | Interpretation of an observed move as durable information versus incomplete evidence |
 | Cross-feed synthesis | Relate the supplied observations | Caution about a shared regime explaining co-movement; no invented causal link |
 | Orient | Form competing explanations | Relative interpretive emphasis on persistence versus a supported regime transition |
 | Decide | Assess the same theses and freeze its checkpoint | Sensitivity to regime dependence in the stated assumptions; forecast and output obligations unchanged |
@@ -149,7 +153,7 @@ These examples specify possible axes, not good policies. They must be checked
 against each node's actual contract before any implementation. The settings
 must not become knobs for inventing confidence, changing factual inputs or
 ignoring counterevidence. The same signal may warrant different settings in
-different nodes; one global “greed weight” need not suit every role.
+different nodes; one global interpretive setting need not suit every role.
 
 The encoder and heads can be an actual small neural network with trainable
 numerical weights. Its outputs are the semantic settings, which are distinct
@@ -166,7 +170,7 @@ improve its score by changing the judge or loosening a validator.
 
 ## External signals choose the settings
 
-An external signal such as VIX, alongside other available features, could feed
+Variability, missingness, source disagreement and event density, could feed
 the shared controller. It would output a vector of settings, one for each adjustable
 component of each node. The renderer turns those settings into prompt text.
 Thus the prompt varies with the observed conditions; it is not one fixed prompt
@@ -189,20 +193,16 @@ on development cases, fit or select a controller from their measured losses,
 then freeze it before testing later cases. There is no arrow from a test
 outcome back into the controller that produced that same forecast.
 
-VIX estimates expected 30-day S&P 500 volatility from option quotations. It is
-one possible feature, not a complete measurement of market stress, a direction
-forecast, or a label for every regime. See [Cboe's definition](https://www.cboe.com/tradable_products/vix/faqs).
-A separate greed or sentiment index would measure a different proposed
-feature; VIX is not a greed score. The controller must use values actually
-available at the cutoff, not later realised volatility or a regime label
-assigned after the outcome. A signal is an input even if it reaches the node
-only through the selected wording. Record its source and availability, and
-give comparison policies the same information access.
+These features must come from observations actually available at the cutoff,
+not later outcomes or labels assigned after evaluation. They are incomplete
+summaries, not a complete model of system dynamics. A signal remains an input
+when it reaches a node through selected wording. Record its source and
+availability; give comparison policies the same information access.
 
 Start with fixed, interpretable mappings and compare them with a fixed-prompt
 baseline. Learning whether a signal should affect a particular interpretive component
-is itself part of the research. Do not assume “higher VIX means more
-scepticism” or “greed means consensus is wrong” is the right rule. Missing or unfamiliar signals need a declared fallback,
+is itself part of the research. No feature has a pre-established beneficial
+mapping to prompt settings. Missing or unfamiliar signals need a declared fallback,
 and changing regimes may make a previously useful mapping fail.
 
 ## Where neural-network ideas apply
@@ -244,7 +244,7 @@ Three approaches are plausible research choices:
    observed returns. It does not differentiate the environment. Applying that
    pattern here would require explicit sampling probabilities, careful handling
    of noise and delayed outcomes, and fresh later evaluation; the example does
-   not establish that it works for financial prompts.
+   not establish that it works for these reasoning tasks.
 
 These are alternatives to investigate, not new dependencies or a claim that
 Zenith already trains a neural controller. The base language-model weights
@@ -277,7 +277,17 @@ compatible with the same past. The target is useful, efficient forecasting
 with honest uncertainty across diverse conditions, not guaranteed prediction
 in every possible situation.
 
-Page 3 of the [four-page paper](../paper/zenith.pdf) diagrams this mechanism.
+Page 3 of the [three-page paper](../paper/zenith.pdf) diagrams this mechanism.
 The [spoken walkthrough](zenith-walkthrough-script.md) explains it in plain language.
 The implementation references above were inspected on 12 October 2026; their
 ideas are credited without claiming that their results transfer to this task.
+
+## Physical problem setting
+
+The proposed use is a partially observed dynamical system. Sensors expose different functions or aspects of state; available histories and known forces, boundaries and interventions condition its future. A position measurement alone need not reveal velocity or direction. History may help, but some state remains unobservable and identifiability is not universal. See Russ Tedrake's [Output Feedback](https://underactuated.mit.edu/output_feedback.html) and [System Identification](https://underactuated.mit.edu/sysid.html).
+
+Heat transfer could combine temperature, heater power, weather and door/vent observations for a six-hour chamber or greenhouse temperature target. Damped vibration could combine camera position, accelerometer readings and force/calibration logs for a one-second displacement or acceleration target. Fluid transport could combine flow, pressure, dye and valve records for downstream concentration; geometry and boundary conditions are necessary inputs.
+
+The graph's proposed job is to align clocks, units and dependent sources; compare sensor-fault with state/regime explanations; select or parameterise a suitable physical model or numerical tool; and freeze target, horizon and uncertainty. Narrative cannot replace equations. Solver integration and transfer to these applications are unimplemented and untested. The disclosed System A recurrence remains a separate protocol fixture, without physical interpretation. Common entity/time linkage and later measurable truth remain required.
+
+A concrete next proposal is a damped driven oscillator with position, acceleration and force histories, calibration, event and control records, and deliberately delayed, duplicated or faulty sensors. Keep hidden fault truth exclusively with the evaluator. Score future-state prediction separately from fault diagnosis. Compare a numerical observer/solver, a direct language-model forecast, the graph and one revised graph under equal information cutoffs and budgets. This experiment is proposed, not implemented. The reasoning DAG is a computational dependency graph, not a physical causal diagram; feedback in the physical system does not require a cycle in each forecast's analysis graph.

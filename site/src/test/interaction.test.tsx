@@ -47,9 +47,9 @@ describe('node inspector', () => {
     expect(within(dialog).getByText('Current instruction')).toBeInTheDocument();
     expect(within(dialog).getByText('Instruction for lab_cross_corr_v1')).toBeInTheDocument();
     expect(within(dialog).getByRole('button', { name: 'Copy instruction' })).toBeInTheDocument();
-    fireEvent.click(within(dialog).getByRole('button', { name: /Stocks miner/ }));
-    await screen.findByRole('dialog', { name: /Stocks miner/ });
-    fireEvent.keyDown(screen.getByRole('heading', { name: 'Stocks miner' }), { key: 'Escape' });
+    fireEvent.click(within(dialog).getByRole('button', { name: /Measurements miner/ }));
+    await screen.findByRole('dialog', { name: /Measurements miner/ });
+    fireEvent.keyDown(screen.getByRole('heading', { name: 'Measurements miner' }), { key: 'Escape' });
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
   });
 
@@ -113,16 +113,16 @@ describe('node inspector', () => {
   });
 
   it('keeps loaded evidence labelled as loaded', async () => {
-    mockFetch(() => ({ body: nodeBody('lab_miner_stock') }));
+    mockFetch(() => ({ body: nodeBody('lab_miner_measurements') }));
     render(
       <GraphExplorer
         graph={lab}
         title="Lab"
-        run={{ kind: 'receipt', label: 'Receipt', sourceUrl: '/x', states: { lab_miner_stock: 'loaded', lab_decide: 'failure' }, calls: {}, note: '' }}
+        run={{ kind: 'receipt', label: 'Receipt', sourceUrl: '/x', states: { lab_miner_measurements: 'loaded', lab_decide: 'failure' }, calls: {}, note: '' }}
       />,
     );
-    const stock = screen.getAllByRole('button', { name: /Stocks miner/ })[0];
-    expect(stock).toHaveAccessibleName(/Loaded/);
+    const measurements = screen.getAllByRole('button', { name: /Measurements miner/ })[0];
+    expect(measurements).toHaveAccessibleName(/Loaded/);
     expect(screen.getAllByRole('button', { name: /Decide \(CP1\)/ })[0]).toHaveAccessibleName(/Failed/);
   });
 });
@@ -142,7 +142,7 @@ describe('markdown from the backend', () => {
   });
 });
 
-describe('mixed-data edition', () => {
+describe('synthetic observed-system edition', () => {
   it('reads the preparation receipt and marks Seed as a prepared request, nothing as ran', async () => {
     mockFetch(() => ({ body: nodeBody('lab_seed_state') }));
     const { Preparation } = await import('../components/Preparation');
@@ -161,15 +161,15 @@ describe('mixed-data edition', () => {
     render(<Preparation result={result} sources={null} labGraph={lab} localRuns={false} />);
     expect(screen.getByText(/The record claims only that the inputs were loaded/)).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /Seed state/ })[0]).toHaveAccessibleName(/Request prepared/);
-    expect(screen.getAllByRole('button', { name: /Stocks feed/ })[0]).toHaveAccessibleName(/Loaded/);
+    expect(screen.getAllByRole('button', { name: /Measurements feed/ })[0]).toHaveAccessibleName(/Loaded/);
     expect(screen.queryAllByRole('button', { name: /, Ran\./ })).toHaveLength(0);
   });
 
   it('renders column-and-row payloads as a table', async () => {
     const { JsonView } = await import('../components/JsonView');
-    render(<JsonView label="Synthetic" value={{ columns: ['ticker', 'pct_change'], rows: [['SYNTH_RATE', 0.1]] }} />);
-    expect(screen.getByRole('columnheader', { name: 'ticker' })).toBeInTheDocument();
-    expect(screen.getByRole('cell', { name: 'SYNTH_RATE' })).toBeInTheDocument();
+    render(<JsonView label="Synthetic" value={{ columns: ['target_id', 'value'], rows: [['signal_a', 0.1]] }} />);
+    expect(screen.getByRole('columnheader', { name: 'target_id' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'signal_a' })).toBeInTheDocument();
   });
 });
 
@@ -177,9 +177,9 @@ describe('dependency disclosure', () => {
   it('lists a node’s direct original-feed input even though the overview hides that edge', async () => {
     mockFetch((url) => ({ body: nodeBody(decodeURIComponent(url.split('/nodes/')[1])) }));
     render(<GraphExplorer graph={lab} title="Lab" />);
-    fireEvent.click(screen.getAllByRole('button', { name: /Stocks directed miner/ })[0]);
-    const dialog = await screen.findByRole('dialog', { name: /Stocks directed miner/ });
+    fireEvent.click(screen.getAllByRole('button', { name: /Measurements directed miner/ })[0]);
+    const dialog = await screen.findByRole('dialog', { name: /Measurements directed miner/ });
     const reads = within(dialog).getByRole('heading', { name: 'Reads' }).parentElement!;
-    expect(within(reads).getByRole('button', { name: /Stocks feed/ })).toBeInTheDocument();
+    expect(within(reads).getByRole('button', { name: /Measurements feed/ })).toBeInTheDocument();
   });
 });

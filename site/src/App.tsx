@@ -20,9 +20,9 @@ import { CopyButton } from './components/CopyButton';
 
 const RECEIPT_LABEL: Record<string, string> = {
   sources: 'Where each input comes from, with file hashes',
-  replacements: 'Synthetic macro and news examples',
+  replacements: 'Synthetic multi-feed observations',
   'demo-result': 'Preparation record',
-  observations: 'Example stored prices',
+  observations: 'Synthetic observations',
   'window-result': 'Window experiment record',
   'conditional-result': 'Conditional continuation record',
 };
@@ -115,8 +115,8 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
         <div className="notice-bar">
           <div className="wrap notice-bar__inner">
             <p>
-              <strong>{site?.notice ?? 'This is not financial advice.'}</strong>
-              <span className="notice-bar__extra"> Zenith is an experimental research prototype.</span>
+              <strong>{site?.notice ?? 'Experimental research prototype.'}</strong>
+              <span className="notice-bar__extra"> An abstract synthetic example of reasoning over observations.</span>
             </p>
             <button type="button" className="z-link-button" onClick={() => setNoticeOpen(true)}>
               Research notice
@@ -163,7 +163,7 @@ function NoticeDialog({ url, onClose }: { url: string; onClose: () => void }) {
         {doc.status === 'ready' ? (
           <Markdown source={doc.value.content} base={doc.value.base_url} />
         ) : doc.status === 'error' ? (
-          <p>The notice could not be loaded. This is not financial advice.</p>
+          <p>The notice could not be loaded. Experimental research prototype.</p>
         ) : (
           <p role="status">Loading…</p>
         )}
@@ -248,7 +248,7 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
               : CHAPTER_COPY[`${chapter.id}:${chapter.evidence_kind}`]?.paragraphs
           }
         >
-          {chapter.id === 'idea' && <LoopDiagram />}
+          {chapter.id === 'idea' && <><LoopDiagram /><ApplicationExample /></>}
           {chapter.id === 'lab' && (
             <LabFigure site={site} graph={lab.status === 'ready' ? lab.value : null} deepLink={deepLink} />
           )}
@@ -265,8 +265,8 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
       <footer className="footer">
         <div className="wrap footer__inner">
           <p>
-            <strong>This is not financial advice.</strong> Historical examples and model outputs are not investment
-            recommendations and must not be used to make financial decisions.
+            <strong>Experimental research prototype.</strong> The example contains invented observations.
+            It demonstrates an evaluation protocol, not reliable prediction of a real system.
           </p>
           <p>
             <a href="https://github.com/wcook04/plectis-zenith" target="_blank" rel="noreferrer">
@@ -278,6 +278,41 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
     </Shell>
     </SiteFiguresContext.Provider>
     </SiteEvidenceContext.Provider>
+  );
+}
+
+function ApplicationExample() {
+  const views = [
+    ['Measurements', 'Air temperature and humidity'],
+    ['Subsystems', 'Soil moisture and fan readings'],
+    ['Environment', 'Weather observations and forecasts available at the cutoff'],
+    ['Events', 'Door openings and sensor outage reports'],
+    ['Interventions', 'Planned and executed irrigation or ventilation'],
+    ['Derived summaries', 'Trends calculated from those same readings'],
+  ];
+  return (
+    <section className="application-example" aria-labelledby="application-example-title">
+      <div>
+        <p className="paper-aside__head">A possible application</p>
+        <h3 id="application-example-title">What will a greenhouse be like in six hours?</h3>
+        <p>Freeze the information available at noon. Predict the air temperature and humidity at 6 pm, with units and uncertainty. Later, compare those predictions with the readings.</p>
+        <p>The reasoning has to connect these views: a missing sensor reading is not evidence of stable conditions, two summaries of one weather report are not independent confirmation, and scheduled irrigation has not necessarily happened.</p>
+        <p>In physics, this is a problem of predicting an evolving state from partial observations. The graph would organise the measurements, conditions and competing explanations, using an appropriate physical model or numerical solver where available. Sensor history can matter: a single position measurement does not tell us which way something is moving. <a href="https://underactuated.mit.edu/output_feedback.html" target="_blank" rel="noreferrer">Background: partial observations and state estimation.</a></p>
+        <p>A useful study would compare the graph with a simple forecast and an appropriate numerical model. This is a motivating example; the published System A data are a separate abstract toy, not a greenhouse simulation.</p>
+      </div>
+      <div>
+        <table>
+          <caption>Different perspectives on one greenhouse</caption>
+          <thead><tr><th scope="col">Feed role</th><th scope="col">Possible observations</th></tr></thead>
+          <tbody>{views.map(([role, observations]) => <tr key={role}><th scope="row">{role}</th><td>{observations}</td></tr>)}</tbody>
+        </table>
+        <p className="application-example__other"><strong>Heat flow:</strong> temperature probes, heater power, ambient conditions and vent logs could support a forecast of a chamber’s temperature six hours later. <a href="https://openstax.org/books/university-physics-volume-2/pages/1-6-mechanisms-of-heat-transfer" target="_blank" rel="noreferrer">Heat-transfer background.</a></p>
+        <p className="application-example__other"><strong>Vibration:</strong> camera positions, accelerometer readings, applied-force history and calibration records could support a forecast of a vibrating mass’s displacement one second later. <a href="https://openstax.org/books/university-physics-volume-1/pages/15-5-damped-oscillations" target="_blank" rel="noreferrer">Damped-oscillation background.</a></p>
+        <p className="application-example__other"><strong>Transport:</strong> concentration sensors, flow measurements, geometry and valve logs could support a forecast of concentration at a downstream sensor. The model would need the relevant initial and boundary conditions.</p>
+        <p className="application-example__other">These are proposed uses. No physical solver is connected or evaluated in this demonstration. The reasoning graph records computational dependencies; its arrows are not claims about physical causation. Physical feedback belongs in the system model.</p>
+        <p className="application-example__other">Finance is another possible application, with its own data and evaluation requirements. This research is not financial advice.</p>
+      </div>
+    </section>
   );
 }
 
@@ -318,15 +353,15 @@ function compositionSentence(sources: Evidence): string | null {
   const snapshots = (sources.data.snapshots as Array<{ lanes?: Array<{ node_id: string; input_origin: string; public_payload?: string }> }>) ?? [];
   const lanes = snapshots[0]?.lanes;
   if (!lanes) return null;
-  const name = (id: string) => nodeName(id).replace(/ feed$/, '').toLowerCase().replace('etfs', 'ETF').replace('stocks', 'stock').replace('prediction markets', 'prediction-market');
+  const name = (id: string) => nodeName(id).replace(/ feed$/, '').toLowerCase().replace('subsystemss', 'SUBSYSTEMS').replace('measurements', 'measurements').replace('interventions', 'intervention');
   const list = (items: string[]) => (items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`);
   const real = lanes.filter((l) => l.input_origin === 'real_saved_input').map((l) => name(l.node_id));
   const synthetic = lanes.filter((l) => l.input_origin === 'authored_synthetic').map((l) => name(l.node_id));
-  const derived = lanes.filter((l) => l.input_origin === 'derived_mixed_inputs').map((l) => name(l.node_id));
+  const derived = lanes.filter((l) => l.input_origin === 'derived_synthetic_inputs').map((l) => name(l.node_id));
   const parts: string[] = [];
   if (real.length) parts.push(`The ${list(real)} feeds contain real saved data, which this site does not publish.`);
   if (synthetic.length) parts.push(`The ${list(synthetic)} feeds contain synthetic examples written for this demonstration, published here in full.`);
-  if (derived.length) parts.push(`The ${list(derived)} feed is computed from both.`);
+  if (derived.length) parts.push(`The ${list(derived)} feed is computed from the numeric observations.`);
   return parts.join(' ');
 }
 
@@ -366,7 +401,7 @@ function graphFacts(graph: Graph): GraphFacts {
   return {
     total: graph.nodes.length,
     feeds: feeds.length,
-    acquired: feeds.filter((n) => n.lane !== 'CALCULATOR').sort((a, b) => laneIndex(a.lane) - laneIndex(b.lane)).map((n) => laneName(n.lane)),
+    acquired: feeds.filter((n) => n.lane !== 'DERIVED').sort((a, b) => laneIndex(a.lane) - laneIndex(b.lane)).map((n) => laneName(n.lane)),
     real: feeds.filter((n) => n.demo_provenance?.input_origin === 'real_saved_input').sort((a, b) => laneIndex(a.lane) - laneIndex(b.lane)).map((n) => laneName(n.lane)),
     synthetic: feeds.filter((n) => n.demo_provenance?.input_origin === 'authored_synthetic').sort((a, b) => laneIndex(a.lane) - laneIndex(b.lane)).map((n) => laneName(n.lane)),
     reasoning: graph.nodes.filter((n) => n.type === 'reasoning').length,
@@ -577,8 +612,8 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
     return (
       <>
         <p className="model-notice">
-          <strong>This is not financial advice.</strong> The demonstration mixes real saved market data with invented
-          examples. Nothing below is a prediction or a recommendation.
+          <strong>Experimental research prototype.</strong> All observations in this demonstration are synthetic.
+          Input preparation does not establish prediction accuracy.
         </p>
         <Preparation result={kind.value} sources={sources.status === 'ready' ? sources.value : null} labGraph={labGraph} localRuns={site.local_runs_enabled} />
       </>
@@ -606,8 +641,8 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
   return (
     <>
       <p className="model-notice">
-        <strong>This is not financial advice.</strong> The runs below used historical market data. Their outputs are
-        research records, not recommendations.
+        <strong>Experimental research prototype.</strong> Saved execution records show what ran.
+        They establish predictive accuracy only when paired with a defined evaluation.
       </p>
       <Results windowResult={evidence.value[0]} conditional={evidence.value[1]} labGraph={labGraph} localRuns={site.local_runs_enabled} />
     </>

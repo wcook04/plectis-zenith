@@ -9,7 +9,9 @@
     "status": {
       "type": "string",
       "required": true,
-      "enum": ["AVAILABLE"],
+      "enum": [
+        "AVAILABLE"
+      ],
       "constraint": "Exactly AVAILABLE when the artifact exists."
     },
     "run_pair": {
@@ -81,7 +83,7 @@
     "lane": {
       "type": "string",
       "required": true,
-      "constraint": "Uppercase lane label: STOCK, ETF, MACRO, SPINE."
+      "constraint": "Uppercase lane label: MEASUREMENTS, SUBSYSTEMS, ENVIRONMENT, SPINE."
     },
     "dossier_path": {
       "type": "string",
@@ -98,13 +100,17 @@
     "type": {
       "type": "string",
       "required": true,
-      "enum": ["CREATE", "UPDATE", "DELETE"],
+      "enum": [
+        "CREATE",
+        "UPDATE",
+        "DELETE"
+      ],
       "constraint": "Operation type for this dossier key."
     },
     "key": {
       "type": "string",
       "required": true,
-      "constraint": "Slash-delimited dossier path (e.g., 'SECTOR_ROTATION/tech_sensitivity')."
+      "constraint": "Slash-delimited dossier path (e.g., 'SYSTEM_RELATIONSHIP/context_sensitivity')."
     },
     "value": {
       "type": "any",
@@ -119,7 +125,13 @@
     "source_artifact": {
       "type": "string",
       "required": true,
-      "enum": ["prediction_reconciliation", "realized_hindsight_brief", "cp2_critique", "ideal_cp2", "lab_cp2"],
+      "enum": [
+        "prediction_reconciliation",
+        "realized_hindsight_brief",
+        "cp2_critique",
+        "ideal_cp2",
+        "lab_cp2"
+      ],
       "constraint": "The Oracle artifact (or Lab CP2) that motivated this change."
     },
     "source_field": {
@@ -134,7 +146,7 @@
       "required": true,
       "enum": [
         "epistemic_hierarchy_override",
-        "pre_pricing_threshold",
+        "availability_threshold",
         "target_selection_bias",
         "lane_reliability_shift",
         "contradiction_handling",
@@ -154,16 +166,20 @@
     "severity": {
       "type": "string",
       "required": true,
-      "enum": ["LOW", "MEDIUM", "HIGH"],
+      "enum": [
+        "LOW",
+        "MEDIUM",
+        "HIGH"
+      ],
       "constraint": "Based on frequency and magnitude of the pattern."
     }
   },
   "dossier_target_allowlist": {
     "description": "Canonical lane-to-dossier mapping. Reject dossier_path values not in this list.",
     "allowed_targets": {
-      "STOCK": "codex/substrate/dossiers/stock.json",
-      "ETF": "codex/substrate/dossiers/etf.json",
-      "MACRO": "codex/substrate/dossiers/macro.json",
+      "MEASUREMENTS": "codex/substrate/dossiers/measurements.json",
+      "SUBSYSTEMS": "codex/substrate/dossiers/subsystems.json",
+      "ENVIRONMENT": "codex/substrate/dossiers/environment.json",
       "SPINE": "codex/substrate/dossiers/oracle_error_taxonomy.json"
     }
   },

@@ -137,7 +137,7 @@ def render_dossier_markdown(root: Path, dossier_names: Optional[Iterable[str]] =
     lines: List[str] = [
         "# Active Dossiers",
         "",
-        "Compiled from `codex/dossiers/*.json` for prompt injection and machine navigation.",
+        "Compiled from `codex/substrate/dossiers/*.json` for prompt injection and machine navigation.",
         "",
     ]
 
@@ -173,6 +173,13 @@ def render_dossier_markdown(root: Path, dossier_names: Optional[Iterable[str]] =
                 f"- Mechanism count: {len(mechanisms)}",
             ]
         )
+        for field in ("perspective", "system", "role"):
+            if payload.get(field):
+                lines.append(f"- {field}: {payload[field]}")
+        contract = payload.get("contract", {})
+        if isinstance(contract, dict):
+            for key, value in sorted(contract.items()):
+                lines.append(f"- {key}: {value}")
         if schema_note:
             lines.append(f"- Schema note: {schema_note}")
 

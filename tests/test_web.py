@@ -44,7 +44,7 @@ def test_native_scopes_sources_and_focus(website):
         assert {node for wave in graph["waves"] for node in wave} == ids
         assert all(edge["source"] in ids and edge["target"] in ids for edge in graph["edges"])
     graph = json.loads(website.get("/api/v1/graph?mission=lab&focus=lab_cross_corr_v1").body)
-    assert "global_stock_feed" in graph["focus"]["ancestors"]
+    assert "global_measurements_feed" in graph["focus"]["ancestors"]
     assert "lab_integrity" in graph["focus"]["descendants"]
     node = json.loads(website.get("/api/v1/nodes/lab_cross_corr_v1").body)
     assert node["source"]["sha256"] == hashlib.sha256((ROOT / node["source"]["path"]).read_bytes()).hexdigest()
@@ -156,3 +156,13 @@ def test_invalid_frontend_manifest_rejected(tmp_path, files):
     (tmp_path / "zenith-public.json").write_text(json.dumps({"files": files}))
     with pytest.raises(ValueError):
         Website(ROOT, frontend_dir=tmp_path)
+
+
+def test_dossier_is_current_generic_source(website):
+    node = json.loads(website.get("/api/v1/nodes/lab_miner_interventions").body)
+    dossier = node["dossier"]
+    path = ROOT / dossier["source"]["path"]
+    assert dossier["data"] == json.loads(path.read_text())
+    assert dossier["source"]["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
+    assert dossier["data"]["perspective"] == "interventions"
+    assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "synthetic"

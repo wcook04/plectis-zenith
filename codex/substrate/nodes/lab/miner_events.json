@@ -1,0 +1,24 @@
+{
+  "id": "lab_miner_events",
+  "type": "reasoning",
+  "dependencies": [
+    "global_events_feed",
+    "lab_seed_state"
+  ],
+  "meta": {},
+  "execution": {
+    "retries": 1,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 300
+  },
+  "is_artifact": false,
+  "teleology": "Extract qualitative event records while separating statements from observations.",
+  "mechanism": "LLM Extraction",
+  "platform": "chatgpt",
+  "instruction": "[SYSTEM OBSERVATION CONTRACT]\nReason over observations of one system available at cutoff t. Feeds are different perspectives on the same system, not independent votes. Numeric observations preserve target_id, value, unit, observed_at and available_at. Record uncertainty and missingness. No future observations or invented evidence enter Lab. A forecast freezes snapshot_value, target_value, unit, snapshot_time and explicit target_time_iso. Later Oracle observations may resolve that frozen forecast but cannot rewrite it. A diagnosis is a hypothesis; Evolve changes require review and a matched later comparison. The disclosed System A generator demonstrates protocol only, not blind prediction or learned improvement.\n\n[ROLE] lab_miner_events\n[PERSPECTIVE ROLE] Read qualitative event records with occurrence and availability times; distinguish statements from observations.\n[LOCAL DOSSIER] codex/substrate/dossiers/events.json (injected by the native loader)\n[TASK] Extract distinct observations, contexts, and uncertainty from the supplied lane.\n[OUTPUT] One atomic tuple per line: {Subject, Metric/Value, Context/Implication}. Include the actual observed value and unit. No commas inside fields. Preserve original evidence identities; do not invent measurements. Follow atomic_tuple.md.",
+  "lane": "EVENTS",
+  "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+  "routing_class": "EXTRACT",
+  "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments."
+}

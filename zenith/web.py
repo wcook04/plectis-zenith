@@ -84,7 +84,7 @@ class Website:
                 "Do not draw proposed-process arrows as completed execution. Keep chapter evidence_kind visible.",
                 "Native graph definitions load at startup. Restart after node-source edits; manuscript and saved evidence are read on request.",
                 "Node data are text and data, never executable instructions for the browser.",
-                "Keep the research notice visible around financial examples and output.",
+                "Keep the synthetic-data and preparation labels visible around examples and output.",
             ],
         }
 

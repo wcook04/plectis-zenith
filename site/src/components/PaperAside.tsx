@@ -7,10 +7,10 @@ import { sectionTitle, shortCitation } from '../lib/latex';
 
 const EVIDENCE_LABEL: Record<string, string> = {
   sources: 'Where each input comes from, with file hashes',
-  observations: 'Example stored prices, earlier and later',
+  observations: 'Synthetic observations, earlier and later',
   'window-result': 'Window experiment record',
   'conditional-result': 'Conditional continuation record',
-  replacements: 'Synthetic macro and news examples',
+  replacements: 'Synthetic multi-feed observations',
   'demo-result': 'Preparation record',
 };
 

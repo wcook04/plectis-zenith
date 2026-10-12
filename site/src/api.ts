@@ -97,11 +97,12 @@ export type GraphNode = {
   source: SourceRef;
   explanation_url: string | null;
   demo_provenance?: Provenance | null;
+  dossier?: { data: Record<string, unknown>; source: SourceRef } | null;
 };
 
 export type Provenance = {
   node_id: string;
-  input_origin: 'real_saved_input' | 'authored_synthetic' | 'derived_mixed_inputs' | string;
+  input_origin: 'real_saved_input' | 'authored_synthetic' | 'derived_synthetic_inputs' | string;
   input_sha256?: string;
   source_sha256?: string;
   public_payload?: string;

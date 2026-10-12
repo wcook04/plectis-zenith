@@ -5,7 +5,7 @@
   "status": "NORMATIVE",
   "inherits": "schema_cp1",
   "description": "Checkpoint 2 output schema for forward Lab CP2 and Oracle hindsight reconstruction. Preserves one shared CP2-core contract while allowing Oracle-only meta trace fields.",
-  "purpose": "CP2 is the machine-checkable schema for directional consequence claims. `lab_director` emits forward CP2 at T-n. `oracle_cp2_emitter` emits an hindsight `ideal_cp2` that preserves the same CP2-core fields (`evidence_dictionary`, `epicentre_thesis`, `predictions_t`, `trade_rationale`) and may add an optional `oracle_meta` object. Engine ownership split remains unchanged: the model emits semantic fields including snapshot_price and target_price; the engine injects deterministic temporal fields and audits model-emitted snapshot_price against the subject-run equity baseline. `system.lib.schema_validator.validate_cp2` continues to validate the CP2-core and tolerate additive Oracle-meta fields without weakening grounding or temporal enforcement, while Oracle runtime requires `oracle_meta` plus Oracle-only handle validation for `ideal_cp2` without changing the shared schema.",
+  "purpose": "CP2 is the machine-checkable schema for directional consequence claims. `lab_director` emits forward CP2 at T-n. `oracle_cp2_emitter` emits an hindsight `ideal_cp2` that preserves the same CP2-core fields (`evidence_dictionary`, `epicentre_thesis`, `predictions_t`, `forecast_rationale`) and may add an optional `oracle_meta` object. Engine ownership split remains unchanged: the model emits semantic fields including snapshot_value and target_value; the engine injects deterministic temporal fields and audits model-emitted snapshot_value against the subject-run observation baseline. `system.lib.schema_validator.validate_cp2` continues to validate the CP2-core and tolerate additive Oracle-meta fields without weakening grounding or temporal enforcement, while Oracle runtime requires `oracle_meta` plus Oracle-only handle validation for `ideal_cp2` without changing the shared schema.",
   "schema": {
     "evidence_dictionary": {
       "type": "array[EvidenceUnit]",
@@ -28,12 +28,12 @@
       "comparison_scope": "prediction",
       "semantics": "Directional consequence claims that are explicit consequences of epicentre_thesis, not independent calls. Oracle uses the same field to express the best subject-grounded hindsight reconstruction of what should have been forecast."
     },
-    "trade_rationale": {
+    "forecast_rationale": {
       "type": "string",
       "required": true,
-      "constraint": "Word count >= trade_rationale_base_words + trade_rationale_per_prediction_words * len(predictions_t). Must contain only resolved [N] citations.",
+      "constraint": "Word count >= forecast_rationale_base_words + forecast_rationale_per_prediction_words * len(predictions_t). Must contain only resolved [N] citations.",
       "comparison_scope": "prediction_justification",
-      "semantics": "Narrates the force -> transmission -> prediction consequence chain. Not a list of isolated trade ideas. For Oracle, the rationale may reference hindsight only through optional Oracle-meta trace, not by contaminating evidence_dictionary."
+      "semantics": "Narrates the force -> transmission -> prediction consequence chain. Not a list of isolated forecast ideas. For Oracle, the rationale may reference hindsight only through optional Oracle-meta trace, not by contaminating evidence_dictionary."
     },
     "oracle_meta": {
       "type": "OracleMeta",
@@ -55,24 +55,18 @@
     "forecast_basis": {
       "type": "string",
       "required": false,
-      "constraint": "CAUSAL (default), EMPIRICAL, or JUDGMENTAL; explicit branch overrides causal-only requirements."
-    },
-    "empirical_rule": {
-      "type": "object",
-      "required": false,
-      "constraint": "Required only in EMPIRICAL; exact supported rule validated by system/lib/empirical_forecast.py; locked from CP1 through CP2 and Oracle."
+      "constraint": "CAUSAL only; no unsupported branches."
     }
   },
   "prediction_unit": {
     "target_id": {
       "type": "string",
       "required": true,
-      "constraint": "Non-empty. For equity predictions: uppercase ticker symbol.",
-      "semantics": "The entity being predicted. Must exist in the T-n stock+ETF ticker universe when out-of-universe enforcement is active.",
+      "constraint": "Non-empty. For observation predictions: uppercase target_id symbol.",
+      "semantics": "The entity being predicted. Must exist in the T-n measurements+SUBSYSTEMS target_id universe when out-of-universe enforcement is active.",
       "examples": [
-        "XLK",
-        "NVDA",
-        "TLT"
+        "SIGNAL_A",
+        "SUBSYSTEM_A"
       ]
     },
     "direction": {
@@ -97,23 +91,23 @@
       "constraint": "ISO 8601 datetime string. Must be after snapshot_time. Engine-owned deterministic field; must equal resolved runtime horizon target.",
       "semantics": "When the prediction resolves (T). Defines the falsification window."
     },
-    "snapshot_price": {
+    "snapshot_value": {
       "type": "number",
       "required": true,
-      "constraint": "Finite numeric baseline price captured at snapshot_time. Model-emitted and engine-audited against T-n stock+ETF feed prices.",
+      "constraint": "Finite numeric baseline value captured at snapshot_time. Model-emitted and engine-audited against T-n measurements+SUBSYSTEMS feed values.",
       "semantics": "Baseline for direction evaluation at target_time_iso."
     },
-    "target_price": {
+    "target_value": {
       "type": "number",
       "required": true,
-      "constraint": "Finite numeric projected price level at target_time_iso.",
-      "semantics": "The projected price level by target_time_iso. Must be logically consistent with snapshot_price and direction."
+      "constraint": "Finite numeric projected value level at target_time_iso.",
+      "semantics": "The projected value level by target_time_iso. Must be logically consistent with snapshot_value and direction."
     },
     "invalidation": {
       "type": "string",
       "required": true,
       "constraint": "Non-empty string. Must state a specific falsifiable condition for this individual prediction target.",
-      "semantics": "Per-prediction invalidation condition. Distinct from the global thesis invalidation in trade_rationale."
+      "semantics": "Per-prediction invalidation condition. Distinct from the global thesis invalidation in forecast_rationale."
     },
     "confidence": {
       "type": "string",
@@ -131,6 +125,11 @@
       "required": false,
       "constraint": "Optional. When present, must name the specific causal mechanism from epicentre_thesis to this target.",
       "semantics": "Explicit link between the dominant force and this prediction. Improves comparability between Lab and Oracle CP2 and enables Evolve to track which transmission paths succeed or fail."
+    },
+    "unit": {
+      "type": "string",
+      "required": true,
+      "constraint": "Nonempty unit must match the subject observation and later truth."
     }
   },
   "oracle_meta": {
@@ -163,7 +162,7 @@
     "kind": {
       "type": "string",
       "required": true,
-      "constraint": "Short classifier such as TRUTH_ONLY_SIGNAL, WEAK_SUBJECT_SUPPORT, or NON_COMPARABLE_MACRO.",
+      "constraint": "Short classifier such as TRUTH_ONLY_SIGNAL, WEAK_SUBJECT_SUPPORT, or NON_COMPARABLE_ENVIRONMENT.",
       "semantics": "Why the item was excluded from CP2-core grounding."
     },
     "ref": {
@@ -196,7 +195,7 @@
     },
     "prediction_justification": {
       "fields": [
-        "trade_rationale"
+        "forecast_rationale"
       ],
       "question": "Did the rationale correctly connect evidence -> force -> transmission -> target?",
       "critique_contract": "schema_cp2_critique.scope=prediction_justification"
@@ -222,7 +221,7 @@
       "evidence_dictionary",
       "epicentre_thesis",
       "predictions_t",
-      "trade_rationale"
+      "forecast_rationale"
     ],
     "oracle_meta_field": "oracle_meta",
     "validator_tolerance": "validate_cp2 enforces CP2-core and ignores additive Oracle-meta keys; Oracle runtime layers a stricter validator that requires oracle_meta on ideal_cp2 and validates Oracle handle syntax without changing the shared schema.",
@@ -239,18 +238,18 @@
     "rules": [
       "epicentre_thesis declares one dominant force at T-n.",
       "Each predictions_t[i] is explainable as a transmission consequence of that force.",
-      "trade_rationale must narrate force -> transmission -> prediction consequence chain.",
+      "forecast_rationale must narrate force -> transmission -> prediction consequence chain.",
       "If a prediction depends on an alternative driver, that alternative must be subordinated to (or shown as derivative of) the epicentre force \u2014 not introduced as a second co-equal thesis."
     ]
   },
   "grounding_rule": {
-    "description": "Every prediction must be grounded in explicitly sourced equity lane data.",
+    "description": "Every prediction must be grounded in explicitly sourced observation lane data.",
     "requirement": "For every PredictionUnit in predictions_t, there must exist at least one evidence_dictionary entry where: subject == target_id (case-normalized .upper().strip()) AND ledger_id starts with 'S_' or 'E_'.",
-    "rationale": "A prediction that references only MACRO or NEWS evidence without a stock/ETF grounding entry is a grounding failure. Oracle-meta never satisfies this rule."
+    "rationale": "A prediction that references only ENVIRONMENT or EVENTS evidence without a measurements/SUBSYSTEMS grounding entry is a grounding failure. Oracle-meta never satisfies this rule."
   },
   "out_of_universe": {
-    "description": "When subject_run_dir is provided, every target_id must exist in the T-n stock+ETF ticker universe.",
-    "fallback": "If ticker universe cannot be loaded, MISSING_CONTEXT is emitted and OUT_OF_UNIVERSE check is skipped (degraded mode)."
+    "description": "When subject_run_dir is provided, every target_id must exist in the T-n measurements+SUBSYSTEMS target_id universe.",
+    "fallback": "If target_id universe cannot be loaded, MISSING_CONTEXT is emitted and OUT_OF_UNIVERSE check is skipped (degraded mode)."
   },
   "oracle_golden_id_guard": {
     "description": "Oracle runs add an additional invariant over the CP2-core grounding set.",
@@ -258,16 +257,16 @@
     "enforcement": "validate_golden_ids(evidence_dictionary, subject_run_dir) \u2014 called from engine Oracle path, not from validate_cp2 itself.",
     "error_code": "INVALID_GOLDEN_ID"
   },
-  "trade_rationale_word_count": {
-    "formula": "trade_rationale_base_words + trade_rationale_per_prediction_words * len(predictions_t)",
+  "forecast_rationale_word_count": {
+    "formula": "forecast_rationale_base_words + forecast_rationale_per_prediction_words * len(predictions_t)",
     "threshold_source": "contract_config.json",
     "defaults": {
-      "trade_rationale_base_words": 75,
-      "trade_rationale_per_prediction_words": 30
+      "forecast_rationale_base_words": 75,
+      "forecast_rationale_per_prediction_words": 30
     }
   },
   "citation_rules": {
-    "description": "Same rules as CP1 epicentre_thesis, applied to both epicentre_thesis and trade_rationale.",
+    "description": "Same rules as CP1 epicentre_thesis, applied to both epicentre_thesis and forecast_rationale.",
     "valid_format": "[N] where N is a positive integer",
     "malformed_rejected": [
       "[1-3] (range)",
@@ -278,7 +277,7 @@
   },
   "validation_sequence": [
     "1. validate_cp1(payload) \u2014 structural + citation + word-count for CP1 fields",
-    "2. Validate CP2-specific fields \u2014 predictions_t presence, direction enum, snapshot_price + target_price numeric validity, direction/target coherence, temporal fields, trade_rationale, and engine price-audit flags",
+    "2. Validate CP2-specific fields \u2014 predictions_t presence, direction enum, snapshot_value + target_value numeric validity, direction/target coherence, temporal fields, forecast_rationale, and engine value-audit flags",
     "3. Grounding checks \u2014 per-prediction evidence with S_ or E_ ledger",
     "4. Out-of-universe checks \u2014 if subject_run_dir provided",
     "5. [Oracle only] Golden ID guard \u2014 Phase 10, engine-level",
@@ -288,21 +287,21 @@
   "error_codes": {
     "_inherited": "All CP1 error codes apply (MISSING_FIELD, INVALID_REF_ID, DUPLICATE_REF_ID, DUPLICATE_LEDGER_ID, INVALID_LEDGER_ID, MALFORMED_CITATION, CITATION_UNRESOLVED, BELOW_MIN_WORD_COUNT).",
     "INVALID_FIELD": "A field value is present but invalid (e.g. direction not in {UP, DOWN}).",
-    "MISSING_SNAPSHOT_PRICE": "snapshot_price is missing for a prediction target.",
-    "MISSING_TARGET_PRICE": "target_price is missing for a prediction target.",
-    "INVALID_TARGET_DIRECTION": "direction and target_price are not logically consistent with snapshot_price.",
-    "SNAPSHOT_PRICE_MISMATCH": "Model-emitted snapshot_price diverges from feed baseline beyond allowed tolerance.",
+    "MISSING_SNAPSHOT_VALUE": "snapshot_value is missing for a prediction target.",
+    "MISSING_TARGET_VALUE": "target_value is missing for a prediction target.",
+    "INVALID_TARGET_DIRECTION": "direction and target_value are not logically consistent with snapshot_value.",
+    "SNAPSHOT_VALUE_MISMATCH": "Model-emitted snapshot_value diverges from feed baseline beyond allowed tolerance.",
     "TEMPORAL_ORDER_INVALID": "target_time_iso is not strictly after snapshot_time.",
     "TEMPORAL_MISMATCH": "prediction temporal fields diverge from canonical runtime values.",
     "GROUNDING_FAILED_WRONG_LANE": "A target_id has no evidence entry with subject == target_id AND ledger_id starting with S_ or E_.",
     "UNGROUNDED_TARGET": "A target_id is not present in the cross_corr_v2 TARGET_SWARM or SOLO_TARGET sets. Prediction was not structurally grounded by the cross-correlator.",
-    "MISSING_CONTEXT": "Ticker universe could not be loaded from subject_run_dir.",
-    "OUT_OF_UNIVERSE": "A target_id is not present in the T-n ticker set."
+    "MISSING_CONTEXT": "target_id universe could not be loaded from subject_run_dir.",
+    "OUT_OF_UNIVERSE": "A target_id is not present in the T-n target_id set."
   },
   "stage_responsibilities": {
     "lab_director": {
-      "role": "Extend locked CP1 thesis with forward predictions and trade rationale.",
-      "boundary": "Must ensure predictions_t are direct consequences of epicentre_thesis, emit snapshot_price + target_price per prediction, ground targets with subject-matching stock or ETF evidence, and must not introduce a second co-equal thesis."
+      "role": "Extend locked CP1 thesis with forward predictions and forecast rationale.",
+      "boundary": "Must ensure predictions_t are direct consequences of epicentre_thesis, emit snapshot_value + target_value per prediction, ground targets with subject-matching measurements or SUBSYSTEMS evidence, and must not introduce a second co-equal thesis."
     },
     "oracle_cp2_emitter": {
       "role": "Emit hindsight `ideal_cp2` using the same CP2-core plus Oracle-meta trace that is required by Oracle runtime.",
@@ -333,16 +332,9 @@
       "evidence_refs": "Nonempty references resolving to the supplied evidence dictionary",
       "semantics": "Explain why no supported forward thesis was selected; not a successful prediction or zero loss",
       "thesis": "Keep the cited 150-word explanation in epicentre_thesis; causal dominance requirements apply only to FORECAST",
-      "cp2": "predictions_t must be exactly []; trade_rationale remains required with citations and at least 75 words",
+      "cp2": "predictions_t must be exactly []; forecast_rationale remains required with citations and at least 75 words",
       "track": "INSUFFICIENT",
       "propagation": "Forward Director preserves locked CP1 status. Oracle may reconsider only from genuinely available subject-side evidence."
     }
-  },
-  "empirical_forecast_contract": {
-    "precedence": "EMPIRICAL replaces causal-only thesis requirements; ordinary CAUSAL remains unchanged.",
-    "instruction": "[EMPIRICAL FORECAST CONTRACT]\nThis explicit branch takes precedence over causal-only requirements below. Legacy forecasts have forecast_basis=\"CAUSAL\". A FORECAST may instead set forecast_basis=\"EMPIRICAL\" and dominant_evidence_track=\"EMPIRICAL\" to test an outcome mapping without claiming an identified market cause. The first supported control is empirical_rule={method:\"trailing_mean_return_v1\",lookback_returns:<integer 1..19>,scale:<nonzero number -1..1>,max_abs_return:<positive fraction <=0.1>,target_ids:[<stock symbols>],evidence_refs:[<exact [N] refs grounding every target>],selection_basis:<why this rule was selected before truth>,calibration_status:\"UNVALIDATED\"}. All fields are required; no extra rule fields. For each target take the last lookback_returns+1 consecutive as-of scalar prices, calculate the arithmetic mean of their simple returns (p[i]/p[i-1]-1), multiply by scale, clip to +/-max_abs_return, and set target_price=last_price*(1+clipped_return). Horizon is the next XNYS close. The engine independently checks the calculation, history boundary, source IDs and exact target set. Zero return is not an epsilon directional forecast; abstain if the rule cannot produce supported nonzero targets. These parameters are an experimental control, not fitted skill or a claim of edge. The full Lab still reviews all available feeds; this control's numeric mapping uses prices only and cannot establish the value of news. Retain evidence citations and ordinary word counts. In EMPIRICAL, epicentre_thesis states the testable predictive hypothesis, its input limits, rule selection and falsification, rather than inventing a dominant cause. Missing causal identification alone does not force ABSTAIN. Use ABSTAIN if usable inputs or an explicit supported mapping are absent. Do not change the rule after seeing later outcomes. Ordinary CAUSAL forecasts retain their existing requirements.\n",
-    "source_owner": "system/lib/empirical_forecast.py",
-    "cp1_lock": "Director preserves forecast_basis and empirical_rule; Oracle cannot refit an empirical subject to later truth."
-  },
-  "judgmental_quantile_contract": "[JUDGMENTAL QUANTILE FORECAST CONTRACT]\nThis explicit branch takes precedence over causal-only and price-formula-only requirements below. A predictive belief does not require an identified cause. Use forecast_basis=\"JUDGMENTAL\", dominant_evidence_track=\"JUDGMENTAL\", decision_status=\"FORECAST\" with forecast_quantiles={method:\"evidence_conditioned_quantiles_v1\",calendar:\"XSHG\" or \"XNYS\",units:\"simple_return_fraction\",calibration_status:\"UNVALIDATED\",targets:[{target_id:<opaque stock ID>,q10:<number>,q50:<number>,q90:<number>,evidence_refs:[<original [N] refs>],reasoning:<evidence-to-estimate explanation and uncertainty>}]}. Exact fields are required. Every target needs original STOCK grounding. Preserve numeric/leading-zero identifiers. Quantiles are ordered 10th/50th/90th percentiles of next-session raw close return, not confidence in a causal story. q50 maps to target_price=snapshot_price*(1+q50). Units are fractions: .01 is 1 percent. A zero median is valid FLAT, not abstention or a guarantee of no movement. Values must be finite, greater than -1 and at most 10 (numeric safety limit, not estimated risk).\nCP1 freezes the entire quantile object. Director and Oracle copy it exactly, with the same original citation mapping and all targets; no hindsight refit. Each prediction uses source currency/basis, source issue timestamp, next actual exchange close, and UP/DOWN/FLAT according to the sign of q50. Cross-correlation maps all locked targets; zero medians use direction_consensus N/A. Phase-two miners audit observations and reasoning without changing frozen estimates. Integrity checks evidence and uncertainty honestly, not unsupported causal certainty. Missing expectations are unknown; large profit growth is not automatically an earnings surprise, entity association is not ownership, and an already public result is not automatically new information. Cite every factual basis; explicitly distinguish subjective numerical judgments from observed quantities or trained calibration. Unknown signals may justify retaining a price-only reference, not omitting declared targets.\nOracle scores the ORIGINAL quantiles and median, retains numeric errors even with an unresolved cause, and proposes only future-tested lessons. Three quantiles are a partial forecast, not a complete probability distribution. Median absolute error and quantile pinball loss measure different aspects; coverage alone cannot establish calibration. Never claim learned advantage merely because this branch is accepted.\n\n"
+  }
 }

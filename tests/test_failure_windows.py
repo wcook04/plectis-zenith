@@ -24,11 +24,11 @@ def pair(tmp_path, number=0, *, length=1, graph='a', blocked=False, no_findings=
     write(lab/'zenith_run.json', manifest)
     sources = {}
     for node, data in [('feed', {'signal': 'prior guidance was cut'}),
-                       ('director', {'prediction': 'price rises'})]:
+                       ('director', {'prediction': 'value rises'})]:
         path = f'artifacts/{node}.json'
         sources[path] = write(lab/path, {'id': node, 'node_hash': manifest['node_hashes'][node],
                                         'status': 'success', 'data': data})
-    prompt = 'Read feed: prior guidance was cut. Predict the next price.'
+    prompt = 'Read feed: prior guidance was cut. Predict the next value.'
     identity = {'run_id': lab.name, 'node_id': 'director',
                 'prompt_sha256': hashlib.sha256(prompt.encode()).hexdigest()}
     packet = dict(identity, schema='zenith_agent_packet_v1', packet_id=_digest(identity), prompt=prompt)
@@ -188,13 +188,13 @@ def test_malformed_record_is_unresolved_not_a_model_failure(tmp_path, field, val
 
 
 @pytest.mark.parametrize('mutation,match', [
-    ('hash', 'bytes changed'), ('quote', 'quote does not match'),
+    ('hash', 'bytes changed'), ('observation', 'observation does not match'),
     ('input', 'citation roles'), ('node', 'recorded node')])
 def test_annotation_requires_source_bound_node_io(tmp_path, mutation, match):
     run = pair(tmp_path)
     a = annotation(diagnose([run])['episodes'][0])
     if mutation == 'hash': a['citations'][0]['sha256'] = '0'*64
-    if mutation == 'quote': a['citations'][0]['value'] = 'invented signal'
+    if mutation == 'observation': a['citations'][0]['value'] = 'invented signal'
     if mutation == 'input': a['citations'] = [c for c in a['citations'] if c['role'] != 'node_input']
     if mutation == 'node': a['node_id'] = 'invented'
     with pytest.raises(ValueError, match=match):

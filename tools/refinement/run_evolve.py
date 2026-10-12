@@ -49,7 +49,7 @@ UPDATER_NODE = REPO_ROOT / "codex" / "nodes" / "refinement" / "dossier_updater.j
 
 # Canonical Oracle artifact ids, with legacy node ids kept as read fallbacks.
 ORACLE_ARTIFACTS: List[Tuple[str, Tuple[str, ...]]] = [
-    ("prediction_reconciliation", ("prediction_reconciliation", "oracle_truth_diff_equity")),
+    ("prediction_reconciliation", ("prediction_reconciliation", "oracle_truth_diff_observations")),
     ("realized_hindsight_brief", ("realized_hindsight_brief", "oracle_truth_map")),
     ("cp2_critique", ("cp2_critique", "oracle_attribution_map")),
     ("ideal_cp2", ("ideal_cp2", "oracle_cp2_emitter")),
@@ -58,9 +58,9 @@ LAB_CP2_ARTIFACT = "lab_director"
 
 
 DOSSIER_ALLOWLIST = {
-    "codex/substrate/dossiers/stock.json",
-    "codex/substrate/dossiers/etf.json",
-    "codex/substrate/dossiers/macro.json",
+    "codex/substrate/dossiers/measurements.json",
+    "codex/substrate/dossiers/subsystems.json",
+    "codex/substrate/dossiers/environment.json",
     "codex/substrate/dossiers/oracle_error_taxonomy.json",
 }
 

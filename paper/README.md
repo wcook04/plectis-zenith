@@ -1,22 +1,9 @@
 # Zenith paper
 
-> **This is not financial advice.** This is experimental research. Historical
-> examples and model outputs are not investment recommendations and must not be
-> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
+Experimental research prototype. Synthetic observations; no demonstrated predictive improvement.
 
-[zenith.pdf](zenith.pdf) is the four-page paper. [zenith.tex](zenith.tex) is its
-complete source, including diagrams and references. Build with
-`tectonic paper/zenith.tex` from the repository root.
+[zenith.pdf](zenith.pdf) is the three-page paper. [zenith.tex](zenith.tex) is its complete source, including diagrams and references. Build from the repository root with `tectonic paper/zenith.tex`. The source rejects exports longer than three pages.
 
-The paper follows the original idea through mixed earlier/later feed packets and the native
-reasoning graphs. The current receipt records preparation only. It distinguishes
-runtime repairs from improved forecasts. Update its example from configuration-bound receipts;
-keep borrowed methods and data cited where used. Keep it within four pages.
+The paper follows cutoff-bound observations of one dynamical system through Lab, later Oracle evaluation, a reviewed Evolve revision and held-out matched comparison. Invented abstract System A teaches the protocol; it is not a physically validated simulation. The preparation receipt establishes no completed forecast.
 
-The paper uses *language-model program*, *discrete prompt optimisation* and
-*context-conditioned prompt selection* to distinguish the graph, its adjustable
-text and the proposed controller. DSPy, MIPRO, ProTeGi and TextGrad are cited at
-their specific uses. Page 3 separates prediction-time prompt assembly from
-development-time fitting; prompt settings and learned controller weights are
-different objects. The [research direction](../docs/research-direction.md)
-contains the fuller terminology and source comparisons.
+DSPy, MIPRO, ProTeGi and TextGrad are credited at their methodological uses. The proposed controller's prompt settings index written variants and are distinct from learned neural parameters. Prediction-time selection and development-time fitting remain separate. See [research direction](../docs/research-direction.md).

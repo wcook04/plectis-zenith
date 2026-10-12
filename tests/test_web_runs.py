@@ -27,13 +27,13 @@ def store(tmp_path: Path) -> RunStore:
             "timestamp": timestamp,
             "grade": "red",
             "grade_reason": "fixture only",
-            "node_outcomes": {"global_stock_feed": "loaded", "cross_corr": "failure", "private_node": "success"},
+            "node_outcomes": {"global_measurements_feed": "loaded", "cross_corr": "failure", "private_node": "success"},
         })
         if mission:
             write(run / "zenith_run.json", {"mission": mission})
         else:
             write(run / "conditional_lab.json", {"subject_run": "LATE_2"})
-    return RunStore(root, {"global_stock_feed", "cross_corr"})
+    return RunStore(root, {"global_measurements_feed", "cross_corr"})
 
 
 def test_list_filter_sort_pagination_and_conditional_lineage(store: RunStore) -> None:
@@ -55,8 +55,8 @@ def test_list_filter_sort_pagination_and_conditional_lineage(store: RunStore) ->
 
 def test_large_saved_artifact_and_bounded_attempts(store: RunStore) -> None:
     run = store.runs_root / "LATE_2"
-    rows = [{"symbol": f"T{index}", "price": index} for index in range(16000)]
-    write(run / "artifacts/global_stock_feed.json", {
+    rows = [{"symbol": f"T{index}", "value": index} for index in range(16000)]
+    write(run / "artifacts/global_measurements_feed.json", {
         "status": "success", "timestamp": 22,
         "metadata": {"hydrated_from": "fixture", "input_node_ids": ["cross_corr", "private_node"],
                      "error": None, "unpublished_key": "not surfaced"},
@@ -64,13 +64,13 @@ def test_large_saved_artifact_and_bounded_attempts(store: RunStore) -> None:
     })
     attempts = run / "debug/json_attempts"
     for index in range(1, 5):
-        write(attempts / f"global_stock_feed.attempt_{index:02d}.json", {
+        write(attempts / f"global_measurements_feed.attempt_{index:02d}.json", {
             "attempt": index, "status": "error", "error_class": "JSON_PARSE_ERROR",
             "errors": ["bad schema"], "json_error": {"message": "bad JSON"},
             "prompt_snippet": "p" * 9000, "output_text": "o" * 17000,
             "credential": "not surfaced",
         })
-    evidence = store.node_evidence("LATE_2", "global_stock_feed")
+    evidence = store.node_evidence("LATE_2", "global_measurements_feed")
     assert evidence["status"] == "loaded"  # recorded status outranks artifact's success
     assert evidence["artifact_bytes"] > 256_000
     assert evidence["artifact_omitted"] is False
@@ -94,7 +94,7 @@ def test_missing_malformed_oversize_and_symlinks(store: RunStore, tmp_path: Path
     artifact.parent.mkdir()
     artifact.write_text("{bad json", encoding="utf-8")
     assert store.node_evidence("LATE_2", "cross_corr")["artifact_error"] == "malformed_json"
-    artifact.write_text('{"status":"success","data":{"price":NaN}}', encoding="utf-8")
+    artifact.write_text('{"status":"success","data":{"value":NaN}}', encoding="utf-8")
     assert store.node_evidence("LATE_2", "cross_corr")["artifact_error"] == "malformed_json"
     artifact.write_bytes(b"x" * (8 * 1024 * 1024 + 1))
     too_large = store.node_evidence("LATE_2", "cross_corr")

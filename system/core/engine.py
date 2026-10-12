@@ -78,7 +78,7 @@ from system.core.loader import PhysicalLoader
 from system.core.governance import compute_waves
 from system.lib.artifacts import load_artifact
 from system.lib.observer_report import generate_observation_report
-from system.lib.run_compare import combined_prices as _combined_run_prices
+from system.lib.run_compare import combined_values as _combined_run_values
 from system.lib.bridge_routes import merge_bridge_config_with_route
 from system.lib.schema_validator import (
     ValidationResult,
@@ -121,19 +121,11 @@ _OUTPUT_SCHEMA_CONTRACTS = {
 }
 _STRUCTURED_JSON_OUTPUT_SCHEMAS = frozenset(_OUTPUT_SCHEMA_CONTRACTS.keys()) | {"json"}
 _CANONICAL_ARTIFACT_ALIASES = {
-    "oracle_truth_diff_equity": "prediction_reconciliation",
+    "oracle_truth_diff_observations": "prediction_reconciliation",
     "oracle_truth_map": "realized_hindsight_brief",
     "oracle_attribution_map": "cp2_critique",
     "oracle_cp2_emitter": "ideal_cp2",
 }
-
-@lru_cache(maxsize=16)
-def _xnys_calendar(year: int):
-    """Use exchange session truth without importing the private scheduler."""
-    import exchange_calendars
-    return exchange_calendars.get_calendar(
-        "XNYS", start=f"{year - 1}-01-01", end=f"{year + 1}-12-31"
-    )
 
 
 def Bridge(root_dir: Optional[str] = None):
@@ -188,62 +180,23 @@ class GodModeEngine:
     """
     
     @staticmethod
-    def resolve_horizon(policy: Optional[str] = None, now: Optional[datetime] = None) -> Dict[str, str]:
-        """
-        [ACTION]
-        - Teleology: Resolve a human-friendly horizon policy into a concrete UTC target time.
-        - Mechanism: Map policy strings ('next_us_close', '24h', '48h', ISO datetime) to a target timestamp.
-        - Guarantee: Returns dict with 'policy', 'target_time' (ISO UTC), 'target_time_et' (ISO ET), 'horizon_label'.
-        - Fails: ValueError on unparseable ISO datetime.
-        - When-needed: Open when a run or audit path needs to translate `next_us_close`, fixed-hour windows, or ISO timestamps into persisted horizon metadata.
-        - Escalates-to: system/core/forensics.py::reconstruct_run_state; system/core/bridge.py
-        """
-        ET = ZoneInfo("America/New_York")
-        if now is None:
-            now = datetime.now(timezone.utc)
-        now_et = now.astimezone(ET)
-        effective = policy or "next_us_close"
-
-        if effective == "next_us_close":
-            if now.tzinfo is None or now.utcoffset() is None:
-                raise ValueError("next_us_close anchor must include an explicit timezone")
-            calendar = _xnys_calendar(now_et.year)
-            session = calendar.date_to_session(now_et.date().isoformat(), direction="next")
-            target_utc = calendar.session_close(session).to_pydatetime().astimezone(timezone.utc)
-            if target_utc <= now.astimezone(timezone.utc):
-                session = calendar.next_session(session)
-                target_utc = calendar.session_close(session).to_pydatetime().astimezone(timezone.utc)
-            target_et = target_utc.astimezone(ET)
-            label = target_et.strftime("Next US Market Close (%a %b %d, %I:%M %p ET)")
-
-        elif effective == "24h":
-            target_utc = now + timedelta(hours=24)
-            target_et = target_utc.astimezone(ET)
-            label = target_et.strftime("24h from now (%a %b %d, %I:%M %p ET)")
-
-        elif effective == "48h":
-            target_utc = now + timedelta(hours=48)
-            target_et = target_utc.astimezone(ET)
-            label = target_et.strftime("48h from now (%a %b %d, %I:%M %p ET)")
-
+    def resolve_horizon(policy=None, now=None):
+        """Freeze a future horizon using elapsed time or an explicit timezone-aware timestamp."""
+        now = now or datetime.now(timezone.utc)
+        if now.tzinfo is None:
+            raise ValueError("horizon anchor requires an explicit timezone")
+        effective = policy or "24h"
+        if effective in ("24h", "48h"):
+            target = now + timedelta(hours=int(effective[:-1]))
         else:
-            # Assume ISO datetime
-            try:
-                parsed = datetime.fromisoformat(effective)
-                if parsed.tzinfo is None:
-                    parsed = parsed.replace(tzinfo=timezone.utc)
-                target_utc = parsed.astimezone(timezone.utc)
-                target_et = target_utc.astimezone(ET)
-                label = target_et.strftime("Custom target (%a %b %d, %I:%M %p ET)")
-            except (ValueError, TypeError) as e:
-                raise ValueError(f"Cannot parse horizon '{effective}' as ISO datetime: {e}")
-
-        return {
-            "policy": effective,
-            "target_time": target_utc.isoformat(),
-            "target_time_et": target_et.isoformat(),
-            "horizon_label": label,
-        }
+            target = datetime.fromisoformat(effective.replace("Z", "+00:00"))
+            if target.tzinfo is None:
+                raise ValueError("target time requires an explicit timezone")
+        target = target.astimezone(timezone.utc)
+        if target <= now.astimezone(timezone.utc):
+            raise ValueError("target time must follow the issue time")
+        return {"policy":effective, "target_time":target.isoformat(),
+                "target_time_et":target.isoformat(), "horizon_label":target.isoformat()}
 
     def __init__(
         self,
@@ -585,7 +538,7 @@ class GodModeEngine:
                 "subject_group": self.subject_group,
                 "timestamp": time.time(),
                 # [C2] Authoritative temporal anchor for all downstream tool nodes.
-                # All feed tools and the calculator must consume these values
+                # All feed tools and the derived must consume these values
                 # and stamp their metadata.as_of to match.
                 "as_of": self._run_anchor_iso,
                 "time_anchor": self._run_anchor_iso,
@@ -1023,35 +976,35 @@ class GodModeEngine:
             return payload.get("data")
         return None
 
-    def _build_equity_price_map(self, run_dir: Optional[Path] = None) -> Dict[str, float]:
+    def _build_observation_value_map(self, run_dir: Optional[Path] = None) -> Dict[str, float]:
         """
-        Build ticker -> snapshot price map from the combined stock + ETF feed baseline.
+        Build target_id -> snapshot value map from the combined measurements + SUBSYSTEMS feed baseline.
 
         Oracle CP2 audits must use the subject (T-n) snapshot, not the truth run.
         """
         source_dir = Path(run_dir) if run_dir is not None else (
             self._subject_run_dir if self._oracle_mode else self.run_dir
         )
-        ticker_prices: Dict[str, float] = {}
-        for ticker, row in _combined_run_prices(source_dir).items():
-            price = row.get("Price") if isinstance(row, dict) else None
-            if isinstance(price, (int, float)) and price == price:
-                ticker_prices[str(ticker).upper().strip()] = float(price)
-        return ticker_prices
+        target_id_values: Dict[str, float] = {}
+        for target_id, row in _combined_run_values(source_dir).items():
+            value = row.get("Value") if isinstance(row, dict) else None
+            if isinstance(value, (int, float)) and value == value:
+                target_id_values[str(target_id).upper().strip()] = float(value)
+        return target_id_values
 
-    def _build_stock_price_map(self) -> Dict[str, float]:
-        """Backward-compatible alias for the equity-wide snapshot price map."""
-        return self._build_equity_price_map()
+    def _build_measurements_value_map(self) -> Dict[str, float]:
+        """Backward-compatible alias for the observation-wide snapshot value map."""
+        return self._build_observation_value_map()
 
     def _audit_cp2_predictions(self, parsed: Any) -> Any:
-        """Inject deterministic temporal fields and audit model-emitted snapshot_price against feed."""
+        """Inject deterministic temporal fields and audit model-emitted snapshot_value against feed."""
         if not isinstance(parsed, dict):
             return parsed
         predictions = parsed.get("predictions_t")
         if not isinstance(predictions, list):
             return parsed
 
-        price_map = self._build_equity_price_map()
+        value_map = self._build_observation_value_map()
         tolerance = 0.005  # 0.5%
         audit_errors: List[str] = []
 
@@ -1065,31 +1018,31 @@ class GodModeEngine:
             if self._target_time_iso:
                 pred["target_time_iso"] = self._target_time_iso
 
-            if not target or target not in price_map:
+            if not target or target not in value_map:
                 continue
 
-            feed_price = price_map[target]
-            model_price_raw = pred.get("snapshot_price")
+            feed_value = value_map[target]
+            model_value_raw = pred.get("snapshot_value")
             try:
-                model_price = float(model_price_raw)
-                if not (model_price == model_price):
+                model_value = float(model_value_raw)
+                if not (model_value == model_value):
                     raise ValueError("nan")
             except Exception:
                 continue
 
-            if feed_price == 0.0:
-                mismatch_ratio = abs(model_price - feed_price)
+            if feed_value == 0.0:
+                mismatch_ratio = abs(model_value - feed_value)
             else:
-                mismatch_ratio = abs(model_price - feed_price) / abs(feed_price)
+                mismatch_ratio = abs(model_value - feed_value) / abs(feed_value)
 
             # Quietly normalize small model rounding drift to the feed baseline.
             if mismatch_ratio <= tolerance:
-                pred["snapshot_price"] = feed_price
+                pred["snapshot_value"] = feed_value
                 continue
 
             audit_errors.append(
-                f"SNAPSHOT_PRICE_MISMATCH: predictions_t[{i}] target_id={target} "
-                f"snapshot_price={model_price} feed_price={feed_price}"
+                f"SNAPSHOT_VALUE_MISMATCH: predictions_t[{i}] target_id={target} "
+                f"snapshot_value={model_value} feed_value={feed_value}"
             )
 
         if audit_errors:
@@ -1150,10 +1103,10 @@ class GodModeEngine:
                 for entry in entries:
                     if not isinstance(entry, dict):
                         continue
-                    tickers = entry.get("tickers")
-                    if not isinstance(tickers, list):
+                    target_ids = entry.get("target_ids")
+                    if not isinstance(target_ids, list):
                         continue
-                    for token in tickers:
+                    for token in target_ids:
                         t = str(token).upper().strip()
                         if t and t != "NONE":
                             targets.add(t)
@@ -1162,7 +1115,7 @@ class GodModeEngine:
         if isinstance(cc2_data, str) and cc2_data:
             import re as _re
 
-            def _extract_ticker_tokens(raw: str) -> Set[str]:
+            def _extract_target_id_tokens(raw: str) -> Set[str]:
                 tokens = set()
                 for tok in _re.findall(r"[A-Z0-9][A-Z0-9._-]{0,9}", raw.upper()):
                     normalized = tok.strip(" .,)(").upper()
@@ -1171,22 +1124,22 @@ class GodModeEngine:
                 return tokens
 
             extracted_targets: Set[str] = set()
-            ticker_lines = _re.findall(r"^\s*TICKERS:\s*(.+)$", cc2_data, _re.MULTILINE)
-            for line in ticker_lines:
-                extracted_targets.update(_extract_ticker_tokens(line))
-            paren_tickers = _re.findall(
+            target_id_lines = _re.findall(r"^\s*TARGET_IDS:\s*(.+)$", cc2_data, _re.MULTILINE)
+            for line in target_id_lines:
+                extracted_targets.update(_extract_target_id_tokens(line))
+            paren_target_ids = _re.findall(
                 r"(?:TARGET_SWARM|SOLO_TARGET):[^\n]*\(([^)]+)\)",
                 cc2_data,
             )
-            for group in paren_tickers:
-                extracted_targets.update(_extract_ticker_tokens(group))
-            bare_tickers = _re.findall(
+            for group in paren_target_ids:
+                extracted_targets.update(_extract_target_id_tokens(group))
+            bare_target_ids = _re.findall(
                 r"(?:TARGET_SWARM|SOLO_TARGET):\s*([A-Z0-9._-]{1,10})\s*$",
                 cc2_data,
                 _re.MULTILINE,
             )
-            for ticker in bare_tickers:
-                extracted_targets.update(_extract_ticker_tokens(ticker))
+            for target_id in bare_target_ids:
+                extracted_targets.update(_extract_target_id_tokens(target_id))
             return extracted_targets or None
         return None
 
@@ -1339,14 +1292,14 @@ class GodModeEngine:
                 {
                     "target_id": row.get("target_id"),
                     "predicted_direction": row.get("prediction_direction"),
-                    "snapshot_price": row.get("subject_snapshot_price"),
-                    "predicted_price": row.get("predicted_target_price"),
-                    "realized_price": row.get("realized_truth_price"),
+                    "snapshot_value": row.get("subject_snapshot_value"),
+                    "predicted_value": row.get("predicted_target_value"),
+                    "realized_value": row.get("realized_truth_value"),
                     "direction_hit": row.get("directional_correct"),
                     "abs_error": row.get("absolute_delta"),
                     "pred_error_pct": row.get("percent_delta"),
                     "status": "GRADED",
-                    "asset_class": row.get("asset_class"),
+                    "target_kind": row.get("target_kind"),
                     "rank": row.get("rank"),
                 }
             )
@@ -2942,9 +2895,9 @@ class GodModeEngine:
             f"{marker}\n"
             "- Return exactly ONE JSON object and nothing else.\n"
             "- Output must parse with json.loads() without preprocessing.\n"
-            "- Never use bare double quotes for emphasis inside JSON string values.\n"
-            "- Use single quotes for emphasis (example: 'cost-push', 'Whale').\n"
-            "- If a literal double quote character is required inside a string, escape it as \\\".\n"
+            "- Never use bare double observations for emphasis inside JSON string values.\n"
+            "- Use single observations for emphasis (example: 'cost-push', 'Whale').\n"
+            "- If a literal double observation character is required inside a string, escape it as \\\".\n"
             "- Do not add trailing commas."
         )
         return f"{prompt}\n\n{guardrail}"
@@ -3077,8 +3030,8 @@ class GodModeEngine:
             f"Your previous response failed validation with these errors:\n{error_list}\n\n"
             f"Your previous (invalid) response was:\n{invalid_output}\n\n"
             f"Fix the errors and return valid JSON only.\n"
-            f"CRITICAL: Escape any internal double quotes inside JSON strings as \\\".\n"
-            f"CRITICAL: For emphasis inside strings, use single quotes (example: 'cost-push')."
+            f"CRITICAL: Escape any internal double observations inside JSON strings as \\\".\n"
+            f"CRITICAL: For emphasis inside strings, use single observations (example: 'cost-push')."
         )
 
     def _hydrate_feed(self, node: CodexNode) -> Tuple[Dict, Any]:

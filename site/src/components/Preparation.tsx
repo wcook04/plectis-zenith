@@ -1,4 +1,4 @@
-// The mixed-data edition's verified preparation, read from
+// The synthetic observed-system edition's verified preparation, read from
 // /api/v1/evidence/demo-result and /sources. Nothing measured is written here.
 import { useMemo, useRef, useState } from 'react';
 import { apiUrl, type Evidence, type Graph } from '../api';
@@ -102,7 +102,7 @@ export function Preparation({
         <div className="boundary">
           <p>
             The record claims only that the inputs were loaded and the first request was prepared. It makes no claim
-            about predictions, diagnoses, improvements or financial results.
+            that predictions, diagnoses or revisions are correct.
           </p>
           <p className="boundary__source">
             <a href={apiUrl('/api/v1/evidence/demo-result')} target="_blank" rel="noreferrer">
@@ -118,9 +118,8 @@ export function Preparation({
             Provenance of the inputs
           </h3>
           <p className="block-lede">
-            The demonstration uses data saved at {numberWord(snapshots.length)} times. The real data are used unchanged and
-            are not published on this site. The synthetic examples are published in full; select Macro or News below, or
-            the matching feed in the graph, to read them.
+            The demonstration contains invented observations at {numberWord(snapshots.length)} cutoffs. All five source
+            perspectives and the computed summaries are published in full. Select a feed below or in the graph to inspect it.
           </p>
           <table className="shape__table inputs-table">
             <thead>
@@ -157,7 +156,7 @@ export function Preparation({
           </table>
           <p className="block-foot">
             Snapshots: {snapshots.map((s) => `${s.id}, ${fmtDate(s.as_of)}`).join('; ')}. Synthetic examples are not
-            anonymised observations and say nothing about what happened in the historical market.
+            measurements of a real system or evidence that the graph predicts it accurately.
           </p>
         </section>
       )}

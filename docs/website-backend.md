@@ -1,11 +1,10 @@
 # Website backend
 
-Claude owns the frontend. This Python backend supplies the real graph, the paper
+The Python backend supplies the real graph, the paper
 and its citations, explanations, the preparation receipt, and optional local run
 evidence. It has no model-execution or editing endpoints.
 
-**This is not financial advice.** Keep the [research notice](../RESEARCH_NOTICE.md)
-visible in the website, especially beside financial examples and model output.
+Keep the experimental boundary visible beside examples and model output.
 
 ## Start
 
@@ -82,7 +81,7 @@ All JSON routes are under `/api/v1`. `GET` and `HEAD` are supported; writes retu
 | `/paper` | Manuscript metadata, citations, citation uses and PDF/source hashes |
 | `/documents/{id}` | Exact Markdown/LaTeX and its source binding |
 | `/graph?mission=lab&focus=lab_cross_corr_v1` | Native nodes, edges, waves and ancestors/descendants |
-| `/nodes/{id}` | Purpose, instruction, expected output, boundary, inputs, consumers and source |
+| `/nodes/{id}` | Purpose, instruction, expected output, boundary, inputs, consumers, source and feed dossier |
 | `/evidence/{id}` | Public result/source JSON and its SHA-256 |
 | `/runs?q=JUL20&mission=lab&limit=20&offset=0` | Optional local run index with total and pagination |
 | `/runs/{run_id}/nodes/{node_id}` | Optional local artifact and recorded attempts |
@@ -137,24 +136,25 @@ Checks cover native topology, manuscript links, result receipts, HTTP/ETags,
 private/public separation, CORS/Host/method rejection, traversal, symlinks,
 oversized and malformed evidence, and mounting a future frontend build.
 
-## Current mixed-data edition
+## Current synthetic edition
 
 Use `site.data_mode`, `site.data_note` and each node's `demo_provenance`.
-The graph has 50 nodes: Lab includes 25 nodes/86 edges, Oracle 28/53.
-The five source lanes plus derived CALC are the current graph; do not hardcode
-historical counts or lanes in the frontend.
+The optional `dossier` contains that lane's current role and evidence contract,
+with its own source path and hash; the inspector exposes it beside the instruction.
+Read current node and edge counts from the API rather than hardcoding them.
+Five synthetic source perspectives describe an invented System A: measurements,
+subsystems, environment, events and interventions. Derived summaries are
+recomputed from supplied inputs. Quantities are abstract and have arbitrary
+or dimensionless units; this is a demonstration of the protocol.
 
-`evidence/sources` now returns `zenith_mixed_demo_v1`: real saved stock, ETF and
-prediction-market inputs, synthetic macro/news, recomputed CALC. Input retention
-and public visibility are separate fields. The raw real inputs remain private.
-`evidence/replacements` contains the complete invented macro/news examples.
-`evidence/demo-result` records six loaded inputs, the pending Seed request and
-zero model calls. Results have evidence kind `verified_preparation`.
+`evidence/sources` describes provenance and hashes. Follow the current site
+manifest for complete synthetic observation payloads and the preparation
+receipt. `evidence/demo-result` establishes preparation only: inputs loaded,
+first request pending, zero model calls and no completed forecast.
+Results have evidence kind `verified_preparation`.
 
-The old `observations`, `window-result` and `conditional-result` routes return
-404. Do not copy their old payloads into a frontend fixture. Fetch the current
-site manifest and follow its evidence URLs. Keep labels visible when opening
-nodes. A missing output means not run; never fill it with a fabricated response.
-The current source instructions are available for every node. Recorded private
-run inputs/outputs are a separate opt-in local capability and are not public
-example data. See [data boundaries](data.md) and [the current demo](demo.md).
+Fetch current evidence URLs; do not restore historical result fixtures as
+results for this configuration. Keep provenance visible when opening nodes.
+Missing output means not run; never fill it with a fabricated response.
+Recorded private runs are an explicit opt-in local capability, excluded from
+public examples. See [data boundaries](data.md) and [the demo](demo.md).

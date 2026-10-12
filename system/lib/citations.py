@@ -1,7 +1,7 @@
 """
 [PURPOSE]
 - Teleology: Provide canonical citation extraction, malformed detection, and resolution checking
-  for CP artifact text fields (epicentre_thesis, trade_rationale).
+  for CP artifact text fields (epicentre_thesis, forecast_rationale).
 - Mechanism: Regex-based citation parser where malformed detection always runs before extraction
   to prevent the valid-looking [1] inside [1-3] from silently passing validation.
 

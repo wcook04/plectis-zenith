@@ -2,7 +2,7 @@
 [PURPOSE]
 - Teleology: Run the deterministic Lab contract audit over persisted node artifacts so the runtime can gate on machine-checkable RED conditions before any semantic interpretation layer weighs in.
 - Mechanism: Read Lab artifact envelopes from disk, normalize the relevant payload fragments, and apply hard-coded structural checks for question-mark bans, tuple formatting, thesis inheritance, target grounding, reconciliation completeness, and CP2 policy invariants.
-- Non-goal: Semantic market interpretation or judgment of thesis quality; those remain outside this deterministic audit lane.
+- Non-goal: Semantic system interpretation or judgment of thesis quality; those remain outside this deterministic audit lane.
 
 [INTERFACE]
 - Exports: compute_lab_contract_audit.
@@ -37,24 +37,24 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 
-from system.lib.market_fusion_readiness import preflight_consumer_claims
+from system.lib.system_fusion_readiness import preflight_consumer_claims
 
 PHASE1_MINERS: Tuple[str, ...] = (
-    "lab_miner_stock",
-    "lab_miner_etf",
-    "lab_miner_macro",
-    "lab_miner_news",
-    "lab_miner_poly",
-    "lab_miner_calc",
+    "lab_miner_measurements",
+    "lab_miner_subsystems",
+    "lab_miner_environment",
+    "lab_miner_events",
+    "lab_miner_interventions",
+    "lab_miner_derived",
 )
 
 PHASE2_MINERS: Tuple[str, ...] = (
-    "lab_miner_v2_stock",
-    "lab_miner_v2_etf",
-    "lab_miner_v2_macro",
-    "lab_miner_v2_news",
-    "lab_miner_v2_poly",
-    "lab_miner_v2_calc",
+    "lab_miner_v2_measurements",
+    "lab_miner_v2_subsystems",
+    "lab_miner_v2_environment",
+    "lab_miner_v2_events",
+    "lab_miner_v2_interventions",
+    "lab_miner_v2_derived",
 )
 
 QUESTION_MARK_SCAN_NODES: Tuple[str, ...] = (
@@ -68,13 +68,13 @@ QUESTION_MARK_SCAN_NODES: Tuple[str, ...] = (
 
 CROSS_FEED_CLAIM_ARTIFACT_IDS: Tuple[str, ...] = (
     "lab_cross_feed_claims",
-    "market_fusion_candidate_situations",
+    "system_fusion_candidate_situations",
 )
 
 CROSS_FEED_CLAIM_FIELDS: Tuple[str, ...] = (
     "candidate_situation_claims",
     "cross_feed_claims",
-    "market_fusion_claims",
+    "system_fusion_claims",
 )
 
 
@@ -159,10 +159,10 @@ def _collect_valid_targets(cross_corr_v2_data: Any) -> Set[str]:
         for entry in entries:
             if not isinstance(entry, dict):
                 continue
-            tickers = entry.get("tickers")
-            if not isinstance(tickers, list):
+            target_ids = entry.get("target_ids")
+            if not isinstance(target_ids, list):
                 continue
-            for token in tickers:
+            for token in target_ids:
                 t = str(token).upper().strip()
                 if t and t != "NONE":
                     targets.add(t)
@@ -285,7 +285,7 @@ def compute_lab_contract_audit(artifacts_dir: Path) -> Dict[str, Any]:
         soft_violations["ungrounded_target"] = len(ungrounded)
         details["ungrounded_targets"] = sorted(set(ungrounded))
 
-    # --- Market-fusion readiness gate for candidate cross-feed claims ---
+    # --- System-fusion readiness gate for candidate cross-feed claims ---
     readiness_preflights: List[Dict[str, Any]] = []
     for node_id in CROSS_FEED_CLAIM_ARTIFACT_IDS:
         data = _load_artifact_data(artifacts_dir, node_id)
@@ -314,9 +314,9 @@ def compute_lab_contract_audit(artifacts_dir: Path) -> Dict[str, Any]:
         row for row in readiness_preflights if row.get("decision") == "refuse"
     ]
     if refused_preflights:
-        hard_fails.append("MARKET_FUSION_READINESS_REFUSAL")
-        soft_violations["market_fusion_readiness_refusal"] = len(refused_preflights)
-        details["market_fusion_readiness_refusals"] = refused_preflights
+        hard_fails.append("SYSTEM_FUSION_READINESS_REFUSAL")
+        soft_violations["system_fusion_readiness_refusal"] = len(refused_preflights)
+        details["system_fusion_readiness_refusals"] = refused_preflights
 
     # --- Contradiction reconciliation completeness ---
     unresolved_bifurcations: List[str] = []

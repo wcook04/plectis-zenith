@@ -1,120 +1,120 @@
-"""Prepare mixed demonstration inputs locally; never fetch data or call a model."""
+"""Construct an independently authored abstract-system example offline."""
 from __future__ import annotations
-
 import hashlib
 import json
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from tools.observations.derived import run as calculate
+LANES = ('measurements','subsystems','environment','events','interventions')
+EARLIER = '2026-07-20T12:00:00+00:00'
+LATER = '2026-07-21T12:00:00+00:00'
 
-from tools.calculator.calculator import run as calculate
+def write(path, value):
+    path = Path(path); path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(value, indent=2, ensure_ascii=False)+'\n')
 
-REAL_LANES = ("stock", "etf", "polymarket")
-REPLACED_LANES = ("macro", "news")
-
-
-def write(path: Path, value: dict) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
-
-
-def sha(data: bytes) -> str:
+def sha(data):
     return hashlib.sha256(data).hexdigest()
 
+def state_at(anchor):
+    """Disclosed toy recurrence, seed 17; demonstrates protocol, not blind forecasting."""
+    import random
+    clock=datetime.fromisoformat(anchor.replace('Z','+00:00'))
+    step=(clock-datetime.fromisoformat(EARLIER)).days
+    if step < 0: raise ValueError('Toy observation precedes disclosed origin')
+    rng=random.Random(17)
+    state=-0.4
+    for index in range(step):
+        context=(index%3-1)*0.2
+        control=0.3 if index%2 else -0.1
+        state=0.7*state+0.2*context+control+rng.uniform(-0.02,0.02)
+    return {'signal_a':round(state,6),'signal_b':round(2*state,6),
+            'context_a':round((step%3-1)*0.2,6),'control_a':0.3 if step%2 else -0.1}
 
-def synthetic(lane: str, anchor: str, later: bool) -> dict:
-    """Independent authored examples. No original macro values or news are read."""
-    if lane == "macro":
-        data = {"columns": ["ticker", "Proxy", "pct_change", "z_score"],
-                "rows": [["SYNTH_RATE", "Fictional rates", 0.2 if later else 0.1, 0.4],
-                         ["SYNTH_ACTIVITY", "Fictional activity", -0.3 if later else 0.2, -0.2]],
-                "synthetic_fixture": True}
-    elif lane == "news":
-        data = {"items": [{"id": "synthetic-notice-2" if later else "synthetic-notice-1",
-                           "text": ("Fictional example: Demo Harbour delays its invented project."
-                                    if later else "Fictional example: Demo Harbour announces an invented project."),
-                           "timestamp_iso": anchor, "source": "authored teaching fixture",
-                           "synthetic_fixture": True}], "synthetic_fixture": True}
+
+def synthetic(lane, anchor, later=False):
+    state=state_at(anchor)
+    numeric={'measurements':[('SIGNAL_A',state['signal_a']),('SIGNAL_B',state['signal_b'])],
+             'subsystems':[('SUBSYSTEM_A',state['signal_a']/2),('SUBSYSTEM_B',-state['signal_a'])],
+             'environment':[('CONTEXT_A',state['context_a'])]}
+    if lane in numeric:
+        observations=[{'target_id':target,'value':value,'unit':'dimensionless',
+                       'observed_at':anchor,'available_at':anchor} for target,value in numeric[lane]]
+        data={'observations':observations,'columns':['target_id','Value','unit','observed_at','available_at'],
+              'rows':[[r['target_id'],r['value'],r['unit'],anchor,anchor] for r in observations]}
     else:
-        raise ValueError("No synthetic replacement defined for this lane")
-    return {"id": f"global_{lane}_feed", "status": "success",
-            "metadata": {"status": "success", "as_of": anchor, "timestamp_iso": anchor,
-                         "synthetic_fixture": True, "data_origin": "authored_synthetic",
-                         "notice": "Invented independently; not an anonymised historical observation."},
-            "data": data}
+        clock=datetime.fromisoformat(anchor.replace('Z','+00:00'))
+        item={'id':lane+'-system-a','system_id':'System A','observed_at':anchor,'available_at':anchor}
+        if lane=='interventions':
+            item.update(control_a=state['control_a'],unit='dimensionless',command_status='planned',
+                        effective_at=(clock+timedelta(days=1)).isoformat(),
+                        text='Authored plan: apply the disclosed control input during the next state transition.')
+            items=[item]
+            if anchor!=EARLIER:
+                previous=(clock-timedelta(days=1)).isoformat()
+                items.append({'id':'executed-system-a','system_id':'System A','control_a':state_at(previous)['control_a'],
+                              'unit':'dimensionless','command_status':'executed','issued_at':previous,
+                              'effective_at':anchor,'observed_at':anchor,'available_at':anchor,
+                              'text':'Authored record: the previously issued control was applied in this transition.'})
+        else:
+            category='negative' if state['context_a']<0 else 'positive' if state['context_a']>0 else 'neutral'
+            item.update(text='Authored qualitative record: current context is '+category+'.',
+                        event_kind='context_observation',context_category=category,
+                        interpretation_boundary='A qualitative view of the existing context input, not independent corroboration.')
+            items=[item]
+        data={'items':items}
+    # One deliberately missing later reading illustrates incomplete target support.
+    # The underlying toy state remains disclosed; absence is never a scored outcome.
+    if lane=='measurements' and anchor!=EARLIER:
+        data['observations'][1].update(value=None,observation_status='missing')
+        data['rows'][1][1]=None
+        data['missingness']=[{'target_id':'SIGNAL_B','reason':'Authored example of an unavailable sensor reading.'}]
+    prefix={'measurements':'S','subsystems':'E','environment':'M','events':'N','interventions':'P'}[lane]
+    records=data.get('observations',data.get('items',[]))
+    data['evidence_dictionary']=[{'ledger_id':prefix+'_'+sha((lane+'|'+anchor+'|'+str(index)).encode())[:8].upper(),
+                                 'subject':record.get('target_id','System A'),
+                                 'signal_summary':json.dumps(record,sort_keys=True),
+                                 'source_ref':'authored_synthetic/'+lane+'/'+anchor,
+                                 'observed_at':anchor,'available_at':anchor}
+                                for index,record in enumerate(records)]
+    data['synthetic_fixture']=True
+    return {'id':f'global_{lane}_feed','status':'success',
+            'metadata':{'status':'success','as_of':anchor,'timestamp_iso':anchor,
+                        'synthetic_fixture':True,'data_origin':'authored_synthetic',
+                        'observation_basis':'explicit_observation','unit':'dimensionless',
+                        'notice':'Disclosed synthetic System A generator. Protocol example, not blind forecasting evidence.'},'data':data}
 
 
-def prepare(root: Path, earlier: Path, later: Path, output: Path) -> dict:
-    root, earlier, later, output = (Path(p).resolve() for p in (root, earlier, later, output))
-    if output.exists():
-        raise ValueError("Demo output must be a new directory; existing evidence is never overwritten")
-    # Validate both sources before creating any output. Read only retained lanes.
-    sources = []
-    for source in (earlier, later):
-        context = json.loads((source / "runtime_context.json").read_text())
-        anchor = context.get("as_of") or context.get("time_anchor")
-        clock = datetime.fromisoformat(str(anchor).replace("Z", "+00:00"))
-        if clock.tzinfo is None:
-            raise ValueError("Source snapshot needs a timezone-aware clock")
-        payloads = {}
-        for lane in REAL_LANES:
-            raw = (source / "artifacts" / f"global_{lane}_feed.json").read_bytes()
-            artifact = json.loads(raw)
-            if artifact.get("status") != "success" or not isinstance(artifact.get("data"), dict):
-                raise ValueError(f"Retained {lane} source must be a successful saved artifact")
-            if artifact.get("metadata", {}).get("synthetic_fixture") or artifact["data"].get("synthetic_fixture"):
-                raise ValueError(f"The mixed demo requires real {lane} input, not a replacement fixture")
-            payloads[lane] = raw
-        sources.append((anchor, clock, payloads))
-    if sources[0][1] >= sources[1][1]:
-        raise ValueError("Later snapshot must follow the earlier snapshot")
-    receipt = {"schema": "zenith_mixed_demo_v1", "data_mode": "mixed",
-               "notice": "This is not financial advice.", "snapshots": [],
-               "model_calls": 0, "execution_status": "inputs_prepared",
-               "claim_boundary": "Real inputs are retained; only macro and news are synthetic replacements. "
-                                 "Preparation does not establish forecasting skill or permission to redistribute real payloads.",
-               "clock_boundary": "Saved snapshot anchors and copied artifact clocks are retained. Underlying observation availability and model training leakage remain unverified."}
-    fixtures = {"schema": "zenith_synthetic_replacements_v1", "snapshots": []}
-    for index, (anchor, _, payloads) in enumerate(sources):
-        name = "earlier" if index == 0 else "later"
-        directory = output / name
-        write(directory / "runtime_context.json", {"as_of": anchor, "time_anchor": anchor,
-              "subject_group": "feeds", "data_mode": "mixed", "publication": "private_inputs"})
-        lanes = []
-        for lane, raw in payloads.items():
-            destination = directory / "artifacts" / f"global_{lane}_feed.json"
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            destination.write_bytes(raw)
-            lanes.append({"node_id": f"global_{lane}_feed", "input_origin": "real_saved_input",
-                          "source_sha256": sha(raw), "input_sha256": sha(raw),
-                          "public_payload": "withheld_pending_permissions_review",
-                          "permission_status": "not_cleared_by_this_receipt"})
-        examples = {}
-        for lane in REPLACED_LANES:
-            value = synthetic(lane, anchor, bool(index))
-            destination = directory / "artifacts" / f"global_{lane}_feed.json"
-            write(destination, value)
-            examples[value["id"]] = value
-            lanes.append({"node_id": value["id"], "input_origin": "authored_synthetic",
-                          "input_sha256": sha(destination.read_bytes()),
-                          "public_payload": "included", "permission_status": "original_fixture"})
-        config = json.loads((root / "codex/substrate/configs/calculator_default.json").read_text())
-        config.get("data", config)["runtime"] = {"as_of": anchor, "run_id": name}
-        derived = calculate(config, run_dir=directory)
-        if derived.get("metadata", {}).get("status") != "success":
-            raise ValueError("Calculator failed on the assembled mixed inputs")
-        derived.update(id="global_calculator_feed", status="success")
-        derived["metadata"].update(as_of=anchor, timestamp_iso=anchor, data_origin="derived_mixed_inputs",
-                                   input_snapshot_time=anchor,
-                                   notice="Recomputed from retained stock/ETF and synthetic macro; not the historical calculator payload.")
-        destination = directory / "artifacts/global_calculator_feed.json"
-        write(destination, derived)
-        lanes.append({"node_id": "global_calculator_feed", "input_origin": "derived_mixed_inputs",
-                      "input_sha256": sha(destination.read_bytes()),
-                      "public_payload": "withheld_pending_upstream_permissions_review",
-                      "dependencies": ["global_stock_feed", "global_etf_feed", "global_macro_feed"]})
-        receipt["snapshots"].append({"id": name, "as_of": anchor, "lanes": lanes})
-        fixtures["snapshots"].append({"id": name, "as_of": anchor, "artifacts": examples})
-    # Public exports are explicit allowlists. No raw retained input, path, prompt or derived table.
-    write(output / "public/provenance.json", receipt)
-    write(output / "public/replacements.json", fixtures)
+def prepare(root, earlier=None, later=None, output=None):
+    if output is None:
+        raise ValueError('A new output directory is required')
+    if earlier is not None or later is not None:
+        raise ValueError('Synthetic demo accepts no source snapshots; no existing data is relabelled')
+    output=Path(output).resolve()
+    if output.exists(): raise ValueError('Demo output must be a new directory; existing evidence is never overwritten')
+    receipt={'schema':'zenith_synthetic_demo_v1','data_mode':'authored_synthetic',
+             'scenario':'abstract System A','snapshots':[], 'model_calls':0,
+             'execution_status':'inputs_prepared','claim_boundary':'Input preparation only; no model forecasts or improvement evidence.'}
+    fixtures={'schema':'zenith_synthetic_observations_v1','snapshots':[]}
+    for name,anchor,is_later in (('earlier',EARLIER,False),('later',LATER,True)):
+        directory=output/name
+        write(directory/'runtime_context.json',{'as_of':anchor,'time_anchor':anchor,'subject_group':'feeds','data_mode':'authored_synthetic'})
+        artifacts={}
+        for lane in LANES:
+            artifact=synthetic(lane,anchor,is_later)
+            write(directory/'artifacts'/f'global_{lane}_feed.json',artifact)
+            artifacts[artifact['id']]=artifact
+        derived=calculate({},run_dir=directory)
+        derived.update(id='global_derived_feed',status='success')
+        derived['metadata'].update(as_of=anchor,timestamp_iso=anchor)
+        write(directory/'artifacts/global_derived_feed.json',derived)
+        artifacts[derived['id']]=derived
+        lanes=[{'node_id':key,'input_origin':'derived_synthetic_inputs' if key=='global_derived_feed' else 'authored_synthetic',
+                'input_sha256':sha((directory/'artifacts'/f'{key}.json').read_bytes()),'public_payload':'included',
+                'permission_status':'original_fixture'} for key in artifacts]
+        receipt['snapshots'].append({'id':name,'as_of':anchor,'lanes':lanes})
+        fixtures['snapshots'].append({'id':name,'as_of':anchor,'artifacts':artifacts})
+    write(output/'public/provenance.json',receipt)
+    write(output/'public/observations.json',fixtures)
+    write(output/'public/replacements.json',fixtures)
     return receipt

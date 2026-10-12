@@ -1,83 +1,40 @@
-# Zenith
+# Plectis Zenith
 
-> **This is not financial advice.** Zenith is an experimental research prototype.
-> See the [research notice](RESEARCH_NOTICE.md).
+**Experimental research prototype.** The public example uses synthetic observations of a disclosed toy generator. No predictive improvement has been demonstrated.
 
-Give a graph of reasoning nodes several feeds from an earlier time. Let it choose
-assets and predict. Open the later snapshot, measure what happened, trace the
-mistakes and propose one change. Test that change on later inputs.
+Zenith studies forecasting a changing, partially observed system from heterogeneous, incomplete, overlapping and sometimes delayed perspectives. A reasoning graph reconciles what the observations mean and when they were available, distinguishes missing evidence from conflicting evidence, forms competing explanations and selects explicit future targets. Saved intermediate outputs expose the support chain. Different feeds are not independent votes.
 
-**Lab → Oracle → Evolve → compare again.** The model weights stay fixed.
-We change the instructions, context or connections in the reasoning graph.
+Lab freezes predictions at a cutoff. Oracle evaluates them against later observations and proposes a failure hypothesis. Evolve proposes one reviewed revision for a held-out matched comparison. Applicability requires observations linked to the same system, entity and time, a declared target and horizon, and later measurable truth.
 
-[Read the paper](paper/zenith.pdf) · [See the diagrams](docs/graphs.md) ·
-[Website backend](docs/website-backend.md) · [Walkthrough](docs/zenith-walkthrough-script.md)
+Physical problems motivate the design. For heat transfer, a heated chamber or greenhouse could combine temperature sensors, heater power, weather and door or vent logs to predict temperature six hours ahead. For damped vibration, camera position, accelerometer readings, applied-force and calibration logs could support a displacement or acceleration target one second ahead; position alone does not reveal direction of motion, so history matters. For fluid transport, flow, pressure, dye observations and valve logs could support a downstream concentration target, provided geometry and boundary conditions are supplied.
 
-![Earlier inputs through Lab, Oracle, Evolve and a later comparison](docs/graphs/replay.svg)
+Sensors expose different functions or aspects of state, and known forces, boundaries and interventions condition the future. Proposed reasoning aligns clocks and units, recognises source dependence, compares sensor faults with state or regime changes, and selects or parameterises an appropriate physical model or numerical tool where available. It must freeze the target, horizon and uncertainty. Narrative is not a substitute for equations. Solver integration and these applications have not been implemented or tested; some state can remain unobservable even with history. See [Tedrake's Output Feedback](https://underactuated.mit.edu/output_feedback.html). A language model is not assumed necessary or better than direct or numerical prediction.
 
-## The demonstration
+The [three-page paper](paper/zenith.pdf) explains the protocol and proposed context-conditioned prompt controller. The [teaching website](site/README.md) exposes native node instructions, dependencies and public evidence through a read-only API.
 
-This is a **mixed-data** prototype. Saved stock, ETF and prediction-market inputs
-remain real. Only the macro and news lanes use explicitly invented examples.
-CALC is recomputed from the resulting stock, ETF and macro inputs.
-[Per-feed provenance](examples/demo/provenance.json) distinguishes each case.
-Real payloads stay local while their publication permissions are reviewed;
-withholding a payload does not turn the computation input into synthetic data.
+![Earlier observations through Lab, Oracle, Evolve and a later comparison](docs/graphs/replay.svg)
 
-The current graph has 25 nodes in Lab. It loads all six input artifacts and
-prepares the first reasoning request. There are **no model calls or completed
-forecasts for this configuration yet**. The [preparation receipt](examples/demo/result.json)
-records that boundary. Earlier experiments used different inputs and are not
-results for this version.
+The public example is an invented abstract System A with five synthetic source perspectives: measurements, subsystems, environment, events and interventions. A sixth derives summaries from those inputs. It is a protocol fixture, not evidence that reasoning adds predictive value or a physically validated simulation. A general observation contract does not establish reliable prediction of arbitrary scientific or physical systems. See [data](docs/data.md), [demo](docs/demo.md), [current status](docs/status.md) and [research boundary](RESEARCH_NOTICE.md).
 
-## Run it
+Each numeric observable carries `target_id`, `value`, `unit`, `observed_at` and `available_at`. Predictions freeze `snapshot_value` and `target_value` at an exact declared horizon; later outcomes must match that target. Preserve missingness and information availability rather than filling them from hindsight.
 
-Use Python 3.12 from a source checkout:
+The current demonstration prepares the first request with zero model calls. It has no completed forecast, Oracle diagnosis or Evolve comparison. Historical runs do not establish results for this configuration.
 
 ```sh
-python3 -m venv .venv
-. .venv/bin/activate
-pip install -e '.[test]'
+python -m pip install -e '.[test]'
 python -m zenith validate
-python -m zenith plan lab
-```
-
-Prepare mixed inputs from your own authorised saved snapshots:
-
-```sh
-python -m zenith prepare-demo --earlier-source /path/to/earlier \
-  --later-source /path/to/later --output state/demo/my-pair
-```
-
-This command copies the three retained real feeds exactly, constructs the two
-labelled replacements and runs the existing calculator. It makes no network or
-model calls. [The demo guide](docs/demo.md) shows how to pass these inputs through
-Lab and Oracle. Public exports contain provenance and invented examples only.
-[Data boundaries](docs/data.md) explain the distinction.
-
-```sh
+python -m zenith prepare-demo --output state/demo/system-a
 python -m zenith serve --port 4175
 ```
 
-The read-only backend serves the graph, node instructions, paper and public
-examples. Claude owns the frontend. Private saved-run inspection is an explicit
-local option, not part of the public site.
+The API serves the paper, graph and published observations. Follow [site/README.md](site/README.md) to build the teaching frontend. Offline checks and document builds:
 
-## The research question
+```sh
+python -m pytest tests
+python scripts/build_graphs.py
+tectonic paper/zenith.tex
+```
 
-Can a recurring mistake identify a useful change to a reasoning node? A diagnosis
-suggests an experiment. Only a matched comparison on later cases can show whether
-the change helped. The [research direction](docs/research-direction.md) also
-proposes a controller that chooses small prompt variations from available context;
-that controller has not been trained or evaluated.
+Native agent responses pass through import-response and validation. Provider execution requires explicit configuration and the existing budget. Never commit credentials or private run payloads. Exact graphs live in `codex/substrate/nodes/`; runtime behavior lives in `zenith/`; evaluation lives in `feedback/`.
 
-| Purpose | Files |
-|---|---|
-| Node instructions and dependencies | `codex/substrate/nodes/` |
-| Execute Lab and Oracle | `zenith/`, `system/core/` |
-| Score forecasts and selections | `feedback/` |
-| Compare versions and diagnose failures | `research/` |
-| Inspect the mixed demonstration | `examples/demo/`, `docs/demo.md` |
-| Paper and diagrams | `paper/`, `docs/graphs.md` |
-
-Run `python -m pytest tests` for the offline checks. Keep the prototype small.
+A diagnosis suggests an experiment. Only a separate comparison can establish whether a revision improves the declared score, with regressions, coverage, uncertainty and cost visible.

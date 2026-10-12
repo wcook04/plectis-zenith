@@ -15,7 +15,7 @@
 
 [CONSTRAINTS]
 - Non-goal: This package file does not re-export tool entrypoints or execute Oracle logic.
-- When-needed: Open when orienting to Oracle v1 package surfaces and deciding whether to read subject_index, subject_snapshot, or truth_diff_equity next.
-- Escalates-to: tools/oracle/subject_index.py::run; tools/oracle/subject_snapshot.py::run; tools/oracle/truth_diff_equity.py::run
-- Navigation-group: market_intelligence
+- When-needed: Open when orienting to Oracle v1 package surfaces and deciding whether to read subject_index, subject_snapshot, or truth_diff_observations next.
+- Escalates-to: tools/oracle/subject_index.py::run; tools/oracle/subject_snapshot.py::run; tools/oracle/truth_diff_observations.py::run
+- Navigation-group: system_intelligence
 """

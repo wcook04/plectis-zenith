@@ -10,11 +10,11 @@ from xml.sax.saxutils import escape, quoteattr
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "graphs"
-LANES = ("stock", "etf", "macro", "news", "poly", "calc")
+LANES = ("measurements", "subsystems", "environment", "events", "interventions", "derived")
 WIDTH = 1440
 CARD = 302
 STEP = 66
-RESEARCH_NOTICE = "Research prototype. This is not financial advice."
+RESEARCH_NOTICE = "Research prototype. Synthetic demonstration."
 
 
 def text(x, y, value, size=14, weight="normal", color="#334155"):
@@ -236,7 +236,7 @@ def overview(slug, title, description, nodes, hashes, scope, stages, notes, work
         headings = [(36, "SAVED INPUTS"), (240, "FIRST PASS"), (445, "CP1"),
                     (645, "DIRECTED PASS"), (845, "CP2 + CHECK")]
         body += [text(x, 125, label, 13, "600", "#64748b") for x, label in headings]
-        labels = ("Stocks", "ETFs", "Macro", "News", "Prediction mkts", "CALC")
+        labels = ("Measurements", "Subsystems", "Environment", "Events", "Interventions", "DERIVED")
         for i, label in enumerate(labels):
             cy = 169 + i * 65
             body += [path(f"M 206 {cy + 24} H 240"),
@@ -249,7 +249,7 @@ def overview(slug, title, description, nodes, hashes, scope, stages, notes, work
                  path("M 925 438 V 605")]
         for i, label in enumerate(labels):
             y = 169 + i * 65
-            body += box(36, y, 170, 48, label, "source feed" if label != "CALC" else "derived tool")
+            body += box(36, y, 170, 48, label, "source feed" if label != "DERIVED" else "derived tool")
             body += box(240, y, 168, 48, label, "read observations")
             body += box(645, y, 168, 48, label, "audit CP1 + feed")
         body += box(445, 338, 160, 100, "Cross → Orient", "Decide · CP1", True, label_size=16)
@@ -263,7 +263,7 @@ def overview(slug, title, description, nodes, hashes, scope, stages, notes, work
         for x, label in [(36, "ORIGINAL LAB SUBJECT"), (234, "LATER TRUTH FEED"),
                          (460, "SIX LANE REVIEWS"), (710, "SYNTHESIS")]:
             body.append(text(x, 125, label, 13, "600", "#64748b"))
-        labels = ("Stocks", "ETFs", "Macro", "News", "Prediction mkts", "CALC")
+        labels = ("Measurements", "Subsystems", "Environment", "Events", "Interventions", "DERIVED")
         for i, label in enumerate(labels):
             cy = 169 + i * 65
             body += [path(f"M 206 {cy + 24} H 210 Q 218 {cy + 24} 218 {cy + 16} "
@@ -346,17 +346,17 @@ def replay(hashes):
     """The intended saved-snapshot workflow, separate from native DAG edges."""
     width, height = 1040, 574
     boxes = [
-        (36, 160, 270, "Earlier saved feeds", "Five source lanes + CALC", "#f5f7f9"),
+        (36, 160, 270, "Earlier saved feeds", "Five sources + summaries", "#f5f7f9"),
         (36, 280, 270, "Full Lab", "Two passes → CP1 and CP2", "#f5f7f9"),
         (36, 400, 270, "Frozen Lab CP2", "Selections and forecasts", "#e6f3ef"),
-        (385, 160, 270, "Later saved feeds", "Five source lanes + CALC", "#f5f7f9"),
+        (385, 160, 270, "Later saved feeds", "Five sources + summaries", "#f5f7f9"),
         (385, 400, 270, "Oracle", "Measured errors + diagnosis", "#f5f7f9"),
         (734, 280, 270, "Evolve review", "Candidate or no_change", "#fffaf0"),
         (734, 400, 270, "Matched comparison", "Old/new on same further inputs", "#fffaf0"),
     ]
     body = [text(32, 44, "Saved-snapshot replay · intended workflow", 29, "600"),
-            text(32, 76, "Real stocks / ETFs / prediction markets; synthetic macro / news; recomputed CALC.", 17),
-            text(32, 105, "Current mixed-input example: inputs loaded; first reasoning request prepared; no forecast yet.", 15),
+            text(32, 76, "Synthetic System A: measurements, subsystems, context, events, interventions and derived summaries.", 17),
+            text(32, 105, "Current synthetic example: inputs loaded; first reasoning request prepared; no forecast yet.", 15),
             text(36, 142, "EARLIER · ISSUE TIME", 13, "600", "#64748b"),
             text(385, 142, "LATER · TRUTH TIME", 13, "600", "#64748b"),
             text(734, 142, "CHANGE · FURTHER TEST", 13, "600", "#64748b")]
@@ -388,17 +388,17 @@ def replay(hashes):
 def main():
     nodes, hashes, groups = load_nodes()
     OUT.mkdir(parents=True, exist_ok=True)
-    lab_order = ["global_calculator_feed", "lab_seed_state"] + ["lab_miner_" + lane for lane in LANES]
+    lab_order = ["global_derived_feed", "lab_seed_state"] + ["lab_miner_" + lane for lane in LANES]
     lab_order += ["lab_cross_corr_v1", "lab_orient", "lab_decide"]
     lab_order += ["lab_miner_v2_" + lane for lane in LANES]
     lab_order += ["lab_cross_corr_v2", "lab_director", "lab_integrity"]
     lab = render("lab-detail", "Lab · full native dependency atlas",
-                 "All 25 Lab nodes and their exact prerequisite edges, from five source feeds and CALC through CP1, directed review, CP2 and Integrity.",
+                 "All 25 Lab nodes and their exact prerequisite edges, from five source feeds and DERIVED through CP1, directed review, CP2 and Integrity.",
                  nodes, hashes, closure(nodes, groups["lab"]), lab_order,
-                 ["Five feeds plus CALC → seed → six miners → Cross / Orient / Decide (CP1) → six directed miners → Cross / Director (CP2).",
+                 ["Five feeds plus DERIVED → seed → six miners → Cross / Orient / Decide (CP1) → six directed miners → Cross / Director (CP2).",
                   "Integrity consumes both phases. Its 18 prerequisites span two continued panels; nothing is omitted.",
                   "Feed content is bound to the issue snapshot by runtime configuration, not by an extra JSON dependency edge."])
-    oracle_order = ["global_calculator_feed", "oracle_subject_index", "oracle_truth_diff_equity", "oracle_truth_diff_macro"]
+    oracle_order = ["global_derived_feed", "oracle_subject_index", "oracle_truth_diff_observations", "oracle_truth_diff_environment"]
     oracle_order += ["oracle_truth_" + lane for lane in LANES]
     oracle_order += ["oracle_truth_map", "oracle_attribution_map", "oracle_explain", "oracle_cp2_emitter"]
     oracle = render("oracle-detail", "Oracle · full native dependency atlas",
@@ -414,23 +414,23 @@ def main():
                     ["Delta Analyzer receives the paired Lab CP2 and Oracle quartet through runner inputs, not a declared dependency edge.",
                      "Readiness gates block missing or unusable feedback. Exporting a handoff is not completed analysis or an applied patch."], evolve_review)
     feeds = groups["feeds"]
-    overview("lab", "Lab · evidence to frozen predictions", "Five source feeds + derived CALC; two passes of model reasoning.", nodes, hashes,
+    overview("lab", "Lab · evidence to frozen predictions", "Five source feeds + derived DERIVED; two passes of model reasoning.", nodes, hashes,
              closure(nodes, groups["lab"]), [
-        ("TOOLS · five feeds + CALC", "Stocks · ETFs · macro · news · prediction markets", feeds),
+        ("TOOLS · five feeds + DERIVED", "Measurements · Subsystems · environment · events · interventions", feeds),
         ("Seed state", "Set the starting context from the available evidence.", ["lab_seed_state"]),
-        ("Six miners · first pass", "One reasoning operator per feed or calculator lane.", ["lab_miner_" + lane for lane in LANES]),
+        ("Six miners · first pass", "One reasoning operator per feed or derived lane.", ["lab_miner_" + lane for lane in LANES]),
         ("Cross → Orient → Decide · CP1", "Combine lane reports; freeze the first decision checkpoint.", ["lab_cross_corr_v1", "lab_orient", "lab_decide"]),
         ("Six directed miners · second pass", "Revisit each lane using CP1 and its source feed.", ["lab_miner_v2_" + lane for lane in LANES]),
         ("Cross → Director · CP2", "Combine directed reports; freeze selections and forecasts.", ["lab_cross_corr_v2", "lab_director"]),
         ("Integrity", "Check the seed and artifacts from both reasoning passes.", ["lab_integrity"]),
     ], ["Solid arrows: real dependencies between groups; internal and skip edges are in detail.",
-        "CALC derives from stocks, ETFs and macro. Source feeds also enter both miner passes.",
+        "Summaries derive from measurements, subsystems and context. Source feeds also enter both miner passes.",
         "Issue-time feed hydration is a runtime binding, not an extra native graph edge."])
     subjects = [i for i in groups["oracle"] if i.startswith("oracle_subject_") and i != "oracle_subject_index"]
     overview("oracle", "Oracle · frozen forecast meets later evidence", "Original Lab artifacts and later truth remain distinct runtime inputs.", nodes, hashes,
              closure(nodes, groups["oracle"]), [
-        ("TOOLS · subject mirrors | later truth feeds + CALC", "Original Lab decisions and evidence | later outcome snapshot", subjects + feeds),
-        ("TOOLS · subject index + numerical diffs", "Recover forecast targets; compare equity and macro values.", ["oracle_subject_index", "oracle_truth_diff_equity", "oracle_truth_diff_macro"]),
+        ("TOOLS · subject mirrors | later truth feeds + DERIVED", "Original Lab decisions and evidence | later outcome snapshot", subjects + feeds),
+        ("TOOLS · subject index + numerical diffs", "Recover forecast targets; compare observations with later values.", ["oracle_subject_index", "oracle_truth_diff_observations", "oracle_truth_diff_environment"]),
         ("Six lane reviews", "Reason over the original subject and each lane’s later evidence.", ["oracle_truth_" + lane for lane in LANES]),
         ("Truth map", "Combine lane reviews and measured differences.", ["oracle_truth_map"]),
         ("Attribution → Explain", "Propose an account of what happened and why.", ["oracle_attribution_map", "oracle_explain"]),
@@ -455,18 +455,17 @@ def main():
     replay(hashes)
     (ROOT / "docs/graphs.md").write_text(f"""# Actual graph diagrams
 
-> **This is not financial advice.** This is experimental research. Historical
-> examples and model outputs are not investment recommendations and must not be
-> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
+> **Experimental research prototype.** The example uses invented observations.
+> See the [research notice](../RESEARCH_NOTICE.md).
 
 The [saved-snapshot replay](graphs/replay.svg) shows the intended workflow.
-The current example keeps real stock, ETF and prediction-market inputs; macro
-and news are labelled synthetic replacements, and CALC is recomputed.
+The current example uses five invented perspectives on System A. A sixth feed
+computes summaries from those observations; it is not independent evidence.
 It has prepared the first reasoning request, with no forecast yet.
 See [current status](status.md) and [per-feed provenance](../examples/demo/provenance.json).
 SVG metadata hashes the node definitions used to draw the graphs.
 
-![Replay workflow: earlier saved feeds and CALC through Lab and frozen CP2; later feeds through Oracle diagnosis, Evolve review and a later matched comparison](graphs/replay.svg)
+![Replay workflow: earlier saved feeds and DERIVED through Lab and frozen CP2; later feeds through Oracle diagnosis, Evolve review and a later matched comparison](graphs/replay.svg)
 
 Read the three columns from issue time to truth time to a further test. The
 earlier saved feeds enter Lab; its CP2 forecast is frozen before the later feeds
@@ -476,20 +475,20 @@ inputs.
 
 The grouped views below open those stages into their native operators.
 
-![Lab: five feeds and CALC through two reasoning passes, CP1, CP2 and Integrity](graphs/lab.svg)
+![Lab: five feeds and DERIVED through two reasoning passes, CP1, CP2 and Integrity](graphs/lab.svg)
 
-Follow one row: the saved STOCK table enters the stock miner, which reports
+Follow one row: the saved MEASUREMENTS table enters the measurements miner, which reports
 observations with source references. Cross-correlation joins all six miner
 reports; Orient weighs them; Decide freezes CP1, including numerical forecast
-quantiles on its judgmental branch. The directed stock miner then checks that
-thesis against CP1 and the original stock feed. The second Cross and Director
+estimates with declared units and horizons. The directed measurements miner then checks that
+thesis against CP1 and the earlier measurements feed. The second Cross and Director
 assemble CP2; Integrity checks artifacts from both passes. The second pass
 does not refit CP1's frozen estimates.
 
 ![Oracle: original Lab subjects and later evidence through truth reviews to Oracle CP2](graphs/oracle.svg)
 
 Oracle reads the original Lab reasoning beside the later saved feeds. Code
-computes numerical equity and macro differences; the six lane reviews inspect
+computes numerical observation and context differences; the six lane reviews inspect
 later evidence against the original subject. Truth map combines the reviews and
 differences, then Attribution and Explain propose a diagnosis. Oracle CP2 keeps
 the original subject targets and citation eligibility. A diagnosis is a
@@ -509,8 +508,8 @@ They group CP1's internal Cross / Orient / Decide chain, CP2's Cross / Director
 chain, and Oracle's Attribution / Explain chain. Direct feed reuse, subject-index
 inputs and other skip edges are left to the exact views below. A shared bus
 means that the named lane outputs enter a downstream consumer; it does not mean
-that every box in one column connects to every box in another. CALC derives from
-the stock, ETF and macro feeds.
+that every box in one column connects to every box in another. Derived summaries use
+the measurements, subsystem and context feeds.
 
 | Exact dependency view | Native nodes | Declared edges |
 |---|---:|---:|

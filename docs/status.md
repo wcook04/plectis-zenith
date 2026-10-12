@@ -1,19 +1,7 @@
 # Current result
 
-**This is not financial advice.** [Research notice](../RESEARCH_NOTICE.md).
+**Experimental research prototype.** The public example uses synthetic observations of a disclosed toy generator. No predictive improvement has been demonstrated.
 
-The current mixed-input configuration is prepared, not evaluated.
+The generic synthetic configuration demonstrates preparation only. The public [receipt](../examples/demo/result.json) owns current counts, input hashes and pending-node state. The intended boundary is six loaded inputs, a prepared first request, zero model calls and no completed forecast, Oracle diagnosis or Evolve comparison.
 
-- Graph validation: 50 nodes; Lab closure 25 nodes/86 edges, Oracle closure 28 nodes/53 edges.
-- Two input packets: real stocks, ETFs and prediction markets; synthetic macro/news; recomputed CALC.
-- Native Lab: six input artifacts loaded; first agent request prepared.
-- Model calls: zero. Completed forecasts: zero. Oracle/Evolve comparison: not run.
-
-[Machine-readable receipt](../examples/demo/result.json) ·
-[Input provenance](../examples/demo/provenance.json).
-
-Earlier private experiments remain attached to their original graph and data.
-They are not measurements of this revised configuration. The next empirical step
-is to freeze an authorised input/model setup, complete Lab, score its frozen
-predictions against the later observations and compare a specific revision on
-further cases. There is no demonstrated forecasting advantage.
+Historical runs belong to their original graph and inputs. They are not measurements of this configuration. Next complete Lab, evaluate frozen targets against later observations, and compare a specific revision on further matched cases with predeclared scoring and budget.

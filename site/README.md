@@ -1,7 +1,7 @@
 # Zenith teaching website
 
-**This is not financial advice.** Zenith is an experimental research prototype.
-Historical examples and model outputs are not investment recommendations. See
+**Experimental research prototype.** The demonstration uses only invented observations.
+Preparation does not demonstrate predictive accuracy or improvement. See
 the [research notice](../RESEARCH_NOTICE.md).
 
 A React frontend for the read-only website API in

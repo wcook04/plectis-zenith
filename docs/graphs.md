@@ -1,17 +1,16 @@
 # Actual graph diagrams
 
-> **This is not financial advice.** This is experimental research. Historical
-> examples and model outputs are not investment recommendations and must not be
-> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
+> **Experimental research prototype.** The example uses invented observations.
+> See the [research notice](../RESEARCH_NOTICE.md).
 
 The [saved-snapshot replay](graphs/replay.svg) shows the intended workflow.
-The current example keeps real stock, ETF and prediction-market inputs; macro
-and news are labelled synthetic replacements, and CALC is recomputed.
+The current example uses five invented perspectives on System A. A sixth feed
+computes summaries from those observations; it is not independent evidence.
 It has prepared the first reasoning request, with no forecast yet.
 See [current status](status.md) and [per-feed provenance](../examples/demo/provenance.json).
 SVG metadata hashes the node definitions used to draw the graphs.
 
-![Replay workflow: earlier saved feeds and CALC through Lab and frozen CP2; later feeds through Oracle diagnosis, Evolve review and a later matched comparison](graphs/replay.svg)
+![Replay workflow: earlier saved feeds and DERIVED through Lab and frozen CP2; later feeds through Oracle diagnosis, Evolve review and a later matched comparison](graphs/replay.svg)
 
 Read the three columns from issue time to truth time to a further test. The
 earlier saved feeds enter Lab; its CP2 forecast is frozen before the later feeds
@@ -21,20 +20,20 @@ inputs.
 
 The grouped views below open those stages into their native operators.
 
-![Lab: five feeds and CALC through two reasoning passes, CP1, CP2 and Integrity](graphs/lab.svg)
+![Lab: five feeds and DERIVED through two reasoning passes, CP1, CP2 and Integrity](graphs/lab.svg)
 
-Follow one row: the saved STOCK table enters the stock miner, which reports
+Follow one row: the saved MEASUREMENTS table enters the measurements miner, which reports
 observations with source references. Cross-correlation joins all six miner
 reports; Orient weighs them; Decide freezes CP1, including numerical forecast
-quantiles on its judgmental branch. The directed stock miner then checks that
-thesis against CP1 and the original stock feed. The second Cross and Director
+estimates with declared units and horizons. The directed measurements miner then checks that
+thesis against CP1 and the earlier measurements feed. The second Cross and Director
 assemble CP2; Integrity checks artifacts from both passes. The second pass
 does not refit CP1's frozen estimates.
 
 ![Oracle: original Lab subjects and later evidence through truth reviews to Oracle CP2](graphs/oracle.svg)
 
 Oracle reads the original Lab reasoning beside the later saved feeds. Code
-computes numerical equity and macro differences; the six lane reviews inspect
+computes numerical observation and context differences; the six lane reviews inspect
 later evidence against the original subject. Truth map combines the reviews and
 differences, then Attribution and Explain propose a diagnosis. Oracle CP2 keeps
 the original subject targets and citation eligibility. A diagnosis is a
@@ -54,8 +53,8 @@ They group CP1's internal Cross / Orient / Decide chain, CP2's Cross / Director
 chain, and Oracle's Attribution / Explain chain. Direct feed reuse, subject-index
 inputs and other skip edges are left to the exact views below. A shared bus
 means that the named lane outputs enter a downstream consumer; it does not mean
-that every box in one column connects to every box in another. CALC derives from
-the stock, ETF and macro feeds.
+that every box in one column connects to every box in another. Derived summaries use
+the measurements, subsystem and context feeds.
 
 | Exact dependency view | Native nodes | Declared edges |
 |---|---:|---:|

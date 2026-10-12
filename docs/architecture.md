@@ -1,39 +1,23 @@
-# Follow one snapshot pair
+# Architecture
 
-> **This is not financial advice.** This is experimental research. Historical
-> examples and model outputs are not investment recommendations and must not be
-> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
+**Experimental research prototype.** The public example uses synthetic observations of a disclosed toy generator. No predictive improvement has been demonstrated.
 
-1. Give Lab the saved earlier feed directory. It reads all five source feeds and
-   CALC, runs its two reasoning passes and saves the selected predictions.
-2. Give Oracle the original Lab directory and the later feed directory. Code
-   measures recorded outcomes; reasoning nodes propose explanations.
-3. Evolve reads the paired record and proposes a versioned instruction or graph
-   change. Preserve the old procedure and the exact proposed change.
-4. Compare both versions on the same later inputs before retaining a change.
+Zenith is a language-model program for forecasting changing, partially observed systems. Its nodes read heterogeneous, incomplete, overlapping or delayed observations and save structured records. Reasoning reconciles semantics and clocks, distinguishes missing from conflicting evidence, proposes competing explanations and selects explicit targets. Intermediate records expose the support chain; source agreement is not a count of independent votes. The same system is observed through measurements, subsystems, environment, events and interventions. A derived feed computes summaries from supplied measurements, subsystem and environment records.
 
-[The diagrams](graphs.md) show the operators and their dependencies. Five source lanes
-are present: STOCK, ETF, MACRO, POLYMARKET and NEWS. CALCULATOR derives
-summaries from stock, ETF and macro inputs. The saved feeds are inputs; replay
-does not call live acquisition tools to replace their contents.
+Lab inventories the cutoff-bound packet, analyses each feed, synthesises findings, forms competing explanations and freezes a thesis at CP1. Directed miners revisit that thesis using the same permitted feeds; Director freezes predictions at CP2 and Integrity checks both passes. Node and edge counts come from `python -m zenith validate`.
 
-| Operation | Owner |
-|---|---|
-| Load and execute the original graph | `zenith/runtime.py`, `system/core/engine.py` |
-| Score forecasts and selections | `feedback/engine.py`, `feedback/selection.py` |
-| Build the paired Evolve handoff | `tools/refinement/run_evolve.py` |
-| Freeze a reviewed successor policy | `zenith/daily.py::compile_review` |
-| Compare later versions | `research/daily_matchoff.py`, `research/cohort.py` |
-| Trace and aggregate failure hypotheses | `research/failure_windows.py` |
+Oracle reads the frozen Lab subject beside later evidence. Deterministic differences and lane reviews enter an evidence summary, attribution hypothesis and final review record. Evolve proposes a reviewed instruction, context or dependency revision. Its native dossier path and the daily comparison controller are separate. A version is accepted through an explicit decision after a matched later comparison.
 
-`zenith daily` is the existing controller for an adapter-backed sequence. The
-FNSPID adapter supplies prices and news only; it is separate from the original
-six-input mixed example. Direct `zenith run lab` and `zenith run oracle` accept saved
-feed directories without inventing a new dataset or scheduler.
+Runtime hydration binds global feeds to the earlier packet for Lab and later packet for Oracle. It does not add native edges. Exact definitions live under `codex/substrate/nodes/`; regenerate diagrams through `scripts/build_graphs.py`. The general interface establishes no universal predictive performance.
 
-An execution failure, a forecast error and a proposed explanation are different
-records. Keep all three. See [failure diagnosis](failure-diagnosis.md) for the
-original evidence-location distinctions and repeated-window analysis.
+Applicability requires common system/entity/time linkage, a declared target and horizon, and later measurable truth. For example, a greenhouse could combine temperature/humidity sensors, soil or subsystem readings, weather context, door-event logs and planned/executed irrigation or ventilation controls to predict humidity or temperature six hours ahead. A missing sensor stream differs from contradictory readings; duplicate weather summaries supply overlapping evidence, not extra votes. Equipment networks and laboratory experiments are other candidate applications, without tested transfer claims. The public System A recurrence remains a separate protocol fixture, not a greenhouse simulator. Compare against direct and numerical baselines; the protocol assumes neither that a language model is necessary nor that it improves prediction.
 
-The current [demo](demo.md) retains real stock/ETF/prediction-market inputs and
-uses labelled replacements only for macro/news. CALC is recomputed.
+## Physical problem setting
+
+The proposed use is a partially observed dynamical system. Sensors expose different functions or aspects of state; available histories and known forces, boundaries and interventions condition its future. A position measurement alone need not reveal velocity or direction. History may help, but some state remains unobservable and identifiability is not universal. See Russ Tedrake's [Output Feedback](https://underactuated.mit.edu/output_feedback.html) and [System Identification](https://underactuated.mit.edu/sysid.html).
+
+Heat transfer could combine temperature, heater power, weather and door/vent observations for a six-hour chamber or greenhouse temperature target. Damped vibration could combine camera position, accelerometer readings and force/calibration logs for a one-second displacement or acceleration target. Fluid transport could combine flow, pressure, dye and valve records for downstream concentration; geometry and boundary conditions are necessary inputs.
+
+The graph's proposed job is to align clocks, units and dependent sources; compare sensor-fault with state/regime explanations; select or parameterise a suitable physical model or numerical tool; and freeze target, horizon and uncertainty. Narrative cannot replace equations. Solver integration and transfer to these applications are unimplemented and untested. The disclosed System A recurrence remains a separate protocol fixture, without physical interpretation. Common entity/time linkage and later measurable truth remain required.
+
+The reasoning DAG represents computational dependencies, not physical causality. A physical system may have feedback; an acyclic per-forecast graph coordinates its analysis and tools.

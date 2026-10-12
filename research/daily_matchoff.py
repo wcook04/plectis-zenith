@@ -49,34 +49,33 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
         snapshot = adapter.snapshot(Path(dataset), day, path)
         snapshots.append((path, snapshot))
     issues, truth = [], []
-    basis, currency = set(), set()
+    basis, unit = set(), set()
     for i, (before, after) in enumerate(zip(snapshots, snapshots[1:])):
-        subject_rows = feedback.dated_rows(before[0]/'artifacts/global_stock_feed.json')
-        truth_rows = feedback.dated_rows(after[0]/'artifacts/global_stock_feed.json')
+        subject_rows = feedback.dated_rows(before[0]/'artifacts/global_measurements_feed.json')
+        truth_rows = feedback.dated_rows(after[0]/'artifacts/global_measurements_feed.json')
         targets = sorted(r['target_id'] for r in subject_rows)
         if targets != sorted(r['target_id'] for r in truth_rows):
-            raise ValueError('Complete identical asset support required across an episode')
+            raise ValueError('Complete identical target support required across an episode')
         for row in subject_rows+truth_rows:
-            basis.add(row['price_basis']); currency.add(row['currency'])
+            basis.add(row['observation_basis']); unit.add(row['unit'])
         target_time = after[1].get('observation_at_utc', after[1]['issue_at_utc'])
         # The native engine accepts next_us_close or an exact timestamp. The
         # source adapter already resolved other exchanges' holidays and closes.
         issues.append({'issue_id': 'day-'+dates[i].replace('-', ''), 'feed_source': str(before[0]),
                        'time_anchor': before[1]['issue_at_utc'],
                        'target_time': target_time,
-                       'horizon_id': 'next_us_close' if calendar.name == 'XNYS' else target_time,
+                       'horizon_id': target_time,
                        'target_ids': targets, 'split': 'development'})
-        truth.extend({'target_id': r['target_id'], 'date': r['observed'], 'price': r['price'],
+        truth.extend({'target_id': r['target_id'], 'observed_at': r['observed'], 'available_at': r['available_at'], 'unit':r['unit'], 'value': r['value'],
                       'source': r['source']} for r in truth_rows)
-    if len(basis) != 1 or None in basis or len(currency) != 1 or None in currency:
-        raise ValueError('One explicit price basis and currency required')
-    price_basis, price_currency = next(iter(basis)), next(iter(currency))
+    if len(basis) != 1 or None in basis or len(unit) != 1 or None in unit:
+        raise ValueError('One explicit value basis and unit required')
+    observation_basis, value_unit = next(iter(basis)), next(iter(unit))
     policy = {'schema': 'zenith_forecast_feedback_policy_v1', 'policy_id': 'daily-matchoff-v1',
-              'price_basis': price_basis, 'currency': price_currency, 'observation_precision': 'session_close',
-              'calendar_id': calendar.name, 'calendar_version': importlib.metadata.version('exchange_calendars'),
+              'observation_basis': observation_basis, 'unit': value_unit, 'observation_precision': 'timestamp',
               'relative_error_threshold': 0.05}
     daily.immutable(output/'feedback-policy.json', policy)
-    daily.immutable(output/'truth.json', {'metadata': {'status': 'success', 'price_basis': price_basis, 'currency': price_currency},
+    daily.immutable(output/'truth.json', {'metadata': {'status': 'success', 'observation_basis': observation_basis, 'unit': value_unit},
                                          'data': {'rows': truth}})
     source_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
     rows = []
@@ -102,7 +101,7 @@ def freeze(root, directory, episode, dataset, start, end, output, model, minimum
                'max_calls_per_run': max_calls_per_run,
                'response_allowance_total': 2*max_calls_per_run*len(issues),
                'comparison': 'development; no untouched or prospective assessment claim',
-               'selection': 'complete common support; at least twenty issues; declared target-price error margin; separate review'}
+               'selection': 'complete common support; at least twenty issues; declared target-value error margin; separate review'}
     binding['matchoff_sha256'] = daily.digest(binding)
     daily.immutable(output/'matchoff.json', binding)
     return {'status': 'prepared', **binding, 'next': ['python', '-m', 'research', 'cohort-next', '--study', str(output/'cohort')]}

@@ -1,1499 +1,1796 @@
 {
- "schema": "zenith_web_graph_v1",
- "mission": "lab",
- "waves": [
-  [
-   "global_etf_feed",
-   "global_macro_feed",
-   "global_news_feed",
-   "global_polymarket_feed",
-   "global_stock_feed",
-   "global_stockgrid_feed"
+  "schema": "zenith_web_graph_v1",
+  "mission": "lab",
+  "nodes": [
+    {
+      "id": "global_derived_feed",
+      "type": "tool",
+      "group": "feeds",
+      "lane": "DERIVED",
+      "purpose": "Expose explicit derived observations of a system at a cutoff.",
+      "mechanism": "Local observation artifact; no live acquisition.",
+      "expectation": "Preserve target identity, value, unit, observed_at and available_at; missing data remains visible.",
+      "boundary": "",
+      "instruction": "Instruction for global_derived_feed",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "global_measurements_feed",
+        "global_environment_feed",
+        "global_subsystems_feed"
+      ],
+      "consumers": [
+        "lab_miner_derived",
+        "lab_miner_v2_derived",
+        "lab_seed_state",
+        "oracle_truth_derived"
+      ],
+      "demo_provenance": {
+        "node_id": "global_derived_feed",
+        "input_origin": "derived_synthetic_inputs",
+        "input_sha256": "b7ed2f98f13b243ad2f69bf512aa691d7aaf0ef7e6cc0dc6f65a36e58ca88fb1",
+        "public_payload": "included",
+        "permission_status": "original_fixture"
+      },
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "derived",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Audit the declared calculation against its input rows. A derived summary is not independent corroboration of those inputs.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/derived.json",
+          "sha256": "64ac963c69004cc3a58374a855496d321a66c114e55babc79221c756f5f6651f",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/derived.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/feeds/global_derived_feed.json",
+        "sha256": "d7fcbd97e00eff0339ffa927a1c7d9b8137f15c10728758263db76a7bd45ebc2",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_derived_feed.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "global_environment_feed",
+      "type": "tool",
+      "group": "feeds",
+      "lane": "ENVIRONMENT",
+      "purpose": "Expose explicit environment observations of a system at a cutoff.",
+      "mechanism": "Local observation artifact; no live acquisition.",
+      "expectation": "Preserve target identity, value, unit, observed_at and available_at; missing data remains visible.",
+      "boundary": "",
+      "instruction": "Instruction for global_environment_feed",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [],
+      "consumers": [
+        "global_derived_feed",
+        "lab_miner_environment",
+        "lab_miner_v2_environment",
+        "lab_seed_state",
+        "oracle_truth_diff_environment",
+        "oracle_truth_environment"
+      ],
+      "demo_provenance": {
+        "node_id": "global_environment_feed",
+        "input_origin": "authored_synthetic",
+        "input_sha256": "d5dd1b21cb2c1906cdc807806e36a389c3b2ad6eff8943b1f34a94361d50550b",
+        "public_payload": "included",
+        "permission_status": "original_fixture"
+      },
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "environment",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read external context and timing; a contemporaneous association does not establish influence.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/environment.json",
+          "sha256": "fa7e8a9b653e9ab62531e8356f271852bd1030628ac15daf40eff29941b6095f",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/environment.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/feeds/global_environment_feed.json",
+        "sha256": "56479e59a41c7844cde6f4d8848e7056e93cae416daecc203ecf6d4cc577294f",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_environment_feed.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "global_events_feed",
+      "type": "tool",
+      "group": "feeds",
+      "lane": "EVENTS",
+      "purpose": "Expose explicit events observations of a system at a cutoff.",
+      "mechanism": "Local observation artifact; no live acquisition.",
+      "expectation": "Preserve target identity, value, unit, observed_at and available_at; missing data remains visible.",
+      "boundary": "",
+      "instruction": "Instruction for global_events_feed",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [],
+      "consumers": [
+        "lab_miner_events",
+        "lab_miner_v2_events",
+        "lab_seed_state",
+        "oracle_truth_events"
+      ],
+      "demo_provenance": {
+        "node_id": "global_events_feed",
+        "input_origin": "authored_synthetic",
+        "input_sha256": "aa022251daa736428e1d0c7a65f41a163c1997a8e9d5b291e72d73c96b6017d5",
+        "public_payload": "included",
+        "permission_status": "original_fixture"
+      },
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "events",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read qualitative event records with occurrence and availability times; distinguish statements from observations.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/events.json",
+          "sha256": "36de959f918485cf299d59909ece1a0d77f4b3b78009a05e87af1b939d2fc19a",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/events.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/feeds/global_events_feed.json",
+        "sha256": "f59fc2e8a429ba1c2c89d1518f7c6ff3a658f6615d29fd026363ec25586a14db",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_events_feed.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "global_interventions_feed",
+      "type": "tool",
+      "group": "feeds",
+      "lane": "INTERVENTIONS",
+      "purpose": "Expose explicit interventions observations of a system at a cutoff.",
+      "mechanism": "Local observation artifact; no live acquisition.",
+      "expectation": "Preserve target identity, value, unit, observed_at and available_at; missing data remains visible.",
+      "boundary": "",
+      "instruction": "Instruction for global_interventions_feed",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [],
+      "consumers": [
+        "lab_miner_interventions",
+        "lab_miner_v2_interventions",
+        "lab_seed_state",
+        "oracle_truth_interventions"
+      ],
+      "demo_provenance": {
+        "node_id": "global_interventions_feed",
+        "input_origin": "authored_synthetic",
+        "input_sha256": "f99256dfc9e907dbedb4ef74e56a4e023db2279b6e23f84f1340a156a80b6a8e",
+        "public_payload": "included",
+        "permission_status": "original_fixture"
+      },
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "interventions",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Distinguish planned commands, executed controls, and observed outcomes. Temporal association with a control does not identify a causal effect.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/interventions.json",
+          "sha256": "15e3056b0949484496de83dbafa529f080e8f2db9ad263944324280a4a01a0de",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/interventions.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/feeds/global_interventions_feed.json",
+        "sha256": "e57fa93a3254b2d5f878fad99040a85216ad63f2f9ef2d0030144673fb756749",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_interventions_feed.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "global_measurements_feed",
+      "type": "tool",
+      "group": "feeds",
+      "lane": "MEASUREMENTS",
+      "purpose": "Expose explicit measurements observations of a system at a cutoff.",
+      "mechanism": "Local observation artifact; no live acquisition.",
+      "expectation": "Preserve target identity, value, unit, observed_at and available_at; missing data remains visible.",
+      "boundary": "",
+      "instruction": "Instruction for global_measurements_feed",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [],
+      "consumers": [
+        "global_derived_feed",
+        "lab_miner_measurements",
+        "lab_miner_v2_measurements",
+        "lab_seed_state",
+        "oracle_truth_diff_observations",
+        "oracle_truth_measurements"
+      ],
+      "demo_provenance": {
+        "node_id": "global_measurements_feed",
+        "input_origin": "authored_synthetic",
+        "input_sha256": "b44639725ac831553d3c99d76195266f21fab8ecf93d810b5dada56a377f6bb6",
+        "public_payload": "included",
+        "permission_status": "original_fixture"
+      },
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "measurements",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read actual numeric measurements; distinguish observation error from model uncertainty.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/measurements.json",
+          "sha256": "3dc429eba76b0694beeb25f1053c3af9f9852be34274ea56f2b30784edabac0f",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/measurements.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/feeds/global_measurements_feed.json",
+        "sha256": "5e51015428560f5667bf57a1444b621c362553d823048ae0591e53e34f647ad3",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_measurements_feed.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "global_subsystems_feed",
+      "type": "tool",
+      "group": "feeds",
+      "lane": "SUBSYSTEMS",
+      "purpose": "Expose explicit subsystems observations of a system at a cutoff.",
+      "mechanism": "Local observation artifact; no live acquisition.",
+      "expectation": "Preserve target identity, value, unit, observed_at and available_at; missing data remains visible.",
+      "boundary": "",
+      "instruction": "Instruction for global_subsystems_feed",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [],
+      "consumers": [
+        "global_derived_feed",
+        "lab_miner_subsystems",
+        "lab_miner_v2_subsystems",
+        "lab_seed_state",
+        "oracle_truth_diff_observations",
+        "oracle_truth_subsystems"
+      ],
+      "demo_provenance": {
+        "node_id": "global_subsystems_feed",
+        "input_origin": "authored_synthetic",
+        "input_sha256": "cd9f82f14a2d4f5a9350fb8ce5c2449c0890e0d49dcc0717a76c3b2c02e53c78",
+        "public_payload": "included",
+        "permission_status": "original_fixture"
+      },
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "subsystems",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read component views; shared hidden state does not make correlated component views independent evidence.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/subsystems.json",
+          "sha256": "4fb28705fe6401d4ee480b763ceffdb55ed42c8752385867544618b00690d3f0",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/subsystems.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/feeds/global_subsystems_feed.json",
+        "sha256": "19eb7963bbfb71a0a9944d04f0ffbd87550b627fbd0aacb5c6855901093812a4",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_subsystems_feed.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_cross_corr_v1",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "SPINE",
+      "purpose": "Native lab_cross_corr_v1 role over a system observed at explicit times.",
+      "mechanism": "LLM Pattern Recognition",
+      "expectation": "Output the declared contract with explicit grounding and uncertainty.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_cross_corr_v1",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_miner_measurements",
+        "lab_miner_subsystems",
+        "lab_miner_environment",
+        "lab_miner_events",
+        "lab_miner_interventions",
+        "lab_miner_derived"
+      ],
+      "consumers": [
+        "lab_decide",
+        "lab_integrity",
+        "lab_orient"
+      ],
+      "demo_provenance": null,
+      "dossier": null,
+      "output_schema": "json",
+      "source": {
+        "path": "codex/substrate/nodes/lab/cross_corr_v1.json",
+        "sha256": "7a77a7f3501aaca5da7b403f57e1836c4ff1bb0393756741885eb07118f4e9c3",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/cross_corr_v1.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_cross_corr_v2",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "SPINE",
+      "purpose": "Native lab_cross_corr_v2 role over a system observed at explicit times.",
+      "mechanism": "LLM Pattern Recognition",
+      "expectation": "Output the declared contract with explicit grounding and uncertainty.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_cross_corr_v2",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_miner_v2_measurements",
+        "lab_miner_v2_subsystems",
+        "lab_miner_v2_environment",
+        "lab_miner_v2_events",
+        "lab_miner_v2_interventions",
+        "lab_miner_v2_derived"
+      ],
+      "consumers": [
+        "lab_director",
+        "lab_integrity"
+      ],
+      "demo_provenance": null,
+      "dossier": null,
+      "output_schema": "json",
+      "source": {
+        "path": "codex/substrate/nodes/lab/cross_corr_v2.json",
+        "sha256": "3a2a1d2ebe54a6f453897fc89c73e124a5c1319f24bf523fc2bc87322d16f24a",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/cross_corr_v2.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_decide",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "SPINE",
+      "purpose": "Freeze a cited CP1 hypothesis or explicit abstention before later observations.",
+      "mechanism": "LLM Synthesis",
+      "expectation": "Valid CP1 evidence_dictionary, epicentre_thesis and decision status.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_decide",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_miner_measurements",
+        "lab_miner_subsystems",
+        "lab_miner_environment",
+        "lab_miner_events",
+        "lab_miner_interventions",
+        "lab_miner_derived",
+        "lab_cross_corr_v1",
+        "lab_orient"
+      ],
+      "consumers": [
+        "lab_director",
+        "lab_integrity",
+        "lab_miner_v2_derived",
+        "lab_miner_v2_environment",
+        "lab_miner_v2_events",
+        "lab_miner_v2_interventions",
+        "lab_miner_v2_measurements",
+        "lab_miner_v2_subsystems"
+      ],
+      "demo_provenance": null,
+      "dossier": null,
+      "output_schema": "isomorphic_cp1",
+      "source": {
+        "path": "codex/substrate/nodes/lab/decide.json",
+        "sha256": "7351802aae136dc2f136c5776dc129a60133925fe187f3a18c274368b0da8e3a",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/decide.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_director",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "SPINE",
+      "purpose": "Freeze unit-bearing numeric CP2 forecasts at the declared later horizon.",
+      "mechanism": "LLM Synthesis",
+      "expectation": "Valid CP2 predictions_t and cited forecast_rationale, preserving CP1 commitments.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_director",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_decide",
+        "lab_miner_v2_measurements",
+        "lab_miner_v2_subsystems",
+        "lab_miner_v2_environment",
+        "lab_miner_v2_events",
+        "lab_miner_v2_interventions",
+        "lab_miner_v2_derived",
+        "lab_cross_corr_v2"
+      ],
+      "consumers": [
+        "lab_integrity"
+      ],
+      "demo_provenance": null,
+      "dossier": null,
+      "output_schema": "isomorphic_cp2",
+      "source": {
+        "path": "codex/substrate/nodes/lab/director.json",
+        "sha256": "d8d35b936f20d2277d2363f3e75ca247ae6279433d53527c9a566477bbd7c2a2",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/director.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_integrity",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "SPINE",
+      "purpose": "Audit forecast commitments against evidence, target support and time boundaries.",
+      "mechanism": "Semantic Oracle",
+      "expectation": "An integrity judgment with concrete failures and preserved abstention.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_integrity",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_seed_state",
+        "lab_miner_measurements",
+        "lab_miner_subsystems",
+        "lab_miner_environment",
+        "lab_miner_events",
+        "lab_miner_interventions",
+        "lab_miner_derived",
+        "lab_cross_corr_v1",
+        "lab_orient",
+        "lab_decide",
+        "lab_miner_v2_measurements",
+        "lab_miner_v2_subsystems",
+        "lab_miner_v2_environment",
+        "lab_miner_v2_events",
+        "lab_miner_v2_interventions",
+        "lab_miner_v2_derived",
+        "lab_cross_corr_v2",
+        "lab_director"
+      ],
+      "consumers": [],
+      "demo_provenance": null,
+      "dossier": null,
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/integrity.json",
+        "sha256": "05e869c590a6b0fb798b2c6d15eb86db94ae16b6a9bdb6938492cb85b033ee0d",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/integrity.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_derived",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "DERIVED",
+      "purpose": "Audit recomputed summaries and preserve their dependence on source inputs.",
+      "mechanism": "LLM Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_derived",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "global_derived_feed",
+        "lab_seed_state"
+      ],
+      "consumers": [
+        "lab_cross_corr_v1",
+        "lab_decide",
+        "lab_integrity",
+        "lab_orient"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "derived",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Audit the declared calculation against its input rows. A derived summary is not independent corroboration of those inputs.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/derived.json",
+          "sha256": "64ac963c69004cc3a58374a855496d321a66c114e55babc79221c756f5f6651f",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/derived.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_derived.json",
+        "sha256": "d9e76e304faac1c70624353da7b1f23cd34f0e5d668556376b269d3d21c89818",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_derived.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_environment",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "ENVIRONMENT",
+      "purpose": "Extract external context, availability and possible contextual influences.",
+      "mechanism": "LLM Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_environment",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "global_environment_feed",
+        "lab_seed_state"
+      ],
+      "consumers": [
+        "lab_cross_corr_v1",
+        "lab_decide",
+        "lab_integrity",
+        "lab_orient"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "environment",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read external context and timing; a contemporaneous association does not establish influence.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/environment.json",
+          "sha256": "fa7e8a9b653e9ab62531e8356f271852bd1030628ac15daf40eff29941b6095f",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/environment.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_environment.json",
+        "sha256": "bd6907df86fd65971cea7ce8952e19c6193222bc52a28dd87e68def07af80380",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_environment.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_events",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "EVENTS",
+      "purpose": "Extract qualitative event records while separating statements from observations.",
+      "mechanism": "LLM Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_events",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "global_events_feed",
+        "lab_seed_state"
+      ],
+      "consumers": [
+        "lab_cross_corr_v1",
+        "lab_decide",
+        "lab_integrity",
+        "lab_orient"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "events",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read qualitative event records with occurrence and availability times; distinguish statements from observations.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/events.json",
+          "sha256": "36de959f918485cf299d59909ece1a0d77f4b3b78009a05e87af1b939d2fc19a",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/events.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_events.json",
+        "sha256": "9e4fb9e93a678da807265cd97f4f56f9bf16d24ed38c01ba515226aa71c09b6d",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_events.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_interventions",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "INTERVENTIONS",
+      "purpose": "Extract planned and executed controls; distinguish timing from identified effects.",
+      "mechanism": "LLM Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_interventions",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "global_interventions_feed",
+        "lab_seed_state"
+      ],
+      "consumers": [
+        "lab_cross_corr_v1",
+        "lab_decide",
+        "lab_integrity",
+        "lab_orient"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "interventions",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Distinguish planned commands, executed controls, and observed outcomes. Temporal association with a control does not identify a causal effect.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/interventions.json",
+          "sha256": "15e3056b0949484496de83dbafa529f080e8f2db9ad263944324280a4a01a0de",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/interventions.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_interventions.json",
+        "sha256": "7b69811bb397d3a9deda1061b3266240a4fe2df93222e705c44923674e5d7198",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_interventions.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_measurements",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "MEASUREMENTS",
+      "purpose": "Extract actual numeric measurements and observation uncertainty.",
+      "mechanism": "LLM Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_measurements",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "global_measurements_feed",
+        "lab_seed_state"
+      ],
+      "consumers": [
+        "lab_cross_corr_v1",
+        "lab_decide",
+        "lab_integrity",
+        "lab_orient"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "measurements",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read actual numeric measurements; distinguish observation error from model uncertainty.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/measurements.json",
+          "sha256": "3dc429eba76b0694beeb25f1053c3af9f9852be34274ea56f2b30784edabac0f",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/measurements.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_measurements.json",
+        "sha256": "b0b800573b3d71f55b4db334c75894940606e243d8798b139ae3c383a802a193",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_measurements.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_subsystems",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "SUBSYSTEMS",
+      "purpose": "Extract component-level views, shared support and component disagreements.",
+      "mechanism": "LLM Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_subsystems",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "global_subsystems_feed",
+        "lab_seed_state"
+      ],
+      "consumers": [
+        "lab_cross_corr_v1",
+        "lab_decide",
+        "lab_integrity",
+        "lab_orient"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "subsystems",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read component views; shared hidden state does not make correlated component views independent evidence.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/subsystems.json",
+          "sha256": "4fb28705fe6401d4ee480b763ceffdb55ed42c8752385867544618b00690d3f0",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/subsystems.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_subsystems.json",
+        "sha256": "912d633574416005bb57a2a636ac26adf33faeba44674113f9d5470cdef097c6",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_subsystems.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_v2_derived",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "DERIVED",
+      "purpose": "Audit recomputed summaries and preserve their dependence on source inputs. Test the frozen CP1 hypothesis.",
+      "mechanism": "LLM Directed Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_v2_derived",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_decide",
+        "global_derived_feed"
+      ],
+      "consumers": [
+        "lab_cross_corr_v2",
+        "lab_director",
+        "lab_integrity"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "derived",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Audit the declared calculation against its input rows. A derived summary is not independent corroboration of those inputs.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/derived.json",
+          "sha256": "64ac963c69004cc3a58374a855496d321a66c114e55babc79221c756f5f6651f",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/derived.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_v2_derived.json",
+        "sha256": "1126f872d46b5dde0d426cc9681b94a284abb6b0657b1854800d5fca23191c01",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_derived.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_v2_environment",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "ENVIRONMENT",
+      "purpose": "Extract external context, availability and possible contextual influences. Test the frozen CP1 hypothesis.",
+      "mechanism": "LLM Directed Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_v2_environment",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_decide",
+        "global_environment_feed"
+      ],
+      "consumers": [
+        "lab_cross_corr_v2",
+        "lab_director",
+        "lab_integrity"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "environment",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read external context and timing; a contemporaneous association does not establish influence.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/environment.json",
+          "sha256": "fa7e8a9b653e9ab62531e8356f271852bd1030628ac15daf40eff29941b6095f",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/environment.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_v2_environment.json",
+        "sha256": "83a6690b9500b0a6d2842018cd8a3f9e35e8e0204836cd5e2b49a53dd6b438aa",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_environment.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_v2_events",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "EVENTS",
+      "purpose": "Extract qualitative event records while separating statements from observations. Test the frozen CP1 hypothesis.",
+      "mechanism": "LLM Directed Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_v2_events",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_decide",
+        "global_events_feed"
+      ],
+      "consumers": [
+        "lab_cross_corr_v2",
+        "lab_director",
+        "lab_integrity"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "events",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read qualitative event records with occurrence and availability times; distinguish statements from observations.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/events.json",
+          "sha256": "36de959f918485cf299d59909ece1a0d77f4b3b78009a05e87af1b939d2fc19a",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/events.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_v2_events.json",
+        "sha256": "8bf51997ae2609923870cbfab6f693b4ba8e21556dfbe1d866337a70a21eba23",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_events.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_v2_interventions",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "INTERVENTIONS",
+      "purpose": "Extract planned and executed controls; distinguish timing from identified effects. Test the frozen CP1 hypothesis.",
+      "mechanism": "LLM Directed Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_v2_interventions",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_decide",
+        "global_interventions_feed"
+      ],
+      "consumers": [
+        "lab_cross_corr_v2",
+        "lab_director",
+        "lab_integrity"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "interventions",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Distinguish planned commands, executed controls, and observed outcomes. Temporal association with a control does not identify a causal effect.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/interventions.json",
+          "sha256": "15e3056b0949484496de83dbafa529f080e8f2db9ad263944324280a4a01a0de",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/interventions.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_v2_interventions.json",
+        "sha256": "6d52ccb1e169749456d727b7be4aa1eeace3176fac90329b83fba818d9111675",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_interventions.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_v2_measurements",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "MEASUREMENTS",
+      "purpose": "Extract actual numeric measurements and observation uncertainty. Test the frozen CP1 hypothesis.",
+      "mechanism": "LLM Directed Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_v2_measurements",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_decide",
+        "global_measurements_feed"
+      ],
+      "consumers": [
+        "lab_cross_corr_v2",
+        "lab_director",
+        "lab_integrity"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "measurements",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read actual numeric measurements; distinguish observation error from model uncertainty.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/measurements.json",
+          "sha256": "3dc429eba76b0694beeb25f1053c3af9f9852be34274ea56f2b30784edabac0f",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/measurements.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_v2_measurements.json",
+        "sha256": "b9dd09e76a7602ce6f25902d0bc3b40d91cd6bb328f776e50dc2f1a3cf9be04d",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_measurements.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_miner_v2_subsystems",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "SUBSYSTEMS",
+      "purpose": "Extract component-level views, shared support and component disagreements. Test the frozen CP1 hypothesis.",
+      "mechanism": "LLM Directed Extraction",
+      "expectation": "Atomic tuples containing actual subject, observed value/unit, context, source uncertainty and support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_miner_v2_subsystems",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_decide",
+        "global_subsystems_feed"
+      ],
+      "consumers": [
+        "lab_cross_corr_v2",
+        "lab_director",
+        "lab_integrity"
+      ],
+      "demo_provenance": null,
+      "dossier": {
+        "data": {
+          "schema_version": "zenith_observation_dossier_v1",
+          "perspective": "subsystems",
+          "system": "An observed system; the public fixture uses abstract System A.",
+          "role": "Read component views; shared hidden state does not make correlated component views independent evidence.",
+          "contract": {
+            "cutoff": "Only records with observed_at and available_at no later than cutoff enter Lab.",
+            "numeric": "target_id,value,unit; preserve zero and negative finite values.",
+            "missingness": "Missing observations remain missing; never impute a successful evaluation.",
+            "uncertainty": "Model uncertainty is distinct from measurement provenance.",
+            "future": "Predictions freeze snapshot_value,target_value,unit and explicit target_time_iso."
+          },
+          "mechanisms": {},
+          "patterns": {}
+        },
+        "source": {
+          "path": "codex/substrate/dossiers/subsystems.json",
+          "sha256": "4fb28705fe6401d4ee480b763ceffdb55ed42c8752385867544618b00690d3f0",
+          "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/dossiers/subsystems.json"
+        }
+      },
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/miner_v2_subsystems.json",
+        "sha256": "2e995773fa3dc30fe45c74fb55f675a1cb58208987d35624b73692beabf2a642",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_subsystems.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_orient",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "SPINE",
+      "purpose": "Construct competing grounded system hypotheses and expected consequences.",
+      "mechanism": "LLM Logic Mapping",
+      "expectation": "Ranked hypothesis paths, cited evidence bases and unresolved alternatives.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_orient",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "lab_miner_measurements",
+        "lab_miner_subsystems",
+        "lab_miner_environment",
+        "lab_miner_events",
+        "lab_miner_interventions",
+        "lab_miner_derived",
+        "lab_cross_corr_v1"
+      ],
+      "consumers": [
+        "lab_decide",
+        "lab_integrity"
+      ],
+      "demo_provenance": null,
+      "dossier": null,
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/orient.json",
+        "sha256": "441416aba8291958d88e0db29aa48596e7cc62a35110f3de9a3c1b38b6f43132",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/orient.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    },
+    {
+      "id": "lab_seed_state",
+      "type": "reasoning",
+      "group": "lab",
+      "lane": "SPINE",
+      "purpose": "Inventory feed structure, clocks, units, coverage and missingness.",
+      "mechanism": "LLM Data Cartography",
+      "expectation": "A topology map with one section per feed and visible support limits.",
+      "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments.",
+      "instruction": "Instruction for lab_seed_state",
+      "instruction_kind": "current_authored_definition_not_run_override",
+      "dependencies": [
+        "global_measurements_feed",
+        "global_subsystems_feed",
+        "global_environment_feed",
+        "global_events_feed",
+        "global_interventions_feed",
+        "global_derived_feed"
+      ],
+      "consumers": [
+        "lab_integrity",
+        "lab_miner_derived",
+        "lab_miner_environment",
+        "lab_miner_events",
+        "lab_miner_interventions",
+        "lab_miner_measurements",
+        "lab_miner_subsystems"
+      ],
+      "demo_provenance": null,
+      "dossier": null,
+      "output_schema": "text",
+      "source": {
+        "path": "codex/substrate/nodes/lab/seed_state.json",
+        "sha256": "ad1bf50d441d4878419a6080b76849cb1a6ba8d70e25e0307e27ed7dda2538cb",
+        "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/seed_state.json"
+      },
+      "explanation_url": "/api/v1/documents/graphs"
+    }
   ],
-  [
-   "global_calculator_feed"
+  "edges": [
+    {
+      "id": "global_measurements_feed->global_derived_feed",
+      "source": "global_measurements_feed",
+      "target": "global_derived_feed",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_environment_feed->global_derived_feed",
+      "source": "global_environment_feed",
+      "target": "global_derived_feed",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_subsystems_feed->global_derived_feed",
+      "source": "global_subsystems_feed",
+      "target": "global_derived_feed",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_measurements->lab_cross_corr_v1",
+      "source": "lab_miner_measurements",
+      "target": "lab_cross_corr_v1",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_subsystems->lab_cross_corr_v1",
+      "source": "lab_miner_subsystems",
+      "target": "lab_cross_corr_v1",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_environment->lab_cross_corr_v1",
+      "source": "lab_miner_environment",
+      "target": "lab_cross_corr_v1",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_events->lab_cross_corr_v1",
+      "source": "lab_miner_events",
+      "target": "lab_cross_corr_v1",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_interventions->lab_cross_corr_v1",
+      "source": "lab_miner_interventions",
+      "target": "lab_cross_corr_v1",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_derived->lab_cross_corr_v1",
+      "source": "lab_miner_derived",
+      "target": "lab_cross_corr_v1",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_measurements->lab_cross_corr_v2",
+      "source": "lab_miner_v2_measurements",
+      "target": "lab_cross_corr_v2",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_subsystems->lab_cross_corr_v2",
+      "source": "lab_miner_v2_subsystems",
+      "target": "lab_cross_corr_v2",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_environment->lab_cross_corr_v2",
+      "source": "lab_miner_v2_environment",
+      "target": "lab_cross_corr_v2",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_events->lab_cross_corr_v2",
+      "source": "lab_miner_v2_events",
+      "target": "lab_cross_corr_v2",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_interventions->lab_cross_corr_v2",
+      "source": "lab_miner_v2_interventions",
+      "target": "lab_cross_corr_v2",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_derived->lab_cross_corr_v2",
+      "source": "lab_miner_v2_derived",
+      "target": "lab_cross_corr_v2",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_measurements->lab_decide",
+      "source": "lab_miner_measurements",
+      "target": "lab_decide",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_subsystems->lab_decide",
+      "source": "lab_miner_subsystems",
+      "target": "lab_decide",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_environment->lab_decide",
+      "source": "lab_miner_environment",
+      "target": "lab_decide",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_events->lab_decide",
+      "source": "lab_miner_events",
+      "target": "lab_decide",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_interventions->lab_decide",
+      "source": "lab_miner_interventions",
+      "target": "lab_decide",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_derived->lab_decide",
+      "source": "lab_miner_derived",
+      "target": "lab_decide",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_cross_corr_v1->lab_decide",
+      "source": "lab_cross_corr_v1",
+      "target": "lab_decide",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_orient->lab_decide",
+      "source": "lab_orient",
+      "target": "lab_decide",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_decide->lab_director",
+      "source": "lab_decide",
+      "target": "lab_director",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_measurements->lab_director",
+      "source": "lab_miner_v2_measurements",
+      "target": "lab_director",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_subsystems->lab_director",
+      "source": "lab_miner_v2_subsystems",
+      "target": "lab_director",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_environment->lab_director",
+      "source": "lab_miner_v2_environment",
+      "target": "lab_director",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_events->lab_director",
+      "source": "lab_miner_v2_events",
+      "target": "lab_director",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_interventions->lab_director",
+      "source": "lab_miner_v2_interventions",
+      "target": "lab_director",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_derived->lab_director",
+      "source": "lab_miner_v2_derived",
+      "target": "lab_director",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_cross_corr_v2->lab_director",
+      "source": "lab_cross_corr_v2",
+      "target": "lab_director",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_seed_state->lab_integrity",
+      "source": "lab_seed_state",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_measurements->lab_integrity",
+      "source": "lab_miner_measurements",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_subsystems->lab_integrity",
+      "source": "lab_miner_subsystems",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_environment->lab_integrity",
+      "source": "lab_miner_environment",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_events->lab_integrity",
+      "source": "lab_miner_events",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_interventions->lab_integrity",
+      "source": "lab_miner_interventions",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_derived->lab_integrity",
+      "source": "lab_miner_derived",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_cross_corr_v1->lab_integrity",
+      "source": "lab_cross_corr_v1",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_orient->lab_integrity",
+      "source": "lab_orient",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_decide->lab_integrity",
+      "source": "lab_decide",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_measurements->lab_integrity",
+      "source": "lab_miner_v2_measurements",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_subsystems->lab_integrity",
+      "source": "lab_miner_v2_subsystems",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_environment->lab_integrity",
+      "source": "lab_miner_v2_environment",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_events->lab_integrity",
+      "source": "lab_miner_v2_events",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_interventions->lab_integrity",
+      "source": "lab_miner_v2_interventions",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_v2_derived->lab_integrity",
+      "source": "lab_miner_v2_derived",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_cross_corr_v2->lab_integrity",
+      "source": "lab_cross_corr_v2",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_director->lab_integrity",
+      "source": "lab_director",
+      "target": "lab_integrity",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_derived_feed->lab_miner_derived",
+      "source": "global_derived_feed",
+      "target": "lab_miner_derived",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_seed_state->lab_miner_derived",
+      "source": "lab_seed_state",
+      "target": "lab_miner_derived",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_environment_feed->lab_miner_environment",
+      "source": "global_environment_feed",
+      "target": "lab_miner_environment",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_seed_state->lab_miner_environment",
+      "source": "lab_seed_state",
+      "target": "lab_miner_environment",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_events_feed->lab_miner_events",
+      "source": "global_events_feed",
+      "target": "lab_miner_events",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_seed_state->lab_miner_events",
+      "source": "lab_seed_state",
+      "target": "lab_miner_events",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_interventions_feed->lab_miner_interventions",
+      "source": "global_interventions_feed",
+      "target": "lab_miner_interventions",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_seed_state->lab_miner_interventions",
+      "source": "lab_seed_state",
+      "target": "lab_miner_interventions",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_measurements_feed->lab_miner_measurements",
+      "source": "global_measurements_feed",
+      "target": "lab_miner_measurements",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_seed_state->lab_miner_measurements",
+      "source": "lab_seed_state",
+      "target": "lab_miner_measurements",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_subsystems_feed->lab_miner_subsystems",
+      "source": "global_subsystems_feed",
+      "target": "lab_miner_subsystems",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_seed_state->lab_miner_subsystems",
+      "source": "lab_seed_state",
+      "target": "lab_miner_subsystems",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_decide->lab_miner_v2_derived",
+      "source": "lab_decide",
+      "target": "lab_miner_v2_derived",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_derived_feed->lab_miner_v2_derived",
+      "source": "global_derived_feed",
+      "target": "lab_miner_v2_derived",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_decide->lab_miner_v2_environment",
+      "source": "lab_decide",
+      "target": "lab_miner_v2_environment",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_environment_feed->lab_miner_v2_environment",
+      "source": "global_environment_feed",
+      "target": "lab_miner_v2_environment",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_decide->lab_miner_v2_events",
+      "source": "lab_decide",
+      "target": "lab_miner_v2_events",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_events_feed->lab_miner_v2_events",
+      "source": "global_events_feed",
+      "target": "lab_miner_v2_events",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_decide->lab_miner_v2_interventions",
+      "source": "lab_decide",
+      "target": "lab_miner_v2_interventions",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_interventions_feed->lab_miner_v2_interventions",
+      "source": "global_interventions_feed",
+      "target": "lab_miner_v2_interventions",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_decide->lab_miner_v2_measurements",
+      "source": "lab_decide",
+      "target": "lab_miner_v2_measurements",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_measurements_feed->lab_miner_v2_measurements",
+      "source": "global_measurements_feed",
+      "target": "lab_miner_v2_measurements",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_decide->lab_miner_v2_subsystems",
+      "source": "lab_decide",
+      "target": "lab_miner_v2_subsystems",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_subsystems_feed->lab_miner_v2_subsystems",
+      "source": "global_subsystems_feed",
+      "target": "lab_miner_v2_subsystems",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_measurements->lab_orient",
+      "source": "lab_miner_measurements",
+      "target": "lab_orient",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_subsystems->lab_orient",
+      "source": "lab_miner_subsystems",
+      "target": "lab_orient",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_environment->lab_orient",
+      "source": "lab_miner_environment",
+      "target": "lab_orient",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_events->lab_orient",
+      "source": "lab_miner_events",
+      "target": "lab_orient",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_interventions->lab_orient",
+      "source": "lab_miner_interventions",
+      "target": "lab_orient",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_miner_derived->lab_orient",
+      "source": "lab_miner_derived",
+      "target": "lab_orient",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "lab_cross_corr_v1->lab_orient",
+      "source": "lab_cross_corr_v1",
+      "target": "lab_orient",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_measurements_feed->lab_seed_state",
+      "source": "global_measurements_feed",
+      "target": "lab_seed_state",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_subsystems_feed->lab_seed_state",
+      "source": "global_subsystems_feed",
+      "target": "lab_seed_state",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_environment_feed->lab_seed_state",
+      "source": "global_environment_feed",
+      "target": "lab_seed_state",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_events_feed->lab_seed_state",
+      "source": "global_events_feed",
+      "target": "lab_seed_state",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_interventions_feed->lab_seed_state",
+      "source": "global_interventions_feed",
+      "target": "lab_seed_state",
+      "kind": "declared_dependency"
+    },
+    {
+      "id": "global_derived_feed->lab_seed_state",
+      "source": "global_derived_feed",
+      "target": "lab_seed_state",
+      "kind": "declared_dependency"
+    }
   ],
-  [
-   "lab_seed_state"
+  "waves": [
+    [
+      "global_environment_feed",
+      "global_events_feed",
+      "global_interventions_feed",
+      "global_measurements_feed",
+      "global_subsystems_feed"
+    ],
+    [
+      "global_derived_feed"
+    ],
+    [
+      "lab_seed_state"
+    ],
+    [
+      "lab_miner_derived",
+      "lab_miner_environment",
+      "lab_miner_events",
+      "lab_miner_interventions",
+      "lab_miner_measurements",
+      "lab_miner_subsystems"
+    ],
+    [
+      "lab_cross_corr_v1"
+    ],
+    [
+      "lab_orient"
+    ],
+    [
+      "lab_decide"
+    ],
+    [
+      "lab_miner_v2_derived",
+      "lab_miner_v2_environment",
+      "lab_miner_v2_events",
+      "lab_miner_v2_interventions",
+      "lab_miner_v2_measurements",
+      "lab_miner_v2_subsystems"
+    ],
+    [
+      "lab_cross_corr_v2"
+    ],
+    [
+      "lab_director"
+    ],
+    [
+      "lab_integrity"
+    ]
   ],
-  [
-   "lab_miner_calc",
-   "lab_miner_etf",
-   "lab_miner_macro",
-   "lab_miner_news",
-   "lab_miner_poly",
-   "lab_miner_stock",
-   "lab_miner_stockgrid"
-  ],
-  [
-   "lab_cross_corr_v1"
-  ],
-  [
-   "lab_orient"
-  ],
-  [
-   "lab_decide"
-  ],
-  [
-   "lab_miner_v2_calc",
-   "lab_miner_v2_etf",
-   "lab_miner_v2_macro",
-   "lab_miner_v2_news",
-   "lab_miner_v2_poly",
-   "lab_miner_v2_stock",
-   "lab_miner_v2_stockgrid"
-  ],
-  [
-   "lab_cross_corr_v2"
-  ],
-  [
-   "lab_director"
-  ],
-  [
-   "lab_integrity"
-  ]
- ],
- "edges": [
-  {
-   "id": "global_stock_feed->global_calculator_feed",
-   "source": "global_stock_feed",
-   "target": "global_calculator_feed",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_macro_feed->global_calculator_feed",
-   "source": "global_macro_feed",
-   "target": "global_calculator_feed",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_etf_feed->global_calculator_feed",
-   "source": "global_etf_feed",
-   "target": "global_calculator_feed",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_stock->lab_cross_corr_v1",
-   "source": "lab_miner_stock",
-   "target": "lab_cross_corr_v1",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_etf->lab_cross_corr_v1",
-   "source": "lab_miner_etf",
-   "target": "lab_cross_corr_v1",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_macro->lab_cross_corr_v1",
-   "source": "lab_miner_macro",
-   "target": "lab_cross_corr_v1",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_news->lab_cross_corr_v1",
-   "source": "lab_miner_news",
-   "target": "lab_cross_corr_v1",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_poly->lab_cross_corr_v1",
-   "source": "lab_miner_poly",
-   "target": "lab_cross_corr_v1",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_calc->lab_cross_corr_v1",
-   "source": "lab_miner_calc",
-   "target": "lab_cross_corr_v1",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_stockgrid->lab_cross_corr_v1",
-   "source": "lab_miner_stockgrid",
-   "target": "lab_cross_corr_v1",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_stock->lab_cross_corr_v2",
-   "source": "lab_miner_v2_stock",
-   "target": "lab_cross_corr_v2",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_etf->lab_cross_corr_v2",
-   "source": "lab_miner_v2_etf",
-   "target": "lab_cross_corr_v2",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_macro->lab_cross_corr_v2",
-   "source": "lab_miner_v2_macro",
-   "target": "lab_cross_corr_v2",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_news->lab_cross_corr_v2",
-   "source": "lab_miner_v2_news",
-   "target": "lab_cross_corr_v2",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_poly->lab_cross_corr_v2",
-   "source": "lab_miner_v2_poly",
-   "target": "lab_cross_corr_v2",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_calc->lab_cross_corr_v2",
-   "source": "lab_miner_v2_calc",
-   "target": "lab_cross_corr_v2",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_stockgrid->lab_cross_corr_v2",
-   "source": "lab_miner_v2_stockgrid",
-   "target": "lab_cross_corr_v2",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_stock->lab_decide",
-   "source": "lab_miner_stock",
-   "target": "lab_decide",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_etf->lab_decide",
-   "source": "lab_miner_etf",
-   "target": "lab_decide",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_macro->lab_decide",
-   "source": "lab_miner_macro",
-   "target": "lab_decide",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_news->lab_decide",
-   "source": "lab_miner_news",
-   "target": "lab_decide",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_poly->lab_decide",
-   "source": "lab_miner_poly",
-   "target": "lab_decide",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_calc->lab_decide",
-   "source": "lab_miner_calc",
-   "target": "lab_decide",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_stockgrid->lab_decide",
-   "source": "lab_miner_stockgrid",
-   "target": "lab_decide",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_cross_corr_v1->lab_decide",
-   "source": "lab_cross_corr_v1",
-   "target": "lab_decide",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_orient->lab_decide",
-   "source": "lab_orient",
-   "target": "lab_decide",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_decide->lab_director",
-   "source": "lab_decide",
-   "target": "lab_director",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_stock->lab_director",
-   "source": "lab_miner_v2_stock",
-   "target": "lab_director",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_etf->lab_director",
-   "source": "lab_miner_v2_etf",
-   "target": "lab_director",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_macro->lab_director",
-   "source": "lab_miner_v2_macro",
-   "target": "lab_director",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_news->lab_director",
-   "source": "lab_miner_v2_news",
-   "target": "lab_director",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_poly->lab_director",
-   "source": "lab_miner_v2_poly",
-   "target": "lab_director",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_calc->lab_director",
-   "source": "lab_miner_v2_calc",
-   "target": "lab_director",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_stockgrid->lab_director",
-   "source": "lab_miner_v2_stockgrid",
-   "target": "lab_director",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_cross_corr_v2->lab_director",
-   "source": "lab_cross_corr_v2",
-   "target": "lab_director",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_seed_state->lab_integrity",
-   "source": "lab_seed_state",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_stock->lab_integrity",
-   "source": "lab_miner_stock",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_etf->lab_integrity",
-   "source": "lab_miner_etf",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_macro->lab_integrity",
-   "source": "lab_miner_macro",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_news->lab_integrity",
-   "source": "lab_miner_news",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_poly->lab_integrity",
-   "source": "lab_miner_poly",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_calc->lab_integrity",
-   "source": "lab_miner_calc",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_stockgrid->lab_integrity",
-   "source": "lab_miner_stockgrid",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_cross_corr_v1->lab_integrity",
-   "source": "lab_cross_corr_v1",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_orient->lab_integrity",
-   "source": "lab_orient",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_decide->lab_integrity",
-   "source": "lab_decide",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_stock->lab_integrity",
-   "source": "lab_miner_v2_stock",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_etf->lab_integrity",
-   "source": "lab_miner_v2_etf",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_macro->lab_integrity",
-   "source": "lab_miner_v2_macro",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_news->lab_integrity",
-   "source": "lab_miner_v2_news",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_poly->lab_integrity",
-   "source": "lab_miner_v2_poly",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_calc->lab_integrity",
-   "source": "lab_miner_v2_calc",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_v2_stockgrid->lab_integrity",
-   "source": "lab_miner_v2_stockgrid",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_cross_corr_v2->lab_integrity",
-   "source": "lab_cross_corr_v2",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_director->lab_integrity",
-   "source": "lab_director",
-   "target": "lab_integrity",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_calculator_feed->lab_miner_calc",
-   "source": "global_calculator_feed",
-   "target": "lab_miner_calc",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_seed_state->lab_miner_calc",
-   "source": "lab_seed_state",
-   "target": "lab_miner_calc",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_etf_feed->lab_miner_etf",
-   "source": "global_etf_feed",
-   "target": "lab_miner_etf",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_seed_state->lab_miner_etf",
-   "source": "lab_seed_state",
-   "target": "lab_miner_etf",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_macro_feed->lab_miner_macro",
-   "source": "global_macro_feed",
-   "target": "lab_miner_macro",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_seed_state->lab_miner_macro",
-   "source": "lab_seed_state",
-   "target": "lab_miner_macro",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_news_feed->lab_miner_news",
-   "source": "global_news_feed",
-   "target": "lab_miner_news",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_seed_state->lab_miner_news",
-   "source": "lab_seed_state",
-   "target": "lab_miner_news",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_polymarket_feed->lab_miner_poly",
-   "source": "global_polymarket_feed",
-   "target": "lab_miner_poly",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_seed_state->lab_miner_poly",
-   "source": "lab_seed_state",
-   "target": "lab_miner_poly",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_stock_feed->lab_miner_stock",
-   "source": "global_stock_feed",
-   "target": "lab_miner_stock",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_seed_state->lab_miner_stock",
-   "source": "lab_seed_state",
-   "target": "lab_miner_stock",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_stockgrid_feed->lab_miner_stockgrid",
-   "source": "global_stockgrid_feed",
-   "target": "lab_miner_stockgrid",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_seed_state->lab_miner_stockgrid",
-   "source": "lab_seed_state",
-   "target": "lab_miner_stockgrid",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_decide->lab_miner_v2_calc",
-   "source": "lab_decide",
-   "target": "lab_miner_v2_calc",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_calculator_feed->lab_miner_v2_calc",
-   "source": "global_calculator_feed",
-   "target": "lab_miner_v2_calc",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_decide->lab_miner_v2_etf",
-   "source": "lab_decide",
-   "target": "lab_miner_v2_etf",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_etf_feed->lab_miner_v2_etf",
-   "source": "global_etf_feed",
-   "target": "lab_miner_v2_etf",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_decide->lab_miner_v2_macro",
-   "source": "lab_decide",
-   "target": "lab_miner_v2_macro",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_macro_feed->lab_miner_v2_macro",
-   "source": "global_macro_feed",
-   "target": "lab_miner_v2_macro",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_decide->lab_miner_v2_news",
-   "source": "lab_decide",
-   "target": "lab_miner_v2_news",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_news_feed->lab_miner_v2_news",
-   "source": "global_news_feed",
-   "target": "lab_miner_v2_news",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_decide->lab_miner_v2_poly",
-   "source": "lab_decide",
-   "target": "lab_miner_v2_poly",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_polymarket_feed->lab_miner_v2_poly",
-   "source": "global_polymarket_feed",
-   "target": "lab_miner_v2_poly",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_decide->lab_miner_v2_stock",
-   "source": "lab_decide",
-   "target": "lab_miner_v2_stock",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_stock_feed->lab_miner_v2_stock",
-   "source": "global_stock_feed",
-   "target": "lab_miner_v2_stock",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_decide->lab_miner_v2_stockgrid",
-   "source": "lab_decide",
-   "target": "lab_miner_v2_stockgrid",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_stockgrid_feed->lab_miner_v2_stockgrid",
-   "source": "global_stockgrid_feed",
-   "target": "lab_miner_v2_stockgrid",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_stock->lab_orient",
-   "source": "lab_miner_stock",
-   "target": "lab_orient",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_etf->lab_orient",
-   "source": "lab_miner_etf",
-   "target": "lab_orient",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_macro->lab_orient",
-   "source": "lab_miner_macro",
-   "target": "lab_orient",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_news->lab_orient",
-   "source": "lab_miner_news",
-   "target": "lab_orient",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_poly->lab_orient",
-   "source": "lab_miner_poly",
-   "target": "lab_orient",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_calc->lab_orient",
-   "source": "lab_miner_calc",
-   "target": "lab_orient",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_miner_stockgrid->lab_orient",
-   "source": "lab_miner_stockgrid",
-   "target": "lab_orient",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "lab_cross_corr_v1->lab_orient",
-   "source": "lab_cross_corr_v1",
-   "target": "lab_orient",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_stock_feed->lab_seed_state",
-   "source": "global_stock_feed",
-   "target": "lab_seed_state",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_etf_feed->lab_seed_state",
-   "source": "global_etf_feed",
-   "target": "lab_seed_state",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_macro_feed->lab_seed_state",
-   "source": "global_macro_feed",
-   "target": "lab_seed_state",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_news_feed->lab_seed_state",
-   "source": "global_news_feed",
-   "target": "lab_seed_state",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_polymarket_feed->lab_seed_state",
-   "source": "global_polymarket_feed",
-   "target": "lab_seed_state",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_calculator_feed->lab_seed_state",
-   "source": "global_calculator_feed",
-   "target": "lab_seed_state",
-   "kind": "declared_dependency"
-  },
-  {
-   "id": "global_stockgrid_feed->lab_seed_state",
-   "source": "global_stockgrid_feed",
-   "target": "lab_seed_state",
-   "kind": "declared_dependency"
-  }
- ],
- "node_count": 28,
- "edge_count": 98,
- "focus": {
-  "id": null,
-  "ancestors": [],
-  "descendants": []
- },
- "semantics": "Edges are authored prerequisites. Saved-run states and runtime feed hydration are separate evidence.",
- "nodes": [
-  {
-   "id": "global_calculator_feed",
-   "type": "tool",
-   "group": "feeds",
-   "lane": "CALCULATOR",
-   "dependencies": [
-    "global_stock_feed",
-    "global_macro_feed",
-    "global_etf_feed"
-   ],
-   "consumers": [
-    "lab_miner_calc",
-    "lab_miner_v2_calc",
-    "lab_seed_state",
-    "oracle_truth_calc"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for global_calculator_feed",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/feeds/global_calculator_feed.json",
-    "sha256": "c1deeba7568bbfff339415f8e9e9c1278385a708b57f4f81fa98661311a6ad22",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_calculator_feed.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "global_etf_feed",
-   "type": "tool",
-   "group": "feeds",
-   "lane": "ETF",
-   "dependencies": [],
-   "consumers": [
-    "global_calculator_feed",
-    "lab_miner_etf",
-    "lab_miner_v2_etf",
-    "lab_seed_state",
-    "oracle_truth_diff_equity",
-    "oracle_truth_etf"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for global_etf_feed",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/feeds/global_etf_feed.json",
-    "sha256": "a18b1dc00c63c3e4d2d19d07de27b7006017741276231874da92d43438f9dd8a",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_etf_feed.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "global_macro_feed",
-   "type": "tool",
-   "group": "feeds",
-   "lane": "MACRO",
-   "dependencies": [],
-   "consumers": [
-    "global_calculator_feed",
-    "lab_miner_macro",
-    "lab_miner_v2_macro",
-    "lab_seed_state",
-    "oracle_truth_diff_macro",
-    "oracle_truth_macro"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for global_macro_feed",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/feeds/global_macro_feed.json",
-    "sha256": "80d1c701fe11c2df60fa80d0ac8ce123f0d564ebc7198f61342a9d685b96e146",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_macro_feed.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "global_news_feed",
-   "type": "tool",
-   "group": "feeds",
-   "lane": "NEWS",
-   "dependencies": [],
-   "consumers": [
-    "lab_miner_news",
-    "lab_miner_v2_news",
-    "lab_seed_state",
-    "oracle_truth_news"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for global_news_feed",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/feeds/global_news_feed.json",
-    "sha256": "71a2b976c68d1ce709be980df2706537db28f05eb91b96adad27af3bbe97a251",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_news_feed.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "global_polymarket_feed",
-   "type": "tool",
-   "group": "feeds",
-   "lane": "POLYMARKET",
-   "dependencies": [],
-   "consumers": [
-    "lab_miner_poly",
-    "lab_miner_v2_poly",
-    "lab_seed_state",
-    "oracle_truth_poly"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for global_polymarket_feed",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/feeds/global_polymarket_feed.json",
-    "sha256": "7401b055e8b15827b746d0313db27c0be05d1fb29d4d5432155d5c62be164019",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_polymarket_feed.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "global_stock_feed",
-   "type": "tool",
-   "group": "feeds",
-   "lane": "STOCK",
-   "dependencies": [],
-   "consumers": [
-    "global_calculator_feed",
-    "lab_miner_stock",
-    "lab_miner_v2_stock",
-    "lab_seed_state",
-    "oracle_truth_diff_equity",
-    "oracle_truth_stock"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for global_stock_feed",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/feeds/global_stock_feed.json",
-    "sha256": "83782b2ef1186f21ff890964b463071159749ff8c984c30a3a09ea3dd759a514",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_stock_feed.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "global_stockgrid_feed",
-   "type": "tool",
-   "group": "feeds",
-   "lane": "STOCKGRID",
-   "dependencies": [],
-   "consumers": [
-    "lab_miner_stockgrid",
-    "lab_miner_v2_stockgrid",
-    "lab_seed_state",
-    "oracle_truth_stockgrid"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for global_stockgrid_feed",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/feeds/global_stockgrid_feed.json",
-    "sha256": "5954828317ed7af885419a897bcbfa1ce48ba810e472509a7f54b2921f535437",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/feeds/global_stockgrid_feed.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_cross_corr_v1",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "SPINE",
-   "dependencies": [
-    "lab_miner_stock",
-    "lab_miner_etf",
-    "lab_miner_macro",
-    "lab_miner_news",
-    "lab_miner_poly",
-    "lab_miner_calc",
-    "lab_miner_stockgrid"
-   ],
-   "consumers": [
-    "lab_decide",
-    "lab_integrity",
-    "lab_orient"
-   ],
-   "output_schema": "json",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_cross_corr_v1",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/cross_corr_v1.json",
-    "sha256": "07ffb6be11dc741a96d490d6a3f4c7754ac05d54c5c68b4562a48afd00b99ed6",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/cross_corr_v1.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_cross_corr_v2",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "SPINE",
-   "dependencies": [
-    "lab_miner_v2_stock",
-    "lab_miner_v2_etf",
-    "lab_miner_v2_macro",
-    "lab_miner_v2_news",
-    "lab_miner_v2_poly",
-    "lab_miner_v2_calc",
-    "lab_miner_v2_stockgrid"
-   ],
-   "consumers": [
-    "lab_director",
-    "lab_integrity"
-   ],
-   "output_schema": "json",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_cross_corr_v2",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/cross_corr_v2.json",
-    "sha256": "80ab69d68f29d6d91d250d476ffc12b65b4cc75fa6e765886313649e2d2639cf",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/cross_corr_v2.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_decide",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "SPINE",
-   "dependencies": [
-    "lab_miner_stock",
-    "lab_miner_etf",
-    "lab_miner_macro",
-    "lab_miner_news",
-    "lab_miner_poly",
-    "lab_miner_calc",
-    "lab_miner_stockgrid",
-    "lab_cross_corr_v1",
-    "lab_orient"
-   ],
-   "consumers": [
-    "lab_director",
-    "lab_integrity",
-    "lab_miner_v2_calc",
-    "lab_miner_v2_etf",
-    "lab_miner_v2_macro",
-    "lab_miner_v2_news",
-    "lab_miner_v2_poly",
-    "lab_miner_v2_stock",
-    "lab_miner_v2_stockgrid"
-   ],
-   "output_schema": "isomorphic_cp1",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_decide",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/decide.json",
-    "sha256": "e9fe07ff8d94d54e5207ca26fc77f68b7456dc910c8334d8dff5aeb0076f99e2",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/decide.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_director",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "SPINE",
-   "dependencies": [
-    "lab_decide",
-    "lab_miner_v2_stock",
-    "lab_miner_v2_etf",
-    "lab_miner_v2_macro",
-    "lab_miner_v2_news",
-    "lab_miner_v2_poly",
-    "lab_miner_v2_calc",
-    "lab_miner_v2_stockgrid",
-    "lab_cross_corr_v2"
-   ],
-   "consumers": [
-    "lab_integrity"
-   ],
-   "output_schema": "isomorphic_cp2",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_director",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/director.json",
-    "sha256": "020ba5df97a44bc0caceff34b1afc65fcf7282f080eac5398647e9e5ee12924e",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/director.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_integrity",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "SPINE",
-   "dependencies": [
-    "lab_seed_state",
-    "lab_miner_stock",
-    "lab_miner_etf",
-    "lab_miner_macro",
-    "lab_miner_news",
-    "lab_miner_poly",
-    "lab_miner_calc",
-    "lab_miner_stockgrid",
-    "lab_cross_corr_v1",
-    "lab_orient",
-    "lab_decide",
-    "lab_miner_v2_stock",
-    "lab_miner_v2_etf",
-    "lab_miner_v2_macro",
-    "lab_miner_v2_news",
-    "lab_miner_v2_poly",
-    "lab_miner_v2_calc",
-    "lab_miner_v2_stockgrid",
-    "lab_cross_corr_v2",
-    "lab_director"
-   ],
-   "consumers": [],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_integrity",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/integrity.json",
-    "sha256": "01ba6426f22d8efd0a257d825b1e23f4f191984e0b97ae43305d22b10f7a5268",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/integrity.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_calc",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "CALCULATOR",
-   "dependencies": [
-    "global_calculator_feed",
-    "lab_seed_state"
-   ],
-   "consumers": [
-    "lab_cross_corr_v1",
-    "lab_decide",
-    "lab_integrity",
-    "lab_orient"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_calc",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_calc.json",
-    "sha256": "c63c86e73f76ed3d068778cf6c98d0c92a596a5c9a6e9b5994eff9558175d7d9",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_calc.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_etf",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "ETF",
-   "dependencies": [
-    "global_etf_feed",
-    "lab_seed_state"
-   ],
-   "consumers": [
-    "lab_cross_corr_v1",
-    "lab_decide",
-    "lab_integrity",
-    "lab_orient"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_etf",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_etf.json",
-    "sha256": "0465d77fe97b0d25b7474a79111b6bc0440eb0d7ffe1497db02103a311aef3b5",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_etf.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_macro",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "MACRO",
-   "dependencies": [
-    "global_macro_feed",
-    "lab_seed_state"
-   ],
-   "consumers": [
-    "lab_cross_corr_v1",
-    "lab_decide",
-    "lab_integrity",
-    "lab_orient"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_macro",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_macro.json",
-    "sha256": "afe9ddf6330696bff96ec485388007a4ca28df89b61426abb145feee8773fd46",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_macro.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_news",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "NEWS",
-   "dependencies": [
-    "global_news_feed",
-    "lab_seed_state"
-   ],
-   "consumers": [
-    "lab_cross_corr_v1",
-    "lab_decide",
-    "lab_integrity",
-    "lab_orient"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_news",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_news.json",
-    "sha256": "0b5aa5385381b9cadeff7529fecbabf1bb876e0e4373bfcab49a463e794cb1e8",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_news.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_poly",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "POLYMARKET",
-   "dependencies": [
-    "global_polymarket_feed",
-    "lab_seed_state"
-   ],
-   "consumers": [
-    "lab_cross_corr_v1",
-    "lab_decide",
-    "lab_integrity",
-    "lab_orient"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_poly",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_poly.json",
-    "sha256": "d082c656b18abd279b2d27b789484eee25ae3373c46b896574b68fc5fab84418",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_poly.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_stock",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "STOCK",
-   "dependencies": [
-    "global_stock_feed",
-    "lab_seed_state"
-   ],
-   "consumers": [
-    "lab_cross_corr_v1",
-    "lab_decide",
-    "lab_integrity",
-    "lab_orient"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_stock",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_stock.json",
-    "sha256": "09b54baedcc68a3e4c64adc836453b4360737a7b4c908437dda276979d013e84",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_stock.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_stockgrid",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "STOCKGRID",
-   "dependencies": [
-    "global_stockgrid_feed",
-    "lab_seed_state"
-   ],
-   "consumers": [
-    "lab_cross_corr_v1",
-    "lab_decide",
-    "lab_integrity",
-    "lab_orient"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_stockgrid",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_stockgrid.json",
-    "sha256": "e6e00120f615046b468e21d5d529be403656c6d8d3de042900554c14ffaf6202",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_stockgrid.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_v2_calc",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "CALCULATOR",
-   "dependencies": [
-    "lab_decide",
-    "global_calculator_feed"
-   ],
-   "consumers": [
-    "lab_cross_corr_v2",
-    "lab_director",
-    "lab_integrity"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_v2_calc",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_v2_calc.json",
-    "sha256": "47da0ae2d503b518c5d34b4ee6473256031093df30c1cfe5f30cd1f1527c89da",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_calc.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_v2_etf",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "ETF",
-   "dependencies": [
-    "lab_decide",
-    "global_etf_feed"
-   ],
-   "consumers": [
-    "lab_cross_corr_v2",
-    "lab_director",
-    "lab_integrity"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_v2_etf",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_v2_etf.json",
-    "sha256": "a774e998777ff502e77866e26aeb5babb6464dbb79184fd5e823405a0f5bc3c5",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_etf.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_v2_macro",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "MACRO",
-   "dependencies": [
-    "lab_decide",
-    "global_macro_feed"
-   ],
-   "consumers": [
-    "lab_cross_corr_v2",
-    "lab_director",
-    "lab_integrity"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_v2_macro",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_v2_macro.json",
-    "sha256": "5da49dbef3d0d1ab6d9e429b3f3ec746887453bd398ee3b50ed15fe0446c901b",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_macro.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_v2_news",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "NEWS",
-   "dependencies": [
-    "lab_decide",
-    "global_news_feed"
-   ],
-   "consumers": [
-    "lab_cross_corr_v2",
-    "lab_director",
-    "lab_integrity"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_v2_news",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_v2_news.json",
-    "sha256": "3a1f2952c6675774c5df6e8cbb77e16a70df64c12180693986147791f3ddc397",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_news.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_v2_poly",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "POLYMARKET",
-   "dependencies": [
-    "lab_decide",
-    "global_polymarket_feed"
-   ],
-   "consumers": [
-    "lab_cross_corr_v2",
-    "lab_director",
-    "lab_integrity"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_v2_poly",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_v2_poly.json",
-    "sha256": "0a1bddd83ebb50c079e8fd896e96da667e38f0e7ae5afdf34e95e6d9f5fae3c6",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_poly.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_v2_stock",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "STOCK",
-   "dependencies": [
-    "lab_decide",
-    "global_stock_feed"
-   ],
-   "consumers": [
-    "lab_cross_corr_v2",
-    "lab_director",
-    "lab_integrity"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_v2_stock",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_v2_stock.json",
-    "sha256": "481e892f97fd434ddab5658e4aa738f904335871e5ea7068d53ec79243d84db8",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_stock.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_miner_v2_stockgrid",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "STOCKGRID",
-   "dependencies": [
-    "lab_decide",
-    "global_stockgrid_feed"
-   ],
-   "consumers": [
-    "lab_cross_corr_v2",
-    "lab_director",
-    "lab_integrity"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_miner_v2_stockgrid",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/miner_v2_stockgrid.json",
-    "sha256": "efbaebdcca892ce2d464669061b0775d8d9479ee237e2da8b36c3073792c2a9c",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/miner_v2_stockgrid.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_orient",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "SPINE",
-   "dependencies": [
-    "lab_miner_stock",
-    "lab_miner_etf",
-    "lab_miner_macro",
-    "lab_miner_news",
-    "lab_miner_poly",
-    "lab_miner_calc",
-    "lab_miner_stockgrid",
-    "lab_cross_corr_v1"
-   ],
-   "consumers": [
-    "lab_decide",
-    "lab_integrity"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_orient",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/orient.json",
-    "sha256": "25a7258efa636fb78412171a1315b9fe60762ddb11fe0a72ce125e15fa8317b6",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/orient.json"
-   },
-   "explanation_url": null
-  },
-  {
-   "id": "lab_seed_state",
-   "type": "reasoning",
-   "group": "lab",
-   "lane": "SPINE",
-   "dependencies": [
-    "global_stock_feed",
-    "global_etf_feed",
-    "global_macro_feed",
-    "global_news_feed",
-    "global_polymarket_feed",
-    "global_calculator_feed",
-    "global_stockgrid_feed"
-   ],
-   "consumers": [
-    "lab_integrity",
-    "lab_miner_calc",
-    "lab_miner_etf",
-    "lab_miner_macro",
-    "lab_miner_news",
-    "lab_miner_poly",
-    "lab_miner_stock",
-    "lab_miner_stockgrid"
-   ],
-   "output_schema": "text",
-   "purpose": "p",
-   "mechanism": "m",
-   "expectation": "e",
-   "boundary": "b",
-   "instruction": "Instruction for lab_seed_state",
-   "instruction_kind": "current_authored_definition_not_run_override",
-   "source": {
-    "path": "codex/substrate/nodes/lab/seed_state.json",
-    "sha256": "5fa246cc1fe159d85cc5d5287497b9e67d23bb718b8ad06f460e705c17469b61",
-    "url": "https://github.com/wcook04/plectis-zenith/blob/main/codex/substrate/nodes/lab/seed_state.json"
-   },
-   "explanation_url": null
-  }
- ]
+  "node_count": 25,
+  "edge_count": 86,
+  "focus": {
+    "id": null,
+    "ancestors": [],
+    "descendants": []
+  },
+  "semantics": "Edges are authored prerequisites. Saved-run states and runtime feed hydration are separate evidence.",
+  "definition_loaded_at_startup": true
 }

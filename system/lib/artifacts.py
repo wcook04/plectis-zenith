@@ -9,7 +9,7 @@
 - Reads: Run directory artifact files (*.json) from run_dir/artifacts/ or run_dir/ fallback.
 - Writes: None (read-only utilities).
 - Exports: load_artifact, load_artifact_data, discover_feed_artifacts, list_artifact_ledger_ids,
-           list_all_artifact_ledger_ids, load_snapshot_ledger_ids, load_equity_universe, EQUITY_FEED_IDS.
+           list_all_artifact_ledger_ids, load_snapshot_ledger_ids, load_observation_universe, OBSERVATION_FEED_IDS.
 
 [FLOW]
 - load_artifact: Reads full artifact envelope from artifacts/{node_id}.json; falls back to run_dir root.
@@ -18,7 +18,7 @@
 - list_artifact_ledger_ids: Extracts ledger_id values from one artifact's evidence_dictionary.
 - list_all_artifact_ledger_ids: Unions ledger_ids across all JSON artifacts in a run.
 - load_snapshot_ledger_ids: Returns Optional[Set[str]] snapshot ledger set for Golden-ID checks.
-- load_equity_universe: Unions ticker sets from global_stock_feed and global_etf_feed artifacts.
+- load_observation_universe: Unions target_id sets from global_measurements_feed and global_subsystems_feed artifacts.
 - When-needed: Open when Golden-ID checks, observer tracing, or CP2 universe validation need the canonical read-only artifact lookup rules for a run directory.
 - Escalates-to: system/lib/artifacts.py::load_artifact; system/lib/contracts.py
 - Navigation-group: kernel_lib
@@ -29,10 +29,10 @@
 [CONSTRAINTS]
 - All functions are pure (no mutation, no writes).
 - All functions return None or empty collections on any IO or shape failure; never raise.
-- Ticker normalization is always .upper().strip().
+- target_id normalization is always .upper().strip().
 - load_artifact tries artifacts/ subdir first, then run_dir root (backward-compatible with tools that
   wrote artifacts to the run root before the artifacts/ convention was formalized).
-- EQUITY_FEED_IDS defines the canonical set of equity feed node IDs whose ticker sets are unioned for
+- OBSERVATION_FEED_IDS defines the canonical set of observation feed node IDs whose target_id sets are unioned for
   CP2 universe validation.
 """
 from __future__ import annotations
@@ -41,8 +41,8 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set
 
-# Canonical equity feed node IDs whose ticker sets are unioned for CP2 universe checks.
-EQUITY_FEED_IDS: List[str] = ["global_stock_feed", "global_etf_feed"]
+# Canonical observation feed node IDs whose target_id sets are unioned for CP2 universe checks.
+OBSERVATION_FEED_IDS: List[str] = ["global_measurements_feed", "global_subsystems_feed"]
 
 
 # ---------------------------------------------------------------------------
@@ -102,7 +102,7 @@ def discover_feed_artifacts(
     - Guarantee: Returns only existing paths and never raises on a missing artifacts directory.
     - Fails: None.
     - When-needed: Open when a caller needs the authoritative discovery rule for feed artifacts before reading them.
-    - Escalates-to: system/lib/artifacts.py::load_artifact; system/lib/artifacts.py::load_equity_universe
+    - Escalates-to: system/lib/artifacts.py::load_artifact; system/lib/artifacts.py::load_observation_universe
     """
     artifacts_dir = Path(run_dir) / "artifacts"
     if not artifacts_dir.is_dir():
@@ -205,15 +205,15 @@ def load_snapshot_ledger_ids(run_dir: Path) -> Optional[Set[str]]:
 
 
 # ---------------------------------------------------------------------------
-# Equity universe (stock + ETF union) — used by CP2 OUT_OF_UNIVERSE checks
+# Observation universe (measurements + SUBSYSTEMS union) — used by CP2 OUT_OF_UNIVERSE checks
 # ---------------------------------------------------------------------------
 
-def _extract_tickers_from_artifact_file(path: Path) -> Set[str]:
+def _extract_target_ids_from_artifact_file(path: Path) -> Set[str]:
     """
     [ACTION]
-    - Internal helper: extract ticker set from a stock/ETF feed artifact file.
+    - Internal helper: extract target_id set from a measurements/SUBSYSTEMS feed artifact file.
     - Tries flat format data.{columns, rows} first; then nested data.topic.row.{columns, rows}.
-    - Returns empty set on any failure or missing Ticker column.
+    - Returns empty set on any failure or missing target_id column.
     - Never raises.
     """
     try:
@@ -221,69 +221,72 @@ def _extract_tickers_from_artifact_file(path: Path) -> Set[str]:
             artifact = json.load(f)
         data = artifact.get("data", {})
 
+        if isinstance(data, dict) and isinstance(data.get("observations"), list):
+            return {str(row["target_id"]).upper().strip() for row in data["observations"]
+                    if isinstance(row,dict) and row.get("target_id")}
         # Flat format: data.{columns, rows}
         if isinstance(data, dict) and "columns" in data and "rows" in data:
             columns = data["columns"]
             rows = data["rows"]
-            for col_name in ("Ticker", "ticker"):
+            for col_name in ("target_id", "target_id"):
                 if col_name in columns:
                     idx = columns.index(col_name)
-                    tickers = {
+                    target_ids = {
                         str(r[idx]).upper().strip()
                         for r in rows
                         if isinstance(r, list) and len(r) > idx and r[idx]
                     }
-                    if tickers:
-                        return tickers
+                    if target_ids:
+                        return target_ids
 
         # Nested format: data.topic.row.{columns, rows}
         if isinstance(data, dict) and isinstance(data.get("topic"), dict):
             row = data["topic"].get("row", {})
             columns = row.get("columns", [])
             rows = row.get("rows", [])
-            for col_name in ("Ticker", "ticker"):
+            for col_name in ("target_id", "target_id"):
                 if col_name in columns:
                     idx = columns.index(col_name)
-                    tickers = {
+                    target_ids = {
                         str(r[idx]).upper().strip()
                         for r in rows
                         if isinstance(r, list) and len(r) > idx and r[idx]
                     }
-                    if tickers:
-                        return tickers
+                    if target_ids:
+                        return target_ids
     except Exception:
         pass
     return set()
 
 
-def load_equity_universe(run_dir: Path) -> Optional[Set[str]]:
+def load_observation_universe(run_dir: Path) -> Optional[Set[str]]:
     """
     [ACTION]
-    - Teleology: Build the canonical CP2 equity universe from stock and ETF feed artifacts in one run.
-    - Mechanism: Tries the canonical EQUITY_FEED_IDS first, extracts uppercase tickers from each artifact, and falls back to stock/etf glob patterns when named feeds are absent.
-    - Guarantee: Returns the unioned ticker set when any feed yields tickers, or None when no usable equity feed context exists.
+    - Teleology: Build the canonical CP2 observation universe from measurements and SUBSYSTEMS feed artifacts in one run.
+    - Mechanism: Tries the canonical OBSERVATION_FEED_IDS first, extracts uppercase target_ids from each artifact, and falls back to measurements/subsystems glob patterns when named feeds are absent.
+    - Guarantee: Returns the unioned target_id set when any feed yields target_ids, or None when no usable observation feed context exists.
     - Fails: None.
-    - When-needed: Open when CP2 OUT_OF_UNIVERSE checks need the exact ticker-union and fallback rules for equity feed artifacts.
+    - When-needed: Open when CP2 OUT_OF_UNIVERSE checks need the exact target_id-union and fallback rules for observation feed artifacts.
     - Escalates-to: system/lib/artifacts.py::discover_feed_artifacts; system/lib/artifacts.py::list_all_artifact_ledger_ids
     """
     artifacts_dir = Path(run_dir) / "artifacts"
     if not artifacts_dir.is_dir():
         return None
 
-    all_tickers: Set[str] = set()
+    all_target_ids: Set[str] = set()
 
     # Primary: try canonical feed IDs
-    for feed_id in EQUITY_FEED_IDS:
+    for feed_id in OBSERVATION_FEED_IDS:
         path = artifacts_dir / f"{feed_id}.json"
         if path.exists():
-            tickers = _extract_tickers_from_artifact_file(path)
-            all_tickers.update(tickers)
+            target_ids = _extract_target_ids_from_artifact_file(path)
+            all_target_ids.update(target_ids)
 
-    # Fallback: glob for any stock/etf feed artifacts if neither named feed was found
-    if not all_tickers:
-        for pattern in ("*stock*feed*.json", "*etf*feed*.json"):
+    # Fallback: glob for any measurements/subsystems feed artifacts if neither named feed was found
+    if not all_target_ids:
+        for pattern in ("*measurements*feed*.json", "*subsystems*feed*.json"):
             for p in sorted(artifacts_dir.glob(pattern)):
-                tickers = _extract_tickers_from_artifact_file(p)
-                all_tickers.update(tickers)
+                target_ids = _extract_target_ids_from_artifact_file(p)
+                all_target_ids.update(target_ids)
 
-    return all_tickers if all_tickers else None
+    return all_target_ids if all_target_ids else None

@@ -15,15 +15,15 @@ from pathlib import Path
 import re
 import sqlite3
 
-from system.lib.run_compare import combined_prices, _iter_tables
+from system.lib.run_compare import combined_values, _iter_tables
 from system.lib.schema_validator import validate_cp2
-from tools.finance.resolve_forecasts import _iter_price_rows, _load_price_index
+from tools.observations.resolve_forecasts import _iter_value_rows, _load_value_index
 from zenith import runtime
 from zenith.providers import write_json
 from system.lib.hashing import hash_node
 
 ROOT = Path(__file__).resolve().parents[1]
-FEEDS = ("global_stock_feed", "global_etf_feed")
+FEEDS = ("global_measurements_feed", "global_subsystems_feed")
 
 
 def canonical(value):
@@ -43,12 +43,12 @@ def timestamp(value):
     return result.astimezone(timezone.utc)
 
 
-def finite_price(value, *, allow_nonpositive=False):
+def finite_value(value, *, allow_nonpositive=False):
     if isinstance(value, bool):
-        raise ValueError("price cannot be boolean")
+        raise ValueError("value cannot be boolean")
     result = float(value)
-    if not math.isfinite(result) or (result <= 0 and not allow_nonpositive):
-        raise ValueError("price must be finite and positive unless it is a predicted target")
+    if not math.isfinite(result) or False:
+        raise ValueError("value must be finite and positive unless it is a predicted target")
     return result
 
 
@@ -103,110 +103,46 @@ def connection(store, *, create=False):
 
 def policy_from(path):
     policy = read_object(path)
-    required = {"schema", "policy_id", "price_basis", "currency", "observation_precision", "relative_error_threshold"}
-    if not required.issubset(policy) or policy["schema"] != "zenith_forecast_feedback_policy_v1":
-        raise ValueError("feedback policy requires the documented v1 fields")
-    if set(policy) - required - {"calendar_id", "calendar_version"}:
-        raise ValueError("unknown feedback policy fields")
-    for key in ("policy_id", "price_basis", "currency"):
+    required = {"schema", "policy_id", "observation_basis", "unit", "observation_precision", "relative_error_threshold"}
+    if set(policy) != required or policy["schema"] != "zenith_forecast_feedback_policy_v1":
+        raise ValueError("feedback policy requires the documented observation fields")
+    for key in ("policy_id", "observation_basis", "unit"):
         if not isinstance(policy[key], str) or not policy[key].strip():
             raise ValueError(f"nonempty {key} required")
     threshold = policy["relative_error_threshold"]
-    if type(threshold) not in (int, float) or not math.isfinite(threshold) or threshold < 0:
+    if type(threshold) not in (int,float) or not math.isfinite(threshold) or threshold < 0:
         raise ValueError("relative_error_threshold must be finite and nonnegative")
-    if policy["observation_precision"] not in {"timestamp", "session_close"}:
-        raise ValueError("observation_precision must be timestamp or session_close")
-    if policy["observation_precision"] == "session_close":
-        if policy.get("calendar_id") not in {"XNYS", "XSHG"}:
-            raise ValueError("session_close requires the native XNYS or XSHG calendar")
-        actual = importlib.metadata.version("exchange_calendars")
-        if policy.get("calendar_version") != actual:
-            raise ValueError("session_close requires the exact installed exchange_calendars version")
+    if policy["observation_precision"] != "timestamp":
+        raise ValueError("observation_precision must be timestamp")
     return policy
 
 
 def observation_time(raw, policy):
-    if policy["observation_precision"] == "timestamp":
-        return timestamp(raw)
-    if not isinstance(raw, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", raw):
-        raise ValueError("session_close observation needs an explicit bar date")
-    day = date.fromisoformat(raw)
-    if importlib.metadata.version("exchange_calendars") != policy["calendar_version"]:
-        raise ValueError("frozen calendar version changed")
-    if policy['calendar_id'] == 'XNYS':
-        from system.core.engine import _xnys_calendar
-        calendar = _xnys_calendar(day.year)
-    elif policy['calendar_id'] == 'XSHG':
-        import exchange_calendars
-        calendar = exchange_calendars.get_calendar('XSHG', start=f'{day.year}-01-01', end=f'{day.year}-12-31')
-    else:
-        raise ValueError('Unsupported session calendar')
-    session = calendar.date_to_session(day.isoformat(), direction="none")
-    return calendar.session_close(session).to_pydatetime().astimezone(timezone.utc)
+    return timestamp(raw)
 
 
 def dated_rows(path):
-    """Reuse Oracle table and historical-price parsers, retaining duplicate rows.
-
-    Only row-level observation fields count. Envelope fetch/as_of timestamps do
-    not identify the bar. Duplicate rows stay visible rather than last-wins.
-    """
+    """Explicit row clocks and units; acquisition metadata never substitutes for truth."""
     payload = read_object(path)
     metadata = payload.get("metadata", {})
-    if not isinstance(metadata, dict):
-        raise ValueError("price metadata must be an object")
     if payload.get("status", "success") not in {"success", "loaded"} or metadata.get("status", "success") not in {"success", "loaded"}:
-        raise ValueError("failed price artifact is not truth")
-    records = []
-    for columns, rows in _iter_tables(payload.get("data", {})):
-        if not all(isinstance(col, str) for col in columns):
-            raise ValueError("price table columns must be strings")
-        for row in rows:
-            if isinstance(row, list):
-                records.append(dict(zip(columns, row)))
-            elif isinstance(row, dict):
-                records.append(row)
-    if not records:
-        records = list(_iter_price_rows(payload))
-        if not records:
-            # Mapping-form historical price observations retain their exact key.
-            raw_data = payload.get("data", payload)
-            for series in raw_data.get("prices", {}).values() if isinstance(raw_data, dict) and isinstance(raw_data.get("prices", {}), dict) else []:
-                if isinstance(series, dict):
-                    for value in series.values():
-                        finite_price(value)  # Preserve rejection of booleans before coercion.
-            for symbol, series in _load_price_index(payload).items():
-                for observed, price in series.items():
-                    records.append({"target_id": symbol, "timestamp": observed, "price": price})
-    result = []
+        raise ValueError("failed observation artifact is not truth")
+    data = payload.get("data", {})
+    records = data.get("observations") if isinstance(data,dict) else None
+    if records is None:
+        records=list(data.get("rows", [])) if isinstance(data,dict) and isinstance(data.get("rows"),list) and all(isinstance(r,dict) for r in data["rows"]) else []
+        for columns, rows in _iter_tables(data):
+            records.extend(dict(zip(columns,row)) if isinstance(row,list) else row for row in rows)
+    result=[]
     for record in records:
-        symbol = record.get("Ticker") or record.get("ticker") or record.get("symbol") or record.get("target_id") or record.get("id")
-        if not isinstance(symbol, str) or not symbol.strip():
-            continue
-        diagnostics = metadata.get("diagnostics", {})
-        observations = diagnostics.get("price_observations", {}) if isinstance(diagnostics, dict) else {}
-        if not isinstance(observations, dict):
-            raise ValueError("price_observations must be an object")
-        observed_meta = observations.get(symbol.strip().upper(), {})
-        if not isinstance(observed_meta, dict):
-            observed_meta = {}
-        observed = next((record[key] for key in ("observation_time", "bar_time", "price_time", "PriceTimestamp", "timestamp", "date", "Date", "PriceDate", "price_date") if record.get(key) is not None), None)
-        if observed is None:
-            observed = observed_meta.get("bar_date") or observed_meta.get("session_date")
-        basis = record.get("price_basis", metadata.get("price_basis", observed_meta.get("price_basis")))
-        if basis is None and observed_meta.get("interval") == "1d" and observed_meta.get("auto_adjust") is False:
-            # This is the provider's adjustment setting, not a claim that all
-            # corporate-action history has been independently established.
-            basis = "daily_close_auto_adjust_false"
-        price = next((record[key] for key in ("Price", "price", "close", "adj_close", "value") if record.get(key) is not None), None)
-        alternatives = [record[key] for key in ("Price", "price", "close", "adj_close", "value") if record.get(key) is not None]
-        if len(alternatives) > 1 and len({finite_price(value) for value in alternatives}) != 1:
-            raise ValueError("ambiguous price columns; supply a normalized price with declared basis")
-        result.append({"target_id": symbol.strip().upper(), "observed": observed, "price": price,
-            "price_basis": basis,
-            "currency": record.get("currency", metadata.get("currency", observed_meta.get("currency"))),
-            "provider_observation": observed_meta,
-            "row_sha256": digest(record), "source": source_ref(path)})
+        target=record.get("target_id")
+        if not isinstance(target,str) or not target.strip(): continue
+        value=record.get("value",record.get("Value"))
+        result.append({"target_id":target.strip().upper(), "observed":record.get("observed_at",record.get("observation_time",record.get("timestamp"))),
+            "available_at":record.get("available_at"), "value":value,
+            "observation_basis":record.get("observation_basis",metadata.get("observation_basis","explicit_observation")),
+            "unit":record.get("unit",metadata.get("unit")), "provider_observation":{},
+            "row_sha256":digest(record), "source":source_ref(path)})
     return result
 
 
@@ -298,7 +234,7 @@ def register(store, subject_run, policy_path, horizon_id, *, root=ROOT):
         raise ValueError("CP2 artifact is not bound to the frozen reasoning policy")
     ancestry = lineage(root, manifest, subject)
     identity = model_identity(subject)
-    prices = combined_prices(subject)
+    values = combined_values(subject)
     observations = []
     for feed in FEEDS:
         path = subject / "artifacts" / f"{feed}.json"
@@ -318,44 +254,28 @@ def register(store, subject_run, policy_path, horizon_id, *, root=ROOT):
             hours = int(duration[1]) * (24 if duration[2] == "d" else 1)
             if hours <= 0 or horizon - issue != timedelta(hours=hours):
                 raise ValueError("duration horizon_id disagrees with the exact CP2 target time")
-        elif horizon_id == "next_us_close":
-            from system.core.engine import GodModeEngine
-            resolved = timestamp(GodModeEngine.resolve_horizon(horizon_id, issue)["target_time"])
-            if resolved != horizon:
-                raise ValueError("next_us_close horizon_id disagrees with the native exchange calendar")
-        elif horizon_id == 'next_xshg_close':
-            if policy.get('calendar_id') != 'XSHG':
-                raise ValueError('next_xshg_close requires the declared XSHG calendar')
-            import exchange_calendars
-            from zoneinfo import ZoneInfo
-            local_day = issue.astimezone(ZoneInfo('Asia/Shanghai')).date()
-            calendar = exchange_calendars.get_calendar('XSHG', start=local_day.isoformat(), end=(local_day+timedelta(days=31)).isoformat())
-            session = calendar.date_to_session(local_day.isoformat(), direction='next')
-            resolved = calendar.session_close(session).to_pydatetime()
-            if resolved <= issue:
-                resolved = calendar.session_close(calendar.next_session(session)).to_pydatetime()
-            if resolved != horizon:
-                raise ValueError('next_xshg_close horizon_id disagrees with the native exchange calendar')
         if (target, issue.isoformat(), horizon.isoformat()) in pairs:
             raise ValueError("duplicate target/issue/horizon in CP2")
         pairs.add((target, issue.isoformat(), horizon.isoformat()))
-        snapshot = finite_price(pred["snapshot_price"])
+        snapshot = finite_value(pred["snapshot_value"])
         # Preserve even implausible finite point forecasts in the measured
         # corpus; discarding poor targets would bias the error denominator.
-        expected = finite_price(pred["target_price"], allow_nonpositive=True)
-        actual_snapshot = (prices.get(target) or {}).get("Price")
-        if actual_snapshot is None or not math.isclose(snapshot, finite_price(actual_snapshot), rel_tol=1e-9, abs_tol=1e-9):
-            raise ValueError("snapshot_price differs from subject-run equity baseline")
+        expected = finite_value(pred["target_value"], allow_nonpositive=True)
+        actual_snapshot = (values.get(target) or {}).get("Value")
+        if actual_snapshot is None or not math.isclose(snapshot, finite_value(actual_snapshot), rel_tol=1e-9, abs_tol=1e-9):
+            raise ValueError("snapshot_value differs from subject-run observation baseline")
         candidates = [row for row in observations if row["target_id"] == target]
         gaps = []
         source_observation = candidates[0] if len(candidates) == 1 else None
         if source_observation is None:
             gaps.append("missing_or_duplicate_subject_observation")
         else:
-            if source_observation["price_basis"] != policy["price_basis"] or source_observation["currency"] != policy["currency"]:
-                gaps.append("subject_price_basis_or_currency_unverified")
+            if source_observation["observation_basis"] != policy["observation_basis"] or source_observation["unit"] != pred["unit"]:
+                gaps.append("subject_observation_basis_or_unit_unverified")
             try:
                 observed = observation_time(source_observation["observed"], policy)
+                if source_observation.get("available_at") and timestamp(source_observation["available_at"]) > issue:
+                    raise ValueError("subject availability was after issue")
                 if observed > issue:
                     raise ValueError("subject observation was after issue")
                 source_observation["observed_time"] = observed.isoformat()
@@ -369,7 +289,7 @@ def register(store, subject_run, policy_path, horizon_id, *, root=ROOT):
         logical_key = digest({k: v for k, v in binding.items() if k != "horizon_id"})
         record = {"schema": "zenith_registered_forecast_v1", **binding,
             "forecast_id": digest({**binding, "cp2_sha256": source["sha256"]}),
-            "snapshot_price": snapshot, "target_price": expected, "direction": pred["direction"],
+            "snapshot_value": snapshot, "target_value": expected, "unit": pred["unit"], "direction": pred["direction"],
             "horizon_seconds": (horizon - issue).total_seconds(), "policy": frozen_policy,
             "source": source, "subject_observation": source_observation,
             "measurement_source": source_ref(Path(__file__)),
@@ -378,8 +298,6 @@ def register(store, subject_run, policy_path, horizon_id, *, root=ROOT):
             "run_manifest": source_ref(manifest_path, root=root) if manifest else None,
             "evaluation_posture": "historical_import" if now >= horizon else "prospective_pending",
             "claim_boundary": "local source provenance; registration alone does not prove contemporaneous publication"}
-        if payload.get('forecast_basis') == 'JUDGMENTAL':
-            record['forecast_quantiles'] = next(row for row in payload['forecast_quantiles']['targets'] if row['target_id'] == target)
         records.append((logical_key, record))
     admitted = []
     with connection(store, create=True) as db:
@@ -417,6 +335,8 @@ def measurement(forecast, rows, as_of, source_errors):
             "issue_time": forecast["issue_time"], "target_time": forecast["target_time"],
             "as_of": as_of.isoformat(), "source": forecast["source"],
             "measurement_source": source_ref(Path(__file__))}
+    if "forecast_quantiles" in forecast:
+        return {**base,"status":"data_gap","data_gaps":["unsupported_forecast_contract"],"metrics":None,"error_classes":[]}
     horizon = timestamp(forecast["target_time"])
     if as_of < horizon:
         return {**base, "status": "pending", "data_gaps": ["horizon_not_mature"], "metrics": None, "error_classes": []}
@@ -437,20 +357,31 @@ def measurement(forecast, rows, as_of, source_errors):
             continue
         if observed != horizon:
             continue
-        if row["price_basis"] != policy["price_basis"] or row["currency"] != policy["currency"]:
+        if row["observation_basis"] != policy["observation_basis"] or row["unit"] != forecast["unit"]:
             saw_wrong_basis = True
             continue
         try:
-            price = finite_price(row["price"])
+            value = finite_value(row["value"])
         except (ValueError, TypeError, OverflowError):
-            gaps.append("invalid_truth_price")
+            gaps.append("invalid_truth_value")
             continue
-        matches.append({**row, "observed_time": observed.isoformat(), "price": price})
+        try:
+            available=timestamp(row["available_at"])
+        except (ValueError,TypeError,KeyError):
+            gaps.append("truth_availability_unverified")
+            continue
+        if available < observed:
+            gaps.append("truth_availability_precedes_observation")
+            continue
+        if available > as_of:
+            gaps.append("truth_not_available_at_evaluation")
+            continue
+        matches.append({**row, "observed_time": observed.isoformat(), "value": value})
     if len(matches) > 1:
         gaps.append("duplicate_truth_observation")
     elif not matches:
         if saw_wrong_basis:
-            gaps.append("truth_price_basis_or_currency_mismatch")
+            gaps.append("truth_observation_basis_or_unit_mismatch")
         elif invalid_observation:
             gaps.append("truth_bar_observation_time_unverified")
         else:
@@ -458,8 +389,8 @@ def measurement(forecast, rows, as_of, source_errors):
     if gaps:
         return {**base, "status": "data_gap", "data_gaps": sorted(set(gaps)), "metrics": None, "error_classes": []}
     truth = matches[0]
-    actual = truth["price"]
-    snapshot, target = forecast["snapshot_price"], forecast["target_price"]
+    actual = truth["value"]
+    snapshot, target = forecast["snapshot_value"], forecast["target_value"]
     absolute_error = abs(target - actual)
     baseline_error = abs(snapshot - actual)
     direction = "UP" if actual > snapshot else "DOWN" if actual < snapshot else "FLAT"
@@ -469,21 +400,18 @@ def measurement(forecast, rows, as_of, source_errors):
         classes.append("direction_miss")
     if absolute_error > baseline_error:
         classes.append("target_worse_than_no_change")
-    if absolute_error / actual > policy["relative_error_threshold"]:
+    if absolute_error / max(abs(actual), 1.0) > policy["relative_error_threshold"]:
         classes.append("relative_target_error_above_declared_threshold")
-    metrics = {"realized_price": actual, "target_price_absolute_error": absolute_error,
-        "target_price_relative_error": absolute_error / actual, "signed_target_error": target - actual,
+    metrics = {"realized_value": actual, "target_value_absolute_error": absolute_error,
+        "target_value_relative_error": absolute_error / max(abs(actual), 1.0), "signed_target_error": target - actual,
         "actual_direction": direction, "direction_hit": hit,
-        "no_change_target_price": snapshot, "no_change_absolute_error": baseline_error,
-        "no_change_relative_error": baseline_error / actual,
+        "no_change_target_value": snapshot, "no_change_absolute_error": baseline_error,
+        "no_change_relative_error": baseline_error / max(abs(actual), 1.0),
         "target_better_than_no_change": absolute_error < baseline_error,
-        "price_basis": policy["price_basis"], "currency": policy["currency"]}
-    if 'forecast_quantiles' in forecast:
-        from system.lib.judgmental_forecast import score_quantiles
-        metrics.update(score_quantiles(forecast['forecast_quantiles'], actual/snapshot-1))
+        "observation_basis": policy["observation_basis"], "unit": forecast["unit"]}
     return {**base, "status": "scored", "data_gaps": [], "metrics": metrics,
             "error_classes": classes, "truth": truth,
-            "interpretation": "price and direction forecast error, not returns or causal diagnosis"}
+            "interpretation": "Forecast error alone does not identify its cause."}
 
 
 def score(store, truth_source, as_of):
@@ -565,14 +493,14 @@ def summary(store, as_of, *, window_days=30):
             "resolved": len(resolved), "statuses": dict(status_counts),
             "data_gap_counts": dict(Counter(gap for _, e in samples if e and e["status"] == "data_gap" for gap in e["data_gaps"])),
             "error_class_counts": dict(Counter(code for _, e in resolved for code in e["error_classes"])),
-            "mean_target_price_absolute_error": mean("target_price_absolute_error"),
-            "mean_target_price_relative_error": mean("target_price_relative_error"),
+            "mean_target_value_absolute_error": mean("target_value_absolute_error"),
+            "mean_target_value_relative_error": mean("target_value_relative_error"),
             "mean_no_change_absolute_error": mean("no_change_absolute_error"),
             "mean_no_change_relative_error": mean("no_change_relative_error"),
             "direction_hit_fraction": mean("direction_hit"),
-            "price_basis": samples[0][0]["policy"]["definition"]["price_basis"],
-            "currency": samples[0][0]["policy"]["definition"]["currency"],
-            "dependency_warning": "Same-issue assets, overlapping horizons and sliding windows are not independent observations."})
+            "observation_basis": samples[0][0]["policy"]["definition"]["observation_basis"],
+            "unit": samples[0][0]["policy"]["definition"]["unit"],
+            "dependency_warning": "Same-issue targets, overlapping horizons and sliding windows are not independent observations."})
     return {"schema": "zenith_rolling_forecast_summary_v1", "as_of": as_of.isoformat(), "window_days": window_days,
             "issue_window_start_inclusive": (as_of - timedelta(days=window_days)).isoformat(), "groups": reports,
             "window_overlap": "Successive rolling reports reuse observations; do not count reports as new trials."}

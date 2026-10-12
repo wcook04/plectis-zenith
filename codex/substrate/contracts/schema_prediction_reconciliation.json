@@ -4,7 +4,7 @@
   "version": "1.2",
   "status": "NORMATIVE",
   "description": "Deterministic Oracle grading surface for comparing Lab prediction targets at T-n against realized truth at T.",
-  "purpose": "This contract defines `prediction_reconciliation`, the first Oracle artifact. It is emitted by the deterministic equity diff layer before interpretive truth mapping. The artifact answers: what did Lab predict, what actually happened, and how large was the miss? It is deliberately factual and low-hallucination.",
+  "purpose": "This contract defines `prediction_reconciliation`, the first Oracle artifact. It is emitted by the deterministic observation diff layer before interpretive truth mapping. The artifact answers: what did Lab predict, what actually happened, and how large was the miss? It is deliberately factual and low-hallucination.",
   "schema": {
     "status": {
       "type": "string",
@@ -27,13 +27,13 @@
     "rows": {
       "type": "array[PredictionReconciliationRow]",
       "required": true,
-      "constraint": "Non-empty. Must cover every comparable STOCK or ETF prediction target from Lab CP2.",
+      "constraint": "Non-empty. Must cover every comparable MEASUREMENTS or SUBSYSTEMS prediction target from Lab CP2.",
       "semantics": "Primary deterministic grading table."
     },
-    "macro_rows": {
-      "type": "array[MacroReconciliationRow]",
+    "environment_rows": {
+      "type": "array[EnvironmentReconciliationRow]",
       "required": false,
-      "constraint": "Optional. Present only when Oracle is grading an explicit macro prediction target that is deterministic and comparable."
+      "constraint": "Optional. Present only when Oracle is grading an explicit environment prediction target that is deterministic and comparable."
     },
     "summary": {
       "type": "PredictionReconciliationSummary",
@@ -41,9 +41,9 @@
       "constraint": "Must summarize row coverage, direction accuracy, and largest misses."
     },
     "feed_health": {
-      "type": "EquityFeedHealth",
+      "type": "ObservationFeedHealth",
       "required": false,
-      "constraint": "Optional deterministic readiness block emitted by oracle_truth_diff_equity. Present when the tool can summarize subject/truth stock+ETF coverage for Lab CP2 prediction targets.",
+      "constraint": "Optional deterministic readiness block emitted by oracle_truth_diff_observations. Present when the tool can summarize subject/truth measurements+SUBSYSTEMS coverage for Lab CP2 prediction targets.",
       "semantics": "Separates missing feed coverage from actual prediction failure before interpretive Oracle or Evolve stages read the reconciliation rows."
     }
   },
@@ -51,14 +51,14 @@
     "target_id": {
       "type": "string",
       "required": true,
-      "constraint": "Uppercase STOCK or ETF ticker."
+      "constraint": "Uppercase MEASUREMENTS or SUBSYSTEMS target_id."
     },
-    "asset_class": {
+    "target_kind": {
       "type": "string",
       "required": true,
       "enum": [
-        "STOCK",
-        "ETF"
+        "MEASUREMENTS",
+        "SUBSYSTEMS"
       ]
     },
     "prediction_direction": {
@@ -69,30 +69,30 @@
         "DOWN"
       ]
     },
-    "subject_snapshot_price": {
+    "subject_snapshot_value": {
       "type": "number",
       "required": true,
-      "constraint": "Finite T-n baseline price."
+      "constraint": "Finite T-n baseline value."
     },
-    "predicted_target_price": {
+    "predicted_target_value": {
       "type": "number",
       "required": true,
       "constraint": "Finite Lab-predicted target level."
     },
-    "realized_truth_price": {
+    "realized_truth_value": {
       "type": "number",
       "required": true,
-      "constraint": "Finite realized T price."
+      "constraint": "Finite realized T value."
     },
     "absolute_delta": {
       "type": "number",
       "required": true,
-      "constraint": "Absolute difference between predicted_target_price and realized_truth_price."
+      "constraint": "Absolute difference between predicted_target_value and realized_truth_value."
     },
     "percent_delta": {
       "type": "number",
       "required": true,
-      "constraint": "Percent miss measured against predicted_target_price or subject_snapshot_price per tool implementation."
+      "constraint": "Percent miss measured against predicted_target_value or subject_snapshot_value per tool implementation."
     },
     "directional_correct": {
       "type": "boolean",
@@ -104,28 +104,28 @@
       "required": false,
       "constraint": "Optional stable ranking field for ordering largest misses or movers."
     },
-    "finance_forecast_extension": {
-      "type": "FinanceForecastResolutionFields",
+    "observations_forecast_extension": {
+      "type": "ObservationsForecastResolutionFields",
       "required": false,
-      "constraint": "Optional additive field set used when rows are emitted by tools/finance/resolve_forecasts.py for finance_forecast_claim_v1 replay. These fields do not change the legacy Oracle equity-diff row contract.",
-      "semantics": "Binds a row to an admitted finance forecast claim's event window, benchmark, and outcome basis so eval_replay can score the declared claim-level event rather than accidental member diagnostics."
+      "constraint": "Optional additive field set used when rows are emitted by tools/observations/resolve_forecasts.py for observations_forecast_claim_v1 replay. These fields do not change the legacy Oracle observation-diff row contract.",
+      "semantics": "Binds a row to an admitted observations forecast claim's event window, benchmark, and outcome basis so eval_replay can score the declared claim-level event rather than accidental member diagnostics."
     }
   },
-  "finance_forecast_resolution_fields": {
+  "observations_forecast_resolution_fields": {
     "forecast_id": {
       "type": "string",
       "required": false,
-      "constraint": "Admitted finance forecast claim id."
+      "constraint": "Admitted observations forecast claim id."
     },
     "candidate_ref": {
       "type": "string",
       "required": false,
-      "constraint": "Original calculator candidate_forecast_card id."
+      "constraint": "Original derived candidate_forecast_card id."
     },
     "truth_join_key": {
       "type": "string",
       "required": false,
-      "constraint": "Stable finance truth join key from finance_forecast_claim_v1.truth_binding."
+      "constraint": "Stable observations truth join key from observations_forecast_claim_v1.truth_binding."
     },
     "subject_as_of": {
       "type": "string",
@@ -155,7 +155,7 @@
     "event_type": {
       "type": "string",
       "required": false,
-      "constraint": "Finance forecast event semantic, e.g. group_return_direction_vs_benchmark."
+      "constraint": "Observations forecast event semantic, e.g. group_return_direction_vs_benchmark."
     },
     "outcome_basis": {
       "type": "string",
@@ -185,14 +185,14 @@
     "truth_source": {
       "type": "string",
       "required": false,
-      "constraint": "Truth materialization source, e.g. price_history_artifact."
+      "constraint": "Truth materialization source, e.g. value_history_artifact."
     }
   },
-  "macro_reconciliation_row": {
+  "environment_reconciliation_row": {
     "series_id": {
       "type": "string",
       "required": true,
-      "constraint": "Non-empty comparable macro series identifier."
+      "constraint": "Non-empty comparable environment series identifier."
     },
     "subject_value": {
       "type": "number|string",
@@ -205,7 +205,7 @@
     "comparison_basis": {
       "type": "string",
       "required": true,
-      "constraint": "Must say why this macro row is deterministic and comparable."
+      "constraint": "Must say why this environment row is deterministic and comparable."
     }
   },
   "prediction_reconciliation_summary": {
@@ -230,7 +230,7 @@
       "required": false
     }
   },
-  "equity_feed_health": {
+  "observation_feed_health": {
     "status": {
       "type": "string",
       "required": true,
@@ -239,17 +239,17 @@
         "DEGRADED",
         "BLOCKED"
       ],
-      "constraint": "READY when every prediction target has subject and truth prices; DEGRADED when at least one but not all targets are comparable; BLOCKED when no deterministic equity target can be graded."
+      "constraint": "READY when every prediction target has subject and truth values; DEGRADED when at least one but not all targets are comparable; BLOCKED when no deterministic observation target can be graded."
     },
     "subject": {
-      "type": "EquityFeedSideHealth",
+      "type": "ObservationFeedSideHealth",
       "required": true
     },
     "truth": {
-      "type": "EquityFeedSideHealth",
+      "type": "ObservationFeedSideHealth",
       "required": true
     },
-    "common_ticker_count": {
+    "common_target_id_count": {
       "type": "integer",
       "required": true
     },
@@ -261,11 +261,11 @@
       "type": "array[string]",
       "required": true
     },
-    "missing_subject_price_targets": {
+    "missing_subject_value_targets": {
       "type": "array[string]",
       "required": true
     },
-    "missing_truth_price_targets": {
+    "missing_truth_value_targets": {
       "type": "array[string]",
       "required": true
     },
@@ -275,34 +275,34 @@
       "constraint": "Human-readable deterministic reasons for DEGRADED or BLOCKED status."
     }
   },
-  "equity_feed_side_health": {
-    "stock_ticker_count": {
+  "observation_feed_side_health": {
+    "measurements_target_id_count": {
       "type": "integer",
       "required": true
     },
-    "etf_ticker_count": {
+    "subsystems_target_id_count": {
       "type": "integer",
       "required": true
     },
-    "stock_price_count": {
+    "measurements_value_count": {
       "type": "integer",
       "required": true
     },
-    "etf_price_count": {
+    "subsystems_value_count": {
       "type": "integer",
       "required": true
     },
-    "ticker_count": {
+    "target_id_count": {
       "type": "integer",
       "required": true
     }
   },
   "coverage_rules": {
     "required_rows": [
-      "Every comparable STOCK target in Lab CP2 must appear exactly once.",
-      "Every comparable ETF target in Lab CP2 must appear exactly once."
+      "Every comparable MEASUREMENTS target in Lab CP2 must appear exactly once.",
+      "Every comparable SUBSYSTEMS target in Lab CP2 must appear exactly once."
     ],
-    "macro_rule": "Macro rows appear only when there is an explicit deterministic macro prediction target.",
+    "environment_rule": "Environment rows appear only when there is an explicit deterministic environment prediction target.",
     "hard_failures": [
       "Missing comparable target row",
       "Duplicate target row",
@@ -317,11 +317,11 @@
     ]
   },
   "stage_responsibilities": {
-    "oracle_truth_diff_equity": {
-      "role": "Primary emitter for comparable STOCK and ETF reconciliation rows."
+    "oracle_truth_diff_observations": {
+      "role": "Primary emitter for comparable MEASUREMENTS and SUBSYSTEMS reconciliation rows."
     },
-    "oracle_truth_diff_macro": {
-      "role": "Optional emitter for explicitly comparable macro rows only."
+    "oracle_truth_diff_environment": {
+      "role": "Optional emitter for explicitly comparable environment rows only."
     }
   },
   "validator": "system.lib.schema_validator.validate_prediction_reconciliation",
@@ -330,6 +330,5 @@
     "subject_decision_status": "ABSTAIN",
     "rows": [],
     "summary": "All row/direction counts zero; no hit-rate or error success claim; requires validated subject CP2 abstention"
-  },
-  "judgmental_quantile_contract": "When subject_forecast_basis=JUDGMENTAL, FLAT means a zero median return, not abstention. Retain original q10/q50/q90 and deterministic unscaled pinball losses, interval coverage and width. These do not establish calibration."
+  }
 }
