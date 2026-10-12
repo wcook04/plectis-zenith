@@ -47,9 +47,13 @@ spacing warnings remain. These are implementation checks, not market evidence.
 The refreshed private [Type B packet receipt](type-b-quantile-daily-packet.json)
 binds source commit `74ffa134f9bee6494ff45a3c9157e743dc351748`, original notes
 and literature, the completed native attempts and the current research brief.
-The local ZIP contains 2,203 files (49,758,404 bytes); all member hashes, fresh
+The local ZIP contains 2,204 files (49,760,216 bytes); all member hashes, fresh
 extraction and local Markdown links were checked. It has not been uploaded.
-The public receipt records metadata only.
+The public receipt records metadata only. The supplied historical budget
+summary is preserved separately from the current budget projection; all supplied
+notes, papers and training attachments were checked for byte identity.
+GitHub offline CI passed on `296794d`, including the unchanged implementation
+commit; this later correction changes packet metadata only.
 
 ## Richer data through the native daily loop, 12 October 2026
 
