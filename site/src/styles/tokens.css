@@ -1,0 +1,143 @@
+/* Zenith site tokens. Typefaces and grounds are borrowed from the Plectis
+   site (sites/microcosm/assets/style.css in ai_workflow): STIX Two Text for
+   reading, Source Sans 3 for interface, cream paper by day and a wine-black
+   ground by night. Both fonts are SIL OFL; licences ship in /fonts.
+   Lane colours are a categorical palette validated per theme with the
+   dataviz validator (lightness band, chroma, adjacent CVD separation). */
+
+@font-face { font-family: "Plectis Serif"; src: url("/fonts/plectis-serif.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Plectis Serif"; src: url("/fonts/plectis-serif-italic.woff2") format("woff2"); font-weight: 400 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "Plectis Sans"; src: url("/fonts/plectis-sans.woff2") format("woff2"); font-weight: 200 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Plectis Serif Fallback"; src: local("Times New Roman"), local("TimesNewRomanPSMT"), local("Liberation Serif"); size-adjust: 105.63%; ascent-override: 72.14%; descent-override: 22.53%; line-gap-override: 23.67%; }
+@font-face { font-family: "Plectis Sans Fallback"; src: local("Arial"), local("ArialMT"), local("Liberation Sans"); size-adjust: 94.72%; ascent-override: 108.11%; descent-override: 42.23%; line-gap-override: 0%; }
+
+:root {
+  --page: #f8f0e2;
+  --surface: #fffdf7;
+  --surface-sunk: #f1e7d4;
+  --ink: #191520;
+  --ink-soft: #342d3d;
+  --muted: #544d5d;
+  --faint: #6d6473;
+  --rule: #eaddc9;
+  --rule-strong: #d9c7ae;
+  --rule-control: #96836a;
+  --accent: #29527b;
+  --accent-strong: #1b3f65;
+  --accent-wash: #e1ebf4;
+  --edge: #8d8072;
+  --edge-strong: #5c5260;
+  --code-bg: #f2e8d2;
+  --code-ink: #37232c;
+  --select-bg: #f6e2b2;
+
+  --zone-before: #f3ead8;
+  --zone-after: #eef0f4;
+  --zone-dev: transparent;
+
+  --state-ok: #2f6b3a;
+  --state-loaded: #29527b;
+  --state-fail: #a3261c;
+  --state-fail-wash: #f8e2dc;
+  --state-idle: #6a6070;
+
+  --lane-stock: #2c64b0;
+  --lane-etf: #5e8a2e;
+  --lane-stockgrid: #7d55b8;
+  --lane-macro: #c4532c;
+  --lane-news: #008a7c;
+  --lane-polymarket: #a8841a;
+  --lane-calculator: #c4436f;
+
+  --shadow: 0 1px 2px rgba(27, 20, 35, 0.06), 0 8px 24px rgba(27, 20, 35, 0.08);
+  --shadow-pop: 0 18px 48px rgba(27, 20, 35, 0.18);
+
+  --font-serif: "Plectis Serif", "Plectis Serif Fallback", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Plectis Sans", "Plectis Sans Fallback", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --max: 1320px;
+  --prose: 640px;
+  --radius: 8px;
+  --radius-sm: 6px;
+  --lh: 1.62;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #1c1526;
+    --surface: #272132;
+    --surface-sunk: #2f2839;
+    --ink: #f2e6d4;
+    --ink-soft: #ddcdbb;
+    --muted: #bcb8c6;
+    --faint: #a6a2b1;
+    --rule: #363040;
+    --rule-strong: #484251;
+    --rule-control: #757080;
+    --accent: #97c1df;
+    --accent-strong: #bdd8ec;
+    --accent-wash: #203244;
+    --edge: #817b8c;
+    --edge-strong: #b4adbf;
+    --code-bg: #221c2c;
+    --code-ink: #e4d3bd;
+    --select-bg: #58411b;
+    --zone-before: #241d2e;
+    --zone-after: #1f1e2d;
+    --state-ok: #8fc79a;
+    --state-loaded: #97c1df;
+    --state-fail: #f08a7e;
+    --state-fail-wash: #3b2228;
+    --state-idle: #8f8a9a;
+    --lane-stock: #5f93db;
+    --lane-etf: #76a043;
+    --lane-stockgrid: #9d80d8;
+    --lane-macro: #d46f48;
+    --lane-news: #26a898;
+    --lane-polymarket: #b38b2e;
+    --lane-calculator: #d6688e;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 26px rgba(0, 0, 0, 0.36);
+    --shadow-pop: 0 20px 64px rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --page: #1c1526;
+  --surface: #272132;
+  --surface-sunk: #2f2839;
+  --ink: #f2e6d4;
+  --ink-soft: #ddcdbb;
+  --muted: #bcb8c6;
+  --faint: #a6a2b1;
+  --rule: #363040;
+  --rule-strong: #484251;
+  --rule-control: #757080;
+  --accent: #97c1df;
+  --accent-strong: #bdd8ec;
+  --accent-wash: #203244;
+  --edge: #817b8c;
+  --edge-strong: #b4adbf;
+  --code-bg: #221c2c;
+  --code-ink: #e4d3bd;
+  --select-bg: #58411b;
+  --zone-before: #241d2e;
+  --zone-after: #1f1e2d;
+  --state-ok: #8fc79a;
+  --state-loaded: #97c1df;
+  --state-fail: #f08a7e;
+  --state-fail-wash: #3b2228;
+  --state-idle: #8f8a9a;
+  --lane-stock: #5f93db;
+  --lane-etf: #76a043;
+  --lane-stockgrid: #9d80d8;
+  --lane-macro: #d46f48;
+  --lane-news: #26a898;
+  --lane-polymarket: #b38b2e;
+  --lane-calculator: #d6688e;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 26px rgba(0, 0, 0, 0.36);
+  --shadow-pop: 0 20px 64px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
