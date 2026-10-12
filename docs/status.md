@@ -2,6 +2,48 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Ten forecasts through the original graph, 12 October 2026
+
+The [judgmental forecast branch](judgmental-forecasts.md) extends native CP1/CP2
+with q10/q50/q90 returns, honest zero medians, cited source identities and exact
+next-session close targets. Director and Oracle freeze the whole proposal.
+Oracle and feedback share quantile scoring; the existing cohort selection
+metric remains unchanged. New validation covers citation substitution, changed
+quantiles, crossed/nonfinite values, holidays, wrong truth dates/bases and FLAT
+median reconciliation. This is an interface and evaluation repair, not learning.
+
+The [completed episode](judgmental-pilot-receipt.json) used April 28 inputs and
+May 4 truth: all 28 Lab and 31 Oracle nodes, ten predictions and 32 accepted
+primary-agent responses. One Oracle enum error was retained and corrected.
+No prior-run response was reused; no new paid provider call occurred. Mean
+absolute median error was 1.1985 percentage points versus 1.2685 for unchanged
+prices and 1.1592 for the preceding twenty returns' median. Mean three-quantile
+pinball loss was 0.3954 versus 0.3536 for historical quantiles. The judgmental
+intervals covered ten outcomes versus eight, but were wider and scored worse.
+These are one-date arithmetic comparisons, not independently executed graph arms.
+
+Evolve reviewed a candidate that makes the earlier-price quantiles and every
+evidence-based adjustment explicit, retaining source uncertainty and zero
+medians. It has no later run or generation-retention result. Separately,
+the [retrieval audit](profit-state-retrieval-audit.json) verifies recovery of
+COSCO's eligible April 10 profit guidance in the original April 28 input,
+with prices unchanged. The optional `issuer_profit_state_v1` profile preserves
+original timestamps and leaves the default archived manifest unchanged.
+
+Next scientific work: hold retrieval and dates fixed while comparing the
+reviewed quantile-reference instruction with the preceding instruction;
+then test retrieval separately. Use later days, original frozen responses,
+the same model and complete ten-stock support. A direct reasoner and the
+arithmetic reference are necessary comparators before attributing value to the
+graph. Calendar-correct native execution is demonstrated; useful transferable
+forecasting improvement remains unestablished.
+
+Validation: all 671 full-suite tests pass after the retrieval profile addition.
+The source extraction checks cover 264 files. The manuscript compiles to 14
+pages with no undefined citations or overfull boxes; changed pages were
+visually inspected. Exchange-calendar deprecation and bibliography underfull
+spacing warnings remain. These are implementation checks, not market evidence.
+
 ## Richer data through the native daily loop, 12 October 2026
 
 The [TraderHarness adapter](traderharness-daily.md) connects five pinned tables

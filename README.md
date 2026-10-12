@@ -10,6 +10,15 @@ and Oracle are the baseline. Evolve can be the lead agent or a worker following
 a fixed prompt. It proposes a versioned change; later forecasts determine
 whether that change helped. This is procedure learning, not LLM weight training.
 
+The latest completed daily episode produced ten numerical forecasts through
+the full Lab and Oracle. Their median errors beat unchanged prices but lost to
+a simple historical-return reference; wider uncertainty intervals also scored
+worse than that reference. Evolve produced a reviewed forecasting candidate,
+and source inspection recovered earlier profit guidance missing from the input.
+The [forecast report](docs/judgmental-forecasts.md),
+[verified results](docs/judgmental-pilot-receipt.json) and
+[paper](paper/zenith.pdf) describe what ran and what still needs later testing.
+
 ## Run the daily loop
 
 Use a Git source checkout on macOS or Linux with Python 3.11 or newer (Python 3.12 is

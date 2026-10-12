@@ -67,3 +67,11 @@ For a probability-only hypothesis, the smaller replay adapter uses `freeze`, ide
 Historical model training, remembered prices, retrospective narratives, dependent weeks/assets, and repeated development selection can contaminate apparent improvements. Synthetic fixtures establish executable contracts, not forecasting ability, significance, investment returns, or causal conclusions. Instant syntax/PIT/graph checks and historical measurements do not remove the waiting horizon for live truth.
 
 The complete contracts, CLI commands, and twenty-issue consumer fixture are in `docs/experiments.md`. The bounded edit/evaluate/keep-or-discard pattern is adapted from [Karpathy autoresearch](https://github.com/karpathy/autoresearch/tree/228791fb499afffb54b46200aca536f79142f117); its code is not copied here. GEPA or other proposal methods may supply explicitly preregistered candidates; the evaluator and acceptance rule remain fixed.
+
+The native [judgmental quantile branch](docs/judgmental-forecasts.md) supports
+rich-evidence numerical beliefs without an identified cause. Freeze median and
+uncertainty before truth, retain the full Lab/Oracle, and compare the actual
+predictions with earlier-price controls. Evolve is the reviewed reasoning step
+performed by the lead agent or a fixed-prompt worker; the controller carries its
+accepted skill into later issues. Neither acceptance nor a single better day
+establishes that the update procedure learns.

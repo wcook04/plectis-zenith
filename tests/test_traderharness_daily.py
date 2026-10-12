@@ -119,3 +119,38 @@ def test_daily_full_native_graph_uses_observation_horizon_and_later_availability
     assert runtime.stamp(spec['time_anchor']).isoformat() == '2023-04-27T07:01:00+00:00'
     assert spec['truth_run'] is None
     assert spec['feed_source'].endswith('2023-04-27')
+
+
+def test_profit_state_survives_news_window_without_a_new_matching_release():
+    def row(identity,stamp,text,entities=None):
+        return {'id':identity,'available_at':stamp,'published_date':stamp[:10],'entities':['601919'] if entities is None else entities,'content':text,'kind':'news'}
+    old=row('prior','2023-04-10T10:22:10+00:00','{{C601919}}：预计一季度归母净利润69.33亿元 同比减少约74.91%')
+    future=row('future','2023-04-28T09:15:53+00:00','{{C601919}}：一季度净利润71.27亿元 同比下降74.2%')
+    unrelated=row('other','2023-04-27T07:00:00+00:00','客户2022年一季度净利润99亿元',['601919','999999'])
+    cutoff='2023-04-28T07:00:00+00:00'
+    legacy,_=adapter.select_daily_text([old,unrelated,future],cutoff,'601919')
+    assert 'prior' not in {r['id'] for r in legacy}
+    memory,audit=adapter.select_daily_text([future,unrelated,old],cutoff,'601919',profit_memory=True)
+    assert audit['profit_state_items_added']==1
+    state=[r for r in memory if r['scope']=='issuer_profit_state']
+    assert state==[{**old,'scope':'issuer_profit_state'}]
+    assert 'future' not in {r['id'] for r in memory}
+    # Once the actual result is available it supersedes guidance as latest state;
+    # prior-comparison retrieval independently keeps the guidance when appropriate.
+    _,later=adapter.select_daily_text([old,unrelated,future],'2023-05-04T07:00:00+00:00','601919',profit_memory=True)
+    assert later['profit_state_records'][0]['id']=='future'
+
+
+def test_profit_state_is_bounded_and_does_not_rewrite_legacy_profile():
+    before=adapter.manifest_body()
+    after=adapter.manifest_body(True)
+    assert 'selection_profile' not in before
+    assert after['selection_profile']=='issuer_profit_state_v1'
+    assert before['policy']==adapter.POLICY
+    assert before['files']==after['files']
+    assert adapter.canonical_hash(before)!=adapter.canonical_hash(after)
+    rows=[{'id':str(i),'available_at':f'2023-04-{i:02d}T07:00:00+00:00','published_date':f'2023-04-{i:02d}',
+           'entities':['601919'],'content':f'{2019+i}年一季度净利润{i}亿元','kind':'news'} for i in range(1,5)]
+    selected,audit=adapter.select_daily_text(rows,'2023-04-28T07:00:00+00:00','601919',profit_memory=True)
+    assert len(audit['profit_state_records'])==2
+    assert [r['id'] for r in selected]==['4','3']

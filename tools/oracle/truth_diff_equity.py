@@ -112,6 +112,10 @@ def _build_prediction_reconciliation_rows(
                 "absolute_delta": float(abs_error),
                 "percent_delta": float(pred_error_pct),
                 "directional_correct": direction_hit,
+                **({key: result[key] for key in ('forecast_quantiles', 'realized_simple_return',
+                    'quantile_pinball_losses', 'mean_quantile_pinball_loss', 'interval_80_covered',
+                    'interval_80_width', 'quantile_units', 'calibration_status')}
+                   if 'forecast_quantiles' in result else {}),
             }
         )
 
@@ -164,6 +168,13 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
     feed_health = equity_feed_health(subject_run_dir, truth_run_dir)
     subject_envelope = load_artifact(subject_run_dir, "lab_director") or {}
     subject_cp2 = subject_envelope.get("data", {})
+    if subject_cp2.get('forecast_basis') == 'JUDGMENTAL' and (
+            subject_envelope.get('status') not in {'success', 'loaded'} or
+            not validate_cp2(subject_cp2, subject_run_dir=subject_run_dir).ok):
+        raise ValueError('Invalid judgmental subject cannot become a scored reconciliation')
+    if subject_cp2.get('forecast_basis') == 'JUDGMENTAL':
+        from system.lib.judgmental_forecast import verify_truth
+        verify_truth(subject_cp2, subject_run_dir, truth_run_dir)
     abstained = subject_cp2.get("decision_status") == "ABSTAIN"
     if abstained and (subject_envelope.get("status") not in {"success", "loaded"}
                       or not validate_cp2(subject_cp2, subject_run_dir=subject_run_dir).ok):
@@ -174,6 +185,7 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
     data = {
         "status": "ABSTAINED" if abstained else "AVAILABLE",
         "subject_decision_status": "ABSTAIN" if abstained else "FORECAST",
+        "subject_forecast_basis": subject_cp2.get('forecast_basis', 'CAUSAL'),
         "subject_run_id": subject_run_dir.name,
         "truth_run_id": truth_run_dir.name,
         "subject_as_of": _load_as_of(subject_run_dir),

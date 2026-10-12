@@ -378,6 +378,8 @@ def register(store, subject_run, policy_path, horizon_id, *, root=ROOT):
             "run_manifest": source_ref(manifest_path, root=root) if manifest else None,
             "evaluation_posture": "historical_import" if now >= horizon else "prospective_pending",
             "claim_boundary": "local source provenance; registration alone does not prove contemporaneous publication"}
+        if payload.get('forecast_basis') == 'JUDGMENTAL':
+            record['forecast_quantiles'] = next(row for row in payload['forecast_quantiles']['targets'] if row['target_id'] == target)
         records.append((logical_key, record))
     admitted = []
     with connection(store, create=True) as db:
@@ -476,6 +478,9 @@ def measurement(forecast, rows, as_of, source_errors):
         "no_change_relative_error": baseline_error / actual,
         "target_better_than_no_change": absolute_error < baseline_error,
         "price_basis": policy["price_basis"], "currency": policy["currency"]}
+    if 'forecast_quantiles' in forecast:
+        from system.lib.judgmental_forecast import score_quantiles
+        metrics.update(score_quantiles(forecast['forecast_quantiles'], actual/snapshot-1))
     return {**base, "status": "scored", "data_gaps": [], "metrics": metrics,
             "error_classes": classes, "truth": truth,
             "interpretation": "price and direction forecast error, not returns or causal diagnosis"}

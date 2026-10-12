@@ -47,6 +47,16 @@ CC-BY-4.0 attribution. The standalone checkout includes the bibliography and sty
   recommend replacing this candidate.
   [Active protocol](../docs/ashare-study.md) owns commands and the spending boundary.
 
+The latest numerical episode is described in
+[judgmental forecasts](../docs/judgmental-forecasts.md), with a
+[verified receipt](../docs/judgmental-pilot-receipt.json) and
+[retrieval audit](../docs/profit-state-retrieval-audit.json). Ten next-close
+forecasts completed the full graph; both point and quantile losses were worse
+than the same-input historical-quantile reference. The revised paper introduces
+the quantile method with its scoring citation, reports the negative comparison,
+and separates the reviewed prompt candidate from the verified retrieval repair.
+Neither change has a later performance result.
+
 ## Historical supporting evidence
 
 The old 2015 study compared a manually frozen price-only rule with a model

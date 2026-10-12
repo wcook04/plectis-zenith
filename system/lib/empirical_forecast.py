@@ -20,8 +20,10 @@ def finite_number(value):
 
 def rule_errors(payload):
     basis = payload.get('forecast_basis', 'CAUSAL')
+    if basis == 'JUDGMENTAL':
+        return []  # Validated by the separate native quantile contract.
     if basis not in ('CAUSAL', 'EMPIRICAL'):
-        return ['INVALID_FORECAST_BASIS: expected CAUSAL or EMPIRICAL']
+        return ['INVALID_FORECAST_BASIS: expected CAUSAL, EMPIRICAL or JUDGMENTAL']
     if basis != 'EMPIRICAL':
         if payload.get('dominant_evidence_track') == 'EMPIRICAL':
             return ['INVALID_EMPIRICAL_RULE: EMPIRICAL track requires explicit basis']

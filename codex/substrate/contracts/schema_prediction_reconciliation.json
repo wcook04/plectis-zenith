@@ -1,7 +1,7 @@
 {
   "id": "schema_prediction_reconciliation",
   "type": "contract",
-  "version": "1.1",
+  "version": "1.2",
   "status": "NORMATIVE",
   "description": "Deterministic Oracle grading surface for comparing Lab prediction targets at T-n against realized truth at T.",
   "purpose": "This contract defines `prediction_reconciliation`, the first Oracle artifact. It is emitted by the deterministic equity diff layer before interpretive truth mapping. The artifact answers: what did Lab predict, what actually happened, and how large was the miss? It is deliberately factual and low-hallucination.",
@@ -330,5 +330,6 @@
     "subject_decision_status": "ABSTAIN",
     "rows": [],
     "summary": "All row/direction counts zero; no hit-rate or error success claim; requires validated subject CP2 abstention"
-  }
+  },
+  "judgmental_quantile_contract": "When subject_forecast_basis=JUDGMENTAL, FLAT means a zero median return, not abstention. Retain original q10/q50/q90 and deterministic unscaled pinball losses, interval coverage and width. These do not establish calibration."
 }

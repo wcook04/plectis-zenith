@@ -110,3 +110,12 @@ or an epsilon directional call. The initial supported rule is a price-history
 control within the full graph. Freeze its inputs, parameters and target set in
 CP1; independently checked target arithmetic and Oracle's no-refit boundary
 remain binding. Distinguish interface repairs from a learned policy improvement.
+
+For evidence-conditioned numerical beliefs without causal identification, use
+`docs/judgmental-forecasts.md`: the native JUDGMENTAL branch freezes q10/q50/q90
+simple-return quantiles at CP1. q50 is a median, not a mean; an exact zero median
+is not a no-call or a point mass. Preserve the whole object through Director and
+Oracle. Evolve receives the original quantiles and deterministic pinball loss.
+Do not judge uncertainty by interval coverage alone or treat one covered event
+as calibration. Compare the frozen judgment with earlier-price controls before
+claiming that text reasoning helped; do not change the cohort objective silently.

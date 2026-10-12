@@ -31,23 +31,21 @@ a reviewed successor then faces later days. The learning object is the
 pipeline's instructions, context, skills and eventually structure. The current
 implementation retains the original full Lab and Oracle, source-bound agent
 handoffs, output contracts and versioned policies in a standalone source
-checkout. A pinned three-equity panel provides 291 shared daily price dates
-and 4,990 date-bucketed news summaries, with explicit availability assumptions.
-A primary-agent development sequence completed two full Labs and
-Oracles. After a declared price-history rule lost to unchanged-price persistence,
-Evolve proposed reducing its scale; the next Lab used that stored change before
-its outcomes were inspected. The changed rule then beat persistence but lost
-to the unchanged rule's arithmetic control. Earlier attempts exposed unsupported
-causal reasoning, forced forecasting and forced criticism; the contracts now
-permit explicit abstention and a testable empirical hypothesis without an
-invented cause. An audit of a richer public source found future-year results in
-historical news rows. These findings establish an executed experience-to-procedure
-transition and specific failures, not a learned forecasting advantage or a
-measured benefit from news. A subsequent ten-stock episode connected richer
-daily headlines, announcement titles and price context to the full Lab and
-Oracle. It abstained and produced a reviewed issuer-identity procedure candidate,
-whose incremental value remains untested. The next empirical question is whether reviewed
-changes improve later reasoning and forecasts beyond an unchanged pipeline.
+checkout. A pinned ten-stock public source supplies 695 adjacent daily pairs
+with prices, dated headlines and announcement titles. In one completed
+episode, Lab issued ten next-close return forecasts with three quantiles each.
+Its median forecasts beat unchanged prices but lost to the preceding twenty
+returns' median; its wider intervals also lost to historical quantiles on
+pinball loss. Oracle exposed an omitted earlier profit-guidance claim, leading
+to a separately versioned retrieval repair. Evolve proposed explicit,
+evidence-cited adjustments from the historical-quantile reference; this
+candidate awaits later testing. An earlier two-day sequence did carry a
+reviewed price-rule change into the next Lab, where it lost to the unchanged
+rule's arithmetic control. These exposed development episodes establish an
+executed experience-to-procedure transition and specific engineering repairs.
+They do not establish a learned forecasting advantage or a measured benefit
+from news. The empirical question is whether reviewed changes improve later
+reasoning and forecasts beyond an unchanged pipeline.
 \end{abstract}
 
 \section{The system we want to learn}
@@ -263,6 +261,24 @@ no-findings review must name the alternatives examined and the limits of its
 evidence. None of these outcomes proves optimality. They permit Evolve to
 retain a procedure instead of accumulating invented lessons.
 
+Abstention is different from a forecast centred at zero. The implemented
+\code{JUDGMENTAL} branch records return quantiles $q_{.1},q_{.5},q_{.9}$,
+their original evidence identifiers and a numerical rationale. Its central
+target is the observed price times $(1+q_{.5})$: a median, not a mean return.
+Zero is a valid median with a nonzero uncertainty interval. The Director and
+Oracle must preserve the entire forecast and its cited source identities;
+validators also require the next actual exchange close and matching truth
+date, currency and price basis. No identified market cause is required.
+
+For realized simple return $y$, each quantile receives the unscaled pinball
+loss $\ell_p(y,q)=\max\{p(y-q),(p-1)(y-q)\}$. We average over
+$p\in\{.1,.5,.9\}$, using the standard consistent quantile score
+\citep{gneitingraftery2007}. Coverage and width of $[q_{.1},q_{.9}]$ are
+additional diagnostics. Three quantiles do not specify a full distribution,
+and high interval coverage alone does not establish calibration. These scores
+reach the existing Oracle and feedback reports; they do not silently replace
+the cohort's declared selection objective.
+
 Financial interpretation must also distinguish familiar facts from changes.
 For example, Salesforce's May 2023 release preserved annual revenue guidance
 while raising non-GAAP operating-margin guidance \citep{salesforce2023march,salesforce2023may}.
@@ -378,6 +394,68 @@ to the filing of BYD Electronic, HKEX stock code 285
 The candidate codifies behavior already partly present; later benefit is unknown.
 The receipt is \code{docs/traderharness-native-receipt.json}. No generation
 selection or new paid provider call occurred.
+
+\subsection{Ten numerical forecasts and a retrieval repair}
+The next development episode used the 28 April 2023 close and the next XSHG
+session, 4 May. It completed the original 28-node Lab and 31-node Oracle with
+32 accepted primary-agent responses and one retained schema correction.
+The inputs contained 21 closing-price observations per stock and 22 text
+items. Lab froze ten judgmental quantile forecasts before the later truth
+was inspected. These dates remain exposed historical development; this is
+neither a held-out assessment nor evidence about an unseen model history.
+
+Eight medians were zero. The other two were $-0.4\%$ for Ganfeng Lithium
+(\code{002460}) and $-0.3\%$ for LONGi (\code{601012}). The first rationale
+considered the reported profit decline and the price fall already observed;
+the second considered continuing weakness despite reported profit growth.
+Both acknowledged missing expectations and the risk of counting information
+already reflected in prices. The numerical increments were judgments, not
+estimates of identified causal effects. At issue time, each stock's preceding
+twenty returns also supplied a frozen arithmetic reference: their median and
+linearly interpolated inclusive 10th and 90th percentiles.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+Forecast & Median MAE & Pinball & Coverage & Width \\
+\midrule
+Lab judgments & 1.1985 & 0.3954 & 10/10 & 5.8700 \\
+Historical quantiles & 1.1592 & 0.3536 & 8/10 & 4.2198 \\
+Unchanged price & 1.2685 & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\caption{One issue date, ten stocks, next-session raw closing returns.
+MAE, mean three-quantile pinball loss and interval width are in percentage
+points; smaller loss is better. Coverage is the count within the nominal
+80\% interval. Arithmetic controls use the same issue-time prices and are
+not independently executed graph arms.}
+\label{tab:judgmental}
+\end{table}
+
+The Lab beat persistence on central error but lost to historical quantiles
+on both reported losses (Table~\ref{tab:judgmental}). Its wider intervals
+covered every outcome without improving the quantile score. Ten correlated
+stocks on one date do not establish calibration or a reliable ranking.
+The reviewed Evolve candidate asks Lab to state its price-only reference and
+the exact evidence-based change to each quantile, without widening tails
+merely because a feed is absent. Its later benefit is untested. Original
+forecasts, comparison calculations and the reviewed candidate are preserved
+in \code{docs/judgmental-pilot-receipt.json}.
+
+Oracle also revealed a concrete input defect. COSCO's 10 April headline
+projecting first-quarter profit of RMB6.933 billion and a 74.91\% annual
+decline in the pinned source \citep{traderharnessdata2026} was absent from
+the 28 April Lab input. It appeared in later retrieval
+only after a matching results headline triggered the prior-period selector.
+The source timestamp made the earlier guidance eligible at issue time; its
+omission was a retrieval failure, not unavailable future information. A new
+optional source profile retains at most two latest distinct issuer
+profit-period claims within 187 days, with original timestamps. Rebuilding
+the original issue snapshot recovered that one item and left quotes unchanged.
+This is a verified source-selection repair, not a new performance result.
+It remains separate from the forecasting candidate so a later comparison can
+distinguish a better input packet from a better reasoning instruction.
 
 \subsection{Earlier development evidence}
 A paid full-graph development attempt using DeepSeek V4.1 Flash stopped at

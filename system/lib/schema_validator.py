@@ -47,6 +47,7 @@ from typing import Any, List, Optional, Set
 from system.lib.citations import detect_malformed_citations, extract_citations, validate_citations
 from system.lib.artifacts import load_equity_universe, load_snapshot_ledger_ids
 from system.lib.empirical_forecast import rule_errors, target_errors
+from system.lib.judgmental_forecast import rule_errors as quantile_rule_errors, target_errors as quantile_target_errors
 
 # ---------------------------------------------------------------------------
 # Format constants
@@ -530,7 +531,7 @@ def validate_prediction_reconciliation(payload: Any) -> ValidationResult:
             errors.append(f"INVALID_FIELD: rows[{idx}].asset_class={asset_class!r}")
 
         direction = row.get("prediction_direction")
-        if direction not in _VALID_DIRECTIONS:
+        if direction not in _VALID_DIRECTIONS | ({'FLAT'} if payload.get('subject_forecast_basis') == 'JUDGMENTAL' else set()):
             errors.append(
                 f"INVALID_FIELD: rows[{idx}].prediction_direction={direction!r} "
                 "(must be UP or DOWN)"
@@ -964,6 +965,7 @@ def validate_cp1(payload: Any) -> ValidationResult:
             errors.extend(_validate_evidence_dictionary(evidence, ledger_id_re))
 
     errors.extend(rule_errors(payload))
+    errors.extend(quantile_rule_errors(payload))
     # Abstention is an explicit, evidence-bound decision, never an empty forecast.
     decision_status = payload.get("decision_status", "FORECAST")
     if decision_status not in ("FORECAST", "ABSTAIN"):
@@ -1092,7 +1094,7 @@ def validate_cp2(
                     errors.append(f"MISSING_FIELD: predictions_t[{i}].target_id")
                 if "direction" not in pred:
                     errors.append(f"MISSING_FIELD: predictions_t[{i}].direction")
-                elif pred["direction"] not in _VALID_DIRECTIONS:
+                elif pred["direction"] not in (_VALID_DIRECTIONS | ({'FLAT'} if payload.get('forecast_basis') == 'JUDGMENTAL' else set())):
                     errors.append(
                         f"INVALID_FIELD: predictions_t[{i}].direction={pred['direction']!r} "
                         f"(must be UP or DOWN)"
@@ -1143,6 +1145,8 @@ def validate_cp2(
                             f"INVALID_TARGET_DIRECTION: predictions_t[{i}] "
                             "DOWN prediction requires target_price < snapshot_price"
                         )
+                    elif direction == "FLAT" and target_price != snapshot_price:
+                        errors.append(f"INVALID_TARGET_DIRECTION: predictions_t[{i}] FLAT median must equal snapshot_price")
 
                 snapshot_dt = _parse_iso_datetime(pred.get("snapshot_time"))
                 target_dt = _parse_iso_datetime(pred.get("target_time_iso"))
@@ -1237,6 +1241,8 @@ def validate_cp2(
     # --- Engine price-audit mismatches ---
     errors.extend(target_errors(payload, subject_run_dir, expected_snapshot_time,
                                 expected_target_time_iso))
+    errors.extend(quantile_target_errors(payload, subject_run_dir, expected_snapshot_time,
+                                        expected_target_time_iso))
     audit_errors = payload.get("_engine_audit_errors")
     if isinstance(audit_errors, list):
         for raw in audit_errors:

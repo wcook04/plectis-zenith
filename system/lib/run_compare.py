@@ -339,6 +339,8 @@ def grade_predictions(subject_run_dir: Path | str, truth_run_dir: Path | str) ->
     predictions = load_predictions(subject_run_dir)
     truth_prices = combined_prices(truth_run_dir)
     meta = load_director_meta(subject_run_dir)
+    cp2 = (_load_json(subject_run_dir/'artifacts/lab_director.json') if (subject_run_dir/'artifacts/lab_director.json').exists() else {}).get('data', {})
+    quantiles = {r['target_id']: r for r in cp2.get('forecast_quantiles', {}).get('targets', [])} if cp2.get('forecast_basis') == 'JUDGMENTAL' else {}
     results: List[Dict[str, Any]] = []
     hits = 0
     misses = 0
@@ -386,6 +388,12 @@ def grade_predictions(subject_run_dir: Path | str, truth_run_dir: Path | str) ->
         else:
             misses += 1
 
+        quantile_metrics = {}
+        if target_id in quantiles and snapshot_price > 0:
+            from system.lib.judgmental_forecast import score_quantiles
+            quantile_metrics = {'forecast_quantiles': quantiles[target_id],
+                                **score_quantiles(quantiles[target_id], realized_price/snapshot_price-1)}
+
         results.append(
             {
                 **base,
@@ -396,6 +404,7 @@ def grade_predictions(subject_run_dir: Path | str, truth_run_dir: Path | str) ->
                 "pred_error_pct": pred_error_pct,
                 "abs_error": abs_error,
                 "realized_pct_move": realized_pct_move,
+                **quantile_metrics,
             }
         )
 

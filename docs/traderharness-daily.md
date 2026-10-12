@@ -116,3 +116,35 @@ XNYS-only; copying it would remain price-only. Separately compare claim-owner
 accuracy and unsupported association rates for the NEWS candidate. The current
 generation scorer requires complete forecasts, so an abstaining candidate
 cannot win that gate by avoiding difficult cases.
+
+## Retaining earlier issuer state
+
+The April28 → May4 quantile episode exposed a retrieval omission: the April10
+601919 profit-guidance headline was available before the forecast, but appeared
+in a packet only after the selector found a fresh matching result. A seven-day
+news window can therefore lose the very comparison needed to interpret the next
+release. This is a source-selection defect; it does not establish that the
+missing fact would have made a profitable prediction.
+
+An explicit new acquisition profile retains up to two latest distinct issuer
+profit-period claims from the eligible 187-day history, independent of whether a
+recent headline triggers comparison retrieval. It keeps original availability
+clocks, single issuer candidate associations and source identities. It is a
+bounded retrieval memory, not authenticated fundamentals or consensus. The
+original profile and completed programmes remain unchanged.
+
+```sh
+python -m benchmarks.traderharness_daily acquire \
+  --dataset work/datasets/traderharness-profit-state \
+  --cached-source work/datasets/traderharness-daily --profit-state-memory
+python -m zenith daily init --work-dir work/profit-state-development \
+  --dataset work/datasets/traderharness-profit-state \
+  --start 2023-05-04 --end 2023-05-05
+```
+
+The new manifest pins the selection profile; later snapshots read it rather
+than accepting an unrecorded switch. The [retrieval audit](profit-state-retrieval-audit.json)
+checks the original exposed issue: eligible earlier items are recovered and
+raw quotes stay identical. Keep this data intervention separate from the
+[reviewed quantile-skill candidate](judgmental-pilot-receipt.json) when measuring
+which change improves later forecasts.

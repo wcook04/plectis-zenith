@@ -3004,6 +3004,7 @@ class GodModeEngine:
                 return validate_cross_corr_v2(parsed)
             return ValidationResult.success()
         elif output_schema == "isomorphic_cp2":
+            from system.lib.judgmental_forecast import locked_evidence
             cross_corr_v2_targets = self._extract_cross_corr_v2_targets()
             cp2_result = validate_cp2(
                 parsed,
@@ -3020,16 +3021,20 @@ class GodModeEngine:
                         return ValidationResult.failure(cp2_result.errors + [
                             "DECISION_STATUS_MISMATCH: Director must preserve the locked CP1 decision status"])
                     if (cp1.get("forecast_basis", "CAUSAL") != parsed.get("forecast_basis", "CAUSAL")
-                            or cp1.get("empirical_rule") != parsed.get("empirical_rule")):
+                            or cp1.get("empirical_rule") != parsed.get("empirical_rule")
+                            or cp1.get("forecast_quantiles") != parsed.get("forecast_quantiles")
+                            or locked_evidence(cp1) != locked_evidence(parsed)):
                         return ValidationResult.failure(cp2_result.errors + [
                             "FORECAST_RULE_MISMATCH: Director must preserve CP1 forecast basis and rule"])
                 return cp2_result
 
             if node.id == "oracle_cp2_emitter" and isinstance(parsed, dict):
                 subject = (load_artifact(self._subject_run_dir, "lab_director") or {}).get("data", {})
-                if "EMPIRICAL" in (subject.get("forecast_basis"), parsed.get("forecast_basis")) and (
+                if {'EMPIRICAL', 'JUDGMENTAL'}.intersection((subject.get("forecast_basis"), parsed.get("forecast_basis"))) and (
                         parsed.get("forecast_basis", "CAUSAL") != subject.get("forecast_basis", "CAUSAL") or
-                        parsed.get("empirical_rule") != subject.get("empirical_rule")):
+                        parsed.get("empirical_rule") != subject.get("empirical_rule") or
+                        parsed.get("forecast_quantiles") != subject.get("forecast_quantiles") or
+                        locked_evidence(parsed) != locked_evidence(subject)):
                     return ValidationResult.failure(cp2_result.errors + [
                         "FORECAST_RULE_MISMATCH: Oracle must not fit an empirical rule to later truth"])
             evidence = (
