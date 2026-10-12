@@ -22,9 +22,18 @@ def main(argv=None):
             sub.add_argument('--final-key')
     selection = commands.add_parser('selection-score')
     selection.add_argument('--input', type=Path, required=True)
+    diagnosis = commands.add_parser('failure-windows', help='source-bound Oracle hypotheses across sliding windows')
+    diagnosis.add_argument('--oracle-run', type=Path, action='append', required=True)
+    diagnosis.add_argument('--widths', type=int, nargs='+', default=[1, 2, 5])
+    diagnosis.add_argument('--stride', type=int, default=1)
+    diagnosis.add_argument('--annotations', type=Path)
     args = parser.parse_args(argv)
     try:
-        if args.command == 'selection-score':
+        if args.command == 'failure-windows':
+            from research.failure_windows import diagnose
+            annotations = read_json(args.annotations)['annotations'] if args.annotations else []
+            result = diagnose(args.oracle_run, args.widths, args.stride, annotations)
+        elif args.command == 'selection-score':
             from feedback.selection import score_panel
             result = score_panel(read_json(args.input))
         elif args.command == 'cohort-freeze':
@@ -36,7 +45,7 @@ def main(argv=None):
             result = cohort.evaluate(args.study, final_key=args.final_key)
         else:
             result = cohort.next_actions(args.study)
-    except (ValueError, OSError, KeyError, RuntimeError) as exc:
+    except (ValueError, OSError, KeyError, RuntimeError, TypeError, IndexError) as exc:
         print(json.dumps({'status': 'rejected', 'error': str(exc)}))
         return 1
     print(json.dumps(result, indent=2, default=str))
