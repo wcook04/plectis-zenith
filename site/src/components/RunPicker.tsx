@@ -35,7 +35,7 @@ export function RunPicker({ mission, value, onChange, receiptLabel, localEnabled
 
   return (
     <label className="run-picker">
-      <span className="run-picker__label">Show states from</span>
+      <span className="run-picker__label">Node states from</span>
       <select
         value={value}
         onChange={(event) => {

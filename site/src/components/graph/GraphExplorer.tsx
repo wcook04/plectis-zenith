@@ -32,6 +32,11 @@ export type ExplorerProps = {
   runControl?: React.ReactNode;
   onSelectionChange?: (id: string | null) => void;
   maxHeight?: number;
+  // Short label naming the graph and what its states show, e.g.
+  // "Lab graph: preparation record". Shown above the drawing.
+  context?: string;
+  // Open a node from outside the graph (a table row, a link); bump nonce to repeat.
+  focusRequest?: { id: string; nonce: number } | null;
 };
 
 export function GraphExplorer(props: ExplorerProps) {
@@ -112,7 +117,7 @@ const PAD = 28;
 const LEGEND_SPACE = 8;
 
 function CanvasExplorer(props: ExplorerProps) {
-  const { graph, title, run, runControl, maxHeight = 720 } = props;
+  const { graph, title, run, runControl, maxHeight = 720, context, focusRequest } = props;
   const families = useMemo(() => layoutGraph(graph, new Set()).families, [graph]);
   const { selected, select, expanded, setExpanded } = useSelection(props, families);
   const [lineageOnly, setLineageOnly] = useState(false);
@@ -376,9 +381,10 @@ function CanvasExplorer(props: ExplorerProps) {
     return () => window.cancelAnimationFrame(frame);
   }, [selected, layout, flow, reduced]);
 
+  // Centre after the inspector has opened and the canvas has its final width.
   const centerOn = useCallback(
     (id: string) => {
-      window.requestAnimationFrame(() =>
+      window.setTimeout(() =>
         window.requestAnimationFrame(() => {
           const renderId = layout.renderIdOf.get(id);
           const item = layout.items.find((i) => i.id === renderId);
@@ -386,7 +392,7 @@ function CanvasExplorer(props: ExplorerProps) {
           const zoom = Math.max(flow.getZoom(), 0.8);
           flow.setCenter(item.x + NODE_W / 2, item.y + NODE_H / 2, { zoom, duration: reduced ? 0 : 280 });
         }),
-      );
+      180);
     },
     [flow, layout, reduced],
   );
@@ -398,6 +404,12 @@ function CanvasExplorer(props: ExplorerProps) {
     },
     [select, centerOn],
   );
+
+  useEffect(() => {
+    if (!focusRequest) return;
+    navigate(focusRequest.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusRequest?.nonce]);
 
   const allExpanded = layout.families.size > 0 && Array.from(layout.families.keys()).every((k) => expanded.has(k));
   // Small graphs (Evolve) need no search, grouping or lineage controls.
@@ -422,7 +434,15 @@ function CanvasExplorer(props: ExplorerProps) {
     />
   ) : null;
 
+  // Visible provenance key only where provenance is drawn: expanded feed cards.
+  const originVisible = layout.items.some((item) => item.kind === 'node' && item.node.demo_provenance);
+
   return (
+    <figure className="explorer-figure" aria-label={title}>
+    <figcaption className="explorer__context">
+      <span className="explorer__context-label">{context ?? title}</span>
+      <span className="explorer__context-help">Select a node to see its instruction, the inputs it reads and the output it must produce.</span>
+    </figcaption>
     <div className={`explorer${compact ? ' explorer--compact' : ''}${selected ? ' has-inspector' : ''}${inspectorBelow ? ' inspector-below' : ''}`}>
       {(!compact || runControl) && (
         <div className="explorer__bar">
@@ -441,12 +461,17 @@ function CanvasExplorer(props: ExplorerProps) {
                   {allExpanded ? 'Collapse groups' : 'Show every node'}
                 </button>
               )}
-              <button type="button" className="z-chip-button" aria-pressed={allDeps} onClick={() => setAllDeps(!allDeps)}>
-                All dependencies
-              </button>
+              <span className="explorer__mode">
+                <button type="button" className="z-chip-button" aria-pressed={allDeps} onClick={() => setAllDeps(!allDeps)}>
+                  {allDeps ? 'Drawing every input' : 'Draw every input'}
+                </button>
+                {!allDeps && hiddenLinks > 0 && (
+                  <span className="explorer__mode-note">Simplified view: some inputs are not drawn. Selecting a node draws all of its inputs.</span>
+                )}
+              </span>
               {selected && (
                 <button type="button" className="z-chip-button" aria-pressed={lineageOnly} onClick={() => setLineageOnly(!lineageOnly)}>
-                  Only this node’s lineage
+                  Hide unrelated nodes
                 </button>
               )}
             </div>
@@ -495,7 +520,6 @@ function CanvasExplorer(props: ExplorerProps) {
             proOptions={{ hideAttribution: true }}
             onPaneClick={() => selected && select(null)}
           />
-          {!selected && <p className="explorer__hint">Select any node to read its instruction, inputs and output.</p>}
         </div>
         {!inspectorBelow && inspector}
       </div>
@@ -503,12 +527,11 @@ function CanvasExplorer(props: ExplorerProps) {
         states={states}
         hasTool={graph.nodes.some((n) => n.type === 'tool')}
         hasCheckpoint={graph.nodes.some((n) => CHECKPOINTS.has(n.id))}
-        hiddenLinks={hiddenLinks}
-        onShowAll={() => setAllDeps(true)}
-        hasOrigin={graph.nodes.some((n) => n.demo_provenance)}
+        hasOrigin={originVisible}
       />
       {inspectorBelow && inspector && <div className="explorer__below">{inspector}</div>}
     </div>
+    </figure>
   );
 }
 
@@ -516,62 +539,57 @@ function Legend({
   states,
   hasTool,
   hasCheckpoint,
-  hiddenLinks,
-  onShowAll,
   hasOrigin,
 }: {
   states: Record<string, NodeState> | null;
   hasTool: boolean;
   hasCheckpoint: boolean;
-  hiddenLinks: number;
-  onShowAll: () => void;
   hasOrigin: boolean;
 }) {
   const present = states ? Array.from(new Set(Object.values(states))) : [];
   const order: NodeState[] = ['success', 'loaded', 'pending', 'failure', 'not_started', 'not_reached', 'unknown'];
   return (
     <div className="legend" aria-label="Key">
-      <span className="legend__item">
-        <span className="legend__swatch legend__swatch--reasoning" aria-hidden="true" /> Model call
-      </span>
-      {hasTool && (
+      <span className="legend__group">
         <span className="legend__item">
-          <span className="legend__swatch legend__swatch--tool" aria-hidden="true" /> Tool
+          <span className="legend__swatch legend__swatch--reasoning" aria-hidden="true" /> Model call
         </span>
-      )}
-      {hasCheckpoint && (
+        {hasTool && (
+          <span className="legend__item">
+            <span className="legend__swatch legend__swatch--tool" aria-hidden="true" /> Tool
+          </span>
+        )}
+        {hasCheckpoint && (
+          <span className="legend__item">
+            <span className="legend__swatch legend__swatch--checkpoint" aria-hidden="true" /> Checkpoint node
+          </span>
+        )}
         <span className="legend__item">
-          <span className="legend__swatch legend__swatch--checkpoint" aria-hidden="true" /> Frozen checkpoint
+          <svg width="30" height="10" aria-hidden="true"><path d="M1 5h22" stroke="currentColor" strokeWidth="1.4" /><path d="M22 1.5l6 3.5-6 3.5z" fill="currentColor" /></svg>
+          Input
         </span>
-      )}
-      <span className="legend__item">
-        <svg width="30" height="10" aria-hidden="true"><path d="M1 5h22" stroke="currentColor" strokeWidth="1.4" /><path d="M22 1.5l6 3.5-6 3.5z" fill="currentColor" /></svg>
-        Input read by the next node
       </span>
-      {hiddenLinks > 0 && (
-        <span className="legend__item">
-          {hiddenLinks} longer links already implied by these paths are hidden.
-          <button type="button" className="z-link-button" onClick={onShowAll}>
-            Show them
-          </button>
+      {present.length > 0 && (
+        <span className="legend__group">
+          <span className="legend__group-label">State in this record</span>
+          {order
+            .filter((s) => present.includes(s))
+            .map((s) => (
+              <span key={s} className={`legend__item z-state z-state--${s}`}>
+                <span className="z-state__glyph" aria-hidden="true" />
+                {STATE_LABEL[s]}
+              </span>
+            ))}
         </span>
       )}
       {hasOrigin && (
-        <span className="legend__item">
-          <span className="z-origin z-origin--real_saved_input">Real input</span>
-          <span className="z-origin z-origin--authored_synthetic">Synthetic</span>
-          <span className="z-origin z-origin--derived_mixed_inputs">Derived</span>
-          feed data
+        <span className="legend__group">
+          <span className="legend__group-label">Feed data</span>
+          <span className="z-origin z-origin--real_saved_input">Real data</span>
+          <span className="z-origin z-origin--authored_synthetic">Synthetic data</span>
+          <span className="z-origin z-origin--derived_mixed_inputs">Computed</span>
         </span>
       )}
-      {order
-        .filter((s) => present.includes(s))
-        .map((s) => (
-          <span key={s} className={`legend__item z-state z-state--${s}`}>
-            <span className="z-state__glyph" aria-hidden="true" />
-            {STATE_LABEL[s]}
-          </span>
-        ))}
     </div>
   );
 }
@@ -665,6 +683,10 @@ function StagedExplorer(props: ExplorerProps) {
   }, [graph]);
   const { selected, select } = useSelection(props, everything.families);
   const states = useRunStates(graph, run);
+  useEffect(() => {
+    if (props.focusRequest) select(props.focusRequest.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.focusRequest?.nonce]);
   const columns = useMemo(() => {
     const byColumn = new Map<number, typeof everything.items>();
     everything.items.forEach((item) => {

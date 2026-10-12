@@ -1,6 +1,6 @@
 // The mixed-data edition's verified preparation, read from
 // /api/v1/evidence/demo-result and /sources. Nothing measured is written here.
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { apiUrl, type Evidence, type Graph } from '../api';
 import { laneLabel } from '../lib/lanes';
 import { nodeName } from '../lib/naming';
@@ -20,7 +20,11 @@ const fmtDate = (iso: string) =>
 export function preparationSummary(result: Evidence): string {
   const d = result.data as Record<string, unknown>;
   const pending = ((d.pending_nodes as string[]) ?? []).map(nodeName);
-  return `${Number(d.completed_count ?? 0)} inputs loaded and the ${pending.join(', ') || 'first'} request prepared, using ${Number(d.model_calls ?? 0)} model calls.`;
+  const calls = Number(d.model_calls ?? 0);
+  const loaded = numberWord(Number(d.completed_count ?? 0));
+  const first = pending.join(', ') || 'the first reasoning step';
+  const model = calls === 0 ? 'No language model has been called' : `The language model has been called ${numberWord(calls)} times`;
+  return `The Lab has loaded its ${loaded} inputs and written the request for its first step, ${first}. ${model}${d.forecast_complete ? '.' : ', so no forecast exists.'}`;
 }
 
 export function Preparation({
@@ -49,7 +53,7 @@ export function Preparation({
     pending.forEach((id) => (states[id] = 'pending'));
     return {
       kind: 'receipt',
-      label: 'Public receipt: preparation',
+      label: 'Published preparation record',
       sourceUrl: apiUrl('/api/v1/evidence/demo-result'),
       states,
       calls: {},
@@ -59,6 +63,12 @@ export function Preparation({
 
   const [choice, setChoice] = useState<{ value: string; run: RunContext | null }>({ value: 'receipt', run: receipt });
   const [selected, setSelected] = useState<string | null>(null);
+  const [focus, setFocus] = useState<{ id: string; nonce: number } | null>(null);
+  const graphRef = useRef<HTMLDivElement>(null);
+  const inspect = (id: string) => {
+    setFocus((prev) => ({ id, nonce: (prev?.nonce ?? 0) + 1 }));
+    graphRef.current?.scrollIntoView({ behavior: window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  };
   const onChange = (next: RunChoice, value: string) => {
     if (next.kind === 'none') setChoice({ value, run: null });
     else if (next.kind === 'receipt') setChoice({ value, run: receipt });
@@ -69,15 +79,15 @@ export function Preparation({
     <div className="results">
       <section className="results__block" aria-labelledby="prep-head">
         <h3 id="prep-head" className="block-head">
-          What the preparation receipt records
+          Contents of the preparation record
         </h3>
         <dl className="ledger">
           <div>
-            <dt>Inputs loaded by the native Lab</dt>
+            <dt>Inputs loaded</dt>
             <dd>{completed}</dd>
           </div>
           <div>
-            <dt>Request prepared, awaiting a model response</dt>
+            <dt>Prepared request</dt>
             <dd>{pending.map(nodeName).join(', ') || 'none'}</dd>
           </div>
           <div>
@@ -89,33 +99,35 @@ export function Preparation({
             <dd>{d.forecast_complete ? 'Yes' : 'No'}</dd>
           </div>
         </dl>
-        <blockquote className="boundary">
-          <p>{String(d.claim_boundary ?? '')}</p>
-          <footer>
-            Claim boundary from the{' '}
+        <div className="boundary">
+          <p>
+            The record claims only that the inputs were loaded and the first request was prepared. It makes no claim
+            about predictions, diagnoses, improvements or financial results.
+          </p>
+          <p className="boundary__source">
             <a href={apiUrl('/api/v1/evidence/demo-result')} target="_blank" rel="noreferrer">
-              preparation receipt
+              Read the preparation record (JSON)
             </a>
-          </footer>
-        </blockquote>
+          </p>
+        </div>
       </section>
 
       {snapshots.length > 0 && (
         <section className="results__block" aria-labelledby="inputs-head">
           <h3 id="inputs-head" className="block-head">
-            Which inputs are real
+            Provenance of the inputs
           </h3>
           <p className="block-lede">
-            The demonstration uses {numberWord(snapshots.length)} saved snapshots. Real inputs are copied unchanged into
-            the computation but kept off the public site; the synthetic ones are published in full and open from the
-            feed nodes in the graph.
+            The demonstration uses data saved at {numberWord(snapshots.length)} times. The real data are used unchanged and
+            are not published on this site. The synthetic examples are published in full; select Macro or News below, or
+            the matching feed in the graph, to read them.
           </p>
           <table className="shape__table inputs-table">
             <thead>
               <tr>
                 <th scope="col">Feed</th>
-                <th scope="col">Input</th>
-                <th scope="col">On this site</th>
+                <th scope="col">Origin</th>
+                <th scope="col">Public availability</th>
               </tr>
             </thead>
             <tbody>
@@ -127,7 +139,17 @@ export function Preparation({
                     <td>
                       <span className={`z-origin z-origin--${lane.input_origin}`}>{ORIGIN_LABEL[lane.input_origin] ?? lane.input_origin}</span>
                     </td>
-                    <td className="inputs-table__payload">{PAYLOAD_LABEL[lane.public_payload ?? ''] ?? lane.public_payload ?? ''}</td>
+                    <td className="inputs-table__payload">
+                      {PAYLOAD_LABEL[lane.public_payload ?? ''] ?? lane.public_payload ?? ''}
+                      {lane.public_payload === 'included' && node && (
+                        <>
+                          {' '}
+                          <button type="button" className="z-link-button" onClick={() => inspect(lane.node_id)}>
+                            Read the synthetic data
+                          </button>
+                        </>
+                      )}
+                    </td>
                   </tr>
                 );
               })}
@@ -140,25 +162,33 @@ export function Preparation({
         </section>
       )}
 
-      <section className="results__block results__block--wide" aria-labelledby="prep-graph-head">
+      <section className="results__block results__block--wide" aria-labelledby="prep-graph-head" ref={graphRef}>
         <h3 id="prep-graph-head" className="block-head">
-          Where execution stands
+          What has run so far
         </h3>
         <p className="block-lede">
-          The inputs are loaded and {pending.map(nodeName).join(', ') || 'the first step'} has its request prepared. Every
-          later node has not started, so there are no model outputs to inspect yet; select a node to read what it would
-          receive and produce.
+          The inputs are loaded and the request for {pending.map(nodeName).join(', ') || 'the first step'} is prepared. No
+          later node has started, so the graph contains no model outputs. Selecting a node shows its instruction, its
+          declared inputs and its expected output.
         </p>
         <GraphExplorer
           key={choice.value}
           graph={labGraph}
           title="Lab graph with the preparation receipt's states"
+          context={
+            choice.run?.kind === 'receipt'
+              ? 'Lab graph: preparation record'
+              : choice.run?.kind === 'local'
+                ? `Lab graph: saved run ${choice.run.runId}`
+                : 'Lab graph: definitions'
+          }
+          focusRequest={focus}
           run={choice.run}
           initialSelected={selected}
           onSelectionChange={setSelected}
           maxHeight={560}
           runControl={
-            <RunPicker mission="lab" value={choice.value} onChange={onChange} receiptLabel="Public receipt: preparation" localEnabled={localRuns} />
+            <RunPicker mission="lab" value={choice.value} onChange={onChange} receiptLabel="Published preparation record" localEnabled={localRuns} />
           }
         />
       </section>

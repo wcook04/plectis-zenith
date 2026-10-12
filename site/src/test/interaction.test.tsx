@@ -109,10 +109,10 @@ describe('node inspector', () => {
     });
     // While RUN_B loads, RUN_A's failure must already be gone.
     expect(screen.queryByText('output ran out')).toBeNull();
-    expect(await screen.findByText(/absent, not a successful output/)).toBeInTheDocument();
+    expect(await screen.findByText(/this means no output, not a success/)).toBeInTheDocument();
   });
 
-  it('keeps reused evidence labelled as reused', async () => {
+  it('keeps loaded evidence labelled as loaded', async () => {
     mockFetch(() => ({ body: nodeBody('lab_miner_stock') }));
     render(
       <GraphExplorer
@@ -122,7 +122,7 @@ describe('node inspector', () => {
       />,
     );
     const stock = screen.getAllByRole('button', { name: /Stocks miner/ })[0];
-    expect(stock).toHaveAccessibleName(/Reused/);
+    expect(stock).toHaveAccessibleName(/Loaded/);
     expect(screen.getAllByRole('button', { name: /Decide \(CP1\)/ })[0]).toHaveAccessibleName(/Failed/);
   });
 });
@@ -143,7 +143,7 @@ describe('markdown from the backend', () => {
 });
 
 describe('mixed-data edition', () => {
-  it('reads the preparation receipt and marks Seed as awaiting a response, nothing as ran', async () => {
+  it('reads the preparation receipt and marks Seed as a prepared request, nothing as ran', async () => {
     mockFetch(() => ({ body: nodeBody('lab_seed_state') }));
     const { Preparation } = await import('../components/Preparation');
     const result = {
@@ -159,9 +159,9 @@ describe('mixed-data edition', () => {
       },
     };
     render(<Preparation result={result} sources={null} labGraph={lab} localRuns={false} />);
-    expect(screen.getByText('Preparation only.')).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: /Seed state/ })[0]).toHaveAccessibleName(/Awaiting response/);
-    expect(screen.getAllByRole('button', { name: /Stocks feed/ })[0]).toHaveAccessibleName(/Reused/);
+    expect(screen.getByText(/The record claims only that the inputs were loaded/)).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /Seed state/ })[0]).toHaveAccessibleName(/Request prepared/);
+    expect(screen.getAllByRole('button', { name: /Stocks feed/ })[0]).toHaveAccessibleName(/Loaded/);
     expect(screen.queryAllByRole('button', { name: /, Ran\./ })).toHaveLength(0);
   });
 
@@ -170,5 +170,16 @@ describe('mixed-data edition', () => {
     render(<JsonView label="Synthetic" value={{ columns: ['ticker', 'pct_change'], rows: [['SYNTH_RATE', 0.1]] }} />);
     expect(screen.getByRole('columnheader', { name: 'ticker' })).toBeInTheDocument();
     expect(screen.getByRole('cell', { name: 'SYNTH_RATE' })).toBeInTheDocument();
+  });
+});
+
+describe('dependency disclosure', () => {
+  it('lists a node’s direct original-feed input even though the overview hides that edge', async () => {
+    mockFetch((url) => ({ body: nodeBody(decodeURIComponent(url.split('/nodes/')[1])) }));
+    render(<GraphExplorer graph={lab} title="Lab" />);
+    fireEvent.click(screen.getAllByRole('button', { name: /Stocks directed miner/ })[0]);
+    const dialog = await screen.findByRole('dialog', { name: /Stocks directed miner/ });
+    const reads = within(dialog).getByRole('heading', { name: 'Reads' }).parentElement!;
+    expect(within(reads).getByRole('button', { name: /Stocks feed/ })).toBeInTheDocument();
   });
 });

@@ -6,12 +6,12 @@ import { SECTION_LABEL } from '../content/copy';
 import { sectionTitle, shortCitation } from '../lib/latex';
 
 const EVIDENCE_LABEL: Record<string, string> = {
-  sources: 'Source hashes for the saved feeds',
+  sources: 'Where each input comes from, with file hashes',
   observations: 'Example stored prices, earlier and later',
-  'window-result': 'Window experiment receipt',
-  'conditional-result': 'Conditional continuation receipt',
+  'window-result': 'Window experiment record',
+  'conditional-result': 'Conditional continuation record',
   replacements: 'Synthetic macro and news examples',
-  'demo-result': 'Preparation receipt',
+  'demo-result': 'Preparation record',
 };
 
 export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper: Paper | null; latex: string | null }) {
@@ -73,7 +73,10 @@ export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper:
 export function linkLabel(url: string): string {
   if (url.includes('arxiv.org')) return 'arXiv';
   if (url.includes('doi.org')) return 'DOI';
-  if (url.includes('github.com/wcook04/plectis-zenith')) return 'Repository';
+  if (url.includes('github.com/wcook04/plectis-zenith')) {
+    const file = url.split('/').pop()?.split('#')[0] ?? '';
+    return file ? file : 'Repository';
+  }
   if (url.includes('github.com')) return 'GitHub';
   return 'Link';
 }

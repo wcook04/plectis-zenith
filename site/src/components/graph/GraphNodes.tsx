@@ -76,7 +76,7 @@ export const ZNode = memo(function ZNode({ data }: NodeProps<ZNodeData>) {
           <span className="z-node__name">{nodeName(node.id)}</span>
           {origin && <span className={`z-origin z-origin--${node.demo_provenance!.input_origin}`}>{origin}</span>}
         </span>
-        {role && <span className="z-node__role">{role}</span>}
+        <span className="z-node__role">{role}</span>
         <span className="z-node__foot">
           {node.lane !== 'SPINE' ? (
             <span className="z-node__lane">
@@ -84,7 +84,7 @@ export const ZNode = memo(function ZNode({ data }: NodeProps<ZNodeData>) {
               {laneLabel(node.lane)}
             </span>
           ) : checkpoint ? (
-            <span className="z-node__lane z-node__lane--cp">Checkpoint</span>
+            <span className="z-node__lane z-node__lane--cp">Checkpoint node</span>
           ) : (
             <span />
           )}
@@ -115,9 +115,11 @@ export const ZGroup = memo(function ZGroup({ data }: NodeProps<ZGroupData>) {
         <span className="z-group__summary" title={lanes.map(laneLabel).join(', ')}>
           {family.summary}
         </span>
+        <span className="z-group__state">
+          <StateMark state={state} />
+        </span>
         <span className="z-group__foot">
           <span className="z-group__count">{members.length} nodes</span>
-          <StateMark state={state} />
           <span className="z-group__expand" aria-hidden="true">
             Expand
           </span>

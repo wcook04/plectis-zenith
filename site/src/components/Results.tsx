@@ -103,14 +103,14 @@ export function Results({
           {stoppedAt ? `The continuation stopped at ${nodeName(stoppedAt)}` : 'Then the next step failed'}
         </h3>
         <p className="block-lede">
-          A separate continuation reused the {numberWord(Object.keys((cond.reused_ancestor_sha256 as object) ?? {}).length)} unchanged
+          A separate continuation loaded the {numberWord(Object.keys((cond.reused_ancestor_sha256 as object) ?? {}).length)} unchanged
           ancestor outputs from the {fmtDate(String(cond.time_anchor))} run and all{' '}
           {numberWord(Object.keys((cond.frozen_feed_sha256 as object) ?? {}).length)} saved feeds, then ran forward with the
           changed instruction. {String(cond.next_failure ?? '')}
         </p>
         <p className="block-lede">
           The graph below shows each node’s recorded state. Select {nodeName('lab_decide')} to read the failure, or any
-          node to compare what ran with what was reused.
+          node to compare what ran in this run with what was loaded from the earlier run.
         </p>
         <Continuation conditional={conditional} labGraph={labGraph} localRuns={localRuns} />
       </section>
@@ -129,11 +129,11 @@ export function Results({
           {num(Number(data.calls ?? 0))} model calls in the window study, about US$
           {Number(data.actual_cost_usd ?? 0).toFixed(2)} in total.{' '}
           <a href={apiUrl('/api/v1/evidence/window-result')} target="_blank" rel="noreferrer">
-            Window receipt
+            Window experiment record
           </a>
           ,{' '}
           <a href={apiUrl('/api/v1/evidence/conditional-result')} target="_blank" rel="noreferrer">
-            continuation receipt
+            continuation record
           </a>
           .
         </p>
@@ -318,11 +318,11 @@ function Continuation({ conditional, labGraph, localRuns }: { conditional: Evide
     });
     return {
       kind: 'receipt',
-      label: 'Public receipt: conditional continuation',
+      label: 'Published continuation record',
       sourceUrl: apiUrl('/api/v1/evidence/conditional-result'),
       states,
       calls,
-      note: `Reused ancestors were loaded from ${String(cond.source_run_id)}; their outputs were not regenerated.`,
+      note: `Earlier outputs were loaded from run ${String(cond.source_run_id)} and not computed again.`,
     };
   }, [cond]);
 
@@ -340,6 +340,7 @@ function Continuation({ conditional, labGraph, localRuns }: { conditional: Evide
       key={choice.value}
       graph={labGraph}
       title="Lab graph with the continuation's recorded states"
+      context={choice.run?.kind === 'receipt' ? 'Lab graph: conditional continuation record' : choice.run?.kind === 'local' ? `Lab graph: saved run ${choice.run.runId}` : 'Lab graph: definitions'}
       run={choice.run}
       initialSelected={selected}
       onSelectionChange={setSelected}
@@ -349,7 +350,7 @@ function Continuation({ conditional, labGraph, localRuns }: { conditional: Evide
           mission="lab"
           value={choice.value}
           onChange={onChange}
-          receiptLabel="Public receipt: conditional continuation"
+          receiptLabel="Published continuation record"
           localEnabled={localRuns}
         />
       }

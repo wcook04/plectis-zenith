@@ -12,8 +12,8 @@ import { laneIndex, LANE_ORDER } from '../../lib/lanes';
 import { nodeFamily, type Family } from '../../lib/naming';
 
 export const NODE_W = 200;
-export const NODE_H = 94;
-export const GROUP_H = 100;
+export const NODE_H = 108;
+export const GROUP_H = 124;
 export const COL_W = 264;
 const ROW_H = NODE_H + 18;
 const MAX_BAND_COLUMNS = 7;
@@ -352,10 +352,35 @@ export function layoutGraph(graph: Graph, expanded: ReadonlySet<string>): GraphL
     inBand.forEach((i) => (i.y += offset - minY));
     offset += maxY - minY + BAND_GAP;
   }
+  // A routed edge inside one band takes the free horizontal corridor nearest
+  // the line between its ends, so it passes just above or below the cards it
+  // skips. Only edges into the next band use the channel above that band.
+  const itemsById = new Map<string, NodeItem | GroupItem>(items.map((item) => [item.id, item]));
+  const boxesInColumn = new Map<number, Array<{ top: number; bottom: number }>>();
+  items.forEach((item) => {
+    if (!boxesInColumn.has(item.column)) boxesInColumn.set(item.column, []);
+    boxesInColumn.get(item.column)!.push({ top: item.y, bottom: item.y + item.h });
+  });
+  frames.forEach((frame) => {
+    const member = itemsById.get(frame.members.find((id) => itemsById.has(id)) ?? '');
+    if (member) boxesInColumn.get(member.column)?.push({ top: frame.y, bottom: frame.y + frame.h });
+  });
+  const CLEAR = 16;
   edges.forEach((edge) => {
     if (!edge.routed) return;
     const band = bandOfItem.get(edge.target) ?? 0;
     edge.channelY = bandTop[band] - CHANNEL_PAD - CHANNEL_STEP * (edge.slot % MAX_SLOTS) - CHANNEL_STEP / 2;
+    const source = itemsById.get(edge.source);
+    const target = itemsById.get(edge.target);
+    if (!source || !target || (bandOfItem.get(edge.source) ?? 0) !== band) return;
+    const blocks: Array<{ top: number; bottom: number }> = [];
+    for (let c = source.column + 1; c < target.column; c++) blocks.push(...(boxesInColumn.get(c) ?? []));
+    const free = (y: number) => blocks.every((b) => y < b.top - CLEAR || y > b.bottom + CLEAR);
+    const ideal = (source.y + source.h / 2 + target.y + target.h / 2) / 2;
+    const candidates = [ideal, ...blocks.flatMap((b) => [b.top - CLEAR - 2, b.bottom + CLEAR + 2])]
+      .filter(free)
+      .sort((a, b) => Math.abs(a - ideal) - Math.abs(b - ideal));
+    if (candidates.length) edge.channelY = candidates[0] + 5 * (edge.slot % 3);
   });
 
   const bands: BandLabel[] =

@@ -3,15 +3,15 @@
 import type { Provenance } from '../api';
 
 export const ORIGIN_LABEL: Record<string, string> = {
-  real_saved_input: 'Real input',
-  authored_synthetic: 'Synthetic',
-  derived_mixed_inputs: 'Derived',
+  real_saved_input: 'Real data',
+  authored_synthetic: 'Synthetic data',
+  derived_mixed_inputs: 'Computed',
 };
 
 export const ORIGIN_DESCRIPTION: Record<string, string> = {
-  real_saved_input: 'A real saved market artifact, copied byte for byte into the computation.',
+  real_saved_input: 'Real market data saved at the time, used unchanged.',
   authored_synthetic: 'Invented examples written for this demonstration. Not an anonymised historical observation.',
-  derived_mixed_inputs: 'Recomputed by the existing calculator from the mixed inputs.',
+  derived_mixed_inputs: 'Computed by the calculator from the real and synthetic feeds.',
 };
 
 export const PAYLOAD_LABEL: Record<string, string> = {

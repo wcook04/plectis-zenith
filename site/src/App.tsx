@@ -19,12 +19,12 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { CopyButton } from './components/CopyButton';
 
 const RECEIPT_LABEL: Record<string, string> = {
-  sources: 'Input provenance and hashes',
+  sources: 'Where each input comes from, with file hashes',
   replacements: 'Synthetic macro and news examples',
-  'demo-result': 'Preparation receipt',
+  'demo-result': 'Preparation record',
   observations: 'Example stored prices',
-  'window-result': 'Window experiment receipt',
-  'conditional-result': 'Conditional continuation receipt',
+  'window-result': 'Window experiment record',
+  'conditional-result': 'Conditional continuation record',
 };
 
 const FIGURE_LABEL: Record<string, string> = {
@@ -43,7 +43,7 @@ const FIGURE_TRACK: Record<string, string> = {
   lab: 'full',
   oracle: 'full',
   evolve: 'compact',
-  results: 'full',
+  results: 'wide',
   next: 'wide',
 };
 
@@ -131,7 +131,7 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
             <nav aria-label="Chapters" className="nav">
               {site.chapters.map((chapter) => (
                 <a key={chapter.id} href={`#${chapter.id}`} aria-current={current === chapter.id ? 'true' : undefined}>
-                  {NAV_LABEL[chapter.id] ?? chapter.title}
+                  {chapter.evidence_kind === 'verified_preparation' ? 'Preparation' : (NAV_LABEL[chapter.id] ?? chapter.title)}
                 </a>
               ))}
               <a href="#paper" aria-current={current === 'paper' ? 'true' : undefined}>
@@ -207,18 +207,30 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           {byline && <span className="hero__byline">{byline}</span>}
         </div>
         </div>
-        <nav className="hero__map" aria-label="What each chapter shows">
-          <p className="hero__map-head">What each part of the site shows</p>
-          <ol>
-            {site.chapters.map((chapter) => (
-              <li key={chapter.id} className={`map-row map-row--${chapter.evidence_kind}`}>
-                <a href={`#${chapter.id}`}>
-                  <span className="map-row__title">{chapter.title}</span>
-                  <span className="map-row__kind">{EVIDENCE_KIND_LABEL[chapter.evidence_kind]?.label ?? chapter.evidence_kind}</span>
-                </a>
-              </li>
-            ))}
-          </ol>
+        <nav className="hero__map" aria-labelledby="contents-caption">
+          <table>
+            <caption id="contents-caption">Contents and the status of the material in each section</caption>
+            <thead>
+              <tr>
+                <th scope="col">
+                  <span className="visually-hidden">Number</span>
+                </th>
+                <th scope="col">Section</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {site.chapters.map((chapter, i) => (
+                <tr key={chapter.id} className={`map-row map-row--${chapter.evidence_kind}`}>
+                  <td className="map-row__num">{i + 1}</td>
+                  <th scope="row" className="map-row__title">
+                    <a href={`#${chapter.id}`}>{chapter.title}</a>
+                  </th>
+                  <td className="map-row__kind">{EVIDENCE_KIND_LABEL[chapter.evidence_kind]?.label ?? chapter.evidence_kind}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </nav>
       </section>
       <StatusStrip site={site} />
@@ -276,6 +288,9 @@ function StatusStrip({ site }: { site: Site }) {
   const url = chapter?.evidence_urls[0];
   const evidence = useAsync<Evidence | null>(() => (url ? api.evidence(url) : Promise.resolve(null)), [url]);
   if (!chapter) return null;
+  const sourcesUrl = site.evidence.sources;
+  const sources = useAsync<Evidence | null>(() => (sourcesUrl ? api.evidence(sourcesUrl) : Promise.resolve(null)), [sourcesUrl]);
+  const composition = sources.status === 'ready' && sources.value ? compositionSentence(sources.value) : null;
   let summary: string | null = null;
   if (evidence.status === 'ready' && evidence.value) {
     const schema = String(evidence.value.data.schema ?? '');
@@ -285,14 +300,34 @@ function StatusStrip({ site }: { site: Site }) {
   return (
     <section className="status-strip" aria-label="Current status">
       <div className="wrap status-strip__inner">
-        <p>
-          <strong>Where it stands.</strong> {summary ?? 'The full loop has not run end to end.'}
-          {site.data_note && <span className="status-strip__note"> {site.data_note}</span>}
-        </p>
+        <div>
+          <p className="status-strip__lead">
+            <strong>{summary ?? 'The full loop has not run end to end.'}</strong>
+          </p>
+          {(composition ?? site.data_note) && <p className="status-strip__note">{composition ?? site.data_note}</p>}
+        </div>
         <a href={`#${chapter.id}`}>{chapter.title}</a>
       </div>
     </section>
   );
+}
+
+// One literal sentence on what the inputs are and what this site publishes,
+// read from the provenance receipt.
+function compositionSentence(sources: Evidence): string | null {
+  const snapshots = (sources.data.snapshots as Array<{ lanes?: Array<{ node_id: string; input_origin: string; public_payload?: string }> }>) ?? [];
+  const lanes = snapshots[0]?.lanes;
+  if (!lanes) return null;
+  const name = (id: string) => nodeName(id).replace(/ feed$/, '').toLowerCase().replace('etfs', 'ETF').replace('stocks', 'stock').replace('prediction markets', 'prediction-market');
+  const list = (items: string[]) => (items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`);
+  const real = lanes.filter((l) => l.input_origin === 'real_saved_input').map((l) => name(l.node_id));
+  const synthetic = lanes.filter((l) => l.input_origin === 'authored_synthetic').map((l) => name(l.node_id));
+  const derived = lanes.filter((l) => l.input_origin === 'derived_mixed_inputs').map((l) => name(l.node_id));
+  const parts: string[] = [];
+  if (real.length) parts.push(`The ${list(real)} feeds contain real saved data, which this site does not publish.`);
+  if (synthetic.length) parts.push(`The ${list(synthetic)} feeds contain synthetic examples written for this demonstration, published here in full.`);
+  if (derived.length) parts.push(`The ${list(derived)} feed is computed from both.`);
+  return parts.join(' ');
 }
 
 function windowSummary(evidence: Evidence): string {
@@ -427,6 +462,7 @@ function LabFigure({ site, graph, deepLink }: { site: Site; graph: Graph | null;
       key={choice.value}
       graph={graph}
       title="The Lab graph"
+      context={choice.run && choice.run.kind === 'local' ? `Lab graph: saved run ${choice.run.runId}` : 'Lab graph: definitions'}
       initialSelected={selected && graph.nodes.some((n) => n.id === selected) ? selected : null}
       run={choice.run}
       onSelectionChange={(id) => {
@@ -454,7 +490,7 @@ function OracleFigure({ chapter }: { chapter: Chapter }) {
   return (
     <>
       {graph.status === 'ready' && graph.value ? (
-        <GraphExplorer graph={graph.value} title="The Oracle graph" maxHeight={640} />
+        <GraphExplorer graph={graph.value} title="The Oracle graph" context="Oracle graph: definitions" maxHeight={640} />
       ) : graph.status === 'error' ? (
         <p className="inspector__warn">The Oracle graph could not be loaded: {graph.message}</p>
       ) : (
@@ -493,7 +529,7 @@ function EvolveFigure({ chapter }: { chapter: Chapter }) {
     <div className="evolve">
       <div className="evolve__graph">
         {graph.status === 'ready' && graph.value ? (
-          <GraphExplorer graph={graph.value} title="The Evolve graph" maxHeight={320} />
+          <GraphExplorer graph={graph.value} title="The Evolve graph" context="Evolve graph: definitions" maxHeight={320} />
         ) : (
           <Loading what="the Evolve graph" />
         )}
@@ -508,8 +544,8 @@ function EvolveFigure({ chapter }: { chapter: Chapter }) {
           <svg viewBox="0 0 48 16" width="48" height="16"><path d="M2 8h40" className="loop-wire loop-wire--test" /><path d="M40 3l6 5-6 5z" fill="var(--edge-strong)" /></svg>
         </div>
         <div className="contrast contrast--test">
-          <h3>Showing it helps</h3>
-          <p>Run the original and the revision on later cases nobody used to choose it, scored by a rule fixed in advance.</p>
+          <h3>Demonstrating an improvement</h3>
+          <p>Run the original and the revised graph on later cases that were not used to choose the revision, scored by a rule declared in advance.</p>
           <p className="contrast__state">Requires a separate comparison</p>
         </div>
       </div>
@@ -552,7 +588,7 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
     return (
       <div className="model-notice">
         <p>
-          <strong>The measured-result receipts are not available from this server</strong> ({evidence.message}). The
+          <strong>The measured results are not available from this server</strong> ({evidence.message}). The
           paper’s Section 4 reports the execution study and its limits.
         </p>
         {chapter.paper_section && (
@@ -564,7 +600,7 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
     );
   }
   if (kind.status === 'error') {
-    return <p className="inspector__warn">The result receipt could not be loaded: {kind.message}</p>;
+    return <p className="inspector__warn">The result record could not be loaded: {kind.message}</p>;
   }
   if (evidence.status === 'loading' || kind.status === 'loading' || !labGraph || !evidence.value) return <Loading what="the recorded results" />;
   return (
@@ -613,7 +649,7 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
               </details>
             </div>
           )}
-          <h3 className="paper-aside__head">Receipts</h3>
+          <h3 className="paper-aside__head">Records</h3>
           <ul className="plain-list">
             {Object.entries(site.evidence).map(([id, url]) => (
               <li key={id}>
@@ -640,12 +676,17 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
             <ol className="refs refs--full">
               {paper.citations.map((citation) => (
                 <li key={citation.id} id={`ref-${citation.id}`}>
-                  {latexToText(citation.latex)}
-                  {citation.urls.map((url) => (
-                    <a key={url} className="refs__link" href={url} target="_blank" rel="noreferrer">
-                      {linkLabel(url)}
-                    </a>
-                  ))}
+                  {latexToText(citation.latex)}{' '}
+                  <span className="refs__links">
+                    ({citation.urls.map((url, i) => (
+                      <span key={url}>
+                        {i > 0 && ', '}
+                        <a href={url} target="_blank" rel="noreferrer">
+                          {linkLabel(url)}
+                        </a>
+                      </span>
+                    ))})
+                  </span>
                 </li>
               ))}
             </ol>

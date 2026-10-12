@@ -35,7 +35,7 @@ const FIXED: Record<string, string> = {
   oracle_explain: 'Later context',
   oracle_cp2_emitter: 'Oracle report',
   delta_analyzer: 'Delta analyser',
-  dossier_updater: 'Dossier updater',
+  dossier_updater: 'Instruction updater',
   version_committer: 'Version committer',
 };
 
@@ -64,7 +64,7 @@ export type Family = { key: string; label: string; summary: string };
 const FAMILIES: Array<{ test: RegExp; family: Family }> = [
   {
     test: /^global_\w+_feed$/,
-    family: { key: 'feeds', label: 'Saved feeds', summary: 'Acquired feeds and the derived calculator' },
+    family: { key: 'feeds', label: 'Saved feeds', summary: 'Data feeds and the calculator' },
   },
   {
     test: /^lab_miner_v2_/,
@@ -72,7 +72,7 @@ const FAMILIES: Array<{ test: RegExp; family: Family }> = [
   },
   {
     test: /^lab_miner_/,
-    family: { key: 'miners', label: 'First-pass miners', summary: 'One feed-specific reader per lane' },
+    family: { key: 'miners', label: 'First-pass miners', summary: 'One reader for each data feed' },
   },
   {
     test: /^oracle_subject_\w+_feed$/,
@@ -88,7 +88,7 @@ const FAMILIES: Array<{ test: RegExp; family: Family }> = [
   },
   {
     test: /^oracle_truth_(stock|etf|macro|news|poly|calc|stockgrid)$/,
-    family: { key: 'lane_reviews', label: 'Lane reviews', summary: 'What each lane shows after the cutoff' },
+    family: { key: 'lane_reviews', label: 'Source reviews', summary: 'What each data source shows after the cutoff' },
   },
 ];
 
@@ -116,11 +116,11 @@ const ROLE: Record<string, string> = {
   oracle_subject_lab_director: 'The Lab’s frozen predictions',
   oracle_truth_diff_equity: 'Stock and ETF before and after',
   oracle_truth_diff_macro: 'Macro before and after',
-  oracle_truth_map: 'Combines the lane reviews',
+  oracle_truth_map: 'Combines the source reviews',
   oracle_attribution_map: 'Maps what happened onto the Lab’s evidence',
   oracle_explain: 'Optional later context for misses',
   oracle_cp2_emitter: 'Records the reconstruction for review',
-  delta_analyzer: 'Which dossier sections to change',
+  delta_analyzer: 'Which parts of an instruction to change',
   dossier_updater: 'Writes the exact patch',
   version_committer: 'Applies it as a new version',
 };
@@ -136,7 +136,7 @@ export function nodeRole(id: string, mission = 'lab'): string {
   m = /^oracle_subject_(\w+?)_feed$/.exec(id);
   if (m) return 'As the Lab saw it';
   m = /^oracle_truth_(\w+)$/.exec(id);
-  if (m) return 'What this lane shows later';
+  if (m) return 'What this source shows later';
   return '';
 }
 

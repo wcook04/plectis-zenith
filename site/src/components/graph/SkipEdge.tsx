@@ -55,13 +55,14 @@ export type StackEdgeData = { width: number; slot: number };
 
 // Cards stacked in one column connect through a bracket in the gap on the
 // column's left, so the edge never crosses a card between them.
-export function StackEdge({ id, sourceX, sourceY, targetX, targetY, data, style, markerEnd }: EdgeProps<StackEdgeData>) {
+export function StackEdge({ id, sourceX, sourceY, targetY, data, style, markerEnd }: EdgeProps<StackEdgeData>) {
   const w = data?.width ?? 200;
-  const left = sourceX - w;
-  // Inside the group frame's 10px padding, never on its border; every edge
-  // into one target shares this trunk.
-  const x0 = Math.min(left, targetX) - 5;
-  const path = rounded([[left, sourceY], [x0, sourceY], [x0, targetY], [targetX, targetY]], 8);
+  // Handles sit 4px outside the card, so the card's left edge is
+  // sourceX - w - 4. The trunk runs 5px inside the group frame's 10px
+  // padding, never on its border; every edge into one target shares it.
+  const cardLeft = sourceX - w - 4;
+  const x0 = cardLeft - 5;
+  const path = rounded([[cardLeft, sourceY], [x0, sourceY], [x0, targetY], [cardLeft, targetY]], 4);
   return <BaseEdge id={id} path={path} style={style} markerEnd={markerEnd} />;
 }
 

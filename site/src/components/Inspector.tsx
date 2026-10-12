@@ -40,7 +40,9 @@ export function Inspector({ graph, nodeId, run, onNavigate, onClose }: Props) {
   const fromGraph = useMemo(() => graph.nodes.find((n) => n.id === nodeId) ?? null, [graph, nodeId]);
   const [detail, setDetail] = useState<{ id: string; node: GraphNode } | null>(null);
   const [detailError, setDetailError] = useState<string | null>(null);
-  const [tab, setTab] = useState<'definition' | 'run'>(run ? 'run' : 'definition');
+  // Saved local runs open on their record; public receipts carry only a state,
+  // so they open on the definition and its data.
+  const [tab, setTab] = useState<'definition' | 'run'>(run?.kind === 'local' ? 'run' : 'definition');
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -300,9 +302,9 @@ function ReceiptRecord({ run, node }: { run: Extract<RunContext, { kind: 'receip
       )}
       <p className="inspector__quiet">{run.note}</p>
       <p className="inspector__quiet">
-        Public receipts carry states and call summaries, not artifacts or prompts.{' '}
+        Published records give each node’s state and a summary of any model call. They do not include outputs or prompts.{' '}
         <a href={run.sourceUrl} target="_blank" rel="noreferrer">
-          Open the receipt
+          Open the record
         </a>
         .
       </p>
@@ -375,27 +377,27 @@ function LocalRecord({
     <>
       <StateBlock state={state} title={`Run ${record.run_id}`} />
       <dl className="facts">
-        <dt>Run kind</dt>
+        <dt>Type of run</dt>
         <dd>{record.source_kind.replace(/_/g, ' ')}</dd>
         {record.subject_run && (
           <>
-            <dt>Reuses outputs from</dt>
+            <dt>Loads earlier outputs from</dt>
             <dd>
               <code>{record.subject_run}</code>
             </dd>
           </>
         )}
-        <dt>Artifact</dt>
+        <dt>Saved output</dt>
         <dd>
           {record.artifact_error
             ? ARTIFACT_ERROR[record.artifact_error] ?? `unavailable (${record.artifact_error})`
             : record.artifact_omitted
               ? 'omitted from this response'
-              : `${artifact?.status ?? 'unknown'} artifact, ${(record.artifact_bytes ?? 0).toLocaleString('en-GB')} bytes`}
+              : `${artifact?.status ?? 'unknown'}, ${(record.artifact_bytes ?? 0).toLocaleString('en-GB')} bytes`}
         </dd>
         {meta.hydrated_from && (
           <>
-            <dt>Hydrated from</dt>
+            <dt>Loaded from</dt>
             <dd>
               <code>{meta.hydrated_from}</code>
             </dd>
@@ -411,9 +413,9 @@ function LocalRecord({
 
       {meta.input_node_ids && meta.input_node_ids.length > 0 && (
         <section className="inspector__section">
-          <h4>Upstream artifacts recorded for this node</h4>
+          <h4>Earlier outputs given to this node</h4>
           <p className="inspector__quiet">
-            These earlier outputs were available to the node. They are not the exact context sent to the model.
+            This list shows which earlier outputs the node received. It is not the exact text sent to the model.
           </p>
           <ul className="node-links node-links--wrap">
             {meta.input_node_ids.map((id) => (
@@ -429,7 +431,7 @@ function LocalRecord({
 
       {artifact && artifact.data !== undefined && !isFailureEnvelope && (
         <section className="inspector__section">
-          <JsonView value={artifact.data} label={state === 'loaded' ? 'Reused output' : 'Recorded output'} />
+          <JsonView value={artifact.data} label={state === 'loaded' ? 'Loaded output' : 'Recorded output'} />
         </section>
       )}
 
@@ -481,10 +483,10 @@ function LocalRecord({
 }
 
 const ARTIFACT_ERROR: Record<string, string> = {
-  missing: 'no artifact saved (absent, not a successful output)',
-  malformed: 'artifact present but malformed',
-  unsafe: 'artifact withheld: unsafe path',
-  oversized: 'artifact larger than the 8 MiB limit; not loaded',
+  missing: 'none saved (this means no output, not a success)',
+  malformed: 'saved but unreadable',
+  unsafe: 'withheld because its file path is unsafe',
+  oversized: 'larger than the 8 MiB limit, so not loaded',
 };
 
 function Excerpt({
@@ -537,7 +539,7 @@ function ProvenanceSection({ node }: { node: GraphNode }) {
       : [];
   return (
     <section className={`inspector__section provenance provenance--${p.input_origin}`}>
-      <h4>Data in this edition</h4>
+      <h4>Data used in this demonstration</h4>
       <p>
         <span className={`z-origin z-origin--${p.input_origin}`}>{originLabel(p)}</span>{' '}
         {ORIGIN_DESCRIPTION[p.input_origin] ?? ''}

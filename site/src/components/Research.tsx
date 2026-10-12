@@ -35,7 +35,7 @@ export function SettingsIllustration({ doc }: { doc: Doc }) {
   const chosen = nearestVariant(variants, value);
   return (
     <figure className="settings">
-      <p className="settings__badge">Illustration only. No controller exists; moving the slider runs nothing.</p>
+      <p className="settings__badge">Illustration. No controller has been implemented; the slider selects among written examples and runs no model.</p>
       <div className="settings__grid">
         <div className="settings__control">
           <label htmlFor={id} className="settings__label">
