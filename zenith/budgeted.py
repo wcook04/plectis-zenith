@@ -57,6 +57,28 @@ def positive_int(value, label):
     return value
 
 
+def reservation_prices(pricing):
+    """Reserve the maximum advertised rate across conditional price schedules.
+
+    Conditions need not be evaluated: this deliberately over-reserves across
+    times/tiers. Unknown condition or charge shapes still fail closed.
+    """
+    rates = {k: amount(v, 'catalogue pricing') for k, v in pricing.items() if k != 'overrides'}
+    overrides = pricing.get('overrides', [])
+    if not isinstance(overrides, list):
+        raise ValueError('pricing overrides must be a list')
+    conditions = {'utc_days', 'utc_start', 'utc_end', 'prompt_tokens'}
+    charges = {'prompt', 'completion', 'request', 'input_cache_read'}
+    for override in overrides:
+        if not isinstance(override, dict) or set(override) - conditions - charges:
+            raise ValueError('Unrecognized conditional pricing fields')
+        if not set(override) & charges:
+            raise ValueError('Conditional pricing lacks rates')
+        for k in charges & override.keys():
+            rates[k] = max(rates.get(k, Decimal(0)), amount(override[k], 'conditional pricing'))
+    return rates
+
+
 def budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir):
     if not isinstance(model, str) or "/" not in model or any(c.isspace() for c in model):
         raise ValueError("openrouter_budgeted requires an explicit namespace/model ID")
@@ -80,7 +102,7 @@ def verified_model(model: str, *, http_get=None):
     pricing = row.get("pricing")
     if not isinstance(pricing, dict) or not {"prompt", "completion"} <= pricing.keys():
         raise RuntimeError("budgeted model lacks known prompt/completion pricing")
-    prices = {key: amount(value, "catalogue pricing") for key, value in pricing.items()}
+    prices = reservation_prices(pricing)
     if prices.get("input_cache_read", Decimal(0)) > prices["prompt"]:
         raise RuntimeError("cached input read price must not exceed the full prompt price")
     for key, value in prices.items():
@@ -120,7 +142,7 @@ def verified_endpoint(model, slug, prices, *, parameters, http_get=None):
     if not isinstance(pricing, dict) or not {"prompt", "completion"} <= pricing.keys():
         raise RuntimeError("pinned endpoint lacks known prompt/completion pricing")
     # OpenRouter's endpoint discount is descriptive metadata, not a fee.
-    rates = {k: amount(v, "endpoint pricing") for k, v in pricing.items() if k != "discount"}
+    rates = reservation_prices({k: v for k, v in pricing.items() if k != 'discount'})
     if "discount" in pricing and amount(pricing["discount"], "endpoint discount") > 1:
         raise RuntimeError("pinned endpoint discount metadata is invalid")
     if rates.get("input_cache_read", Decimal(0)) > rates["prompt"]:

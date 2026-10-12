@@ -37,8 +37,16 @@ def validate_reasoning_policy(policy: Mapping[str, Any], graph: Mapping[str, Any
     for node_id, row in policy["nodes"].items():
         if node_id not in graph:
             raise ValueError(f"reasoning_policy unknown node: {node_id}")
-        if not isinstance(row, Mapping) or set(row) - {"skill_addon", "incoming_weights", "max_context_chars"}:
+        if not isinstance(row, Mapping) or set(row) - {"skill_addon", "incoming_weights", "max_context_chars", "learned_head"}:
             raise ValueError(f"reasoning_policy invalid fields for node {node_id}")
+        if 'learned_head' in row:
+            from system.lib.learned_composition import SOURCE_EDGES
+            from system.lib.learned_head import check_model
+            if node_id != 'lab_decide' or not SOURCE_EDGES <= set(graph[node_id].dependencies):
+                raise ValueError('Learned head needs explicit original STOCK/NEWS edges into Decide')
+            if 'max_context_chars' in row or any(row.get('incoming_weights',{}).get(e,1) <= 0 for e in SOURCE_EDGES):
+                raise ValueError('Learned head cannot withhold or excerpt its source inputs')
+            check_model(row['learned_head'])
         if "skill_addon" in row and not isinstance(row["skill_addon"], str):
             raise ValueError(f"reasoning_policy skill_addon must be text for {node_id}")
         if len(row.get("skill_addon", "")) > 512:
