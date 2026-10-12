@@ -1,5 +1,7 @@
 # Plectis Zenith
 
+The active research direction is [shared-universe basket forecasting](program.md): all baskets and constituents inform every basket forecast, with controlled tests of directed investigation. That experiment is not yet implemented. The paper and public fixture below describe the preceding generic configuration.
+
 **Experimental research prototype.** The public example uses synthetic observations of a disclosed toy generator. No predictive improvement has been demonstrated.
 
 Zenith studies forecasting a changing, partially observed system from heterogeneous, incomplete, overlapping and sometimes delayed perspectives. A reasoning graph reconciles what the observations mean and when they were available, distinguishes missing evidence from conflicting evidence, forms competing explanations and selects explicit future targets. Saved intermediate outputs expose the support chain. Different feeds are not independent votes.
