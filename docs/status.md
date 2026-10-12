@@ -4,6 +4,17 @@ This records implementation evidence, not a claim that the system predicts marke
 
 ## Type B research handoff and remaining budget, 12 October 2026
 
+The completed [packet receipt](type-b-research-packet.json) binds
+`/Users/willcook/Downloads/Zenith-TypeB-Research-2026-10-12.zip` to source commit
+`617740adee857975c390de2397ee6c2ef33b570b`. The 43.2 MiB ZIP contains 1,131 files:
+the complete committed repository, original supplied context, primary papers
+and selected upstream code, actual training forecasts and historical model
+outputs, original guidance releases, and a research brief that permits replacing
+the current direction. The full withheld A-share evaluator/packet tables are
+excluded; previously exposed accounting examples are explicitly identified.
+Every manifested member passed its hash check, including after fresh extraction.
+No new inference was purchased. Type B should start at `00_RESEARCH_BRIEF.md`.
+
 The operator now requests a complete source-rich Type B ZIP to challenge the
 research direction and dedicates the remaining authorized inference budget to
 the programme. This supersedes the earlier operator paid hold below; it does
