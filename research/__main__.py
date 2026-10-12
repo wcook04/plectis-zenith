@@ -69,6 +69,12 @@ def reflection_command(args):
 def main(argv=None):
     parser = argparse.ArgumentParser(description='Frozen Zenith replay experiments')
     commands = parser.add_subparsers(dest='command', required=True)
+    synthetic = commands.add_parser('synthetic-learning', help='run the constructed operator-learning example; no model calls')
+    synthetic.add_argument('--output', type=Path, required=True, help='fresh directory; never overwrite a previous attempt')
+    synthetic.add_argument('--seed', type=int, default=1729)
+    synthetic.add_argument('--no-signal', action='store_true', help='negative control: labels contain noise only')
+    selection = commands.add_parser('selection-score', help='descriptive fixed-universe scores; does not admit native cohorts')
+    selection.add_argument('--input', type=Path, required=True, help='JSON array of issue cases with universe, selection, forecasts, fallback and truth')
     init = commands.add_parser('freeze', help='validate and freeze a new study before trials')
     init.add_argument('--spec', type=Path, required=True)
     init.add_argument('--study', type=Path, required=True)
@@ -116,7 +122,16 @@ def main(argv=None):
     candidate.add_argument('--output', type=Path, required=True, help='new directory for policy and provenance')
     args = parser.parse_args(argv)
     try:
-        if args.command.startswith('reflection-'):
+        if args.command == 'synthetic-learning':
+            from research.synthetic_learning import run as synthetic_run
+            report = synthetic_run(args.output, seed=args.seed, signal=not args.no_signal)
+            result = {k: report[k] for k in ('kind', 'boundary', 'decision', 'assessment', 'trial_count', 'model_calls')}
+            result['report'] = str(args.output / 'report.json')
+        elif args.command == 'selection-score':
+            from feedback.selection import score_panel
+            from research.engine import read_json
+            result = score_panel(read_json(args.input))
+        elif args.command.startswith('reflection-'):
             result = reflection_command(args)
         elif args.command.startswith('cohort-'):
             from research import cohort

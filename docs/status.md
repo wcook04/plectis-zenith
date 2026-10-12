@@ -2,6 +2,50 @@
 
 This records implementation evidence, not a claim that the system predicts markets successfully. Local runtime artifacts live under ignored `work/` and `state/`; the repository retains code, protocols, fixtures and source manifests.
 
+## Selection and the update procedure, 12 October 2026
+
+The operator asked what can actually be learned after a run, separating stock
+selection from numerical forecast accuracy. `feedback/selection.py` now scores
+the original universe with explicit fallback forecasts for unselected names.
+It separately reports selected loss, coverage and, when every name has a shadow
+forecast, comparison with uniform selection and a labelled hindsight bound.
+Missing unselected truth keeps the score pending; derived overflow is rejected.
+This additive evaluator does not admit or change existing native cohorts.
+
+`research synthetic-learning` runs a constructed deterministic three-operator
+example beside the existing financial system. Across 64 training, 32 validation
+and 64 assessment dates, it selects among twelve supplied procedures. The
+signal condition chooses prior-guidance comparison, signal ranking and scale
+0.08; later whole-universe squared loss is 0.000166406 versus fallback
+0.000295698. Strictly improving single-edit search instead stops at zero.
+Removing the predictive term chooses zero and matches the fallback. The
+[receipt](learning-microcosm-receipt.json) includes both conditions and all
+training trials. Source code and correct rule are known; no LLM, native Lab,
+financial advantage or automatic fault-attribution result is claimed.
+
+The [learning design](learning-design.md) explains the measurement, diagnosis
+and intervention distinction and how bounded combinations can cross a neutral
+intermediate step. The operating programme and skill carry that lesson. The
+paper adds the full-universe objective, constructed results, and citations to
+autoresearch and SelectiveNet at use. Its abstract and the README now reflect
+the already completed later quantile diagnostic instead of leaving the earlier
+candidate described as untested.
+
+Current GitHub checks retained TraderHarness as the ready daily data owner;
+the upstream autoresearch source still matches the repository's existing pin.
+The next financial experiment remains a rich-evidence interpretation change on
+matched later inputs, with an unchanged full graph and direct-reasoner control.
+The constructed world is a debugging instrument, not a reason to discard the
+working multi-feed adapter or a substitute for that financial experiment.
+
+Validation: **706 tests passed**, including missing unselected truth, date
+weighting, exhaustive uniform-selection checks, overflow rejection, future-label
+independence, retained failed trials and the noise control. The new absolute-loss
+scorer independently reproduces both already frozen native median errors.
+All 264 extraction hashes pass. The 16-page paper builds with citations resolved
+and no overfull boxes; pages containing the new argument and table were visually
+checked. Existing bibliography-spacing and exchange-calendar warnings remain.
+
 ## Later quantile comparison, 12 October 2026
 
 The [May 5 → May 8 diagnostic](judgmental-matchoff-receipt.json) completed two

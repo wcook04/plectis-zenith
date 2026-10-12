@@ -13,6 +13,17 @@ The repeatable entry is `python -m zenith daily init`, then `daily next`, native
 or a fixed-prompt worker performs the reasoning; the controller handles source
 binding and progression. It never fabricates completion or purchases inference.
 
+For the operator's selection/credit-assignment question, run
+`python -m research synthetic-learning --output work/learning-example` and its
+`--no-signal` control. Read the [worked learning design](docs/learning-design.md#a-small-closed-system-we-can-run).
+This finite known-world example tests the update procedure without replacing
+the native financial graph. Its full-universe selection scorer retains
+unselected names at a declared fallback. An Oracle explanation is a hypothesis;
+matched interventions test its consequences. Permit predeclared coupled changes
+when single-component improvements cannot cross a neutral or adverse intermediate
+step. The correct rule is supplied in the synthetic bank; success there is not
+LLM discovery or financial evidence.
+
 The [two-issue empirical pilot](docs/empirical-forecasts.md#the-completed-two-day-sequence)
 now demonstrates an actual reviewed procedure change reaching a later full Lab.
 Both Labs and Oracles completed. The shrinkage candidate lost to unchanged-rule

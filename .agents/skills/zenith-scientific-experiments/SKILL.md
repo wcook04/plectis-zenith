@@ -66,6 +66,21 @@ The reference-only Karpathy source pin is recorded in
 `third_party/skills/import_manifest.json`; no GPU training dependency or
 upstream autonomous shell loop is installed.
 
+Selection is part of the decision. `feedback/selection.py` scores the original
+universe with a frozen fallback for unselected names, separate conditional loss
+and coverage, and optional full-shadow ranking comparisons. Missing unselected
+truth cannot disappear. Hindsight-best selection is a bound, not predictability
+or a training label for what the graph should have known. This read-only scorer
+does not relax native cohort admission. Use `research synthetic-learning` only
+as a constructed operator example: its correct rule is already in the bank.
+Keep its noise control and single-edit-search failure visible. A neutral local
+intervention does not prove a node is irrelevant; bounded combinations can
+matter. Freeze their search budget and assess the selected procedure later.
+Check derived losses and aggregates for nonfinite values, not only their input
+numbers. When a result changes, reconcile the abstract and README with the
+detailed result before publishing; an older candidate must not remain described
+as untested after a later diagnostic.
+
 1. Freeze a falsifiable question, candidate interface, evidence/data cutoff,
    source hashes, chronological event groups, purge/embargo, metric/common
    support, budget, stop rule and validation/holdout split **before** trials.

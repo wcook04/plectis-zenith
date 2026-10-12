@@ -10,14 +10,40 @@ and Oracle are the baseline. Evolve can be the lead agent or a worker following
 a fixed prompt. It proposes a versioned change; later forecasts determine
 whether that change helped. This is procedure learning, not LLM weight training.
 
-The latest completed daily episode produced ten numerical forecasts through
-the full Lab and Oracle. Their median errors beat unchanged prices but lost to
-a simple historical-return reference; wider uncertainty intervals also scored
-worse than that reference. Evolve produced a reviewed forecasting candidate,
-and source inspection recovered earlier profit guidance missing from the input.
-The [forecast report](docs/judgmental-forecasts.md),
-[verified results](docs/judgmental-pilot-receipt.json) and
-[paper](paper/zenith.pdf) describe what ran and what still needs later testing.
+To understand the learning step, run the small constructed example below.
+It separates interpreting evidence, choosing companies and forecasting, and
+shows why a sequence of individually improving edits can miss a useful
+combination. This is a deterministic example with a known correct rule, not
+LLM training or evidence of a financial advantage.
+
+The real-data loop also runs. The latest [native comparison](docs/judgmental-forecasts.md)
+produced ten forecasts under each instruction on identical May 5 inputs.
+The revised instruction had worse later loss. A corrected baseline response
+exceeded the frozen call allowance, so the [result](docs/judgmental-matchoff-receipt.json)
+is descriptive and the formal comparison was not admitted. No policy was
+promoted. The [paper](paper/zenith.pdf) distinguishes these financial attempts
+from the constructed learning result.
+
+## See what happens after a run
+
+After installing the checkout as below, run:
+
+```sh
+python -m research synthetic-learning --output work/learning-example
+python -m research synthetic-learning --output work/learning-no-signal --no-signal
+```
+
+The example scores the whole eight-company universe, including the six names
+the graph did not select. Twelve candidate procedures are tested on earlier
+synthetic dates; later dates accept one, and a final period measures it.
+Every attempt and intermediate output is saved. In the known-signal world,
+the selected combination beats the zero forecast; in the noise-only world,
+it chooses zero. A greedy single-edit control gets stuck at zero even when
+signal exists. No API key, download or paid call is needed.
+
+[The worked explanation](docs/learning-design.md#a-small-closed-system-we-can-run)
+connects this example to the actual Lab/Oracle/Evolve operations and distinguishes
+a witnessed mistake, a suspected cause and a tested remedy.
 
 ## Run the daily loop
 

@@ -32,20 +32,19 @@ pipeline's instructions, context, skills and eventually structure. The current
 implementation retains the original full Lab and Oracle, source-bound agent
 handoffs, output contracts and versioned policies in a standalone source
 checkout. A pinned ten-stock public source supplies 695 adjacent daily pairs
-with prices, dated headlines and announcement titles. In one completed
-episode, Lab issued ten next-close return forecasts with three quantiles each.
-Its median forecasts beat unchanged prices but lost to the preceding twenty
-returns' median; its wider intervals also lost to historical quantiles on
-pinball loss. Oracle exposed an omitted earlier profit-guidance claim, leading
-to a separately versioned retrieval repair. Evolve proposed explicit,
-evidence-cited adjustments from the historical-quantile reference; this
-candidate awaits later testing. An earlier two-day sequence did carry a
-reviewed price-rule change into the next Lab, where it lost to the unchanged
-rule's arithmetic control. These exposed development episodes establish an
-executed experience-to-procedure transition and specific engineering repairs.
-They do not establish a learned forecasting advantage or a measured benefit
-from news. The empirical question is whether reviewed changes improve later
-reasoning and forecasts beyond an unchanged pipeline.
+with prices, dated headlines and announcement titles. Completed native episodes
+demonstrate forecasts, later scoring and a reviewed change reaching a subsequent
+Lab. The tested revisions have not established a financial learning advantage.
+A separate constructed experiment isolates interpretation, selection and
+numerical forecasting. It scores the whole original universe, retaining
+unselected names at a declared fallback. Among twelve supplied procedures,
+bounded search finds a combination that improves later synthetic loss, while
+strictly improving single-edit search stops at zero forecasts. Removing the
+predictive term makes zero forecasts the selected rule. This known-world
+example demonstrates an interaction between reasoning components and the
+update procedure; it is neither language-model discovery nor market evidence.
+The financial question remains whether reviewed changes improve later
+reasoning and forecasts beyond an unchanged pipeline and simple references.
 \end{abstract}
 
 \section{The system we want to learn}
@@ -279,6 +278,36 @@ and high interval coverage alone does not establish calibration. These scores
 reach the existing Oracle and feedback reports; they do not silently replace
 the cohort's declared selection objective.
 
+\subsection{Selection is part of the forecast decision}
+If Lab selects a subset of the available companies, prediction accuracy on
+that subset is only a conditional score. Selecting fewer easy cases can lower
+it without improving the overall decision. The risk--coverage distinction is
+standard in selective prediction \citep{geifman2019selectivenet}; here we use a
+declared fallback to make the unselected cases explicit.
+
+Freeze a universe $U$, a selection $S\subseteq U$, forecasts $f_i$ for selected
+names and fallback forecasts $b_i$ for the others. For later outcomes $y_i$,
+the implemented full-universe loss is
+\[
+  \frac{1}{|U|}\left(\sum_{i\in S}\ell(f_i,y_i)
+                 +\sum_{i\in U\setminus S}\ell(b_i,y_i)\right).
+\]
+The evaluator reports selected-only loss and coverage alongside this quantity,
+then weights issue dates equally. It supports squared error for mean forecasts
+and absolute error for medians. Missing truth anywhere leaves the panel pending.
+With a zero-return fallback, selecting nothing obtains the reference loss,
+not zero error. This additive evaluator does not change the existing native
+cohort's admission or objective.
+
+When an experiment freezes shadow forecasts for every name, it can also
+compare the chosen subset with uniform selection of the same size, holding
+those forecasts fixed. A further score finds the best realized loss reduction
+from choosing up to the declared budget. This is a hindsight bound: neither
+it nor a missed large move establishes earlier predictability. Without the
+shadow forecasts, these ranking comparisons remain unknown. Their computation
+must be counted in the experiment's resource cost.
+
+\subsection{An intermediate claim is not yet a price effect}
 Financial interpretation must also distinguish familiar facts from changes.
 For example, Salesforce's May 2023 release preserved annual revenue guidance
 while raising non-GAAP operating-margin guidance \citep{salesforce2023march,salesforce2023may}.
@@ -325,6 +354,56 @@ layered memory and persistent guidance \citep{finmem2023,fincon2024}.
 Zenith uses these sources to sharpen its own explicit transition and controls.
 It does not claim that implementing a loop establishes a new optimization
 method or inherits their reported results.
+
+\subsection{A constructed test of the update procedure}
+To examine the hard step between diagnosis and useful change, we implemented
+a small deterministic analogue beside the native graph. It has three
+parameterized operations: interpret company disclosures, map the interpretation
+to a return, and select two of eight names. Consider profit of 100 last year,
+prior guidance of 180 and new guidance of 150. Growth is positive, but the
+guidance revision is negative. The synthetic generator makes returns depend
+on that revision, with shared and company noise. Missing prior guidance stays
+unknown and receives a zero forecast. In a market, this comparison would still
+need an independently supported mapping to the remaining price response.
+
+The supplied bank has two comparison rules, two ranking rules and three scales,
+including zero. Sixty-four synthetic dates select one of these twelve
+procedures. The next 32 accept it only if its full-universe squared loss beats
+the incumbent by 10\%; the last 64 measure the frozen choice. Evolve is finite
+search in this example. Its bounded change, fixed evaluation and retained
+attempts follow the practical pattern of autoresearch \citep{karpathy2026autores}.
+No model is invoked, and the generator and correct rule are deliberately known.
+Thus the experiment isolates the mechanism rather than testing autonomous
+discovery or an independently hidden market process.
+
+\begin{table}[htbp]
+\centering\small
+\begin{tabular}{lrrr}
+\toprule
+Constructed condition & Initial & Zero fallback & Selected \\
+\midrule
+Guidance signal & 0.009324797 & 0.000295698 & 0.000166406 \\
+Noise only & 0.008959609 & 0.000041172 & 0.000041172 \\
+\bottomrule
+\end{tabular}
+\caption{Later full-universe mean squared return loss, seed 1729. Every
+unselected name receives the frozen fallback. These are constructed operator
+results, not native Lab, language-model or financial performance.}
+\label{tab:constructed-learning}
+\end{table}
+
+The signal case selects comparison with prior guidance, ranking by absolute
+forecast and scale 0.08. Its later loss is 43.7\% below the fallback. The
+noise-only control selects scale zero. More revealingly, greedy search over
+strictly improving single edits stops at zero even in the signal case. Once
+scale is zero, changing the comparison or rank has no effect; restoring a
+positive scale under the wrong comparison makes forecasts worse. Joint search
+crosses this plateau. Ranking stronger signals under a miscalibrated mapping
+can also increase loss. These examples show why an operation's measured value
+depends on its neighbors and why a neutral intervention cannot establish its
+irrelevance. They motivate bounded coupled proposals and later tests, not
+causal blame from one forecast miss. The standalone commands, all trial losses
+and source bindings are in \code{docs/learning-design.md} and its linked receipt.
 
 \section{What has actually executed}
 The two-issue sequence used the three-equity InvestorBench snapshots at the
@@ -546,7 +625,7 @@ twenty issue dates are required; these are decision gates, not significance
 guarantees. An abstention is a retained terminal attempt with missing forecast
 coverage, never a zero-loss success; this gate therefore cannot select an
 abstaining strategy. A selective strategy would require a separately declared
-coverage and utility objective. A twenty-date two-version comparison requires 840 reasoning
+comparison using an objective such as the full-universe loss above. A twenty-date two-version comparison requires 840 reasoning
 responses before retries, which makes base competence a practical prerequisite.
 
 A separately reviewed retention receipt binds the comparison, selected policy

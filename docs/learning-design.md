@@ -1,6 +1,12 @@
 # Learning a reasoning graph
 
-The latest concrete sequence is the [two-day native pilot](empirical-forecasts.md#the-completed-two-day-sequence):
+The [constructed learning example](#a-small-closed-system-we-can-run) makes
+selection, forecasting and the update procedure separately inspectable. It
+finds a useful combination of rules in a known synthetic world where greedy
+single-rule improvement stops at zero forecasts. This is a mechanism example,
+not evidence that an LLM discovered the rule or can forecast markets.
+
+The [two-day native pilot](empirical-forecasts.md#the-completed-two-day-sequence) demonstrates:
 forecast, observed loss, one reviewed skill change, then a later forecast using
 that change. The candidate did not beat the unchanged-rule control. This gives
 the design an executed transition and a negative comparison, not evidence of
@@ -8,6 +14,21 @@ an improving reasoner. Unknown causality does not prohibit a declared empirical
 prediction; its input mapping, parameters and targets must remain frozen.
 
 ## One predictor, one experiment, successive versions
+
+The operator's question is: after one run, what can the system actually learn?
+The answer has three parts. **Measurement** computes what happened and how the
+frozen decisions scored. **Diagnosis** proposes a reason for a defect or loss.
+**An intervention** tests a concrete change. Oracle's prose cannot substitute
+for the third part. A wrong forecast can follow sound reasoning; an accurate
+forecast can follow a mistaken argument. Repeating a story does not identify
+which operation should change.
+
+Evolve can be the lead agent, or a worker with the same fixed instructions and
+recorded evidence. It does not need its own predictive DAG. Its output is a
+candidate procedure and a testable claim about that procedure. The existing
+`daily review`, `daily matchoff` and `daily retain` commands own native versions
+and comparisons. The simple example below makes the proposal mechanism finite
+and explicit so the evaluator and update rule can be examined separately.
 
 The [finance grounding](finance-design.md) relates this loop to QuantAgent,
 TradingAgents and other reviewed systems, with versioned sources and explicit
@@ -160,6 +181,130 @@ Begin an aggregation experiment with matched input ablations: the same issue tim
 For price targets, the benchmark computes normalized-return errors. Its aggregation gives each issue date equal weight after averaging across the available stocks at that date. Horizon results remain separate. A future combined objective must freeze its horizon weights before candidate selection; an improvement at one horizon cannot conceal deterioration at another through a later change of weights.
 
 The fixed no-change forecast is an essential reference. More elaborate reasoning earns its cost only through measured improvement on matched support. The current benchmark already shows why: a richer OHLCV ridge baseline does not consistently beat no change across horizons. There is no evidence yet that adding language-model nodes will do better.
+
+## Did the graph select the right subset?
+
+First declare what selecting a name means. Finding the largest eventual moves,
+forecasting accurately, and choosing profitable trades are different objectives.
+A large missed move does not establish that its direction was knowable earlier.
+Selective prediction studies accuracy together with coverage; see
+[Geifman and El-Yaniv's SelectiveNet](https://proceedings.mlr.press/v97/geifman19a.html).
+We use that distinction, not their neural training algorithm.
+
+`feedback/selection.py` implements a forecast-specific objective. Freeze a
+universe, a maximum selection count, a forecast for each selected name and a
+fallback for every unselected name. On later truth, score **all** names: use
+the graph's forecast where selected and the declared fallback elsewhere.
+Average within a date, then weight dates equally. For a zero-return fallback,
+declining to select everything reproduces the zero-return reference; it cannot
+manufacture zero prediction error. The loss can be squared error for means or
+absolute error for medians. Missing truth anywhere keeps the panel pending.
+
+Report selected-only error and coverage beside the full-universe score. They
+answer different questions. To examine ranking independently, an experiment
+can compute and freeze shadow forecasts for the unselected names as well.
+Then the scorer compares the chosen set with uniform selection of the same
+size using those same forecasts. It also reports the best realized loss
+reduction achievable by choosing up to the declared budget. That last number
+is a **hindsight bound**, not a list of opportunities the system should have
+foreseen. Without shadow forecasts the ranking comparisons remain unknown.
+Count the computation of shadow forecasts in the experiment's cost.
+
+The scorer is additive and read-only. It does not change native cohort admission
+or permit a partially supported cohort to win. A native selective strategy
+still needs a newly declared comparison using this objective. The API accepts
+explicit issue cases; `python -m research selection-score --input cases.json`
+evaluates their JSON array. Each case supplies `issue_id`, `universe`,
+`selected`, `forecasts`, `fallback`, `truth`, `budget` and optionally `loss`.
+The caller remains responsible for freezing inputs and checking source clocks.
+
+## A small closed system we can run
+
+```sh
+python -m research synthetic-learning --output work/learning-example
+python -m research synthetic-learning --output work/learning-no-signal --no-signal
+```
+
+These commands use no network, model, GPU or acquired financial data. They run
+a deterministic operator analogue beside the native graph, not a smaller
+replacement for it. Synthetic quotes and company disclosures enter three
+operations: interpret the comparison, map it to a return, and rank names. Each
+operation's input, output and parameter is recorded. The synthetic future return
+depends on the new guidance relative to prior guidance, with added shared and
+company noise. Missing prior guidance remains unknown and gets the declared
+zero-return fallback. The experiment selects two of eight names each day.
+
+For example, last year's profit of 100, prior guidance of 180 and new guidance
+of 150 imply 50% growth over last year but a 16.7% guidance downgrade. The
+constructed world rewards the latter comparison. In a real market it would
+still be necessary to establish the remaining price effect and what investors
+expected. The example deliberately supplies that relationship; it does not
+discover a law of finance.
+
+The bank contains twelve procedures: two comparison rules, two ranking rules,
+and three numerical scales including zero. It is frozen before execution.
+Evolve is exhaustive training search here, not an LLM writing new skills.
+Sixty-four synthetic dates choose one proposal; the following 32 decide whether
+it beats the incumbent by the predeclared 10% margin. The final 64 measure that
+frozen choice. The final labels are not arguments to the selection function;
+an executable test changes them and checks that the decision is unchanged.
+All generator code is public and known to the author, so this is procedural
+separation, not a blind financial holdout. Every trial is reserved and retained,
+including failures, and an existing output directory cannot be overwritten.
+
+The bounded edit/evaluate/retain structure follows
+[Karpathy's autoresearch](https://github.com/karpathy/autoresearch/tree/228791fb499afffb54b46200aca536f79142f117).
+The new code uses Zenith's existing JSON/hash utilities and feedback namespace;
+it does not execute upstream scripts. Existing reflective proposals remain
+grounded in [GEPA](https://github.com/gepa-ai/gepa/tree/462e437a09be67d2acb59564cc0ea59132f5777c)
+and the native reflection owner described below.
+
+Default seed 1729 gives these later full-universe mean squared return errors:
+
+| Constructed condition | Initial procedure | Zero fallback | Selected procedure |
+| --- | ---: | ---: | ---: |
+| Guidance revision affects returns | 0.009324797 | 0.000295698 | 0.000166406 |
+| Same inputs, predictive term removed | 0.008959609 | 0.000041172 | 0.000041172 |
+
+In the signal condition the selected procedure compares prior guidance, ranks
+by absolute forecast signal and uses scale 0.08. It reduces later loss 43.7%
+relative to the fallback. In the noise condition it selects scale zero. These
+numbers are reproducible constructed results, not expected market performance.
+The full [receipt](learning-microcosm-receipt.json) binds both runs, all training
+trials, source hashes and later results. Fresh runs regenerate the synthetic
+inputs, predictions and trace files from the standalone checkout.
+
+There is a useful failure of the update procedure itself. Starting at the
+initial rule, the best strictly improving single edit sets the numerical scale
+to zero. Changing comparison or ranking then has zero effect, and increasing
+the scale with the wrong comparison hurts. Greedy single-edit search stops.
+Searching the declared combinations finds the better procedure. Similarly,
+ranking by signal with the wrong numerical scale can make error worse by
+concentrating the largest miscalibrated predictions. An operation's measured
+effect depends on its neighbors. This constructed counterexample justifies
+testing bounded coupled hypotheses; it does not justify unlimited search or
+assign blame to a node after one bad outcome.
+
+## What a diagnosis must establish
+
+| Suspected failure | Evidence we can check | Experiment that can test the remedy |
+| --- | --- | --- |
+| Information never existed by the issue time | Original publication and source contents | Change target/horizon or obtain genuinely earlier evidence; do not invent a lesson |
+| Available evidence was not acquired or delivered | Acquisition, retrieval and node-context records | Restore that input, holding the reasoner fixed |
+| Wrong entity, period, units or comparison | Recompute the cited intermediate from original records | Correct the relevant operation; rerun downstream reasoning |
+| Poor selection | Frozen ranks, full universe and shadow forecasts | Change ranking while holding forecasts and inputs fixed |
+| Wrong magnitude or uncertainty | Earlier forecast/outcome pairs and calibration | Fit only on earlier cases; score on later matched cases |
+| Noise, regime change or unknown cause | No witnessed defect; a forecast miss alone is insufficient | Retain uncertainty, no-change and zero-signal controls |
+
+For real data, keep the existing TraderHarness profit-state inputs identical
+and test a reasoning rule requiring same-issuer, same-period prior guidance
+before treating growth as new information. Record absent consensus separately.
+An observed interpretation improvement is worth measuring even if the next-day
+return remains unpredictable. Test numerical use separately from retrieval,
+then test the combined procedure if the components interact. Compare against
+the unchanged full graph, a direct reasoner on the same inputs, and the price
+reference on later dates. This is the connection back to the financial system;
+the synthetic generator is a debugging instrument, not its replacement dataset.
 
 ## Immediate checks and delayed labels
 
