@@ -49,6 +49,16 @@ issuer/arithmetic validation, rejected Oracle format and Herculean contamination
 The skills now carry the reusable distinction between testable prediction and
 causal explanation, and the requirement to inspect dated source content.
 
+Published implementation commit: `f4c98fc`, with [GitHub CI passing](https://github.com/wcook04/plectis-zenith/actions/runs/38206120385).
+The revised twelve-page manuscript
+builds with citations resolved and no overfull boxes; the changed pages were
+visually checked. The [updated private Type B packet receipt](type-b-daily-learning-packet.json)
+binds 1,669 files and the complete source at that commit. Its 45.3 MiB ZIP includes
+the original notes/papers, both native daily runs and the failed change, with a
+new assignment grounded in the daily programme. Fresh extraction, every member
+hash and credential-pattern checks pass. The ZIP stays local in Downloads;
+the public repository contains its receipt, not the private packet.
+
 ## Honest no-call through the native loop, 12 October 2026
 
 The [native decision contract](abstention.md) now represents evidence-bound
