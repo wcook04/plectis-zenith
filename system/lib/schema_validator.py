@@ -1,4 +1,4 @@
-"""
+r"""
 
 [PURPOSE]
 - Teleology: Provide machine-checkable, deterministic validators for CP1 and CP2 artifact schemas,
