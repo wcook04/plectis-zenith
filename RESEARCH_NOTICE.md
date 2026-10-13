@@ -2,9 +2,10 @@
 
 **This is not financial advice.** Zenith is an experimental research prototype
 for studying how a graph of reasoning steps can be inspected and revised.
-Its financial examples illustrate that research question. They are not an
-investment service, a trading strategy offered for use, or a recommendation
-to buy, sell or hold any asset.
+Financial snapshots are an experimental setting. The software can produce asset
+selections, rankings, probabilities and price forecasts. These are experimental
+records, not a service offered to guide your investment decisions. It is not
+designed or validated for allocating capital or real-money trading.
 
 This notice covers the repository, README, paper, diagrams, website and graph
 viewer, demonstrations, scripts, historical examples, and model-generated
@@ -22,12 +23,17 @@ qualified professional for decisions about your own circumstances.
 
 ## What the evidence supports
 
-The current demonstration uses real saved stock, ETF and prediction-market
+The mixed-data demonstration uses real saved stock, ETF and prediction-market
 inputs, labelled synthetic macro/news replacements and recomputed calculator
 summaries. The reduced graph loads these inputs and prepares its first reasoning
 request. It has made no model calls or completed forecasts. This preparation is
 not a financial backtest or evidence of prediction improvement. See the
 [current receipt](docs/status.md) and [per-feed boundaries](docs/data.md).
+
+The separate offline teaching example completes the native Lab graph using
+authored synthetic inputs and responses, including a rejected response and its
+correction. It makes no model or network calls. Its fictional targets illustrate
+the contracts; completion does not measure forecast quality or financial value.
 
 Historical examples, simulated results and model outputs do not guarantee
 future performance. Saved collection clocks do not verify every underlying
@@ -50,15 +56,23 @@ outputs as better forecasts, a trading win rate, or proven self-improvement.
 Retain notices in exported paper pages and clips; a link or footer alone may
 be missed when material is excerpted.
 
-This wording is not a legal clearance or a guarantee against liability.
-The substance, presentation, audience and context of a communication matter.
-The UK's FCA explains that a disclaimer can be insufficient to prevent a
-personal recommendation, and that financial promotions must be assessed
-individually. See [PERG 8.30B.20–21 and 8.30B.32](https://handbook.fca.org.uk/handbook/perg8)
-and [FG24/1, sections 2.1–2.10 and 2.20–2.30](https://www.fca.org.uk/publication/finalised-guidance/fg24-1.pdf).
-Before turning research communication into product promotion, personalised
-guidance or a service, obtain legal review for the intended jurisdictions and
-use. Calling something “theoretical” does not determine its regulatory status.
+This notice describes the research purpose and limitations. It does not change
+the Apache-2.0 software licence, give regulatory permission or guarantee
+protection from liability. In the UK, an unauthorised person can give regulated
+investment advice even without personalising it. Substance, audience, business
+context and applicable exclusions matter. See [FCA PERG 8.24](https://handbook.fca.org.uk/handbook/PERG/8/24.html).
+
+A communication inviting or inducing investment in the course of business can
+also engage the financial-promotion restriction. A disclaimer does not settle
+that assessment. See [FSMA section 21](https://www.legislation.gov.uk/ukpga/2000/8/section/21/data.html)
+and the FCA's [FG24/1](https://www.fca.org.uk/publication/finalised-guidance/fg24-1.pdf).
+Before offering advice, distributing live investment signals, promoting
+investments or facilitating transactions, obtain UK financial-services legal
+advice about that specific activity. Publishing real-instrument recommendations
+can also raise presentation and conflicts-disclosure duties under
+[UK MAR article 20](https://www.legislation.gov.uk/eur/2014/596/article/20/data.html).
+Publishing research code and operating it for investors are distinct activities;
+reuse must be assessed in its own context.
 
 The [software licence](LICENSE) and [third-party data notice](NOTICE) remain
 separate from these research limitations.

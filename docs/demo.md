@@ -1,6 +1,22 @@
-# Prepare one mixed snapshot pair
+# Run the demonstration
 
 **This is not financial advice.** [Research notice](../RESEARCH_NOTICE.md).
+
+## Offline teaching example (start here)
+
+`python -m zenith demo --output state/demo/offline-example` is a fully synthetic,
+offline first run. It needs no inputs, credentials or network. It authors its own
+feed snapshots, executes the real native Lab graph through the original engine,
+`runtime.start`/`import-response` and contract validation, deliberately imports one
+invalid response (rejected and retained), corrects it, and reports the completion
+counts it actually observed in `summary.json`. Everything it generates stays under
+`--output`, and an existing nonempty output directory is refused.
+
+It is a **synthetic contract demonstration**: completing the graph shows the
+contracts execute, not that forecasting improved. The generated README and
+summary retain the research notice and identify the synthetic inputs.
+
+## Prepare one mixed snapshot pair (real inputs, optional)
 
 `prepare-demo` uses real saved stocks, ETFs and prediction markets. It replaces
 only macro and news, then reruns CALC. It never reads the original macro/news

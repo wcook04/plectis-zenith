@@ -129,7 +129,7 @@ class _NodeIndexer:
           - `DuplicateIDError` if two JSON files declare the same trimmed `"id"`.
           - Propagates unexpected filesystem exceptions not caught by the per-file parse guard.
         - Forbid:
-          - Hidden paths (any path part starting with ".") are excluded from consideration.
+          - Hidden paths inside the nodes directory are excluded from consideration.
         - Orders:
           - Candidate traversal is forced into sorted path order for determinism.
         - Locks: None.
@@ -142,7 +142,7 @@ class _NodeIndexer:
         for path in sorted(self.nodes_dir.rglob("*"), key=str):
             if path.suffix.lower() != ".json":
                 continue
-            if any(part.startswith(".") for part in path.parts):
+            if any(part.startswith(".") for part in path.relative_to(self.nodes_dir).parts):
                 continue
 
             try:

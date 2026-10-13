@@ -3,9 +3,10 @@
 > **This is not financial advice.** Zenith is an experimental research prototype.
 > See the [research notice](RESEARCH_NOTICE.md).
 
-Give a graph of reasoning nodes several feeds from an earlier time. Let it choose
-assets and predict. Open the later snapshot, measure what happened, trace the
-mistakes and propose one change. Test that change on later inputs.
+Zenith studies whether recorded failures in a graph of reasoning steps can guide
+useful revisions. Lab produces experimental forecasts from earlier snapshots;
+Oracle compares them with later observations; Evolve proposes a change for
+another comparison. Start with the fully synthetic offline example below.
 
 **Lab → Oracle → Evolve → compare again.** The model weights stay fixed.
 We change the instructions, context or connections in the reasoning graph.
@@ -15,7 +16,7 @@ We change the instructions, context or connections in the reasoning graph.
 
 ![Earlier inputs through Lab, Oracle, Evolve and a later comparison](docs/graphs/replay.svg)
 
-## The demonstration
+## The mixed-data research demonstration
 
 This is a **mixed-data** prototype. Saved stock, ETF and prediction-market inputs
 remain real. Only the macro and news lanes use explicitly invented examples.
@@ -42,6 +43,25 @@ python -m zenith validate
 python -m zenith plan lab
 ```
 
+### First run: the offline teaching example
+
+Start here. This path is entirely synthetic, needs no inputs or credentials, and
+makes no network or model calls:
+
+```sh
+python -m zenith demo --output state/demo/offline-example
+```
+
+It authors its own feed snapshots, runs the **real native Lab graph** through the
+original engine, validation and handoff contracts, shows one deliberately invalid
+response being rejected and then corrected, and writes the actual completion
+counts and evidence paths to `summary.json`. **This is not financial advice.**
+It is a synthetic contract demonstration; it is not evidence of improved
+forecasting. It refuses a nonempty output directory and keeps every generated
+file under `--output`.
+
+### Later: real inputs and providers (optional)
+
 Prepare mixed inputs from your own authorised saved snapshots:
 
 ```sh
@@ -53,7 +73,11 @@ This command copies the three retained real feeds exactly, constructs the two
 labelled replacements and runs the existing calculator. It makes no network or
 model calls. [The demo guide](docs/demo.md) shows how to pass these inputs through
 Lab and Oracle. Public exports contain provenance and invented examples only.
-[Data boundaries](docs/data.md) explain the distinction.
+[Data boundaries](docs/data.md) explain the distinction. Real inputs and provider
+execution need explicit configuration and are never part of the offline example.
+Explicit provider execution sends the assembled prompt and supplied data to
+that provider. Use data you are entitled to send; do not supply personal
+financial information.
 
 ```sh
 python -m zenith serve --port 4175
