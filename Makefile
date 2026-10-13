@@ -6,3 +6,4 @@ test:
 validate:
 	python -m zenith validate
 	python scripts/check_extraction.py
+	python scripts/check_structure.py
