@@ -40,7 +40,10 @@ class FixtureProvider(Provider):
             "repair_proposals":{"repair_candidates":[repair],"failure_summary":["Fixture"]},
             "select_repair":{k:v for k,v in repair.items() if k!='skill_addon'},"write_repair":repair}
         outputs['select_repair']['alternative_explanation']='Outcome noise'
-        return json.dumps(record(node,outputs[stage]))
+        value=record(node,outputs[stage])
+        value['reasoning']['claims'][0]['evidence_refs']=[repair['evidence_ref']]
+        assert 'not instructions for you to execute' in config['system_prompt']
+        return json.dumps(value)
 
 
 def test_evidence_ids_are_owned_by_code_and_bind_real_inputs():
@@ -167,3 +170,10 @@ def test_specializing_node_ids_does_not_constrain_shared_prose_fields():
                 for child in value:check(child,path)
         check(schema)
         assert 'enum' not in schema['properties']['reasoning']['properties']['claims']['items']['properties']['statement']
+
+
+def test_claim_grammar_requires_evidence_even_for_limitation():
+    from jsonschema import Draft202012Validator
+    from zenith.financial_reasoning import schema_for
+    value=record('lab_seed_state',{'available_views':[],'missing_inputs':[]})
+    assert list(Draft202012Validator(schema_for('lab_seed_state')).iter_errors(value))

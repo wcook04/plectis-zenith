@@ -38,7 +38,7 @@ flowchart LR
   V --> H[Further held-out comparison]
 ```
 
-CP1 saves an immutable plan. Its provisional forecast is the common numerical baseline. CP2 can reject the initial hypotheses and must select exactly one allowed forecast for every basket. Uninvestigated targets retain their baseline. Forecast values come from tools, never invented arithmetic in model output.
+CP1 saves an immutable plan. Its provisional forecast is the common numerical baseline. CP2 can reject the initial hypotheses. The current model output is a list of approved candidate IDs, at most one for each target. Numerical code owns the candidate-to-target mapping and fills every unselected basket with its baseline. Uninvestigated targets retain their baseline. Forecast values come from tools, never invented arithmetic in model output.
 
 | Arm | First pass and second pass | Model calls per origin |
 |---|---|---:|
@@ -77,3 +77,13 @@ python -m zenith basket report --study work/basket-study
 Only `run` makes inference calls. `fetch` downloads the pinned source; it never executes the upstream collection scripts. Source and snapshot destinations must be new. Runtime code, node definitions, data and study protocol are hashed. An interrupted paid call is not silently resent. Private runtime artifacts remain under ignored `work/` and `state/`; published evidence contains a reviewed subset.
 
 The [status record](status.md) distinguishes completed measurements from this protocol. The older [System A fixture](demo.md) remains useful for generic observation-contract tests.
+
+## Output-contract repair
+
+The first 221-call pilot is preserved at source commit `b6ba457cf2e80ee17522c76148d91e20c6f15018`. Its Director returned a basket-to-candidate map. Eight arms assigned a candidate to the wrong basket; validation rejected those maps and retained the full baseline as registered. The numerical scores in `examples/baskets/result.json` have not been rerun or rewritten.
+
+The current Director selects candidate IDs only. Numerical code derives each target from the candidate's recorded query and retains the baseline for all other baskets. Unknown IDs, duplicate selections for a target and malformed lists still fail. This removes a redundant model-generated association without weakening validation. The six-target output remains mandatory, but code constructs it.
+
+A separate check on the first available session on or after 1 February 2025 runs all four model arms, using the already frozen 2023 instruction revision. It has a 26-call cap, preserves the original pilot, and cannot adopt a policy or establish predictive superiority. It checks the repaired interface on a new date.
+
+The completed [repair record](../examples/baskets/repair.json) reports all four arms successful. Reproduce the engineering check with `python -m research.basket_repair_check --previous <original-local-study> --output <new-local-directory> --env-file <local-env-file>`. Its budget guard includes the earlier campaign allowance, and it refuses to overwrite a previous attempt.

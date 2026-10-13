@@ -1,6 +1,13 @@
 # Zenith research programme
 
-**Research direction, 12 October 2026.** Forecast every research basket from the shared history of all baskets and all their constituents. Study whether learning which cross-source investigations to perform improves forecasts at a fixed computation budget. The executable implementation is documented in [the basket protocol](docs/baskets.md); [status](docs/status.md) owns measured results. The checked-in System A demonstration remains a separate protocol fixture.
+**Research direction, 13 October 2026.** Learn which distinctions a reasoning
+programme must preserve, investigate and act on, using failures to propose and
+test local repairs. Forecast every research basket from the shared history of
+all baskets and constituents. First-run predictive gain is not the condition
+for demonstrating this loop. The [reasoning ontology](docs/reasoning-ontology.md)
+owns the current full-graph contracts; [status](docs/status.md) owns measured
+results. The earlier reduced basket experiment and System A fixture remain
+separate evidence.
 
 ## Question and task
 
@@ -17,7 +24,7 @@ A modest pilot can use six to eight baskets with tens of constituents each. One 
 1. An immutable numerical store holds dated observations, availability clocks, corporate-action conventions, basket definitions and provenance. A deterministic inventory describes coverage and query handles. The whole panel must not be transcribed into the Seed prompt.
 2. A common inexpensive numerical procedure forecasts every basket. Include a zero-return reference and a regularised all-universe model fitted only on eligible earlier observations.
 3. First-pass readers report bounded observations and unresolved questions. Cross-source synthesis can identify a subgroup, lag or alternative explanation worth checking elsewhere.
-4. CP1 saves the provisional forecast vector, empirical hypotheses and investigation plan. It is immutable as a record. Its conclusions may be rejected before CP2.
+4. The feed packet saves the provisional forecast vector; CP1 saves empirical hypotheses and the investigation plan. It is immutable as a record. Its conclusions may be rejected before CP2.
 5. Directed readers request cutoff-valid windows and calculations from a small operation catalogue. Initial candidates are constituent breadth/concentration, a lagged relationship, and stability across earlier windows. Each query records its inputs, parameters, result, evidence hash and resource use. Numerical code computes statistics, fits coefficients and produces forecast values; the LLM chooses and interprets investigations.
 6. CP2 freezes final forecasts for the same complete target universe, plus the changes from CP1 and their support. An uninvestigated basket keeps its baseline forecast. An unsuccessful investigation can legitimately leave it unchanged.
 
@@ -53,8 +60,23 @@ Retain a revision only under a predeclared full-universe comparison, with uncert
 
 ## Implementation and research boundary
 
-The native basket profile now implements a cutoff-bound numerical store, an all-universe ridge baseline, an empirical CP1 investigation plan, validated all-target CP2 forecasts, directed/undirected comparisons, a serial controller and a development-only Evolve instruction. It uses the existing engine, provider budget, artifact storage and reasoning-policy loader. The exact bounded operations and evaluation rules live in [the implementation protocol](docs/baskets.md).
+The current `financial` task profile runs the full native Lab, Oracle and Evolve
+missions. Every reasoning stage uses a common validated record, with typed
+claims, distinctions, uncertainties and a stage-specific result. Input references
+must resolve. Six lane views share one numerical history; they are not six
+isolated basket predictors. The two-pass Lab freezes an empirical investigation
+at CP1 and final numerical choices at CP2.
 
-The earlier causal-thesis constraints remain in the legacy Lab profile. Basket nodes have their own empirical contracts and do not relax historical validation rules. Numerical evaluation replaces subjective accuracy judgments in this profile. Evolve changes one instruction; it does not train model weights or a neural controller.
+Oracle receives the actual intermediate Lab records and later measured errors.
+It produces located failure hypotheses, which remain hypotheses. Evolve stages
+one instruction change, the expected effect and its evidence. Local replay
+freezes unaffected artifacts and reruns descendants. An empty-instruction control
+and later matched comparisons separate development effects from prospective
+behavior as far as this small experiment permits. No model weights or neural
+controller are trained.
 
-The first pilot samples four development and six later test origins. It can establish that the loop executes and expose useful or harmful revisions. Its dependent basket errors and small date sample cannot establish broad superiority. Larger chronological comparisons, repeated unchanged controls and prospective evaluation remain research requirements. The selected data source and its qualifications live in [data](docs/data.md). Website design is outside the task.
+The original generic contracts remain available as a separate profile. The
+18-node `basket` mission and its earlier comparisons are a diagnostic pilot;
+running it through the same engine did not exercise full Oracle decomposition.
+Do not describe engine reuse as proof that a particular research graph ran.
+Website design remains outside the task.

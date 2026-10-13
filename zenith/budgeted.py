@@ -362,12 +362,15 @@ class OpenRouterBudgetedProvider(Provider):
         return None
 
     def ask_ai(self, prompt: str, config: dict | None = None, cancel=None) -> str:
+        system_prompt=(config or {}).get("system_prompt")
+        if system_prompt is not None and not isinstance(system_prompt,str):raise ValueError("system_prompt must be text")
         response_format=(config or {}).get("response_format")
         if response_format is not None:
             if not isinstance(response_format,dict) or response_format.get("type")!="json_schema":
                 raise ValueError("only explicit JSON Schema response formats are supported")
         identity = self.identity(prompt, config)
         if response_format is not None:identity["response_format_sha256"]=digest(response_format)
+        if system_prompt is not None:identity["system_prompt_sha256"]=text_digest(system_prompt)
         self._bind_run()
         call_binding = {**identity, "provider": "openrouter_budgeted", "requested_model": self.model}
         if self.provider_slug is not None:
@@ -392,7 +395,7 @@ class OpenRouterBudgetedProvider(Provider):
                                          http_get=self.catalogue_get)
             context_length = min(context_length, endpoint["context_length"])
         # One token per UTF8 byte plus a disclosed conservative framing allowance.
-        input_bound = len(prompt.encode("utf-8")) + (len(json.dumps(response_format).encode()) if response_format else 0) + INPUT_OVERHEAD_TOKENS
+        input_bound = len(prompt.encode("utf-8")) + len((system_prompt or "").encode("utf-8")) + (len(json.dumps(response_format).encode()) if response_format else 0) + INPUT_OVERHEAD_TOKENS
         output_bound = self.options["max_output_tokens"]
         if input_bound + output_bound > context_length:
             raise RuntimeError("conservative UTF8 input bound plus output cap exceeds verified model context")
@@ -442,6 +445,7 @@ class OpenRouterBudgetedProvider(Provider):
                                         "request": float(prices.get("request", Decimal(0))), "image": 0}}}
             # This text-only adapter never enables web-search plugins or :online routing.
             # A catalogue's optional web_search price therefore is not a requested charge.
+            if system_prompt is not None:payload["messages"].insert(0,{"role":"system","content":system_prompt})
             if response_format is not None:payload["response_format"]=response_format
             if "reasoning" in row["supported_parameters"]:
                 payload["reasoning"] = {"enabled": False}

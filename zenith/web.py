@@ -66,8 +66,8 @@ class Website:
                 f"{API}/site": "Ordered teaching chapters, document/figure/evidence links and capabilities.",
                 f"{API}/paper": "Current manuscript title, PDF/source hashes, bibliography and citation-use lines.",
                 f"{API}/documents/{{id}}": {"ids": list(DOCUMENTS), "returns": "Exact Markdown or LaTeX, source hash, heading line numbers and link base."},
-                f"{API}/graph": {"query": {"mission": "all|basket|basket_serial|basket_evolve|lab|oracle|refinement (evolve alias)", "focus": "optional node ID"}, "returns": "Native scoped nodes, directed edges, execution waves, ancestor/descendant IDs."},
-                f"{API}/nodes/{{id}}": "Current authored operator, purpose, instruction, expected output, inputs/consumers, source. Not a historical run override.",
+                f"{API}/graph": {"query": {"mission": "financial_lab|financial_oracle|financial_refinement|all|basket|basket_serial|basket_evolve|lab|oracle|refinement (evolve alias)", "focus": "optional node ID"}, "returns": "Native scoped nodes, directed edges, execution waves, ancestor/descendant IDs."},
+                f"{API}/nodes/{{id}}": {"query":{"task_profile":"generic (default) or financial"},"returns":"Effective operator, instruction, inputs, consumers and source; financial profile includes reasoning schema. Not a historical run override."},
                 f"{API}/evidence/{{id}}": {"ids": list(EVIDENCE), "returns": "Public measured-result JSON with source hash; not private run files."},
                 f"{API}/runs": {"enabled": self.local_runs, "query": {"q": "substring", "mission": "optional native mission", "limit": "1..100, default40", "offset": "nonnegative, default0"}, "returns": "Paginated saved-run summaries; loaded and success remain distinct."},
                 f"{API}/runs/{{run_id}}/nodes/{{node_id}}": {"enabled": self.local_runs, "returns": "Artifact data/status/lineage, bounded recorded attempts and explicit omitted/error/truncation markers."},
@@ -103,6 +103,10 @@ class Website:
         if path == f"{API}/graph":
             values = options({"mission", "focus"})
             return json_response(self.content.graph(values.get("mission", "all"), values.get("focus")))
+        node_parts=path.removeprefix(API+"/").split("/") if path.startswith(API+"/") else []
+        if len(node_parts)==2 and node_parts[0]=="nodes":
+            values=options({"task_profile"})
+            return json_response(self.content.node(node_parts[1],values.get("task_profile","generic")))
         if path == f"{API}/runs":
             if not self.runs:
                 raise FileNotFoundError("Local records are disabled")

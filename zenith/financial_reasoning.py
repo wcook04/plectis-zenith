@@ -7,7 +7,7 @@ import json
 from jsonschema import Draft202012Validator
 from .providers import digest
 
-VERSION="zenith.reasoning.v3"
+VERSION="zenith.reasoning.v4"
 
 
 def obj(properties, required=None):
@@ -25,7 +25,7 @@ EVIDENCE_ID={"type":"string","pattern":"^E[0-9a-f]{6}_[0-9]{3,5}$"}
 REFS=arr(EVIDENCE_ID)
 CLAIM=obj({"id":{"type":"string","pattern":"^C[1-9][0-9]*$"},
     "kind":{"enum":["observation","hypothesis","inference","limitation","decision","diagnosis"]},
-    "statement":TEXT,"evidence_refs":REFS,"certainty":{"enum":["observed","supported","tentative","unknown"]}})
+    "statement":TEXT,"evidence_refs":arr(EVIDENCE_ID,1),"certainty":{"enum":["observed","supported","tentative","unknown"]}})
 DISTINCTION=obj({"id":{"type":"string","pattern":"^D[1-9][0-9]*$"},"question":TEXT,
     "alternatives":arr(TEXT,2,4),"status":{"enum":["unresolved","supported","rejected"]},"evidence_refs":REFS})
 CATEGORIES=["evidence_absent","evidence_discarded","inference_error","numerical_model_error",

@@ -104,9 +104,11 @@ class BudgetedTests(unittest.TestCase):
         caller=Mock(return_value=reply())
         provider=self.provider(row=row,caller=caller)
         shape={'type':'json_schema','json_schema':{'name':'test','strict':True,'schema':{'type':'object','properties':{},'required':[],'additionalProperties':False}}}
-        provider.ask_ai('hello',{'meta':{'session_id':'RUN','node_id':'structured'},'response_format':shape})
+        provider.ask_ai('hello',{'meta':{'session_id':'RUN','node_id':'structured'},'response_format':shape,'system_prompt':'Execute only your current task.'})
         payload=caller.call_args.args[2]
         self.assertEqual(payload['response_format'],shape)
+        self.assertEqual(payload['messages'][0],{'role':'system','content':'Execute only your current task.'})
+        self.assertIn('system_prompt_sha256',next(iter(self.ledger()['entries'].values())))
         self.assertNotIn('plugins',payload)
         record=next(iter(self.ledger()['entries'].values()))
         self.assertEqual(record['response_format_sha256'],digest(shape))

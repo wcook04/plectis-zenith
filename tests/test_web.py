@@ -178,9 +178,23 @@ def test_financial_graph_exposes_typed_reasoning_contracts(website):
         assert graph['task_profile']=='financial'
         typed=[n for n in graph['nodes'] if 'reasoning_schema' in n]
         assert typed
+        for node in graph['nodes']:
+            detail=json.loads(website.get(node['detail_url']).body)
+            assert detail['id']==node['id']
+            assert detail['task_profile']=='financial'
         assert all(n['reasoning_schema']['properties']['node_id']['const']==n['id'] for n in typed)
 
 
         if mission=='oracle':
             assert all('oracle_subject_index' in n['dependencies'] for n in typed)
             assert all(any(e['source']=='oracle_subject_index' and e['target']==n['id'] for e in graph['edges']) for n in typed)
+
+
+def test_financial_node_detail_preserves_profile_and_excludes_generic_fixture(website):
+    node=json.loads(website.get('/api/v1/nodes/oracle_cp2_emitter?task_profile=financial').body)
+    assert node['task_profile']=='financial'
+    assert 'oracle_subject_index' in node['dependencies']
+    assert node['reasoning_schema']['properties']['stage']['const']=='repair_proposals'
+    assert node['dossier'] is None and node['demo_provenance'] is None
+    assert node['profile_source']['path']=='zenith/market_graph.py'
+    with pytest.raises(ValueError):website.get('/api/v1/nodes/lab_director?task_profile=invalid')

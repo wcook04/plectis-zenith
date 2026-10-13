@@ -6,196 +6,196 @@
 \usepackage{enumitem,tikz}
 \usetikzlibrary{arrows.meta,positioning}
 \setlist{nosep,leftmargin=*}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
 \AddToHook{shipout/before}{\ifnum\value{page}>3
-  \PackageError{zenith}{Paper exceeds three pages}{Shorten the paper before publishing.}\fi}
+\PackageError{zenith}{Paper exceeds three pages}{Shorten the paper before publishing.}\fi}
 \begin{document}
 \begin{center}
-{\Large\bfseries Zenith: learning what to investigate before forecasting}\\[4pt]
-Will Cook \quad\textbullet\quad 12 October 2026
+{\Large\bfseries Zenith: learning from failures in a reasoning graph}\\[4pt]
+Will Cook \quad\textbullet\quad 13 October 2026
 \end{center}
 \hypertarget{idea}{}
 \textbf{Abstract.}
-Zenith treats reasoning as a policy for choosing useful numerical investigations.
-An initial forecast may miss a distinction between sources, feature families or
-times. A language-model programme proposes a small set of questions, numerical
-tools answer them using earlier data, and a final decision may revise the
-forecast. Later errors guide one reusable instruction change, evaluated on
-separate dates. We implement this loop for six research baskets sharing the
-histories of 147 financial instruments and 17 market indices. Comparisons include
-an all-universe numerical model, fixed investigations and a single controller
-with the same data and tools. The study is a small retrospective execution test;
-its question is whether selective investigation earns its additional computation.
+Zenith studies how a forecasting programme can learn which distinctions its
+reasoning must preserve and investigate. Lab reads several views of a shared
+system, tests provisional hypotheses and commits forecasts. Oracle compares
+those forecasts with later observations and traces failure hypotheses through
+the saved intermediate records. Evolve proposes one reusable change. A local
+replay tests its effect on the computation; separate later cases test whether
+that change carries forward. We implement this loop with typed reasoning
+records and a historical financial panel. The immediate experimental object is
+an inspectable sequence from error to tested repair. Neither a plausible
+diagnosis nor a successful replay establishes general predictive improvement.
 
-\textbf{1. The task.}
-At each cutoff, predict the five-market-session return of every basket using the
-entire declared universe. A basket's own members are only one possible source of
-information: breadth in another group, lagged returns or changing volume may be
-worth testing. Such patterns are empirical hypotheses. Neither correlated prices
-nor a dependency between computations identifies an economic cause.
+\textbf{1. The learning problem.}
+An error can have different origins. The required evidence may never have been
+observed. A reader may discard a useful distinction when compressing its input.
+A synthesis may combine dependent observations as if they were independent, or
+turn an association into an unsupported conclusion. A numerical model may fail
+although the reasoning around it was defensible. Some outcomes remain uncertain
+under every feasible use of the available evidence.
 
-The source is the adjusted-instrument and index history published by SocrateAI
-under a dataset-specific MIT-form licence~\cite{nepse}. We pin its repository
-commit and import through 31 December 2025. The audited panel contains 447,243
-instrument observations and 59,319 index observations; 2,319 rows with missing
-index prices are quarantined. Optional blank volume values remain missing.
+These possibilities require different responses. More persuasive retrospective
+prose does not distinguish them. Zenith records each step's inputs and explicit
+claims so that a proposed repair can name a particular computation, the evidence
+available there, and the downstream change expected from revising it. These are
+structured assertions made by the programme, not access to a model's private
+internal reasoning.
 
-Membership is fixed on 29 December 2021, using only preceding observations:
-at least 95\% quote coverage over 252 sessions, a quote at formation and positive
-median volume. We sort the 147 eligible instruments by their preceding
-126-session beta to the equal-weight universe and form six balanced groups.
-These are constructed research baskets, not historical sectors or traded ETFs.
-Each begins at 100 with equal initial value in its members and keeps fixed shares.
-Missing quotes retain the last observed price, with quote ages and stale fractions
-reported. For basket index $V_b$, the target is
-\[
-  r_{b,t}=V_b(t+5)/V_b(t)-1,
-\]
-where the offset counts available market sessions. No future-survival screen or
-future price fill determines membership or the target.
+\textbf{The shared-universe task.}
+At cutoff $t$, forecast the five-market-session return of every basket from the
+histories of all baskets and all their constituents. Our panel uses published
+NEPSE instrument and index data~\cite{nepse}. It contains 147 eligible instruments
+formed into six research baskets, with 17 market-index histories. Membership is
+fixed on 29 December 2021 using preceding coverage, volume and beta; each basket
+holds fixed shares after equal initial-value allocation. These are constructed
+research indices, not historical sectors or traded ETFs. Missing quotes retain
+the last observation and expose their age. For basket value $V_b$, the target is
+$r_{b,t}=V_b(t+5)/V_b(t)-1$.
 
-\hypertarget{lab}{}
-\textbf{2. Investigations produce candidates, not stories.}
-A deterministic store exposes returns, volatility, volume, quote age, basket
-breadth and dispersion, and market-index returns. The common provisional forecast
-is a ridge regression over all features, fitted on at most 252 earlier origins
-whose labels have matured. Training-only scaling, clipping and a fixed penalty
-are shared by the baseline and candidate fits. Arithmetic stays in numerical code.
+Different views retain constituent returns, breadth, index context, volume,
+lagged relationships and quote quality. The numerical history stays on disk;
+Seed receives its inventory and readers receive bounded views. A flat basket
+average may conceal opposing constituent movements. A finding elsewhere can
+make that distinction worth retrieving in a second pass. A compact answer after
+the question is known does not establish that the useful question was cheap to
+discover. Whether this structure helps on financial data is an empirical question;
+it does not prove that a single adaptive model could not do the same work.
 
-Six first-pass readers inspect different slices of the same universe. A planner
-combines their observations and freezes an investigation plan (CP1). A query
-chooses a target basket, any source basket or the whole universe or index group,
-a feature family and a lag of 0, 1, 5 or 20 sessions. Up to six queries are allowed.
-The tool fits the selected feature subset and reports a candidate forecast plus
-its gain over the common baseline on eight earlier rolling validation origins.
-Every validation fit excludes labels maturing after that validation cutoff.
+The source licence explicitly covers the dataset and accompanying documentation.
+The pinned publisher snapshot is retrospective: release timestamps and adjustment
+vintages are not certified point-in-time records. Prices and volume omit many
+possible causes, and pretrained-model knowledge remains a limitation. The task
+supports a research replay, not a trading-performance claim.
 \newpage
+\hypertarget{lab}{}
+\textbf{2. A typed reasoning programme.}
+The financial task profile retains the native graph engine and the full Lab,
+Oracle and Evolve node identities. It replaces the earlier domain prompts and
+single-causal-thesis requirement with empirical investigation contracts. Lab
+has six feed nodes and nineteen reasoning nodes. Six first-pass readers feed
+synthesis, orientation and a frozen CP1 plan. Six directed readers then test that
+plan; a second synthesis feeds Director's CP2 commitment and Integrity's audit.
 
-\textbf{Revision within a forecast.}
-A final model selects one eligible candidate or the baseline for each basket.
-The complete vector is frozen at CP2. CP1 remains an immutable record, but its
-hypotheses need not survive investigation. Uninvestigated targets retain their
-baseline. The tool validates candidate identity and target coverage; the language
-model cannot supply an unsupported numerical forecast. A validation gain may
-reflect selection noise, so retaining the baseline is a legitimate decision.
+Every reasoning node emits a versioned envelope: node identity, stage, reasoning
+and a typed result. Its reasoning contains claims, distinctions and uncertainties.
+Claims identify their kind---observation, hypothesis, inference, limitation,
+decision or diagnosis---and select evidence IDs bound by code to exact input
+fields and value hashes; the provider receives the same constrained output schema. A distinction gives a question and at least two alternatives, with
+support or an unresolved status. Claim identities persist as node and local ID.
+Stated certainty is an epistemic label, not a calibrated probability.
 
-\begin{center}
-\begin{tikzpicture}[node distance=7mm,>=Stealth,
-  box/.style={draw,rounded corners=2pt,align=center,font=\small,minimum height=11mm,text width=43mm}]
-\node[box] (read) {Shared history\\six source readers};
-\node[box,right=of read] (plan) {CP1\\choose investigations};
-\node[box,right=of plan] (tool) {Numerical tools\\up to six queries};
-\node[box,below=of tool] (final) {CP2\\freeze every forecast};
-\node[box,left=of final] (score) {Later outcomes\\full-universe loss};
-\node[box,left=of score] (revise) {One instruction revision\\then later comparison};
-\draw[->] (read)--(plan);\draw[->] (plan)--(tool);
-\draw[->] (tool)--(final);\draw[->] (final)--(score);\draw[->] (score)--(revise);
-\end{tikzpicture}
-\end{center}
-{\small Figure 1. The executable basket loop. Forecast-time numerical tools
-see only cutoff-valid data. Development outcomes can guide a revision; later
-test outcomes cannot enter its instruction.}
+\begin{center}\small
+\begin{tabular}{@{}p{29mm}p{61mm}p{61mm}@{}}
+\toprule
+Stage & Typed result & Mechanical check \\
+\midrule
+Read and synthesise & Claims, distinctions, questions & Input references resolve \\
+Plan (CP1) & Target, source, operation, lag, reason & Available queries; all targets covered \\
+Investigate & Candidate ID, verdict, evidence & Candidate matches the executed test \\
+Decide (CP2) & Selected IDs and rationale & Exact numerical values; complete vector \\
+Diagnose & Node, category, evidence, feasible test & Subject record remains unchanged \\
+Repair & Node, instruction, expected effect & Frozen policy; named replay descendants \\
+\bottomrule
+\end{tabular}\end{center}
+
+Schema validity makes records comparable and rejects malformed references. It
+cannot certify that an inference follows from its evidence. Malformed responses
+are preserved and stop execution; there is no automatic retry heuristic. Input
+contract changes require a separately identified run.
+
+\textbf{Investigation and commitment.}
+A common ridge model uses all available features and at most 252 mature training
+origins. CP1 chooses six investigations, one per target; each can use another
+basket, all baskets or the market indices. Operations select trend, breadth,
+volume or lagged features. Numerical code fits candidates and reports their
+gain against the baseline on eight earlier rolling validation origins. Each fit
+excludes labels that had not matured at its own cutoff.
+
+The directed pass interprets those results against the original evidence. CP1
+freezes what was proposed, not what must ultimately be believed. CP2 may reject
+an investigated hypothesis. The model selects candidate IDs; code owns their
+target mapping and forecast values. Unselected targets keep the numerical
+baseline, so uncertainty cannot disappear by omitting a difficult basket.
 
 \hypertarget{oracle}{}
-\textbf{3. Comparison and learning.}
-Four development dates in 2023 compare directed investigation with an undirected
-control. The latter runs the same reader/planner architecture but substitutes
-six predeclared own-basket trend queries. Both have the same maximum query
-allowance. Their first-pass model calls are independent, so the pilot does not
-isolate all sampling variability.
+\textbf{3. Failure decomposition.}
+After CP2 is committed, Oracle opens later observations. Deterministic tools
+calculate each prediction error. Six reviews compare the appropriate source
+view with the saved Lab claims. Every review also receives Lab's topology, node
+instructions, typed contracts and reconstructible original inputs. A combined review,
+attribution, critique and repair proposals follow. Oracle distinguishes unavailable
+evidence, discarded evidence, inference error, numerical-model error and
+irreducible uncertainty; it can also report no supported failure attribution.
 
+A wrong forecast alone does not establish a defective reasoning step. A useful
+diagnosis names the first supported failure, cites its saved input or output,
+and proposes a test feasible with information available there. An omitted news
+event discovered afterwards cannot be smuggled into a repaired earlier input.
+The graph records dependencies between computations, not economic causality.
+\newpage
 \hypertarget{trace}{}
-Evolve reads development losses and saved traces, then proposes one addition of
-at most 512 characters to the planner instruction. The revision is hashed and
-frozen before held-out execution. This learns a procedural instruction;
-it does not change model weights, fit a neural controller or identify market
-causality. One proposal is tested, including the possibility of no change.
+\textbf{4. Evolve and the test of a repair.}
+Evolve selects a failure hypothesis and writes one reusable instruction, bounded
+to 512 characters, using the selected node's original inputs, output and task.
+It stages a candidate policy; source dossiers are not automatically changed.
 
-Six later dates in 2024 compare the incumbent, its revision, the undirected arm
-and a serial controller. The serial controller receives all first-pass numerical
-rows and the same query catalogue. It chooses investigations and then selects
-forecasts in two calls, versus eight for each graph arm. The same inexpensive
-base model is used throughout. Numerical ridge and zero-return baselines require
-no language-model calls. A serial programme could execute the same computation
-graph; exclusive expressive capability is not the claim.
-
-Every arm commits all six forecasts before the evaluator opens that date's
-outcome. Squared fractional return error is averaged equally over targets and
-origins. A failed run retains the entire numerical baseline vector, stays in the
-score and is separately reported. The revision is retained only if it lowers
-mean held-out loss, does not increase worst-origin loss and no model arm fails.
-A shared cap of \$2 and 260 attempted calls bounds the whole experiment.
+A local replay freezes unaffected artifacts and executes the changed node and
+its descendants. An empty-instruction replay controls for repeated execution.
+This tests a computational change conditional on the saved programme and case,
+not a cause of the external market movement. Because the outcome helped select
+the repair, replay is development evidence. Later comparisons must freeze the
+instruction and commit both forecasts before opening outcomes. Changes, no-ops,
+regressions and failed attempts remain visible.
 
 \hypertarget{results}{}
-\textbf{Measured result.}
-The comparison completed 221 calls to Ling 3.0 Flash for a reported
-\$0.021791. Directed, revised and serial held-out forecasts equalled the ridge
-baseline: mean squared return error 0.00065565, versus 0.00065196 for undirected
-investigations and 0.00064589 for zero return. Eight of 32 model arms failed
-candidate-to-target validation and retained the predeclared baseline fallback.
-The proposed instruction was not retained. There is no observed advantage for
-the directed graph or revision in this pilot. The complete forecast and failure
-records are published in \path{examples/baskets/}; the proposed diagnosis remains
-unverified model output.
-\newpage
+\textbf{Execution evidence.}
+The February case completed all 25 Lab, 28 Oracle and three Evolve nodes with
+GPT-4.1 mini via OpenRouter. Lab predicted gains for all six baskets; all six
+fell. B04's forecast was $+1.524\%$, against $-3.999\%$ realised. Oracle
+identified weak candidate-validation gains as a possible inference failure,
+but also suggested tests requiring unavailable data. Those suggestions are not
+information-feasible repairs.
+
+Evolve proposed \texttt{freeze\_selected\_candidates}. Original, control and
+repaired forecasts had identical mean squared return error, $0.0013997011$.
+Each replay reran Director and Integrity and preserved 23 artifacts byte for
+byte. An engineering-agent clarification of Evolve's role produced a longer,
+case-specific instruction, again without a local forecast change. Neither was
+adopted. This clarification was external to the experimental model.
+An explicit reviewer instruction to reject nonpositive validation gain also
+left forecasts unchanged: Director still selected Q1 with gain $-0.0000204080$.
+This is an observable failure to apply the instruction, not evidence of a useful repair.
+
+A later May reader stopped after emitting an observation without a citation:
+the provider schema allowed an empty list while validation required evidence.
+This input-contract failure was preserved without retry. Independent later
+attempts are reported in \path{docs/status.md}. Earlier interface failures and
+the smaller basket pilot remain separate evidence. Execution, valid structure
+and a useful learned repair are different claims.
 
 \hypertarget{research}{}
-\textbf{4. What this experiment can establish.}
-A completed run demonstrates a reproducible sequence from historical data through
-provisional reasoning, targeted computation, forecast revision, later scoring
-and one tested instruction change. A lower observed loss would be a descriptive
-result on these dates. Six held-out dates are not 36 independent experiments:
-baskets share constituents' market environment and errors within a date are
-dependent. The present sample does not support a claim of statistical superiority.
+\textbf{Scope and next experiments.}
+The loop makes a real error, its diagnosis, a proposed instruction and measured
+replay effects inspectable. The present results also expose weak attribution
+and repair generation. More cases are needed to assess whether diagnoses reliably select useful
+repairs. Baskets within a date share market conditions; they are not independent
+replications. Larger chronological comparisons should include repeated unchanged
+controls, an all-universe numerical forecaster, and a single adaptive controller
+with the same observations and tools. A serial programme can execute the same
+DAG; exclusive expressive power is not a claim.
 
-The open financial system need not be fully observed for forecasting to be
-scored. It does, however, limit explanations. Prices and volume alone omit many
-possible causes. The published data have unknown historical release timestamps
-and adjustment vintages; stale marks are not executable prices; instrument types
-and historical classifications are incomplete. Consequently the target is a
-retrospective last-quote research index, not trading returns or a certified
-point-in-time backtest. Pretrained models may also have encountered the historical
-period. A prospective test is needed to address that limitation.
-
-The architecture must survive stronger comparisons. An adaptive serial model can
-read the same data and ask the same questions; a numerical model can summarise
-many histories cheaply. Zenith is useful only if its investigation policy adds
-value at an acceptable cost. Larger chronological tests should include repeated
-unchanged controls, broader numerical baselines, cost-matched alternatives and
-predeclared uncertainty estimates at the forecast-date level. Any procedure
-selected after inspecting the current test results belongs to development in
-its next evaluation.
-
-\textbf{Related work and scope.}
-DSPy composes language-model modules and optimises programmes against a
-metric~\cite{dspy}. MIPRO optimises instructions and demonstrations across
-multi-stage programmes~\cite{mipro}. Zenith applies the same general principle
-of measured programme revision to a bounded forecasting investigation policy.
-The specific contribution of this prototype is the executable comparison:
-all-source access, numerical candidate generation, immutable provisional and
-final records, full-target scoring, an inexpensive serial competitor, and a
-separate test of one proposed instruction. Prompt revision alone is not novel,
-and the structure of the workflow does not establish predictive benefit.
-
-\textbf{Reproduction and evidence.}
-The backend uses the existing native graph engine and its budgeted OpenRouter
-adapter. Source files, import outputs, numerical snapshots, forecast commitments
-and policy revisions carry hashes. Failed imports and paid attempts are retained;
-no failed forecast is silently removed or replaced by a fresh attempt. The
-numerical store is separate from the bounded text shown to readers. The query
-catalogue, ridge specification, exact dates and data qualifications are documented
-in \path{docs/baskets.md}; \path{docs/status.md} owns current results.
-
-The previous invented System A example remains a synthetic protocol fixture.
-Its preparation receipt is not evidence for this financial experiment.
-Source and reproduction commands are in the
-\href{https://github.com/wcook04/plectis-zenith}{Zenith repository}.
+DSPy composes language-model modules~\cite{dspy}; MIPRO optimises instructions
+and demonstrations across programmes~\cite{mipro}. Prompt optimisation itself is
+not novel. Zenith's research focus is the connection between preserved reasoning
+distinctions, located failure hypotheses and information-feasible repair tests.
+Schemas provide an experimental vocabulary; their scientific value depends on
+what the resulting comparisons establish.
 
 \begin{thebibliography}{3}\small
-\setlength{\itemsep}{3pt}\setlength{\parskip}{0pt}
+\setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}
 \bibitem{nepse} SocrateAI. \emph{NEPSE Open Data}, pinned source
-\href{https://github.com/socrateai-official/nepse-open-data/tree/497e27238a107de00c6f435a4f4f76983205577d}{\texttt{497e27238a10}}, 2026.
+\href{https://github.com/socrateai-official/nepse-open-data/tree/497e27238a107de00c6f435a4f4f76983205577d}{\texttt{497e27238a10}}.
 Dataset-specific MIT-form licence; copyright 2025 SocrateAI.
 \bibitem{dspy} O. Khattab et al. DSPy: Compiling Declarative Language Model Calls
 into Self-Improving Pipelines. \emph{ICLR}, 2024.

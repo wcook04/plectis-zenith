@@ -20,6 +20,7 @@ DOCUMENTS = {
     "data": "docs/data.md",
     "diagnosis": "docs/failure-diagnosis.md",
     "reasoning-ontology": "docs/reasoning-ontology.md",
+    "worked-case": "docs/full-graph-case.md",
     "research-direction": "docs/research-direction.md",
     "walkthrough": "docs/zenith-walkthrough-script.md",
     "notice": "RESEARCH_NOTICE.md",
@@ -35,6 +36,11 @@ EVIDENCE = {
     "full-graph-result": "examples/full-graph/result.json",
     "full-graph-trace": "examples/full-graph/trace.json",
     "reasoning-schemas": "examples/full-graph/reasoning-schemas.json",
+    "experiment-reasoning-schemas": "examples/full-graph/experiment-reasoning-schemas.json",
+    "full-graph-protocol": "examples/full-graph/protocol.json",
+    "full-graph-history": "examples/full-graph/development-history.json",
+    "full-graph-followups": "examples/full-graph/followups.json",
+    "full-graph-manifest": "examples/full-graph/manifest.json",
 }
 FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail", "basket-detail", "basket-serial-detail")
 CHAPTERS = (
@@ -137,9 +143,15 @@ class PublicContent:
                 "pdf_sha256": digest(pdf), "citations": citations, "sections": sections,
                 "notice_url": f"{API}/documents/notice"}
 
-    def node(self, identifier: str) -> dict:
+    def node(self, identifier: str, task_profile: str = "generic") -> dict:
         if identifier not in self.nodes:
             raise FileNotFoundError("Unknown node")
+        if task_profile=="financial":
+            group=self.nodes[identifier].group
+            if group not in {"lab","oracle","refinement","feeds"}:raise ValueError("Node has no financial profile")
+            mission="lab" if group=="feeds" else group
+            return next(n for n in self.graph("financial_"+mission)["nodes"] if n["id"]==identifier)
+        if task_profile!="generic":raise ValueError("Unknown task profile")
         node = self.nodes[identifier]
         path, raw, authored = self.sources[identifier]
         consumers = sorted(n.id for n in self.nodes.values() if identifier in n.dependencies)
@@ -175,6 +187,15 @@ class PublicContent:
                 row["task_profile"]="financial"
                 row["instruction"]=node.instruction
                 row["output_schema"]=node.output_schema
+                row["dossier"]=None;row["demo_provenance"]=None
+                row["explanation_url"]=f"{API}/documents/reasoning-ontology"
+                row["detail_url"]=f"{API}/nodes/{node.id}?task_profile=financial"
+                row["profile_source"]=self.source("zenith/market_graph.py",safe_read(self.root,"zenith/market_graph.py"))
+                row["instruction_kind"]="effective_financial_definition_not_run_override"
+                if node.type.value=="reasoning":
+                    from .financial_reasoning import stage_for
+                    row["purpose"]="Financial reasoning stage: "+stage_for(node.id)
+                    row["expectation"]="Validated reasoning record with the attached stage-specific JSON Schema."
                 if node.type.value=="reasoning": row["reasoning_schema"]=schema_for(node.id,persisted=True)
             selected={n["id"] for n in answer["nodes"]}
             edges=[{"id":f"{dep}->{nid}","source":dep,"target":nid,"kind":"declared_dependency"}

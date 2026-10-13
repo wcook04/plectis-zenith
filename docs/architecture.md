@@ -1,12 +1,15 @@
 # Architecture
 
-**Experimental research prototype.** The public example uses synthetic observations of a disclosed toy generator. No predictive improvement has been demonstrated.
+**Experimental research prototype.** The active financial profile runs the full
+Lab → Oracle → Evolve structure with the [shared reasoning ontology](reasoning-ontology.md).
+It uses historical financial observations. The generic System A fixture and the
+reduced basket pilot are separate profiles; their results do not transfer automatically.
 
 Zenith is a language-model program for forecasting changing, partially observed systems. Its nodes read heterogeneous, incomplete, overlapping or delayed observations and save structured records. Reasoning reconciles semantics and clocks, distinguishes missing from conflicting evidence, proposes competing explanations and selects explicit targets. Intermediate records expose the support chain; source agreement is not a count of independent votes. The same system is observed through measurements, subsystems, environment, events and interventions. A derived feed computes summaries from supplied measurements, subsystem and environment records.
 
-Lab inventories the cutoff-bound packet, analyses each feed, synthesises findings, forms competing explanations and freezes a thesis at CP1. Directed miners revisit that thesis using the same permitted feeds; Director freezes predictions at CP2 and Integrity checks both passes. Node and edge counts come from `python -m zenith validate`.
+Lab inventories the cutoff-bound packet, analyses each feed, synthesises findings, forms competing explanations and freezes an investigation plan at CP1 in the financial profile (a thesis in the generic fixture). Directed miners revisit that thesis using the same permitted feeds; Director freezes predictions at CP2 and Integrity checks both passes. Node and edge counts come from `python -m zenith validate`.
 
-Oracle reads the frozen Lab subject beside later evidence. Deterministic differences and lane reviews enter an evidence summary, attribution hypothesis and final review record. Evolve proposes a reviewed instruction, context or dependency revision. Its native dossier path and the daily comparison controller are separate. A version is accepted through an explicit decision after a matched later comparison.
+Oracle reads the frozen Lab subject beside later evidence. Deterministic differences and lane reviews enter an evidence summary, attribution hypothesis and final review record. Evolve selects a located failure hypothesis and stages one reusable instruction. The financial profile runs its native three-node scope, freezes the resulting candidate policy, and tests it through local replay and later comparisons. Staging does not change source dossiers or accept the candidate. The generic dossier runner and daily comparison controller remain separate interfaces.
 
 Runtime hydration binds global feeds to the earlier packet for Lab and later packet for Oracle. It does not add native edges. Exact definitions live under `codex/substrate/nodes/`; regenerate diagrams through `scripts/build_graphs.py`. The general interface establishes no universal predictive performance.
 

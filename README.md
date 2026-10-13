@@ -1,14 +1,15 @@
 # Plectis Zenith
 
-Zenith learns which parts of a large observation history to investigate before making a forecast. Its first real-data experiment predicts six research baskets from the shared histories of 147 instruments, the baskets themselves and market indices. Every basket can use the whole universe.
+Zenith learns which distinctions a reasoning programme must preserve and investigate. Lab reads a shared financial universe, tests hypotheses and freezes forecasts. Oracle compares them with later outcomes and examines the full Lab graph and saved inputs to locate a possible failure. Evolve writes one instruction change; local replay and later cases test its consequences.
 
-A numerical model supplies initial forecasts. Six readers identify patterns and questions; a planner chooses up to six numerical investigations. A final model selects a supported candidate or keeps the baseline for each basket. The backend freezes all predictions before scoring later outcomes. One instruction revision is proposed from development results and tested on later dates.
+The immediate experiment is the complete error → diagnosis → repair → test loop. A wrong forecast is useful evidence. A plausible diagnosis still needs testing, and an ineffective repair remains a result. This does not establish that the graph outperforms a single adaptive model.
 
-The experiment compares this graph with a numerical forecaster, fixed investigations and a single controller that sees all first-pass data and has the same query tools. The graph has to earn its extra computation. Historical association is not evidence of physical causality.
+The financial profile uses 25 Lab, 28 Oracle and three Evolve nodes. Every reasoning node emits a typed record of claims, evidence references, distinctions, uncertainty and a stage-specific result. All six baskets can use the histories of all 147 eligible instruments, all baskets and 17 market indices.
 
-- [Current measurements and decision](docs/status.md)
+- [Current execution evidence](docs/status.md)
+- [A forecast failure, its diagnosis and attempted repairs](docs/full-graph-case.md)
 - [Three-page research paper](paper/zenith.pdf)
-- [Executable protocol and reproduction](docs/baskets.md)
+- [Reasoning ontology and full-loop protocol](docs/reasoning-ontology.md)
 - [Data source, licence and limitations](docs/data.md)
 - [Research programme](program.md)
 
@@ -20,13 +21,14 @@ python -m zenith validate
 python -m zenith basket fetch --output work/data/nepse-source
 python -m zenith basket ingest --source work/data/nepse-source \
   --output work/data/nepse-panel --through 2025-12-31
-python -m zenith basket prepare --data work/data/nepse-panel \
-  --study work/basket-study --model inclusionai/ling-3.0-flash
-python -m zenith basket run --study work/basket-study --env-file /path/to/local.env
-python -m zenith basket report --study work/basket-study
+python -m zenith plan lab --task-profile financial
+python -m research.graph_failure_study prepare --data work/data/nepse-panel \
+  --study work/full-graph-study
+python -m research.graph_failure_study run --study work/full-graph-study \
+  --env-file /path/to/local.env
 ```
 
-The model run has a shared $2 / 260-call cap. Only the `run` step makes inference calls. Credentials and raw run artifacts stay local. Numerical preparation requires NumPy and pandas; the existing engine owns model execution, saved node artifacts, budgets and policies.
+Only `run` makes inference calls, through the explicit provider and frozen batch limits. Credentials and raw run artifacts stay local. Each node gets one attempt. Rejected output is preserved for input-contract diagnosis; valid forecasts are evaluated even when wrong. The native engine owns execution, intermediate artifacts, budgets and policies. The [earlier smaller basket pilot](docs/baskets.md) remains separately labelled.
 
 The [read-only API](site/README.md) serves the paper, graph definitions and approved evidence. Start it with `python -m zenith serve --port 4175`. Frontend design is outside this change. The older [System A demonstration](docs/demo.md) remains a synthetic protocol fixture, separate from this financial experiment.
 

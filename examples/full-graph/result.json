@@ -1,0 +1,692 @@
+{
+  "schema": "zenith_full_graph_failure_result_v1",
+  "complete": true,
+  "completion_meaning": "All planned arms attempted or collected; failures are retained, not successful forecasts.",
+  "protocol_sha256": "fd37f505a9db43df85c11af2ab365fd8a49741bd4233c3fe73958d357362b67d",
+  "original": {
+    "run_id": "zenith-graph-context-20261013-subject",
+    "forecasts": {
+      "B01": 0.007310920787633521,
+      "B02": 0.007587054800173996,
+      "B03": 0.011216156949556098,
+      "B04": 0.01524259822296981,
+      "B05": 0.01381412162405814,
+      "B06": 0.015392520907572952
+    },
+    "cp2_sha256": "340fb491a9f36b9669a8a287ce7ce30965a11b9cbb82e85bffe540b7cc3d9794",
+    "rows": {
+      "B01": {
+        "prediction": 0.007310920787633521,
+        "realised": -0.010746562735366894,
+        "squared_error": 0.00032607271118343143
+      },
+      "B02": {
+        "prediction": 0.007587054800173996,
+        "realised": -0.01861231010796338,
+        "squared_error": 0.0006864067215897402
+      },
+      "B03": {
+        "prediction": 0.011216156949556098,
+        "realised": -0.017415297599086776,
+        "squared_error": 0.0008197601895710028
+      },
+      "B04": {
+        "prediction": 0.01524259822296981,
+        "realised": -0.039986762016172794,
+        "squared_error": 0.0030502822324249865
+      },
+      "B05": {
+        "prediction": 0.01381412162405814,
+        "realised": -0.027076895596072403,
+        "squared_error": 0.0016720752892970124
+      },
+      "B06": {
+        "prediction": 0.015392520907572952,
+        "realised": -0.02754475034729653,
+        "squared_error": 0.0018436092628142415
+      }
+    },
+    "mse": 0.0013997010678134024
+  },
+  "oracle_run": "zenith-graph-context-20261013-oracle",
+  "evolve_run": "zenith-graph-context-20261013-evolve",
+  "repair": {
+    "schema_version": "zenith.reasoning.v3",
+    "node_id": "dossier_updater",
+    "stage": "write_repair",
+    "reasoning": {
+      "claims": [
+        {
+          "id": "C1",
+          "kind": "observation",
+          "statement": "Basket B01 shows a slight decrease in predicted 20-day returns (0.00731) compared to baseline (0.00824), with heterogeneous constituent returns and a slightly negative validation gain, indicating weak predictive improvement and complex intra-basket dynamics.",
+          "evidence_refs": [
+            "E6992ec_007"
+          ],
+          "certainty": "observed"
+        },
+        {
+          "id": "C2",
+          "kind": "observation",
+          "statement": "Basket B02's baseline predicted return (0.00768) closely matches the numerical prediction (0.00759) at lag 0, but observed 5-day returns (0.02777) significantly exceed baseline, suggesting additional return drivers beyond baseline models.",
+          "evidence_refs": [
+            "E6992ec_008"
+          ],
+          "certainty": "observed"
+        },
+        {
+          "id": "C3",
+          "kind": "observation",
+          "statement": "Basket B03's candidate breadth operation at 5-day lag yields a predicted return (0.01237) slightly above baseline (0.01122) but with negative validation gain, indicating no significant predictive improvement and inconclusive evidence on capturing intra-basket heterogeneity.",
+          "evidence_refs": [
+            "E6992ec_009"
+          ],
+          "certainty": "observed"
+        },
+        {
+          "id": "C4",
+          "kind": "observation",
+          "statement": "Basket B04 exhibits positive 5-day returns with elevated relative volumes in multiple constituents; candidate volume operation at lag 0 predicts a return (0.01524) above baseline (0.01158), supporting volume-return co-movement as a predictive feature, though validation is limited.",
+          "evidence_refs": [
+            "E6992ec_010"
+          ],
+          "certainty": "observed"
+        },
+        {
+          "id": "C5",
+          "kind": "observation",
+          "statement": "Candidate intervention Q5 using 5-day lag INDEX trend to predict B05 returns yields a predicted return (0.01381) slightly below baseline (0.01491) with a small positive validation gain, supporting modest predictive influence of market-wide trends on B05 returns.",
+          "evidence_refs": [
+            "E6992ec_011"
+          ],
+          "certainty": "observed"
+        },
+        {
+          "id": "C6",
+          "kind": "observation",
+          "statement": "Candidate Q6 applying 1-day lag on B06 predicts a return (0.01168) lower than baseline (0.01539) with minimal validation gain, indicating weak evidence for significant short-term return persistence contributing to baseline returns.",
+          "evidence_refs": [
+            "E6992ec_012"
+          ],
+          "certainty": "observed"
+        }
+      ],
+      "distinctions": [
+        {
+          "id": "D1",
+          "question": "Does the lag 20-day return prediction for B01 indicate a significant decrease in expected returns compared to baseline?",
+          "alternatives": [
+            "Yes, there is a significant decrease in expected returns at 20-day lag for B01.",
+            "No, the decrease is minor and not significant compared to baseline."
+          ],
+          "status": "supported",
+          "evidence_refs": [
+            "E6992ec_012"
+          ]
+        },
+        {
+          "id": "D2",
+          "question": "Do observed 5-day returns for B02 align with baseline predictions or indicate additional factors?",
+          "alternatives": [
+            "Observed returns align closely with baseline predictions.",
+            "Observed returns significantly exceed baseline predictions, indicating additional factors or interventions."
+          ],
+          "status": "supported",
+          "evidence_refs": [
+            "E6992ec_008"
+          ]
+        },
+        {
+          "id": "D3",
+          "question": "Does the candidate query Q3 significantly improve prediction of basket B03 returns compared to baseline?",
+          "alternatives": [
+            "Candidate query Q3 improves prediction significantly.",
+            "Candidate query Q3 does not improve prediction significantly."
+          ],
+          "status": "supported",
+          "evidence_refs": [
+            "E6992ec_009"
+          ]
+        }
+      ],
+      "uncertainties": [
+        "The economic significance of the small decrease in B01's predicted 20-day returns is unclear.",
+        "Causal factors driving excess observed returns in B02 beyond baseline are not identified.",
+        "The ability of breadth operation to capture meaningful intra-basket heterogeneity in B03 remains unresolved.",
+        "The causal mechanism linking volume-return co-movement in B04 to predictive improvement is not established.",
+        "Limited validation samples and data limitations reduce confidence in generalizing findings across baskets.",
+        "No direct evidence on how market events or interventions specifically impact short-term returns in B06."
+      ]
+    },
+    "result": {
+      "node_id": "lab_director",
+      "skill_addon": "freeze_selected_candidates",
+      "evidence_ref": "E6992ec_007",
+      "hypothesis": "Freeze candidate Q1 for B01 reflecting slight decrease in 20-day returns; retain baseline for B03 and B06 due to inconclusive or negative validation gains; select candidate Q2 for B02 to maintain stable baseline return expectations acknowledging additional factors; select candidate Q4 for B04 to capture volume-return co-movement predictive value; select candidate Q5 for B05 to incorporate modest market-wide trend influence.",
+      "expected_effect": "This instruction stages a candidate replay preserving the current best-supported predictions and candidate selections for all six baskets at cutoff 2025-02-02, enabling later testing and validation without adopting unconfirmed or weakly supported model changes."
+    },
+    "evidence_catalog": {
+      "E6992ec_007": {
+        "source": "delta_analyzer",
+        "pointer": "/reasoning/claims/0",
+        "value_sha256": "70aaad5c9c8f28ece2dfd9f796f1bfa38dc68e6cc0df19e596fc00ad367dc5f8",
+        "hint": "{\"id\":\"C1\",\"kind\":\"diagnosis\",\"statement\":\"The baseline and candidate predicted returns for all six "
+      },
+      "E6992ec_008": {
+        "source": "delta_analyzer",
+        "pointer": "/reasoning/claims/1",
+        "value_sha256": "95d64d3f75439d38f73e84baa7ec2e9e31959d92a2b9091db875f22e3341a18e",
+        "hint": "{\"id\":\"C2\",\"kind\":\"diagnosis\",\"statement\":\"Candidate queries Q3 for basket B03 and Q6 for basket B06"
+      },
+      "E6992ec_009": {
+        "source": "delta_analyzer",
+        "pointer": "/reasoning/claims/2",
+        "value_sha256": "249704cfaaaa0ff93bde599a76a2e3e3451d56ee77923b53157383d60428d0a6",
+        "hint": "{\"id\":\"C3\",\"kind\":\"limitation\",\"statement\":\"The data universe is composed of research groups rather "
+      },
+      "E6992ec_010": {
+        "source": "delta_analyzer",
+        "pointer": "/reasoning/claims/3",
+        "value_sha256": "9056dc3c2ffdeceab36269ea046c873c7b459454e461cbcacac6e01ade6f1fa3",
+        "hint": "{\"id\":\"C4\",\"kind\":\"diagnosis\",\"statement\":\"No direct evidence is available on causal interventions o"
+      },
+      "E6992ec_011": {
+        "source": "delta_analyzer",
+        "pointer": "/reasoning/distinctions",
+        "value_sha256": "ebc48bcce29c96cd8910100c9bd41b3fd75517ddceab785c3b5aed1783cda088",
+        "hint": "[{\"id\":\"D1\",\"question\":\"Do baseline and candidate predicted returns accurately forecast realized ret"
+      },
+      "E6992ec_012": {
+        "source": "delta_analyzer",
+        "pointer": "/reasoning/distinctions/0",
+        "value_sha256": "d5d5fcfbd896f2853884598fe28efb719a22747d5467dd5dac1466263f70f174",
+        "hint": "{\"id\":\"D1\",\"question\":\"Do baseline and candidate predicted returns accurately forecast realized retu"
+      }
+    }
+  },
+  "replay": {
+    "control": {
+      "run_id": "zenith-graph-context-20261013-replay-control",
+      "forecasts": {
+        "B01": 0.007310920787633521,
+        "B02": 0.007587054800173996,
+        "B03": 0.011216156949556098,
+        "B04": 0.01524259822296981,
+        "B05": 0.01381412162405814,
+        "B06": 0.015392520907572952
+      },
+      "cp2_sha256": "4e0a02e070d6dff78cedd7b0b45a21ad939e90fee2356642da750420c651cd45",
+      "rows": {
+        "B01": {
+          "prediction": 0.007310920787633521,
+          "realised": -0.010746562735366894,
+          "squared_error": 0.00032607271118343143
+        },
+        "B02": {
+          "prediction": 0.007587054800173996,
+          "realised": -0.01861231010796338,
+          "squared_error": 0.0006864067215897402
+        },
+        "B03": {
+          "prediction": 0.011216156949556098,
+          "realised": -0.017415297599086776,
+          "squared_error": 0.0008197601895710028
+        },
+        "B04": {
+          "prediction": 0.01524259822296981,
+          "realised": -0.039986762016172794,
+          "squared_error": 0.0030502822324249865
+        },
+        "B05": {
+          "prediction": 0.01381412162405814,
+          "realised": -0.027076895596072403,
+          "squared_error": 0.0016720752892970124
+        },
+        "B06": {
+          "prediction": 0.015392520907572952,
+          "realised": -0.02754475034729653,
+          "squared_error": 0.0018436092628142415
+        }
+      },
+      "mse": 0.0013997010678134024,
+      "replay_receipt": {
+        "source_run": "zenith-graph-context-20261013-subject",
+        "intervention_node": "lab_director",
+        "rerun_nodes": [
+          "lab_director",
+          "lab_integrity"
+        ],
+        "frozen_nodes": [
+          "global_derived_feed",
+          "global_environment_feed",
+          "global_events_feed",
+          "global_interventions_feed",
+          "global_measurements_feed",
+          "global_subsystems_feed",
+          "lab_cross_corr_v1",
+          "lab_cross_corr_v2",
+          "lab_decide",
+          "lab_miner_derived",
+          "lab_miner_environment",
+          "lab_miner_events",
+          "lab_miner_interventions",
+          "lab_miner_measurements",
+          "lab_miner_subsystems",
+          "lab_miner_v2_derived",
+          "lab_miner_v2_environment",
+          "lab_miner_v2_events",
+          "lab_miner_v2_interventions",
+          "lab_miner_v2_measurements",
+          "lab_miner_v2_subsystems",
+          "lab_orient",
+          "lab_seed_state"
+        ],
+        "frozen_hashes": {
+          "global_derived_feed": "b078b029dab0e216e806dcd58b5b9ef22c27d8bb74887f5726625a940fbd7f6e",
+          "lab_miner_events": "e3338cfef1b33327680623d74f876131efb3f62eec62687e3950c9e7be14a29a",
+          "lab_seed_state": "ead6f93ce495ab31f8d3826ae0b974a6481bd91d93b3830da98815768462a54e",
+          "lab_miner_v2_derived": "1b1cfa650e58f89548d55b6ffec9f8f6487efba77d5bf1e7839faff13ce7d92a",
+          "lab_miner_v2_environment": "0d8314c2604c5e3ebcf48e8ea25c5a7acd2d1d7dd348787f3b01cea099ff7bf0",
+          "lab_miner_subsystems": "9aa4f3b7dd09a75c0d6c0a7b0c47fc07b94824a5e109bde5ef0cd54c03f76caa",
+          "global_measurements_feed": "f60630b1ade64ba797406ea79404d46a8d8f488b5d8f7737c67c306d23269f28",
+          "global_environment_feed": "ab0537ef0d37d1eedae68107f6bce6b428b773b51e73940dba826eae368d3f07",
+          "lab_miner_v2_measurements": "5531a5ca215d45ce569a5e220fdb93d0bf12d1a3bf3f9e398c46ec80296d1ef2",
+          "lab_decide": "54cac746e4d7743e4ee8e76e5a04e23eac8e5bb8711451322da7562c2d051d85",
+          "global_interventions_feed": "c6567e73a929c148ac20217034aa0c062d795077b53d400ad56e7184f5d0cd60",
+          "lab_cross_corr_v1": "089b435c226d5897253e654529f04b64e2cff850896b427a4fdc557ea0cc3fdf",
+          "lab_cross_corr_v2": "bb8d4fbda9ed9f69d9e94226dff31b50a0ca4789dd7baafa1df5345f3fe9baad",
+          "lab_miner_measurements": "e88615a76a156493481e1a864a74e13859059569b98235d3c3cdd3a3eee3971e",
+          "lab_miner_derived": "a1f24d5e2f679f9212bd64f1b169560a8b149a0d00db03f62ee962cf73bca31e",
+          "lab_miner_v2_interventions": "63f79f270ba9a570a29bb1586bb779fa89fde1658370f82b7393a29a9683a710",
+          "lab_miner_interventions": "4fdef3a69e32169ea3bd9d9b762825a1b8aecf410386d2bd27ee116e2eb971d0",
+          "lab_miner_v2_subsystems": "96eca9e996b4fc02bb64c47f48b7d1cadc6b2259fbf5381039ef69eac25bcc81",
+          "global_subsystems_feed": "e590e7872f7c8d7fd566d7973092e42281ea204c6faf411a5424a9d2ae5c6509",
+          "global_events_feed": "2dc05da9b4379b154bf4bad3895455f58426cc54d0564a8dacde99782e66489c",
+          "lab_miner_environment": "3c57b00cfcc2ae0ffe950abae7ec58b1195a1494a48dad0bdac0d199c1ef80f7",
+          "lab_miner_v2_events": "6ef2799d7e74f24bb44a86b46fe98f6543d127cd979e8352bf702484812817e2",
+          "lab_orient": "a7ce3c29b9f9cd33dfd1c204eb3dfd17f64e11307e5de78bf35980e42553db43"
+        },
+        "interpretation": "outcome-informed development replay; not held-out improvement"
+      },
+      "changed_outputs": [
+        "lab_director",
+        "lab_integrity"
+      ]
+    },
+    "repair": {
+      "run_id": "zenith-graph-context-20261013-replay-repair",
+      "forecasts": {
+        "B01": 0.007310920787633521,
+        "B02": 0.007587054800173996,
+        "B03": 0.011216156949556098,
+        "B04": 0.01524259822296981,
+        "B05": 0.01381412162405814,
+        "B06": 0.015392520907572952
+      },
+      "cp2_sha256": "e44abcc3bc521f6d80a3d5ac9d5937fb0f3d94f9acc2e96bc073836adef54638",
+      "rows": {
+        "B01": {
+          "prediction": 0.007310920787633521,
+          "realised": -0.010746562735366894,
+          "squared_error": 0.00032607271118343143
+        },
+        "B02": {
+          "prediction": 0.007587054800173996,
+          "realised": -0.01861231010796338,
+          "squared_error": 0.0006864067215897402
+        },
+        "B03": {
+          "prediction": 0.011216156949556098,
+          "realised": -0.017415297599086776,
+          "squared_error": 0.0008197601895710028
+        },
+        "B04": {
+          "prediction": 0.01524259822296981,
+          "realised": -0.039986762016172794,
+          "squared_error": 0.0030502822324249865
+        },
+        "B05": {
+          "prediction": 0.01381412162405814,
+          "realised": -0.027076895596072403,
+          "squared_error": 0.0016720752892970124
+        },
+        "B06": {
+          "prediction": 0.015392520907572952,
+          "realised": -0.02754475034729653,
+          "squared_error": 0.0018436092628142415
+        }
+      },
+      "mse": 0.0013997010678134024,
+      "replay_receipt": {
+        "source_run": "zenith-graph-context-20261013-subject",
+        "intervention_node": "lab_director",
+        "rerun_nodes": [
+          "lab_director",
+          "lab_integrity"
+        ],
+        "frozen_nodes": [
+          "global_derived_feed",
+          "global_environment_feed",
+          "global_events_feed",
+          "global_interventions_feed",
+          "global_measurements_feed",
+          "global_subsystems_feed",
+          "lab_cross_corr_v1",
+          "lab_cross_corr_v2",
+          "lab_decide",
+          "lab_miner_derived",
+          "lab_miner_environment",
+          "lab_miner_events",
+          "lab_miner_interventions",
+          "lab_miner_measurements",
+          "lab_miner_subsystems",
+          "lab_miner_v2_derived",
+          "lab_miner_v2_environment",
+          "lab_miner_v2_events",
+          "lab_miner_v2_interventions",
+          "lab_miner_v2_measurements",
+          "lab_miner_v2_subsystems",
+          "lab_orient",
+          "lab_seed_state"
+        ],
+        "frozen_hashes": {
+          "global_derived_feed": "b078b029dab0e216e806dcd58b5b9ef22c27d8bb74887f5726625a940fbd7f6e",
+          "lab_miner_events": "e3338cfef1b33327680623d74f876131efb3f62eec62687e3950c9e7be14a29a",
+          "lab_seed_state": "ead6f93ce495ab31f8d3826ae0b974a6481bd91d93b3830da98815768462a54e",
+          "lab_miner_v2_derived": "1b1cfa650e58f89548d55b6ffec9f8f6487efba77d5bf1e7839faff13ce7d92a",
+          "lab_miner_v2_environment": "0d8314c2604c5e3ebcf48e8ea25c5a7acd2d1d7dd348787f3b01cea099ff7bf0",
+          "lab_miner_subsystems": "9aa4f3b7dd09a75c0d6c0a7b0c47fc07b94824a5e109bde5ef0cd54c03f76caa",
+          "global_measurements_feed": "f60630b1ade64ba797406ea79404d46a8d8f488b5d8f7737c67c306d23269f28",
+          "global_environment_feed": "ab0537ef0d37d1eedae68107f6bce6b428b773b51e73940dba826eae368d3f07",
+          "lab_miner_v2_measurements": "5531a5ca215d45ce569a5e220fdb93d0bf12d1a3bf3f9e398c46ec80296d1ef2",
+          "lab_decide": "54cac746e4d7743e4ee8e76e5a04e23eac8e5bb8711451322da7562c2d051d85",
+          "global_interventions_feed": "c6567e73a929c148ac20217034aa0c062d795077b53d400ad56e7184f5d0cd60",
+          "lab_cross_corr_v1": "089b435c226d5897253e654529f04b64e2cff850896b427a4fdc557ea0cc3fdf",
+          "lab_cross_corr_v2": "bb8d4fbda9ed9f69d9e94226dff31b50a0ca4789dd7baafa1df5345f3fe9baad",
+          "lab_miner_measurements": "e88615a76a156493481e1a864a74e13859059569b98235d3c3cdd3a3eee3971e",
+          "lab_miner_derived": "a1f24d5e2f679f9212bd64f1b169560a8b149a0d00db03f62ee962cf73bca31e",
+          "lab_miner_v2_interventions": "63f79f270ba9a570a29bb1586bb779fa89fde1658370f82b7393a29a9683a710",
+          "lab_miner_interventions": "4fdef3a69e32169ea3bd9d9b762825a1b8aecf410386d2bd27ee116e2eb971d0",
+          "lab_miner_v2_subsystems": "96eca9e996b4fc02bb64c47f48b7d1cadc6b2259fbf5381039ef69eac25bcc81",
+          "global_subsystems_feed": "e590e7872f7c8d7fd566d7973092e42281ea204c6faf411a5424a9d2ae5c6509",
+          "global_events_feed": "2dc05da9b4379b154bf4bad3895455f58426cc54d0564a8dacde99782e66489c",
+          "lab_miner_environment": "3c57b00cfcc2ae0ffe950abae7ec58b1195a1494a48dad0bdac0d199c1ef80f7",
+          "lab_miner_v2_events": "6ef2799d7e74f24bb44a86b46fe98f6543d127cd979e8352bf702484812817e2",
+          "lab_orient": "a7ce3c29b9f9cd33dfd1c204eb3dfd17f64e11307e5de78bf35980e42553db43"
+        },
+        "interpretation": "outcome-informed development replay; not held-out improvement"
+      },
+      "changed_outputs": [
+        "lab_director",
+        "lab_integrity"
+      ]
+    }
+  },
+  "later": [
+    {
+      "cutoff": "2025-05-04",
+      "outcome": {
+        "cutoff": "2025-05-04",
+        "target_date": "2025-05-11",
+        "returns": {
+          "B01": 0.005281007611718458,
+          "B02": 0.011025083152521598,
+          "B03": 0.026089360911869086,
+          "B04": 0.01933412881508323,
+          "B05": 0.01345210404915731,
+          "B06": -0.005424044625710223
+        },
+        "stale_fraction": {
+          "B01": 0.04,
+          "B02": 0.0,
+          "B03": 0.0,
+          "B04": 0.0,
+          "B05": 0.0,
+          "B06": 0.0
+        }
+      },
+      "arms": {
+        "incumbent": {
+          "status": "failed",
+          "run_id": "zenith-graph-context-20261013-2025-05-04-incumbent",
+          "failure": {
+            "schema": "zenith_run_status_v1",
+            "run_id": "zenith-graph-context-20261013-2025-05-04-incumbent",
+            "mission": "lab",
+            "status": "failed",
+            "completed_count": 12,
+            "scope_count": 25,
+            "failed_nodes": [
+              "lab_miner_derived"
+            ],
+            "pending": [],
+            "engine_failure_nodes": [
+              "lab_miner_derived"
+            ],
+            "run_summary": {
+              "run_id": "zenith-graph-context-20261013-2025-05-04-incumbent",
+              "timestamp": 1791848496.284606,
+              "grade": "red",
+              "grade_reason": "Run contains failed nodes",
+              "node_outcomes": {
+                "global_environment_feed": "success",
+                "global_events_feed": "success",
+                "global_measurements_feed": "success",
+                "global_interventions_feed": "success",
+                "global_subsystems_feed": "success",
+                "global_derived_feed": "success",
+                "lab_seed_state": "success",
+                "lab_miner_interventions": "success",
+                "lab_miner_derived": "failure",
+                "lab_miner_environment": "success",
+                "lab_miner_events": "success",
+                "lab_miner_subsystems": "success",
+                "lab_miner_measurements": "success",
+                "lab_cross_corr_v1": "not_started",
+                "lab_cross_corr_v2": "not_started",
+                "lab_decide": "not_started",
+                "lab_director": "not_started",
+                "lab_integrity": "not_started",
+                "lab_miner_v2_derived": "not_started",
+                "lab_miner_v2_environment": "not_started",
+                "lab_miner_v2_events": "not_started",
+                "lab_miner_v2_interventions": "not_started",
+                "lab_miner_v2_measurements": "not_started",
+                "lab_miner_v2_subsystems": "not_started",
+                "lab_orient": "not_started"
+              },
+              "duration_seconds": 33.57129979133606
+            },
+            "execution_kind": "openrouter_budgeted",
+            "claim_boundary": "Execution and contract validation do not establish forecasting accuracy or usefulness for the observed system."
+          },
+          "mse": null,
+          "forecasts": null
+        },
+        "revised": {
+          "status": "completed",
+          "run_id": "zenith-graph-context-20261013-2025-05-04-revised",
+          "forecasts": {
+            "B01": 0.005293222429716571,
+            "B02": 0.0027212474946424845,
+            "B03": 0.007642652013288826,
+            "B04": 0.010945516907123837,
+            "B05": 0.009708365127395225,
+            "B06": 0.012187229091287232
+          },
+          "cp2_sha256": "0cd5599cf75c4cacca79fddb0b27fe1d22c33f7302810fc788d48d80adfd49f7",
+          "rows": {
+            "B01": {
+              "prediction": 0.005293222429716571,
+              "realised": 0.005281007611718458,
+              "squared_error": 1.492017787270203e-10
+            },
+            "B02": {
+              "prediction": 0.0027212474946424845,
+              "realised": 0.011025083152521598,
+              "squared_error": 6.895368663306464e-05
+            },
+            "B03": {
+              "prediction": 0.007642652013288826,
+              "realised": 0.026089360911869086,
+              "squared_error": 0.00034028106918896007
+            },
+            "B04": {
+              "prediction": 0.010945516907123837,
+              "realised": 0.01933412881508323,
+              "squared_error": 7.036880974235811e-05
+            },
+            "B05": {
+              "prediction": 0.009708365127395225,
+              "realised": 0.01345210404915731,
+              "squared_error": 1.4015581114316339e-05
+            },
+            "B06": {
+              "prediction": 0.012187229091287232,
+              "realised": -0.005424044625710223,
+              "squared_error": 0.00031015696193500535
+            }
+          },
+          "mse": 0.00013396270963591386
+        }
+      }
+    },
+    {
+      "cutoff": "2025-08-03",
+      "outcome": {
+        "cutoff": "2025-08-03",
+        "target_date": "2025-08-11",
+        "returns": {
+          "B01": 0.013924288182615818,
+          "B02": -0.009763127755375911,
+          "B03": -0.0036998386728515076,
+          "B04": -0.034547511488405847,
+          "B05": -0.03325662955201303,
+          "B06": -0.031117049833896404
+        },
+        "stale_fraction": {
+          "B01": 0.0,
+          "B02": 0.0,
+          "B03": 0.0,
+          "B04": 0.0,
+          "B05": 0.0,
+          "B06": 0.0
+        }
+      },
+      "arms": {
+        "incumbent": {
+          "status": "completed",
+          "run_id": "zenith-graph-context-20261013-2025-08-03-incumbent",
+          "forecasts": {
+            "B01": 0.00393129006954542,
+            "B02": 0.0029422580119098404,
+            "B03": 0.004352228023832128,
+            "B04": 0.011021168688275813,
+            "B05": 0.010710124985006623,
+            "B06": 0.0014788445860089428
+          },
+          "cp2_sha256": "c92f7c673ff30f7d8c4c26c978eb139916d3368a919250b661699b42bada698e",
+          "rows": {
+            "B01": {
+              "prediction": 0.00393129006954542,
+              "realised": 0.013924288182615818,
+              "squared_error": 9.986001128782854e-05
+            },
+            "B02": {
+              "prediction": 0.0029422580119098404,
+              "realised": -0.009763127755375911,
+              "squared_error": 0.00016142682749554737
+            },
+            "B03": {
+              "prediction": 0.004352228023832128,
+              "realised": -0.0036998386728515076,
+              "squared_error": 6.48357780878417e-05
+            },
+            "B04": {
+              "prediction": 0.011021168688275813,
+              "realised": -0.034547511488405847,
+              "squared_error": 0.0020765046130446995
+            },
+            "B05": {
+              "prediction": 0.010710124985006623,
+              "realised": -0.03325662955201303,
+              "squared_error": 0.0019330755045185379
+            },
+            "B06": {
+              "prediction": 0.0014788445860089428,
+              "realised": -0.031117049833896404,
+              "squared_error": 0.0010624923330336165
+            }
+          },
+          "mse": 0.0008996991779113453
+        },
+        "revised": {
+          "status": "completed",
+          "run_id": "zenith-graph-context-20261013-2025-08-03-revised",
+          "forecasts": {
+            "B01": 0.002109993460284276,
+            "B02": 0.0029422580119098404,
+            "B03": 0.005357870858107025,
+            "B04": 0.010600719262233563,
+            "B05": 0.007447430323418509,
+            "B06": 0.0014788445860089428
+          },
+          "cp2_sha256": "6365bed8977baa07f82f22250826a280abfb69a0d42d4980c10a4c0a5320f900",
+          "rows": {
+            "B01": {
+              "prediction": 0.002109993460284276,
+              "realised": 0.013924288182615818,
+              "squared_error": 0.0001395775597861109
+            },
+            "B02": {
+              "prediction": 0.0029422580119098404,
+              "realised": -0.009763127755375911,
+              "squared_error": 0.00016142682749554737
+            },
+            "B03": {
+              "prediction": 0.005357870858107025,
+              "realised": -0.0036998386728515076,
+              "squared_error": 8.204210194721705e-05
+            },
+            "B04": {
+              "prediction": 0.010600719262233563,
+              "realised": -0.034547511488405847,
+              "squared_error": 0.002038362739912982
+            },
+            "B05": {
+              "prediction": 0.007447430323418509,
+              "realised": -0.03325662955201303,
+              "squared_error": 0.0016568204903427153
+            },
+            "B06": {
+              "prediction": 0.0014788445860089428,
+              "realised": -0.031117049833896404,
+              "squared_error": 0.0010624923330336165
+            }
+          },
+          "mse": 0.0008567870087530315
+        }
+      }
+    }
+  ],
+  "adoption": "not_adopted; instruction is ineffective or case-specific and later evaluation includes a failed pair",
+  "nodes": {
+    "lab": 25,
+    "oracle": 28,
+    "refinement": 3
+  },
+  "collection_extension": {
+    "schema": "zenith_failure_collection_extension_v1",
+    "original_protocol_sha256": "fd37f505a9db43df85c11af2ab365fd8a49741bd4233c3fe73958d357362b67d",
+    "collector_sha256": "b42b376f6a1d668f9e30615a72abf3ab994d17b832c40f410b7d01be4ad1447b",
+    "rule": "Preserve failures; no node retries. Execute remaining independent predeclared arms. Failed arms have no forecast or score."
+  },
+  "source_checkpoint": "76a4cb1fd028db866a659ed3ff1989179ec9cb20",
+  "run_accounting": {
+    "attempted_calls": 99,
+    "reported_cost_usd": "1.2509336",
+    "repeated_node_attempts": 0
+  },
+  "study_id": "zenith-graph-context-20261013",
+  "boundary": "Test trace-grounded failure decomposition, a feasible local repair, and later behavior; initial accuracy is not the completion criterion."
+}

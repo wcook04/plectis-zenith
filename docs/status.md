@@ -1,4 +1,28 @@
-# Current result
+# Current experiment
+
+The February financial case completed the full **25-node Lab → 28-node Oracle → three-node Evolve** loop and local replay through the native engine. Oracle received the complete Lab graph and reconstructible original inputs. Every reasoning record has a validated schema and code-bound evidence references.
+
+Lab predicted gains in all six baskets; all six fell. Oracle hypothesised a failure in how weak numerical validation evidence influenced selection, but some proposed tests required unavailable data. Evolve's first instruction was an uninformative label. **Its forecasts matched the unchanged replay control exactly.** No repair was adopted.
+
+A separate, explicitly versioned updater-context clarification produced a case-specific instruction and another unchanged local forecast. This clarification was authored by the engineering agent, outside the experimental model. It is not autonomous learning. A May incumbent later failed because its provider schema allowed an observation without a reference while the validator required one. That failed attempt has not been retried.
+
+[Read the worked case](full-graph-case.md). Source checkpoint matching these runs: `76a4cb1fd028db866a659ed3ff1989179ec9cb20`. The retained offline suite at that checkpoint passed **390 tests**. The bounded experiment is now collected: **99 model calls, zero automatic retries**. The May incumbent remains a failed arm. An explicit collection extension completed the independent predeclared arms without resending that node.
+
+| Case | Incumbent MSE | First candidate MSE | Interpretation |
+|---|---:|---:|---|
+| February local replay | 0.0013997011 | 0.0013997011 | Same forecasts as unchanged control |
+| May later case | unavailable: failed reader | 0.0001339627 | No valid paired comparison |
+| August later case | 0.0008996992 | 0.0008567870 | Lower loss on one diagnostic case; no general or attributed gain |
+
+The first instruction was not a useful reusable repair, and the August difference cannot establish otherwise. [Public result](../examples/full-graph/result.json), [full trace and Oracle context](../examples/full-graph/trace.json), and [earlier failed interface versions](../examples/full-graph/development-history.json) preserve the evidence.
+
+The current schema revision requires every claim to cite an input and supplies the active role through a system message. Graph instructions inside the context remain quoted evidence. The experiment's original v3 schemas are retained separately from the current v4 contracts.
+
+The v4 Evolve-only context check again produced the same action label. A separate reviewer-authored Director instruction also left February forecasts unchanged; Director retained Q1 despite its negative validation gain and the instruction to reject nonpositive gains. The updater-context follow-up's August revised arm failed on candidate identity. These checks were not adopted and do not establish autonomous improvement. Their [complete records and selection audit](../examples/full-graph/followups.json) remain separate from the original campaign. The current runtime's retained offline suite passes **392 tests**.
+
+The earlier experiment below used an 18-node basket graph. It did not run full Oracle failure decomposition, and its results remain separate.
+
+# Earlier reduced-graph pilot
 
 The shared-universe basket backend completed a real-data comparison using **147 instruments, six research baskets and 17 index histories**. The model was `inclusionai/ling-3.0-flash` through OpenRouter. It made **221 calls**, with reported inference cost **$0.0217910322**.
 
@@ -20,6 +44,16 @@ Four dates in 2023 supplied development evidence. Evolve proposed an instruction
 Eight of the 32 model arms failed final validation: the model assigned a numerical candidate to a target for which that candidate had not been calculated. The predeclared failure policy retained the entire numerical baseline vector and included those cases in the score. These failures are visible in the [result](../examples/baskets/result.json), rather than discarded. The revision's diagnosis is model-generated and has not been independently established as causal or numerically correct.
 
 The first attempted endpoint, `nex-agi/nex-n2.5-mini`, timed out on eight requests and its budget stopped. Those requests were not retried; their actual cost remains unknown, with a total conservative reservation of $0.004005700. A separate successful Ling feasibility check cost $0.000001029. Including that check, known cost is $0.0217920612; adding the full timeout reservation gives a conservative ceiling of $0.0257977612 for these attempts.
+
+## Repair checked on a new date
+
+The current backend removes the redundant target map from the model response. The model selects candidate IDs; numerical code assigns targets and supplies baselines for every unselected basket. Unknown IDs and multiple choices for one target still fail validation.
+
+A separate **2 February 2025 → 9 February 2025** check completed all four arms with **zero failures**, using 26 calls costing **$0.002831955**. Each arm made valid changes from its numerical baseline. The existing development-only instruction was used unchanged for the revised arm. This is a single-date interface check, not a repeat of the original test or evidence that the graph is superior. No policy was adopted from it.
+
+[The repair record](../examples/baskets/repair.json) contains the plans, selections, forecasts, outcomes and costs; [its frozen protocol](../examples/baskets/repair-protocol.json) identifies the implementation. The original pilot and its source remain at commit `b6ba457cf2e80ee17522c76148d91e20c6f15018`.
+
+Across both runs and the endpoint check: **256 attempted calls**, **$0.0246240162 known cost**, and a **$0.0286297162 conservative ceiling** after adding every unknown timeout reservation. Both are within the declared $2 and 260-attempt campaign limits.
 
 ## Evidence and implementation
 

@@ -1,7 +1,7 @@
 # Zenith teaching website
 
-**Experimental research prototype.** The demonstration uses only invented observations.
-Preparation does not demonstrate predictive accuracy or improvement. See
+**Experimental research prototype.** The active financial experiment uses licensed historical observations.
+The older System A fixture uses invented observations. See
 the [research notice](../RESEARCH_NOTICE.md).
 
 A React frontend for the read-only website API in
@@ -85,3 +85,9 @@ colour-blind separation in both themes.
 The shared-universe backend adds `basket`, `basket_serial` and `basket_evolve` mission scopes to `/api/v1/graph`. `/api/v1/documents/experiment` describes the numerical protocol; `/api/v1/evidence/basket-result`, `basket-protocol` and `basket-trace` expose reviewed research evidence. `/api/v1/documents/synthetic-fixture` retains the earlier System A instructions.
 
 The site metadata labels the active data as `historical_research`. Public mode serves allowlisted evidence only; it does not expose the downloaded panel, local credentials or arbitrary run files. Model execution stays in the explicit CLI. No frontend redesign is required to use these endpoints.
+
+`/api/v1/evidence/basket-repair` serves the successful new-date interface check separately from the original pilot result. Graph API records for basket nodes link to their own protocol and do not attach a legacy System A dossier.
+
+## Full reasoning-graph backend
+
+Use `financial_lab`, `financial_oracle` and `financial_refinement` as graph mission parameters. Responses expose effective dependencies, instructions and the persisted reasoning schema at each model node. `/api/v1/documents/reasoning-ontology` explains the contracts. `/api/v1/evidence/reasoning-schemas` exports them, and the `full-graph-result` and `full-graph-trace` evidence routes serve the completed experiment when present. The trace includes the frozen Lab graph and original-input bindings available to Oracle. This change concerns the backend and evidence; it does not redesign the frontend.

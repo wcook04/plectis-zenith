@@ -66,8 +66,7 @@ explanations come from the existing Markdown, including the
 A document response includes its hash, heading line numbers and `base_url` for
 relative links. Sanitize rendered Markdown and treat model output as data.
 
-The experiment has not produced a completed forecast. Successful local JSON
-validation must not be displayed as predictive success. Use the current result
+Use the recorded experiment status. Successful JSON validation alone must not be displayed as predictive success. Use the current result
 documents and receipts instead of hardcoding result counts into the frontend.
 
 ## API
@@ -81,13 +80,13 @@ All JSON routes are under `/api/v1`. `GET` and `HEAD` are supported; writes retu
 | `/paper` | Manuscript metadata, citations, citation uses and PDF/source hashes |
 | `/documents/{id}` | Exact Markdown/LaTeX and its source binding |
 | `/graph?mission=lab&focus=lab_cross_corr_v1` | Native nodes, edges, waves and ancestors/descendants |
-| `/nodes/{id}` | Purpose, instruction, expected output, boundary, inputs, consumers, source and feed dossier |
+| `/nodes/{id}?task_profile=financial` | Effective role, instruction, schema, inputs, consumers and profile source |
 | `/evidence/{id}` | Public result/source JSON and its SHA-256 |
 | `/runs?q=JUL20&mission=lab&limit=20&offset=0` | Optional local run index with total and pagination |
 | `/runs/{run_id}/nodes/{node_id}` | Optional local artifact and recorded attempts |
 | `/health` | Version and enabled capabilities |
 
-Missions are `all`, `lab`, `oracle` and `refinement`; `evolve` aliases `refinement`.
+The active missions are `financial_lab`, `financial_oracle` and `financial_refinement`. Their graph responses include effective node hashes, instructions, dependencies and `reasoning_schema`. The generic `all`, `lab`, `oracle` and `refinement` graphs remain available; `evolve` aliases generic `refinement`. Earlier `basket`, `basket_serial` and `basket_evolve` graphs describe the reduced pilot.
 Site metadata lists document and evidence IDs. The PDF is `/assets/paper.pdf`;
 figure URLs are `/assets/graphs/{id}.svg` and are listed by `/site`.
 
@@ -119,7 +118,7 @@ const site = await fetch(`${api}/api/v1/site`).then(r => r.json());
 const graphUrl = site.chapters.find(c => c.id === 'lab').graph_url;
 const graph = await fetch(`${api}${graphUrl}`).then(r => r.json());
 // On node click:
-const node = await fetch(`${api}/api/v1/nodes/${encodeURIComponent(selectedId)}`)
+const node = await fetch(`${api}/api/v1/nodes/${encodeURIComponent(selectedId)}?task_profile=financial`)
   .then(r => r.json());
 // Offer the run selector only when site.local_runs_enabled is true.
 ```
@@ -158,3 +157,5 @@ results for this configuration. Keep provenance visible when opening nodes.
 Missing output means not run; never fill it with a fabricated response.
 Recorded private runs are an explicit opt-in local capability, excluded from
 public examples. See [data boundaries](data.md) and [the demo](demo.md).
+
+Financial graph node records include `detail_url` for profile-preserving inspection. The node route defaults to the generic fixture for compatibility; use the explicit financial parameter for the research graph. The completed experiment used reasoning schema v3; current contracts are v4 after correcting citation requirements and role separation. Public traces keep their original version.
