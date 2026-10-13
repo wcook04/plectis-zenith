@@ -28,7 +28,10 @@ MISSION_TARGETS.update(basket="basket_final", basket_serial="basket_serial_final
 
 def _graph_loader(root: Path, graph_variant: dict | None = None, task_profile: str = "generic"):
     loader = PhysicalLoader(Path(root))
-    if task_profile == "financial":
+    if task_profile == "financial_investigator_v1":
+        from .investigator import InvestigatorGraphLoader
+        loader = InvestigatorGraphLoader()
+    elif task_profile == "financial":
         from .market_graph import MarketGraphLoader
         loader = MarketGraphLoader(loader)
     elif task_profile != "generic":
@@ -59,7 +62,15 @@ def scope_for(graph: dict, target: str) -> set[str]:
 
 def plan(root: Path, mission: str, target: str | None = None, graph_variant: dict | None = None, task_profile: str = "generic") -> dict:
     graph = load_graph(root, graph_variant, task_profile)
-    selected = target or MISSION_TARGETS[mission]
+    if task_profile == "financial_investigator_v1":
+        from .investigator import TARGETS
+        if mission not in TARGETS or graph_variant:
+            raise ValueError("investigator profile supports Lab and combined refinement review only")
+        selected = target or TARGETS[mission]
+        if selected != TARGETS[mission]:
+            raise ValueError("investigator profile requires its complete mission target")
+    else:
+        selected = target or MISSION_TARGETS[mission]
     scope = scope_for(graph, selected)
     scoped = {key: graph[key] for key in scope}
     waves = compute_waves(scoped)
@@ -192,13 +203,19 @@ def _engine(root: Path, run_dir: Path, spec: dict, *, resume: bool, provider=Non
     if spec.get("task_profile") == "financial":
         from .market_graph import MarketEngine
         engine_type = MarketEngine
-    return engine_type(run_id=run_dir.name, root_dir=str(root), loader=loader,
+    if spec.get("task_profile") == "financial_investigator_v1":
+        from .investigator import InvestigatorEngine
+        engine_type = InvestigatorEngine
+    engine = engine_type(run_id=run_dir.name, root_dir=str(root), loader=loader,
                          run_mode=RunMode.RESUME if resume else RunMode.FRESH,
                          execution_mode=ExecutionMode.LAB if spec.get("feed_source") else ExecutionMode.RUNTIME,
                          feed_source_run_id=spec.get("feed_source"), subject_group=spec["mission"],
                          horizon=spec.get("horizon"), time_anchor=spec.get("time_anchor"),
                          oracle_subject_run_dir=spec.get("subject_run"), oracle_truth_run_dir=spec.get("truth_run"),
                          bridge=provider or provider_for(run_dir, spec), reasoning_policy=spec.get("reasoning_policy"))
+    if spec.get("task_profile") == "financial_investigator_v1":
+        engine.investigation_policy = spec["investigation_policy"]
+    return engine
 
 
 def status(root: Path, run_id: str) -> dict:
@@ -294,9 +311,11 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
     selected = plan(root, mission, target, variant_payload, task_profile)
     if task_profile == "financial" and (context_profile != "original" or graph_variant):
         raise ValueError("financial task profile uses the full original topology and context protocol")
+    if task_profile == "financial_investigator_v1" and (context_profile != "original" or graph_variant):
+        raise ValueError("investigator profile has its own frozen context and graph protocol")
     if bool(replay_from) != bool(replay_node):
         raise ValueError("replay requires source and intervention node")
-    if replay_from and (task_profile != "financial" or mission != "lab"):
+    if replay_from and (task_profile not in ("financial", "financial_investigator_v1") or mission != "lab"):
         raise ValueError("local replay is supported for the financial Lab only")
     run_dir = runs_root(root) / safe_run_id(run_id)
     if run_dir.exists():
@@ -322,9 +341,9 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
         raise ValueError("paid budget options require --provider openrouter_budgeted")
     if provider == "captured" and not responses:
         raise ValueError("captured provider requires --responses")
-    if mission == "refinement" and task_profile != "financial":
+    if mission == "refinement" and task_profile not in ("financial", "financial_investigator_v1"):
         raise ValueError("Evolve uses its reviewed pair runner; inspect the graph or use tools/refinement/run_evolve.py")
-    if mission == "refinement" and task_profile == "financial" and not feed_source:
+    if mission == "refinement" and task_profile in ("financial", "financial_investigator_v1") and not feed_source:
         raise ValueError("financial Evolve requires its recorded Lab/Oracle evidence packet")
     source = resolve_source(root, feed_source) if feed_source else None
     if source:
@@ -349,6 +368,10 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
             "responses": str(Path(responses).resolve()) if responses else None, "model": model,
             "context_profile": context_profile, "task_profile": task_profile,
             "implementation_hashes": implementation_hashes()}
+    if task_profile == "financial_investigator_v1":
+        from .investigator_contracts import DEFAULT_PROCEDURE
+        from system.lib.reasoning_policy import investigation_policy
+        spec["investigation_policy"] = investigation_policy(DEFAULT_PROCEDURE)
     if paid_budget is not None:
         spec["paid_budget"] = paid_budget
     if provider_slug is not None:
@@ -358,10 +381,13 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
         spec["graph_variant_source"] = str(variant_path)
         spec["graph_variant_source_sha256"] = text_digest(variant_path.read_text())
     if policy:
-        from system.lib.reasoning_policy import validate_reasoning_policy
+        from system.lib.reasoning_policy import validate_reasoning_policy, validate_investigation_policy
         policy_path = Path(policy).resolve()
         payload = json.loads(policy_path.read_text())
-        spec["reasoning_policy"] = validate_reasoning_policy(payload, graph_for_manifest(root, spec))
+        if task_profile == "financial_investigator_v1":
+            spec["investigation_policy"] = validate_investigation_policy(payload)
+        else:
+            spec["reasoning_policy"] = validate_reasoning_policy(payload, graph_for_manifest(root, spec))
         spec["policy_source"] = str(policy_path)
         spec["policy_source_sha256"] = text_digest(policy_path.read_text())
     source_dirs = [path for path in (source, subject, truth) if path is not None]
@@ -370,10 +396,29 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
         spec["replay_node"] = replay_node
         source_dirs.append(Path(spec["replay_from"]))
     spec["source_hashes"] = _source_hashes(source_dirs)
+    if task_profile == "financial_investigator_v1" and mission == "lab":
+        from .investigator import read
+        from .basket_panel import InvestigationStore
+        case = read(source,"investigator_case")
+        InvestigationStore(case)  # Verify external array hashes before provider construction.
+        if stamp(time_anchor).date().isoformat() != case["cutoff"]:
+            raise ValueError("investigator anchor differs from cutoff snapshot")
+        if replay_from:
+            old = json.loads((Path(spec["replay_from"])/"zenith_run.json").read_text())
+            _check_frozen_graph(root,old)
+            if replay_node != "investigator_entry":
+                raise ValueError("investigator procedure edits replay from investigator_entry")
+            for field in ("task_profile","feed_source","time_anchor","horizon","model","provider","node_hashes"):
+                if old.get(field) != spec.get(field):
+                    raise ValueError("investigator replay changed "+field)
+            if status(root,old["run_id"])["status"] != "completed":
+                raise ValueError("investigator replay requires a complete subject")
+            spec["replay_receipt"] = {"boundary":"whole Lab from entry", "source":spec["replay_from"],
+                "reused_reasoning_outputs":[], "interpretation":"outcome-informed development replay, not held-out evidence"}
     with run_lock(run_dir):
         bridge = provider_for(run_dir, spec)
         engine = _engine(root, run_dir, spec, resume=False, provider=bridge)
-        if replay_from:
+        if replay_from and task_profile == "financial":
             from .market_graph import seed_replay
             spec["replay_receipt"] = seed_replay(engine, spec, root)
         spec["time_anchor"] = engine._run_anchor_iso
@@ -392,6 +437,8 @@ def resume(root: Path, run_id: str) -> dict:
     with run_lock(run_dir):
         spec = json.loads((run_dir / "zenith_run.json").read_text())
         _check_frozen_graph(root, spec)
+        if spec.get("task_profile") == "financial_investigator_v1" and status(root,run_id)["failed_nodes"]:
+            raise ValueError("investigator failed attempt is terminal; no automatic resampling through resume")
         if spec.get("feed_source"):
             forward_preflight(root, Path(spec["feed_source"]), stamp(spec["time_anchor"]))
         engine = _engine(root, run_dir, spec, resume=True)
@@ -415,6 +462,8 @@ def import_response(root: Path, *, packet_path: Path, response_path: Path, model
         spec = json.loads((run_dir / "zenith_run.json").read_text())
         if spec["provider"] != "agent" or packet["node_id"] not in spec["scope"]:
             raise ValueError("packet does not belong to this agent mission")
+        if spec.get("task_profile") == "financial_investigator_v1" and status(root,run_id)["failed_nodes"]:
+            raise ValueError("investigator failed attempt is terminal; preserve rejected output")
         _check_frozen_graph(root, spec)
         if spec.get("feed_source"):
             forward_preflight(root, Path(spec["feed_source"]), stamp(spec["time_anchor"]))

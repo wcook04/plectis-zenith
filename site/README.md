@@ -90,4 +90,6 @@ The site metadata labels the active data as `historical_research`. Public mode s
 
 ## Full reasoning-graph backend
 
+The paper's current chapters point to the adaptive investigator method and curated episode evidence. `/api/v1/documents/investigator`, `/api/v1/evidence/investigator-result` and `/assets/graphs/investigator-detail.svg` expose those reviewed public artifacts. Actual private investigator runs remain local CLI artifacts. The full financial graph routes below remain historical comparators.
+
 Use `financial_lab`, `financial_oracle` and `financial_refinement` as graph mission parameters. Responses expose effective dependencies, instructions and the persisted reasoning schema at each model node. `/api/v1/documents/reasoning-ontology` explains the contracts. `/api/v1/evidence/reasoning-schemas` exports them, and the `full-graph-result` and `full-graph-trace` evidence routes serve the completed experiment when present. The trace includes the frozen Lab graph and original-input bindings available to Oracle. This change concerns the backend and evidence; it does not redesign the frontend.

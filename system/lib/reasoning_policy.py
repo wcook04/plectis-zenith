@@ -24,6 +24,26 @@ def policy_sha256(policy: Mapping[str, Any]) -> str:
     return hashlib.sha256(_canonical(payload).encode("utf-8")).hexdigest()
 
 
+def investigation_policy(procedure: str, parent_sha256: str | None = None) -> dict:
+    """Separate v1 replacement procedure contract; legacy addons stay <=512."""
+    if not isinstance(procedure, str) or not 1 <= len(procedure) <= 4096 or not procedure.strip():
+        raise ValueError("investigation procedure must contain 1..4096 characters")
+    if parent_sha256 is not None and (not isinstance(parent_sha256, str) or len(parent_sha256) != 64):
+        raise ValueError("invalid parent policy hash")
+    result = {"schema":"zenith_investigation_policy_v1", "procedure":procedure,"parent_sha256":parent_sha256}
+    result["policy_sha256"] = policy_sha256(result)
+    return result
+
+
+def validate_investigation_policy(policy: Mapping[str, Any]) -> dict:
+    if not isinstance(policy, Mapping) or set(policy) != {"schema","procedure","parent_sha256","policy_sha256"}:
+        raise ValueError("invalid investigation policy fields")
+    expected = investigation_policy(policy["procedure"], policy["parent_sha256"])
+    if dict(policy) != expected:
+        raise ValueError("investigation policy hash/schema mismatch")
+    return expected
+
+
 def validate_reasoning_policy(policy: Mapping[str, Any], graph: Mapping[str, Any]) -> dict[str, Any]:
     """Reject undeclared fields, graph edges, invalid weights and hash drift."""
     if not isinstance(policy, Mapping):

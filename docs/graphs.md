@@ -1,6 +1,11 @@
 # Actual graph diagrams
 
-The active basket profiles are [the directed graph](graphs/basket-detail.svg) and
+The new [adaptive investigator](graphs/investigator-detail.svg) is the bounded
+native execution scaffold for [investigator v1](investigator.md). Each run exports
+its actual active dependencies in `execution_graph.json`; inactive slots make no
+model calls. The two-node review mission receives later evidence separately.
+
+The historical basket profiles are [the directed graph](graphs/basket-detail.svg) and
 [the serial controller](graphs/basket-serial-detail.svg). Their numerical evaluator
 and development-only Evolve comparison are described in [the basket protocol](baskets.md).
 The diagrams below describe the separate legacy System A profile.
@@ -81,7 +86,7 @@ In that controller, `export_agent_handoff` exports pending analysis and
 compares old and new versions on the same later inputs; `daily retain` records
 the reviewed retention decision.
 
-Regenerate all nine figures without extra dependencies:
+Regenerate all ten figures with the installed research dependencies:
 
 ```sh
 python3 scripts/build_graphs.py

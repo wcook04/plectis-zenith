@@ -1,3 +1,15 @@
+# Native adaptive investigator — 13 October 2026
+
+The new profile runs one answer-conditioned investigator through inspect, compare and commit, followed by one graph-aware diagnosis/procedure proposal, complete unchanged/candidate replay, and a review receiving the exact measured result. [Method](investigator.md), [three-page paper](../paper/zenith.pdf) and [curated evidence receipt](investigator-evidence.json) describe this active design.
+
+The first real GPT-4.1 episode completed **12 calls**, costing **$1.243572**. All three Lab arms chose zero forecasts for all six baskets; MSE was **0.000642668662**. The original investigator compared B04 concentration; the unchanged control compared B04 participation; the proposed-procedure arm compared B04 and B06 concentration. Action variation is real, but one pair cannot attribute it to the proposal or establish useful behaviour change. The exhaustive numerical comparator also chose zero, with its larger 21-comparison allowance disclosed.
+
+The reviewer incorrectly ranked larger MSEs below smaller ones and proposed an unnecessary minimum-validation-selection rule. The exact unchanged-forecast receipt reached its next provider request, but it repeated the proposal. No procedure was adopted and no learning benefit was demonstrated.
+
+A separately frozen reviewer-interface correction supplied code-owned ordering, explicit feedback instructions and phase-specific decisions. **One additional call**, costing **$0.375084**, withdrew the false ordering diagnosis and rejected the proposal. It still treated an advisory default as mandatory and incorrectly placed the candidate commitment at turn three rather than four. This is a limited engineering result, not reliable semantic review or autonomous improvement. Total reported cost: **$1.618656 across 13 calls**; no automatic retries.
+
+The current retained suite passes **410 tests**. The original experiment and revised interface have separate source archives and input hashes in the evidence receipt. Private raw runs remain local. All exposed packet cases remain development evidence.
+
 # Returned-research audit — 13 October 2026
 
 The [ten-return synthesis](research-returns-20261013.md) has been checked against
@@ -13,11 +25,8 @@ policies or measured learning.
 The source supports earlier temporal-meaning errors and an omitted dependency
 from measured repair results to the next inspected Evolve input. The
 [receipt](research-returns-20261013.json) preserves source witnesses, archive
-hashes, numerical results and verification scope. The proposed typed interfaces,
-feedback loop and simpler controller remain unimplemented and untested with a
-new model campaign. All supplied dates remain development evidence. The
-[programme](../program.md#next-experiment-after-the-ten-research-returns) now
-records the recommended order for the next experiment.
+hashes, numerical results and verification scope. At this audit checkpoint, the proposed typed interfaces, feedback loop and simpler controller were unimplemented. The [native investigator](investigator.md) is the subsequent implementation; its execution record is separate from these historical findings. All supplied dates remain development evidence. The
+[programme](../program.md#current-implementation) records the revised implementation direction.
 
 # Recorded full-graph experiment
 
@@ -39,7 +48,7 @@ The first instruction was not a useful reusable repair, and the August differenc
 
 The current schema revision requires every claim to cite an input and supplies the active role through a system message. Graph instructions inside the context remain quoted evidence. The experiment's original v3 schemas are retained separately from the current v4 contracts.
 
-The v4 Evolve-only context check again produced the same action label. A separate reviewer-authored Director instruction also left February forecasts unchanged; Director retained Q1 despite its negative validation gain and the instruction to reject nonpositive gains. The updater-context follow-up's August revised arm failed on candidate identity. These checks were not adopted and do not establish autonomous improvement. Their [complete records and selection audit](../examples/full-graph/followups.json) remain separate from the original campaign. The current runtime's retained offline suite passes **392 tests**.
+The v4 Evolve-only context check again produced the same action label. A separate reviewer-authored Director instruction also left February forecasts unchanged; Director retained Q1 despite its negative validation gain and the instruction to reject nonpositive gains. The updater-context follow-up's August revised arm failed on candidate identity. These checks were not adopted and do not establish autonomous improvement. Their [complete records and selection audit](../examples/full-graph/followups.json) remain separate from the original campaign. That historical runtime checkpoint passed **392 tests**.
 
 The earlier experiment below used an 18-node basket graph. It did not run full Oracle failure decomposition, and its results remain separate.
 

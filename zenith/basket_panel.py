@@ -18,7 +18,7 @@ def finite(value):
     return json.loads(json.dumps(value, default=lambda v: v.item() if hasattr(v, "item") else str(v), allow_nan=False))
 
 
-def ridge(x, y, current, alpha=100.0):
+def ridge(x, y, current, alpha=100.0, normalizer=None):
     """Fit scaling and a dual ridge on the supplied training rows only."""
     x, y, current = np.asarray(x), np.asarray(y), np.asarray(current)
     mean = x.mean(axis=0); scale = x.std(axis=0)
@@ -27,7 +27,7 @@ def ridge(x, y, current, alpha=100.0):
     q = np.clip((current - mean) / scale, -10, 10)
     ym = y.mean(axis=0)
     # Divide by feature count so the registered penalty has the same meaning for subsets.
-    normalizer = max(1, x.shape[1])
+    normalizer = max(1, x.shape[1]) if normalizer is None else normalizer
     dual = np.linalg.solve(z @ z.T / normalizer + alpha * np.eye(len(z)), y - ym)
     return ym + (q @ z.T / normalizer) @ dual
 
@@ -195,3 +195,171 @@ def investigate(payload, queries):
                         "validation_cases": len(gains), "validation_last_label_date": str(max(history["label_end_dates"])),
                         "feature_count": len(cols), "data_sha256": payload["store_sha256"], "cutoff": payload["cutoff"]})
     return outputs
+
+
+# Investigator v1 uses the same ridge/scaling and the legacy eight mature folds.
+# New representations keep the ORIGINAL feature-count denominator fixed.
+SUMMARY_QUANTITIES = ("positive_value_weight", "top3_abs_contribution_share", "fresh_endpoints_value_weight")
+
+
+def investigator_snapshot(panel, cutoff, destination):
+    """Export only cutoff data; evaluator labels beyond cutoff stay in Panel."""
+    destination = Path(destination)
+    panel.snapshot(cutoff, destination)
+    payload = json.loads((destination / "artifacts/basket_panel_feed.json").read_text())["data"]
+    i = panel.cutoff_index(cutoff)
+    prices = panel.marked.iloc[:i+1].to_numpy() / panel.marked.iloc[panel.formation_i].to_numpy()
+    ages = panel.age.iloc[:i+1].to_numpy()
+    np.savez_compressed(destination / "composition.npz", prices=prices, ages=ages,
+                        dates=panel.dates[:i+1], symbols=np.asarray(panel.symbols))
+    payload.update(composition=str((destination / "composition.npz").resolve()),
+                   composition_sha256=sha256(destination / "composition.npz"),
+                   qualifications=panel.manifest["qualifications"], schema="zenith_investigator_snapshot_v1")
+    write_json(destination / "artifacts/investigator_case.json", {
+        "status": "success", "metadata": {"as_of": cutoff+"T23:59:59+00:00"}, "data": payload})
+    return payload
+
+
+class InvestigationStore:
+    """Hash-verified numerical owner; no language output can supply numbers."""
+    def __init__(self, payload):
+        self.payload = payload
+        for name in ("store", "features", "composition"):
+            if sha256(payload[name]) != payload[name+"_sha256"]:
+                raise ValueError("cutoff store hash mismatch: " + name)
+        with np.load(payload["store"], allow_pickle=False) as f:
+            self.h = {k: f[k].copy() for k in f.files}
+        with np.load(payload["composition"], allow_pickle=False) as f:
+            self.c = {k: f[k].copy() for k in f.files}
+        self.cutoff = payload["cutoff"]
+        self.baskets = payload["overview"]["basket_ids"]
+        if max(self.h["label_end_dates"]) > self.cutoff or self.c["dates"][-1] != self.cutoff:
+            raise ValueError("future labels or wrong composition cutoff")
+        if not (np.diff(self.h["origins"]) > 0).all():
+            raise ValueError("nonchronological origins")
+        if not np.isfinite(self.h["x"]).all() or not np.isfinite(self.h["y"]).all():
+            raise ValueError("nonfinite training store")
+        self.positions = self.h["val_positions"]
+        self.folds = []
+        means = []
+        for k in self.positions:
+            train = self.h["origins"] + HORIZON <= self.h["origins"][k]
+            last = str(max(self.h["label_end_dates"][train]))
+            if last > str(self.h["dates"][k]):
+                raise ValueError("unmatured validation training label")
+            means.append(self.h["y"][train].mean(axis=0))
+            self.folds.append({"origin": str(self.h["dates"][k]),
+                "target_end": str(self.h["label_end_dates"][k]), "last_training_label_date": last})
+        values = {"ridge": np.asarray([payload["overview"]["baseline"][b] for b in self.baskets]),
+                  "zero": np.zeros(len(self.baskets)), "mean": self.h["y"].mean(axis=0)}
+        self.validation = {"ridge": self.h["val_baseline"], "zero": np.zeros_like(self.h["val_baseline"]), "mean": np.asarray(means)}
+        y = self.h["y"][self.positions]
+        self.options = {}
+        for name, predictions in values.items():
+            for j, b in enumerate(self.baskets):
+                cid = f"R:{name}:{b}"
+                self.options[cid] = {"candidate_id": cid, "target": b, "recipe": name,
+                    "prediction": float(predictions[j]), "validation_mse": float(np.mean((y[:,j]-self.validation[name][:,j])**2))}
+        self.defaults = {b: min((r for r in self.options.values() if r["target"] == b), key=lambda r: r["validation_mse"])["candidate_id"] for b in self.baskets}
+
+    def context(self):
+        o = self.payload["overview"]
+        return {"schema": "zenith_investigator_case_v1", "cutoff": self.cutoff,
+            "target": {"kind": "forecast", "start_exclusive": self.cutoff, "horizon_sessions": HORIZON, "unit": "return_fraction"},
+            "observations": {"kind": "observed", "start_exclusive": str(self.c["dates"][-6]), "end_inclusive": self.cutoff,
+                             "unit": "return_fraction", "baskets": o["basket_observations"]},
+            "universe": {k:o[k] for k in ("basket_ids", "groups", "index_inputs", "constituent_count", "feature_count")},
+            "references": list(self.options.values()), "default_selection": self.defaults,
+            "reference_rule": "minimum eight-fold mature validation MSE per basket; ties prefer ridge, zero, mean; selected on development folds, not unbiased performance",
+            "validation_last_label_date": self.folds[-1]["target_end"],
+            "training_last_label_date": str(max(self.h["label_end_dates"])),
+            "qualifications": self.payload["qualifications"],
+            "teacher_authored_worked_example": self.payload.get("worked_example"),
+            "numerical_identity": {k:self.payload[k] for k in ("store_sha256", "features_sha256", "composition_sha256")}}
+
+    def _composition(self, basket):
+        members = self.payload["overview"]["groups"][basket]
+        cols = [list(self.c["symbols"]).index(s) for s in members]
+        p = self.c["prices"][:,cols]
+        start, end = p[:-5], p[5:]
+        weights = start / start.sum(axis=1, keepdims=True)
+        returns = end / start - 1
+        contributions = weights * returns
+        absolute = np.abs(contributions)
+        mass = absolute.sum(axis=1)
+        # Undefined concentration is zero with an explicit no-movement convention.
+        top3 = np.divide(np.sort(absolute, axis=1)[:,-3:].sum(axis=1), mass, out=np.zeros_like(mass), where=mass>0)
+        fresh = (self.c["ages"][:-5,cols] == 0) & (self.c["ages"][5:,cols] == 0)
+        summaries = np.column_stack(((weights*(returns>0)).sum(axis=1), top3, (weights*fresh).sum(axis=1)))
+        return members, weights, returns, contributions, summaries
+
+    def inspect(self, source):
+        if source == "INDEX":
+            with np.load(self.payload["features"], allow_pickle=False) as f:
+                current = f["x"][-1]
+            return {"operation": "inspect_index", "cutoff": self.cutoff, "feature_age_sessions": 0,
+                "values": {d["name"]:float(current[j]) for j,d in enumerate(self.payload["feature_info"]) if d["group"] == "INDEX"},
+                "definition": "trailing return1/5/20 in return fractions; lookback is not forecast horizon"}
+        if source not in self.baskets+["ALL"]:
+            raise ValueError("unknown inspection source")
+        result = {}
+        for b in self.baskets if source == "ALL" else [source]:
+            members,w,r,c,s = self._composition(b)
+            result[b] = {"participation_fraction": float((r[-1]>0).mean()),
+                "basket_return": float(c[-1].sum()), **dict(zip(SUMMARY_QUANTITIES, s[-1].tolist())),
+                "rows": [{"symbol":symbol,"start_value_weight":float(w[-1,j]),"return_fraction":float(r[-1,j]),
+                          "return_contribution":float(c[-1,j]),"quote_age_sessions":int(self.c["ages"][-1,list(self.c["symbols"]).index(symbol)])} for j,symbol in enumerate(members)],
+                "stock_features": [row for row in self.payload["overview"]["stock_observations"] if row["basket"]==b]}
+        return finite({"operation":"inspect_contributions", "kind":"observed", "start_exclusive":str(self.c["dates"][-6]),
+            "end_inclusive":self.cutoff,"unit":"return_fraction", "baskets":result,
+            "definition":"fixed shares; starting value weight times constituent return; participation and concentration can coexist; no-movement top3 share=0"})
+
+    def compare(self, source, quantity, sequence):
+        if source not in self.baskets+["ALL"] or quantity not in SUMMARY_QUANTITIES:
+            raise ValueError("unsupported representation comparison")
+        selected = self.baskets if source == "ALL" else [source]
+        matrices = [self._composition(b)[-1][:,SUMMARY_QUANTITIES.index(quantity)] for b in selected]
+        summaries = np.column_stack(matrices)
+        x = np.column_stack((self.h["x"], summaries[self.h["origins"]-5]))
+        current = np.concatenate((self.h["current"], summaries[-1]))
+        if not np.isfinite(x).all() or not np.isfinite(current).all():
+            raise ValueError("undefined representation in training interval")
+        denominator = self.h["x"].shape[1]
+        prediction = ridge(x, self.h["y"], current, normalizer=denominator)
+        validation = []
+        for k in self.positions:
+            train = self.h["origins"]+HORIZON <= self.h["origins"][k]
+            validation.append(ridge(x[train], self.h["y"][train], x[k], normalizer=denominator))
+        validation = np.asarray(validation)
+        candidates, rows = [], []
+        for j,b in enumerate(self.baskets):
+            y = self.h["y"][self.positions,j]
+            default = self.options[self.defaults[b]]
+            default_val = self.validation[default["recipe"]][:,j]
+            candidate = {"candidate_id":f"C{sequence:02}:{b}","target":b,"prediction":float(prediction[j]),
+                "recipe":{"kind":"add_summary","source":source,"quantity":quantity},
+                "validation_mse":float(np.mean((y-validation[:,j])**2)),
+                "gain_vs_ridge":float(np.mean((y-self.validation["ridge"][:,j])**2-(y-validation[:,j])**2)),
+                "gain_vs_selected_reference":float(np.mean((y-default_val)**2-(y-validation[:,j])**2))}
+            candidates.append(candidate)
+            rows.extend({**fold,"target":b,"realised":float(y[n]),"ridge":float(self.validation["ridge"][n,j]),
+                "selected_reference":float(default_val[n]),"candidate":float(validation[n,j]),
+                "candidate_squared_error":float((y[n]-validation[n,j])**2)} for n,fold in enumerate(self.folds))
+        return {"operation":"compare_add_summary","candidates":candidates,"folds":rows,
+            "spec":{"source":source,"quantity":quantity,"added_columns":[b+":"+quantity for b in selected],
+                "reference":"all-feature ridge","alpha":100,"common_normalizer":denominator,
+                "feature_lookback_sessions":5,"feature_age_sessions":0,"forecast_horizon_sessions":5,
+                "unchanged":"all original columns, target baskets, eight origins, label maturity, standardization, clipping and penalty"},
+            "validation_last_label_date":self.folds[-1]["target_end"],"training_last_label_date":str(max(self.h["label_end_dates"])),
+            "interpretation":"paired representation comparison, not causal mechanism or untouched evaluation; extra searches increase selection bias"}
+
+    def commit(self, ids, candidates):
+        options = {**self.options, **{c["candidate_id"]:c for c in candidates}}
+        if len(ids) != len(self.baskets) or len(set(ids)) != len(ids) or any(i not in options for i in ids):
+            raise ValueError("commit requires six distinct available candidate IDs")
+        rows = [options[i] for i in ids]
+        if {r["target"] for r in rows} != set(self.baskets):
+            raise ValueError("commit must cover every target exactly once")
+        return {"forecasts":{r["target"]:r["prediction"] for r in rows},
+                "selections":{r["target"]:{"candidate_id":r["candidate_id"],"recipe":r["recipe"]} for r in rows},
+                "cutoff":self.cutoff,"horizon_sessions":5,"unit":"return_fraction","forecast_basis":"EMPIRICAL"}

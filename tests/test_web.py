@@ -69,7 +69,10 @@ def test_teaching_material_uses_current_sources(website):
         assert section["pdf_url"].endswith("#nameddest=" + section["id"])
         assert all(website.get(url).body for url in chapter["evidence_urls"])
     results = next(c for c in site["chapters"] if c["id"] == "results")
-    assert set(results["evidence_urls"]) == {"/api/v1/evidence/"+name for name in ("full-graph-result","full-graph-trace") if (ROOT/"examples/full-graph"/("result.json" if name.endswith("result") else "trace.json")).exists()}
+    assert results["evidence_urls"] == ["/api/v1/evidence/investigator-result"]
+    evidence=json.loads(website.get(results["evidence_urls"][0]).body)["data"]
+    assert evidence["profile"]=="financial_investigator_v1" and not evidence["learning_demonstrated"]
+    assert website.get("/assets/graphs/investigator-detail.svg").body
     for url in site["evidence"].values():
         evidence = json.loads(website.get(url).body)
         assert evidence["data"] == json.loads((ROOT / evidence["source"]["path"]).read_text())

@@ -20,12 +20,14 @@ DOCUMENTS = {
     "data": "docs/data.md",
     "diagnosis": "docs/failure-diagnosis.md",
     "reasoning-ontology": "docs/reasoning-ontology.md",
+    "investigator": "docs/investigator.md",
     "worked-case": "docs/full-graph-case.md",
     "research-direction": "docs/research-direction.md",
     "walkthrough": "docs/zenith-walkthrough-script.md",
     "notice": "RESEARCH_NOTICE.md",
 }
 EVIDENCE = {
+    "investigator-result": "docs/investigator-evidence.json",
     "sources": "examples/demo/provenance.json",
     "replacements": "examples/demo/replacements.json",
     "demo-result": "examples/demo/result.json",
@@ -42,18 +44,18 @@ EVIDENCE = {
     "full-graph-followups": "examples/full-graph/followups.json",
     "full-graph-manifest": "examples/full-graph/manifest.json",
 }
-FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail", "basket-detail", "basket-serial-detail")
+FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail", "basket-detail", "basket-serial-detail", "investigator-detail")
 CHAPTERS = (
-    ("idea", "The idea", "introduction", "replay", None, "proposed_process"),
-    ("lab", "Investigate the shared universe", "reasoning-ontology", None, "financial_lab", "authored_mechanism"),
-    ("oracle", "Decompose forecast failures", "diagnosis", None, "financial_oracle", "authored_mechanism"),
-    ("evolve", "Repair, replay and test", "reasoning-ontology", None, "financial_refinement", "authored_mechanism"),
-    ("results", "Measured results", "results", None, "financial_lab", "measured_experiment"),
+    ("idea", "The idea", "introduction", None, None, "authored_mechanism"),
+    ("lab", "An adaptive investigator", "investigator", "investigator-detail", None, "authored_mechanism"),
+    ("oracle", "Review the recorded computation", "investigator", None, None, "authored_mechanism"),
+    ("evolve", "Test one exact procedure change", "investigator", None, None, "authored_mechanism"),
+    ("results", "Measured results", "results", None, None, "measured_experiment"),
     ("next", "What still needs testing", "research-direction", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
-    "idea": (), "lab": ("reasoning-schemas",), "oracle": ("full-graph-trace",), "evolve": ("full-graph-trace",),
-    "results": ("full-graph-result", "full-graph-trace"), "next": (),
+    "idea": (), "lab": (), "oracle": ("investigator-result",), "evolve": ("investigator-result",),
+    "results": ("investigator-result",), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
                   "evolve": "trace", "results": "results", "next": "research"}

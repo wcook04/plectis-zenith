@@ -1,44 +1,31 @@
 # Working in Zenith
 
-Read README.md and program.md. Preserve the original loop: multiple observations of the same system available at a cutoff, Lab predictions, later Oracle evaluation, one reviewed Evolve change and a held-out matched comparison. Keep the repo barebones and the paper within three pages. Do not restore removed survey or operator machinery.
+Read README.md and program.md. The active research unit is one adaptive Lab investigator, one combined Oracle/Evolve reviewer, and a controlled test of an exact reusable procedure replacement. docs/investigator.md owns the native method; docs/status.md and its receipts own measured claims. Keep the paper within three pages and this repo barebones.
 
-`program.md` owns the selected research direction and implementation order. Distinguish that programme from the existing public fixture and from demonstrated results. The shared universe is available to every target; feed partitions must not restrict a basket to its own constituents. Use numerical tools for calculations and preserve the existing runner, budgets and evaluation owners. External reviews are proposals until checked against source.
+## Execution and evidence
 
-The active research experiment uses licensed historical NEPSE data and constructed baskets; docs/baskets.md and docs/status.md own its method and measured result. The older generic fixture is an invented abstract System A. Generate five perspectives of the disclosed System A recurrence: measurements, subsystems, environment, events and interventions; recompute derived values from those inputs. Never relabel historical observations as synthetic. The example is not a physically validated simulation. Generality of the interface is not a claim of universal predictive performance. Use RESEARCH_NOTICE.md for the research boundary.
+Use the existing engine, providers, budgets, numerical store and evaluator. Every basket can use the entire permitted universe; feed partitions must not isolate targets. Code owns quantities, candidate IDs, target mappings and complete forecast vectors. The financial investigator's references are explicit options, not fallback forecasts after invalid output.
 
-The executable nodes, contracts and engine own behavior. Preserve evidence cutoffs, observation/availability clocks, missingness, frozen forecasts and failed attempts. A diagnosis is a hypothesis; a changed policy needs later evaluation. Native agent responses go through import-response and validation. Provider execution must be explicit and respect the immutable budget. Never commit credentials or private runtime artifacts.
+Preserve observation and availability cutoffs, label maturity, quote ages, basket lineage and frozen horizons. Separate historical and synthetic evidence. Constructed baskets are not traded ETFs; price histories do not establish market causes. RESEARCH_NOTICE.md owns the research boundary.
 
-Serve graph definitions, paper-linked explanations and accurately labelled evidence through the read-only website API. Public mode excludes private runs. Local run inspection is explicit and loopback-only. Frontend changes follow the operator's current request.
+An investigator may stop early or retain a reference. Numerical defaults are advisory. The reviewer must see the executed graph, exact original contexts and numerical receipts, with later outcomes separately labelled. Mechanical validity does not certify an inference or diagnosis.
 
-Run graph validation and relevant offline tests; run the retained suite after runtime changes. Regenerate graph diagrams with scripts/build_graphs.py and maintain extraction receipts accurately. Derive node counts and budgets from the native graph. Lane changes must update scopes, prompts, examples and publication receipts. Commit only owned changes and preserve other work. Historical studies remain historical evidence, not results for the generic configuration.
+One model-authored procedure replaces the incumbent exactly. Test it by replaying the whole Lab with unchanged and candidate procedures under matched conditions. Measure actions, recipes, forecasts and loss separately. Bind the measured receipt into the next actual provider request; delivery alone does not prove intelligent use. Never auto-adopt a proposal.
 
-For bounded numerical decisions, let the model select stable candidate IDs; let deterministic code own target mappings and complete-vector defaults. Do not make the model regenerate identity relations already present in trusted tool results. Preserve comparisons that exposed a defect; evaluate repairs on a fresh, explicitly labelled case rather than rewriting earlier evidence.
+Provider execution must be explicit and respect the immutable budget. Invalid responses are terminal, with original attempts retained and no automatic retry. A deliberate input-contract change requires a separately versioned experiment. Preserve the exact runtime source checkpoint before changing a research campaign. Never commit credentials or private runtime artifacts.
 
-The financial task profile's ontology is owned by `zenith/financial_reasoning.py`;
-`zenith/market_graph.py` binds it to full native missions. Preserve structured
-claims, resolvable evidence pointers, explicit distinctions, failure categories
-and the separation between outcome-informed replay and later evaluation. Never
-substitute a smaller mission and describe engine reuse as the requested graph.
-Make sensible architecture changes when needed, but name the effective graph,
-its task contract and the evidence it actually produced. Initial forecast skill
-is not the completion criterion for a failure-decomposition experiment.
+## Contracts and learning claims
 
-Every Oracle reasoning stage needs the frozen subject graph, effective node
-instructions, typed contracts and reconstructible original inputs as well as
-outputs. Evolve needs the selected node's context when writing an instruction.
-Keep outcome evidence separate. Preflight realistic prompt sizes without
-silently dropping source context. Code owns evidence IDs and their bindings.
-Do not automatically retry malformed model responses: preserve the failed
-attempt, diagnose the input contract, and version any deliberate change before
-running it. Valid incorrect forecasts are the learning input, not retry triggers.
+Active instructions belong in the provider system message. Quoted instructions from prior contexts are evidence, not the current task. Initial diagnosis and measured-feedback review have different allowed decisions. Give arithmetic to code and require action signatures to describe executable actions.
 
-When specializing JSON Schemas, rebuild reused fragments without shared mutable
-aliases. Test both the fields being narrowed and neighboring free-prose fields;
-a grammar-valid response can still be made meaningless by a bad input contract.
-Provider constraints complement local validation and never certify reasoning.
+Keep provider grammar consistent with local validation and rebuild specialised schema fragments without shared mutable aliases. Test valid alternatives and rejected counterexamples. Do not silently truncate exact review context.
 
-Active role instructions belong in the provider's system message. Quoted graph
-instructions are evidence, not the current task. Keep provider grammar consistent
-with local validation, including required citations. Archive the exact runtime
-source checkpoint before changing it during a research campaign; independent
-continuations can execute that verified snapshot while development proceeds.
+Distinguish engineering corrections, execution, intended behaviour, predictive value and transfer. An unchanged replay is a result. A signature occurring is not a semantic or causal explanation. Exposed packet dates remain development material; protect further evaluation boundaries and disclose unequal comparison budgets.
+
+## Historical profiles and closeout
+
+Keep the older financial 25/28/3 graph, basket pilot and generic System A fixture runnable with their own contracts and evidence. Do not present their topology or 512-character addon as the active design. Removed plans remain in Git history; avoid duplicate active roadmaps.
+
+Run relevant offline tests and the retained suite after runtime changes. Regenerate graphs with scripts/build_graphs.py and refresh extraction receipts with their owner. Update paper, programme and status when the research direction changes. Public website mode excludes private runs. Frontend work follows the operator's actual scope.
+
+Commit only owned changes; preserve other work. Encode reusable lessons in the smallest relevant contract, test or this guide. Do not add generic governance machinery or new frameworks without an observed need.

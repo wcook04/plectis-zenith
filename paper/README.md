@@ -1,9 +1,9 @@
 # Zenith paper
 
-Experimental research prototype using licensed historical NEPSE observations. No general predictive improvement or useful autonomous repair has been demonstrated.
+[zenith.pdf](zenith.pdf) is the three-page paper; [zenith.tex](zenith.tex) is its editable source. It describes the native adaptive investigator and controlled procedure-repair loop, including the first real episode's false diagnosis and unchanged forecasts.
 
-[zenith.pdf](zenith.pdf) is the three-page paper. [zenith.tex](zenith.tex) is its complete source and references. Build from the repository root with `tectonic paper/zenith.tex`. The source rejects exports longer than three pages.
+No useful autonomous repair or predictive improvement has been demonstrated. Engineering changes, measured behaviour and protected-case learning remain distinct. The earlier 25/28/3 graph is historical evidence, not the active design.
 
-The paper follows the shared basket universe through the full Lab graph, graph-aware Oracle diagnosis and Evolve. The February case completed the loop and local replays; its tested instructions did not change numerical forecasts. Later cases include both completed and failed arms. [Current results](../docs/status.md) and [the worked case](../docs/full-graph-case.md) own the measured claims. The older invented System A example remains a separate synthetic fixture.
+[Execution status](../docs/status.md), [the evidence receipt](../docs/investigator-evidence.json), [native method](../docs/investigator.md) and [programme](../program.md) provide the implementation and evidence behind the paper.
 
-DSPy and MIPRO are credited in this edition. Learned changes refer to explicit programme instructions, not neural weight updates. Prediction-time selection and outcome-informed development remain separate. [Research direction](../docs/research-direction.md) retains broader proposals; it is not a result receipt.
+Build from the repository root with: tectonic paper/zenith.tex. The source rejects exports longer than three pages.

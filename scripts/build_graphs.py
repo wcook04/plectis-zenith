@@ -468,9 +468,34 @@ def main():
                 "CP1 is an immutable provisional plan; CP2 validates and freezes all six forecasts."],
                notice="Research prototype. Published historical observations; constructed baskets.")
     replay(hashes)
+    # The adaptive profile is a bounded native DAG; run folders separately export
+    # the actual active actions so scaffold slots are not mistaken for model calls.
+    import sys
+    sys.path.insert(0,str(ROOT))
+    from zenith.investigator import InvestigatorGraphLoader
+    from zenith.investigator_contracts import MAX_TURNS
+    adaptive = InvestigatorGraphLoader().load_all_nodes()
+    adaptive_nodes = {key:{"id":key,"type":node.type.value,"dependencies":list(node.dependencies)} for key,node in adaptive.items()}
+    adaptive_sources = {name:hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in ("zenith/investigator.py","zenith/investigator_contracts.py")}
+    order = ["investigator_case"]
+    for i in range(1,MAX_TURNS+1):
+        order += [f"investigator_turn_{i:02}",f"investigator_result_{i:02}"]
+    order += ["investigator_final","investigator_review_feed","investigator_review"]
+    render("investigator-detail","Adaptive investigator · bounded native graph",
+        "Each active turn chooses after earlier tool results. Unused slots after commitment make no model calls.",
+        adaptive_nodes,adaptive_sources,set(adaptive),order,
+        ["Lab: cutoff feed → up to eight adaptive action/result pairs → canonical all-target commitment.",
+         "Review receives actual execution and later outcomes through a separately frozen feed.",
+         "Study coordinator replays both procedures and supplies the measured result to the next review."],
+        notice="Research prototype. Scaffold bounds differ from each run's exported execution graph.")
     (ROOT / "docs/graphs.md").write_text(f"""# Actual graph diagrams
 
-The active basket profiles are [the directed graph](graphs/basket-detail.svg) and
+The new [adaptive investigator](graphs/investigator-detail.svg) is the bounded
+native execution scaffold for [investigator v1](investigator.md). Each run exports
+its actual active dependencies in `execution_graph.json`; inactive slots make no
+model calls. The two-node review mission receives later evidence separately.
+
+The historical basket profiles are [the directed graph](graphs/basket-detail.svg) and
 [the serial controller](graphs/basket-serial-detail.svg). Their numerical evaluator
 and development-only Evolve comparison are described in [the basket protocol](baskets.md).
 The diagrams below describe the separate legacy System A profile.
@@ -551,7 +576,7 @@ In that controller, `export_agent_handoff` exports pending analysis and
 compares old and new versions on the same later inputs; `daily retain` records
 the reviewed retention decision.
 
-Regenerate all nine figures without extra dependencies:
+Regenerate all ten figures with the installed research dependencies:
 
 ```sh
 python3 scripts/build_graphs.py
