@@ -1,0 +1,101 @@
+{
+  "experiments": [
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": null,
+        "op": "begin",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": null,
+        "op": "rollback",
+        "value": null
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 4
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "other",
+        "key": "a",
+        "op": "put",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 4
+      },
+      {
+        "connection": "other",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      }
+    ]
+  ],
+  "purpose": "Distinguish conflict handling (IGNORE vs REPLACE vs DO UPDATE), trigger presence, and channel scope (main changes vs main total_changes vs combined total_changes) by creating sequences where committed state and channel counts diverge, including rollback and cross-connection effects."
+}

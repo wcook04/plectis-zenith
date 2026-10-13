@@ -1,0 +1,89 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "k",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 3
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "k",
+        "value": 4
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 2
+      },
+      {
+        "op": "delete",
+        "connection": "main",
+        "key": "k",
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 1
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 2
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 3
+      }
+    ]
+  ],
+  "purpose": "These sequences separate conflict handling, trigger presence, and channel scope by creating direct and indirect row changes whose committed effects may cancel while channel counts differ."
+}

@@ -15,13 +15,66 @@ import subprocess
 import sys
 import threading
 
-METHODS = frozenset('get items keys values append extend sort lower upper strip split setdefault add discard copy count index pop remove'.split())
+METHODS = frozenset('get items keys values append extend sort lower upper strip split setdefault add discard copy count index pop remove clear update'.split())
 BUILTINS = {name: value for name, value in vars(__import__('builtins')).items()
             if name in 'abs all any bool dict enumerate float int isinstance len list max min range reversed round set sorted str sum tuple zip'.split()}
-NODES = frozenset('Module FunctionDef arguments arg Return Assign AugAssign Expr If For Break Continue Pass '
-                  'Name Load Store Constant List Tuple Dict Set Subscript Slice Attribute Call keyword '
+NODES = frozenset('Module FunctionDef arguments arg Return Assign AugAssign Delete Nonlocal Expr If For Break Continue Pass '
+                  'Name Load Store Del Constant List Tuple Dict Set Subscript Slice Attribute Call keyword '
                   'BinOp UnaryOp BoolOp Compare IfExp ListComp SetComp DictComp GeneratorExp comprehension Lambda '
                   'Add Sub Mult Div FloorDiv Mod BitOr BitAnd BitXor UAdd USub Not And Or Eq NotEq Lt LtE Gt GtE In NotIn Is IsNot'.split())
+JSON_ANSWER_MAX_BYTES = 60_000
+JSON_ANSWER_MAX_DEPTH = 16
+
+
+def validate_answer_contract(answer_contract):
+    if answer_contract not in ('investigation', 'json'):
+        raise ValueError("answer_contract must be 'investigation' or 'json'")
+
+
+def validate_json_answer(answer):
+    """Accept only finite JSON values within a byte and nesting envelope."""
+    visited = 0
+
+    def visit(value, depth):
+        nonlocal visited
+        visited += 1
+        if depth > JSON_ANSWER_MAX_DEPTH:
+            raise ValueError('JSON answer exceeds nesting depth limit')
+        if visited > JSON_ANSWER_MAX_BYTES:
+            raise ValueError('JSON answer exceeds serialized size limit')
+        kind = type(value)
+        if value is None or kind in (bool, int):
+            return
+        if kind is float:
+            if not math.isfinite(value):
+                raise ValueError('JSON numbers must be finite')
+            return
+        if kind is str:
+            if len(value) > JSON_ANSWER_MAX_BYTES:
+                raise ValueError('JSON answer exceeds serialized size limit')
+            return
+        if kind not in (dict, list):
+            raise ValueError('answer must contain only JSON objects, arrays and scalars')
+        if len(value) > JSON_ANSWER_MAX_BYTES:
+            raise ValueError('JSON answer exceeds serialized size limit')
+        if kind is dict:
+            for key, item in value.items():
+                if type(key) is not str:
+                    raise ValueError('JSON object keys must be strings')
+                visit(key, depth)
+                visit(item, depth + 1)
+        else:
+            for item in value:
+                visit(item, depth + 1)
+
+    visit(answer, 0)
+    size = 0
+    encoder = json.JSONEncoder(allow_nan=False, separators=(',', ':'), ensure_ascii=True)
+    for chunk in encoder.iterencode(answer):
+        size += len(chunk.encode('utf8'))
+        if size > JSON_ANSWER_MAX_BYTES:
+            raise ValueError('JSON answer exceeds serialized size limit')
+    return answer
 
 
 def validate_source(source):
@@ -42,6 +95,16 @@ def validate_source(source):
             name = node.name if isinstance(node, ast.FunctionDef) else node.arg if isinstance(node, ast.arg) else node.id
             if name.startswith('_'):
                 raise ValueError('private names are not permitted')
+        if isinstance(node, ast.Nonlocal) and any(name.startswith('_') for name in node.names):
+            raise ValueError('private names are not permitted')
+        if isinstance(node, ast.Delete):
+            targets = list(node.targets)
+            while targets:
+                target = targets.pop()
+                if isinstance(target, (ast.Tuple, ast.List)):
+                    targets.extend(target.elts)
+                elif not isinstance(target, (ast.Name, ast.Subscript)):
+                    raise ValueError('deletion is permitted only for names and subscripts')
         if isinstance(node, ast.FunctionDef) and (node.decorator_list or node.returns or node.args.defaults or node.args.kw_defaults):
             raise ValueError('decorators, annotations and function defaults are not permitted')
         if isinstance(node, ast.arg) and node.annotation:
@@ -51,7 +114,10 @@ def validate_source(source):
     return tree
 
 
-def validate_answer(answer):
+def validate_answer(answer, *, answer_contract='investigation'):
+    validate_answer_contract(answer_contract)
+    if answer_contract == 'json':
+        return validate_json_answer(answer)
     if not isinstance(answer, dict) or set(answer) != {'findings', 'unresolved', 'ratio'}:
         raise ValueError('answer requires exactly findings, unresolved and ratio')
     for key in ('findings', 'unresolved'):
@@ -66,8 +132,9 @@ def validate_answer(answer):
     return answer
 
 
-def execute_local(source, cases):
+def execute_local(source, cases, *, answer_contract='investigation'):
     """Worker-only execution; callers must use execute for process limits."""
+    validate_answer_contract(answer_contract)
     code = compile(validate_source(source), '<investigation>', 'exec')
     results = []
     for case in cases:
@@ -83,16 +150,17 @@ def execute_local(source, cases):
         try:
             exec(code, namespace)
             context = json.loads(json.dumps({k: v for k, v in case.items() if k not in ('tables', 'id')}))
-            answer = validate_answer(namespace['investigate'](context, acquire))
+            answer = validate_answer(namespace['investigate'](context, acquire), answer_contract=answer_contract)
             results.append({'answer': answer, 'trace': trace, 'error': None})
         except Exception as exc:
             results.append({'answer': None, 'trace': trace, 'error': f'{type(exc).__name__}: {exc}'[:500]})
     return results
 
 
-def execute(source, cases):
+def execute(source, cases, *, answer_contract='investigation'):
+    validate_answer_contract(answer_contract)
     validate_source(source)
-    request = json.dumps({'source': source, 'cases': cases}, allow_nan=False)
+    request = json.dumps({'source': source, 'cases': cases, 'answer_contract': answer_contract}, allow_nan=False)
     if len(request.encode()) > 12_000_000:
         raise ValueError('evaluation batch exceeds 12 MB')
     process = subprocess.Popen([sys.executable, '-I', str(Path(__file__).resolve()), '--worker'],
@@ -135,4 +203,5 @@ if __name__ == '__main__':
         resource.setrlimit(resource.RLIMIT_AS, (1024 ** 3, 1024 ** 3))
     resource.setrlimit(resource.RLIMIT_FSIZE, (0, 0))
     payload = json.load(sys.stdin)
-    print(json.dumps(execute_local(payload['source'], payload['cases']), allow_nan=False))
+    print(json.dumps(execute_local(payload['source'], payload['cases'],
+                                   answer_contract=payload.get('answer_contract', 'investigation')), allow_nan=False))

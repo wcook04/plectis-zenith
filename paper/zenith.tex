@@ -11,188 +11,189 @@
 \PackageError{zenith}{Paper exceeds three pages}{Shorten the paper before publishing.}\fi}
 \begin{document}
 \begin{center}
-{\Large\bfseries Zenith: learning executable investigations}\\[4pt]
-Will Cook \quad\textbullet\quad 13 October 2026
+{\Large\bfseries Zenith: learning executable observation models}\\[4pt]
+Will Cook \quad\textbullet\quad 14 October 2026
 \end{center}
 \hypertarget{idea}{}
 \textbf{Abstract.}
-What should accumulate when a language-model investigator learns from failure?
-Zenith retains an executable procedure, its claimed scope, measured counterexamples
-and versioned dependencies. An investigation returns supported findings alongside
-unresolved evidence obligations. A measured failure can prompt a replacement
-computation; complete replay decides whether to retain it. We synthesise five
-independently returned prototypes into an implemented test of model-authored
-programs, using operational time-series measurements rather than unsupported
-market prediction. The experiment separates one-shot compilation, repair,
-frozen reuse and source-schema adaptation, with costs and failed attempts retained.
-The contribution is a testable implementation and evidence, not a claim of
-new general intelligence or an unprecedented learning architecture.
+Zenith retains executable models of a source's responses, their supporting
+observations and counterexamples. A language model proposes experiments and
+writes restricted Python; a host executes both. Ten research returns motivate
+small tests on actual SQLite behavior. An initial comparison scored 244/288,
+but unchanged early code tied the final learner: continued revision added no
+measured benefit. Fresh reconstruction subsequently repaired selected failures.
+A four-candidate pool combining DeepSeek and Qwen programs, selected using
+observed development cases, scored 279/288 on separate confirmation sequences,
+versus 191/288 and 194/288 for single-model pools. A stronger later control
+selected from the larger historical archive and reached 286/288 on another
+panel after two native probes per source, with no new model calls. This favors
+preserving evidence and executable alternatives before purchasing new code.
+These conditional results do not establish graph superiority or recursive
+self-improvement.
 
-\textbf{1. Knowledge that can do work.}
-A useful retained object should answer a later question, acquire missing evidence,
-or determine that a conclusion remains unsupported. More text or more graph
-nodes need not achieve any of these. We therefore make the editable object an
-investigation program $P$, with context $c$ and an acquisition interface $Q$:
+\textbf{1. Retain a model that observations can challenge.}
+Let $D_s=\{(a_i,o_i)\}$ be host-recorded experiments on source $s$. An executable
+program $P_s$ uses the evidence to predict a requested quantity $q$ after a new
+action sequence $a$:
 \[
-                 P(c,Q)\longmapsto(F,U,\rho).
+       P_s(a,q,D_s)\longmapsto (v,u),\qquad
+       u=1\ \Longrightarrow\ v=\mathrm{null}.
 \]
-$F$ contains established findings, $U$ contains unresolved checks, and $\rho$ is
-a numerical comparison when identifiable from the supplied evidence. The
-executed graph records acquired tables and their hashes; it is a computation
-trace, not a graph of causes in the external world.
+The retained object is code, source binding, measured receipts and counterexamples.
+The model's scope statement remains a hypothesis. A hash binds bytes; it does
+not show that the source's meaning is unchanged. Identifiability is specific
+to the question: uncertainty about one counter need not prevent a supported
+conclusion about committed state.
 
 \hypertarget{lab}{}
-\textbf{A concrete operational task.}
-Child-operation intervals describe requests before and after a deployment.
-The quantity contract distinguishes active time, elapsed time and billed work:
-\[
-q_{\rm active}=\left|\bigcup_j[a_j,b_j]\right|,\qquad
-q_{\rm elapsed}=\max_j b_j-\min_j a_j,\qquad
-q_{\rm work}=\sum_j(b_j-a_j).
-\]
-Overlap and idle gaps make these quantities differ even for identical records.
-Repeated delivery of one operation is not extra work. Time units must agree;
-request populations include failures as well as successes. To separate workload
-mix from within-class change, both periods use the before-period class weights:
-\[
-\rho=\frac{\sum_g w_g^{\rm before}\,\overline q_g^{\rm after}}
-           {\sum_g w_g^{\rm before}\,\overline q_g^{\rm before}}.
-\]
-Ratios above $1.2$ indicate regression, below $0.8$ improvement, and otherwise
-stability, with declared numerical tolerances. These meanings and labels are
-supplied task definitions; the model authors their executable realization.
+\textbf{A source whose numbers have different meanings.}
+Each experiment starts with an empty SQLite table and two writing connections.
+The public actions are insertion, update, deletion and transaction control.
+The hidden source configuration varies conflict handling, an insertion trigger
+and counter selection. A separate connection measures committed count and value
+sum. The emitted counter can count direct changes, connection-total changes,
+or the totals across both writers. These are actual SQLite executions, not
+synthetic labels produced by a model. Native counters differ in whether they
+include trigger effects or another connection's writes~\cite{sqlite}.
 
-A record can establish duplicate delivery and changed workload mix while
-missing requests prevent a latency conclusion. Conversely, a measurement fault
-and a real regression can coexist. Collapsing the result to one fault label
-would erase independently supported evidence. Missing coverage, unknown clock
-units and conflicting operation records therefore remain explicit obligations.
+For example, two insertions of the same key can preserve, replace or update a
+value. Rolling back can remove visible effects while a change counter retains
+work already performed. A no-op update can increment a counter without changing
+the stored value. Past measurements must distinguish these possibilities before
+a later compound sequence can be answered reliably. The model receives action
+documentation, the allowed source family and calibration receipts. Actual
+settings, candidate programs and the source implementation stay private.
+
+The study supplies three useful quantities: channel, committed count and sum.
+It does not claim that the model invented those goals. The private evaluator
+executes every compatible configuration in a frozen 18-member family. A query
+is supported if their values agree. This identification condition is relative
+to that family, not a guarantee against every source consistent with finite data.
 \newpage
 \hypertarget{oracle}{}
-\textbf{2. Repair the computation, then reuse it.}
-Lab executes the incumbent. Oracle receives its measured outputs and the
-independent evaluator's comparison. Evolve writes a complete replacement
-procedure. The next review must also receive a rejected candidate's execution
-errors: repeatedly showing incumbent failures cannot explain why a proposed
-repair never ran.
+\textbf{2. One investigation loop.}
+The model proposes discriminating experiments. The host records their actual
+outcomes and an independent challenge. It then executes a proposed predictor
+on every observed development case. The next request receives the selected
+program and the actual last challenger, including rejected code and measured
+execution failures. Search can also restart from the same measurements without
+the failed code. Evidence persists across replacement; a candidate is retained
+only under the declared development rule. Lab, Oracle and Evolve name functions
+of this loop, not mandatory separate model agents.
 
 \begin{center}
 \begin{tikzpicture}[font=\small,box/.style={draw,rounded corners,align=center,
 minimum height=12mm,text width=38mm},>=Stealth,node distance=8mm]
-\node[box] (lab) {Lab\\execute and acquire};
-\node[box,right=of lab] (review) {Oracle + Evolve\\measure and rewrite};
-\node[box,right=of review] (test) {Full replay\\accept or reject};
+\node[box] (lab) {Propose experiments\\measure the source};
+\node[box,right=of lab] (review) {Write a predictor\\execute and compare};
+\node[box,right=of review] (test) {Retain or revise\\freeze and test};
 \draw[->] (lab)--(review);
 \draw[->] (review)--(test);
-\draw[->] (test.south)--++(0,-7mm)-|node[pos=.25,below]{including rejected-program errors} (review.south);
+\draw[->] (test.south)--++(0,-7mm)-|node[pos=.25,below]{observations and actual candidate failures} (review.south);
 \end{tikzpicture}
 \end{center}
 
 \hypertarget{trace}{}
-A proposal becomes a learner's experimental incumbent only when its
-whole-development score improves and no previously correct case regresses.
-Source, dataset, evaluator, model route and budget are frozen before inference.
-Every candidate and attempted call remains recorded. The numerical executor
-receives no answer key or generator case identifier. A restricted Python subset
-runs in a separate process with logged table acquisition and resource limits.
-It permits model-authored computations beyond a finite catalogue of supplied
-recipes; it is not a general-purpose security sandbox.
+Initial and repair trajectories retain the latest executable candidate whose
+development score is at least the incumbent's. Ties permit revision without
+claiming improvement; regressions remain recorded. A lookup can fit development,
+so further-case evaluation is essential. The initial six-source comparison
+matches observation history, tools and six proposals per source across
+incremental, archive and fresh construction. An unchanged early program with
+final history tests whether a stable interpreter already explains the benefit.
 
-The retained source, scope statement and evidence references form one reusable
-object. Scope language is a model claim, not a proof; executable checks and
-counterexamples test it. For a renamed source, a model returns a field mapping.
-A fixed host transformation changes names only, preserving values and the
-frozen numerical source. This tests schema binding without smuggling in a new
-solver. It does not demonstrate discovery of an unfamiliar domain.
+\textbf{Repair and candidate search.}
+Three failed programs are selected retrospectively. Generic repair,
+counterexample emphasis and cold reconstruction receive the same observations
+and two proposals, using DeepSeek and Qwen separately. A follow-on compares
+four-slot pools: two original proposals from each model, versus four from either.
+The latter add two continuations, so search histories differ. Development
+accuracy selects programs; source hashes break ties. New action structures
+exclude earlier calibration and evaluation structures. A uniform primary pool
+is committed before separate confirmation of all three pools.
 
-\textbf{3. A campaign with separable claims.}
-Three repeated temperature-zero learners receive at most six proposal rounds.
-They use the same model and initial material, not independent models or curricula.
-There are 64 development cases, 256 held-out cases, and 64 renamed-schema cases.
-Held-out fault combinations exclude those used in development; half require a
-numerical conclusion and half require unresolved checks. The factors themselves
-are authored and known. These are dependent synthetic tests of composition,
-not 256 independent real-world problems.
+\textbf{Feedback without new code.}
+A further test freezes eight attempt slots per source and acquires two probes
+in fixed order or by candidate disagreement. Within each history, compare the
+unchanged initial selection with development-based reselection. A stronger
+reference selects from all 18 same-source historical proposals using the same
+fixed-policy receipts; its larger search budget is explicit. The primary measure
+is correctly resolved supported answers on a fixed query denominator. Wrong
+claims, abstentions and execution errors are separate. This authored policy
+tests information and selection, not learning the investigation policy itself.
 
-The first proposal is scored after freezing alongside the final program. Findings
-and unresolved sets must match exactly; ratios allow 1\% relative or 0.005 absolute error.
-Deleting the learned object restores a naive summed-duration incumbent. An
-independent handwritten reference uses the same observed tables; the latent-data
-evaluator computes interval coverage by a different algorithm. On 32 paired
-cases, direct and prose-memory controls receive all raw tables. The latter gets
-a translation of the first learner's final algorithm. Neither has a code executor,
-so differences measure the entire compilation/execution arrangement, not memory
-alone. Prose equivalence is intended but not certified; the primary learner is
-chosen in advance, never by held-out score.
+\textbf{Learned composition.}
+A model writes transition/readout functions, then graph, flat-library and fresh-library
+conditions receive the same functions, observations and three assembly proposals.
+Native nested savepoints test new behavior. The flat condition may inline or
+rewrite any code. Actual invocation, state consumption and neutral-child
+ablations distinguish useful dependence from merely naming a child.
 
-Researcher changes to syntax, prompts, providers or reasoning settings create
-new versions. Inspected cases become development evidence for subsequent design;
-fresh seeds do not erase knowledge of the task family. Rejected and malformed
-attempts remain failures. Current inexpensive Chinese-developed models are
-selected from verified catalogue and endpoint metadata, with serialized calls,
-a fixed spending ceiling and no expensive fallback.
+All construction is frozen before protected scoring; failed outputs remain
+unchanged. Sources are configured members of one disclosed software family,
+not independent domains. Different screens are not pooled into one accuracy.
 \newpage
 \hypertarget{results}{}
-\textbf{4. Measured evidence.}
-Five supplied prototypes reproduced locally with 198 passing tests. Their
-strong shared result was bounded executable investigation with applicability
-and counterexamples. Their searches used researcher-authored grammars, and
-simpler code controls matched key results. We retain those contributions without
-attributing their primitives to a language model.
+\textbf{3. Evidence and limits.}
+The ten supplied prototypes passed 337 return-specific tests. Their authored
+policies and grammars motivate experiments, not claims of autonomous discovery.
 
-The broad-feedback campaign used DeepSeek V4.1 Flash for 38 calls costing
-\$0.0900. The predeclared primary learner's accepted development scores
-rose from 12/64 to 52/64 and then 60/64. Its first model proposal, rejected for
-four development regressions, nevertheless provides a one-shot comparator:
+\textbf{Compilation, repair and complementary search.}
+The initial 126-call DeepSeek comparison cost \$0.1295. Incremental, archive and
+fresh construction scored 244, 187 and 230 of 288. Unchanged early code also
+scored 244; source-level comparison intervals span zero. Continued revision
+added no measured benefit. Two 18-call repair screens cost \$0.0610. A selected
+DeepSeek restart confirmed at 188/288 versus 23/288 for unchanged failed seeds.
+A later four-slot comparison confirmed mixed DeepSeek/Qwen candidates at 279/288,
+versus 191/288 and 194/288 for single-model pools. Its 12 additional calls cost
+\$0.0240. All mixed winners were retained original proposals. Counts match,
+but generation histories and costs differ; these are three selected failures.
+
+\textbf{Reuse the full archive before generating more.}
+A later assay makes no model calls and measures 12 native probes across three
+sources. Initial and reselected programs share each policy's exact receipts.
+All choices freeze before a new final panel:
 \begin{center}
-\begin{tabular}{lrrr}
+\begin{tabular}{lrr}
 \toprule
-Repeated learner & First proposal & Frozen final & Renamed schema\\
+Inventory, probes, selection & Supported correct / 288 & Exact / 288\\
 \midrule
-1 (primary) & 94/256 & 232/256 & 61/64\\
-2 & 8/256 & 177/256 & 43/64\\
-3 & 94/256 & 177/256 & 43/64\\
+Eight, fixed, initial & 165 & 165\\
+Eight, fixed, reselect & 180 & 180\\
+Eight, disagreement, initial & 234 & 255\\
+Eight, disagreement, reselect & 249 & 270\\
+Historical eighteen, fixed, initial & 265 & 265\\
+Historical eighteen, fixed, reselect & 286 & 286\\
 \bottomrule
 \end{tabular}
 \end{center}
-For the primary learner, development corrected 144 held-out answers and
-regressed six relative to its first proposal. The final program answered all
-128 unresolved cases and 104/128 numerical cases. All remaining errors counted
-duplicate deliveries as additional billed work. On 32 paired cases, the frozen
-program answered 28 correctly; direct and prose controls each answered two.
-The handwritten reference answered 256/256; deleting the learned program
-restored 6/256. Execution tools differ between the model-answer controls and
-the program, so this does not isolate a memory advantage.
-
-A follow-up reduced the witness context and exposed numerical residuals.
-Its frozen learners scored 170/256, 6/256 and 177/256: compact feedback did not
-establish better repair. One learner repeatedly ignored an actionable regression
-already present in its feedback. The final prose-control call was credit-rejected,
-so that campaign's controls remain incomplete. Across six versions, including
-three earlier failed attempts: 108 calls attempted, \$0.1874 reported cost and
-\$0.0088 reserved for the unpriced rejected call. Frozen programs, evaluators,
-inputs and individual outputs replay offline without inference.
+All conditions have zero execution errors and unsupported commitments.
+Disagreement leaves 21 queries unidentified; its exact score credits their
+correct abstentions, while the primary numerical score does not. Its entire
+69-answer advantage comes from avoiding a fixed probe that exposes shared
+simulator misspecification. After that contradiction, the smaller inventory
+abstains on all 96 queries for that source. This is not better identification.
+The historical archive handles the stronger evidence, but has a larger search
+budget. This assay has no separate confirmation; its panel differs from the
+candidate-pool comparison.
 
 \hypertarget{research}{}
-\textbf{Interpretation and next boundary.}
-The promising direction is to spend language-model inference on acquiring a
-reusable computation and semantic binding, then run that computation cheaply
-on further observations. The necessary evidence is useful frozen reuse, accurate
-scope checks and retained competence as later procedures are added. A correct
-first program demonstrates compilation; improvement after feedback requires a
-separate comparison. Added examples and additional attempts can explain gains
-without a uniquely effective repair mechanism.
+\textbf{Interpretation.}
+Retain observations, executable alternatives and independent challenges; test
+what to reuse before asking for more code. Agreement can preserve a shared bug,
+and useful contradictory evidence can lower a flawed program's apparent coverage.
+Five composition versions stopped before protected scoring; the final
+four-call DeepSeek screen produced no qualified primitive. Graph benefit remains
+unresolved: actual state use and ablation must beat a competent flat library. A changing program or feedback loop does
+not establish improvement of the learning algorithm itself.
 
-Program execution for model reasoning already appears in PAL~\cite{pal};
-executable skill accumulation appears in Voyager~\cite{voyager}; and library
-learning is central to DreamCoder~\cite{dreamcoder}. Zenith does not claim those
-ideas as new. Its present question is narrower: can measured failures produce
-scoped investigations that compose supported findings without suppressing
-unresolved evidence? Equal-tool, equal-discovery-budget comparisons on new
-semantic contracts and real operational data are the next decisive tests.
-The retained financial studies establish no forecasting or causal advantage.
+PAL~\cite{pal}, Voyager~\cite{voyager} and DreamCoder~\cite{dreamcoder} already
+motivate execution and reusable programs. The present contribution is a
+falsifiable comparison of retained computation, observation and selection.
+The supplied SQLite family and goals limit its scope; different panels are not
+pooled. Exact archived replay preserves individual answers and failed attempts.
 
-\begin{thebibliography}{3}\small
+\begin{thebibliography}{4}\small
 \setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
 \bibitem{pal} L. Gao et al. \emph{PAL: Program-aided Language Models}. 2022.
 \href{https://arxiv.org/abs/2211.10435}{arXiv:2211.10435}.
@@ -200,5 +201,8 @@ The retained financial studies establish no forecasting or causal advantage.
 \href{https://arxiv.org/abs/2305.16291}{arXiv:2305.16291}.
 \bibitem{dreamcoder} K. Ellis et al. \emph{DreamCoder: Growing generalizable, interpretable knowledge with wake-sleep Bayesian program learning}. 2020.
 \href{https://arxiv.org/abs/2006.08381}{arXiv:2006.08381}.
+\bibitem{sqlite} SQLite. \emph{Count the Number of Rows Modified; Total Number of Rows Modified}.
+\href{https://sqlite.org/c3ref/changes.html}{changes};
+\href{https://sqlite.org/c3ref/total_changes.html}{total\_changes}. Accessed 13 October 2026.
 \end{thebibliography}
 \end{document}

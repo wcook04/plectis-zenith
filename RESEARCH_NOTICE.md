@@ -1,6 +1,6 @@
 # Research boundary
 
-Zenith is an experimental research prototype. The active executable-investigation campaign uses generated operational measurements with explicit source contracts and an independent evaluator. Its results concern a finite designed task family. Synthetic combinations and renamed source fields are not evidence of reliable real-world operation, autonomous scientific discovery or general intelligence.
+Zenith is an experimental research prototype. The active observation-learning campaign executes constructed action sequences against native SQLite sources and measures their outcomes. An independent evaluator identifies supported quantities relative to a frozen finite source family. These controlled configurations are not independent domains or evidence of reliable production operation, open-world discovery or general intelligence. Earlier operational campaigns used generated measurements and supplied source contracts; their results retain that boundary.
 
 A proposed procedure and its explanation remain hypotheses until tested. Preserve failed attempts, numerical errors, unresolved conditions, complete comparison results and costs. Inspected evaluation cases become development evidence for later engineering decisions. Record a new protocol and fresh cases after changing the runtime or interface.
 

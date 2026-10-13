@@ -1,0 +1,7 @@
+{
+  "call_id": "771fbe48140dd2a59591fb33bed1d76bb49235db2b12549a29156cf38228d3fd",
+  "content": "{\"source\": \"def investigate(context, acquire):\\n    events = acquire(\\\"events\\\")\\n    seen = {}\\n    for record in events:\\n        event_id = record[\\\"event_id\\\"]\\n        work = record[\\\"work\\\"]\\n        if event_id not in seen:\\n            seen[event_id] = work\\n    ratio = 0\\n    for event_id in seen:\\n        ratio = ratio + seen[event_id]\\n    return {\\\"findings\\\": [], \\\"unresolved\\\": [], \\\"ratio\\\": ratio}\", \"scope\": \"Deduplicate event records by event_id and sum work once per unique id.\", \"lesson\": \"Duplicate deliveries must be collapsed by identity, while distinct ids with equal work remain separate contributions.\"}",
+  "original_content_sha256": "2861c8a6e8e1ab88b419923652571575e61e739f09f219b7075d6a0f34eca5fc",
+  "projection": "assistant content only; transport, headers, routing and credentials omitted",
+  "redacted": false
+}

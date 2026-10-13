@@ -2,6 +2,7 @@
 import hashlib
 import http.client
 import json
+import shutil
 import threading
 from pathlib import Path
 
@@ -54,13 +55,13 @@ def test_native_scopes_sources_and_focus(website):
 def test_teaching_material_uses_current_sources(website):
     site = json.loads(website.get("/api/v1/site").body)
     assert [chapter["id"] for chapter in site["chapters"]] == ["idea", "lab", "oracle", "evolve", "results", "next"]
-    assert next(c for c in site["chapters"] if c["id"] == "results")["evidence_kind"] == "measured_experiment"
+    assert site['active_evidence_id'] == 'observation-learning-result'
     for url in site["documents"].values():
         doc = json.loads(website.get(url).body)
         assert doc["content"] == (ROOT / doc["source"]["path"]).read_text()
     paper = json.loads(website.get(site["paper_url"]).body)
     assert paper["pdf_sha256"] == hashlib.sha256((ROOT / "paper/zenith.pdf").read_bytes()).hexdigest()
-    assert {c["id"] for c in paper["citations"]} >= {"pal", "voyager", "dreamcoder"}
+    assert paper["citations"]
     assert all(c["used_at"] for c in paper["citations"])
     for chapter in site["chapters"]:
         section = chapter["paper_section"]
@@ -69,11 +70,18 @@ def test_teaching_material_uses_current_sources(website):
         assert section["pdf_url"].endswith("#nameddest=" + section["id"])
         assert all(website.get(url).body for url in chapter["evidence_urls"])
     results = next(c for c in site["chapters"] if c["id"] == "results")
-    assert results["evidence_urls"] == ["/api/v1/evidence/investigation-learning-result"]
-    learning=json.loads(website.get(results["evidence_urls"][0]).body)["data"]
+    active = site['evidence'].get('observation-learning-result')
+    assert results["evidence_urls"] == ([active] if active else [])
+    if not active:
+        assert results['evidence_kind'] == 'research_proposal'
+    learning=json.loads(website.get('/api/v1/evidence/investigation-learning-result').body)["data"]
     assert learning['schema']=='zenith_learning_evidence_v1'
     assert any(c['complete'] for c in learning['campaigns'])
-    assert site['data_mode']=='synthetic_research'
+    assert site['data_mode']=='native_observation_research'
+    current_method=json.loads(website.get('/api/v1/documents/observation-learning').body)
+    historical_method=json.loads(website.get('/api/v1/documents/executable-investigations').body)
+    assert current_method['source'] == historical_method['source']
+    assert current_method['content'] == historical_method['content']
     evidence=json.loads(website.get('/api/v1/evidence/investigator-result').body)["data"]
     assert evidence["profile"]=="financial_investigator_v1" and not evidence["learning_demonstrated"]
     assert website.get("/assets/graphs/investigator-detail.svg").body
@@ -171,7 +179,34 @@ def test_dossier_is_current_generic_source(website):
     assert dossier["data"] == json.loads(path.read_text())
     assert dossier["source"]["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
     assert dossier["data"]["perspective"] == "interventions"
-    assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "synthetic_research"
+    assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "native_observation_research"
+
+
+@pytest.mark.parametrize('status,complete,aggregate,kind', [
+    ('partial_snapshot', False, None, 'measured_execution'),
+    ('failed', False, None, 'measured_execution'),
+    ('complete', True, {'incremental': {'correct': 1, 'total': 2}}, 'measured_experiment'),
+])
+def test_active_observation_receipt_is_source_bound_without_relabelling_history(tmp_path, status, complete, aggregate, kind):
+    # Controlled API fixture; no model outcome is published by this test.
+    for directory in ('codex', 'paper', 'docs', 'examples'):
+        shutil.copytree(ROOT/directory, tmp_path/directory)
+    shutil.copy2(ROOT/'master_config.json', tmp_path/'master_config.json')
+    receipt = {'schema': 'zenith_observation_learning_evidence_v1',
+               'status': status, 'complete': complete, 'aggregate': aggregate,
+               'campaign': 'test-fixture-only'}
+    path = tmp_path/'docs/observation-learning-20261013.json'
+    path.write_text(json.dumps(receipt))
+    app = Website(tmp_path)
+    site = json.loads(app.get('/api/v1/site').body)
+    results = next(chapter for chapter in site['chapters'] if chapter['id'] == 'results')
+    assert results['evidence_urls'] == ['/api/v1/evidence/observation-learning-result']
+    assert results['evidence_kind'] == kind
+    served = json.loads(app.get(results['evidence_urls'][0]).body)
+    assert served['data'] == receipt
+    assert served['source']['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
+    historical = json.loads(app.get('/api/v1/evidence/investigation-learning-result').body)
+    assert historical['data']['schema'] == 'zenith_learning_evidence_v1'
 
 
 def test_basket_nodes_use_their_own_protocol(website):

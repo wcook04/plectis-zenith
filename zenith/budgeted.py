@@ -8,12 +8,13 @@ import json
 import math
 import os
 import re
+import time
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from system.lib import openrouter_free_runtime as api
 from .providers import Provider, digest, now, text_digest, write_json
-from .provider_policy import require_model, require_prices, serialized_inference
+from .provider_policy import require_model, require_prices, inference_gate
 
 ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 INPUT_OVERHEAD_TOKENS = 4096
@@ -273,14 +274,21 @@ class OpenRouterBudgetedProvider(Provider):
     ``caller`` is the existing HTTP POST protocol (url, headers, payload, timeout).
     ``catalogue_get`` is its metadata-only GET counterpart. Both are injection
     seams for tests; default transports accept only the official HTTPS host.
+    ``inference_mode='bounded'`` opts a pinned route into host-wide bounded
+    admission. The default remains legacy serial execution.
     """
     def __init__(self, run_dir: Path, model: str, max_cost_usd, max_calls: int,
                  max_output_tokens: int = 4096, budget_dir: Path | None = None,
-                 caller=None, catalogue_get=None, provider_slug=None):
+                 caller=None, catalogue_get=None, provider_slug=None, inference_mode='serial'):
         super().__init__(run_dir)
         self.options = budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir)
         self.model = model
         self.provider_slug = normalize_provider_slug(provider_slug)
+        if inference_mode not in ('serial', 'bounded'):
+            raise ValueError('inference_mode must be serial or bounded')
+        if inference_mode == 'bounded' and self.provider_slug is None:
+            raise ValueError('bounded inference requires a pinned provider_slug')
+        self.inference_mode = inference_mode
         self.budget_dir = Path(self.options["budget_dir"])
         self.caller = caller or api._default_http_post
         self.catalogue_get = catalogue_get
@@ -291,6 +299,8 @@ class OpenRouterBudgetedProvider(Provider):
         binding = {"schema": "zenith_paid_run_binding_v1", "model": self.model, "limits": self.options}
         if self.provider_slug is not None:
             binding["provider_slug"] = self.provider_slug
+        if self.inference_mode != 'serial':
+            binding['inference_mode'] = self.inference_mode
         with self._lock, (handoff / ".budgeted.lock").open("a+") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             try:
@@ -367,8 +377,11 @@ class OpenRouterBudgetedProvider(Provider):
             raise RuntimeError("a paid node already had its single attempt; repair prompts and retries are disabled")
         return None
 
-    @serialized_inference
     def ask_ai(self, prompt: str, config: dict | None = None, cancel=None) -> str:
+        with inference_gate(self.inference_mode, self.provider_slug, cancel) as timing:
+            return self._ask_ai(prompt, config, cancel, timing)
+
+    def _ask_ai(self, prompt, config, cancel, timing):
         reasoning_effort = (config or {}).get('reasoning_effort', 'none')
         if reasoning_effort not in ('none', 'low', 'medium', 'high'):
             raise ValueError('reasoning_effort must be none, low, medium or high')
@@ -379,6 +392,8 @@ class OpenRouterBudgetedProvider(Provider):
             if not isinstance(response_format,dict) or response_format.get("type")!="json_schema":
                 raise ValueError("only explicit JSON Schema response formats are supported")
         identity = self.identity(prompt, config)
+        if self.inference_mode != 'serial':
+            identity['inference_mode'] = self.inference_mode
         if reasoning_effort != 'none':identity['reasoning_effort'] = reasoning_effort
         if response_format is not None:identity["response_format_sha256"]=digest(response_format)
         if system_prompt is not None:identity["system_prompt_sha256"]=text_digest(system_prompt)
@@ -434,7 +449,8 @@ class OpenRouterBudgetedProvider(Provider):
                   "max_output_tokens": output_bound, "context_length": context_length,
                   "catalogue_pricing": {k: str(v) for k, v in catalogue_prices.items()},
                   "reservation_pricing": {k: str(v) for k, v in prices.items()},
-                  "catalogue_sha256": digest(row), "budget_dir": str(self.budget_dir)}
+                  "catalogue_sha256": digest(row), "budget_dir": str(self.budget_dir),
+                  **timing, 'network_elapsed_seconds': 0.0}
         if endpoint is not None:
             record.update(requested_provider_slug=self.provider_slug, verified_provider_name=endpoint["provider_name"],
                           endpoint_metadata_sha256=digest(endpoint), endpoint_metadata=endpoint)
@@ -442,6 +458,8 @@ class OpenRouterBudgetedProvider(Provider):
             cached = self._previous(ledger, call_id, identity)
             if cached is not None:
                 return cached
+            if cancel is not None and cancel.is_set():
+                raise RuntimeError('paid call cancelled before reservation')
             if len(ledger["entries"]) >= self.options["max_calls"]:
                 raise RuntimeError("shared paid budget max_calls reached")
             if amount(ledger["total_reserved_usd"]) + reservation > amount(self.options["max_cost_usd"]):
@@ -470,8 +488,12 @@ class OpenRouterBudgetedProvider(Provider):
                                         {"effort": reasoning_effort, "exclude": True})
             if self.provider_slug is not None:
                 payload["provider"]["only"] = [self.provider_slug]
-            data = self.caller(ENDPOINT, {"Authorization": "Bearer " + token,
-                                       "Content-Type": "application/json", "Accept": "application/json"}, payload, 120)
+            network_started = time.monotonic()
+            try:
+                data = self.caller(ENDPOINT, {"Authorization": "Bearer " + token,
+                                           "Content-Type": "application/json", "Accept": "application/json"}, payload, 120)
+            finally:
+                record['network_elapsed_seconds'] = time.monotonic() - network_started
             data = api.redact(durable(data), secrets=(token,))
             record["provider_response"] = data
             usage = data.get("usage")
@@ -509,7 +531,8 @@ class OpenRouterBudgetedProvider(Provider):
                          requested_model=self.model, actual_model=actual_model, usage=usage, cost=str(cost),
                          reserved_cost_usd=str(reservation), endpoint=ENDPOINT, budget_dir=str(self.budget_dir),
                          response_sha256=text_digest(content), requested_provider_slug=self.provider_slug,
-                         verified_provider_name=record.get("verified_provider_name"), actual_provider=actual_provider)
+                         verified_provider_name=record.get("verified_provider_name"), actual_provider=actual_provider,
+                         **timing, network_elapsed_seconds=record['network_elapsed_seconds'])
             return content
         except BaseException as exc:
             message = api.safe_error(exc, secrets=(token,))
@@ -521,7 +544,8 @@ class OpenRouterBudgetedProvider(Provider):
                          usage=record.get("provider_response", {}).get("usage"), cost=record.get("cost"),
                          reserved_cost_usd=str(reservation), error=message, endpoint=ENDPOINT,
                          requested_provider_slug=self.provider_slug, verified_provider_name=record.get("verified_provider_name"),
-                         actual_provider=record.get("provider_response", {}).get("provider"))
+                         actual_provider=record.get("provider_response", {}).get("provider"),
+                         **timing, network_elapsed_seconds=record['network_elapsed_seconds'])
             raise RuntimeError(message) from None
 
     def _settle(self, call_id, record, call_path, *, halt=False):

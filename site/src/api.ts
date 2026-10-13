@@ -45,6 +45,7 @@ export type Site = {
   documents: Record<string, string>;
   figures: Record<string, string>;
   evidence: Record<string, string>;
+  active_evidence_id?: string;
   local_runs_enabled: boolean;
   run_index_url?: string | null;
   data_mode?: string;

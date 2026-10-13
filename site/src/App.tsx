@@ -19,6 +19,9 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { CopyButton } from './components/CopyButton';
 
 const RECEIPT_LABEL: Record<string, string> = {
+  'observation-learning-result': 'Native observation-learning study',
+  'observation-screens': 'Follow-on repair, candidate search and composition tests',
+  'investigation-learning-result': 'Historical operational investigation campaigns',
   sources: 'Where each input comes from, with file hashes',
   replacements: 'Synthetic multi-feed observations',
   'demo-result': 'Preparation record',
@@ -116,7 +119,7 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
           <div className="wrap notice-bar__inner">
             <p>
               <strong>{site?.notice ?? 'Experimental research prototype.'}</strong>
-              <span className="notice-bar__extra"> An abstract synthetic example of reasoning over observations.</span>
+              <span className="notice-bar__extra"> Constructed experiments with measured native behavior.</span>
             </p>
             <button type="button" className="z-link-button" onClick={() => setNoticeOpen(true)}>
               Research notice
@@ -183,7 +186,8 @@ function useGraph(url: string | null) {
 
 function Page({ site, paper }: { site: Site; paper: Paper | null }) {
   const byId = useMemo(() => new Map(site.chapters.map((c) => [c.id, c])), [site]);
-  const learningActive = Boolean(site.evidence['investigation-learning-result']);
+  const learningActive = Boolean(site.active_evidence_id === 'observation-learning-result'
+    || site.evidence['observation-learning-result'] || site.evidence['investigation-learning-result']);
   const lab = useGraph(byId.get('lab')?.graph_url ?? null);
   const deepLink = useMemo(() => new URLSearchParams(window.location.search).get('node'), []);
   const byline = useByline(site);
@@ -266,8 +270,8 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
       <footer className="footer">
         <div className="wrap footer__inner">
           <p>
-            <strong>Experimental research prototype.</strong> The example contains invented observations.
-            Its synthetic results do not establish reliable real-world operation.
+            <strong>Experimental research prototype.</strong> Constructed experiments measure native SQLite behavior.
+            Their bounded results do not establish reliable production operation. Earlier synthetic examples remain historical.
           </p>
           <p>
             <a href="https://github.com/wcook04/plectis-zenith" target="_blank" rel="noreferrer">
@@ -320,10 +324,13 @@ function ApplicationExample() {
 // One line under the hero with where the work actually stands, read from the
 // receipt bound to the results chapter.
 function StatusStrip({ site }: { site: Site }) {
-  const chapter = site.chapters.find((c) => c.evidence_kind === 'measured_experiment' || c.evidence_kind === 'measured_execution' || c.evidence_kind === 'verified_preparation');
+  const chapter = site.chapters.find((c) => c.id === 'results')
+    ?? site.chapters.find((c) => c.evidence_kind === 'measured_experiment' || c.evidence_kind === 'measured_execution' || c.evidence_kind === 'verified_preparation');
   const url = chapter?.evidence_urls[0];
   const evidence = useAsync<Evidence | null>(() => (url ? api.evidence(url) : Promise.resolve(null)), [url]);
-  const sourcesUrl = site.evidence['investigation-learning-result'] ? undefined : site.evidence.sources;
+  const observationActive = site.active_evidence_id === 'observation-learning-result'
+    || Boolean(site.evidence['observation-learning-result']);
+  const sourcesUrl = observationActive || site.evidence['investigation-learning-result'] ? undefined : site.evidence.sources;
   const sources = useAsync<Evidence | null>(() => (sourcesUrl ? api.evidence(sourcesUrl) : Promise.resolve(null)), [sourcesUrl]);
   const composition = sources.status === 'ready' && sources.value ? compositionSentence(sources.value) : null;
   let summary: string | null = null;
@@ -332,7 +339,15 @@ function StatusStrip({ site }: { site: Site }) {
     if (schema.startsWith('zenith_demo_preparation')) summary = preparationSummary(evidence.value);
     else if (schema.startsWith('zenith_original_feed_window')) summary = windowSummary(evidence.value);
     else if (schema === 'zenith_learning_evidence_v1') summary = `${evidence.value.data.total_calls} model calls; $${Number(evidence.value.data.total_reported_cost_usd).toFixed(4)} reported cost across all recorded attempts.`;
+    else if (schema === 'zenith_observation_learning_evidence_v1') {
+      const data = evidence.value.data as unknown as ObservationReceipt;
+      summary = `Initial native comparison: ${observationStatus(data)}; ${data.total_calls} calls including canary attempts; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
+    }
   }
+  if (observationActive && !url) summary = 'Observation study results pending.';
+  else if (observationActive && evidence.status === 'error') summary = 'Observation-study receipt unavailable.';
+  else if (observationActive && evidence.status === 'ready' && evidence.value
+    && evidence.value.data.schema !== 'zenith_observation_learning_evidence_v1') summary = 'Observation-study receipt schema unsupported.';
   if (!chapter) return null;
   return (
     <section className="status-strip" aria-label="Current status">
@@ -616,6 +631,74 @@ function InvestigationResults({ result }: { result: Evidence }) {
   </div>;
 }
 
+type ObservationScore = { correct: number; total: number; unsupported: number; errors: number };
+type ObservationComparison = {
+  worlds: number; mean_accuracy_difference: number; paired_bootstrap_95_percentile: [number, number];
+  wins: number; ties: number; losses: number;
+};
+type ObservationReceipt = {
+  status: string; complete: boolean; campaign: string; planned_worlds: number; frozen_worlds: number;
+  model: string; provider_slug: string; total_calls: number; total_reported_cost_usd: string;
+  unreported_cost_calls: number; unreported_cost_reservations_usd: string; cost_bounds_usd: [string, string];
+  aggregate: Record<string, ObservationScore> | null;
+  comparisons: Record<string, ObservationComparison> | null;
+  failure: { error?: string } | null; boundary: string;
+};
+
+function observationComplete(data: ObservationReceipt): boolean {
+  return data.complete === true && data.status === 'complete' && data.aggregate != null;
+}
+
+function observationStatus(data: ObservationReceipt): string {
+  if (observationComplete(data)) return 'Protected evaluation complete';
+  if (data.status === 'failed') return 'Campaign stopped';
+  if (data.status === 'interrupted') return 'Campaign interrupted';
+  if (data.status === 'pilot') return 'Pilot snapshot';
+  if (data.status === 'running') return 'Campaign running';
+  return 'Partial snapshot';
+}
+
+const OBSERVATION_ARMS = [
+  ['incremental', 'Incremental (primary)'], ['archive', 'Full construction archive'],
+  ['fresh', 'Fresh from final evidence'], ['freeze_and_grow', 'Frozen first checkpoint (control)'],
+  ['empty_history', 'Final program, empty history (control)'], ['cold', 'Unlearned program (control)'],
+] as const;
+
+function ObservationResults({ result }: { result: Evidence }) {
+  const data = result.data as unknown as ObservationReceipt;
+  const complete = observationComplete(data);
+  const points = (value: number) => `${(value * 100).toFixed(1)} percentage points`;
+  return <div className="diagnosis">
+    <h3 className="block-head">{observationStatus(data)}</h3>
+    <p>Campaign: {data.campaign}</p>
+    <p>{data.frozen_worlds}/{data.planned_worlds} source streams frozen. {data.model} via {data.provider_slug}.</p>
+    <p>{data.total_calls} calls including canary attempts; ${Number(data.total_reported_cost_usd).toFixed(4)} reported inference cost.</p>
+    {data.unreported_cost_calls > 0 && <p>Billing remains unresolved for {data.unreported_cost_calls} {data.unreported_cost_calls === 1 ? 'call' : 'calls'}; ${Number(data.unreported_cost_reservations_usd).toFixed(4)} remains reserved. Cost bounds: ${Number(data.cost_bounds_usd[0]).toFixed(4)} to ${Number(data.cost_bounds_usd[1]).toFixed(4)}.</p>}
+    {data.failure?.error && <p role="status">Recorded failure: {data.failure.error}</p>}
+    {complete ? <>
+      <table className="diagnosis__table">
+        <caption>Protected exact answers and conditional identification errors</caption>
+        <thead><tr><th>Policy or control</th><th>Exact answers</th><th>Unsupported exact</th><th>Execution or response errors</th></tr></thead>
+        <tbody>{OBSERVATION_ARMS.map(([id, label]) => {
+          const score = data.aggregate?.[id];
+          return score ? <tr key={id}><th>{label}</th><td>{score.correct}/{score.total}</td><td>{score.unsupported}</td><td>{score.errors}</td></tr> : null;
+        })}</tbody>
+      </table>
+      {data.comparisons && <table className="diagnosis__table">
+        <caption>Incremental accuracy minus each comparison, paired by native source</caption>
+        <thead><tr><th>Comparison</th><th>Mean difference</th><th>Descriptive 95% interval</th><th>Wins / ties / losses</th></tr></thead>
+        <tbody>{OBSERVATION_ARMS.filter(([id]) => id === 'archive' || id === 'fresh' || id === 'freeze_and_grow').map(([id, label]) => {
+          const comparison = data.comparisons?.[id];
+          return comparison ? <tr key={id}><th>{label}</th><td>{points(comparison.mean_accuracy_difference)}</td><td>{points(comparison.paired_bootstrap_95_percentile[0])} to {points(comparison.paired_bootstrap_95_percentile[1])}</td><td>{comparison.wins} / {comparison.ties} / {comparison.losses}</td></tr> : null;
+        })}</tbody>
+      </table>}
+      <p>Configured sources are conditional replications in one native software family. These comparisons do not establish transfer across domains or general intelligence.</p>
+    </> : <p>Protected outcome tables are unavailable until construction and the protected evaluation complete. Frozen stream counts and inference calls do not establish learning success.</p>}
+    <p>{data.boundary}</p>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete observation-study receipt</a>
+  </div>;
+}
+
 function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph: Graph | null; site: Site }) {
   const windowUrl = chapter.evidence_urls.find((u) => u.endsWith('window-result')) ?? site.evidence['window-result'];
   const condUrl = chapter.evidence_urls.find((u) => u.endsWith('conditional-result')) ?? site.evidence['conditional-result'];
@@ -638,6 +721,17 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
   );
   if (kind.status === 'ready' && kind.value?.data.schema === 'zenith_learning_evidence_v1') {
     return <InvestigationResults result={kind.value} />;
+  }
+  if (kind.status === 'ready' && kind.value?.data.schema === 'zenith_observation_learning_evidence_v1') {
+    return <><ObservationResults result={kind.value} />
+      {site.evidence['observation-screens'] && <p><a href={site.evidence['observation-screens']} target="_blank" rel="noreferrer">Read the follow-on repair, candidate search and composition receipts</a></p>}
+    </>;
+  }
+  if (site.active_evidence_id === 'observation-learning-result' || site.evidence['observation-learning-result']) {
+    if (kind.status === 'error') return <p role="status">The observation-study receipt is unavailable: {kind.message}</p>;
+    if (!bound) return <p role="status">Results pending. The current study has no published observation receipt. Protected scores will appear only after measured evaluation.</p>;
+    if (kind.status === 'ready') return <p role="status">The observation-study receipt has an unsupported schema; no scores are displayed.</p>;
+    return <Loading what="the observation-study receipt" />;
   }
   if (isPreparation && labGraph && kind.status === 'ready' && kind.value) {
     return (
@@ -725,7 +819,7 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
               </li>
             ))}
           </ul>
-          <h3 className="paper-aside__head">Diagrams from the repository</h3>
+          <h3 className="paper-aside__head">Historical graph profiles</h3>
           <ul className="plain-list">
             {Object.entries(site.figures).map(([id, url]) => (
               <li key={id}>

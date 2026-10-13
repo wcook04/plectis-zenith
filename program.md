@@ -1,35 +1,41 @@
 # Zenith research programme
 
-The central question is whether language-model computation can become cumulative: can a measured failure produce a reusable executable investigation that helps on further cases? The object that accumulates is a scoped program with retained counterexamples and exact dependencies. Its output is a partial answer: supported findings and unresolved evidence obligations can coexist.
+The question is whether investigations can accumulate useful executable knowledge. The model should turn measured source behavior into a computation that helps with later questions, while retaining the evidence needed to challenge its scope. A larger graph, more text or a higher score after extra attempts is not by itself cumulative learning.
 
-The [paper](paper/zenith.pdf), [executable method](docs/executable-investigations.md) and [measured status](docs/status.md) describe the current work. The five supplied research returns have been reproduced and assimilated; their authored finite searches informed the mechanism, while actual model-generated code is tested separately.
+The active implementation is one investigator, an observation ledger and source-bound program versions with optional executable dependencies. It proposes experiments, observes actual SQLite responses, writes ordinary restricted Python, and retains or replaces that code under a declared development rule. Replacing a failed program need not discard the measurements. The host supplies measured outcomes, not a model's self-assessment. Independent challenge matters because an entire candidate family can agree and still be wrong.
 
-## Current implementation
+## Current test
 
-The operational task compares a contract-defined per-request quantity across periods. Active time, wall elapsed time and billed work differ under overlap or idle gaps. The investigator acquires span and population tables, handles record multiplicity and clock units, standardizes workload mix, and preserves unresolved coverage or conflict conditions.
+The [observation-learning protocol](docs/executable-investigations.md) compares incremental state with an execution-enabled archive and a fresh compiler. All receive the same external evidence and six proposal calls per source. Six balanced source configurations expose duplicate writes, triggers, rollbacks and separate connections. The allowed family and support criterion are disclosed; actual configurations stay private. Native execution distinguishes identified goals from unresolved ones. All construction finishes before protected evaluation.
 
-The model writes a complete bounded Python procedure. The runtime logs acquired evidence and executes numerical operations. The evaluator is independent of that procedure. Every proposal, execution error and rejection remains in the campaign record; failed-candidate evidence reaches the next actual repair request. Full development replay determines promotion, with no regression on previously correct cases. A candidate is only an experimental incumbent, not an automatically deployed system.
+The early-program-plus-final-history control asks whether an unchanged interpreter already explains the benefit. Exact records retain calls, tokens, failed outputs, rejected candidates, neutral revisions, corrected cases and regressions. The spending ceiling bounds the experiment; low actual inference prices allow a scientifically useful comparison rather than an arbitrarily tiny demonstration.
 
-Frozen evaluation includes previously unseen combinations of known faults, renamed-schema binding without numerical-code changes, a deletion control, an independent code reference, each first proposal, and direct/prose answer controls. The direct controls lack code execution, so their comparison measures the whole compilation/execution arrangement. Repeated temperature-zero learners are not independent draws from different models.
+The completed native campaign answers that control negatively for continued revision: the final incremental program and early checkpoint given final evidence both score 244/288, tying on every source. Archive and fresh compilation score 187/288 and 230/288, with no robust source-level superiority established. The 126 calls cost $0.12947251224. Follow-on screens investigated three specific failures. Generic and counterexample-focused edits largely stalled, but a selected fresh DeepSeek reconstruction scored 188/288 against 23/288 for unchanged code on a separate confirmation pool. This supports fresh candidate search from retained evidence on those sources; it does not establish that the learning mechanism improves itself.
 
-## Acceptance
+## What would count as progress
 
-1. The proposed computation executes and its exact failure or success reaches the next review.
-2. The model makes a reusable change supported by measured development improvement.
-3. The frozen change succeeds on further cases, including scope counterexamples and simultaneous faults.
-4. Its total discovery and execution cost is justified against a competent one-shot compiler and simpler code.
-5. Further episodes extend useful coverage without losing already supported distinctions.
+1. A program predicts new combinations from measured observations instead of replaying remembered answers.
+2. Measured feedback changes a failing computation, with the actual candidate error delivered into the next request.
+3. Retained state improves final matched-history performance beyond a competent archive and fresh compilation, or achieves comparable performance at lower total cost.
+4. Useful computations survive appropriate reuse while unsupported bindings are challenged; unrelated supported conclusions remain available.
+5. Later source contracts extend useful coverage without erasing previous competence, under independent tests.
 
-A perfect synthetic score would establish bounded task coverage, not a new scientific theory. A good first proposal can establish useful compilation without establishing learning from failure. Model-written explanations and scope statements remain claims until checked. Engineering repairs create a new experiment version, not retroactive success.
+The first three claims are separated by the current experiment. A tie selects a simpler explanation rather than establishing a special memory mechanism. Native execution grounds feedback, but a small authored source family is not arbitrary semantic discovery. Model-written scope statements are hypotheses. Cumulative learning across unrelated sources, automatic discovery of useful quantities and adaptive curriculum remain further claims to test.
 
-## Next evidence
+## Direction after the comparison
 
-Move from fixed semantic factors to genuinely new source contracts: partially documented telemetry migrations, absent joins, incomplete request populations, and new quantities whose computations are not specified by the old task. Give equal execution tools and discovery budgets to one-shot, prose-memory and executable-memory controls. Test retained programs against explicit revocation and changed applicability, then use real operational datasets with independently obtainable answers.
+Use observed failures to decide what to change. Information loss calls for acquiring a separating observation; an incorrect computation calls for code repair; a stale source binding calls for renewed measurement. These are different failures. Add shared helpers, source-specific routing or a curriculum only when the simple program and archive controls show why they are needed. Include cached and unchanged-program alternatives in economic comparisons.
 
-A useful investigation must explain what new evidence would settle an unresolved quantity. The current callback permits table acquisition; it does not yet establish learned query value or efficient multi-step information gathering. Multiple learned procedures and dependency-aware revocation become justified when one program's scope is demonstrably insufficient, not because a bigger graph looks more impressive.
+The small screens combine the returns around executable procedures, source bindings, observations, counterexamples and explicit dependencies. Fresh reconstruction helped selected failures, and development-selected complementary programs confirmed well. The stronger follow-on reference then reached 286/288 using the full historical archive, two fixed native probes per source and no new model calls. Its historical search budget is larger, but it shows why new generation must be compared with selecting retained code. An authored disagreement policy scored better in the smaller pool by avoiding a counterexample to its shared simulator error. That is not better identification; independent challenges must be retained.
 
-Financial prediction remains a separate stress test. It will only become a primary target again if the available observations support an achievable decision and the learned object improves a protected evaluation. Historical market errors do not establish their own causal explanation.
+The resulting order is concrete: replay retained alternatives against the available measurements; obtain a discriminating observation where useful; reselect using development evidence; ask for new or revised code when the retained inventory still fails. Preserve every candidate's source, scope, evidence and observed failures. This is implemented in the candidate-pool and active-selection screens. The order is a research recommendation assembled from their results, not yet a validated universal controller. Graph composition remains a separate measured question against the same code in a flat library.
 
-## Retained history
+An apparent winner is a lead to confirm, not a result to promote immediately. Freeze new action structures and source settings before the confirmation calls; retain the simpler controls and all failed attempts. Pursue the smallest combination that improves later performance or total cost. A graph earns its place through actual dependency use and a measured advantage, not through having more named nodes.
 
-The financial investigator, earlier graphs and source archives remain available through [status](docs/status.md). Exposed historical dates remain development material. Earlier cost and interface audits are engineering history, not the central research claim. There is one active programme and one paper; new results replace their current position without erasing failed attempts.
+The [ten-return synthesis](docs/frontier-returns-20261013.md) records accepted ideas and negative results. It rejects default elaborate routing, an unearned general ontology and a universal veto on every empirical regression. The paper and [status](docs/status.md) own the current claim; receipts own measured outcomes. Historical financial and operational studies remain available with their original versions and limitations.
+
+## Relation to the graph ambition
+
+The initial study tested one potential learned component. Experiment plans specify interventions; native executions supply observations; predictor programs make forecasts of those observations; measured errors guide program revision or fresh reconstruction. A shared planner sees the observation history, while each construction condition sees its own program failures. The follow-on composition test adds model-written transition/readout nodes and explicit dependencies, with a flat-library control. Neither study trains the underlying language model or demonstrates improvement of the learning algorithm itself.
+
+The original graph ambition remains a further empirical question. Useful retained procedures could become nodes with explicit input/output dependencies. Graph evolution would mean learning a useful decomposition, composing or replacing procedures, and changing dependencies while improving performance on later tasks. It must beat a flat executable library and fresh construction with comparable evidence and cost. Making one predictor better would establish a component-level result, not that graph-level claim or recursive self-improvement.

@@ -27,14 +27,14 @@ export const EVIDENCE_KIND_LABEL: Record<string, { label: string; note: string }
 };
 
 export const SECTION_LABEL: Record<string, string> = {
-  idea: 'Section 1, Knowledge that can do work', lab: 'Section 1, The operational task',
-  oracle: 'Section 2, Repair and reuse', trace: 'Section 2, Frozen procedures',
-  research: 'Section 4, Interpretation and next evidence', results: 'Section 4, Measured evidence',
+  idea: 'The research question', lab: 'The native observation task',
+  oracle: 'Measured repair', trace: 'Frozen prediction programs',
+  research: 'Interpretation and next evidence', results: 'Measured comparisons',
 };
 
 export const HERO = {
   lede: 'Can a measured failure become a computation that keeps working?',
-  question: 'Zenith turns operational investigations into reusable programs. Lab executes, Oracle measures the errors, and Evolve proposes a repair. New cases test whether that computation survives beyond the examples used to develop it.',
+  question: 'Zenith turns measured source behavior into executable predictions. Retain alternative programs and their evidence, challenge them with observations, and test when selection, new code or composition actually helps.',
 };
 
 // Counts come from the graph the backend serves, never from this file.
@@ -66,31 +66,31 @@ export function labParagraphs(f: GraphFacts | null): string[] {
 
 export const CHAPTER_COPY: Record<string, { kicker: string; paragraphs: string[] }> = {
   idea: { kicker: 'Knowledge that can do work', paragraphs: [
-    'Retain an executable investigation, its scope and the counterexamples used to repair it. The next case can use that computation without buying the same reasoning again.',
-    'An answer can contain supported findings and unresolved checks together. Duplicated telemetry does not rule out a real regression; missing requests can prevent a numerical conclusion while other findings remain valid.',
+    'An observed counterexample can require a different computation. Retain useful alternative programs, measured failures and the evidence on which predictions depend.',
+    'The current study asks what a native SQLite channel measures. A counter can include rolled-back changes or auxiliary writes even when committed item count stays unchanged.',
   ] },
-  lab: { kicker: 'Compute the requested quantity', paragraphs: [
-    'Acquire operation intervals and request populations. Read the quantity contract: active time, elapsed time and billed work treat overlap and idle gaps differently.',
-    'The model authors Python; a restricted process executes it and records acquired tables. Source contracts, units, repeated records and workload proportions must survive the calculation.',
+  lab: { kicker: 'Measure an unfamiliar source', paragraphs: [
+    'The model proposes action sequences. The host executes disposable native SQLite experiments and records the channel alongside separately read committed count and value sum.',
+    'Every construction policy receives the same observed transcript. Model-written Python predicts new action combinations; a restricted process records its acquired history and execution errors.',
   ] },
   oracle: { kicker: 'Make failure observable', paragraphs: [
-    'An independent evaluator compares the actual findings, unresolved conditions and numerical ratio with the expected answer. The next request receives measured witnesses, including rejected programs and their execution errors.',
-    'The full development suite determines whether a proposal improves the incumbent without breaking previously correct cases. A plausible explanation alone cannot pass that test.',
+    'Measured calibration outputs check each proposed program. Rejected candidates and their execution errors remain available to the next repair request.',
+    'Development selection permits valid neutral revisions and reports regressions. Protected compositions are evaluated only after every construction call has finished; source identification remains conditional on the frozen native family.',
   ] },
-  evolve: { kicker: 'Keep a tested computation', paragraphs: [
-    'Freeze the accepted program before evaluating further cases. A renamed-schema test may change field bindings, but it cannot rewrite the numerical solver.',
-    'The first model proposal, unchanged incumbent, direct answers and prose-memory answers remain comparison controls. Compilation, improvement during development and real-world transfer are separate claims.',
+  evolve: { kicker: 'Freeze before comparison', paragraphs: [
+    'Incremental repair sees the latest challenger; archive construction retains earlier attempts; the fresh compiler starts with final evidence. All receive the same proposal allowance and executable interface.',
+    'Freeze every checkpoint before protected evaluation. A first-checkpoint control, empty-history replay and unlearned program test what the final computation and supplied observations contribute.',
   ] },
   results: { kicker: 'Replay the evidence', paragraphs: [
-    'The table below reads versioned campaign receipts. Each complete campaign reports every learner, including failures; the first learner is the declared primary comparison.',
-    'Published programs, input tables, evaluator and execution harness replay offline. These are synthetic combinations of known factors, not independent real-world problems.',
+    'The table below shows the initial native comparison. Follow-on receipts and the repository explanation compare fresh reconstruction, complementary candidate pools, new observations, archive selection and composition.',
+    'Complete receipts compare frozen exact answers, unsupported commitments and execution errors. Configured native sources are conditional replications in one software family, not independent domains.',
   ] },
   'results:verified_preparation': { kicker: 'Historical fixture preparation', paragraphs: [
     'The retained System A fixture uses invented observations. Its preparation receipt loaded inputs and prepared a request without inference.',
   ] },
   next: { kicker: 'Make the knowledge cumulative', paragraphs: [
-    'Compare equal-tool, equal-budget learners on new semantic contracts and real operational data with obtainable answers. Test whether retained procedures reduce discovery cost without hiding changed applicability.',
-    'Extend the library when one program is demonstrably insufficient. Preserve scope counterexamples and revoke dependent conclusions when their evidence stops supporting them.',
+    'Test transfer to independently implemented sources and misleading near-matches. A bounded native comparison cannot by itself establish broad semantic discovery or lifetime economic value.',
+    'Compare complete evidence, execution and inference costs. Preserve unresolved goals and failed attempts when the current computation does not support a new conclusion.',
   ] },
 };
 

@@ -69,6 +69,21 @@ relative links. Sanitize rendered Markdown and treat model output as data.
 Use the recorded experiment status. Successful JSON validation alone must not be displayed as predictive success. Use the current result
 documents and receipts instead of hardcoding result counts into the frontend.
 
+The active source is `/api/v1/documents/observation-learning`, an alias of
+`docs/executable-investigations.md`. Its public receipt is
+`/api/v1/evidence/observation-learning-result`, bound to
+`docs/observation-learning-20261013.json`. Site metadata names this active
+evidence ID even before a receipt is published. A missing receipt means results
+pending, rather than a fallback to historical operational scores.
+
+The receipt uses `zenith_observation_learning_evidence_v1`. Protected tables
+require `complete=true`, `status=complete` and a measured aggregate. Failed and
+partial snapshots publish status, calls, canaries, unresolved billing and source
+hashes without completed outcome tables. Absence of a failure does not establish
+that an external process is running. The site reads costs and comparison values
+from the receipt. The older `investigation-learning-result` route remains
+historical and retains its original schema.
+
 ## API
 
 All JSON routes are under `/api/v1`. `GET` and `HEAD` are supported; writes return
@@ -86,7 +101,7 @@ All JSON routes are under `/api/v1`. `GET` and `HEAD` are supported; writes retu
 | `/runs/{run_id}/nodes/{node_id}` | Optional local artifact and recorded attempts |
 | `/health` | Version and enabled capabilities |
 
-The active missions are `financial_lab`, `financial_oracle` and `financial_refinement`. Their graph responses include effective node hashes, instructions, dependencies and `reasoning_schema`. The generic `all`, `lab`, `oracle` and `refinement` graphs remain available; `evolve` aliases generic `refinement`. Earlier `basket`, `basket_serial` and `basket_evolve` graphs describe the reduced pilot.
+Historical graph missions include `financial_lab`, `financial_oracle` and `financial_refinement`. Their graph responses include effective node hashes, instructions, dependencies and `reasoning_schema`. The generic `all`, `lab`, `oracle` and `refinement` graphs remain available; `evolve` aliases generic `refinement`. Earlier `basket`, `basket_serial` and `basket_evolve` graphs describe the reduced pilot. The active native observation study publishes source-bound programs and receipts and does not require those historical graphs to render its results.
 Site metadata lists document and evidence IDs. The PDF is `/assets/paper.pdf`;
 figure URLs are `/assets/graphs/{id}.svg` and are listed by `/site`.
 
@@ -115,11 +130,10 @@ Local mode rejects remote binds, unapproved origins and nonlocal Host headers.
 ```js
 const api = 'http://127.0.0.1:4175';
 const site = await fetch(`${api}/api/v1/site`).then(r => r.json());
-const graphUrl = site.chapters.find(c => c.id === 'lab').graph_url;
-const graph = await fetch(`${api}${graphUrl}`).then(r => r.json());
-// On node click:
-const node = await fetch(`${api}/api/v1/nodes/${encodeURIComponent(selectedId)}?task_profile=financial`)
-  .then(r => r.json());
+const resultUrl = site.chapters.find(c => c.id === 'results').evidence_urls[0];
+const receipt = await fetch(`${api}${resultUrl}`).then(r => r.json());
+// Render status and costs even when protected scores are unavailable.
+// Historical graphs remain at /api/v1/graph; use their explicit mission profile.
 // Offer the run selector only when site.local_runs_enabled is true.
 ```
 
@@ -135,7 +149,21 @@ Checks cover native topology, manuscript links, result receipts, HTTP/ETags,
 private/public separation, CORS/Host/method rejection, traversal, symlinks,
 oversized and malformed evidence, and mounting a future frontend build.
 
-## Current synthetic edition
+## Current native observation edition
+
+The initial comparison receipt remains immutable. `/api/v1/evidence/observation-screens`
+serves `docs/observation-screens-20261013.json` for the later repair, candidate-pool,
+composition and fixed-inventory selection tests, with separate protocols and cost
+accounting. The results chapter links this receipt and the updated manuscript;
+it does not overwrite the original comparison table with a different population.
+
+`site.data_mode` is `native_observation_research`. Constructed action sequences
+produce actual native SQLite counter and committed-state observations. The
+comparison remains conditional on the frozen software family. The source-bound
+receipt separates primary policies, controls, errors and unsupported exact
+answers; it does not certify arbitrary semantic discovery or production use.
+
+## Retained synthetic edition
 
 Use `site.data_mode`, `site.data_note` and each node's `demo_provenance`.
 The optional `dossier` contains that lane's current role and evidence contract,

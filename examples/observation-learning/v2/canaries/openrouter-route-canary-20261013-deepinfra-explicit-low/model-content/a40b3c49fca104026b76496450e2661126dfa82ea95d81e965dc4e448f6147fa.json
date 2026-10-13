@@ -1,0 +1,7 @@
+{
+  "call_id": "a40b3c49fca104026b76496450e2661126dfa82ea95d81e965dc4e448f6147fa",
+  "content": "{\n  \"source\": \"def investigate(context, acquire):\\n    events = acquire(\\\"events\\\")\\n    seen = set()\\n    total = 0\\n    for event in events:\\n        event_id = event[\\\"event_id\\\"]\\n        if event_id not in seen:\\n            seen.add(event_id)\\n            total += event[\\\"work\\\"]\\n    return {\\\"findings\\\": [], \\\"unresolved\\\": [], \\\"ratio\\\": total}\",\n  \"scope\": \"Deduplicates events by event_id and sums work once per unique ID.\",\n  \"lesson\": \"Duplicate deliveries must not double-count work; distinct IDs with equal work both count.\"\n}",
+  "original_content_sha256": "98b7617c0e8531d1b3aa92ab05e1b708707da04eae560fccc0ea38319a6902ef",
+  "projection": "assistant content only; transport, headers, routing and credentials omitted",
+  "redacted": false
+}

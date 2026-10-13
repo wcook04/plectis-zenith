@@ -1,0 +1,70 @@
+{
+  "model": "deepseek/deepseek-v4.1-flash",
+  "provider_slug": "baidu/fp8",
+  "reasoning_effort": "none",
+  "max_calls": 1,
+  "max_cost_usd": "0.05",
+  "max_output_tokens": 8192,
+  "prompt": {
+    "request": "Return exactly one JSON object matching the schema, never an array. Write investigate(context, acquire) in Python. acquire(\"events\") returns records with event_id and work. Return {\"findings\": [], \"unresolved\": [], \"ratio\": sum of work once per unique event_id}. Duplicate deliveries repeat exactly. Distinct IDs with equal work must both count. No imports, top-level assignments, annotations or default function arguments. This is an interface canary, not a research evaluation.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in source. scope and lesson are short claims; source must contain function definition and body, never a label or signature."
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "The COMPLETE EXECUTABLE PYTHON PROGRAM defining investigate(context, acquire) and helper functions, with full bodies. Never a label, signature, prose instruction, placeholder or code fence."
+      },
+      "scope": {
+        "type": "string"
+      },
+      "lesson": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson"
+    ],
+    "additionalProperties": false
+  },
+  "selection_reason": "Final separately authorized explicit-source NONE qualification at the intended main8192output ceiling; one new call, not a retry.",
+  "source_protocol_sha256": "a5d397479abbded03abe09efeb64f2cde1bb11cc9649766551d20e3f4ca999ca",
+  "runtime_source": {
+    "path": "/Users/willcook/src/plectis-zenith-distinctions/work/openrouter-route-canary-20261013-baidu-explicit-none/runtime-source.zip",
+    "sha256": "7bdf3c5d4b292304500e6af86b283328eb374a234bb70dfc8cef32f0114a644a",
+    "scope": "Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads"
+  },
+  "loaded_runtime_fingerprints": {
+    "zenith/budgeted.py": "a0ae963b9b5ec344ff72aaf527a214158160b6b5f637c02f8ff032ed3174adb7",
+    "zenith/provider_policy.py": "2ab5c7a8cd5c123fa2520aae73adf73063257ed7a0c6824595e8d4f28c0ac111",
+    "zenith/investigation_program.py": "cc28eaa110d6861b54b7235c44ac5e04172891e6eefe22a3788a3535c18600cf",
+    "system/lib/openrouter_free_runtime.py": "3b45810bf5105d3d7ed4ef4053ee2f4f800bdd04d548f748d520eb4b0cecb3eb"
+  },
+  "fixture": {
+    "tables": {
+      "events": [
+        {
+          "event_id": "a",
+          "work": 2
+        },
+        {
+          "event_id": "a",
+          "work": 2
+        },
+        {
+          "event_id": "b",
+          "work": 2
+        }
+      ]
+    },
+    "expected": {
+      "findings": [],
+      "unresolved": [],
+      "ratio": 4
+    },
+    "original_fixture_sha256": "11090e5777f949193d611eba17eb63465c43e93457ec5cf549457a3447e93a2e"
+  },
+  "frozen_at_utc": "2026-10-13T20:45:18.241432+00:00"
+}

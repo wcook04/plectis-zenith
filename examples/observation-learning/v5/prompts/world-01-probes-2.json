@@ -1,0 +1,1069 @@
+{
+  "system": "Design discriminating experiments for an unknown measurement source. Return one JSON object.",
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "history": [
+      {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "69354163802873792160199e105d5541d5decbb57dd2db7d3a7b04689a34d5c0"
+      },
+      {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "b",
+            "op": "put",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "key": "b",
+            "op": "put",
+            "value": 6
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 0,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "06fd9543ae42ca77750e163adbd80c75c260d451079672eea7ced57238b830d0"
+      },
+      {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "b",
+            "op": "put",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "key": "b",
+            "op": "put",
+            "value": 6
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          },
+          {
+            "connection": "other",
+            "key": "c",
+            "op": "put",
+            "value": 7
+          },
+          {
+            "connection": "other",
+            "key": "c",
+            "op": "put",
+            "value": 8
+          },
+          {
+            "connection": "other",
+            "key": "c",
+            "op": "update",
+            "value": 9
+          },
+          {
+            "connection": "other",
+            "key": "c",
+            "op": "delete"
+          }
+        ],
+        "observed": {
+          "channel": 0,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "b7e37648279bfc88c0eda89bc9212d3f7e2215afd7037baf0b74cbc77bbfeac1"
+      },
+      {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 77
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 32
+          },
+          {
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 0,
+          "committed_count": 1,
+          "committed_sum": 77
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "3daa49a835ee39657ddebe6f28d207ada991c32415e940cbce695c551d92e96e"
+      },
+      {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 0,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "1978b8b96e93b927ac7596eb07b3840f865bfa6f4b4c11ef9e33056529f2add4"
+      },
+      {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 7
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 7
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "fa064cdf1bf14e038ae567c53d1a49717eb7d886dbc1fc97d9919fc446d6a72d"
+      },
+      {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 7
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 8
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 9
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "cb6b7e2ac39034da30285881055731451444b5c3a21c5b44555c3c14a7e73ae4"
+      },
+      {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 77
+          },
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 32
+          },
+          {
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 0,
+          "committed_count": 1,
+          "committed_sum": 77
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "1fa30ebb5020cab8ebe1ed364c95a37b4a251fdc5ecab94a69f5bdd0f09d8724"
+      }
+    ],
+    "previous_experiments": [
+      {
+        "episode": 0,
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          }
+        ],
+        "receipt": {
+          "source_id": "source-f4c2e333ca707e1387b2",
+          "actions": [
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "update",
+              "value": 3
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "delete"
+            }
+          ],
+          "observed": {
+            "channel": 1,
+            "committed_count": 0,
+            "committed_sum": 0
+          },
+          "authority": "native SQLite counter; committed state read through a separate connection",
+          "sqlite_version": "3.45.3",
+          "receipt_sha256": "69354163802873792160199e105d5541d5decbb57dd2db7d3a7b04689a34d5c0"
+        }
+      },
+      {
+        "episode": 0,
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "b",
+            "op": "put",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "key": "b",
+            "op": "put",
+            "value": 6
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "receipt": {
+          "source_id": "source-f4c2e333ca707e1387b2",
+          "actions": [
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "update",
+              "value": 3
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "delete"
+            },
+            {
+              "connection": "main",
+              "op": "begin"
+            },
+            {
+              "connection": "main",
+              "key": "b",
+              "op": "put",
+              "value": 5
+            },
+            {
+              "connection": "main",
+              "key": "b",
+              "op": "put",
+              "value": 6
+            },
+            {
+              "connection": "main",
+              "op": "rollback"
+            }
+          ],
+          "observed": {
+            "channel": 0,
+            "committed_count": 0,
+            "committed_sum": 0
+          },
+          "authority": "native SQLite counter; committed state read through a separate connection",
+          "sqlite_version": "3.45.3",
+          "receipt_sha256": "06fd9543ae42ca77750e163adbd80c75c260d451079672eea7ced57238b830d0"
+        }
+      },
+      {
+        "episode": 0,
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "b",
+            "op": "put",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "key": "b",
+            "op": "put",
+            "value": 6
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          },
+          {
+            "connection": "other",
+            "key": "c",
+            "op": "put",
+            "value": 7
+          },
+          {
+            "connection": "other",
+            "key": "c",
+            "op": "put",
+            "value": 8
+          },
+          {
+            "connection": "other",
+            "key": "c",
+            "op": "update",
+            "value": 9
+          },
+          {
+            "connection": "other",
+            "key": "c",
+            "op": "delete"
+          }
+        ],
+        "receipt": {
+          "source_id": "source-f4c2e333ca707e1387b2",
+          "actions": [
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "update",
+              "value": 3
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "delete"
+            },
+            {
+              "connection": "main",
+              "op": "begin"
+            },
+            {
+              "connection": "main",
+              "key": "b",
+              "op": "put",
+              "value": 5
+            },
+            {
+              "connection": "main",
+              "key": "b",
+              "op": "put",
+              "value": 6
+            },
+            {
+              "connection": "main",
+              "op": "rollback"
+            },
+            {
+              "connection": "other",
+              "key": "c",
+              "op": "put",
+              "value": 7
+            },
+            {
+              "connection": "other",
+              "key": "c",
+              "op": "put",
+              "value": 8
+            },
+            {
+              "connection": "other",
+              "key": "c",
+              "op": "update",
+              "value": 9
+            },
+            {
+              "connection": "other",
+              "key": "c",
+              "op": "delete"
+            }
+          ],
+          "observed": {
+            "channel": 0,
+            "committed_count": 0,
+            "committed_sum": 0
+          },
+          "authority": "native SQLite counter; committed state read through a separate connection",
+          "sqlite_version": "3.45.3",
+          "receipt_sha256": "b7e37648279bfc88c0eda89bc9212d3f7e2215afd7037baf0b74cbc77bbfeac1"
+        }
+      },
+      {
+        "episode": 0,
+        "authority": "independent fixed challenge",
+        "receipt": {
+          "source_id": "source-f4c2e333ca707e1387b2",
+          "actions": [
+            {
+              "op": "begin"
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 77
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 32
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          "observed": {
+            "channel": 0,
+            "committed_count": 1,
+            "committed_sum": 77
+          },
+          "authority": "native SQLite counter; committed state read through a separate connection",
+          "sqlite_version": "3.45.3",
+          "receipt_sha256": "3daa49a835ee39657ddebe6f28d207ada991c32415e940cbce695c551d92e96e"
+        }
+      },
+      {
+        "episode": 1,
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "receipt": {
+          "source_id": "source-f4c2e333ca707e1387b2",
+          "actions": [
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 3
+            }
+          ],
+          "observed": {
+            "channel": 0,
+            "committed_count": 1,
+            "committed_sum": 1
+          },
+          "authority": "native SQLite counter; committed state read through a separate connection",
+          "sqlite_version": "3.45.3",
+          "receipt_sha256": "1978b8b96e93b927ac7596eb07b3840f865bfa6f4b4c11ef9e33056529f2add4"
+        }
+      },
+      {
+        "episode": 1,
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 7
+          }
+        ],
+        "receipt": {
+          "source_id": "source-f4c2e333ca707e1387b2",
+          "actions": [
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "update",
+              "value": 5
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "delete"
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 7
+            }
+          ],
+          "observed": {
+            "channel": 1,
+            "committed_count": 1,
+            "committed_sum": 7
+          },
+          "authority": "native SQLite counter; committed state read through a separate connection",
+          "sqlite_version": "3.45.3",
+          "receipt_sha256": "fa064cdf1bf14e038ae567c53d1a49717eb7d886dbc1fc97d9919fc446d6a72d"
+        }
+      },
+      {
+        "episode": 1,
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 7
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 8
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 9
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          }
+        ],
+        "receipt": {
+          "source_id": "source-f4c2e333ca707e1387b2",
+          "actions": [
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "update",
+              "value": 5
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "delete"
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 7
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 8
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "update",
+              "value": 9
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "delete"
+            }
+          ],
+          "observed": {
+            "channel": 1,
+            "committed_count": 0,
+            "committed_sum": 0
+          },
+          "authority": "native SQLite counter; committed state read through a separate connection",
+          "sqlite_version": "3.45.3",
+          "receipt_sha256": "cb6b7e2ac39034da30285881055731451444b5c3a21c5b44555c3c14a7e73ae4"
+        }
+      },
+      {
+        "episode": 1,
+        "authority": "independent fixed challenge",
+        "receipt": {
+          "source_id": "source-f4c2e333ca707e1387b2",
+          "actions": [
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 77
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 32
+            },
+            {
+              "op": "rollback"
+            }
+          ],
+          "observed": {
+            "channel": 0,
+            "committed_count": 1,
+            "committed_sum": 77
+          },
+          "authority": "native SQLite counter; committed state read through a separate connection",
+          "sqlite_version": "3.45.3",
+          "receipt_sha256": "1fa30ebb5020cab8ebe1ed364c95a37b4a251fdc5ecab94a69f5bdd0f09d8724"
+        }
+      }
+    ],
+    "last_plan_response_error": null,
+    "request": "Propose exactly three legal experiments that distinguish plausible source behaviors not yet separated by the observations. Use null for key/value on operations where those fields do not apply. Experiments each start fresh. Prefer informative combinations, including effects which may cancel in committed state but remain in the channel. No answers are requested."
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "experiments": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "properties": {
+              "op": {
+                "type": "string",
+                "enum": [
+                  "put",
+                  "update",
+                  "delete",
+                  "begin",
+                  "commit",
+                  "rollback"
+                ]
+              },
+              "connection": {
+                "type": "string",
+                "enum": [
+                  "main",
+                  "other"
+                ]
+              },
+              "key": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "value": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "connection",
+              "key",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "purpose": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "experiments",
+      "purpose"
+    ],
+    "additionalProperties": false
+  }
+}

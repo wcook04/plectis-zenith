@@ -1,0 +1,65 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 2
+      },
+      {
+        "op": "delete",
+        "connection": "main",
+        "key": "k",
+        "value": null
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "k",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 3
+      }
+    ]
+  ],
+  "purpose": "These three sequences separate the remaining plausible source behaviors: repeated same-key puts distinguish INSERT OR IGNORE from REPLACE/DO UPDATE and expose trigger effects; put-then-delete distinguishes direct change counts from trigger-inflated counts and from total_changes; cross-connection same-key puts distinguish main-only counters from main+other total_changes and expose conflict handling across connections."
+}

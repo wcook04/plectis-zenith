@@ -1,0 +1,101 @@
+{
+  "experiments": [
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 4
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 4
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 5
+      }
+    ]
+  ],
+  "purpose": "Distinguish INSERT OR IGNORE, INSERT OR REPLACE, and INSERT ... ON CONFLICT DO UPDATE, and expose whether an AFTER INSERT trigger adds a row to the auxiliary log, by using repeated puts, an update, a delete, and a re-put. The channel counts direct row changes and trigger effects, while committed_count and committed_sum reveal the final visible state. The three sequences differ only in the number of trailing puts, so comparing their channel and committed outcomes separates conflict handling from trigger instrumentation and from the three channel definitions."
+}

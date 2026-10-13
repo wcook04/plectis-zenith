@@ -1,0 +1,1068 @@
+{
+  "schema": "zenith_model_interface_qualifications_v1",
+  "boundary": "Engineering execution canaries only: four event-deduplication checks, not a model benchmark or SQLite result. Failed calls preserved; reservations are not charges. Exact provider transports and credentials excluded. The original runtime is identified by the preparation hashes, not presented as an independently portable frozen replay.",
+  "runs": [
+    {
+      "qualification": "model-qualification-20261013-v2",
+      "request": {
+        "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n",
+        "prompt": "This is an execution-interface qualification, not the SQLite task.\nWrite a complete executable Python program defining investigate(context, acquire).\ncontext contains rows: each row has an event_id string and an integer value.\nSum values once per event_id. Repeated identical records count once. If the same\nevent_id has conflicting values, return {\"value\": null, \"unresolved\": true}.\nOtherwise return {\"value\": the integer sum, \"unresolved\": false}.\nDo not return a signature or a description in source: return the full function\ndefinition and executable function body. No imports, no external calls.\n",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "Complete executable Python program defining investigate(context, acquire), including the function body. Never a label or bare signature."
+            },
+            "scope": {
+              "type": "string",
+              "description": "Short statement of the supported scope."
+            },
+            "lesson": {
+              "type": "string",
+              "description": "Short technical account of the revision."
+            }
+          },
+          "required": [
+            "source",
+            "scope",
+            "lesson"
+          ],
+          "additionalProperties": false
+        },
+        "model": "z-ai/glm-5.3-flash",
+        "provider": "fireworks",
+        "reasoning": "none"
+      },
+      "calls": {
+        "calls": [
+          {
+            "call_id": "cbac3f2f11e87518dbbc27886a9ce1bb74930237dfc08f676a72da01469835b6",
+            "run_id": "glm",
+            "node_id": "explicit-qualification",
+            "status": "failed",
+            "requested_model": "z-ai/glm-5.3-flash",
+            "actual_provider": null,
+            "requested_provider_slug": "fireworks",
+            "verified_provider_name": "Fireworks",
+            "reasoning_effort": null,
+            "cost": null,
+            "reserved_cost_usd": "0.00471975",
+            "prompt_sha256": "8197473ffeee26225fa9e3e2454ebad1ac6c294f27f57207fa49cd0ce6e27f90",
+            "system_prompt_sha256": "8deb79b902b177cb9fb33618311add769c8dde630a484f6f35192d1fee642b74",
+            "response_sha256": null,
+            "response_format_sha256": "fdaa1faddeb74a0242ed3cbad82f606085c592b762056fb8b2629f17b9db2f2a",
+            "recorded_at": "2026-10-13T21:34:48.598903+00:00",
+            "max_output_tokens": 4096,
+            "input_token_bound": 6889,
+            "inference_mode": "bounded",
+            "queue_elapsed_seconds": 0.00042083400330739096,
+            "network_elapsed_seconds": 0.0726216659968486,
+            "global_inference_limit": 3,
+            "provider_route_limit": 1,
+            "provider_route_sha256": "0caee180da9d0f3f29af4cd0013dc302f229b87ff05b2697f8700f592fb3a955",
+            "actual_model": null,
+            "usage": null,
+            "catalogue_pricing": {
+              "prompt": "2.61E-8",
+              "completion": "9E-7",
+              "input_cache_read": "1.08E-8"
+            },
+            "reservation_pricing": {
+              "completion": "9E-7",
+              "input_cache_read": "3E-8",
+              "prompt": "1.5E-7"
+            },
+            "finish_reason": null,
+            "original_entry_sha256": "807201b27925de4f132824ec4a8a49e81db5620c1105fe6c0450dfd681189deb",
+            "private_attempt_record": {
+              "path": "handoff/api_calls/openrouter_budgeted/cbac3f2f11e87518dbbc27886a9ce1bb74930237dfc08f676a72da01469835b6.json",
+              "original_bytes_sha256": "4e061da46570ff2b30852a0f42c5a67035c6311069f6ffe3dd80e6c8d9968380",
+              "json_sha256": "807201b27925de4f132824ec4a8a49e81db5620c1105fe6c0450dfd681189deb",
+              "matches_ledger": true
+            },
+            "provider_transport_published": false,
+            "error": "RuntimeError: RuntimeError: OpenRouter HTTP 400: {\"code\": \"400\", \"message\": \"Reasoning is mandatory for this endpoint and cannot be disabled.\"}",
+            "original_error_sha256": "2bd8a14f8038de36c1b83c34fccedb1a4bb93150228a0a730a432853321c86b6",
+            "content_available": false
+          }
+        ],
+        "ledger_present": true,
+        "original_ledger_sha256": "13d2fd9ef39feb42e34207e420a8563ad3d0f6435b738e51ac732be108eb8289",
+        "reported_cost_usd": "0",
+        "unknown_cost_calls": 1,
+        "unknown_reservations_usd": "0.00471975",
+        "halted": true
+      },
+      "model_contents": [],
+      "started": {
+        "models": [
+          [
+            "z-ai/glm-5.3-flash",
+            "fireworks",
+            "glm"
+          ],
+          [
+            "qwen/qwen3.8-omni-flash",
+            "alibaba",
+            "qwen"
+          ]
+        ],
+        "prompt": "This is an execution-interface qualification, not the SQLite task.\nWrite a complete executable Python program defining investigate(context, acquire).\ncontext contains rows: each row has an event_id string and an integer value.\nSum values once per event_id. Repeated identical records count once. If the same\nevent_id has conflicting values, return {\"value\": null, \"unresolved\": true}.\nOtherwise return {\"value\": the integer sum, \"unresolved\": false}.\nDo not return a signature or a description in source: return the full function\ndefinition and executable function body. No imports, no external calls.\n",
+        "cases": [
+          {
+            "rows": []
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "b",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "a",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": -2
+              },
+              {
+                "event_id": "b",
+                "value": 8
+              }
+            ]
+          }
+        ],
+        "keys": [
+          {
+            "value": 0,
+            "unresolved": false
+          },
+          {
+            "value": 4,
+            "unresolved": false
+          },
+          {
+            "value": null,
+            "unresolved": true
+          },
+          {
+            "value": 6,
+            "unresolved": false
+          }
+        ],
+        "source_hashes": {
+          "zenith/budgeted.py": "1a4640b57af3ae7d5cf1ce029c596b77f03ede16ce77d24c65d8b63682de7bd1",
+          "zenith/provider_policy.py": "5e1ce647a4f4481cb4bdce545a08df36dc406dab141e2989c5ae800b9d251b1d",
+          "zenith/investigation_program.py": "f523a325ff8207b99945365d4ebc6830c30705c7c859611fed2105fe5985b49f",
+          "research/observation_learning_study.py": "09eb5ab2c08fb181821e4b49ec8ed361f51ad500782bae58ea17cd933d6a0eb2",
+          "work/model-qualification-20261013-v2/run.py": "140f89f207df77119f2c181149f0d766a591058f6b2f75cc11e483c870034879"
+        },
+        "claim": "Tiny interface qualification only; no model ranking or learning claim.",
+        "max_calls": 2,
+        "max_total_cost_usd": ".20",
+        "retry": false
+      },
+      "results": {
+        "model": "z-ai/glm-5.3-flash",
+        "provider": "fireworks",
+        "error": "RuntimeError: RuntimeError: RuntimeError: OpenRouter HTTP 400: {\"code\": \"400\", \"message\": \"Reasoning is mandatory for this endpoint and cannot be disabled.\"}"
+      },
+      "result": {
+        "model": "z-ai/glm-5.3-flash",
+        "provider": "fireworks",
+        "error": "RuntimeError: RuntimeError: RuntimeError: OpenRouter HTTP 400: {\"code\": \"400\", \"message\": \"Reasoning is mandatory for this endpoint and cannot be disabled.\"}"
+      }
+    },
+    {
+      "qualification": "model-qualification-20261013-v2",
+      "request": {
+        "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n",
+        "prompt": "This is an execution-interface qualification, not the SQLite task.\nWrite a complete executable Python program defining investigate(context, acquire).\ncontext contains rows: each row has an event_id string and an integer value.\nSum values once per event_id. Repeated identical records count once. If the same\nevent_id has conflicting values, return {\"value\": null, \"unresolved\": true}.\nOtherwise return {\"value\": the integer sum, \"unresolved\": false}.\nDo not return a signature or a description in source: return the full function\ndefinition and executable function body. No imports, no external calls.\n",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "Complete executable Python program defining investigate(context, acquire), including the function body. Never a label or bare signature."
+            },
+            "scope": {
+              "type": "string",
+              "description": "Short statement of the supported scope."
+            },
+            "lesson": {
+              "type": "string",
+              "description": "Short technical account of the revision."
+            }
+          },
+          "required": [
+            "source",
+            "scope",
+            "lesson"
+          ],
+          "additionalProperties": false
+        },
+        "model": "qwen/qwen3.8-omni-flash",
+        "provider": "alibaba",
+        "reasoning": "none"
+      },
+      "calls": {
+        "calls": [
+          {
+            "call_id": "873b509699cbe019192962f39f818f3ce9143240e04b99dddc871bfbfadcfe8b",
+            "run_id": "qwen",
+            "node_id": "explicit-qualification",
+            "status": "response_supplied",
+            "requested_model": "qwen/qwen3.8-omni-flash",
+            "actual_provider": "Alibaba",
+            "requested_provider_slug": "alibaba",
+            "verified_provider_name": "Alibaba",
+            "reasoning_effort": null,
+            "cost": "0.00020449",
+            "reserved_cost_usd": "0.00295847",
+            "prompt_sha256": "8197473ffeee26225fa9e3e2454ebad1ac6c294f27f57207fa49cd0ce6e27f90",
+            "system_prompt_sha256": "8deb79b902b177cb9fb33618311add769c8dde630a484f6f35192d1fee642b74",
+            "response_sha256": "3b014f792a98943a34f26a092dd49e83b6a17bdd0e669250d65e3a5bbd67ceee",
+            "response_format_sha256": "fdaa1faddeb74a0242ed3cbad82f606085c592b762056fb8b2629f17b9db2f2a",
+            "recorded_at": "2026-10-13T21:34:47.638919+00:00",
+            "max_output_tokens": 4096,
+            "input_token_bound": 6889,
+            "inference_mode": "bounded",
+            "queue_elapsed_seconds": 0.00045295800373423845,
+            "network_elapsed_seconds": 3.3538107909989776,
+            "global_inference_limit": 3,
+            "provider_route_limit": 1,
+            "provider_route_sha256": "047364b9be67f665eca384b8061d688b8642a8b47b3de35c22a012ed6fe69242",
+            "actual_model": "qwen/qwen3.8-omni-flash",
+            "usage": {
+              "prompt_tokens": 605,
+              "completion_tokens": 242,
+              "total_tokens": 847,
+              "cost": 0.00020449,
+              "is_byok": false,
+              "prompt_tokens_details": {
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "audio_tokens": 0,
+                "video_tokens": 0
+              },
+              "cost_details": {
+                "upstream_inference_cost": 0.00020449,
+                "upstream_inference_prompt_cost": 9.075e-05,
+                "upstream_inference_completions_cost": 0.00011374
+              },
+              "completion_tokens_details": {
+                "reasoning_tokens": 0,
+                "image_tokens": 0,
+                "audio_tokens": 0
+              }
+            },
+            "catalogue_pricing": {
+              "prompt": "1.5E-7",
+              "completion": "4.7E-7",
+              "input_cache_read": "1.6E-8"
+            },
+            "reservation_pricing": {
+              "completion": "4.7E-7",
+              "input_cache_read": "1.6E-8",
+              "prompt": "1.5E-7"
+            },
+            "finish_reason": "stop",
+            "original_entry_sha256": "bc8ee42c1d1c851cf74b25eaf0ad20e5d604374f5e4a94d80b0a2706b227bedf",
+            "private_attempt_record": {
+              "path": "handoff/api_calls/openrouter_budgeted/873b509699cbe019192962f39f818f3ce9143240e04b99dddc871bfbfadcfe8b.json",
+              "original_bytes_sha256": "1fba12efd689d7da1d7f9985c86ea9153f1ba6be08908dcdcb3e70a6cdec38b3",
+              "json_sha256": "bc8ee42c1d1c851cf74b25eaf0ad20e5d604374f5e4a94d80b0a2706b227bedf",
+              "matches_ledger": true
+            },
+            "provider_transport_published": false
+          }
+        ],
+        "ledger_present": true,
+        "original_ledger_sha256": "3a10de69b1f79efbef436cb861721f0e60aa15b50bd2ced0f5e92566156f91b6",
+        "reported_cost_usd": "0.00020449",
+        "unknown_cost_calls": 0,
+        "unknown_reservations_usd": "0",
+        "halted": false
+      },
+      "model_contents": [
+        {
+          "call_id": "873b509699cbe019192962f39f818f3ce9143240e04b99dddc871bfbfadcfe8b",
+          "content": "{\n  \"source\": \"def investigate(context, acquire):\\n    rows = context.get('rows', [])\\n    event_values = {}\\n    for row in rows:\\n        eid = row['event_id']\\n        val = row['value']\\n        if eid not in event_values:\\n            event_values[eid] = set()\\n        event_values[eid].add(val)\\n    total_sum = 0\\n    unresolved = False\\n    for eid, vals in event_values.items():\\n        if len(vals) > 1:\\n            unresolved = True\\n            break\\n        else:\\n            v = list(vals)[0]\\n            total_sum += v\\n    if unresolved:\\n        return {\\\"value\\\": None, \\\"unresolved\\\": True}\\n    else:\\n        return {\\\"value\\\": total_sum, \\\"unresolved\\\": False}\",\n  \"scope\": \"Sums unique values per event ID from provided rows; detects conflicts.\",\n  \"lesson\": \"Use a dictionary of sets to track distinct values per event ID. If any event has more than one distinct value, mark as unresolved.\"\n}",
+          "original_content_sha256": "3b014f792a98943a34f26a092dd49e83b6a17bdd0e669250d65e3a5bbd67ceee",
+          "projection": "assistant content only; transport, headers, routing and credentials omitted",
+          "redacted": false
+        }
+      ],
+      "started": {
+        "models": [
+          [
+            "z-ai/glm-5.3-flash",
+            "fireworks",
+            "glm"
+          ],
+          [
+            "qwen/qwen3.8-omni-flash",
+            "alibaba",
+            "qwen"
+          ]
+        ],
+        "prompt": "This is an execution-interface qualification, not the SQLite task.\nWrite a complete executable Python program defining investigate(context, acquire).\ncontext contains rows: each row has an event_id string and an integer value.\nSum values once per event_id. Repeated identical records count once. If the same\nevent_id has conflicting values, return {\"value\": null, \"unresolved\": true}.\nOtherwise return {\"value\": the integer sum, \"unresolved\": false}.\nDo not return a signature or a description in source: return the full function\ndefinition and executable function body. No imports, no external calls.\n",
+        "cases": [
+          {
+            "rows": []
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "b",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "a",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": -2
+              },
+              {
+                "event_id": "b",
+                "value": 8
+              }
+            ]
+          }
+        ],
+        "keys": [
+          {
+            "value": 0,
+            "unresolved": false
+          },
+          {
+            "value": 4,
+            "unresolved": false
+          },
+          {
+            "value": null,
+            "unresolved": true
+          },
+          {
+            "value": 6,
+            "unresolved": false
+          }
+        ],
+        "source_hashes": {
+          "zenith/budgeted.py": "1a4640b57af3ae7d5cf1ce029c596b77f03ede16ce77d24c65d8b63682de7bd1",
+          "zenith/provider_policy.py": "5e1ce647a4f4481cb4bdce545a08df36dc406dab141e2989c5ae800b9d251b1d",
+          "zenith/investigation_program.py": "f523a325ff8207b99945365d4ebc6830c30705c7c859611fed2105fe5985b49f",
+          "research/observation_learning_study.py": "09eb5ab2c08fb181821e4b49ec8ed361f51ad500782bae58ea17cd933d6a0eb2",
+          "work/model-qualification-20261013-v2/run.py": "140f89f207df77119f2c181149f0d766a591058f6b2f75cc11e483c870034879"
+        },
+        "claim": "Tiny interface qualification only; no model ranking or learning claim.",
+        "max_calls": 2,
+        "max_total_cost_usd": ".20",
+        "retry": false
+      },
+      "results": {
+        "model": "qwen/qwen3.8-omni-flash",
+        "provider": "alibaba",
+        "correct": 4,
+        "total": 4,
+        "results": [
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 4,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": null,
+              "unresolved": true
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 6,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          }
+        ]
+      },
+      "raw": {
+        "content": "{\n  \"source\": \"def investigate(context, acquire):\\n    rows = context.get('rows', [])\\n    event_values = {}\\n    for row in rows:\\n        eid = row['event_id']\\n        val = row['value']\\n        if eid not in event_values:\\n            event_values[eid] = set()\\n        event_values[eid].add(val)\\n    total_sum = 0\\n    unresolved = False\\n    for eid, vals in event_values.items():\\n        if len(vals) > 1:\\n            unresolved = True\\n            break\\n        else:\\n            v = list(vals)[0]\\n            total_sum += v\\n    if unresolved:\\n        return {\\\"value\\\": None, \\\"unresolved\\\": True}\\n    else:\\n        return {\\\"value\\\": total_sum, \\\"unresolved\\\": False}\",\n  \"scope\": \"Sums unique values per event ID from provided rows; detects conflicts.\",\n  \"lesson\": \"Use a dictionary of sets to track distinct values per event ID. If any event has more than one distinct value, mark as unresolved.\"\n}"
+      },
+      "result": {
+        "model": "qwen/qwen3.8-omni-flash",
+        "provider": "alibaba",
+        "correct": 4,
+        "total": 4,
+        "results": [
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 4,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": null,
+              "unresolved": true
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 6,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "qualification": "model-qualification-20261013-v3",
+      "request": {
+        "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n",
+        "prompt": "This is an execution-interface qualification, not the SQLite task.\nWrite a complete executable Python program defining investigate(context, acquire).\ncontext contains rows: each row has an event_id string and an integer value.\nSum values once per event_id. Repeated identical records count once. If the same\nevent_id has conflicting values, return {\"value\": null, \"unresolved\": true}.\nOtherwise return {\"value\": the integer sum, \"unresolved\": false}.\nDo not return a signature or a description in source: return the full function\ndefinition and executable function body. No imports, no external calls.\n",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "Complete executable Python program defining investigate(context, acquire), including the function body. Never a label or bare signature."
+            },
+            "scope": {
+              "type": "string",
+              "description": "Short statement of the supported scope."
+            },
+            "lesson": {
+              "type": "string",
+              "description": "Short technical account of the revision."
+            }
+          },
+          "required": [
+            "source",
+            "scope",
+            "lesson"
+          ],
+          "additionalProperties": false
+        },
+        "model": "z-ai/glm-5.3-flash",
+        "provider": "fireworks",
+        "reasoning": "low"
+      },
+      "calls": {
+        "calls": [
+          {
+            "call_id": "e7d5ce546801d5e1e2f86cd7b1964931940bc77eb03fe7aecd58da8206a06a79",
+            "run_id": "glm",
+            "node_id": "explicit-qualification",
+            "status": "response_supplied",
+            "requested_model": "z-ai/glm-5.3-flash",
+            "actual_provider": "Fireworks",
+            "requested_provider_slug": "fireworks",
+            "verified_provider_name": "Fireworks",
+            "reasoning_effort": "low",
+            "cost": "0.00015425",
+            "reserved_cost_usd": "0.00840615",
+            "prompt_sha256": "8197473ffeee26225fa9e3e2454ebad1ac6c294f27f57207fa49cd0ce6e27f90",
+            "system_prompt_sha256": "8deb79b902b177cb9fb33618311add769c8dde630a484f6f35192d1fee642b74",
+            "response_sha256": "01726669125200ee61cda609fee3e3131dcd7cf69e7a7157f2285a2af0fd319e",
+            "response_format_sha256": "fdaa1faddeb74a0242ed3cbad82f606085c592b762056fb8b2629f17b9db2f2a",
+            "recorded_at": "2026-10-13T21:36:50.221330+00:00",
+            "max_output_tokens": 8192,
+            "input_token_bound": 6889,
+            "inference_mode": "bounded",
+            "queue_elapsed_seconds": 0.0005056660011177883,
+            "network_elapsed_seconds": 3.8503878749979776,
+            "global_inference_limit": 3,
+            "provider_route_limit": 1,
+            "provider_route_sha256": "0caee180da9d0f3f29af4cd0013dc302f229b87ff05b2697f8700f592fb3a955",
+            "actual_model": "z-ai/glm-5.3-flash",
+            "usage": {
+              "prompt_tokens": 455,
+              "completion_tokens": 172,
+              "total_tokens": 627,
+              "cost": 0.00015425,
+              "is_byok": false,
+              "prompt_tokens_details": {
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "audio_tokens": 0,
+                "video_tokens": 0
+              },
+              "cost_details": {
+                "upstream_inference_cost": 0.00015425,
+                "upstream_inference_prompt_cost": 6.825e-05,
+                "upstream_inference_completions_cost": 8.6e-05
+              },
+              "completion_tokens_details": {
+                "reasoning_tokens": 2,
+                "image_tokens": 0,
+                "audio_tokens": 0
+              }
+            },
+            "catalogue_pricing": {
+              "prompt": "2.61E-8",
+              "completion": "9E-7",
+              "input_cache_read": "1.08E-8"
+            },
+            "reservation_pricing": {
+              "input_cache_read": "3E-8",
+              "completion": "9E-7",
+              "prompt": "1.5E-7"
+            },
+            "finish_reason": "stop",
+            "original_entry_sha256": "9dd86c18cf4188e46cdb644046b369020a9a13db1d923bb865baa27d79d05a8e",
+            "private_attempt_record": {
+              "path": "handoff/api_calls/openrouter_budgeted/e7d5ce546801d5e1e2f86cd7b1964931940bc77eb03fe7aecd58da8206a06a79.json",
+              "original_bytes_sha256": "0b016d61fc26a8aac601a32b36da580c236d6ccb6a60662090fe2b8496f0bee2",
+              "json_sha256": "9dd86c18cf4188e46cdb644046b369020a9a13db1d923bb865baa27d79d05a8e",
+              "matches_ledger": true
+            },
+            "provider_transport_published": false
+          }
+        ],
+        "ledger_present": true,
+        "original_ledger_sha256": "e81dace6df376e41568a0ec9ae623a58047c21401df0e071379c8c9eefeacf25",
+        "reported_cost_usd": "0.00015425",
+        "unknown_cost_calls": 0,
+        "unknown_reservations_usd": "0",
+        "halted": false
+      },
+      "model_contents": [
+        {
+          "call_id": "e7d5ce546801d5e1e2f86cd7b1964931940bc77eb03fe7aecd58da8206a06a79",
+          "content": "{\"source\": \"def investigate(context, acquire):\\n    values = {}\\n    for row in context.get(\\\"rows\\\", []):\\n        eid = row[\\\"event_id\\\"]\\n        val = row[\\\"value\\\"]\\n        if eid in values:\\n            if values[eid] != val:\\n                return {\\\"value\\\": None, \\\"unresolved\\\": True}\\n        else:\\n            values[eid] = val\\n    return {\\\"value\\\": sum(values.values()), \\\"unresolved\\\": False}\", \"scope\": \"Deduplicate identical event records and sum values once per event_id; conflicting values for an event_id make the goal unresolved.\", \"lesson\": \"Group rows by event_id; identical repeats collapse to one contribution, conflicting values for the same event_id yield null and unresolved.\"}",
+          "original_content_sha256": "01726669125200ee61cda609fee3e3131dcd7cf69e7a7157f2285a2af0fd319e",
+          "projection": "assistant content only; transport, headers, routing and credentials omitted",
+          "redacted": false
+        }
+      ],
+      "started": {
+        "models": [
+          [
+            "z-ai/glm-5.3-flash",
+            "fireworks",
+            "glm"
+          ]
+        ],
+        "prompt": "This is an execution-interface qualification, not the SQLite task.\nWrite a complete executable Python program defining investigate(context, acquire).\ncontext contains rows: each row has an event_id string and an integer value.\nSum values once per event_id. Repeated identical records count once. If the same\nevent_id has conflicting values, return {\"value\": null, \"unresolved\": true}.\nOtherwise return {\"value\": the integer sum, \"unresolved\": false}.\nDo not return a signature or a description in source: return the full function\ndefinition and executable function body. No imports, no external calls.\n",
+        "cases": [
+          {
+            "rows": []
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "b",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "a",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": -2
+              },
+              {
+                "event_id": "b",
+                "value": 8
+              }
+            ]
+          }
+        ],
+        "keys": [
+          {
+            "value": 0,
+            "unresolved": false
+          },
+          {
+            "value": 4,
+            "unresolved": false
+          },
+          {
+            "value": null,
+            "unresolved": true
+          },
+          {
+            "value": 6,
+            "unresolved": false
+          }
+        ],
+        "source_hashes": {
+          "zenith/budgeted.py": "1a4640b57af3ae7d5cf1ce029c596b77f03ede16ce77d24c65d8b63682de7bd1",
+          "zenith/provider_policy.py": "5e1ce647a4f4481cb4bdce545a08df36dc406dab141e2989c5ae800b9d251b1d",
+          "zenith/investigation_program.py": "f523a325ff8207b99945365d4ebc6830c30705c7c859611fed2105fe5985b49f",
+          "research/observation_learning_study.py": "09eb5ab2c08fb181821e4b49ec8ed361f51ad500782bae58ea17cd933d6a0eb2",
+          "work/model-qualification-20261013-v3/run.py": "114d5466dc7e242054b551ea3d14acdd7f59fc6d151dd55ce03e6dc29baad25c"
+        },
+        "claim": "Tiny interface qualification only; no model ranking or learning claim.",
+        "max_calls": 1,
+        "max_total_cost_usd": ".10",
+        "retry": false
+      },
+      "results": {
+        "model": "z-ai/glm-5.3-flash",
+        "provider": "fireworks",
+        "correct": 4,
+        "total": 4,
+        "results": [
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 4,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": null,
+              "unresolved": true
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 6,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          }
+        ]
+      },
+      "raw": {
+        "content": "{\"source\": \"def investigate(context, acquire):\\n    values = {}\\n    for row in context.get(\\\"rows\\\", []):\\n        eid = row[\\\"event_id\\\"]\\n        val = row[\\\"value\\\"]\\n        if eid in values:\\n            if values[eid] != val:\\n                return {\\\"value\\\": None, \\\"unresolved\\\": True}\\n        else:\\n            values[eid] = val\\n    return {\\\"value\\\": sum(values.values()), \\\"unresolved\\\": False}\", \"scope\": \"Deduplicate identical event records and sum values once per event_id; conflicting values for an event_id make the goal unresolved.\", \"lesson\": \"Group rows by event_id; identical repeats collapse to one contribution, conflicting values for the same event_id yield null and unresolved.\"}"
+      },
+      "result": {
+        "model": "z-ai/glm-5.3-flash",
+        "provider": "fireworks",
+        "correct": 4,
+        "total": 4,
+        "results": [
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 4,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": null,
+              "unresolved": true
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 6,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          }
+        ]
+      }
+    },
+    {
+      "qualification": "model-qualification-20261013-v4",
+      "request": {
+        "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n",
+        "prompt": "This is an execution-interface qualification, not the SQLite task.\nWrite a complete executable Python program defining investigate(context, acquire).\ncontext contains rows: each row has an event_id string and an integer value.\nSum values once per event_id. Repeated identical records count once. If the same\nevent_id has conflicting values, return {\"value\": null, \"unresolved\": true}.\nOtherwise return {\"value\": the integer sum, \"unresolved\": false}.\nDo not return a signature or a description in source: return the full function\ndefinition and executable function body. No imports, no external calls.\n",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "string",
+              "description": "Complete executable Python program defining investigate(context, acquire), including the function body. Never a label or bare signature."
+            },
+            "scope": {
+              "type": "string",
+              "description": "Short statement of the supported scope."
+            },
+            "lesson": {
+              "type": "string",
+              "description": "Short technical account of the revision."
+            }
+          },
+          "required": [
+            "source",
+            "scope",
+            "lesson"
+          ],
+          "additionalProperties": false
+        },
+        "model": "z-ai/glm-5.3-flash",
+        "provider": "streamlake/fp8",
+        "reasoning": "low"
+      },
+      "calls": {
+        "calls": [
+          {
+            "call_id": "605ddc5c39e4f31a7b1d1907ef4ee5597b6d6a7c4fa1d5c004f322a3ebcc2d49",
+            "run_id": "glm",
+            "node_id": "explicit-qualification",
+            "status": "response_supplied",
+            "requested_model": "z-ai/glm-5.3-flash",
+            "actual_provider": "StreamLake",
+            "requested_provider_slug": "streamlake/fp8",
+            "verified_provider_name": "StreamLake",
+            "reasoning_effort": "low",
+            "cost": "0.0000460375",
+            "reserved_cost_usd": "0.0076724715",
+            "prompt_sha256": "8197473ffeee26225fa9e3e2454ebad1ac6c294f27f57207fa49cd0ce6e27f90",
+            "system_prompt_sha256": "8deb79b902b177cb9fb33618311add769c8dde630a484f6f35192d1fee642b74",
+            "response_sha256": "a0edb78b645e64ad4ff9243a9ae037a3fb72ad014ce9c313d7c0bcf4157cd4b1",
+            "response_format_sha256": "fdaa1faddeb74a0242ed3cbad82f606085c592b762056fb8b2629f17b9db2f2a",
+            "recorded_at": "2026-10-13T22:05:04.355985+00:00",
+            "max_output_tokens": 8192,
+            "input_token_bound": 6889,
+            "inference_mode": "bounded",
+            "queue_elapsed_seconds": 0.00037608300044666976,
+            "network_elapsed_seconds": 5.405518540996127,
+            "global_inference_limit": 3,
+            "provider_route_limit": 1,
+            "provider_route_sha256": "22df737fc0f10f5822e9d9e8b0556d7e4f955ed937b8e73dfe91b91be6e57b9e",
+            "actual_model": "z-ai/glm-5.3-flash",
+            "usage": {
+              "prompt_tokens": 455,
+              "completion_tokens": 181,
+              "total_tokens": 636,
+              "cost": 4.60375e-05,
+              "is_byok": false,
+              "prompt_tokens_details": {
+                "cached_tokens": 0,
+                "cache_write_tokens": 0,
+                "audio_tokens": 0,
+                "video_tokens": 0
+              },
+              "cost_details": {
+                "upstream_inference_cost": 4.60375e-05,
+                "upstream_inference_prompt_cost": 1.97925e-05,
+                "upstream_inference_completions_cost": 2.6245e-05
+              },
+              "completion_tokens_details": {
+                "reasoning_tokens": 180,
+                "image_tokens": 0,
+                "audio_tokens": 0
+              }
+            },
+            "catalogue_pricing": {
+              "prompt": "2.61E-8",
+              "completion": "9E-7",
+              "input_cache_read": "1.08E-8"
+            },
+            "reservation_pricing": {
+              "completion": "9E-7",
+              "input_cache_read": "1.08E-8",
+              "prompt": "4.35E-8"
+            },
+            "finish_reason": "stop",
+            "original_entry_sha256": "9e0f8a331864bc082d46c57c1daf227b5447de68bf02820ca5badbd1a7f256a9",
+            "private_attempt_record": {
+              "path": "handoff/api_calls/openrouter_budgeted/605ddc5c39e4f31a7b1d1907ef4ee5597b6d6a7c4fa1d5c004f322a3ebcc2d49.json",
+              "original_bytes_sha256": "25858a7c8cf0a4fc7f3627a56da0afd2e4c59d63a238bf41cbca0d5a36fb6187",
+              "json_sha256": "9e0f8a331864bc082d46c57c1daf227b5447de68bf02820ca5badbd1a7f256a9",
+              "matches_ledger": true
+            },
+            "provider_transport_published": false
+          }
+        ],
+        "ledger_present": true,
+        "original_ledger_sha256": "f335056a6d314f0595c9db4dc7e7f4670a46aab49459d9b6b51153e9677dee64",
+        "reported_cost_usd": "0.0000460375",
+        "unknown_cost_calls": 0,
+        "unknown_reservations_usd": "0",
+        "halted": false
+      },
+      "model_contents": [
+        {
+          "call_id": "605ddc5c39e4f31a7b1d1907ef4ee5597b6d6a7c4fa1d5c004f322a3ebcc2d49",
+          "content": "{\"lesson\":\"Deduplicate identical records per event_id; conflicting values for the same event_id make the aggregate unresolvable.\",\"scope\":\"Sum integer values once per unique event_id; identical duplicate rows count once; conflicting values for the same event_id yield null with unresolved true.\",\"source\":\"def investigate(context, acquire):\\n    seen = {}\\n    conflict = False\\n    for row in context.get(\\\"rows\\\"):\\n        eid = row.get(\\\"event_id\\\")\\n        val = row.get(\\\"value\\\")\\n        if eid in seen:\\n            if seen[eid] != val:\\n                conflict = True\\n        else:\\n            seen[eid] = val\\n    if conflict:\\n        return {\\\"value\\\": None, \\\"unresolved\\\": True}\\n    return {\\\"value\\\": sum(seen.values()), \\\"unresolved\\\": False}\"}",
+          "original_content_sha256": "a0edb78b645e64ad4ff9243a9ae037a3fb72ad014ce9c313d7c0bcf4157cd4b1",
+          "projection": "assistant content only; transport, headers, routing and credentials omitted",
+          "redacted": false
+        }
+      ],
+      "started": {
+        "models": [
+          [
+            "z-ai/glm-5.3-flash",
+            "streamlake/fp8",
+            "glm"
+          ]
+        ],
+        "prompt": "This is an execution-interface qualification, not the SQLite task.\nWrite a complete executable Python program defining investigate(context, acquire).\ncontext contains rows: each row has an event_id string and an integer value.\nSum values once per event_id. Repeated identical records count once. If the same\nevent_id has conflicting values, return {\"value\": null, \"unresolved\": true}.\nOtherwise return {\"value\": the integer sum, \"unresolved\": false}.\nDo not return a signature or a description in source: return the full function\ndefinition and executable function body. No imports, no external calls.\n",
+        "cases": [
+          {
+            "rows": []
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "b",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": 2
+              },
+              {
+                "event_id": "a",
+                "value": 5
+              }
+            ]
+          },
+          {
+            "rows": [
+              {
+                "event_id": "a",
+                "value": -2
+              },
+              {
+                "event_id": "b",
+                "value": 8
+              }
+            ]
+          }
+        ],
+        "keys": [
+          {
+            "value": 0,
+            "unresolved": false
+          },
+          {
+            "value": 4,
+            "unresolved": false
+          },
+          {
+            "value": null,
+            "unresolved": true
+          },
+          {
+            "value": 6,
+            "unresolved": false
+          }
+        ],
+        "source_hashes": {
+          "zenith/budgeted.py": "1a4640b57af3ae7d5cf1ce029c596b77f03ede16ce77d24c65d8b63682de7bd1",
+          "zenith/provider_policy.py": "5e1ce647a4f4481cb4bdce545a08df36dc406dab141e2989c5ae800b9d251b1d",
+          "zenith/investigation_program.py": "f523a325ff8207b99945365d4ebc6830c30705c7c859611fed2105fe5985b49f",
+          "research/observation_learning_study.py": "09eb5ab2c08fb181821e4b49ec8ed361f51ad500782bae58ea17cd933d6a0eb2",
+          "work/model-qualification-20261013-v4/run.py": "a2ffc7aac6ea79b6fe29438c99df821cb4cb282c9d3a8b2f9c58c3abb1cc171a"
+        },
+        "claim": "Tiny interface qualification only; no model ranking or learning claim.",
+        "max_calls": 1,
+        "max_total_cost_usd": ".10",
+        "retry": false
+      },
+      "results": {
+        "model": "z-ai/glm-5.3-flash",
+        "provider": "streamlake/fp8",
+        "correct": 4,
+        "total": 4,
+        "results": [
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 4,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": null,
+              "unresolved": true
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 6,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          }
+        ]
+      },
+      "raw": {
+        "content": "{\"lesson\":\"Deduplicate identical records per event_id; conflicting values for the same event_id make the aggregate unresolvable.\",\"scope\":\"Sum integer values once per unique event_id; identical duplicate rows count once; conflicting values for the same event_id yield null with unresolved true.\",\"source\":\"def investigate(context, acquire):\\n    seen = {}\\n    conflict = False\\n    for row in context.get(\\\"rows\\\"):\\n        eid = row.get(\\\"event_id\\\")\\n        val = row.get(\\\"value\\\")\\n        if eid in seen:\\n            if seen[eid] != val:\\n                conflict = True\\n        else:\\n            seen[eid] = val\\n    if conflict:\\n        return {\\\"value\\\": None, \\\"unresolved\\\": True}\\n    return {\\\"value\\\": sum(seen.values()), \\\"unresolved\\\": False}\"}"
+      },
+      "result": {
+        "model": "z-ai/glm-5.3-flash",
+        "provider": "streamlake/fp8",
+        "correct": 4,
+        "total": 4,
+        "results": [
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 4,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": null,
+              "unresolved": true
+            },
+            "trace": [],
+            "error": null
+          },
+          {
+            "answer": {
+              "value": 6,
+              "unresolved": false
+            },
+            "trace": [],
+            "error": null
+          }
+        ]
+      }
+    }
+  ]
+}

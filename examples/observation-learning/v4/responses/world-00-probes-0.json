@@ -1,0 +1,77 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "commit",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "a",
+        "value": 3
+      }
+    ]
+  ],
+  "purpose": "These three sequences separate the three put conflict modes, the presence/absence of the AFTER INSERT trigger, and the three channel definitions. Sequence 1 distinguishes INSERT OR IGNORE from INSERT OR REPLACE/ON CONFLICT DO UPDATE via committed value and channel. Sequence 2 distinguishes trigger firing on ignored inserts and rollback effects. Sequence 3 distinguishes main-only counters from main+other counters and trigger firing on cross-connection updates."
+}

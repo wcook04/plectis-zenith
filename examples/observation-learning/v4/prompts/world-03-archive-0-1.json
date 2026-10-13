@@ -1,0 +1,284 @@
+{
+  "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n",
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "history": [
+      {
+        "source_id": "source-3985ba99677cf25f27bd",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "d32c3e1d4f085cf09a53f945acbd519eff8b02dc4775bbb56c42a9d7fa89dac3"
+      },
+      {
+        "source_id": "source-3985ba99677cf25f27bd",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "22ad6646915641b1a5a3c05bbdfe8bb71c48789c9af33a4bc6c99fc97ddad236"
+      },
+      {
+        "source_id": "source-3985ba99677cf25f27bd",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "other",
+            "key": "b",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 2,
+          "committed_sum": 3
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "3d61578583f7a2efee904d7712e386c39190fc86f21e15cba9d80e4cf6e2b417"
+      },
+      {
+        "source_id": "source-3985ba99677cf25f27bd",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 90
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 81
+          },
+          {
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 81
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "5e90f55cd6736e475fd31729c52a665eff04438ece687593a2b0a29abf85b1d9"
+      }
+    ],
+    "champion": {
+      "source": "def investigate(context, acquire):\n    hist = acquire(\"history\")\n    # Family: put in {ignore, replace, upsert}, trigger in {none, after_insert},\n    # channel in {changes, total_main, total_both}.\n    # We simulate each candidate and keep those matching all receipts.\n\n    def simulate(put_mode, trig, chan, actions):\n        # state: dict key->value for committed main db\n        # other db separate committed state\n        main = {}\n        other = {}\n        # transaction buffers: None means no open txn\n        tmain = None\n        tother = None\n        # counters\n        changes_main = 0\n        total_main = 0\n        total_other = 0\n        # trigger log count (unread, but affects total_changes)\n        trig_count = 0\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                if conn == \"main\":\n                    tmain = {}\n                else:\n                    tother = {}\n            elif op == \"commit\":\n                if conn == \"main\":\n                    if tmain is not None:\n                        main.update(tmain)\n                        tmain = None\n                else:\n                    if tother is not None:\n                        other.update(tother)\n                        tother = None\n            elif op == \"rollback\":\n                if conn == \"main\":\n                    tmain = None\n                else:\n                    tother = None\n            elif op == \"put\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    db = main if tmain is None else tmain\n                    base = main\n                else:\n                    db = other if tother is None else tother\n                    base = other\n                # determine if key exists in the effective view\n                # For main txn, view is main overlaid with tmain\n                if conn == \"main\" and tmain is not None:\n                    exists = key in tmain or key in main\n                elif conn == \"other\" and tother is not None:\n                    exists = key in tother or key in other\n                else:\n                    exists = key in db\n                changed = 0\n                if put_mode == \"ignore\":\n                    if not exists:\n                        db[key] = val\n                        changed = 1\n                elif put_mode == \"replace\":\n                    db[key] = val\n                    changed = 1\n                else:  # upsert\n                    if exists:\n                        # DO UPDATE SET value=excluded.value\n                        # if value same, still counts as change? SQLite counts row as changed\n                        db[key] = val\n                        changed = 1\n                    else:\n                        db[key] = val\n                        changed = 1\n                if changed:\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n                    if trig == \"after_insert\" and not exists:\n                        # trigger fires on insert only\n                        trig_count += 1\n                        if conn == \"main\":\n                            total_main += 1\n                        else:\n                            total_other += 1\n            elif op == \"update\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    db = main if tmain is None else tmain\n                else:\n                    db = other if tother is None else tother\n                if key in db:\n                    db[key] = val\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n            elif op == \"delete\":\n                key = act.get(\"key\")\n                if conn == \"main\":\n                    db = main if tmain is None else tmain\n                else:\n                    db = other if tother is None else tother\n                if key in db:\n                    del db[key]\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n        # committed state: main + other? No, separate connections to same db file.\n        # Actually both connections see same database. Committed state is union.\n        # But main and other are separate connections to same file, so committed\n        # state is shared. Our model: main and other are views of same committed db.\n        # We need to merge: committed = main updated with other's committed changes.\n        # Since both write to same file, committed state is the combination.\n        # Let's redo: single committed dict, but transactions buffer per connection.\n        return None\n\n    # The above is getting complex. Let's simplify: single committed database.\n    # Each connection has its own transaction buffer.\n    def simulate2(put_mode, trig, chan, actions):\n        committed = {}\n        tmain = None\n        tother = None\n        changes_main = 0\n        total_main = 0\n        total_other = 0\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                if conn == \"main\":\n                    tmain = {}\n                else:\n                    tother = {}\n            elif op == \"commit\":\n                if conn == \"main\":\n                    if tmain is not None:\n                        committed.update(tmain)\n                        tmain = None\n                else:\n                    if tother is not None:\n                        committed.update(tother)\n                        tother = None\n            elif op == \"rollback\":\n                if conn == \"main\":\n                    tmain = None\n                else:\n                    tother = None\n            elif op == \"put\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                # effective view: committed overlaid with this connection's buffer\n                if buf is not None:\n                    exists = key in buf or key in committed\n                else:\n                    exists = key in committed\n                changed = 0\n                if put_mode == \"ignore\":\n                    if not exists:\n                        if buf is not None:\n                            buf[key] = val\n                        else:\n                            committed[key] = val\n                        changed = 1\n                elif put_mode == \"replace\":\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    changed = 1\n                else:  # upsert\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    changed = 1\n                if changed:\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n                    if trig == \"after_insert\" and not exists:\n                        if conn == \"main\":\n                            total_main += 1\n                        else:\n                            total_other += 1\n            elif op == \"update\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    exists = key in buf or key in committed\n                else:\n                    exists = key in committed\n                if exists:\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n            elif op == \"delete\":\n                key = act.get(\"key\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    exists = key in buf or key in committed\n                else:\n                    exists = key in committed\n                if exists:\n                    if buf is not None:\n                        if key in buf:\n                            del buf[key]\n                        else:\n                            # delete from committed inside txn: need tombstone\n                            # simplify: mark as deleted in buffer\n                            buf[key] = None\n                    else:\n                        del committed[key]\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n        # final committed state: apply buffers? No, uncommitted not visible.\n        # committed dict already has committed changes.\n        # But tombstones in buffer not applied. For committed state, ignore buffers.\n        # However, committed dict may have been modified directly for non-txn.\n        # For txn, committed dict only updated on commit.\n        # But we used committed dict for non-txn writes directly. Good.\n        # For txn deletes, we set buf[key]=None, not committed. Good.\n        # But for txn puts, we set buf[key]=val, not committed. Good.\n        # So committed dict is correct committed state.\n        # However, for non-txn writes, we modified committed directly. Good.\n        # But for txn writes, we need to ensure committed not modified. Good.\n        # One issue: for txn put, exists check uses committed, but if key was\n        # deleted in same txn, buf has None. exists = key in buf or key in committed.\n        # If buf[key]=None, key in buf is True, so exists True. That's wrong for\n        # delete then put. But rare. Let's handle: if buf has None, treat as not exists.\n        # We'll refine later.\n        if chan == \"changes\":\n            return changes_main\n        elif chan == \"total_main\":\n            return total_main\n        else:\n            return total_main + total_other\n\n    # Refine simulate2 for tombstones\n    def simulate3(put_mode, trig, chan, actions):\n        committed = {}\n        tmain = None\n        tother = None\n        changes_main = 0\n        total_main = 0\n        total_other = 0\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                if conn == \"main\":\n                    tmain = {}\n                else:\n                    tother = {}\n            elif op == \"commit\":\n                if conn == \"main\":\n                    if tmain is not None:\n                        for k, v in tmain.items():\n                            if v is None:\n                                if k in committed:\n                                    del committed[k]\n                            else:\n                                committed[k] = v\n                        tmain = None\n                else:\n                    if tother is not None:\n                        for k, v in tother.items():\n                            if v is None:\n                                if k in committed:\n                                    del committed[k]\n                            else:\n                                committed[k] = v\n                        tother = None\n            elif op == \"rollback\":\n                if conn == \"main\":\n                    tmain = None\n                else:\n                    tother = None\n            elif op == \"put\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    if key in buf:\n                        exists = buf[key] is not None\n                    else:\n                        exists = key in committed\n                else:\n                    exists = key in committed\n                changed = 0\n                if put_mode == \"ignore\":\n                    if not exists:\n                        if buf is not None:\n                            buf[key] = val\n                        else:\n                            committed[key] = val\n                        changed = 1\n                elif put_mode == \"replace\":\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    changed = 1\n                else:\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    changed = 1\n                if changed:\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n                    if trig == \"after_insert\" and not exists:\n                        if conn == \"main\":\n                            total_main += 1\n                        else:\n                            total_other += 1\n            elif op == \"update\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    if key in buf:\n                        exists = buf[key] is not None\n                    else:\n                        exists = key in committed\n                else:\n                    exists = key in committed\n                if exists:\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n            elif op == \"delete\":\n                key = act.get(\"key\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    if key in buf:\n                        exists = buf[key] is not None\n                    else:\n                        exists = key in committed\n                else:\n                    exists = key in committed\n                if exists:\n                    if buf is not None:\n                        buf[key] = None\n                    else:\n                        del committed[key]\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n        if chan == \"changes\":\n            return changes_main\n        elif chan == \"total_main\":\n            return total_main\n        else:\n            return total_main + total_other\n\n    # committed state after actions\n    def committed_state(actions):\n        committed = {}\n        tmain = None\n        tother = None\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                if conn == \"main\":\n                    tmain = {}\n                else:\n                    tother = {}\n            elif op == \"commit\":\n                if conn == \"main\":\n                    if tmain is not None:\n                        for k, v in tmain.items():\n                            if v is None:\n                                if k in committed:\n                                    del committed[k]\n                            else:\n                                committed[k] = v\n                        tmain = None\n                else:\n                    if tother is not None:\n                        for k, v in tother.items():\n                            if v is None:\n                                if k in committed:\n                                    del committed[k]\n                            else:\n                                committed[k] = v\n                        tother = None\n            elif op == \"rollback\":\n                if conn == \"main\":\n                    tmain = None\n                else:\n                    tother = None\n            elif op == \"put\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    buf[key] = val\n                else:\n                    committed[key] = val\n            elif op == \"update\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    buf[key] = val\n                else:\n                    committed[key] = val\n            elif op == \"delete\":\n                key = act.get(\"key\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    buf[key] = None\n                else:\n                    if key in committed:\n                        del committed[key]\n        return committed\n\n    # Filter candidates\n    candidates = []\n    for put_mode in [\"ignore\", \"replace\", \"upsert\"]:\n        for trig in [\"none\", \"after_insert\"]:\n            for chan in [\"changes\", \"total_main\", \"total_both\"]:\n                ok = True\n                for rec in hist:\n                    acts = rec.get(\"actions\", [])\n                    obs = rec.get(\"observed\", {})\n                    pred_chan = simulate3(put_mode, trig, chan, acts)\n                    if pred_chan != obs.get(\"channel\"):\n                        ok = False\n                        break\n                    st = committed_state(acts)\n                    if len(st) != obs.get(\"committed_count\"):\n                        ok = False\n                        break\n                    if sum(st.values()) != obs.get(\"committed_sum\"):\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((put_mode, trig, chan))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n\n    vals = set()\n    for put_mode, trig, chan in candidates:\n        if goal == \"channel\":\n            vals.add(simulate3(put_mode, trig, chan, actions))\n        elif goal == \"committed_count\":\n            st = committed_state(actions)\n            vals.add(len(st))\n        elif goal == \"committed_sum\":\n            st = committed_state(actions)\n            vals.add(sum(st.values()))\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(vals) == 1:\n        return {\"value\": list(vals)[0], \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+      "scope": "Infers put conflict mode, trigger presence, and channel from calibration receipts by simulating the 18-member family; predicts channel, committed_count, or committed_sum for new sequences only when all consistent candidates agree.",
+      "lesson": "The source uses INSERT OR REPLACE (or upsert) with no trigger and main changes() channel: repeated put on same key yields channel 1 and committed value 2; rollback restores prior committed state; other-connection writes are visible to committed reader but not counted by main changes()."
+    },
+    "champion_score": {
+      "correct": 12,
+      "total": 12,
+      "errors": 0
+    },
+    "champion_feedback": [
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "goal": "channel",
+        "expected": {
+          "value": 1,
+          "unresolved": false
+        },
+        "actual": {
+          "value": 1,
+          "unresolved": false
+        },
+        "error": null,
+        "correct": true
+      },
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "goal": "committed_count",
+        "expected": {
+          "value": 1,
+          "unresolved": false
+        },
+        "actual": {
+          "value": 1,
+          "unresolved": false
+        },
+        "error": null,
+        "correct": true
+      }
+    ],
+    "request": "Author a complete reusable observation program. Use the measured errors to change the computation, including coupled changes when necessary. A correct calibration score alone does not establish a correct model of new compositions. Preserve uncertainty where evidence cannot determine a goal.",
+    "construction_archive": [
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    hist = acquire(\"history\")\n    # Family: put in {ignore, replace, upsert}, trigger in {none, after_insert},\n    # channel in {changes, total_main, total_both}.\n    # We simulate each candidate and keep those matching all receipts.\n\n    def simulate(put_mode, trig, chan, actions):\n        # state: dict key->value for committed main db\n        # other db separate committed state\n        main = {}\n        other = {}\n        # transaction buffers: None means no open txn\n        tmain = None\n        tother = None\n        # counters\n        changes_main = 0\n        total_main = 0\n        total_other = 0\n        # trigger log count (unread, but affects total_changes)\n        trig_count = 0\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                if conn == \"main\":\n                    tmain = {}\n                else:\n                    tother = {}\n            elif op == \"commit\":\n                if conn == \"main\":\n                    if tmain is not None:\n                        main.update(tmain)\n                        tmain = None\n                else:\n                    if tother is not None:\n                        other.update(tother)\n                        tother = None\n            elif op == \"rollback\":\n                if conn == \"main\":\n                    tmain = None\n                else:\n                    tother = None\n            elif op == \"put\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    db = main if tmain is None else tmain\n                    base = main\n                else:\n                    db = other if tother is None else tother\n                    base = other\n                # determine if key exists in the effective view\n                # For main txn, view is main overlaid with tmain\n                if conn == \"main\" and tmain is not None:\n                    exists = key in tmain or key in main\n                elif conn == \"other\" and tother is not None:\n                    exists = key in tother or key in other\n                else:\n                    exists = key in db\n                changed = 0\n                if put_mode == \"ignore\":\n                    if not exists:\n                        db[key] = val\n                        changed = 1\n                elif put_mode == \"replace\":\n                    db[key] = val\n                    changed = 1\n                else:  # upsert\n                    if exists:\n                        # DO UPDATE SET value=excluded.value\n                        # if value same, still counts as change? SQLite counts row as changed\n                        db[key] = val\n                        changed = 1\n                    else:\n                        db[key] = val\n                        changed = 1\n                if changed:\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n                    if trig == \"after_insert\" and not exists:\n                        # trigger fires on insert only\n                        trig_count += 1\n                        if conn == \"main\":\n                            total_main += 1\n                        else:\n                            total_other += 1\n            elif op == \"update\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    db = main if tmain is None else tmain\n                else:\n                    db = other if tother is None else tother\n                if key in db:\n                    db[key] = val\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n            elif op == \"delete\":\n                key = act.get(\"key\")\n                if conn == \"main\":\n                    db = main if tmain is None else tmain\n                else:\n                    db = other if tother is None else tother\n                if key in db:\n                    del db[key]\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n        # committed state: main + other? No, separate connections to same db file.\n        # Actually both connections see same database. Committed state is union.\n        # But main and other are separate connections to same file, so committed\n        # state is shared. Our model: main and other are views of same committed db.\n        # We need to merge: committed = main updated with other's committed changes.\n        # Since both write to same file, committed state is the combination.\n        # Let's redo: single committed dict, but transactions buffer per connection.\n        return None\n\n    # The above is getting complex. Let's simplify: single committed database.\n    # Each connection has its own transaction buffer.\n    def simulate2(put_mode, trig, chan, actions):\n        committed = {}\n        tmain = None\n        tother = None\n        changes_main = 0\n        total_main = 0\n        total_other = 0\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                if conn == \"main\":\n                    tmain = {}\n                else:\n                    tother = {}\n            elif op == \"commit\":\n                if conn == \"main\":\n                    if tmain is not None:\n                        committed.update(tmain)\n                        tmain = None\n                else:\n                    if tother is not None:\n                        committed.update(tother)\n                        tother = None\n            elif op == \"rollback\":\n                if conn == \"main\":\n                    tmain = None\n                else:\n                    tother = None\n            elif op == \"put\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                # effective view: committed overlaid with this connection's buffer\n                if buf is not None:\n                    exists = key in buf or key in committed\n                else:\n                    exists = key in committed\n                changed = 0\n                if put_mode == \"ignore\":\n                    if not exists:\n                        if buf is not None:\n                            buf[key] = val\n                        else:\n                            committed[key] = val\n                        changed = 1\n                elif put_mode == \"replace\":\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    changed = 1\n                else:  # upsert\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    changed = 1\n                if changed:\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n                    if trig == \"after_insert\" and not exists:\n                        if conn == \"main\":\n                            total_main += 1\n                        else:\n                            total_other += 1\n            elif op == \"update\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    exists = key in buf or key in committed\n                else:\n                    exists = key in committed\n                if exists:\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n            elif op == \"delete\":\n                key = act.get(\"key\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    exists = key in buf or key in committed\n                else:\n                    exists = key in committed\n                if exists:\n                    if buf is not None:\n                        if key in buf:\n                            del buf[key]\n                        else:\n                            # delete from committed inside txn: need tombstone\n                            # simplify: mark as deleted in buffer\n                            buf[key] = None\n                    else:\n                        del committed[key]\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n        # final committed state: apply buffers? No, uncommitted not visible.\n        # committed dict already has committed changes.\n        # But tombstones in buffer not applied. For committed state, ignore buffers.\n        # However, committed dict may have been modified directly for non-txn.\n        # For txn, committed dict only updated on commit.\n        # But we used committed dict for non-txn writes directly. Good.\n        # For txn deletes, we set buf[key]=None, not committed. Good.\n        # But for txn puts, we set buf[key]=val, not committed. Good.\n        # So committed dict is correct committed state.\n        # However, for non-txn writes, we modified committed directly. Good.\n        # But for txn writes, we need to ensure committed not modified. Good.\n        # One issue: for txn put, exists check uses committed, but if key was\n        # deleted in same txn, buf has None. exists = key in buf or key in committed.\n        # If buf[key]=None, key in buf is True, so exists True. That's wrong for\n        # delete then put. But rare. Let's handle: if buf has None, treat as not exists.\n        # We'll refine later.\n        if chan == \"changes\":\n            return changes_main\n        elif chan == \"total_main\":\n            return total_main\n        else:\n            return total_main + total_other\n\n    # Refine simulate2 for tombstones\n    def simulate3(put_mode, trig, chan, actions):\n        committed = {}\n        tmain = None\n        tother = None\n        changes_main = 0\n        total_main = 0\n        total_other = 0\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                if conn == \"main\":\n                    tmain = {}\n                else:\n                    tother = {}\n            elif op == \"commit\":\n                if conn == \"main\":\n                    if tmain is not None:\n                        for k, v in tmain.items():\n                            if v is None:\n                                if k in committed:\n                                    del committed[k]\n                            else:\n                                committed[k] = v\n                        tmain = None\n                else:\n                    if tother is not None:\n                        for k, v in tother.items():\n                            if v is None:\n                                if k in committed:\n                                    del committed[k]\n                            else:\n                                committed[k] = v\n                        tother = None\n            elif op == \"rollback\":\n                if conn == \"main\":\n                    tmain = None\n                else:\n                    tother = None\n            elif op == \"put\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    if key in buf:\n                        exists = buf[key] is not None\n                    else:\n                        exists = key in committed\n                else:\n                    exists = key in committed\n                changed = 0\n                if put_mode == \"ignore\":\n                    if not exists:\n                        if buf is not None:\n                            buf[key] = val\n                        else:\n                            committed[key] = val\n                        changed = 1\n                elif put_mode == \"replace\":\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    changed = 1\n                else:\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    changed = 1\n                if changed:\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n                    if trig == \"after_insert\" and not exists:\n                        if conn == \"main\":\n                            total_main += 1\n                        else:\n                            total_other += 1\n            elif op == \"update\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    if key in buf:\n                        exists = buf[key] is not None\n                    else:\n                        exists = key in committed\n                else:\n                    exists = key in committed\n                if exists:\n                    if buf is not None:\n                        buf[key] = val\n                    else:\n                        committed[key] = val\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n            elif op == \"delete\":\n                key = act.get(\"key\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    if key in buf:\n                        exists = buf[key] is not None\n                    else:\n                        exists = key in committed\n                else:\n                    exists = key in committed\n                if exists:\n                    if buf is not None:\n                        buf[key] = None\n                    else:\n                        del committed[key]\n                    if conn == \"main\":\n                        changes_main = 1\n                        total_main += 1\n                    else:\n                        total_other += 1\n        if chan == \"changes\":\n            return changes_main\n        elif chan == \"total_main\":\n            return total_main\n        else:\n            return total_main + total_other\n\n    # committed state after actions\n    def committed_state(actions):\n        committed = {}\n        tmain = None\n        tother = None\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                if conn == \"main\":\n                    tmain = {}\n                else:\n                    tother = {}\n            elif op == \"commit\":\n                if conn == \"main\":\n                    if tmain is not None:\n                        for k, v in tmain.items():\n                            if v is None:\n                                if k in committed:\n                                    del committed[k]\n                            else:\n                                committed[k] = v\n                        tmain = None\n                else:\n                    if tother is not None:\n                        for k, v in tother.items():\n                            if v is None:\n                                if k in committed:\n                                    del committed[k]\n                            else:\n                                committed[k] = v\n                        tother = None\n            elif op == \"rollback\":\n                if conn == \"main\":\n                    tmain = None\n                else:\n                    tother = None\n            elif op == \"put\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    buf[key] = val\n                else:\n                    committed[key] = val\n            elif op == \"update\":\n                key = act.get(\"key\")\n                val = act.get(\"value\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    buf[key] = val\n                else:\n                    committed[key] = val\n            elif op == \"delete\":\n                key = act.get(\"key\")\n                if conn == \"main\":\n                    buf = tmain\n                else:\n                    buf = tother\n                if buf is not None:\n                    buf[key] = None\n                else:\n                    if key in committed:\n                        del committed[key]\n        return committed\n\n    # Filter candidates\n    candidates = []\n    for put_mode in [\"ignore\", \"replace\", \"upsert\"]:\n        for trig in [\"none\", \"after_insert\"]:\n            for chan in [\"changes\", \"total_main\", \"total_both\"]:\n                ok = True\n                for rec in hist:\n                    acts = rec.get(\"actions\", [])\n                    obs = rec.get(\"observed\", {})\n                    pred_chan = simulate3(put_mode, trig, chan, acts)\n                    if pred_chan != obs.get(\"channel\"):\n                        ok = False\n                        break\n                    st = committed_state(acts)\n                    if len(st) != obs.get(\"committed_count\"):\n                        ok = False\n                        break\n                    if sum(st.values()) != obs.get(\"committed_sum\"):\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((put_mode, trig, chan))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n\n    vals = set()\n    for put_mode, trig, chan in candidates:\n        if goal == \"channel\":\n            vals.add(simulate3(put_mode, trig, chan, actions))\n        elif goal == \"committed_count\":\n            st = committed_state(actions)\n            vals.add(len(st))\n        elif goal == \"committed_sum\":\n            st = committed_state(actions)\n            vals.add(sum(st.values()))\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(vals) == 1:\n        return {\"value\": list(vals)[0], \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+          "scope": "Infers put conflict mode, trigger presence, and channel from calibration receipts by simulating the 18-member family; predicts channel, committed_count, or committed_sum for new sequences only when all consistent candidates agree.",
+          "lesson": "The source uses INSERT OR REPLACE (or upsert) with no trigger and main changes() channel: repeated put on same key yields channel 1 and committed value 2; rollback restores prior committed state; other-connection writes are visible to committed reader but not counted by main changes()."
+        },
+        "accepted": true,
+        "development_score": {
+          "correct": 12,
+          "total": 12,
+          "errors": 0
+        },
+        "feedback": [
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "channel",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          },
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "committed_count",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          }
+        ],
+        "response_error": null
+      }
+    ]
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "Complete executable Python program defining investigate(context, acquire), including the function body. Never a label or bare signature."
+      },
+      "scope": {
+        "type": "string",
+        "description": "Short statement of the supported scope."
+      },
+      "lesson": {
+        "type": "string",
+        "description": "Short technical account of the revision."
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson"
+    ],
+    "additionalProperties": false
+  }
+}

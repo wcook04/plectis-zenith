@@ -1,0 +1,6590 @@
+{
+  "public": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. BEGIN transactions cannot nest; the additional savepoint interface below can nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nprivate settings and oracle implementations are never supplied. Some arms receive previously model-written primitives as described in their prompt.\n\nAdditional legal actions: savepoint(name), rollback_to(name), release(name), with\nname one of s0, s1, s2. They issue native SQLite SAVEPOINT, ROLLBACK TO and RELEASE\non the selected connection. Names are unique while active, at most three deep.\nThese are actual SQL operations, not source-dependent macros. Native savepoint\nbehavior is fixed across the disclosed family; actual insertion/counter settings\nremain private. Infer behavior from observed experiments and native SQL semantics.\nThe separate reader sees only committed state. Some queries end with an open\nsavepoint or transaction. Evaluation is conditional on this family, never an\nequivalence claim about unrestricted SQL. Preserve irreversible measurement\neffects when reasoning about reversible row effects.\n",
+    "streams": [
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "base": [
+          {
+            "source_id": "source-14b99a8dd1e8c3320ae0",
+            "actions": [],
+            "observed": {
+              "channel": 0,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "fa5ca8c06a99b267ac406e83c949178283258f6b32db50939e9e6fb6a5f9d7de"
+          },
+          {
+            "source_id": "source-14b99a8dd1e8c3320ae0",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "7427319d60f86de1425806620056f93795b66deca0b92deae055512ccc8ee7c6"
+          },
+          {
+            "source_id": "source-14b99a8dd1e8c3320ae0",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "other"
+              }
+            ],
+            "observed": {
+              "channel": 0,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "9bc14a68bc545efcad8635a6ab0e384ac84a9ebb3c4b3c954aff5f9aa6f0c325"
+          },
+          {
+            "source_id": "source-14b99a8dd1e8c3320ae0",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 5,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 5
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "fb9f68a8e6c77718fde5fa706ccc422bc85e573bd857f9dae34f700768a41b46"
+          },
+          {
+            "source_id": "source-14b99a8dd1e8c3320ae0",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 2,
+              "committed_sum": 4
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "108e033764c759db70934beb0666c1a4da4d109d479406795bcd58235ab438cd"
+          },
+          {
+            "source_id": "source-14b99a8dd1e8c3320ae0",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 3,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 4,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 3,
+              "committed_sum": 9
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "3a0913743a19dfb47342cac590fa3913221dbb9bef148d3b68eab0ba766ff8d5"
+          },
+          {
+            "source_id": "source-14b99a8dd1e8c3320ae0",
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "3a8b9624089fca54f2d5fda07413800e4c671ad123508c84cf5a645b489bd9eb"
+          },
+          {
+            "source_id": "source-14b99a8dd1e8c3320ae0",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "a9c0849aa9d091df7be557e84e946fb2a7e40564d585202e3e0f1d1a8f9e4681"
+          },
+          {
+            "source_id": "source-14b99a8dd1e8c3320ae0",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 4,
+                "connection": "other"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 2,
+              "committed_sum": 6
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "db318efc5e46257f63641362649c97596ae5bc04bb6f55cfe14f0967ad05e0f3"
+          }
+        ],
+        "stages": [
+          [
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 1,
+                "committed_sum": 7
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "cfcf805329d50bd38ed6b8973ad86d88618075ce150d1cb5792dc01f492d3362"
+            },
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s0"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "990a2fc3d2e18f1870a8ccdfe69d50029e90ce54e65c6a914763282c390e523a"
+            },
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "b85fb08ceea64c496a95da1c4daf405b74d3df4de890ef9ef759fb78acdb0678"
+            },
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "d4500cb6a3ac191fea417bef9609a3a7c34c4a6a9716fe87010ef964db1cbed9"
+            },
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                },
+                {
+                  "op": "commit"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 1,
+                "committed_sum": 7
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "a48deb2daf2357d40f18376d32ed0d47af3e94f5a44fe5dfcf8541cafeed464c"
+            }
+          ],
+          [
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 11,
+                  "connection": "main"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s1"
+                },
+                {
+                  "op": "release",
+                  "name": "s1"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 1,
+                "committed_sum": 7
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "af20ad9455705cd355cbf094c087aba9654a6b239b839da81daff77be4f51e5a"
+            },
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 11,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s1"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s0"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "8ee5925a92b6a51ad424baa1e75e23d1cedcac3eeb2a6207c09850835454e7f8"
+            },
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 11,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                },
+                {
+                  "op": "rollback"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "5e161149f1d1bd4567e957920e2dfa253f2dbf6a2d218e9f4609762bc1588ba1"
+            }
+          ],
+          [
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 13,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "delete",
+                  "key": "p"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 17,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 1,
+                "committed_sum": 17
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "3c5af1167c621af370a3ef14d129ee37a151e790cbe295ca1fc8307655869853"
+            },
+            {
+              "source_id": "source-14b99a8dd1e8c3320ae0",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 13,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 17,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "r",
+                  "value": 19,
+                  "connection": "other"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 3,
+                "committed_sum": 49
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "e55e047a966ad70b5c5bd239099e870f3ed03f27db8f4d5135bd5d75f4859199"
+            }
+          ]
+        ],
+        "eval": [
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-0",
+              "value": 26,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-0",
+              "value": 64,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-0",
+              "value": 52,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-0",
+              "value": 52,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-1",
+              "value": 55,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-1",
+              "value": 62,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-1",
+              "value": 43,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-2",
+              "value": 75,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-2",
+              "value": 87,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-2",
+              "value": 47,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-2",
+              "value": 47,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-3",
+              "value": 95,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-3",
+              "value": 41,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-3",
+              "value": 83,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-4",
+              "value": 45,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-4",
+              "value": 88,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-4",
+              "value": 79,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-4",
+              "value": 79,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-5",
+              "value": 30,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-5",
+              "value": 50,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-5",
+              "value": 47,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-6",
+              "value": 71,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-6",
+              "value": 34,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-6",
+              "value": 58,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-6",
+              "value": 58,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-7",
+              "value": 72,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-7",
+              "value": 83,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-7",
+              "value": 99,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-8",
+              "value": 52,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-8",
+              "value": 88,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-8",
+              "value": 34,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-8",
+              "value": 34,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-9",
+              "value": 29,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-9",
+              "value": 34,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-9",
+              "value": 43,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-10",
+              "value": 77,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-10",
+              "value": 30,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-10",
+              "value": 24,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-10",
+              "value": 24,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-11",
+              "value": 37,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-11",
+              "value": 51,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-11",
+              "value": 34,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-12",
+              "value": 98,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-12",
+              "value": 97,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-12",
+              "value": 55,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-12",
+              "value": 55,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-13",
+              "value": 37,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-13",
+              "value": 72,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-13",
+              "value": 55,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-14",
+              "value": 40,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-14",
+              "value": 26,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-14",
+              "value": 63,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-14",
+              "value": 63,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-15",
+              "value": 80,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-15",
+              "value": 39,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-15",
+              "value": 28,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ]
+        ],
+        "confirmation": [
+          [
+            {
+              "op": "put",
+              "key": "confirmation-0",
+              "value": 164,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 249,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-0",
+              "value": 229
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 208,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-1",
+              "value": 139,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-1"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 274,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 131
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 275,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 131,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-2",
+              "value": 178,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-2",
+              "value": 149,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-2",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 206,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 176,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-3",
+              "value": 240,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-3",
+              "value": 217
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 192,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 174
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-3"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-4",
+              "value": 243,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 257,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-4",
+              "value": 281
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 154,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-5",
+              "value": 132,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-5"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 120,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 169
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 168,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 169,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-6",
+              "value": 287,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-6",
+              "value": 181,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-6",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 137,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 248,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-7",
+              "value": 216,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-7",
+              "value": 222
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 278,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 263
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-7"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-8",
+              "value": 275,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 158,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-8",
+              "value": 256
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 218,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-9",
+              "value": 207,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-9"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 162,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 250
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 146,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 250,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-10",
+              "value": 275,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-10",
+              "value": 112,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-10",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 224,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 119,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-11",
+              "value": 277,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-11",
+              "value": 129
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 124,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 282
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-11"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-12",
+              "value": 167,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 118,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-12",
+              "value": 174
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 221,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-13",
+              "value": 114,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-13"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 142,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 160
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 199,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 160,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-14",
+              "value": 125,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-14",
+              "value": 108,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-14",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 217,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 297,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-15",
+              "value": 142,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-15",
+              "value": 163
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 141,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 267
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-15"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ]
+        ]
+      },
+      {
+        "source_id": "source-86827f9172def24e2e7e",
+        "base": [
+          {
+            "source_id": "source-86827f9172def24e2e7e",
+            "actions": [],
+            "observed": {
+              "channel": 0,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "d73c04b50cbd17edf94543f608a590bcc3f1d65944b79da8fa14d13d59676fb8"
+          },
+          {
+            "source_id": "source-86827f9172def24e2e7e",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "78adfe98672223f7a8d27905f626848ac10530ead476cf0b010b3254949ff45d"
+          },
+          {
+            "source_id": "source-86827f9172def24e2e7e",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "other"
+              }
+            ],
+            "observed": {
+              "channel": 0,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "35b76f93e0aafb23eabac3a2329cfb29aedfacdd455a2f9fa03a6e7f1d382688"
+          },
+          {
+            "source_id": "source-86827f9172def24e2e7e",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 5,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "5fc779db0ff7b617c051c9d67a5bff21ed4392d4edc7fd84378055bac9725bab"
+          },
+          {
+            "source_id": "source-86827f9172def24e2e7e",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 4,
+              "committed_count": 2,
+              "committed_sum": 4
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "9dfc13b5d244867aedc2def7945d7971a91b6c31b4bee05a9fd16785e3de7ff5"
+          },
+          {
+            "source_id": "source-86827f9172def24e2e7e",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 3,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 4,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 6,
+              "committed_count": 3,
+              "committed_sum": 9
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "73f286d53b0a4cd9980afca85cbbcf975237eefddc48554e000e4acfe7ca3dc5"
+          },
+          {
+            "source_id": "source-86827f9172def24e2e7e",
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "bbf998c8a8e52c0ada6a30bbae72ac330ded8354d9eeb572910e95c8938af114"
+          },
+          {
+            "source_id": "source-86827f9172def24e2e7e",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 3,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "71c0b77d0a51aba87083a2f7a0184948c96ea3e999d462c58ab48e32381faa66"
+          },
+          {
+            "source_id": "source-86827f9172def24e2e7e",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 4,
+                "connection": "other"
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 2,
+              "committed_sum": 6
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "70976eab61d87e801970b77735914a465cb124f373fca521a17b7069dc63fd08"
+          }
+        ],
+        "stages": [
+          [
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 7
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "959608e3fb33bd45ffaab1a09d244bf431c30574020ea9d204f02c2b8025df78"
+            },
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s0"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "7921476f8ee5ac6d30fbf9b62e97c95f99d3df2807408d7d9283b5324f20784f"
+            },
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "145a83f69949a91cb21274efd38877a9a139456a4fa0a3baecce07969fb4f87d"
+            },
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "5fb6776709daadc04193c9e0231123a019aa3cce0feaf1aa781afb0978c8b010"
+            },
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                },
+                {
+                  "op": "commit"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 7
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "a420cf16f4b3e15e97391f6e5e54fb3434fbe6ff4f8031d0346bf56ed3b8c872"
+            }
+          ],
+          [
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 11,
+                  "connection": "main"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s1"
+                },
+                {
+                  "op": "release",
+                  "name": "s1"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 7
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "acae11c802ae8b40036210b8d56fe73ee7b33650b94c9fbb0598e2f9901b6ae5"
+            },
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 11,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s1"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s0"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 4,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "b34353e3fc01a487984e1332dc3b7e8508da2c900ea261742189d54163448bc8"
+            },
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 11,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                },
+                {
+                  "op": "rollback"
+                }
+              ],
+              "observed": {
+                "channel": 4,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "7d21eb4bbee8738fd752affd36cba7c573a625c1bc0f360306c85efd687ae204"
+            }
+          ],
+          [
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 13,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "delete",
+                  "key": "p"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 17,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 5,
+                "committed_count": 1,
+                "committed_sum": 17
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "dfc1e84a4e0e025a162ffab5371f09f08e5bad488360a4b69ba69b3f0e2ca61f"
+            },
+            {
+              "source_id": "source-86827f9172def24e2e7e",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 13,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 17,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "r",
+                  "value": 19,
+                  "connection": "other"
+                }
+              ],
+              "observed": {
+                "channel": 4,
+                "committed_count": 3,
+                "committed_sum": 49
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "267a99915a35f67dbecfa2177329b7999878613ae1b9361c522dae66c0c7dd41"
+            }
+          ]
+        ],
+        "eval": [
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-0",
+              "value": 84,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-0",
+              "value": 49,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-0",
+              "value": 27,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-0",
+              "value": 27,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-1",
+              "value": 86,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-1",
+              "value": 99,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-1",
+              "value": 66,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-2",
+              "value": 99,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-2",
+              "value": 57,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-2",
+              "value": 36,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-2",
+              "value": 36,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-3",
+              "value": 95,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-3",
+              "value": 90,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-3",
+              "value": 56,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-4",
+              "value": 53,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-4",
+              "value": 50,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-4",
+              "value": 32,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-4",
+              "value": 32,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-5",
+              "value": 73,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-5",
+              "value": 60,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-5",
+              "value": 45,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-6",
+              "value": 97,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-6",
+              "value": 94,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-6",
+              "value": 60,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-6",
+              "value": 60,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-7",
+              "value": 67,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-7",
+              "value": 56,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-7",
+              "value": 90,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-8",
+              "value": 30,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-8",
+              "value": 61,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-8",
+              "value": 54,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-8",
+              "value": 54,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-9",
+              "value": 69,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-9",
+              "value": 52,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-9",
+              "value": 31,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-10",
+              "value": 56,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-10",
+              "value": 80,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-10",
+              "value": 46,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-10",
+              "value": 46,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-11",
+              "value": 61,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-11",
+              "value": 65,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-11",
+              "value": 51,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-12",
+              "value": 86,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-12",
+              "value": 71,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-12",
+              "value": 85,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-12",
+              "value": 85,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-13",
+              "value": 65,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-13",
+              "value": 63,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-13",
+              "value": 23,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-14",
+              "value": 90,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-14",
+              "value": 60,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-14",
+              "value": 75,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-14",
+              "value": 75,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-15",
+              "value": 46,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-15",
+              "value": 28,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-15",
+              "value": 51,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ]
+        ],
+        "confirmation": [
+          [
+            {
+              "op": "put",
+              "key": "confirmation-0",
+              "value": 284,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 135,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-0",
+              "value": 175
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 197,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-1",
+              "value": 210,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-1"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 245,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 199
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 118,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 199,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-2",
+              "value": 192,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-2",
+              "value": 106,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-2",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 176,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 174,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-3",
+              "value": 203,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-3",
+              "value": 205
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 186,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 111
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-3"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-4",
+              "value": 199,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 235,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-4",
+              "value": 126
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 286,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-5",
+              "value": 262,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-5"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 246,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 158
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 241,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 158,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-6",
+              "value": 114,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-6",
+              "value": 185,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-6",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 130,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 209,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-7",
+              "value": 185,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-7",
+              "value": 105
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 168,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 253
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-7"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-8",
+              "value": 192,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 163,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-8",
+              "value": 234
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 153,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-9",
+              "value": 182,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-9"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 294,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 217
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 127,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 217,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-10",
+              "value": 201,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-10",
+              "value": 272,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-10",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 250,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 185,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-11",
+              "value": 280,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-11",
+              "value": 221
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 205,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 153
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-11"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-12",
+              "value": 290,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 140,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-12",
+              "value": 170
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 174,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-13",
+              "value": 185,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-13"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 140,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 205
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 254,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 205,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-14",
+              "value": 265,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-14",
+              "value": 292,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-14",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 297,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 299,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-15",
+              "value": 137,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-15",
+              "value": 215
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 154,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 268
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-15"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ]
+        ]
+      },
+      {
+        "source_id": "source-ae38e3689a583afa1d22",
+        "base": [
+          {
+            "source_id": "source-ae38e3689a583afa1d22",
+            "actions": [],
+            "observed": {
+              "channel": 0,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "b4df3cbe21f511abb9cd7b518171ff9df7b26b9f30db375099955d658940098b"
+          },
+          {
+            "source_id": "source-ae38e3689a583afa1d22",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "4cddf965626b4f748afc41c3997af602dd4544a8d047e61fedb64167f0132f25"
+          },
+          {
+            "source_id": "source-ae38e3689a583afa1d22",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "other"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "0d2b962cde97068b1a9b88e7188c339efe53d118a567c3081868901558cbc9b9"
+          },
+          {
+            "source_id": "source-ae38e3689a583afa1d22",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 5,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 5
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "06f7911021e050633746ab454b4593c43d45432f3392ea2222ed1699d27aa058"
+          },
+          {
+            "source_id": "source-ae38e3689a583afa1d22",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 2,
+              "committed_sum": 4
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "81f9ccefa00ca04921590bfcc8b84c5d76e59aa0ac280478fd0428a5c798e995"
+          },
+          {
+            "source_id": "source-ae38e3689a583afa1d22",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 3,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 4,
+                "connection": "main"
+              }
+            ],
+            "observed": {
+              "channel": 3,
+              "committed_count": 3,
+              "committed_sum": 9
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "703d0bbe0a960025a5549cf3f4bd1cf63b15f72ba158d02487b9b4f1da9174e6"
+          },
+          {
+            "source_id": "source-ae38e3689a583afa1d22",
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "8ad2a318443dd72769489760f273cffcaffbc742abae3ea66f2baf059d524b47"
+          },
+          {
+            "source_id": "source-ae38e3689a583afa1d22",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "da9e469dd1c62815b2cbcf74cf65bbab2060891a87f2e691528ad94c591a80d2"
+          },
+          {
+            "source_id": "source-ae38e3689a583afa1d22",
+            "actions": [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 4,
+                "connection": "other"
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 2,
+              "committed_sum": 6
+            },
+            "authority": "native SQLite; independent committed-state connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "af814d0db5055b9999e79515c16b527c1cc8d63ed0a8dfe77df4e15553b5ac2c"
+          }
+        ],
+        "stages": [
+          [
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 1,
+                "committed_sum": 7
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "fdafbd4a8f67c001791ab61ebb8defe2e0f1010848827ff5745cb3ecfc180c62"
+            },
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s0"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "b3a1c63818810326d93be7eb929361e923c0de0e458e2ba6bb84397fb1ee95c3"
+            },
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "7fefcddd29a494c2c0a61b0ff55fe219d980b81a4f972075e7a669ca80fa8bfb"
+            },
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "3b7ed7308cc69b778ebe2b9ee8e9c562526c36063b005a27498a30616a37a447"
+            },
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                },
+                {
+                  "op": "commit"
+                }
+              ],
+              "observed": {
+                "channel": 1,
+                "committed_count": 1,
+                "committed_sum": 7
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "eb313f48d44a11d954c9fbc20d7d3c3ad35777d47f6d8a9decd412bc200b5a4f"
+            }
+          ],
+          [
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 11,
+                  "connection": "main"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s1"
+                },
+                {
+                  "op": "release",
+                  "name": "s1"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 7
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "7d7689a25cbf0eaf967fa68d5c832e5316501a325bb6f33d865fcc6e4672b480"
+            },
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 11,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s1"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s0"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "33f8c4680d949c678a5d04fe428f0946b7a46d3dd1da88d16a8227c538a2f81d"
+            },
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 7,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 11,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                },
+                {
+                  "op": "rollback"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 0,
+                "committed_sum": 0
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "d12a3ad4005a440b585459db6528ac349774726196a1c348132e5934cea032ed"
+            }
+          ],
+          [
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 13,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "delete",
+                  "key": "p"
+                },
+                {
+                  "op": "rollback_to",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 17,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                }
+              ],
+              "observed": {
+                "channel": 3,
+                "committed_count": 1,
+                "committed_sum": 17
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "64a8ffa0e1204d6d647723f09e5d992f312ff6fa14c6136fee5b60463c4c12dd"
+            },
+            {
+              "source_id": "source-ae38e3689a583afa1d22",
+              "actions": [
+                {
+                  "op": "savepoint",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "p",
+                  "value": 13,
+                  "connection": "main"
+                },
+                {
+                  "op": "savepoint",
+                  "name": "s1"
+                },
+                {
+                  "op": "put",
+                  "key": "q",
+                  "value": 17,
+                  "connection": "main"
+                },
+                {
+                  "op": "release",
+                  "name": "s0"
+                },
+                {
+                  "op": "put",
+                  "key": "r",
+                  "value": 19,
+                  "connection": "other"
+                }
+              ],
+              "observed": {
+                "channel": 3,
+                "committed_count": 3,
+                "committed_sum": 49
+              },
+              "authority": "native SQLite; independent committed-state connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "1715f3be410fd517cd9ced669d88d545359f4200164ecdb79c9e126823a196e2"
+            }
+          ]
+        ],
+        "eval": [
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-0",
+              "value": 58,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-0",
+              "value": 92,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-0",
+              "value": 67,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-0",
+              "value": 67,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-1",
+              "value": 92,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-1",
+              "value": 74,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-1",
+              "value": 71,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-2",
+              "value": 65,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-2",
+              "value": 51,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-2",
+              "value": 85,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-2",
+              "value": 85,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-3",
+              "value": 86,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-3",
+              "value": 37,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-3",
+              "value": 57,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-4",
+              "value": 68,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-4",
+              "value": 25,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-4",
+              "value": 32,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-4",
+              "value": 32,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-5",
+              "value": 91,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-5",
+              "value": 54,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-5",
+              "value": 37,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-6",
+              "value": 97,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-6",
+              "value": 72,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-6",
+              "value": 63,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-6",
+              "value": 63,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-7",
+              "value": 88,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-7",
+              "value": 27,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-7",
+              "value": 24,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-8",
+              "value": 72,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-8",
+              "value": 53,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-8",
+              "value": 69,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-8",
+              "value": 69,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-9",
+              "value": 50,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-9",
+              "value": 86,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-9",
+              "value": 59,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-10",
+              "value": 34,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-10",
+              "value": 59,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-10",
+              "value": 38,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-10",
+              "value": 38,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-11",
+              "value": 59,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-11",
+              "value": 50,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-11",
+              "value": 27,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-12",
+              "value": 57,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-12",
+              "value": 35,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-12",
+              "value": 38,
+              "connection": "main"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-12",
+              "value": 38,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-13",
+              "value": 47,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-13",
+              "value": 45,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-13",
+              "value": 93,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s0"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-14",
+              "value": 81,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-14",
+              "value": 46,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-14",
+              "value": 52,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "later-protected-14",
+              "value": 52,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "protected-15",
+              "value": 45,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "protected-15",
+              "value": 41,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "other-protected-15",
+              "value": 78,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            }
+          ]
+        ],
+        "confirmation": [
+          [
+            {
+              "op": "put",
+              "key": "confirmation-0",
+              "value": 280,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 143,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-0",
+              "value": 234
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 279,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-1",
+              "value": 223,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-1"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 121,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 180
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 250,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 180,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-2",
+              "value": 257,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-2",
+              "value": 126,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-2",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 227,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 143,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-3",
+              "value": 170,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-3",
+              "value": 174
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 199,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 244
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-3"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-4",
+              "value": 241,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 206,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-4",
+              "value": 235
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 228,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-5",
+              "value": 218,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-5"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 231,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 186
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 106,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 186,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-6",
+              "value": 213,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-6",
+              "value": 142,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-6",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 208,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 105,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-7",
+              "value": 103,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-7",
+              "value": 267
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 204,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 170
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-7"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-8",
+              "value": 106,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 195,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-8",
+              "value": 135
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 201,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-9",
+              "value": 104,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-9"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 204,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 156
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 190,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 156,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-10",
+              "value": 234,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-10",
+              "value": 290,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-10",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 221,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 105,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-11",
+              "value": 136,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-11",
+              "value": 138
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 228,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 201
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-11"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-12",
+              "value": 132,
+              "connection": "other"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 122,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-12",
+              "value": 208
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "b"
+            },
+            {
+              "op": "rollback_to",
+              "name": "s1"
+            },
+            {
+              "op": "release",
+              "name": "s1"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 206,
+              "connection": "main"
+            },
+            {
+              "op": "commit"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-13",
+              "value": 140,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-13"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 143,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 251
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "put",
+              "key": "c",
+              "value": 218,
+              "connection": "main"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 251,
+              "connection": "other"
+            }
+          ],
+          [
+            {
+              "op": "begin",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-14",
+              "value": 202,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "confirmation-14",
+              "value": 281,
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0",
+              "connection": "other"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-14",
+              "connection": "other"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 184,
+              "connection": "other"
+            },
+            {
+              "op": "release",
+              "name": "s2",
+              "connection": "other"
+            },
+            {
+              "op": "rollback",
+              "connection": "other"
+            },
+            {
+              "op": "put",
+              "key": "later",
+              "value": 212,
+              "connection": "main"
+            }
+          ],
+          [
+            {
+              "op": "put",
+              "key": "confirmation-15",
+              "value": 226,
+              "connection": "main"
+            },
+            {
+              "op": "begin"
+            },
+            {
+              "op": "savepoint",
+              "name": "s1"
+            },
+            {
+              "op": "update",
+              "key": "confirmation-15",
+              "value": 259
+            },
+            {
+              "op": "savepoint",
+              "name": "s2"
+            },
+            {
+              "op": "put",
+              "key": "b",
+              "value": 128,
+              "connection": "main"
+            },
+            {
+              "op": "savepoint",
+              "name": "s0"
+            },
+            {
+              "op": "update",
+              "key": "b",
+              "value": 189
+            },
+            {
+              "op": "rollback_to",
+              "name": "s2"
+            },
+            {
+              "op": "delete",
+              "key": "confirmation-15"
+            },
+            {
+              "op": "release",
+              "name": "s2"
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  "private": {
+    "configs": {
+      "source-14b99a8dd1e8c3320ae0": {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "conflict": "upsert",
+        "insert_trigger": false,
+        "counter": "main_direct"
+      },
+      "source-86827f9172def24e2e7e": {
+        "source_id": "source-86827f9172def24e2e7e",
+        "conflict": "ignore",
+        "insert_trigger": true,
+        "counter": "main_total"
+      },
+      "source-ae38e3689a583afa1d22": {
+        "source_id": "source-ae38e3689a583afa1d22",
+        "conflict": "replace",
+        "insert_trigger": false,
+        "counter": "all_total"
+      }
+    }
+  }
+}

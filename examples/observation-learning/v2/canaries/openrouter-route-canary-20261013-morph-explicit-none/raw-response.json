@@ -1,0 +1,3 @@
+{
+  "text": "{\"source\": \"def investigate(context, acquire):\\n    events = acquire(\\\"events\\\")\\n    seen = set()\\n    total = 0\\n    for event in events:\\n        event_id = event[\\\"event_id\\\"]\\n        if event_id in seen:\\n            continue\\n        seen.add(event_id)\\n        total = total + event[\\\"work\\\"]\\n    return {\\\"findings\\\": [], \\\"unresolved\\\": [], \\\"ratio\\\": total}\", \"scope\": \"Deduplicate event records by event_id, summing work once per unique id; duplicate deliveries are ignored, distinct ids with equal work both count.\", \"lesson\": \"Deduplication must key on identity (event_id), not on value equality of the payload, so identical work values from different ids are preserved.\"}"
+}

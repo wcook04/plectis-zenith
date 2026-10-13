@@ -1,0 +1,71 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 5
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "b",
+        "value": 7
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 5
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 9
+      },
+      {
+        "op": "delete",
+        "connection": "main",
+        "key": "a",
+        "value": null
+      }
+    ],
+    [
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 4
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 6
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 8
+      }
+    ]
+  ],
+  "purpose": "Separate the three put conflict modes, the presence/absence of the AFTER INSERT trigger, and the three channel definitions. Experiment 1 (writes on both connections) distinguishes main-only counters from main+other total_changes. Experiment 2 (insert, replace, delete) distinguishes INSERT OR IGNORE (channel 1, count 0) from INSERT OR REPLACE (channel 3, count 0) and from ON CONFLICT DO UPDATE (channel 2, count 0), while also exposing trigger effects on the replace path. Experiment 3 (rolled-back transaction then fresh insert) tests whether the channel is changes() (1) versus total_changes (3) and whether the trigger fires on the rolled-back inserts, since rollback cancels committed state but not the counter."
+}

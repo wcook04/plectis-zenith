@@ -1,0 +1,1124 @@
+{
+  "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n",
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "history": [
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "757b535314967aa398da672ae28a80e8aaf1d937e7ac36c0b9bf14cd52a5bbb5"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "ef964a1aa7ad382bd4868886f79c262abbca0f2da96b97414497bd14dc08d667"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "cb30b901eb94712fd78206380c0da060b60f562d6a1160ef0199b22a391c0eb2"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 33
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 77
+          },
+          {
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 33
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "505d4f110fac454cc1496d01d42aa609739f2f17ed18ceb91a110a505e1baf2d"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "1acb0fa4f15fdbff650168940a401c02e261944cd198692011794bf304b5bbe8"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "other",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "0dcc4185405e69ab6df5f39338dc1cb35f5e607bb3f5dad9ac2cfcdc14643c21"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "ef2fdb40bd783897661cdf2d37c1e583192c7fbb811b261cc1b591da614bdff1"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 33
+          },
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 77
+          },
+          {
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 33
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "b11ab2c266516ae1aa2f300f05a3a02c88eeac14308208d09200690c09488822"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 10
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 20
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 30
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 10
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "96c45ce548f0e2d219f660537acfd47d44f3f39b9dd71ddf881de7fb2bb579e1"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 10
+          },
+          {
+            "connection": "other",
+            "key": "x",
+            "op": "put",
+            "value": 20
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 30
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 10
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "d702e9231f853a9ea4a5d28686ecb25799320cb41caa47a113d6ff65267ee612"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 10
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 20
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 30
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 10
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "2c707f70a6d62602e44939e781e4fd94ed1d29028406554c05db311fdf2ff4f0"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 33
+          },
+          {
+            "connection": "other",
+            "key": "a",
+            "op": "put",
+            "value": 77
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 33
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "9bb996303219d286f01bf1d8bf63f32e0e8e61171e5b6632b626db6c26a3214f"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "c02de96650362b908aecc357076f00985947c19119a8ab57602697154688a366"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [],
+        "observed": {
+          "channel": 0,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "031bba77dc278d0655feb813e2ec5ed5817a26667bb00ddacd34b22437e57fc2"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "ea81a82467399d53e8e7704c66e4a6624c0d687c54ad82f65cd4a68a0159914e"
+      }
+    ],
+    "diagnostic_evidence": {
+      "goal": "channel",
+      "original_actions": [
+        {
+          "connection": "main",
+          "key": "k",
+          "op": "put",
+          "value": 1
+        },
+        {
+          "connection": "main",
+          "key": "k",
+          "op": "put",
+          "value": 2
+        }
+      ],
+      "original_expected": {
+        "value": 2,
+        "unresolved": false
+      },
+      "original_prediction": {
+        "value": null,
+        "unresolved": true
+      },
+      "minimum": {
+        "actions": [],
+        "legal": true,
+        "expected_before_new_measurement": {
+          "value": 0,
+          "unresolved": false
+        },
+        "prediction": {
+          "value": null,
+          "unresolved": true
+        },
+        "error": null,
+        "fails": true,
+        "native_observed": {
+          "channel": 0,
+          "committed_count": 0,
+          "committed_sum": 0
+        }
+      },
+      "prefixes": [
+        {
+          "actions": [],
+          "legal": true,
+          "expected_before_new_measurement": {
+            "value": 0,
+            "unresolved": false
+          },
+          "prediction": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "fails": true,
+          "native_observed": {
+            "channel": 0,
+            "committed_count": 0,
+            "committed_sum": 0
+          }
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            }
+          ],
+          "legal": true,
+          "expected_before_new_measurement": {
+            "value": 2,
+            "unresolved": false
+          },
+          "prediction": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "fails": true,
+          "native_observed": {
+            "channel": 2,
+            "committed_count": 1,
+            "committed_sum": 1
+          }
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 2
+            }
+          ],
+          "legal": true,
+          "expected_before_new_measurement": {
+            "value": 2,
+            "unresolved": false
+          },
+          "prediction": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "fails": true,
+          "native_observed": {
+            "channel": 2,
+            "committed_count": 1,
+            "committed_sum": 1
+          }
+        }
+      ],
+      "reduction_trials": [
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 2
+            }
+          ],
+          "legal": true,
+          "expected_before_new_measurement": {
+            "value": 2,
+            "unresolved": false
+          },
+          "prediction": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "fails": true,
+          "native_observed": {
+            "channel": 2,
+            "committed_count": 1,
+            "committed_sum": 2
+          }
+        },
+        {
+          "actions": [],
+          "legal": true,
+          "expected_before_new_measurement": {
+            "value": 0,
+            "unresolved": false
+          },
+          "prediction": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "fails": true,
+          "native_observed": {
+            "channel": 0,
+            "committed_count": 0,
+            "committed_sum": 0
+          }
+        },
+        {
+          "actions": [],
+          "legal": true,
+          "expected_before_new_measurement": {
+            "value": 0,
+            "unresolved": false
+          },
+          "prediction": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "fails": true,
+          "native_observed": {
+            "channel": 0,
+            "committed_count": 0,
+            "committed_sum": 0
+          }
+        },
+        {
+          "actions": [],
+          "legal": true,
+          "expected_before_new_measurement": {
+            "value": 0,
+            "unresolved": false
+          },
+          "prediction": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "fails": true,
+          "native_observed": {
+            "channel": 0,
+            "committed_count": 0,
+            "committed_sum": 0
+          }
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            }
+          ],
+          "legal": true,
+          "expected_before_new_measurement": {
+            "value": 2,
+            "unresolved": false
+          },
+          "prediction": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "fails": true,
+          "native_observed": {
+            "channel": 2,
+            "committed_count": 1,
+            "committed_sum": 1
+          }
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 2
+            }
+          ],
+          "legal": true,
+          "expected_before_new_measurement": {
+            "value": 2,
+            "unresolved": false
+          },
+          "prediction": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "fails": true,
+          "native_observed": {
+            "channel": 2,
+            "committed_count": 1,
+            "committed_sum": 1
+          }
+        }
+      ],
+      "boundary": "Black-box predictions of unchanged model code versus native observations. Empty minima from global abstention are not informative semantic diagnoses; retain original nonempty prefix contrasts."
+    },
+    "feedback": [
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "goal": "channel",
+        "expected": {
+          "value": 2,
+          "unresolved": false
+        },
+        "actual": {
+          "value": null,
+          "unresolved": true
+        },
+        "error": null,
+        "correct": false
+      },
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "goal": "committed_count",
+        "expected": {
+          "value": 1,
+          "unresolved": false
+        },
+        "actual": {
+          "value": null,
+          "unresolved": true
+        },
+        "error": null,
+        "correct": false
+      },
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "goal": "committed_sum",
+        "expected": {
+          "value": 1,
+          "unresolved": false
+        },
+        "actual": {
+          "value": null,
+          "unresolved": true
+        },
+        "error": null,
+        "correct": false
+      },
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "goal": "channel",
+        "expected": {
+          "value": 2,
+          "unresolved": false
+        },
+        "actual": {
+          "value": null,
+          "unresolved": true
+        },
+        "error": null,
+        "correct": false
+      },
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "goal": "committed_count",
+        "expected": {
+          "value": 1,
+          "unresolved": false
+        },
+        "actual": {
+          "value": null,
+          "unresolved": true
+        },
+        "error": null,
+        "correct": false
+      },
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "goal": "committed_sum",
+        "expected": {
+          "value": 1,
+          "unresolved": false
+        },
+        "actual": {
+          "value": null,
+          "unresolved": true
+        },
+        "error": null,
+        "correct": false
+      }
+    ],
+    "request": "Author a complete reusable observation program, correcting measured computation failures. Return the full source, scope and lesson; no hand-authored solver is supplied.",
+    "champion": {
+      "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n    actions = context.get(\"actions\", [])\n    goal = context.get(\"goal\")\n\n    def run(acts, pm, cm, tr):\n        main = {}\n        other = {}\n        committed = {}\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n        in_tx = None\n        tx_snapshot = None\n        for act in acts:\n            op = act.get('op')\n            conn = act.get('connection', 'main')\n            if op == 'put':\n                store = main if conn == 'main' else other\n                existed = act.get('key') in store\n                if pm == 'ignore':\n                    if existed:\n                        changed = 0\n                    else:\n                        store[act.get('key')] = act.get('value')\n                        changed = 1\n                else:\n                    store[act.get('key')] = act.get('value')\n                    changed = 1\n                if conn == 'main':\n                    main_changes = changed\n                    main_total += changed\n                else:\n                    other_total += changed\n            elif op == 'update':\n                store = main if conn == 'main' else other\n                if act.get('key') in store:\n                    store[act.get('key')] = act.get('value')\n                    changed = 1\n                else:\n                    changed = 0\n                if conn == 'main':\n                    main_changes = changed\n                    main_total += changed\n                else:\n                    other_total += changed\n            elif op == 'delete':\n                store = main if conn == 'main' else other\n                if act.get('key') in store:\n                    del store[act.get('key')]\n                    changed = 1\n                else:\n                    changed = 0\n                if conn == 'main':\n                    main_changes = changed\n                    main_total += changed\n                else:\n                    other_total += changed\n            elif op == 'begin':\n                in_tx = conn\n                tx_snapshot = dict(main) if conn == 'main' else dict(other)\n            elif op == 'commit':\n                if in_tx == 'main':\n                    committed = dict(main)\n                else:\n                    committed = dict(other)\n                in_tx = None\n            elif op == 'rollback':\n                if in_tx == 'main':\n                    main = tx_snapshot\n                else:\n                    other = tx_snapshot\n                in_tx = None\n        if in_tx is None:\n            committed = dict(main)\n        if cm == 'changes':\n            ch = main_changes\n        elif cm == 'total_main':\n            ch = main_total\n        else:\n            ch = main_total + other_total\n        return ch, len(committed), sum(committed.values())\n\n    modes = ['ignore', 'replace', 'upsert']\n    channels = ['changes', 'total_main', 'total_both']\n    triggers = [False, True]\n\n    candidates = []\n    for pm in modes:\n        for cm in channels:\n            for tr in triggers:\n                ok = True\n                for r in receipts:\n                    ra = r.get('actions', [])\n                    obs = r.get('observed', {})\n                    ch, cc, cs = run(ra, pm, cm, tr)\n                    if ch != obs.get('channel') or cc != obs.get('committed_count') or cs != obs.get('committed_sum'):\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((pm, cm, tr))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    results = set()\n    for pm, cm, tr in candidates:\n        ch, cc, cs = run(actions, pm, cm, tr)\n        if goal == 'channel':\n            results.add(ch)\n        elif goal == 'committed_count':\n            results.add(cc)\n        elif goal == 'committed_sum':\n            results.add(cs)\n\n    if len(results) == 1:\n        return {\"value\": list(results)[0], \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+      "scope": "Family-consistent simulation over put mode, channel mode, and trigger presence; predicts only when all consistent members agree.",
+      "lesson": "Calibration receipts constrain the private combination; simulate every consistent member and require unanimity for a supported answer."
+    },
+    "last_challenger": {
+      "proposal": {
+        "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n    actions = context.get(\"actions\", [])\n    goal = context.get(\"goal\")\n\n    def run(acts, pm, cm, tr):\n        main = {}\n        other = {}\n        committed = {}\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n        in_tx = None\n        tx_snapshot = None\n        for act in acts:\n            op = act.get('op')\n            conn = act.get('connection', 'main')\n            if op == 'put':\n                store = main if conn == 'main' else other\n                existed = act.get('key') in store\n                if pm == 'ignore':\n                    if existed:\n                        changed = 0\n                    else:\n                        store[act.get('key')] = act.get('value')\n                        changed = 1\n                else:\n                    store[act.get('key')] = act.get('value')\n                    changed = 1\n                if conn == 'main':\n                    main_changes = changed\n                    main_total += changed\n                else:\n                    other_total += changed\n            elif op == 'update':\n                store = main if conn == 'main' else other\n                if act.get('key') in store:\n                    store[act.get('key')] = act.get('value')\n                    changed = 1\n                else:\n                    changed = 0\n                if conn == 'main':\n                    main_changes = changed\n                    main_total += changed\n                else:\n                    other_total += changed\n            elif op == 'delete':\n                store = main if conn == 'main' else other\n                if act.get('key') in store:\n                    del store[act.get('key')]\n                    changed = 1\n                else:\n                    changed = 0\n                if conn == 'main':\n                    main_changes = changed\n                    main_total += changed\n                else:\n                    other_total += changed\n            elif op == 'begin':\n                in_tx = conn\n                tx_snapshot = dict(main) if conn == 'main' else dict(other)\n            elif op == 'commit':\n                if in_tx == 'main':\n                    committed = dict(main)\n                else:\n                    committed = dict(other)\n                in_tx = None\n            elif op == 'rollback':\n                if in_tx == 'main':\n                    main = tx_snapshot\n                else:\n                    other = tx_snapshot\n                in_tx = None\n        if in_tx is None:\n            committed = dict(main)\n        if cm == 'changes':\n            ch = main_changes\n        elif cm == 'total_main':\n            ch = main_total\n        else:\n            ch = main_total + other_total\n        return ch, len(committed), sum(committed.values())\n\n    modes = ['ignore', 'replace', 'upsert']\n    channels = ['changes', 'total_main', 'total_both']\n    triggers = [False, True]\n\n    candidates = []\n    for pm in modes:\n        for cm in channels:\n            for tr in triggers:\n                ok = True\n                for r in receipts:\n                    ra = r.get('actions', [])\n                    obs = r.get('observed', {})\n                    ch, cc, cs = run(ra, pm, cm, tr)\n                    if ch != obs.get('channel') or cc != obs.get('committed_count') or cs != obs.get('committed_sum'):\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((pm, cm, tr))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    results = set()\n    for pm, cm, tr in candidates:\n        ch, cc, cs = run(actions, pm, cm, tr)\n        if goal == 'channel':\n            results.add(ch)\n        elif goal == 'committed_count':\n            results.add(cc)\n        elif goal == 'committed_sum':\n            results.add(cs)\n\n    if len(results) == 1:\n        return {\"value\": list(results)[0], \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+        "scope": "Family-consistent simulation over put mode, channel mode, and trigger presence; predicts only when all consistent members agree.",
+        "lesson": "Calibration receipts constrain the private combination; simulate every consistent member and require unanimity for a supported answer."
+      },
+      "accepted": true,
+      "candidate_summary": {
+        "correct": 0,
+        "total": 45,
+        "errors": 0
+      },
+      "feedback": [
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 2
+            }
+          ],
+          "goal": "channel",
+          "expected": {
+            "value": 2,
+            "unresolved": false
+          },
+          "actual": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "correct": false
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 2
+            }
+          ],
+          "goal": "committed_count",
+          "expected": {
+            "value": 1,
+            "unresolved": false
+          },
+          "actual": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "correct": false
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 2
+            }
+          ],
+          "goal": "committed_sum",
+          "expected": {
+            "value": 1,
+            "unresolved": false
+          },
+          "actual": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "correct": false
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "op": "begin"
+            },
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "op": "rollback"
+            }
+          ],
+          "goal": "channel",
+          "expected": {
+            "value": 2,
+            "unresolved": false
+          },
+          "actual": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "correct": false
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "op": "begin"
+            },
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "op": "rollback"
+            }
+          ],
+          "goal": "committed_count",
+          "expected": {
+            "value": 1,
+            "unresolved": false
+          },
+          "actual": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "correct": false
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "op": "begin"
+            },
+            {
+              "connection": "main",
+              "key": "k",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "op": "rollback"
+            }
+          ],
+          "goal": "committed_sum",
+          "expected": {
+            "value": 1,
+            "unresolved": false
+          },
+          "actual": {
+            "value": null,
+            "unresolved": true
+          },
+          "error": null,
+          "correct": false
+        }
+      ],
+      "response_error": null
+    }
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "Complete executable Python program defining investigate(context, acquire), including the function body. Never a label or bare signature."
+      },
+      "scope": {
+        "type": "string",
+        "description": "Short statement of the supported scope."
+      },
+      "lesson": {
+        "type": "string",
+        "description": "Short technical account of the revision."
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson"
+    ],
+    "additionalProperties": false
+  }
+}

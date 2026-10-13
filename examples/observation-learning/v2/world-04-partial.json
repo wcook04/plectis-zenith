@@ -1,0 +1,2767 @@
+{
+  "source_id": "source-cfa9a0c4c697f5e9d949",
+  "provider_slug": "deepinfra/fp8",
+  "history": [
+    {
+      "source_id": "source-cfa9a0c4c697f5e9d949",
+      "actions": [
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 1
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 2
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 3
+        }
+      ],
+      "observed": {
+        "channel": 2,
+        "committed_count": 1,
+        "committed_sum": 1
+      },
+      "authority": "native SQLite counter; committed state read through a separate connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "1acb0fa4f15fdbff650168940a401c02e261944cd198692011794bf304b5bbe8"
+    },
+    {
+      "source_id": "source-cfa9a0c4c697f5e9d949",
+      "actions": [
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 1
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 2
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "delete"
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 3
+        }
+      ],
+      "observed": {
+        "channel": 5,
+        "committed_count": 1,
+        "committed_sum": 3
+      },
+      "authority": "native SQLite counter; committed state read through a separate connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "1e89bee8b4807b431175da26593ae0fde8f93f74fc071728b6321497cf06ad01"
+    },
+    {
+      "source_id": "source-cfa9a0c4c697f5e9d949",
+      "actions": [
+        {
+          "connection": "main",
+          "op": "begin"
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 1
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 2
+        },
+        {
+          "connection": "main",
+          "op": "rollback"
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 3
+        }
+      ],
+      "observed": {
+        "channel": 4,
+        "committed_count": 1,
+        "committed_sum": 3
+      },
+      "authority": "native SQLite counter; committed state read through a separate connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "35d64fb6eb84e28522aa364aef42990058078484c818e861b772eb8044111632"
+    },
+    {
+      "source_id": "source-cfa9a0c4c697f5e9d949",
+      "actions": [
+        {
+          "op": "begin"
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 33
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 77
+        },
+        {
+          "op": "commit"
+        }
+      ],
+      "observed": {
+        "channel": 2,
+        "committed_count": 1,
+        "committed_sum": 33
+      },
+      "authority": "native SQLite counter; committed state read through a separate connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "505d4f110fac454cc1496d01d42aa609739f2f17ed18ceb91a110a505e1baf2d"
+    }
+  ],
+  "probe_log": [
+    {
+      "episode": 0,
+      "actions": [
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 1
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 2
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 3
+        }
+      ],
+      "receipt": {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "1acb0fa4f15fdbff650168940a401c02e261944cd198692011794bf304b5bbe8"
+      }
+    },
+    {
+      "episode": 0,
+      "actions": [
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 1
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 2
+        },
+        {
+          "op": "delete",
+          "connection": "main",
+          "key": "a"
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 3
+        }
+      ],
+      "receipt": {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 5,
+          "committed_count": 1,
+          "committed_sum": 3
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "1e89bee8b4807b431175da26593ae0fde8f93f74fc071728b6321497cf06ad01"
+      }
+    },
+    {
+      "episode": 0,
+      "actions": [
+        {
+          "op": "begin",
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 1
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 2
+        },
+        {
+          "op": "rollback",
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 3
+        }
+      ],
+      "receipt": {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 4,
+          "committed_count": 1,
+          "committed_sum": 3
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "35d64fb6eb84e28522aa364aef42990058078484c818e861b772eb8044111632"
+      }
+    },
+    {
+      "episode": 0,
+      "authority": "independent fixed challenge",
+      "receipt": {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 33
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 77
+          },
+          {
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 33
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "505d4f110fac454cc1496d01d42aa609739f2f17ed18ceb91a110a505e1baf2d"
+      }
+    }
+  ],
+  "arms": {
+    "incremental": {
+      "champion": {
+        "source": "def investigate(context, acquire):\n    return {\"value\": None, \"unresolved\": True}\n",
+        "scope": "No learned source model.",
+        "lesson": ""
+      },
+      "rounds": [
+        {
+          "proposal": {
+            "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n    # Family: put mode in {ignore, replace, upsert}, trigger in {none, after_insert},\n    # channel in {changes, total_main, total_main+total_other}\n    # We simulate each candidate and keep those matching all receipts.\n\n    def simulate(actions, mode, trig, chan):\n        # state: dict key->value for committed items\n        # We track per-connection total_changes and last changes()\n        state = {}\n        # transaction buffers per connection\n        tx = {\"main\": None, \"other\": None}\n        total = {\"main\": 0, \"other\": 0}\n        last_changes = {\"main\": 0, \"other\": 0}\n        log_count = 0\n\n        def apply_write(conn, op, key, value):\n            nonlocal log_count\n            # returns number of direct row changes for this statement\n            if op == \"put\":\n                if mode == \"ignore\":\n                    if key in state:\n                        return 0\n                    state[key] = value\n                    n = 1\n                elif mode == \"replace\":\n                    state[key] = value\n                    n = 1\n                else:  # upsert\n                    if key in state:\n                        state[key] = value\n                        n = 1\n                    else:\n                        state[key] = value\n                        n = 1\n                if trig and n > 0:\n                    log_count += 1\n                return n\n            elif op == \"update\":\n                if key in state:\n                    state[key] = value\n                    n = 1\n                else:\n                    n = 0\n                if trig and n > 0:\n                    log_count += 1\n                return n\n            elif op == \"delete\":\n                if key in state:\n                    del state[key]\n                    n = 1\n                else:\n                    n = 0\n                return n\n            return 0\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                tx[conn] = dict(state)\n            elif op == \"commit\":\n                if tx[conn] is not None:\n                    state = tx[conn]\n                    tx[conn] = None\n            elif op == \"rollback\":\n                tx[conn] = None\n            else:\n                key = act.get(\"key\")\n                value = act.get(\"value\", 0)\n                if tx[conn] is not None:\n                    # operate on tx buffer\n                    saved = state\n                    state = tx[conn]\n                    n = apply_write(conn, op, key, value)\n                    tx[conn] = state\n                    state = saved\n                else:\n                    n = apply_write(conn, op, key, value)\n                total[conn] += n\n                last_changes[conn] = n\n\n        if chan == \"changes\":\n            return last_changes[\"main\"]\n        elif chan == \"total_main\":\n            return total[\"main\"]\n        else:\n            return total[\"main\"] + total[\"other\"]\n\n    modes = [\"ignore\", \"replace\", \"upsert\"]\n    trigs = [False, True]\n    chans = [\"changes\", \"total_main\", \"total_both\"]\n\n    candidates = []\n    for mode in modes:\n        for trig in trigs:\n            for chan in chans:\n                ok = True\n                for r in receipts:\n                    acts = r.get(\"actions\", [])\n                    obs = r.get(\"observed\", {})\n                    ch = simulate(acts, mode, trig, chan)\n                    if ch != obs.get(\"channel\"):\n                        ok = False\n                        break\n                    # committed state check\n                    st = {}\n                    tx = {\"main\": None, \"other\": None}\n                    for act in acts:\n                        op = act.get(\"op\")\n                        conn = act.get(\"connection\", \"main\")\n                        if op == \"begin\":\n                            tx[conn] = dict(st)\n                        elif op == \"commit\":\n                            if tx[conn] is not None:\n                                st = tx[conn]\n                                tx[conn] = None\n                        elif op == \"rollback\":\n                            tx[conn] = None\n                        else:\n                            key = act.get(\"key\")\n                            value = act.get(\"value\", 0)\n                            if tx[conn] is not None:\n                                saved = st\n                                st = tx[conn]\n                                if op == \"put\":\n                                    if mode == \"ignore\":\n                                        if key not in st:\n                                            st[key] = value\n                                    else:\n                                        st[key] = value\n                                elif op == \"update\":\n                                    if key in st:\n                                        st[key] = value\n                                elif op == \"delete\":\n                                    if key in st:\n                                        del st[key]\n                                tx[conn] = st\n                                st = saved\n                            else:\n                                if op == \"put\":\n                                    if mode == \"ignore\":\n                                        if key not in st:\n                                            st[key] = value\n                                    else:\n                                        st[key] = value\n                                elif op == \"update\":\n                                    if key in st:\n                                        st[key] = value\n                                elif op == \"delete\":\n                                    if key in st:\n                                        del st[key]\n                    if len(st) != obs.get(\"committed_count\"):\n                        ok = False\n                        break\n                    if sum(st.values()) != obs.get(\"committed_sum\"):\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((mode, trig, chan))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n\n    results = set()\n    for mode, trig, chan in candidates:\n        if goal == \"channel\":\n            results.add(simulate(actions, mode, trig, chan))\n        else:\n            st = {}\n            tx = {\"main\": None, \"other\": None}\n            for act in actions:\n                op = act.get(\"op\")\n                conn = act.get(\"connection\", \"main\")\n                if op == \"begin\":\n                    tx[conn] = dict(st)\n                elif op == \"commit\":\n                    if tx[conn] is not None:\n                        st = tx[conn]\n                        tx[conn] = None\n                elif op == \"rollback\":\n                    tx[conn] = None\n                else:\n                    key = act.get(\"key\")\n                    value = act.get(\"value\", 0)\n                    if tx[conn] is not None:\n                        saved = st\n                        st = tx[conn]\n                        if op == \"put\":\n                            if mode == \"ignore\":\n                                if key not in st:\n                                    st[key] = value\n                            else:\n                                st[key] = value\n                        elif op == \"update\":\n                            if key in st:\n                                st[key] = value\n                        elif op == \"delete\":\n                            if key in st:\n                                del st[key]\n                        tx[conn] = st\n                        st = saved\n                    else:\n                        if op == \"put\":\n                            if mode == \"ignore\":\n                                if key not in st:\n                                    st[key] = value\n                            else:\n                                st[key] = value\n                        elif op == \"update\":\n                            if key in st:\n                                st[key] = value\n                        elif op == \"delete\":\n                            if key in st:\n                                del st[key]\n            if goal == \"committed_count\":\n                results.add(len(st))\n            else:\n                results.add(sum(st.values()))\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "Simulates the disclosed 18-member SQLite family (put mode x trigger x channel) and keeps candidates consistent with all calibration receipts; answers only when all surviving candidates agree.",
+            "lesson": "The receipts pin put mode to INSERT OR IGNORE (repeated puts on same key yield channel 2 for three puts, and committed_sum stays 1), no AFTER INSERT trigger (channel equals direct changes), and channel = main changes() (last statement count, not cumulative)."
+          },
+          "parent_sha256": "de3e933ec154e73d322d2319a711b7c428752fb21287538cc70042a23f8a5bfd",
+          "candidate_sha256": "aa7b36dce6000da3dee1a807600048cf0e106865127f87c7c9d433c7c4814c6a",
+          "accepted": false,
+          "regressions": 0,
+          "unchanged": false,
+          "candidate_summary": {
+            "correct": 0,
+            "total": 12,
+            "errors": 12
+          },
+          "feedback": [
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 5,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 3,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            }
+          ],
+          "old": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "eb0197a12353de14caa59efebd24294474ef22af173329facf92f595b1e1004b",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "f2b43e32d5d65bd3798ac6b1c18b5c9d11fa5b9bda3ee21083c41df76df3093e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "33f3e4aecd5814287e637e0365d41b59495d0ff9f06328d6127190e9c4fa9d11",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "92f01fcb01094a05044e3c49f824ce498dc55c36abef359e7ec978a3cf8ff445",
+                "expected": {
+                  "value": 5,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "4473cbecc2a7564b5278d38bd78bccd80abd54337b31861391a41965e634c94c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "cca28906fb28f2bf165457b11cae27c406f052b97443282e2d69fd685ae135d3",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "e4aacacf4d542bf436579bd664619f5f0af5221d6f75f3edc56b5622567ed155",
+                "expected": {
+                  "value": 4,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "0c139fdd36a6d03d60c8b3bcf0bb7deb5b0850bbcf16649a0e58fa17f88c6499",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "d0af932e08da790b927af5a4f99cc07c99321da0663b48b4cd91bc05c41e1c06",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "a6238fb13ccdb4ac1e978e5aadb3ccb69f2919d1849b2ead0f68372a4bfb1ab1",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "6a1a410b90fb4cee8a54337145458fc82bcd4053874004cd9bfdf00fca4df35e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "a4ef82a67a617ccadfcbfb9330c7b855075bd5bd5f291dfe81f6369fd0b03816",
+                "expected": {
+                  "value": 33,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "candidate": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 12,
+            "rows": [
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "eb0197a12353de14caa59efebd24294474ef22af173329facf92f595b1e1004b",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "f2b43e32d5d65bd3798ac6b1c18b5c9d11fa5b9bda3ee21083c41df76df3093e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "33f3e4aecd5814287e637e0365d41b59495d0ff9f06328d6127190e9c4fa9d11",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "92f01fcb01094a05044e3c49f824ce498dc55c36abef359e7ec978a3cf8ff445",
+                "expected": {
+                  "value": 5,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "4473cbecc2a7564b5278d38bd78bccd80abd54337b31861391a41965e634c94c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "cca28906fb28f2bf165457b11cae27c406f052b97443282e2d69fd685ae135d3",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "e4aacacf4d542bf436579bd664619f5f0af5221d6f75f3edc56b5622567ed155",
+                "expected": {
+                  "value": 4,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "0c139fdd36a6d03d60c8b3bcf0bb7deb5b0850bbcf16649a0e58fa17f88c6499",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "d0af932e08da790b927af5a4f99cc07c99321da0663b48b4cd91bc05c41e1c06",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "a6238fb13ccdb4ac1e978e5aadb3ccb69f2919d1849b2ead0f68372a4bfb1ab1",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "6a1a410b90fb4cee8a54337145458fc82bcd4053874004cd9bfdf00fca4df35e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "a4ef82a67a617ccadfcbfb9330c7b855075bd5bd5f291dfe81f6369fd0b03816",
+                "expected": {
+                  "value": 33,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "response_error": null
+        },
+        {
+          "proposal": {
+            "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n\n    def run(actions, mode, trig, chan):\n        state = {}\n        tx = {\"main\": None, \"other\": None}\n        total = {\"main\": 0, \"other\": 0}\n        last = {\"main\": 0, \"other\": 0}\n        log = [0]\n\n        def write(conn, op, key, value):\n            if op == \"put\":\n                if mode == \"ignore\":\n                    if key in state:\n                        return 0\n                    state[key] = value\n                    n = 1\n                else:\n                    state[key] = value\n                    n = 1\n                if trig:\n                    log[0] += 1\n                return n\n            if op == \"update\":\n                if key in state:\n                    state[key] = value\n                    n = 1\n                else:\n                    n = 0\n                if trig and n > 0:\n                    log[0] += 1\n                return n\n            if op == \"delete\":\n                if key in state:\n                    del state[key]\n                    return 1\n                return 0\n            return 0\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                tx[conn] = dict(state)\n            elif op == \"commit\":\n                if tx[conn] is not None:\n                    state = tx[conn]\n                    tx[conn] = None\n            elif op == \"rollback\":\n                tx[conn] = None\n            else:\n                key = act.get(\"key\")\n                value = act.get(\"value\", 0)\n                if tx[conn] is not None:\n                    saved = state\n                    state = tx[conn]\n                    n = write(conn, op, key, value)\n                    tx[conn] = state\n                    state = saved\n                else:\n                    n = write(conn, op, key, value)\n                total[conn] += n\n                last[conn] = n\n\n        if chan == \"changes\":\n            return last[\"main\"]\n        if chan == \"total_main\":\n            return total[\"main\"]\n        return total[\"main\"] + total[\"other\"]\n\n    def committed(actions, mode):\n        state = {}\n        tx = {\"main\": None, \"other\": None}\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                tx[conn] = dict(state)\n            elif op == \"commit\":\n                if tx[conn] is not None:\n                    state = tx[conn]\n                    tx[conn] = None\n            elif op == \"rollback\":\n                tx[conn] = None\n            else:\n                key = act.get(\"key\")\n                value = act.get(\"value\", 0)\n                if tx[conn] is not None:\n                    saved = state\n                    state = tx[conn]\n                    if op == \"put\":\n                        if mode == \"ignore\":\n                            if key not in state:\n                                state[key] = value\n                        else:\n                            state[key] = value\n                    elif op == \"update\":\n                        if key in state:\n                            state[key] = value\n                    elif op == \"delete\":\n                        if key in state:\n                            del state[key]\n                    tx[conn] = state\n                    state = saved\n                else:\n                    if op == \"put\":\n                        if mode == \"ignore\":\n                            if key not in state:\n                                state[key] = value\n                        else:\n                            state[key] = value\n                    elif op == \"update\":\n                        if key in state:\n                            state[key] = value\n                    elif op == \"delete\":\n                        if key in state:\n                            del state[key]\n        return state\n\n    modes = [\"ignore\", \"replace\"]\n    trigs = [False, True]\n    chans = [\"changes\", \"total_main\", \"total_both\"]\n\n    candidates = []\n    for mode in modes:\n        for trig in trigs:\n            for chan in chans:\n                ok = True\n                for r in receipts:\n                    acts = r.get(\"actions\", [])\n                    obs = r.get(\"observed\", {})\n                    if run(acts, mode, trig, chan) != obs.get(\"channel\"):\n                        ok = False\n                        break\n                    st = committed(acts, mode)\n                    if len(st) != obs.get(\"committed_count\"):\n                        ok = False\n                        break\n                    if sum(st.values()) != obs.get(\"committed_sum\"):\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((mode, trig, chan))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = set()\n    for mode, trig, chan in candidates:\n        if goal == \"channel\":\n            results.add(run(actions, mode, trig, chan))\n        else:\n            st = committed(actions, mode)\n            if goal == \"committed_count\":\n                results.add(len(st))\n            else:\n                results.add(sum(st.values()))\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "Simulates the disclosed SQLite family (put mode x trigger x channel) and answers only when all candidates consistent with calibration agree.",
+            "lesson": "Receipts pin put mode to INSERT OR IGNORE, no AFTER INSERT trigger, and channel = main changes() (last statement count)."
+          },
+          "parent_sha256": "de3e933ec154e73d322d2319a711b7c428752fb21287538cc70042a23f8a5bfd",
+          "candidate_sha256": "a5238fea6b1aadac7e23b7c4e163aec3e410fb5223ea687ee1af00743da98190",
+          "accepted": false,
+          "regressions": 0,
+          "unchanged": false,
+          "candidate_summary": {
+            "correct": 0,
+            "total": 12,
+            "errors": 12
+          },
+          "feedback": [
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 5,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 3,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            }
+          ],
+          "old": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "eb0197a12353de14caa59efebd24294474ef22af173329facf92f595b1e1004b",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "f2b43e32d5d65bd3798ac6b1c18b5c9d11fa5b9bda3ee21083c41df76df3093e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "33f3e4aecd5814287e637e0365d41b59495d0ff9f06328d6127190e9c4fa9d11",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "92f01fcb01094a05044e3c49f824ce498dc55c36abef359e7ec978a3cf8ff445",
+                "expected": {
+                  "value": 5,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "4473cbecc2a7564b5278d38bd78bccd80abd54337b31861391a41965e634c94c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "cca28906fb28f2bf165457b11cae27c406f052b97443282e2d69fd685ae135d3",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "e4aacacf4d542bf436579bd664619f5f0af5221d6f75f3edc56b5622567ed155",
+                "expected": {
+                  "value": 4,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "0c139fdd36a6d03d60c8b3bcf0bb7deb5b0850bbcf16649a0e58fa17f88c6499",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "d0af932e08da790b927af5a4f99cc07c99321da0663b48b4cd91bc05c41e1c06",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "a6238fb13ccdb4ac1e978e5aadb3ccb69f2919d1849b2ead0f68372a4bfb1ab1",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "6a1a410b90fb4cee8a54337145458fc82bcd4053874004cd9bfdf00fca4df35e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "a4ef82a67a617ccadfcbfb9330c7b855075bd5bd5f291dfe81f6369fd0b03816",
+                "expected": {
+                  "value": 33,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "candidate": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 12,
+            "rows": [
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "eb0197a12353de14caa59efebd24294474ef22af173329facf92f595b1e1004b",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "f2b43e32d5d65bd3798ac6b1c18b5c9d11fa5b9bda3ee21083c41df76df3093e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "33f3e4aecd5814287e637e0365d41b59495d0ff9f06328d6127190e9c4fa9d11",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "92f01fcb01094a05044e3c49f824ce498dc55c36abef359e7ec978a3cf8ff445",
+                "expected": {
+                  "value": 5,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "4473cbecc2a7564b5278d38bd78bccd80abd54337b31861391a41965e634c94c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "cca28906fb28f2bf165457b11cae27c406f052b97443282e2d69fd685ae135d3",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "e4aacacf4d542bf436579bd664619f5f0af5221d6f75f3edc56b5622567ed155",
+                "expected": {
+                  "value": 4,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "0c139fdd36a6d03d60c8b3bcf0bb7deb5b0850bbcf16649a0e58fa17f88c6499",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "d0af932e08da790b927af5a4f99cc07c99321da0663b48b4cd91bc05c41e1c06",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "a6238fb13ccdb4ac1e978e5aadb3ccb69f2919d1849b2ead0f68372a4bfb1ab1",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "6a1a410b90fb4cee8a54337145458fc82bcd4053874004cd9bfdf00fca4df35e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "a4ef82a67a617ccadfcbfb9330c7b855075bd5bd5f291dfe81f6369fd0b03816",
+                "expected": {
+                  "value": 33,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "response_error": null
+        }
+      ],
+      "checkpoints": [
+        {
+          "program": {
+            "source": "def investigate(context, acquire):\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "No learned source model.",
+            "lesson": ""
+          },
+          "history": [
+            {
+              "source_id": "source-cfa9a0c4c697f5e9d949",
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 1
+              },
+              "authority": "native SQLite counter; committed state read through a separate connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "1acb0fa4f15fdbff650168940a401c02e261944cd198692011794bf304b5bbe8"
+            },
+            {
+              "source_id": "source-cfa9a0c4c697f5e9d949",
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "observed": {
+                "channel": 5,
+                "committed_count": 1,
+                "committed_sum": 3
+              },
+              "authority": "native SQLite counter; committed state read through a separate connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "1e89bee8b4807b431175da26593ae0fde8f93f74fc071728b6321497cf06ad01"
+            },
+            {
+              "source_id": "source-cfa9a0c4c697f5e9d949",
+              "actions": [
+                {
+                  "connection": "main",
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "op": "rollback"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "observed": {
+                "channel": 4,
+                "committed_count": 1,
+                "committed_sum": 3
+              },
+              "authority": "native SQLite counter; committed state read through a separate connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "35d64fb6eb84e28522aa364aef42990058078484c818e861b772eb8044111632"
+            },
+            {
+              "source_id": "source-cfa9a0c4c697f5e9d949",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 33
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 77
+                },
+                {
+                  "op": "commit"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 33
+              },
+              "authority": "native SQLite counter; committed state read through a separate connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "505d4f110fac454cc1496d01d42aa609739f2f17ed18ceb91a110a505e1baf2d"
+            }
+          ],
+          "program_sha256": "de3e933ec154e73d322d2319a711b7c428752fb21287538cc70042a23f8a5bfd"
+        }
+      ]
+    },
+    "archive": {
+      "champion": {
+        "source": "def investigate(context, acquire):\n    return {\"value\": None, \"unresolved\": True}\n",
+        "scope": "No learned source model.",
+        "lesson": ""
+      },
+      "rounds": [
+        {
+          "proposal": {
+            "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n    if not receipts:\n        return {\"value\": None, \"unresolved\": True}\n\n    def simulate(actions, put_mode, trigger, channel_mode):\n        # put_mode: 0=IGNORE, 1=REPLACE, 2=UPSERT\n        # trigger: bool, AFTER INSERT trigger logging one row\n        # channel_mode: 0=changes(), 1=total_changes main, 2=total_changes main+other\n        main = {}\n        other = {}\n        log = 0\n        main_changes = 0\n        other_changes = 0\n        main_total = 0\n        other_total = 0\n        in_tx = False\n        tx_conn = None\n        last_changes = 0\n\n        def do_put(conn, key, value):\n            nonlocal log, main_changes, other_changes, main_total, other_total, last_changes\n            d = main if conn == \"main\" else other\n            changed = 0\n            if put_mode == 0:\n                if key not in d:\n                    d[key] = value\n                    changed = 1\n            elif put_mode == 1:\n                d[key] = value\n                changed = 1\n            else:\n                if key in d:\n                    if d[key] != value:\n                        d[key] = value\n                        changed = 1\n                else:\n                    d[key] = value\n                    changed = 1\n            if changed and trigger:\n                log += 1\n            if conn == \"main\":\n                main_changes += changed\n                main_total += changed\n            else:\n                other_changes += changed\n                other_total += changed\n            last_changes = changed\n\n        def do_update(conn, key, value):\n            nonlocal log, main_changes, other_changes, main_total, other_total, last_changes\n            d = main if conn == \"main\" else other\n            changed = 0\n            if key in d:\n                if d[key] != value:\n                    d[key] = value\n                    changed = 1\n            if changed and trigger:\n                log += 1\n            if conn == \"main\":\n                main_changes += changed\n                main_total += changed\n            else:\n                other_changes += changed\n                other_total += changed\n            last_changes = changed\n\n        def do_delete(conn, key):\n            nonlocal log, main_changes, other_changes, main_total, other_total, last_changes\n            d = main if conn == \"main\" else other\n            changed = 0\n            if key in d:\n                del d[key]\n                changed = 1\n            if conn == \"main\":\n                main_changes += changed\n                main_total += changed\n            else:\n                other_changes += changed\n                other_total += changed\n            last_changes = changed\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                in_tx = True\n                tx_conn = conn\n            elif op == \"commit\":\n                in_tx = False\n                tx_conn = None\n            elif op == \"rollback\":\n                in_tx = False\n                tx_conn = None\n            elif op == \"put\":\n                do_put(conn, act.get(\"key\"), act.get(\"value\"))\n            elif op == \"update\":\n                do_update(conn, act.get(\"key\"), act.get(\"value\"))\n            elif op == \"delete\":\n                do_delete(conn, act.get(\"key\"))\n\n        if channel_mode == 0:\n            ch = last_changes\n        elif channel_mode == 1:\n            ch = main_total\n        else:\n            ch = main_total + other_total\n        return ch, len(main), sum(main.values())\n\n    candidates = []\n    for put_mode in range(3):\n        for trigger in (False, True):\n            for channel_mode in range(3):\n                ok = True\n                for r in receipts:\n                    ch, cnt, sm = simulate(r[\"actions\"], put_mode, trigger, channel_mode)\n                    obs = r[\"observed\"]\n                    if ch != obs[\"channel\"] or cnt != obs[\"committed_count\"] or sm != obs[\"committed_sum\"]:\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((put_mode, trigger, channel_mode))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = []\n    for put_mode, trigger, channel_mode in candidates:\n        ch, cnt, sm = simulate(actions, put_mode, trigger, channel_mode)\n        if goal == \"channel\":\n            results.append(ch)\n        elif goal == \"committed_count\":\n            results.append(cnt)\n        elif goal == \"committed_sum\":\n            results.append(sm)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(set(results)) == 1:\n        return {\"value\": results[0], \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "Infers put conflict mode, trigger presence, and channel counter from calibration receipts; predicts channel, committed_count, or committed_sum for new sequences.",
+            "lesson": "The channel is a native SQLite counter, not net committed effects; rollback and conflict handling change which counter increments. Multiple family members may agree on a goal, so only return a value when all consistent candidates predict the same result."
+          },
+          "parent_sha256": "de3e933ec154e73d322d2319a711b7c428752fb21287538cc70042a23f8a5bfd",
+          "candidate_sha256": "1d1e75c02a8f024e064d83f9ed0e35c6c900da96329e0e7afa43e8ce11f4d5ef",
+          "accepted": false,
+          "regressions": 0,
+          "unchanged": false,
+          "candidate_summary": {
+            "correct": 0,
+            "total": 12,
+            "errors": 12
+          },
+          "feedback": [
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 5,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 3,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Nonlocal",
+              "correct": false
+            }
+          ],
+          "old": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "eb0197a12353de14caa59efebd24294474ef22af173329facf92f595b1e1004b",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "f2b43e32d5d65bd3798ac6b1c18b5c9d11fa5b9bda3ee21083c41df76df3093e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "33f3e4aecd5814287e637e0365d41b59495d0ff9f06328d6127190e9c4fa9d11",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "92f01fcb01094a05044e3c49f824ce498dc55c36abef359e7ec978a3cf8ff445",
+                "expected": {
+                  "value": 5,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "4473cbecc2a7564b5278d38bd78bccd80abd54337b31861391a41965e634c94c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "cca28906fb28f2bf165457b11cae27c406f052b97443282e2d69fd685ae135d3",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "e4aacacf4d542bf436579bd664619f5f0af5221d6f75f3edc56b5622567ed155",
+                "expected": {
+                  "value": 4,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "0c139fdd36a6d03d60c8b3bcf0bb7deb5b0850bbcf16649a0e58fa17f88c6499",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "d0af932e08da790b927af5a4f99cc07c99321da0663b48b4cd91bc05c41e1c06",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "a6238fb13ccdb4ac1e978e5aadb3ccb69f2919d1849b2ead0f68372a4bfb1ab1",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "6a1a410b90fb4cee8a54337145458fc82bcd4053874004cd9bfdf00fca4df35e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "a4ef82a67a617ccadfcbfb9330c7b855075bd5bd5f291dfe81f6369fd0b03816",
+                "expected": {
+                  "value": 33,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "candidate": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 12,
+            "rows": [
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "eb0197a12353de14caa59efebd24294474ef22af173329facf92f595b1e1004b",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "f2b43e32d5d65bd3798ac6b1c18b5c9d11fa5b9bda3ee21083c41df76df3093e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "33f3e4aecd5814287e637e0365d41b59495d0ff9f06328d6127190e9c4fa9d11",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "92f01fcb01094a05044e3c49f824ce498dc55c36abef359e7ec978a3cf8ff445",
+                "expected": {
+                  "value": 5,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "4473cbecc2a7564b5278d38bd78bccd80abd54337b31861391a41965e634c94c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "cca28906fb28f2bf165457b11cae27c406f052b97443282e2d69fd685ae135d3",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "e4aacacf4d542bf436579bd664619f5f0af5221d6f75f3edc56b5622567ed155",
+                "expected": {
+                  "value": 4,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "0c139fdd36a6d03d60c8b3bcf0bb7deb5b0850bbcf16649a0e58fa17f88c6499",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "d0af932e08da790b927af5a4f99cc07c99321da0663b48b4cd91bc05c41e1c06",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "a6238fb13ccdb4ac1e978e5aadb3ccb69f2919d1849b2ead0f68372a4bfb1ab1",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "6a1a410b90fb4cee8a54337145458fc82bcd4053874004cd9bfdf00fca4df35e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Nonlocal",
+                "trace": [],
+                "id": "a4ef82a67a617ccadfcbfb9330c7b855075bd5bd5f291dfe81f6369fd0b03816",
+                "expected": {
+                  "value": 33,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "response_error": null
+        },
+        {
+          "proposal": {
+            "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n\n    def simulate(actions, put_mode, trigger, channel_mode):\n        main = {}\n        other = {}\n        log = 0\n        main_total = 0\n        other_total = 0\n        last_changes = 0\n        tx_conn = None\n        tx_main = {}\n        tx_other = {}\n\n        def do_put(conn, key, value):\n            d = main if conn == \"main\" else other\n            changed = 0\n            if put_mode == 0:\n                if key not in d:\n                    d[key] = value\n                    changed = 1\n            elif put_mode == 1:\n                d[key] = value\n                changed = 1\n            else:\n                if key in d:\n                    if d[key] != value:\n                        d[key] = value\n                        changed = 1\n                else:\n                    d[key] = value\n                    changed = 1\n            return changed\n\n        def do_update(conn, key, value):\n            d = main if conn == \"main\" else other\n            changed = 0\n            if key in d:\n                if d[key] != value:\n                    d[key] = value\n                    changed = 1\n            return changed\n\n        def do_delete(conn, key):\n            d = main if conn == \"main\" else other\n            changed = 0\n            if key in d:\n                del d[key]\n                changed = 1\n            return changed\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                tx_conn = conn\n                if conn == \"main\":\n                    tx_main = dict(main)\n                else:\n                    tx_other = dict(other)\n            elif op == \"commit\":\n                tx_conn = None\n            elif op == \"rollback\":\n                if tx_conn == \"main\":\n                    main = tx_main\n                elif tx_conn == \"other\":\n                    other = tx_other\n                tx_conn = None\n            elif op == \"put\":\n                changed = do_put(conn, act.get(\"key\"), act.get(\"value\"))\n                if changed and trigger:\n                    log += 1\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n                last_changes = changed\n            elif op == \"update\":\n                changed = do_update(conn, act.get(\"key\"), act.get(\"value\"))\n                if changed and trigger:\n                    log += 1\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n                last_changes = changed\n            elif op == \"delete\":\n                changed = do_delete(conn, act.get(\"key\"))\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n                last_changes = changed\n\n        if channel_mode == 0:\n            ch = last_changes\n        elif channel_mode == 1:\n            ch = main_total\n        else:\n            ch = main_total + other_total\n        return ch, len(main), sum(main.values())\n\n    candidates = []\n    for put_mode in range(3):\n        for trigger in (False, True):\n            for channel_mode in range(3):\n                ok = True\n                for r in receipts:\n                    ch, cnt, sm = simulate(r[\"actions\"], put_mode, trigger, channel_mode)\n                    obs = r[\"observed\"]\n                    if ch != obs[\"channel\"] or cnt != obs[\"committed_count\"] or sm != obs[\"committed_sum\"]:\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((put_mode, trigger, channel_mode))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = []\n    for put_mode, trigger, channel_mode in candidates:\n        ch, cnt, sm = simulate(actions, put_mode, trigger, channel_mode)\n        if goal == \"channel\":\n            results.append(ch)\n        elif goal == \"committed_count\":\n            results.append(cnt)\n        elif goal == \"committed_sum\":\n            results.append(sm)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(set(results)) == 1:\n        return {\"value\": results[0], \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "Infers put conflict mode, trigger presence, and channel counter from calibration receipts; predicts channel, committed_count, or committed_sum for new sequences.",
+            "lesson": "The channel is a native SQLite counter, not net committed effects; rollback and conflict handling change which counter increments. Multiple family members may agree on a goal, so only return a value when all consistent candidates predict the same result."
+          },
+          "parent_sha256": "de3e933ec154e73d322d2319a711b7c428752fb21287538cc70042a23f8a5bfd",
+          "candidate_sha256": "bd41fc81c942d376d2e3376cc093ea7c827945a528bf4ec46d2bbb15a6e23cea",
+          "accepted": false,
+          "regressions": 0,
+          "unchanged": false,
+          "candidate_summary": {
+            "correct": 0,
+            "total": 12,
+            "errors": 12
+          },
+          "feedback": [
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 5,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "delete"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 3,
+                "unresolved": false
+              },
+              "actual": null,
+              "error": "ValueError: unsupported syntax: Delete",
+              "correct": false
+            }
+          ],
+          "old": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "eb0197a12353de14caa59efebd24294474ef22af173329facf92f595b1e1004b",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "f2b43e32d5d65bd3798ac6b1c18b5c9d11fa5b9bda3ee21083c41df76df3093e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "33f3e4aecd5814287e637e0365d41b59495d0ff9f06328d6127190e9c4fa9d11",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "92f01fcb01094a05044e3c49f824ce498dc55c36abef359e7ec978a3cf8ff445",
+                "expected": {
+                  "value": 5,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "4473cbecc2a7564b5278d38bd78bccd80abd54337b31861391a41965e634c94c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "cca28906fb28f2bf165457b11cae27c406f052b97443282e2d69fd685ae135d3",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "e4aacacf4d542bf436579bd664619f5f0af5221d6f75f3edc56b5622567ed155",
+                "expected": {
+                  "value": 4,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "0c139fdd36a6d03d60c8b3bcf0bb7deb5b0850bbcf16649a0e58fa17f88c6499",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "d0af932e08da790b927af5a4f99cc07c99321da0663b48b4cd91bc05c41e1c06",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "a6238fb13ccdb4ac1e978e5aadb3ccb69f2919d1849b2ead0f68372a4bfb1ab1",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "6a1a410b90fb4cee8a54337145458fc82bcd4053874004cd9bfdf00fca4df35e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "a4ef82a67a617ccadfcbfb9330c7b855075bd5bd5f291dfe81f6369fd0b03816",
+                "expected": {
+                  "value": 33,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "candidate": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 12,
+            "rows": [
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "eb0197a12353de14caa59efebd24294474ef22af173329facf92f595b1e1004b",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "f2b43e32d5d65bd3798ac6b1c18b5c9d11fa5b9bda3ee21083c41df76df3093e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "33f3e4aecd5814287e637e0365d41b59495d0ff9f06328d6127190e9c4fa9d11",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "92f01fcb01094a05044e3c49f824ce498dc55c36abef359e7ec978a3cf8ff445",
+                "expected": {
+                  "value": 5,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "4473cbecc2a7564b5278d38bd78bccd80abd54337b31861391a41965e634c94c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "cca28906fb28f2bf165457b11cae27c406f052b97443282e2d69fd685ae135d3",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "e4aacacf4d542bf436579bd664619f5f0af5221d6f75f3edc56b5622567ed155",
+                "expected": {
+                  "value": 4,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "0c139fdd36a6d03d60c8b3bcf0bb7deb5b0850bbcf16649a0e58fa17f88c6499",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "d0af932e08da790b927af5a4f99cc07c99321da0663b48b4cd91bc05c41e1c06",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "a6238fb13ccdb4ac1e978e5aadb3ccb69f2919d1849b2ead0f68372a4bfb1ab1",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "6a1a410b90fb4cee8a54337145458fc82bcd4053874004cd9bfdf00fca4df35e",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": null,
+                "error": "ValueError: unsupported syntax: Delete",
+                "trace": [],
+                "id": "a4ef82a67a617ccadfcbfb9330c7b855075bd5bd5f291dfe81f6369fd0b03816",
+                "expected": {
+                  "value": 33,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "response_error": null
+        }
+      ],
+      "checkpoints": []
+    },
+    "fresh": {
+      "champion": {
+        "source": "def investigate(context, acquire):\n    return {\"value\": None, \"unresolved\": True}\n",
+        "scope": "No learned source model.",
+        "lesson": ""
+      },
+      "rounds": [],
+      "checkpoints": []
+    }
+  }
+}

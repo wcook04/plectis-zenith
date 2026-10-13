@@ -70,6 +70,84 @@ it('renders current investigation evidence without waiting for historical graphs
   expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph'))).toBe(true);
 });
 
+function observationFixture(status: string, complete: boolean) {
+  const score = { correct: 5, total: 8, unsupported: 1, errors: 0 };
+  const comparison = { worlds: 2, mean_accuracy_difference: -0.125,
+    paired_bootstrap_95_percentile: [-0.25, 0], wins: 0, ties: 1, losses: 1 };
+  return { schema: 'zenith_observation_learning_evidence_v1', campaign: 'test-fixture-only',
+    status, complete, planned_worlds: 2, frozen_worlds: 2, model: 'fixture-model', provider_slug: 'fixture-provider',
+    total_calls: 45, total_reported_cost_usd: '0.12', unreported_cost_calls: 1,
+    unreported_cost_reservations_usd: '0.02', cost_bounds_usd: ['0.12', '0.14'],
+    aggregate: complete ? { incremental: score, archive: score, fresh: score,
+      freeze_and_grow: score, empty_history: score, cold: score } : null,
+    comparisons: complete ? { archive: comparison, fresh: comparison, freeze_and_grow: comparison } : null,
+    failure: status === 'failed' ? { error: 'fixture provider stopped' } : null,
+    boundary: 'Controlled test fixture, not a model research result.' };
+}
+
+function mockObservationSite(receipt: ReturnType<typeof observationFixture> | null) {
+  const source = { path: 'test-fixture-only.json', sha256: 'fixture', url: 'https://example.org/test-fixture-only.json' };
+  const evidenceUrl = '/api/v1/evidence/observation-learning-result';
+  const chapters = ['lab', 'oracle', 'evolve', 'results'].map(id => ({
+    id, title: id, evidence_kind: id === 'results' ? 'measured_execution' : 'authored_mechanism',
+    graph_url: null, figure_url: null, document_url: null, paper_section: null,
+    evidence_urls: id === 'results' && receipt ? [evidenceUrl] : [], available: true,
+  }));
+  mockFetch(url => {
+    if (url.endsWith('/site')) return { body: { title: 'Zenith', chapters, documents: {}, figures: {},
+      active_evidence_id: 'observation-learning-result', data_mode: 'native_observation_research',
+      evidence: receipt ? { 'observation-learning-result': evidenceUrl } : {}, notice: 'Test fixture', capabilities: {} } };
+    if (url === evidenceUrl) return { body: { source, data: receipt } };
+    if (url.endsWith('/documents/paper')) return { body: { content: '', source } };
+    if (url.endsWith('/paper')) return { body: { source, citations: [], sections: [], pdf_sha256: 'fixture' } };
+    throw new Error(`Unexpected test fixture request: ${url}`);
+  });
+}
+
+it('shows pending observation results without substituting historical scores', async () => {
+  mockObservationSite(null);
+  render(<App />);
+  expect(await screen.findByText(/The current study has no published observation receipt/)).toBeInTheDocument();
+  expect(screen.getByText('Observation study results pending.')).toBeInTheDocument();
+  expect(screen.queryByText('Protected exact answers and conditional identification errors')).toBeNull();
+  expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph'))).toBe(true);
+});
+
+it.each(['running', 'partial_snapshot', 'failed', 'interrupted', 'pilot'])('retains %s status and costs without protected score tables', async status => {
+  mockObservationSite(observationFixture(status, false));
+  render(<App />);
+  expect(await screen.findByText(/Protected outcome tables are unavailable/)).toBeInTheDocument();
+  expect(screen.getByText(/Billing remains unresolved for 1 call/)).toBeInTheDocument();
+  expect(screen.queryByText('Protected exact answers and conditional identification errors')).toBeNull();
+  if (status === 'failed') expect(screen.getByText(/fixture provider stopped/)).toBeInTheDocument();
+});
+
+it('renders completed native comparisons and negative differences without a historical graph', async () => {
+  mockObservationSite(observationFixture('complete', true));
+  render(<App />);
+  expect(await screen.findByRole('heading', { name: 'Protected evaluation complete' })).toBeInTheDocument();
+  expect(screen.getAllByText('5/8')).toHaveLength(6);
+  expect(screen.getAllByText('-12.5 percentage points')).toHaveLength(3);
+  expect(screen.getByText(/Configured sources are conditional replications/)).toBeInTheDocument();
+  expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph'))).toBe(true);
+});
+
+it('withholds complete-looking aggregates when campaign status is partial', async () => {
+  mockObservationSite({ ...observationFixture('complete', true), status: 'partial_snapshot' });
+  render(<App />);
+  expect(await screen.findByText(/Protected outcome tables are unavailable/)).toBeInTheDocument();
+  expect(screen.queryByText('5/8')).toBeNull();
+});
+
+it('shows an unsupported observation receipt without loading historical graphs or scores', async () => {
+  mockObservationSite({ ...observationFixture('complete', true), schema: 'test-unsupported-schema' });
+  render(<App />);
+  expect(await screen.findByText('Observation-study receipt schema unsupported.')).toBeInTheDocument();
+  expect(screen.getByText(/The observation-study receipt has an unsupported schema/)).toBeInTheDocument();
+  expect(screen.queryByText('5/8')).toBeNull();
+  expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph'))).toBe(true);
+});
+
 describe('node inspector', () => {
   it('opens a node, shows its current instruction and walks to an upstream input', async () => {
     mockFetch((url) => ({ body: nodeBody(decodeURIComponent(url.split('/nodes/')[1])) }));

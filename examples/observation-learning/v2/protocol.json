@@ -1,0 +1,285 @@
+{
+  "schema": "zenith_observation_learning_v2",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "provider_slug": "deepinfra/fp8",
+  "provider_slugs": [
+    "deepinfra/fp8",
+    "baidu/fp8",
+    "morph/fp8"
+  ],
+  "world_providers": [
+    "deepinfra/fp8",
+    "baidu/fp8",
+    "morph/fp8",
+    "morph/fp8",
+    "deepinfra/fp8",
+    "baidu/fp8"
+  ],
+  "route_allocation": "Cyclic counterbalance across three-source blocks; with six worlds and three routes each route sees both trigger states and different conflict/counter settings. Route is fixed within each paired source comparison.",
+  "workers": 3,
+  "inference_mode": "bounded",
+  "reasoning_effort": "none",
+  "max_cost_usd": "2",
+  "max_output_tokens": 8192,
+  "max_calls": 126,
+  "worlds": 6,
+  "seed": 20261014,
+  "episodes": 3,
+  "probes_per_episode": 3,
+  "proposals_per_episode": 2,
+  "arms": [
+    "incremental",
+    "archive",
+    "fresh"
+  ],
+  "dataset_sha256": "5421d2c1d0a1d0f8caa729422acf5f3dc2312716efb2c355af5e2e587f5eecf0",
+  "source": {
+    "path": "/Users/willcook/src/plectis-zenith-distinctions/work/observation-learning-20261013-v2/runtime-source.zip",
+    "sha256": "79fab3b84af6a926f8c63ec0a99d67108cd1d5cd80e216d083aaa5376c48fd69",
+    "scope": "Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads"
+  },
+  "acquisition": "One independent model planner proposes three experiments per episode. Host executes these and one fixed challenge. Exact same resulting receipts are broadcast to all arms. Invalid probes are retained as failed experiments, never replaced. This isolates evidence organization, not a causal advantage of acquisition policy.",
+  "construction": "Incremental and execution-enabled archive each receive two proposals at each of three growing evidence prefixes. Fresh compiler receives all final evidence and six proposals. Identical program interface, development scoring, candidate acceptance and total proposal allowance; no cross-arm messages.",
+  "promotion": "Latest valid candidate with development exact score >= champion wins; record all regressions and unchanged hashes. Ties are revisions, not measured improvements. Rejected candidates remain available as search parents. No protected feedback.",
+  "primary": "Final protected exact accuracy per configured world, paired incremental minus archive and incremental minus fresh. Worlds are conditional replications in one native software family, not independent domains.",
+  "checkpoint": "After the first episode across all worlds, drain every request and stop unless every world has an executable candidate with at least one correct observed answer and at least one valid model probe. This engineering gate uses development evidence only. It does not select a winning arm or inspect protected outcomes. Finish the three-prefix pilot before deciding whether a separately frozen confirmation is informative.",
+  "controls": "Replay first accepted checkpoint with final raw evidence (freeze-and-grow), final program with empty evidence, and a cold abstaining program. Evaluate every checkpoint only after ALL model construction calls finish.",
+  "oracle": "Actual native SQLite execution and independent committed-state reader. Goal-specific identification conditional on a disclosed 18-member native family. Actual source configurations and protected outcomes never appear in model prompts; candidate programs and the evaluator implementation are not supplied.",
+  "inference": "At most three independent worlds in flight and one request per exact endpoint across the host. All arms of a world use the same pinned route. Dependencies within a world remain sequential. Shared budget reservations and settlement are atomic. No automatic retries or model/provider fallback. A failure stops admission and drains active requests. Raw content and actual schema errors reach subsequent repair prompts.",
+  "uncertainty": "World-level paired bootstrap is descriptive of these configured sources. Protected compositions are authored and bounded; no claim of arbitrary semantic discovery, broad intelligence or autonomous ontology invention.",
+  "model_evidence": {
+    "selection": "Recent capable inexpensive Chinese text/coding model; fixed explicit-source instruction and disabled reasoning passed an execution canary on each pinned route. One interface pass does not establish semantic task quality.",
+    "openrouter_skill_commit": "33597a44e38b0cdc38ea1256ef8bcf50c2704e3d",
+    "canaries": [
+      {
+        "id": "openrouter-route-canary-20261013-baidu",
+        "sha256": "ffc57132ac554543a1858dc3622fde323edecac40ab5f65b129412e655d3617a",
+        "ok": false,
+        "reasoning_effort": "none",
+        "route": "baidu/fp8",
+        "cost_usd": "0.000113118"
+      },
+      {
+        "id": "openrouter-route-canary-20261013-baidu-explicit-low",
+        "sha256": "a1fa2733ba99068ae2f74d0f6b23d70706280478b2117252914ef06f601d4718",
+        "ok": true,
+        "reasoning_effort": "low",
+        "route": "baidu/fp8",
+        "cost_usd": "0.000918612"
+      },
+      {
+        "id": "openrouter-route-canary-20261013-baidu-explicit-none",
+        "sha256": "3562cdf0314e93f06410a0874a14363b6f1f21cb7c1e495fb0ccd4bcd503ac3a",
+        "ok": true,
+        "reasoning_effort": "none",
+        "route": "baidu/fp8",
+        "cost_usd": "0.000105468"
+      },
+      {
+        "id": "openrouter-route-canary-20261013-deepinfra",
+        "sha256": "d57a92078bd7435b5f0ea10fd4eb668ca2363f3bbd54580aa142c4a0f0eaf27f",
+        "ok": false,
+        "reasoning_effort": "none",
+        "route": "deepinfra/fp8",
+        "cost_usd": "0.00004396"
+      },
+      {
+        "id": "openrouter-route-canary-20261013-deepinfra-explicit-low",
+        "sha256": "a51bd974ef6fe0900c440b321254750abe4e88ee1b866c359038a50bb3db2950",
+        "ok": true,
+        "reasoning_effort": "low",
+        "route": "deepinfra/fp8",
+        "cost_usd": "0.00055062"
+      },
+      {
+        "id": "openrouter-route-canary-20261013-deepinfra-explicit-none",
+        "sha256": "fb2e1a39ffeec6fe5bceb5100b61cdc851aa9407340216745526c60d1b64d0a0",
+        "ok": true,
+        "reasoning_effort": "none",
+        "route": "deepinfra/fp8",
+        "cost_usd": "0.00008078"
+      },
+      {
+        "id": "openrouter-route-canary-20261013-morph",
+        "sha256": "2779c99b0eeb45cce816a81b240f0f0d25e791e0bce5c657fbaa4781799cf224",
+        "ok": false,
+        "reasoning_effort": "none",
+        "route": "morph/fp8",
+        "cost_usd": "0.000093878"
+      },
+      {
+        "id": "openrouter-route-canary-20261013-morph-explicit-low",
+        "sha256": "53d33a02f6c8838008df968e0bd34613a98f6612ad3a22260b2b0340782bfbcb",
+        "ok": true,
+        "reasoning_effort": "low",
+        "route": "morph/fp8",
+        "cost_usd": "0.000128305"
+      },
+      {
+        "id": "openrouter-route-canary-20261013-morph-explicit-none",
+        "sha256": "30bbca40499e175f0acd7275372594268305a191683150605f0e284cf0219ee0",
+        "ok": true,
+        "reasoning_effort": "none",
+        "route": "morph/fp8",
+        "cost_usd": "0.000123585"
+      }
+    ],
+    "endpoints": [
+      {
+        "name": "Morph | deepseek/deepseek-v4.1-flash-20260910",
+        "model_id": "deepseek/deepseek-v4.1-flash",
+        "model_name": "DeepSeek: DeepSeek V4.1 Flash",
+        "context_length": 1048576,
+        "pricing": {
+          "prompt": "0.000000049",
+          "completion": "0.00000069",
+          "input_cache_read": "0.000000009",
+          "discount": 0
+        },
+        "provider_name": "Morph",
+        "tag": "morph/fp8",
+        "quantization": "fp8",
+        "max_completion_tokens": 943718,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "stop",
+          "top_p",
+          "top_k",
+          "min_p",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "seed",
+          "logit_bias",
+          "response_format",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "reasoning_effort"
+        ],
+        "supports_tool_choice": {
+          "none": true,
+          "auto": true,
+          "required": false,
+          "function": false
+        },
+        "status": 0,
+        "uptime_last_30m": 100,
+        "uptime_last_5m": 100,
+        "uptime_last_1d": 100,
+        "supports_implicit_caching": false,
+        "native_tools": {},
+        "supports_voice_cloning": false,
+        "supports_multiple_audio_references": false,
+        "supports_image_reference": false,
+        "latency_last_30m": null,
+        "throughput_last_30m": null
+      },
+      {
+        "name": "Baidu | deepseek/deepseek-v4.1-flash-20260910",
+        "model_id": "deepseek/deepseek-v4.1-flash",
+        "model_name": "DeepSeek: DeepSeek V4.1 Flash",
+        "context_length": 1048576,
+        "pricing": {
+          "prompt": "0.000000102",
+          "completion": "0.000000408",
+          "input_cache_read": "0.00000000204",
+          "discount": 0.66
+        },
+        "provider_name": "Baidu",
+        "tag": "baidu/fp8",
+        "quantization": "fp8",
+        "max_completion_tokens": 393216,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "temperature",
+          "top_p",
+          "max_tokens",
+          "stop",
+          "response_format",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "reasoning_effort"
+        ],
+        "supports_tool_choice": {
+          "none": true,
+          "auto": true,
+          "required": false,
+          "function": true
+        },
+        "status": 0,
+        "uptime_last_30m": 100,
+        "uptime_last_5m": 100,
+        "uptime_last_1d": 99.37150837988827,
+        "supports_implicit_caching": false,
+        "native_tools": {},
+        "supports_voice_cloning": false,
+        "supports_multiple_audio_references": false,
+        "supports_image_reference": false,
+        "latency_last_30m": null,
+        "throughput_last_30m": null
+      },
+      {
+        "name": "DeepInfra | deepseek/deepseek-v4.1-flash-20260910",
+        "model_id": "deepseek/deepseek-v4.1-flash",
+        "model_name": "DeepSeek: DeepSeek V4.1 Flash",
+        "context_length": 1048576,
+        "pricing": {
+          "prompt": "0.00000014",
+          "completion": "0.00000042",
+          "input_cache_read": "0.0000000042",
+          "discount": 0.3
+        },
+        "provider_name": "DeepInfra",
+        "tag": "deepinfra/fp8",
+        "quantization": "fp8",
+        "max_completion_tokens": 131072,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "stop",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "top_k",
+          "seed",
+          "min_p",
+          "logit_bias",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "response_format",
+          "reasoning_effort"
+        ],
+        "supports_tool_choice": {
+          "none": true,
+          "auto": true,
+          "required": true,
+          "function": true
+        },
+        "status": 0,
+        "uptime_last_30m": 100,
+        "uptime_last_5m": 100,
+        "uptime_last_1d": 100,
+        "supports_implicit_caching": false,
+        "native_tools": {},
+        "supports_voice_cloning": false,
+        "supports_multiple_audio_references": false,
+        "supports_image_reference": false,
+        "latency_last_30m": null,
+        "throughput_last_30m": null
+      }
+    ]
+  }
+}

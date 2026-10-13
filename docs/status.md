@@ -1,8 +1,124 @@
-# Executable investigations — 13 October 2026
+# Executable observation models — 13 October 2026
 
-Zenith now tests actual model-authored numerical procedures, with measured repair and frozen reuse. The five new research returns reproduced with **198 passing tests** and informed one native implementation. Their finite authored grammars are distinguished from the new live-model experiments. [Method and synthesis](executable-investigations.md), [three-page paper](../paper/zenith.pdf), [complete versioned receipt](investigation-learning-20261013.json).
+The ten frontier returns have been synthesized into one implemented loop: model-proposed source experiments, host-recorded measurements, model-written predictors and measured revision. All ten returns were audited with **337 passing return-specific tests**. [Synthesis and custody](frontier-returns-20261013.md), [active method](executable-investigations.md), [three-page paper](../paper/zenith.pdf).
 
-The task investigates operational measurements with explicit quantity contracts. It separates active time, elapsed time and billed work; accounts for workload mix, coverage, units and record multiplicity; and preserves supported findings alongside unresolved checks. This replaces unconstrained market prediction as the active research task.
+## Small tests after the native campaign
+
+**Fresh reconstruction repaired failures that repeated edits did not.** Three failed V5 programs were selected retrospectively. Generic repair, counterexample-focused repair and a cold restart received identical native observations and two proposals per source. Each model made 18 calls. The final programs were frozen before structurally new screening sequences were scored.
+
+| Model | Unchanged / 144 | Generic repair / 144 | Counterexample focus / 144 | Restart / 144 | Reported cost |
+|---|---:|---:|---:|---:|---:|
+| DeepSeek V4.1 Flash | 11 | 11 | 11 | 94 | $0.0198473408 |
+| Qwen 3.8 Omni Flash | 11 | 11 | 20 | 53 | $0.0411468060 |
+
+The best aggregate model/condition was selected under a recorded rule before opening the separate confirmation pool. On 32 further structures per source, **the selected DeepSeek restart scored 188/288 versus 23/288 for the unchanged programs**, with no execution errors. Qwen's confirmation was explicitly forfeited because both screens shared that pool. These are new sequences for three already selected sources, not new domains or a general model ranking. [DeepSeek records](../examples/observation-learning/screen-repair-deepseek-v1/report.json), [Qwen records](../examples/observation-learning/screen-repair-qwen-v1/report.json).
+
+The models succeeded on different sources: DeepSeek restart scored 46, 0 and 48 of 48; Qwen scored 11, 40 and 2. A development-perfect Qwen counterexample repair nevertheless scored only 20/48 on its screening source, including 11 unsupported commitments. Fitting observed examples is therefore insufficient. The useful lead is preserving measurements and tests while allowing fresh candidate search; neither a confident repair explanation nor a development-perfect program guarantees generalization.
+
+Exact offline replay reproduced all 36 construction comparisons per model, every individual screening answer and trace, and the selected DeepSeek confirmation. Raw model content and actual provider request identities were checked independently; no client cache or stale-feedback explanation was found.
+
+### Combining candidate programs
+
+The next comparison gave each source four candidate slots: two original DeepSeek and two original Qwen restart proposals, or four proposals from either model alone. Single-model pools added two same-model continuations; the mixed pool reused four earlier attempts. Every candidate was scored on the same development measurements, and a deterministic source-hash rule broke ties. All earlier V5 discovery, evaluation, repair and confirmation action structures were excluded from the new panels.
+
+| Frozen pool | Screening / 144 | Separate confirmation / 288 |
+|---|---:|---:|
+| Mixed, two proposals per model (selected primary) | 138 | 279 |
+| Four DeepSeek proposals | 96 | 191 |
+| Four Qwen proposals | 96 | 194 |
+| Original failed programs | 14 | 26 |
+
+The primary pool was committed under the predeclared screening rule before evaluating confirmation. All three frozen pools were predeclared confirmation comparators. They made no unsupported commitments or execution errors in either panel. The **12 additional calls cost $0.0239651368**; 12 earlier calls were reused, with 36 overlapping slot references across the three pools. This is useful complementary candidate coverage on three selected failures. The conditions match proposal counts but differ in generation history and token cost; the result does not establish general model-mixture superiority or an advantage over every program in the larger historical archive.
+
+The [immutable pool bundle](../examples/observation-learning/screen-candidate-pool-v1/report.json) replays 4,452 individual development answers, all actual construction prompts, every source-selection decision, and both protected panels with zero inference calls. [Follow-on receipts and cost accounting](observation-screens-20261013.json).
+
+All mixed winners were original retained proposals. Attributed proposal costs were $0.0261005432 for mixed, $0.0115803240 for DeepSeek-only and $0.0384853560 for Qwen-only. These costs overlap: the union of 24 distinct calls cost $0.0500656800. The 12 new calls did not create the mixed winners. Two new Qwen attempts failed the object schema and restricted-name interface; their development error rows do not measure executed numerical reasoning.
+
+### Test the retained archive before buying more code
+
+The next frozen assay made **zero model calls**. It retained all eight current proposal slots per source and measured two native probes under each of two policies: fixed order or candidate disagreement. Within each policy, the initial and reselected program receive identical history. A stronger reference selected from all 18 same-source V5 proposals, using only development evidence and the same fixed-policy receipts. No historical protected winner was imported. All selection ended before the new final panel was evaluated.
+
+| Frozen inventory and policy | Correct supported numerical answers / 288 | Exact answers / 288 | Wrong supported values | Abstentions |
+|---|---:|---:|---:|---:|
+| Current eight, fixed probes, initial choice | 165 | 165 | 27 | 96 |
+| Current eight, fixed probes, reselect | 180 | 180 | 12 | 96 |
+| Current eight, disagreement probes, initial choice | 234 | 255 | 33 | 21 |
+| Current eight, disagreement probes, reselect | 249 | 270 | 18 | 21 |
+| Historical eighteen, fixed probes, initial choice | 265 | 265 | 2 | 21 |
+| Historical eighteen, fixed probes, reselect | **286** | **286** | **2** | **0** |
+
+All six conditions had zero execution errors and unsupported commitments. Fixed-policy evidence identified all 288 queries; disagreement-policy evidence identified 267, leaving 21 correctly unresolved. The primary numerical measure therefore does not count those 21 abstentions as gains. There were **12 actual probe receipts total** across three sources and two policies; controls share them. The new panel uses 32 action structures excluded from all earlier discovery and evaluation panels.
+
+The disagreement score requires a caution: its entire 69-answer numerical advantage comes from one source where the fixed policy exposes a shared simulator error. The fixed probe reports channel 15; a retained DeepSeek simulation predicts 20 by mishandling trigger increments. After that contradiction the current inventory cannot fit the observed history and abstains on all 96 final queries for that source. Disagreement instead selects two zero-write/open-transaction probes and avoids this counterexample. Higher final score therefore does **not** establish better source identification. Independent challenges remain necessary even when a probe policy optimizes candidate disagreement.
+
+The larger historical archive handles the stronger evidence and is the best condition here, so new generation is not necessary to explain the improvement. Its 18-proposal historical search budget exceeds the current eight slots; this is not an equal-cost memory comparison. The disagreement policy is authored, not learned by a model. This single predeclared assay has no separate confirmation panel and must not be compared numerically to the earlier 279/288 result on different sequences. [Exact records](../examples/observation-learning/screen-active-selection-v1/report.json).
+
+### Composition remains unresolved
+
+Five separately frozen versions stopped before protected graph/flat/fresh scoring. None establishes a graph benefit or a graph failure on the intended comparison.
+
+| Version | Attempts | Reported cost | Terminal outcome |
+|---|---:|---:|---|
+| GLM / Fireworks v1 | 1 | Unknown | Upstream shared-pool HTTP 429 |
+| GLM / Streamlake v2 | 2 | $0.0019130749 | No qualified primitive: empty-state interface mismatch, then malformed source |
+| GLM / Streamlake v3 | 14 | $0.0197342622 | Empty diagnostic completion after exhausting the output allowance; no complete source |
+| DeepSeek / DeepInfra v4 | 1 | Unknown | Provider grammar rejected `uniqueItems` before returning code |
+| DeepSeek / DeepInfra v5 | 4 | $0.0055610688 | First two programs used forbidden private helper names; later two executed but scored 0/27 on primitive development |
+
+The v5 request schema omits only the unsupported wire keyword; unchanged host validation still rejects duplicate dependencies. It uses one predeclared source, four primitive proposals and no output repair. The later primitives fail to model transactions correctly and abstain after no source hypothesis fits. No assembly calls ran. GLM v3's two passing primitive proposals have identical source; their readout re-simulates the action context, so interface agreement alone would not establish meaningful learned state composition. Every failed version, original output and forfeited unused confirmation pool remains in the [public index](observation-screens-20261013.json).
+
+### Cost and reproduction of this pass
+
+The complete follow-on batch made **74 new attempts for $0.1125724670 reported cost**. Three failed calls lack reported charges; their combined conservative reservation is **$0.022297600**, not a measured invoice. The original 126-call V5 comparison is separate. Together these two passes have 200 attempts and $0.24204497924 reported cost. Reused candidate references are counted once, not as new inference.
+
+Repair and candidate-pool public replays reproduce individual development outputs, selection and confirmation. The active assay reproduces 2,304 unlabelled candidate predictions, 12 selected native receipts and all 1,728 final answer rows. Terminal composition bundles preserve failures without inventing protected scores. The current checkout passes 604 retained backend tests, 28 website tests, topology and extraction checks; the updated paper compiles within three pages. All replays use archived source with network access disabled. The [method](executable-investigations.md) gives the commands; the [programme](../program.md) records what these findings recommend and what remains untested.
+
+## Native-source campaign
+
+**The completed experiment produced useful predictors, but continued program revision added no measured benefit.** Six balanced SQLite configurations supplied three evidence episodes. Incremental state, an execution-enabled archive and fresh compilation received the same external observations and six coding proposals per source. All construction froze before 48 protected queries per source were evaluated.
+
+| Frozen condition | Correct / 288 | Execution errors |
+|---|---:|---:|
+| Incremental state | 244 | 0 |
+| Execution-enabled archive | 187 | 0 |
+| Fresh compiler | 230 | 6 |
+| Early incremental program with final history | 244 | 0 |
+| Final incremental program with empty history | 184 | 0 |
+| Cold abstention | 8 | 0 |
+
+The early-program control ties the final incremental program on **every source**. More strongly, the incremental source code remained byte-identical from the first checkpoint through the last on all six sources; its own-prefix protected total was already 244 at the first checkpoint. Additional code revision therefore earns no separate benefit in this run. Client records verify distinct requests, growing histories, delivery of the actual failed candidate and feedback, and distinct provider generation IDs; this is not a detected client cache or stale-feedback error. Removing history reduces aggregate accuracy, but compiled programs can legitimately retain source knowledge, and individual sources vary.
+
+Incremental construction wins/ties/loses on **3/2/1** sources against the archive and **3/1/2** against fresh compilation. The respective mean accuracy differences are +19.8 and +4.9 percentage points, but descriptive source-level paired bootstrap intervals span zero: **[-25.0, +65.6]** and **[-39.6, +51.4]** percentage points. These six configured sources are one software family, not six independent domains; neither aggregate ranking establishes a reliable memory advantage. All arms made zero unsupported commitments under the frozen family criterion; wrong resolved values, abstentions and execution failures still count as errors in exact accuracy.
+
+DeepSeek V4.1 Flash completed **126 calls for $0.12947251224**, with reasoning disabled and no automatic retries or fallback. Up to three independent source trials overlapped, one call per pinned DeepInfra, Baidu or Morph endpoint. Paired conditions shared their source's route. Every call settled with a reported cost.
+
+| Function | Calls | Reported inference cost |
+|---|---:|---:|
+| Shared experiment planning | 18 | $0.00718965560 |
+| Incremental construction | 36 | $0.03430335708 |
+| Archive construction | 36 | $0.04538664880 |
+| Fresh construction | 36 | $0.04259285076 |
+
+The declared $2 ceiling was a maximum, not an invoice estimate. These charges cover API inference, not local execution or development labour. [Active receipt](observation-learning-20261013.json) and [immutable V5 bundle](../examples/observation-learning/v5/report.json) bind prompts, exact returned programs, host measurements, all candidates, final comparisons, token usage and the archived runtime. Offline replay reproduces **216 construction checks (6,048 answers/traces)** and **78 protected panels (3,744 answers/traces)** from six frozen sources, without API calls.
+
+The source family and support criterion were public, while the actual source configurations stayed private. The experiment measures predictions for new compositions of known actions. It does not evolve a graph, invent new quantities, demonstrate cross-domain transfer or improve its own learning algorithm. The [programme](../program.md#relation-to-the-graph-ambition) preserves the original graph ambition and states the additional test it needs.
+
+### Preserved engineering attempts
+
+| Version | Outcome before protected evaluation | Main calls | Reported main cost |
+|---|---|---:|---:|
+| [V1](../examples/observation-learning/v1/report.json) | Serial run stopped cleanly between calls while redesigning admission | 12 | $0.0438456144 |
+| [V2](../examples/observation-learning/v2/report.json) | First-prefix checkpoint stopped on restricted-language delivery failures | 30 | $0.02540744808 |
+| [V3](../examples/observation-learning/v3/report.json) | Billed empty response stopped admission; active calls settled | 8 | $0.013553597 |
+| [V4](../examples/observation-learning/v4/report.json) | Old gate stopped on one source with zero correct observed answers | 30 | $0.03705523248 |
+
+V2's 22 restricted-language failures motivated minimal local-state syntax support. Its 24 original programs subsequently executed unchanged on observed queries; this diagnostic does not replace V2 outcomes. V3's failed planner consumed all 8,192 completion tokens as reasoning and returned no assistant answer. V5 used reasoning disabled and a development-only engineering gate requiring executable delivery and measured probes from every source, plus some correct observed output across the cohort. Difficult zero-score sources remained in the comparison. Nine separately recorded route/interface checks cost $0.002158326; V5 does not count them again. No protected outcomes informed these engineering changes, and they do not isolate the causal effect of reasoning settings.
+
+## Historical operational campaign
+
+The earlier operational experiment tested model-authored numerical procedures, with measured repair and frozen reuse. The five new research returns reproduced with **198 passing tests** and informed one native implementation. Their finite authored grammars are distinguished from the new live-model experiments. [Method and synthesis](executable-investigations.md), [three-page paper](../paper/zenith.pdf), [complete versioned receipt](investigation-learning-20261013.json).
+
+That task investigated operational measurements with explicit quantity contracts. It separates active time, elapsed time and billed work; accounts for workload mix, coverage, units and record multiplicity; and preserves supported findings alongside unresolved checks. It replaced unconstrained market prediction as the research task before the native-source study.
 
 ## What the model learned
 
@@ -41,7 +157,7 @@ The implementation, paper and site now present the same active study. Historical
 
 # Historical model calibration — 13 October 2026
 
-The [repair report](model-repair-20261013.md) and [cost receipt](model-repair-20261013.json) record the earlier engineering baseline. New experiments enforce inexpensive Chinese-developed models, verified tariff ceilings and host-wide serialized inference. Lossless reviewer inputs remove repeated evidence, and the capability inventory distinguishes all legal recipes from the subset already tried.
+The [repair report](model-repair-20261013.md) and [cost receipt](model-repair-20261013.json) record the earlier engineering baseline. Those experiments enforced inexpensive Chinese-developed models, verified tariff ceilings and host-wide serialized inference. The current policy permits bounded concurrency. Lossless reviewer inputs remove repeated evidence, and the capability inventory distinguishes all legal recipes from the subset already tried.
 
 Thirteen modern-model calls cost **$0.046824887272**. DeepSeek completed the native Lab with unchanged zero forecasts and passed 16/16 component questions in valid format. Qwen answered the same questions correctly but violated the object schema; that attempt remains a format failure. A later Qwen review returned no change, while still making a false directional claim. No procedure was adopted, and no predictive or learning improvement is established. These are different workloads, not a controlled aggregate model comparison.
 

@@ -1,0 +1,89 @@
+{
+  "experiments": [
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 4
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 4
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 4
+      }
+    ]
+  ],
+  "purpose": "Separate INSERT OR IGNORE, INSERT OR REPLACE, and ON CONFLICT DO UPDATE by comparing channel counts on repeated puts, delete-then-put, and repeated updates, while committed state stays identical across candidates."
+}

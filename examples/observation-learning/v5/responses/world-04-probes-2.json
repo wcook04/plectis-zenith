@@ -1,0 +1,77 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "x",
+        "value": 10
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "x",
+        "value": 20
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "x",
+        "value": 30
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "x",
+        "value": 10
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "x",
+        "value": 20
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "x",
+        "value": 30
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "x",
+        "value": 10
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "x",
+        "value": 20
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "x",
+        "value": 30
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      }
+    ]
+  ],
+  "purpose": "Distinguish INSERT OR IGNORE vs REPLACE vs ON CONFLICT DO UPDATE, and main-only vs main+other total_changes, using repeated puts to the same key where committed state may remain 10 but channel counts differ."
+}

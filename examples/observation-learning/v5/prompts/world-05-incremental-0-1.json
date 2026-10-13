@@ -1,0 +1,369 @@
+{
+  "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n",
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "history": [
+      {
+        "source_id": "source-a161f7468549039a9b44",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          }
+        ],
+        "observed": {
+          "channel": 5,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "21902a25efa6f965071f715f0f3518a04c31f846539c165578e5f3f45014b5e4"
+      },
+      {
+        "source_id": "source-a161f7468549039a9b44",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 4
+          }
+        ],
+        "observed": {
+          "channel": 7,
+          "committed_count": 1,
+          "committed_sum": 4
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "582f34e83a96b9974d953cec58c53d95b454cdd9de4ee6e10b77330198585fc5"
+      },
+      {
+        "source_id": "source-a161f7468549039a9b44",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 4
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 5
+          }
+        ],
+        "observed": {
+          "channel": 8,
+          "committed_count": 1,
+          "committed_sum": 5
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "4cc5197378c4393f33f59070c73735e22315b9f734ed42b6d73ea63f1bcc914e"
+      },
+      {
+        "source_id": "source-a161f7468549039a9b44",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 63
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 69
+          },
+          {
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 3,
+          "committed_count": 1,
+          "committed_sum": 69
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "9b1b83c3c6f1d78558829141c49073a7e918a5355fb902d20eff249fc9329e41"
+      }
+    ],
+    "champion": {
+      "lesson": "The channel is main total_changes plus other total_changes, and the put operation is INSERT OR REPLACE. The trigger is absent. The channel counts every row change including those from failed inserts and updates, and the committed state reflects the final table contents.",
+      "scope": "The source uses INSERT OR REPLACE for put, no trigger, and channel = main total_changes + other total_changes. The model predicts channel, committed_count, and committed_sum for any action sequence within the disclosed family.",
+      "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n    # Determine put behavior and channel from history\n    # We'll simulate all possible combinations and filter by history\n    # Family: put_op in ['ignore', 'replace', 'upsert'], trigger in [False, True], channel in ['changes', 'total_main', 'total_both']\n    # We'll implement a simulator for each combination and check against history\n    \n    def simulate(actions, put_op, trigger, channel_type):\n        # Returns (channel_value, committed_count, committed_sum)\n        # State: main and other connections each have their own view of the database\n        # But since transactions are not nested and we only have one table, we can model\n        # the database as a single table with committed state and uncommitted changes per connection.\n        # However, SQLite semantics: each connection has its own transaction. Changes are visible only after commit.\n        # We'll maintain: committed_items (dict key->value), and for each connection: pending_items (dict key->value) or None if no transaction.\n        # Also need to track total_changes for each connection.\n        # total_changes is cumulative for the connection, including changes that are later rolled back.\n        # changes() returns the number of rows modified by the most recent statement on that connection.\n        # For channel = main total_changes + other total_changes, we sum the total_changes of both connections.\n        # For channel = main total_changes, we use main's total_changes.\n        # For channel = main changes(), we use the changes() from the last statement on main.\n        \n        committed = {}\n        main_pending = None\n        other_pending = None\n        main_total = 0\n        other_total = 0\n        main_last_changes = 0\n        other_last_changes = 0\n        \n        # For trigger: if trigger is True, an AFTER INSERT trigger inserts one row into an auxiliary log.\n        # This means every successful INSERT (including REPLACE) will cause an additional row change in the log table.\n        # The log table is not read, but it affects total_changes and changes().\n        # For changes(), the trigger's insert is a separate statement? Actually, triggers execute as part of the statement,\n        # so changes() counts only direct changes to the table? In SQLite, changes() returns the number of rows modified by the most recent statement,\n        # excluding changes made by triggers. So trigger does not affect changes().\n        # However, total_changes includes changes made by triggers.\n        # So for channel = changes(), trigger has no effect.\n        # For channel = total_changes, trigger adds 1 for each successful INSERT (including REPLACE) on that connection.\n        \n        def apply_put(conn, key, value):\n            nonlocal main_pending, other_pending, main_total, other_total, main_last_changes, other_last_changes\n            # Determine current state for this connection\n            if conn == 'main':\n                pending = main_pending\n                total = main_total\n                last_changes = main_last_changes\n            else:\n                pending = other_pending\n                total = other_total\n                last_changes = other_last_changes\n            \n            # The effective table for this connection: if pending is not None, use pending; else use committed\n            # But pending is a full copy? Actually, in SQLite, a transaction sees the committed state plus its own changes.\n            # We'll model pending as a dict that starts as a copy of committed when transaction begins, and is modified.\n            # If no transaction, pending is None and we operate directly on committed.\n            \n            if pending is None:\n                # No transaction: operate on committed directly\n                table = committed\n            else:\n                table = pending\n            \n            # Determine if key exists\n            exists = key in table\n            old_value = table.get(key)\n            \n            # Apply put according to put_op\n            if put_op == 'ignore':\n                if exists:\n                    # INSERT OR IGNORE: no change\n                    changes = 0\n                else:\n                    table[key] = value\n                    changes = 1\n            elif put_op == 'replace':\n                # INSERT OR REPLACE: always replaces, deletes old row if exists, inserts new\n                # This counts as 1 change (the insert), but if there was an old row, it's deleted and new inserted.\n                # In SQLite, REPLACE deletes the old row and inserts new, so changes() returns 1? Actually, it returns 1 for the insert, but the delete is implicit.\n                # According to SQLite docs, changes() returns the number of rows modified by the most recent statement. For REPLACE, it's 1 if a row was inserted, 0 if not? Actually, REPLACE always inserts, so 1.\n                # But if there was a conflict, it deletes the old row first, then inserts. The delete is not counted separately.\n                # So changes = 1 always.\n                table[key] = value\n                changes = 1\n            elif put_op == 'upsert':\n                # INSERT ... ON CONFLICT(id) DO UPDATE SET value=excluded.value\n                if exists:\n                    # Update the value\n                    table[key] = value\n                    changes = 1\n                else:\n                    table[key] = value\n                    changes = 1\n            \n            # Update total_changes\n            total += changes\n            # If trigger is True and changes > 0 (i.e., an insert happened), add 1 for the trigger's insert\n            # But for upsert, if it's an update, does the trigger fire? The trigger is AFTER INSERT, so only on insert.\n            # For upsert, if it's an update, no insert, so no trigger.\n            # For replace, it's an insert, so trigger fires.\n            # For ignore, if it inserts, trigger fires.\n            # So we need to know if an insert occurred.\n            insert_occurred = False\n            if put_op == 'ignore':\n                if not exists:\n                    insert_occurred = True\n            elif put_op == 'replace':\n                insert_occurred = True\n            elif put_op == 'upsert':\n                if not exists:\n                    insert_occurred = True\n            if trigger and insert_occurred:\n                total += 1\n            \n            # Update last_changes: changes() returns the number of rows modified by the most recent statement, excluding triggers.\n            # So last_changes = changes (the direct changes)\n            last_changes = changes\n            \n            # Write back\n            if conn == 'main':\n                main_pending = pending\n                main_total = total\n                main_last_changes = last_changes\n            else:\n                other_pending = pending\n                other_total = total\n                other_last_changes = last_changes\n        \n        def apply_update(conn, key, value):\n            nonlocal main_pending, other_pending, main_total, other_total, main_last_changes, other_last_changes\n            if conn == 'main':\n                pending = main_pending\n                total = main_total\n                last_changes = main_last_changes\n            else:\n                pending = other_pending\n                total = other_total\n                last_changes = other_last_changes\n            \n            if pending is None:\n                table = committed\n            else:\n                table = pending\n            \n            if key in table:\n                table[key] = value\n                changes = 1\n            else:\n                changes = 0\n            \n            total += changes\n            # No trigger for update\n            last_changes = changes\n            \n            if conn == 'main':\n                main_pending = pending\n                main_total = total\n                main_last_changes = last_changes\n            else:\n                other_pending = pending\n                other_total = total\n                other_last_changes = last_changes\n        \n        def apply_delete(conn, key):\n            nonlocal main_pending, other_pending, main_total, other_total, main_last_changes, other_last_changes\n            if conn == 'main':\n                pending = main_pending\n                total = main_total\n                last_changes = main_last_changes\n            else:\n                pending = other_pending\n                total = other_total\n                last_changes = other_last_changes\n            \n            if pending is None:\n                table = committed\n            else:\n                table = pending\n            \n            if key in table:\n                del table[key]\n                changes = 1\n            else:\n                changes = 0\n            \n            total += changes\n            # No trigger for delete\n            last_changes = changes\n            \n            if conn == 'main':\n                main_pending = pending\n                main_total = total\n                main_last_changes = last_changes\n            else:\n                other_pending = pending\n                other_total = total\n                other_last_changes = last_changes\n        \n        def apply_begin(conn):\n            nonlocal main_pending, other_pending\n            if conn == 'main':\n                if main_pending is None:\n                    main_pending = dict(committed)\n            else:\n                if other_pending is None:\n                    other_pending = dict(committed)\n        \n        def apply_commit(conn):\n            nonlocal main_pending, other_pending, committed\n            if conn == 'main':\n                if main_pending is not None:\n                    committed = main_pending\n                    main_pending = None\n            else:\n                if other_pending is not None:\n                    committed = other_pending\n                    other_pending = None\n        \n        def apply_rollback(conn):\n            nonlocal main_pending, other_pending\n            if conn == 'main':\n                main_pending = None\n            else:\n                other_pending = None\n        \n        for action in actions:\n            op = action.get('op')\n            conn = action.get('connection', 'main')\n            if op == 'put':\n                apply_put(conn, action['key'], action['value'])\n            elif op == 'update':\n                apply_update(conn, action['key'], action['value'])\n            elif op == 'delete':\n                apply_delete(conn, action['key'])\n            elif op == 'begin':\n                apply_begin(conn)\n            elif op == 'commit':\n                apply_commit(conn)\n            elif op == 'rollback':\n                apply_rollback(conn)\n        \n        # After all actions, committed state is the final committed dict\n        # But if there is an open transaction, the committed state is still the committed dict (uncommitted changes not visible)\n        # The separate read connection sees only committed state.\n        committed_count = len(committed)\n        committed_sum = sum(committed.values())\n        \n        # Channel value\n        if channel_type == 'changes':\n            channel_value = main_last_changes\n        elif channel_type == 'total_main':\n            channel_value = main_total\n        elif channel_type == 'total_both':\n            channel_value = main_total + other_total\n        else:\n            channel_value = 0\n        \n        return channel_value, committed_count, committed_sum\n    \n    # Enumerate all combinations\n    put_ops = ['ignore', 'replace', 'upsert']\n    triggers = [False, True]\n    channel_types = ['changes', 'total_main', 'total_both']\n    \n    # Filter combinations that match all history receipts\n    valid_combos = []\n    for put_op in put_ops:\n        for trigger in triggers:\n            for channel_type in channel_types:\n                ok = True\n                for receipt in history:\n                    actions = receipt['actions']\n                    observed = receipt['observed']\n                    ch, cc, cs = simulate(actions, put_op, trigger, channel_type)\n                    if ch != observed['channel'] or cc != observed['committed_count'] or cs != observed['committed_sum']:\n                        ok = False\n                        break\n                if ok:\n                    valid_combos.append((put_op, trigger, channel_type))\n    \n    # If no valid combos, return unresolved\n    if not valid_combos:\n        return {\"value\": None, \"unresolved\": True}\n    \n    # Now predict for the query context\n    query_actions = context['actions']\n    goal = context['goal']\n    \n    # Compute predictions for each valid combo\n    predictions = set()\n    for put_op, trigger, channel_type in valid_combos:\n        ch, cc, cs = simulate(query_actions, put_op, trigger, channel_type)\n        if goal == 'channel':\n            predictions.add(ch)\n        elif goal == 'committed_count':\n            predictions.add(cc)\n        elif goal == 'committed_sum':\n            predictions.add(cs)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n    \n    if len(predictions) == 1:\n        return {\"value\": predictions.pop(), \"unresolved\": False}\n    else:\n        return {\"value\": None, \"unresolved\": True}\n"
+    },
+    "champion_score": {
+      "correct": 12,
+      "total": 12,
+      "errors": 0
+    },
+    "champion_feedback": [
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          }
+        ],
+        "goal": "channel",
+        "expected": {
+          "value": 5,
+          "unresolved": false
+        },
+        "actual": {
+          "value": 5,
+          "unresolved": false
+        },
+        "error": null,
+        "correct": true
+      },
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          }
+        ],
+        "goal": "committed_count",
+        "expected": {
+          "value": 0,
+          "unresolved": false
+        },
+        "actual": {
+          "value": 0,
+          "unresolved": false
+        },
+        "error": null,
+        "correct": true
+      }
+    ],
+    "request": "Author a complete reusable observation program. Use the measured errors to change the computation, including coupled changes when necessary. A correct calibration score alone does not establish a correct model of new compositions. Preserve uncertainty where evidence cannot determine a goal.",
+    "last_challenger": {
+      "proposal": {
+        "lesson": "The channel is main total_changes plus other total_changes, and the put operation is INSERT OR REPLACE. The trigger is absent. The channel counts every row change including those from failed inserts and updates, and the committed state reflects the final table contents.",
+        "scope": "The source uses INSERT OR REPLACE for put, no trigger, and channel = main total_changes + other total_changes. The model predicts channel, committed_count, and committed_sum for any action sequence within the disclosed family.",
+        "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n    # Determine put behavior and channel from history\n    # We'll simulate all possible combinations and filter by history\n    # Family: put_op in ['ignore', 'replace', 'upsert'], trigger in [False, True], channel in ['changes', 'total_main', 'total_both']\n    # We'll implement a simulator for each combination and check against history\n    \n    def simulate(actions, put_op, trigger, channel_type):\n        # Returns (channel_value, committed_count, committed_sum)\n        # State: main and other connections each have their own view of the database\n        # But since transactions are not nested and we only have one table, we can model\n        # the database as a single table with committed state and uncommitted changes per connection.\n        # However, SQLite semantics: each connection has its own transaction. Changes are visible only after commit.\n        # We'll maintain: committed_items (dict key->value), and for each connection: pending_items (dict key->value) or None if no transaction.\n        # Also need to track total_changes for each connection.\n        # total_changes is cumulative for the connection, including changes that are later rolled back.\n        # changes() returns the number of rows modified by the most recent statement on that connection.\n        # For channel = main total_changes + other total_changes, we sum the total_changes of both connections.\n        # For channel = main total_changes, we use main's total_changes.\n        # For channel = main changes(), we use the changes() from the last statement on main.\n        \n        committed = {}\n        main_pending = None\n        other_pending = None\n        main_total = 0\n        other_total = 0\n        main_last_changes = 0\n        other_last_changes = 0\n        \n        # For trigger: if trigger is True, an AFTER INSERT trigger inserts one row into an auxiliary log.\n        # This means every successful INSERT (including REPLACE) will cause an additional row change in the log table.\n        # The log table is not read, but it affects total_changes and changes().\n        # For changes(), the trigger's insert is a separate statement? Actually, triggers execute as part of the statement,\n        # so changes() counts only direct changes to the table? In SQLite, changes() returns the number of rows modified by the most recent statement,\n        # excluding changes made by triggers. So trigger does not affect changes().\n        # However, total_changes includes changes made by triggers.\n        # So for channel = changes(), trigger has no effect.\n        # For channel = total_changes, trigger adds 1 for each successful INSERT (including REPLACE) on that connection.\n        \n        def apply_put(conn, key, value):\n            nonlocal main_pending, other_pending, main_total, other_total, main_last_changes, other_last_changes\n            # Determine current state for this connection\n            if conn == 'main':\n                pending = main_pending\n                total = main_total\n                last_changes = main_last_changes\n            else:\n                pending = other_pending\n                total = other_total\n                last_changes = other_last_changes\n            \n            # The effective table for this connection: if pending is not None, use pending; else use committed\n            # But pending is a full copy? Actually, in SQLite, a transaction sees the committed state plus its own changes.\n            # We'll model pending as a dict that starts as a copy of committed when transaction begins, and is modified.\n            # If no transaction, pending is None and we operate directly on committed.\n            \n            if pending is None:\n                # No transaction: operate on committed directly\n                table = committed\n            else:\n                table = pending\n            \n            # Determine if key exists\n            exists = key in table\n            old_value = table.get(key)\n            \n            # Apply put according to put_op\n            if put_op == 'ignore':\n                if exists:\n                    # INSERT OR IGNORE: no change\n                    changes = 0\n                else:\n                    table[key] = value\n                    changes = 1\n            elif put_op == 'replace':\n                # INSERT OR REPLACE: always replaces, deletes old row if exists, inserts new\n                # This counts as 1 change (the insert), but if there was an old row, it's deleted and new inserted.\n                # In SQLite, REPLACE deletes the old row and inserts new, so changes() returns 1? Actually, it returns 1 for the insert, but the delete is implicit.\n                # According to SQLite docs, changes() returns the number of rows modified by the most recent statement. For REPLACE, it's 1 if a row was inserted, 0 if not? Actually, REPLACE always inserts, so 1.\n                # But if there was a conflict, it deletes the old row first, then inserts. The delete is not counted separately.\n                # So changes = 1 always.\n                table[key] = value\n                changes = 1\n            elif put_op == 'upsert':\n                # INSERT ... ON CONFLICT(id) DO UPDATE SET value=excluded.value\n                if exists:\n                    # Update the value\n                    table[key] = value\n                    changes = 1\n                else:\n                    table[key] = value\n                    changes = 1\n            \n            # Update total_changes\n            total += changes\n            # If trigger is True and changes > 0 (i.e., an insert happened), add 1 for the trigger's insert\n            # But for upsert, if it's an update, does the trigger fire? The trigger is AFTER INSERT, so only on insert.\n            # For upsert, if it's an update, no insert, so no trigger.\n            # For replace, it's an insert, so trigger fires.\n            # For ignore, if it inserts, trigger fires.\n            # So we need to know if an insert occurred.\n            insert_occurred = False\n            if put_op == 'ignore':\n                if not exists:\n                    insert_occurred = True\n            elif put_op == 'replace':\n                insert_occurred = True\n            elif put_op == 'upsert':\n                if not exists:\n                    insert_occurred = True\n            if trigger and insert_occurred:\n                total += 1\n            \n            # Update last_changes: changes() returns the number of rows modified by the most recent statement, excluding triggers.\n            # So last_changes = changes (the direct changes)\n            last_changes = changes\n            \n            # Write back\n            if conn == 'main':\n                main_pending = pending\n                main_total = total\n                main_last_changes = last_changes\n            else:\n                other_pending = pending\n                other_total = total\n                other_last_changes = last_changes\n        \n        def apply_update(conn, key, value):\n            nonlocal main_pending, other_pending, main_total, other_total, main_last_changes, other_last_changes\n            if conn == 'main':\n                pending = main_pending\n                total = main_total\n                last_changes = main_last_changes\n            else:\n                pending = other_pending\n                total = other_total\n                last_changes = other_last_changes\n            \n            if pending is None:\n                table = committed\n            else:\n                table = pending\n            \n            if key in table:\n                table[key] = value\n                changes = 1\n            else:\n                changes = 0\n            \n            total += changes\n            # No trigger for update\n            last_changes = changes\n            \n            if conn == 'main':\n                main_pending = pending\n                main_total = total\n                main_last_changes = last_changes\n            else:\n                other_pending = pending\n                other_total = total\n                other_last_changes = last_changes\n        \n        def apply_delete(conn, key):\n            nonlocal main_pending, other_pending, main_total, other_total, main_last_changes, other_last_changes\n            if conn == 'main':\n                pending = main_pending\n                total = main_total\n                last_changes = main_last_changes\n            else:\n                pending = other_pending\n                total = other_total\n                last_changes = other_last_changes\n            \n            if pending is None:\n                table = committed\n            else:\n                table = pending\n            \n            if key in table:\n                del table[key]\n                changes = 1\n            else:\n                changes = 0\n            \n            total += changes\n            # No trigger for delete\n            last_changes = changes\n            \n            if conn == 'main':\n                main_pending = pending\n                main_total = total\n                main_last_changes = last_changes\n            else:\n                other_pending = pending\n                other_total = total\n                other_last_changes = last_changes\n        \n        def apply_begin(conn):\n            nonlocal main_pending, other_pending\n            if conn == 'main':\n                if main_pending is None:\n                    main_pending = dict(committed)\n            else:\n                if other_pending is None:\n                    other_pending = dict(committed)\n        \n        def apply_commit(conn):\n            nonlocal main_pending, other_pending, committed\n            if conn == 'main':\n                if main_pending is not None:\n                    committed = main_pending\n                    main_pending = None\n            else:\n                if other_pending is not None:\n                    committed = other_pending\n                    other_pending = None\n        \n        def apply_rollback(conn):\n            nonlocal main_pending, other_pending\n            if conn == 'main':\n                main_pending = None\n            else:\n                other_pending = None\n        \n        for action in actions:\n            op = action.get('op')\n            conn = action.get('connection', 'main')\n            if op == 'put':\n                apply_put(conn, action['key'], action['value'])\n            elif op == 'update':\n                apply_update(conn, action['key'], action['value'])\n            elif op == 'delete':\n                apply_delete(conn, action['key'])\n            elif op == 'begin':\n                apply_begin(conn)\n            elif op == 'commit':\n                apply_commit(conn)\n            elif op == 'rollback':\n                apply_rollback(conn)\n        \n        # After all actions, committed state is the final committed dict\n        # But if there is an open transaction, the committed state is still the committed dict (uncommitted changes not visible)\n        # The separate read connection sees only committed state.\n        committed_count = len(committed)\n        committed_sum = sum(committed.values())\n        \n        # Channel value\n        if channel_type == 'changes':\n            channel_value = main_last_changes\n        elif channel_type == 'total_main':\n            channel_value = main_total\n        elif channel_type == 'total_both':\n            channel_value = main_total + other_total\n        else:\n            channel_value = 0\n        \n        return channel_value, committed_count, committed_sum\n    \n    # Enumerate all combinations\n    put_ops = ['ignore', 'replace', 'upsert']\n    triggers = [False, True]\n    channel_types = ['changes', 'total_main', 'total_both']\n    \n    # Filter combinations that match all history receipts\n    valid_combos = []\n    for put_op in put_ops:\n        for trigger in triggers:\n            for channel_type in channel_types:\n                ok = True\n                for receipt in history:\n                    actions = receipt['actions']\n                    observed = receipt['observed']\n                    ch, cc, cs = simulate(actions, put_op, trigger, channel_type)\n                    if ch != observed['channel'] or cc != observed['committed_count'] or cs != observed['committed_sum']:\n                        ok = False\n                        break\n                if ok:\n                    valid_combos.append((put_op, trigger, channel_type))\n    \n    # If no valid combos, return unresolved\n    if not valid_combos:\n        return {\"value\": None, \"unresolved\": True}\n    \n    # Now predict for the query context\n    query_actions = context['actions']\n    goal = context['goal']\n    \n    # Compute predictions for each valid combo\n    predictions = set()\n    for put_op, trigger, channel_type in valid_combos:\n        ch, cc, cs = simulate(query_actions, put_op, trigger, channel_type)\n        if goal == 'channel':\n            predictions.add(ch)\n        elif goal == 'committed_count':\n            predictions.add(cc)\n        elif goal == 'committed_sum':\n            predictions.add(cs)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n    \n    if len(predictions) == 1:\n        return {\"value\": predictions.pop(), \"unresolved\": False}\n    else:\n        return {\"value\": None, \"unresolved\": True}\n"
+      },
+      "accepted": true,
+      "development_score": {
+        "correct": 12,
+        "total": 12,
+        "errors": 0
+      },
+      "feedback": [
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "update",
+              "value": 3
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "delete"
+            }
+          ],
+          "goal": "channel",
+          "expected": {
+            "value": 5,
+            "unresolved": false
+          },
+          "actual": {
+            "value": 5,
+            "unresolved": false
+          },
+          "error": null,
+          "correct": true
+        },
+        {
+          "actions": [
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 1
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "put",
+              "value": 2
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "update",
+              "value": 3
+            },
+            {
+              "connection": "main",
+              "key": "a",
+              "op": "delete"
+            }
+          ],
+          "goal": "committed_count",
+          "expected": {
+            "value": 0,
+            "unresolved": false
+          },
+          "actual": {
+            "value": 0,
+            "unresolved": false
+          },
+          "error": null,
+          "correct": true
+        }
+      ],
+      "response_error": null
+    }
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "Complete executable Python program defining investigate(context, acquire), including the function body. Never a label or bare signature."
+      },
+      "scope": {
+        "type": "string",
+        "description": "Short statement of the supported scope."
+      },
+      "lesson": {
+        "type": "string",
+        "description": "Short technical account of the revision."
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson"
+    ],
+    "additionalProperties": false
+  }
+}

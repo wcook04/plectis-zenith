@@ -1,0 +1,561 @@
+{
+  "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n",
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "history": [
+      {
+        "source_id": "source-f17213b1497af891bf07",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "346696aa5968d652468261bd0677f104cc28acabb77a338a25cbdd61a2843499"
+      },
+      {
+        "source_id": "source-f17213b1497af891bf07",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "020b27c20007c9258a4d8e6f4db0d73c9d11597103e032271010ca375e880a14"
+      },
+      {
+        "source_id": "source-f17213b1497af891bf07",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "other",
+            "key": "b",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          }
+        ],
+        "observed": {
+          "channel": 3,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "bf16ffcd8913bda5ecd1f2591a58a8bab20d20a77ac6510636cce42ef7e3a092"
+      },
+      {
+        "source_id": "source-f17213b1497af891bf07",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 88
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 47
+          },
+          {
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 47
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "8db9b81266c6cfc92b1da1f228b770ecce8d30263ac97d4c503c296872de048a"
+      },
+      {
+        "source_id": "source-f17213b1497af891bf07",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 7
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 9
+          }
+        ],
+        "observed": {
+          "channel": 3,
+          "committed_count": 1,
+          "committed_sum": 9
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "697ea6edb24dff88955f06f1c9527d588f29104d3b2b8f3756b9ab21a4c9b2e9"
+      },
+      {
+        "source_id": "source-f17213b1497af891bf07",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 5
+          },
+          {
+            "connection": "other",
+            "key": "a",
+            "op": "put",
+            "value": 7
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 9
+          }
+        ],
+        "observed": {
+          "channel": 3,
+          "committed_count": 1,
+          "committed_sum": 9
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "67580e6abaae30449e4367efafc71ea6e576fc3ec8762fd54ab23e667e0b5907"
+      },
+      {
+        "source_id": "source-f17213b1497af891bf07",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 5
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 7
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 9
+          }
+        ],
+        "observed": {
+          "channel": 3,
+          "committed_count": 1,
+          "committed_sum": 9
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "621c7d1196b299f7e3d8fb2939e8408c08d4a4b12cccc064e9a20c418a8020cc"
+      },
+      {
+        "source_id": "source-f17213b1497af891bf07",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 88
+          },
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 47
+          },
+          {
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 88
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "09880cd609865baf73f651088e5909ac5c1e4ffdb1a55045bf5477cb0b05d749"
+      }
+    ],
+    "champion": {
+      "source": "def investigate(context, acquire):\n    hist = acquire(\"history\")\n\n    def simulate(put_mode, has_trigger, channel_mode, actions):\n        committed = {}\n        txn = {\"main\": None, \"other\": None}\n        tc = {\"main\": 0, \"other\": 0}\n        last_changes_main = 0\n\n        def view_of(conn):\n            if txn[conn] is not None:\n                return txn[conn]\n            return committed\n\n        def do_put(conn, key, value):\n            nonlocal last_changes_main\n            view = view_of(conn)\n            direct = 0\n            trig = 0\n            if key in view:\n                if put_mode == \"ignore\":\n                    direct = 0\n                else:\n                    view[key] = value\n                    direct = 1\n            else:\n                view[key] = value\n                direct = 1\n            if direct == 1 and has_trigger:\n                trig = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct + trig\n\n        def do_update(conn, key, value):\n            nonlocal last_changes_main\n            view = view_of(conn)\n            direct = 0\n            if key in view:\n                view[key] = value\n                direct = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct\n\n        def do_delete(conn, key):\n            nonlocal last_changes_main\n            view = view_of(conn)\n            direct = 0\n            if key in view:\n                del view[key]\n                direct = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"put\":\n                do_put(conn, act[\"key\"], act[\"value\"])\n            elif op == \"update\":\n                do_update(conn, act[\"key\"], act[\"value\"])\n            elif op == \"delete\":\n                do_delete(conn, act[\"key\"])\n            elif op == \"begin\":\n                txn[conn] = dict(committed)\n            elif op == \"commit\":\n                if txn[conn] is not None:\n                    committed.clear()\n                    committed.update(txn[conn])\n                    txn[conn] = None\n            elif op == \"rollback\":\n                txn[conn] = None\n\n        if channel_mode == \"changes\":\n            ch = last_changes_main\n        elif channel_mode == \"total_main\":\n            ch = tc[\"main\"]\n        else:\n            ch = tc[\"main\"] + tc[\"other\"]\n        return ch, len(committed), sum(committed.values())\n\n    put_modes = [\"ignore\", \"replace\", \"update\"]\n    trigger_opts = [False, True]\n    channel_modes = [\"changes\", \"total_main\", \"total_both\"]\n\n    candidates = []\n    for pm in put_modes:\n        for ht in trigger_opts:\n            for cm in channel_modes:\n                ok = True\n                for rec in hist:\n                    ch, cc, cs = simulate(pm, ht, cm, rec[\"actions\"])\n                    obs = rec[\"observed\"]\n                    if ch != obs[\"channel\"] or cc != obs[\"committed_count\"] or cs != obs[\"committed_sum\"]:\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((pm, ht, cm))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = set()\n    for pm, ht, cm in candidates:\n        ch, cc, cs = simulate(pm, ht, cm, actions)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cc)\n        elif goal == \"committed_sum\":\n            results.add(cs)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+      "scope": "Predicts channel, committed_count, or committed_sum for a fresh action sequence by enumerating the disclosed 18-member family (put mode x trigger x channel) and keeping only combinations consistent with all calibration receipts.",
+      "lesson": "The receipts constrain put conflict handling, trigger presence, and counter channel jointly; simulating each candidate and intersecting predictions yields a supported value only when all surviving candidates agree."
+    },
+    "champion_score": {
+      "correct": 24,
+      "total": 24,
+      "errors": 0
+    },
+    "champion_feedback": [
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "goal": "channel",
+        "expected": {
+          "value": 2,
+          "unresolved": false
+        },
+        "actual": {
+          "value": 2,
+          "unresolved": false
+        },
+        "error": null,
+        "correct": true
+      },
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "goal": "committed_count",
+        "expected": {
+          "value": 1,
+          "unresolved": false
+        },
+        "actual": {
+          "value": 1,
+          "unresolved": false
+        },
+        "error": null,
+        "correct": true
+      }
+    ],
+    "request": "Author a complete reusable observation program. Use the measured errors to change the computation, including coupled changes when necessary. A correct calibration score alone does not establish a correct model of new compositions. Preserve uncertainty where evidence cannot determine a goal.",
+    "construction_archive": [
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    hist = acquire(\"history\")\n    # Family: put in {OR IGNORE, OR REPLACE, ON CONFLICT DO UPDATE value}\n    # trigger: none or AFTER INSERT log insert\n    # channel: changes(), total_changes(main), total_changes(main)+total_changes(other)\n    # We must determine which combination is consistent with all receipts,\n    # then predict the goal for the query sequence.\n\n    def simulate(put_mode, has_trigger, channel_mode, actions):\n        # returns (channel, committed_count, committed_sum)\n        # state: dict key->value for committed main db\n        # pending transaction state per connection\n        committed = {}\n        # transaction buffers: None means no open txn\n        txn = {\"main\": None, \"other\": None}\n        # total_changes counters per connection\n        tc = {\"main\": 0, \"other\": 0}\n        # last changes() on main\n        last_changes_main = 0\n        # trigger log count (unread, but affects total_changes)\n        # We'll track total_changes including trigger inserts.\n\n        def apply_put(conn, key, value):\n            nonlocal last_changes_main\n            # determine current view for this connection\n            if txn[conn] is not None:\n                view = txn[conn]\n            else:\n                view = committed\n            # simulate insert\n            direct = 0\n            trig = 0\n            if key in view:\n                if put_mode == \"ignore\":\n                    direct = 0\n                elif put_mode == \"replace\":\n                    view[key] = value\n                    direct = 1\n                else:  # update\n                    view[key] = value\n                    direct = 1\n            else:\n                view[key] = value\n                direct = 1\n            if direct == 1 and has_trigger:\n                trig = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct + trig\n\n        def apply_update(conn, key, value):\n            nonlocal last_changes_main\n            if txn[conn] is not None:\n                view = txn[conn]\n            else:\n                view = committed\n            direct = 0\n            if key in view:\n                view[key] = value\n                direct = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct\n\n        def apply_delete(conn, key):\n            nonlocal last_changes_main\n            if txn[conn] is not None:\n                view = txn[conn]\n            else:\n                view = committed\n            direct = 0\n            if key in view:\n                del view[key]\n                direct = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"put\":\n                apply_put(conn, act[\"key\"], act[\"value\"])\n            elif op == \"update\":\n                apply_update(conn, act[\"key\"], act[\"value\"])\n            elif op == \"delete\":\n                apply_delete(conn, act[\"key\"])\n            elif op == \"begin\":\n                txn[conn] = dict(committed)\n            elif op == \"commit\":\n                if txn[conn] is not None:\n                    committed.clear()\n                    committed.update(txn[conn])\n                    txn[conn] = None\n            elif op == \"rollback\":\n                txn[conn] = None\n\n        if channel_mode == \"changes\":\n            ch = last_changes_main\n        elif channel_mode == \"total_main\":\n            ch = tc[\"main\"]\n        else:\n            ch = tc[\"main\"] + tc[\"other\"]\n        return ch, len(committed), sum(committed.values())\n\n    put_modes = [\"ignore\", \"replace\", \"update\"]\n    trigger_opts = [False, True]\n    channel_modes = [\"changes\", \"total_main\", \"total_both\"]\n\n    candidates = []\n    for pm in put_modes:\n        for ht in trigger_opts:\n            for cm in channel_modes:\n                ok = True\n                for rec in hist:\n                    ch, cc, cs = simulate(pm, ht, cm, rec[\"actions\"])\n                    obs = rec[\"observed\"]\n                    if ch != obs[\"channel\"] or cc != obs[\"committed_count\"] or cs != obs[\"committed_sum\"]:\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((pm, ht, cm))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = set()\n    for pm, ht, cm in candidates:\n        ch, cc, cs = simulate(pm, ht, cm, actions)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cc)\n        elif goal == \"committed_sum\":\n            results.add(cs)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+          "scope": "Predicts channel, committed_count, or committed_sum for a fresh action sequence by enumerating the disclosed 18-member family (put mode x trigger x channel) and keeping only combinations consistent with all calibration receipts.",
+          "lesson": "The receipts constrain put conflict handling, trigger presence, and counter channel jointly; simulating each candidate and intersecting predictions yields a supported value only when all surviving candidates agree."
+        },
+        "accepted": true,
+        "development_score": {
+          "correct": 12,
+          "total": 12,
+          "errors": 0
+        },
+        "feedback": [
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "channel",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 2,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          },
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "committed_count",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          }
+        ],
+        "response_error": null
+      },
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    hist = acquire(\"history\")\n\n    def simulate(put_mode, has_trigger, channel_mode, actions):\n        committed = {}\n        txn = {\"main\": None, \"other\": None}\n        tc = {\"main\": 0, \"other\": 0}\n        last_changes_main = 0\n\n        def view_of(conn):\n            if txn[conn] is not None:\n                return txn[conn]\n            return committed\n\n        def do_put(conn, key, value):\n            nonlocal last_changes_main\n            view = view_of(conn)\n            direct = 0\n            trig = 0\n            if key in view:\n                if put_mode == \"ignore\":\n                    direct = 0\n                else:\n                    view[key] = value\n                    direct = 1\n            else:\n                view[key] = value\n                direct = 1\n            if direct == 1 and has_trigger:\n                trig = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct + trig\n\n        def do_update(conn, key, value):\n            nonlocal last_changes_main\n            view = view_of(conn)\n            direct = 0\n            if key in view:\n                view[key] = value\n                direct = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct\n\n        def do_delete(conn, key):\n            nonlocal last_changes_main\n            view = view_of(conn)\n            direct = 0\n            if key in view:\n                del view[key]\n                direct = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"put\":\n                do_put(conn, act[\"key\"], act[\"value\"])\n            elif op == \"update\":\n                do_update(conn, act[\"key\"], act[\"value\"])\n            elif op == \"delete\":\n                do_delete(conn, act[\"key\"])\n            elif op == \"begin\":\n                txn[conn] = dict(committed)\n            elif op == \"commit\":\n                if txn[conn] is not None:\n                    committed.clear()\n                    committed.update(txn[conn])\n                    txn[conn] = None\n            elif op == \"rollback\":\n                txn[conn] = None\n\n        if channel_mode == \"changes\":\n            ch = last_changes_main\n        elif channel_mode == \"total_main\":\n            ch = tc[\"main\"]\n        else:\n            ch = tc[\"main\"] + tc[\"other\"]\n        return ch, len(committed), sum(committed.values())\n\n    put_modes = [\"ignore\", \"replace\", \"update\"]\n    trigger_opts = [False, True]\n    channel_modes = [\"changes\", \"total_main\", \"total_both\"]\n\n    candidates = []\n    for pm in put_modes:\n        for ht in trigger_opts:\n            for cm in channel_modes:\n                ok = True\n                for rec in hist:\n                    ch, cc, cs = simulate(pm, ht, cm, rec[\"actions\"])\n                    obs = rec[\"observed\"]\n                    if ch != obs[\"channel\"] or cc != obs[\"committed_count\"] or cs != obs[\"committed_sum\"]:\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((pm, ht, cm))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = set()\n    for pm, ht, cm in candidates:\n        ch, cc, cs = simulate(pm, ht, cm, actions)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cc)\n        elif goal == \"committed_sum\":\n            results.add(cs)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+          "scope": "Predicts channel, committed_count, or committed_sum for a fresh action sequence by enumerating the disclosed 18-member family (put mode x trigger x channel) and keeping only combinations consistent with all calibration receipts.",
+          "lesson": "The receipts constrain put conflict handling, trigger presence, and counter channel jointly; simulating each candidate and intersecting predictions yields a supported value only when all surviving candidates agree."
+        },
+        "accepted": true,
+        "development_score": {
+          "correct": 12,
+          "total": 12,
+          "errors": 0
+        },
+        "feedback": [
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "channel",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 2,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          },
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "committed_count",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          }
+        ],
+        "response_error": null
+      },
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    hist = acquire(\"history\")\n\n    def simulate(put_mode, has_trigger, channel_mode, actions):\n        committed = {}\n        txn = {\"main\": None, \"other\": None}\n        tc = {\"main\": 0, \"other\": 0}\n        last_changes_main = 0\n\n        def view_of(conn):\n            if txn[conn] is not None:\n                return txn[conn]\n            return committed\n\n        def do_put(conn, key, value):\n            nonlocal last_changes_main\n            view = view_of(conn)\n            direct = 0\n            trig = 0\n            if key in view:\n                if put_mode == \"ignore\":\n                    direct = 0\n                else:\n                    view[key] = value\n                    direct = 1\n            else:\n                view[key] = value\n                direct = 1\n            if direct == 1 and has_trigger:\n                trig = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct + trig\n\n        def do_update(conn, key, value):\n            nonlocal last_changes_main\n            view = view_of(conn)\n            direct = 0\n            if key in view:\n                view[key] = value\n                direct = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct\n\n        def do_delete(conn, key):\n            nonlocal last_changes_main\n            view = view_of(conn)\n            direct = 0\n            if key in view:\n                del view[key]\n                direct = 1\n            if conn == \"main\":\n                last_changes_main = direct\n            tc[conn] += direct\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"put\":\n                do_put(conn, act[\"key\"], act[\"value\"])\n            elif op == \"update\":\n                do_update(conn, act[\"key\"], act[\"value\"])\n            elif op == \"delete\":\n                do_delete(conn, act[\"key\"])\n            elif op == \"begin\":\n                txn[conn] = dict(committed)\n            elif op == \"commit\":\n                if txn[conn] is not None:\n                    committed.clear()\n                    committed.update(txn[conn])\n                    txn[conn] = None\n            elif op == \"rollback\":\n                txn[conn] = None\n\n        if channel_mode == \"changes\":\n            ch = last_changes_main\n        elif channel_mode == \"total_main\":\n            ch = tc[\"main\"]\n        else:\n            ch = tc[\"main\"] + tc[\"other\"]\n        return ch, len(committed), sum(committed.values())\n\n    put_modes = [\"ignore\", \"replace\", \"update\"]\n    trigger_opts = [False, True]\n    channel_modes = [\"changes\", \"total_main\", \"total_both\"]\n\n    candidates = []\n    for pm in put_modes:\n        for ht in trigger_opts:\n            for cm in channel_modes:\n                ok = True\n                for rec in hist:\n                    ch, cc, cs = simulate(pm, ht, cm, rec[\"actions\"])\n                    obs = rec[\"observed\"]\n                    if ch != obs[\"channel\"] or cc != obs[\"committed_count\"] or cs != obs[\"committed_sum\"]:\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((pm, ht, cm))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = set()\n    for pm, ht, cm in candidates:\n        ch, cc, cs = simulate(pm, ht, cm, actions)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cc)\n        elif goal == \"committed_sum\":\n            results.add(cs)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+          "scope": "Predicts channel, committed_count, or committed_sum for a fresh action sequence by enumerating the disclosed 18-member family (put mode x trigger x channel) and keeping only combinations consistent with all calibration receipts.",
+          "lesson": "The receipts constrain put conflict handling, trigger presence, and counter channel jointly; simulating each candidate and intersecting predictions yields a supported value only when all surviving candidates agree."
+        },
+        "accepted": true,
+        "development_score": {
+          "correct": 24,
+          "total": 24,
+          "errors": 0
+        },
+        "feedback": [
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "channel",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 2,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          },
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "committed_count",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          }
+        ],
+        "response_error": null
+      }
+    ]
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "Complete executable Python program defining investigate(context, acquire), including the function body. Never a label or bare signature."
+      },
+      "scope": {
+        "type": "string",
+        "description": "Short statement of the supported scope."
+      },
+      "lesson": {
+        "type": "string",
+        "description": "Short technical account of the revision."
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson"
+    ],
+    "additionalProperties": false
+  }
+}

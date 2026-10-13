@@ -1,0 +1,3007 @@
+{
+  "source_id": "source-b23ea10b80ca887e778e",
+  "provider_slug": "deepinfra/fp8",
+  "history": [
+    {
+      "source_id": "source-b23ea10b80ca887e778e",
+      "actions": [
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 1
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 2
+        }
+      ],
+      "observed": {
+        "channel": 2,
+        "committed_count": 1,
+        "committed_sum": 2
+      },
+      "authority": "native SQLite counter; committed state read through a separate connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "a30224ade82094c625a30380e6526b3155e0969e9970b545b3bfe84e4b1e26a9"
+    },
+    {
+      "source_id": "source-b23ea10b80ca887e778e",
+      "actions": [
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 1
+        },
+        {
+          "connection": "main",
+          "op": "begin"
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 2
+        },
+        {
+          "connection": "main",
+          "op": "rollback"
+        }
+      ],
+      "observed": {
+        "channel": 2,
+        "committed_count": 1,
+        "committed_sum": 1
+      },
+      "authority": "native SQLite counter; committed state read through a separate connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "e24a4273d1515e31bf0432854d235544e0617f8b94f9b1a2443aa8b7ae9c4545"
+    },
+    {
+      "source_id": "source-b23ea10b80ca887e778e",
+      "actions": [
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 1
+        },
+        {
+          "connection": "main",
+          "op": "begin"
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 2
+        },
+        {
+          "connection": "main",
+          "op": "commit"
+        },
+        {
+          "connection": "other",
+          "key": "a",
+          "op": "put",
+          "value": 3
+        }
+      ],
+      "observed": {
+        "channel": 2,
+        "committed_count": 1,
+        "committed_sum": 3
+      },
+      "authority": "native SQLite counter; committed state read through a separate connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "cafc7ae11e12c3d46e777ce05945bcf5396f4dcb3a6166efc10063bb8e13c46d"
+    },
+    {
+      "source_id": "source-b23ea10b80ca887e778e",
+      "actions": [
+        {
+          "op": "begin"
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 96
+        },
+        {
+          "connection": "main",
+          "key": "a",
+          "op": "put",
+          "value": 88
+        },
+        {
+          "op": "commit"
+        }
+      ],
+      "observed": {
+        "channel": 2,
+        "committed_count": 1,
+        "committed_sum": 88
+      },
+      "authority": "native SQLite counter; committed state read through a separate connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "24ffd7e4f623e72795981153257d8edb33c4396ebbdbd8315c525915868130c9"
+    }
+  ],
+  "probe_log": [
+    {
+      "episode": 0,
+      "actions": [
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 1
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 2
+        }
+      ],
+      "receipt": {
+        "source_id": "source-b23ea10b80ca887e778e",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "a30224ade82094c625a30380e6526b3155e0969e9970b545b3bfe84e4b1e26a9"
+      }
+    },
+    {
+      "episode": 0,
+      "actions": [
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 1
+        },
+        {
+          "op": "begin",
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 2
+        },
+        {
+          "op": "rollback",
+          "connection": "main"
+        }
+      ],
+      "receipt": {
+        "source_id": "source-b23ea10b80ca887e778e",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "e24a4273d1515e31bf0432854d235544e0617f8b94f9b1a2443aa8b7ae9c4545"
+      }
+    },
+    {
+      "episode": 0,
+      "actions": [
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 1
+        },
+        {
+          "op": "begin",
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "connection": "main",
+          "key": "a",
+          "value": 2
+        },
+        {
+          "op": "commit",
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "connection": "other",
+          "key": "a",
+          "value": 3
+        }
+      ],
+      "receipt": {
+        "source_id": "source-b23ea10b80ca887e778e",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "commit"
+          },
+          {
+            "connection": "other",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 3
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "cafc7ae11e12c3d46e777ce05945bcf5396f4dcb3a6166efc10063bb8e13c46d"
+      }
+    },
+    {
+      "episode": 0,
+      "authority": "independent fixed challenge",
+      "receipt": {
+        "source_id": "source-b23ea10b80ca887e778e",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 96
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 88
+          },
+          {
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 88
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "24ffd7e4f623e72795981153257d8edb33c4396ebbdbd8315c525915868130c9"
+      }
+    }
+  ],
+  "arms": {
+    "incremental": {
+      "champion": {
+        "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n    actions = context.get(\"actions\", [])\n    goal = context.get(\"goal\")\n\n    def sim_actions(acts, pm, cm, tr):\n        committed = {}\n        pending = {\"main\": None, \"other\": None}\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n\n        def do_put(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            existed = key in committed\n            if pm == \"ignore\":\n                if existed:\n                    changed = 0\n                    inserted = False\n                else:\n                    committed[key] = value\n                    changed = 1\n                    inserted = True\n            elif pm == \"replace\":\n                committed[key] = value\n                changed = 1\n                inserted = True\n            else:\n                committed[key] = value\n                changed = 1\n                inserted = not existed\n            trig = 1 if (tr and inserted) else 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n            else:\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n\n        def do_update(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                committed[key] = value\n                changed = 1\n            else:\n                changed = 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n\n        def do_delete(conn, key):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                del committed[key]\n                changed = 1\n            else:\n                changed = 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n\n        for act in acts:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                pending[conn] = []\n            elif op == \"commit\":\n                if pending[conn] is not None:\n                    for (o, k, v) in pending[conn]:\n                        if o == \"put\":\n                            do_put(conn, k, v)\n                        elif o == \"update\":\n                            do_update(conn, k, v)\n                        elif o == \"delete\":\n                            do_delete(conn, k)\n                    pending[conn] = None\n            elif op == \"rollback\":\n                pending[conn] = None\n            elif op in (\"put\", \"update\", \"delete\"):\n                if pending[conn] is not None:\n                    pending[conn].append((op, act.get(\"key\"), act.get(\"value\")))\n                else:\n                    if op == \"put\":\n                        do_put(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"update\":\n                        do_update(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"delete\":\n                        do_delete(conn, act.get(\"key\"))\n\n        if cm == \"changes\":\n            channel = main_changes\n        elif cm == \"total_main\":\n            channel = main_total\n        else:\n            channel = main_total + other_total\n        return channel, len(committed), sum(committed.values())\n\n    put_modes = [\"ignore\", \"replace\", \"upsert\"]\n    channel_modes = [\"changes\", \"total_main\", \"total_both\"]\n    triggers = [False, True]\n\n    consistent = []\n    for pm in put_modes:\n        for cm in channel_modes:\n            for tr in triggers:\n                ok = True\n                for r in receipts:\n                    ra = r.get(\"actions\", [])\n                    obs = r.get(\"observed\", {})\n                    ch, cnt, sm = sim_actions(ra, pm, cm, tr)\n                    if ch != obs.get(\"channel\") or cnt != obs.get(\"committed_count\") or sm != obs.get(\"committed_sum\"):\n                        ok = False\n                        break\n                if ok:\n                    consistent.append((pm, cm, tr))\n\n    if not consistent:\n        return {\"value\": None, \"unresolved\": True}\n\n    results = set()\n    for (pm, cm, tr) in consistent:\n        ch, cnt, sm = sim_actions(actions, pm, cm, tr)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cnt)\n        elif goal == \"committed_sum\":\n            results.add(sm)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+        "scope": "Family: put in {ignore, replace, upsert}, channel in {changes, total_main, total_both}, trigger in {none, after-insert}. Simulate SQLite semantics including transactions and trigger effects on total_changes.",
+        "lesson": "Receipts constrain the family; only predict when all consistent members agree. Trigger adds to total_changes but not changes(). REPLACE fires trigger; IGNORE does not on conflict; upsert fires only on insert."
+      },
+      "rounds": [
+        {
+          "proposal": {
+            "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n    actions = context.get(\"actions\", [])\n    goal = context.get(\"goal\")\n\n    def simulate(put_mode, channel_mode, trigger):\n        # committed state: dict key -> value\n        committed = {}\n        # per-connection open transaction state and pending writes\n        # pending: list of (op, key, value) applied at commit\n        pending = {\"main\": None, \"other\": None}\n        # channel counters\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n        # trigger log count (unread, but affects total_changes)\n        log_count = 0\n\n        def apply_put(conn, key, value):\n            nonlocal main_changes, main_total, other_total, log_count\n            # determine effect on committed state\n            if put_mode == \"ignore\":\n                if key in committed:\n                    changed = 0\n                else:\n                    committed[key] = value\n                    changed = 1\n            elif put_mode == \"replace\":\n                if key in committed:\n                    if committed[key] == value:\n                        changed = 1\n                    else:\n                        changed = 1\n                else:\n                    changed = 1\n                committed[key] = value\n            else:  # upsert\n                if key in committed:\n                    if committed[key] == value:\n                        changed = 1\n                    else:\n                        changed = 1\n                    committed[key] = value\n                else:\n                    committed[key] = value\n                    changed = 1\n            # trigger fires on insert (not on update for upsert?)\n            # AFTER INSERT trigger fires only on actual INSERT\n            inserted = False\n            if put_mode == \"ignore\":\n                inserted = (changed == 1)\n            elif put_mode == \"replace\":\n                inserted = True  # REPLACE deletes+inserts, trigger fires\n            else:\n                # upsert: insert if new, update if existing\n                inserted = (changed == 1 and key not in committed_before)\n            # simpler: track whether row was newly inserted\n            return changed\n\n        # We need to track committed_before for upsert trigger\n        # Rewrite apply_put more carefully\n        def do_put(conn, key, value):\n            nonlocal main_changes, main_total, other_total, log_count\n            existed = key in committed\n            old_val = committed.get(key)\n            if put_mode == \"ignore\":\n                if existed:\n                    changed = 0\n                    inserted = False\n                else:\n                    committed[key] = value\n                    changed = 1\n                    inserted = True\n            elif put_mode == \"replace\":\n                committed[key] = value\n                changed = 1\n                inserted = True\n            else:  # upsert\n                committed[key] = value\n                changed = 1\n                inserted = not existed\n            # trigger: AFTER INSERT fires on inserted row\n            trig = 1 if (trigger and inserted) else 0\n            log_count += trig\n            # channel accounting\n            if channel_mode == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif channel_mode == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n            else:  # total_both\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n            return changed\n\n        def do_update(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                committed[key] = value\n                changed = 1\n            else:\n                changed = 0\n            if channel_mode == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif channel_mode == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            return changed\n\n        def do_delete(conn, key):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                del committed[key]\n                changed = 1\n            else:\n                changed = 0\n            if channel_mode == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif channel_mode == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            return changed\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                pending[conn] = []\n            elif op == \"commit\":\n                if pending[conn] is not None:\n                    for (o, k, v) in pending[conn]:\n                        if o == \"put\":\n                            do_put(conn, k, v)\n                        elif o == \"update\":\n                            do_update(conn, k, v)\n                        elif o == \"delete\":\n                            do_delete(conn, k)\n                    pending[conn] = None\n            elif op == \"rollback\":\n                pending[conn] = None\n            elif op in (\"put\", \"update\", \"delete\"):\n                if pending[conn] is not None:\n                    pending[conn].append((op, act.get(\"key\"), act.get(\"value\")))\n                else:\n                    if op == \"put\":\n                        do_put(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"update\":\n                        do_update(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"delete\":\n                        do_delete(conn, act.get(\"key\"))\n\n        if channel_mode == \"changes\":\n            channel = main_changes\n        elif channel_mode == \"total_main\":\n            channel = main_total\n        else:\n            channel = main_total + other_total\n        count = len(committed)\n        total = sum(committed.values())\n        return channel, count, total\n\n    # Determine which family members are consistent with receipts\n    put_modes = [\"ignore\", \"replace\", \"upsert\"]\n    channel_modes = [\"changes\", \"total_main\", \"total_both\"]\n    triggers = [False, True]\n\n    consistent = []\n    for pm in put_modes:\n        for cm in channel_modes:\n            for tr in triggers:\n                ok = True\n                for r in receipts:\n                    ra = r.get(\"actions\", [])\n                    obs = r.get(\"observed\", {})\n                    ch, cnt, sm = simulate(pm, cm, tr)\n                    # need to simulate with ra, not actions\n                    # redo with ra\n                    pass\n                # placeholder\n\n    # Actually simulate per receipt\n    def sim_actions(acts, pm, cm, tr):\n        committed = {}\n        pending = {\"main\": None, \"other\": None}\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n\n        def do_put(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            existed = key in committed\n            if pm == \"ignore\":\n                if existed:\n                    changed = 0\n                    inserted = False\n                else:\n                    committed[key] = value\n                    changed = 1\n                    inserted = True\n            elif pm == \"replace\":\n                committed[key] = value\n                changed = 1\n                inserted = True\n            else:\n                committed[key] = value\n                changed = 1\n                inserted = not existed\n            trig = 1 if (tr and inserted) else 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n            else:\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n\n        def do_update(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                committed[key] = value\n                changed = 1\n            else:\n                changed = 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n\n        def do_delete(conn, key):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                del committed[key]\n                changed = 1\n            else:\n                changed = 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n\n        for act in acts:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                pending[conn] = []\n            elif op == \"commit\":\n                if pending[conn] is not None:\n                    for (o, k, v) in pending[conn]:\n                        if o == \"put\":\n                            do_put(conn, k, v)\n                        elif o == \"update\":\n                            do_update(conn, k, v)\n                        elif o == \"delete\":\n                            do_delete(conn, k)\n                    pending[conn] = None\n            elif op == \"rollback\":\n                pending[conn] = None\n            elif op in (\"put\", \"update\", \"delete\"):\n                if pending[conn] is not None:\n                    pending[conn].append((op, act.get(\"key\"), act.get(\"value\")))\n                else:\n                    if op == \"put\":\n                        do_put(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"update\":\n                        do_update(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"delete\":\n                        do_delete(conn, act.get(\"key\"))\n\n        if cm == \"changes\":\n            channel = main_changes\n        elif cm == \"total_main\":\n            channel = main_total\n        else:\n            channel = main_total + other_total\n        return channel, len(committed), sum(committed.values())\n\n    consistent = []\n    for pm in put_modes:\n        for cm in channel_modes:\n            for tr in triggers:\n                ok = True\n                for r in receipts:\n                    ra = r.get(\"actions\", [])\n                    obs = r.get(\"observed\", {})\n                    ch, cnt, sm = sim_actions(ra, pm, cm, tr)\n                    if ch != obs.get(\"channel\") or cnt != obs.get(\"committed_count\") or sm != obs.get(\"committed_sum\"):\n                        ok = False\n                        break\n                if ok:\n                    consistent.append((pm, cm, tr))\n\n    if not consistent:\n        return {\"value\": None, \"unresolved\": True}\n\n    results = set()\n    for (pm, cm, tr) in consistent:\n        ch, cnt, sm = sim_actions(actions, pm, cm, tr)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cnt)\n        elif goal == \"committed_sum\":\n            results.add(sm)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "Family: put in {ignore, replace, upsert}, channel in {changes, total_main, total_both}, trigger in {none, after-insert}. Simulate SQLite semantics including transactions and trigger effects on total_changes.",
+            "lesson": "Receipts constrain the family; only predict when all consistent members agree. Trigger adds to total_changes but not changes(). REPLACE fires trigger; IGNORE does not on conflict; upsert fires only on insert."
+          },
+          "parent_sha256": "de3e933ec154e73d322d2319a711b7c428752fb21287538cc70042a23f8a5bfd",
+          "candidate_sha256": "6d7a69fce8bd4106eba506c769b361193ce693ec7fa7b0bad60190085da8966a",
+          "accepted": true,
+          "regressions": 0,
+          "unchanged": false,
+          "candidate_summary": {
+            "correct": 0,
+            "total": 12,
+            "errors": 0
+          },
+          "feedback": [
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "op": "rollback"
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "op": "rollback"
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "op": "rollback"
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            }
+          ],
+          "old": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "2394e01b20ed864036238b4e723f8a51816deff8c721a70619fa4a82287a32fd",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "5b0807c34a6a349476f582ba08030577e07bcf952b9d53c7c7a7f89c6d9f0697",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "17f8bcd0f32d79be7fa0b0842c4e7275754a1ec1e7abb1b0e905b0d0ef01d879",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "3d7a3196cd3c8fd81736494e5f8a4c7fc59492efb4c359c5977e606410718cfe",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "73d6085319eb3451b6ac8298797fcb69c9dad8f926b8d0ba9905e71036b3b97c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "2e5d80fa87d26ee9fbb17643848ec8b52572d89593a55aed70a68ca81b68df81",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "c4d68b0926855441c1de39d992d41f2f3ea440b3c1a7479d1118fcc0c10cbe50",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "68ee21e0d119ac21005b5072af18831bf04a3cc5c5dc60c36c93bb8fe5bddc47",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "1cd671d82c7baabfa20fc8515e7e29d2e2729682cd0f6f8ac18632d816697a8c",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "fb0c91c71e087b912fc716e197d374e81480fd9b8119b5375f79e54d3eba1838",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "28f7e630bf0adbbf3921a422981f36cdbf082dc6449512ae2e357a65b5d0f9a0",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "569ad5280b4d701c9c8194cfcf53026f4222252a781cefe27436da707a13c0ea",
+                "expected": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "candidate": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2394e01b20ed864036238b4e723f8a51816deff8c721a70619fa4a82287a32fd",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "5b0807c34a6a349476f582ba08030577e07bcf952b9d53c7c7a7f89c6d9f0697",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "17f8bcd0f32d79be7fa0b0842c4e7275754a1ec1e7abb1b0e905b0d0ef01d879",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "3d7a3196cd3c8fd81736494e5f8a4c7fc59492efb4c359c5977e606410718cfe",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "73d6085319eb3451b6ac8298797fcb69c9dad8f926b8d0ba9905e71036b3b97c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2e5d80fa87d26ee9fbb17643848ec8b52572d89593a55aed70a68ca81b68df81",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "c4d68b0926855441c1de39d992d41f2f3ea440b3c1a7479d1118fcc0c10cbe50",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "68ee21e0d119ac21005b5072af18831bf04a3cc5c5dc60c36c93bb8fe5bddc47",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "1cd671d82c7baabfa20fc8515e7e29d2e2729682cd0f6f8ac18632d816697a8c",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "fb0c91c71e087b912fc716e197d374e81480fd9b8119b5375f79e54d3eba1838",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "28f7e630bf0adbbf3921a422981f36cdbf082dc6449512ae2e357a65b5d0f9a0",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "569ad5280b4d701c9c8194cfcf53026f4222252a781cefe27436da707a13c0ea",
+                "expected": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "response_error": null
+        },
+        {
+          "proposal": {
+            "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n    actions = context.get(\"actions\", [])\n    goal = context.get(\"goal\")\n\n    def sim_actions(acts, pm, cm, tr):\n        committed = {}\n        pending = {\"main\": None, \"other\": None}\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n\n        def do_put(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            existed = key in committed\n            if pm == \"ignore\":\n                if existed:\n                    changed = 0\n                    inserted = False\n                else:\n                    committed[key] = value\n                    changed = 1\n                    inserted = True\n            elif pm == \"replace\":\n                committed[key] = value\n                changed = 1\n                inserted = True\n            else:\n                committed[key] = value\n                changed = 1\n                inserted = not existed\n            trig = 1 if (tr and inserted) else 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n            else:\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n\n        def do_update(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                committed[key] = value\n                changed = 1\n            else:\n                changed = 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n\n        def do_delete(conn, key):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                del committed[key]\n                changed = 1\n            else:\n                changed = 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n\n        for act in acts:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                pending[conn] = []\n            elif op == \"commit\":\n                if pending[conn] is not None:\n                    for (o, k, v) in pending[conn]:\n                        if o == \"put\":\n                            do_put(conn, k, v)\n                        elif o == \"update\":\n                            do_update(conn, k, v)\n                        elif o == \"delete\":\n                            do_delete(conn, k)\n                    pending[conn] = None\n            elif op == \"rollback\":\n                pending[conn] = None\n            elif op in (\"put\", \"update\", \"delete\"):\n                if pending[conn] is not None:\n                    pending[conn].append((op, act.get(\"key\"), act.get(\"value\")))\n                else:\n                    if op == \"put\":\n                        do_put(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"update\":\n                        do_update(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"delete\":\n                        do_delete(conn, act.get(\"key\"))\n\n        if cm == \"changes\":\n            channel = main_changes\n        elif cm == \"total_main\":\n            channel = main_total\n        else:\n            channel = main_total + other_total\n        return channel, len(committed), sum(committed.values())\n\n    put_modes = [\"ignore\", \"replace\", \"upsert\"]\n    channel_modes = [\"changes\", \"total_main\", \"total_both\"]\n    triggers = [False, True]\n\n    consistent = []\n    for pm in put_modes:\n        for cm in channel_modes:\n            for tr in triggers:\n                ok = True\n                for r in receipts:\n                    ra = r.get(\"actions\", [])\n                    obs = r.get(\"observed\", {})\n                    ch, cnt, sm = sim_actions(ra, pm, cm, tr)\n                    if ch != obs.get(\"channel\") or cnt != obs.get(\"committed_count\") or sm != obs.get(\"committed_sum\"):\n                        ok = False\n                        break\n                if ok:\n                    consistent.append((pm, cm, tr))\n\n    if not consistent:\n        return {\"value\": None, \"unresolved\": True}\n\n    results = set()\n    for (pm, cm, tr) in consistent:\n        ch, cnt, sm = sim_actions(actions, pm, cm, tr)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cnt)\n        elif goal == \"committed_sum\":\n            results.add(sm)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "Family: put in {ignore, replace, upsert}, channel in {changes, total_main, total_both}, trigger in {none, after-insert}. Simulate SQLite semantics including transactions and trigger effects on total_changes.",
+            "lesson": "Receipts constrain the family; only predict when all consistent members agree. Trigger adds to total_changes but not changes(). REPLACE fires trigger; IGNORE does not on conflict; upsert fires only on insert."
+          },
+          "parent_sha256": "6d7a69fce8bd4106eba506c769b361193ce693ec7fa7b0bad60190085da8966a",
+          "candidate_sha256": "f53bb9ff113b7c79525428f5f3c2c3227b142c9b40282a9332b9efb04bb8585e",
+          "accepted": true,
+          "regressions": 0,
+          "unchanged": false,
+          "candidate_summary": {
+            "correct": 0,
+            "total": 12,
+            "errors": 0
+          },
+          "feedback": [
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "op": "rollback"
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "op": "rollback"
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "op": "rollback"
+                }
+              ],
+              "goal": "committed_sum",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": {
+                "value": null,
+                "unresolved": true
+              },
+              "error": null,
+              "correct": false
+            }
+          ],
+          "old": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2394e01b20ed864036238b4e723f8a51816deff8c721a70619fa4a82287a32fd",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "5b0807c34a6a349476f582ba08030577e07bcf952b9d53c7c7a7f89c6d9f0697",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "17f8bcd0f32d79be7fa0b0842c4e7275754a1ec1e7abb1b0e905b0d0ef01d879",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "3d7a3196cd3c8fd81736494e5f8a4c7fc59492efb4c359c5977e606410718cfe",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "73d6085319eb3451b6ac8298797fcb69c9dad8f926b8d0ba9905e71036b3b97c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2e5d80fa87d26ee9fbb17643848ec8b52572d89593a55aed70a68ca81b68df81",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "c4d68b0926855441c1de39d992d41f2f3ea440b3c1a7479d1118fcc0c10cbe50",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "68ee21e0d119ac21005b5072af18831bf04a3cc5c5dc60c36c93bb8fe5bddc47",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "1cd671d82c7baabfa20fc8515e7e29d2e2729682cd0f6f8ac18632d816697a8c",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "fb0c91c71e087b912fc716e197d374e81480fd9b8119b5375f79e54d3eba1838",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "28f7e630bf0adbbf3921a422981f36cdbf082dc6449512ae2e357a65b5d0f9a0",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "569ad5280b4d701c9c8194cfcf53026f4222252a781cefe27436da707a13c0ea",
+                "expected": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "candidate": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2394e01b20ed864036238b4e723f8a51816deff8c721a70619fa4a82287a32fd",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "5b0807c34a6a349476f582ba08030577e07bcf952b9d53c7c7a7f89c6d9f0697",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "17f8bcd0f32d79be7fa0b0842c4e7275754a1ec1e7abb1b0e905b0d0ef01d879",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "3d7a3196cd3c8fd81736494e5f8a4c7fc59492efb4c359c5977e606410718cfe",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "73d6085319eb3451b6ac8298797fcb69c9dad8f926b8d0ba9905e71036b3b97c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2e5d80fa87d26ee9fbb17643848ec8b52572d89593a55aed70a68ca81b68df81",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "c4d68b0926855441c1de39d992d41f2f3ea440b3c1a7479d1118fcc0c10cbe50",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "68ee21e0d119ac21005b5072af18831bf04a3cc5c5dc60c36c93bb8fe5bddc47",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "1cd671d82c7baabfa20fc8515e7e29d2e2729682cd0f6f8ac18632d816697a8c",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "fb0c91c71e087b912fc716e197d374e81480fd9b8119b5375f79e54d3eba1838",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "28f7e630bf0adbbf3921a422981f36cdbf082dc6449512ae2e357a65b5d0f9a0",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "569ad5280b4d701c9c8194cfcf53026f4222252a781cefe27436da707a13c0ea",
+                "expected": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "response_error": null
+        }
+      ],
+      "checkpoints": [
+        {
+          "program": {
+            "source": "def investigate(context, acquire):\n    receipts = acquire(\"history\")\n    actions = context.get(\"actions\", [])\n    goal = context.get(\"goal\")\n\n    def sim_actions(acts, pm, cm, tr):\n        committed = {}\n        pending = {\"main\": None, \"other\": None}\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n\n        def do_put(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            existed = key in committed\n            if pm == \"ignore\":\n                if existed:\n                    changed = 0\n                    inserted = False\n                else:\n                    committed[key] = value\n                    changed = 1\n                    inserted = True\n            elif pm == \"replace\":\n                committed[key] = value\n                changed = 1\n                inserted = True\n            else:\n                committed[key] = value\n                changed = 1\n                inserted = not existed\n            trig = 1 if (tr and inserted) else 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n            else:\n                if conn == \"main\":\n                    main_total += changed + trig\n                else:\n                    other_total += changed + trig\n\n        def do_update(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                committed[key] = value\n                changed = 1\n            else:\n                changed = 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n\n        def do_delete(conn, key):\n            nonlocal main_changes, main_total, other_total\n            if key in committed:\n                del committed[key]\n                changed = 1\n            else:\n                changed = 0\n            if cm == \"changes\":\n                if conn == \"main\":\n                    main_changes = changed\n            elif cm == \"total_main\":\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n            else:\n                if conn == \"main\":\n                    main_total += changed\n                else:\n                    other_total += changed\n\n        for act in acts:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"begin\":\n                pending[conn] = []\n            elif op == \"commit\":\n                if pending[conn] is not None:\n                    for (o, k, v) in pending[conn]:\n                        if o == \"put\":\n                            do_put(conn, k, v)\n                        elif o == \"update\":\n                            do_update(conn, k, v)\n                        elif o == \"delete\":\n                            do_delete(conn, k)\n                    pending[conn] = None\n            elif op == \"rollback\":\n                pending[conn] = None\n            elif op in (\"put\", \"update\", \"delete\"):\n                if pending[conn] is not None:\n                    pending[conn].append((op, act.get(\"key\"), act.get(\"value\")))\n                else:\n                    if op == \"put\":\n                        do_put(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"update\":\n                        do_update(conn, act.get(\"key\"), act.get(\"value\"))\n                    elif op == \"delete\":\n                        do_delete(conn, act.get(\"key\"))\n\n        if cm == \"changes\":\n            channel = main_changes\n        elif cm == \"total_main\":\n            channel = main_total\n        else:\n            channel = main_total + other_total\n        return channel, len(committed), sum(committed.values())\n\n    put_modes = [\"ignore\", \"replace\", \"upsert\"]\n    channel_modes = [\"changes\", \"total_main\", \"total_both\"]\n    triggers = [False, True]\n\n    consistent = []\n    for pm in put_modes:\n        for cm in channel_modes:\n            for tr in triggers:\n                ok = True\n                for r in receipts:\n                    ra = r.get(\"actions\", [])\n                    obs = r.get(\"observed\", {})\n                    ch, cnt, sm = sim_actions(ra, pm, cm, tr)\n                    if ch != obs.get(\"channel\") or cnt != obs.get(\"committed_count\") or sm != obs.get(\"committed_sum\"):\n                        ok = False\n                        break\n                if ok:\n                    consistent.append((pm, cm, tr))\n\n    if not consistent:\n        return {\"value\": None, \"unresolved\": True}\n\n    results = set()\n    for (pm, cm, tr) in consistent:\n        ch, cnt, sm = sim_actions(actions, pm, cm, tr)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cnt)\n        elif goal == \"committed_sum\":\n            results.add(sm)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "Family: put in {ignore, replace, upsert}, channel in {changes, total_main, total_both}, trigger in {none, after-insert}. Simulate SQLite semantics including transactions and trigger effects on total_changes.",
+            "lesson": "Receipts constrain the family; only predict when all consistent members agree. Trigger adds to total_changes but not changes(). REPLACE fires trigger; IGNORE does not on conflict; upsert fires only on insert."
+          },
+          "history": [
+            {
+              "source_id": "source-b23ea10b80ca887e778e",
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 2
+              },
+              "authority": "native SQLite counter; committed state read through a separate connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "a30224ade82094c625a30380e6526b3155e0969e9970b545b3bfe84e4b1e26a9"
+            },
+            {
+              "source_id": "source-b23ea10b80ca887e778e",
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "op": "rollback"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 1
+              },
+              "authority": "native SQLite counter; committed state read through a separate connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "e24a4273d1515e31bf0432854d235544e0617f8b94f9b1a2443aa8b7ae9c4545"
+            },
+            {
+              "source_id": "source-b23ea10b80ca887e778e",
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                },
+                {
+                  "connection": "main",
+                  "op": "commit"
+                },
+                {
+                  "connection": "other",
+                  "key": "a",
+                  "op": "put",
+                  "value": 3
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 3
+              },
+              "authority": "native SQLite counter; committed state read through a separate connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "cafc7ae11e12c3d46e777ce05945bcf5396f4dcb3a6166efc10063bb8e13c46d"
+            },
+            {
+              "source_id": "source-b23ea10b80ca887e778e",
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 96
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 88
+                },
+                {
+                  "op": "commit"
+                }
+              ],
+              "observed": {
+                "channel": 2,
+                "committed_count": 1,
+                "committed_sum": 88
+              },
+              "authority": "native SQLite counter; committed state read through a separate connection",
+              "sqlite_version": "3.45.3",
+              "receipt_sha256": "24ffd7e4f623e72795981153257d8edb33c4396ebbdbd8315c525915868130c9"
+            }
+          ],
+          "program_sha256": "f53bb9ff113b7c79525428f5f3c2c3227b142c9b40282a9332b9efb04bb8585e"
+        }
+      ]
+    },
+    "archive": {
+      "champion": {
+        "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n    if not history:\n        return {\"value\": None, \"unresolved\": True}\n\n    def simulate(actions, put_mode, instrument, channel_mode):\n        # put_mode: 0=IGNORE, 1=REPLACE, 2=UPSERT\n        # instrument: 0=none, 1=AFTER INSERT trigger\n        # channel_mode: 0=main changes(), 1=main total_changes, 2=main+other total_changes\n        items = {}\n        log = []\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n        in_tx = {\"main\": False, \"other\": False}\n        tx_items = {\"main\": None, \"other\": None}\n        tx_log = {\"main\": None, \"other\": None}\n\n        def do_put(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            cur = items if not in_tx[conn] else tx_items[conn]\n            cur_log = log if not in_tx[conn] else tx_log[conn]\n            changed = 0\n            inserted = False\n            if put_mode == 0:\n                if key not in cur:\n                    cur[key] = value\n                    changed = 1\n                    inserted = True\n            elif put_mode == 1:\n                if key in cur:\n                    cur[key] = value\n                    changed = 1\n                else:\n                    cur[key] = value\n                    changed = 1\n                    inserted = True\n            else:\n                if key in cur:\n                    cur[key] = value\n                    changed = 1\n                else:\n                    cur[key] = value\n                    changed = 1\n                    inserted = True\n            if instrument == 1 and inserted:\n                cur_log.append(key)\n            if conn == \"main\":\n                main_changes = changed\n                main_total += changed\n            else:\n                other_total += changed\n\n        def do_update(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            cur = items if not in_tx[conn] else tx_items[conn]\n            changed = 0\n            if key in cur:\n                cur[key] = value\n                changed = 1\n            if conn == \"main\":\n                main_changes = changed\n                main_total += changed\n            else:\n                other_total += changed\n\n        def do_delete(conn, key):\n            nonlocal main_changes, main_total, other_total\n            cur = items if not in_tx[conn] else tx_items[conn]\n            changed = 0\n            if key in cur:\n                del cur[key]\n                changed = 1\n            if conn == \"main\":\n                main_changes = changed\n                main_total += changed\n            else:\n                other_total += changed\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"put\":\n                do_put(conn, act[\"key\"], act[\"value\"])\n            elif op == \"update\":\n                do_update(conn, act[\"key\"], act[\"value\"])\n            elif op == \"delete\":\n                do_delete(conn, act[\"key\"])\n            elif op == \"begin\":\n                in_tx[conn] = True\n                tx_items[conn] = dict(items)\n                tx_log[conn] = list(log)\n            elif op == \"commit\":\n                if in_tx[conn]:\n                    items = tx_items[conn]\n                    log = tx_log[conn]\n                    in_tx[conn] = False\n                    tx_items[conn] = None\n                    tx_log[conn] = None\n            elif op == \"rollback\":\n                if in_tx[conn]:\n                    in_tx[conn] = False\n                    tx_items[conn] = None\n                    tx_log[conn] = None\n\n        if channel_mode == 0:\n            ch = main_changes\n        elif channel_mode == 1:\n            ch = main_total\n        else:\n            ch = main_total + other_total\n        return ch, len(items), sum(items.values())\n\n    candidates = []\n    for pm in range(3):\n        for inst in range(2):\n            for cm in range(3):\n                ok = True\n                for rec in history:\n                    ch, cc, cs = simulate(rec[\"actions\"], pm, inst, cm)\n                    obs = rec[\"observed\"]\n                    if ch != obs[\"channel\"] or cc != obs[\"committed_count\"] or cs != obs[\"committed_sum\"]:\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((pm, inst, cm))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = set()\n    for pm, inst, cm in candidates:\n        ch, cc, cs = simulate(actions, pm, inst, cm)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cc)\n        elif goal == \"committed_sum\":\n            results.add(cs)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+        "scope": "Family-consistent simulation over put mode, trigger instrumentation, and channel counter; answer only when all consistent members agree.",
+        "lesson": "Calibration receipts constrain the 18-member family; simulate each candidate and intersect predictions for the queried sequence."
+      },
+      "rounds": [
+        {
+          "proposal": {
+            "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n    if not history:\n        return {\"value\": None, \"unresolved\": True}\n\n    def simulate(actions, put_mode, instrument, channel_mode):\n        # put_mode: 0=IGNORE, 1=REPLACE, 2=UPSERT\n        # instrument: 0=none, 1=AFTER INSERT trigger\n        # channel_mode: 0=main changes(), 1=main total_changes, 2=main+other total_changes\n        items = {}\n        log = []\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n        in_tx = {\"main\": False, \"other\": False}\n        tx_items = {\"main\": None, \"other\": None}\n        tx_log = {\"main\": None, \"other\": None}\n        tx_changes = {\"main\": 0, \"other\": 0}\n        tx_total = {\"main\": 0, \"other\": 0}\n\n        def do_put(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            cur = items if not in_tx[conn] else tx_items[conn]\n            cur_log = log if not in_tx[conn] else tx_log[conn]\n            changed = 0\n            inserted = False\n            if put_mode == 0:\n                if key not in cur:\n                    cur[key] = value\n                    changed = 1\n                    inserted = True\n            elif put_mode == 1:\n                if key in cur:\n                    cur[key] = value\n                    changed = 1\n                else:\n                    cur[key] = value\n                    changed = 1\n                    inserted = True\n            else:\n                if key in cur:\n                    cur[key] = value\n                    changed = 1\n                else:\n                    cur[key] = value\n                    changed = 1\n                    inserted = True\n            if instrument == 1 and inserted:\n                cur_log.append(key)\n            if conn == \"main\":\n                main_changes = changed\n                main_total += changed\n            else:\n                other_total += changed\n\n        def do_update(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            cur = items if not in_tx[conn] else tx_items[conn]\n            changed = 0\n            if key in cur:\n                cur[key] = value\n                changed = 1\n            if conn == \"main\":\n                main_changes = changed\n                main_total += changed\n            else:\n                other_total += changed\n\n        def do_delete(conn, key):\n            nonlocal main_changes, main_total, other_total\n            cur = items if not in_tx[conn] else tx_items[conn]\n            changed = 0\n            if key in cur:\n                del cur[key]\n                changed = 1\n            if conn == \"main\":\n                main_changes = changed\n                main_total += changed\n            else:\n                other_total += changed\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"put\":\n                do_put(conn, act[\"key\"], act[\"value\"])\n            elif op == \"update\":\n                do_update(conn, act[\"key\"], act[\"value\"])\n            elif op == \"delete\":\n                do_delete(conn, act[\"key\"])\n            elif op == \"begin\":\n                in_tx[conn] = True\n                tx_items[conn] = dict(items)\n                tx_log[conn] = list(log)\n                tx_changes[conn] = 0\n                tx_total[conn] = 0\n            elif op == \"commit\":\n                if in_tx[conn]:\n                    items = tx_items[conn]\n                    log = tx_log[conn]\n                    in_tx[conn] = False\n                    tx_items[conn] = None\n                    tx_log[conn] = None\n            elif op == \"rollback\":\n                if in_tx[conn]:\n                    in_tx[conn] = False\n                    tx_items[conn] = None\n                    tx_log[conn] = None\n\n        if channel_mode == 0:\n            ch = main_changes\n        elif channel_mode == 1:\n            ch = main_total\n        else:\n            ch = main_total + other_total\n        return ch, len(items), sum(items.values())\n\n    candidates = []\n    for pm in range(3):\n        for inst in range(2):\n            for cm in range(3):\n                ok = True\n                for rec in history:\n                    ch, cc, cs = simulate(rec[\"actions\"], pm, inst, cm)\n                    obs = rec[\"observed\"]\n                    if ch != obs[\"channel\"] or cc != obs[\"committed_count\"] or cs != obs[\"committed_sum\"]:\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((pm, inst, cm))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = set()\n    for pm, inst, cm in candidates:\n        ch, cc, cs = simulate(actions, pm, inst, cm)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cc)\n        elif goal == \"committed_sum\":\n            results.add(cs)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "Family-consistent simulation over put mode, trigger instrumentation, and channel counter; answer only when all consistent members agree.",
+            "lesson": "Calibration receipts constrain the 18-member family; simulate each candidate and intersect predictions for the queried sequence."
+          },
+          "parent_sha256": "de3e933ec154e73d322d2319a711b7c428752fb21287538cc70042a23f8a5bfd",
+          "candidate_sha256": "0b23d04382e822df20a2f4e5457b0ca0a886f5e8a7e2cc883c75d5a31e782a8f",
+          "accepted": true,
+          "regressions": 0,
+          "unchanged": false,
+          "candidate_summary": {
+            "correct": 12,
+            "total": 12,
+            "errors": 0
+          },
+          "feedback": [
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": {
+                "value": 2,
+                "unresolved": false
+              },
+              "error": null,
+              "correct": true
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": {
+                "value": 1,
+                "unresolved": false
+              },
+              "error": null,
+              "correct": true
+            }
+          ],
+          "old": {
+            "correct": 0,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "2394e01b20ed864036238b4e723f8a51816deff8c721a70619fa4a82287a32fd",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "5b0807c34a6a349476f582ba08030577e07bcf952b9d53c7c7a7f89c6d9f0697",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "17f8bcd0f32d79be7fa0b0842c4e7275754a1ec1e7abb1b0e905b0d0ef01d879",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "3d7a3196cd3c8fd81736494e5f8a4c7fc59492efb4c359c5977e606410718cfe",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "73d6085319eb3451b6ac8298797fcb69c9dad8f926b8d0ba9905e71036b3b97c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "2e5d80fa87d26ee9fbb17643848ec8b52572d89593a55aed70a68ca81b68df81",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "c4d68b0926855441c1de39d992d41f2f3ea440b3c1a7479d1118fcc0c10cbe50",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "68ee21e0d119ac21005b5072af18831bf04a3cc5c5dc60c36c93bb8fe5bddc47",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "1cd671d82c7baabfa20fc8515e7e29d2e2729682cd0f6f8ac18632d816697a8c",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "fb0c91c71e087b912fc716e197d374e81480fd9b8119b5375f79e54d3eba1838",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "28f7e630bf0adbbf3921a422981f36cdbf082dc6449512ae2e357a65b5d0f9a0",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": null,
+                  "unresolved": true
+                },
+                "trace": [],
+                "error": null,
+                "id": "569ad5280b4d701c9c8194cfcf53026f4222252a781cefe27436da707a13c0ea",
+                "expected": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "correct": false,
+                "unsupported": false
+              }
+            ]
+          },
+          "candidate": {
+            "correct": 12,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2394e01b20ed864036238b4e723f8a51816deff8c721a70619fa4a82287a32fd",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "5b0807c34a6a349476f582ba08030577e07bcf952b9d53c7c7a7f89c6d9f0697",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "17f8bcd0f32d79be7fa0b0842c4e7275754a1ec1e7abb1b0e905b0d0ef01d879",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "3d7a3196cd3c8fd81736494e5f8a4c7fc59492efb4c359c5977e606410718cfe",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "73d6085319eb3451b6ac8298797fcb69c9dad8f926b8d0ba9905e71036b3b97c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2e5d80fa87d26ee9fbb17643848ec8b52572d89593a55aed70a68ca81b68df81",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "c4d68b0926855441c1de39d992d41f2f3ea440b3c1a7479d1118fcc0c10cbe50",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "68ee21e0d119ac21005b5072af18831bf04a3cc5c5dc60c36c93bb8fe5bddc47",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "1cd671d82c7baabfa20fc8515e7e29d2e2729682cd0f6f8ac18632d816697a8c",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "fb0c91c71e087b912fc716e197d374e81480fd9b8119b5375f79e54d3eba1838",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "28f7e630bf0adbbf3921a422981f36cdbf082dc6449512ae2e357a65b5d0f9a0",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "569ad5280b4d701c9c8194cfcf53026f4222252a781cefe27436da707a13c0ea",
+                "expected": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              }
+            ]
+          },
+          "response_error": null
+        },
+        {
+          "proposal": {
+            "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n    if not history:\n        return {\"value\": None, \"unresolved\": True}\n\n    def simulate(actions, put_mode, instrument, channel_mode):\n        # put_mode: 0=IGNORE, 1=REPLACE, 2=UPSERT\n        # instrument: 0=none, 1=AFTER INSERT trigger\n        # channel_mode: 0=main changes(), 1=main total_changes, 2=main+other total_changes\n        items = {}\n        log = []\n        main_changes = 0\n        main_total = 0\n        other_total = 0\n        in_tx = {\"main\": False, \"other\": False}\n        tx_items = {\"main\": None, \"other\": None}\n        tx_log = {\"main\": None, \"other\": None}\n\n        def do_put(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            cur = items if not in_tx[conn] else tx_items[conn]\n            cur_log = log if not in_tx[conn] else tx_log[conn]\n            changed = 0\n            inserted = False\n            if put_mode == 0:\n                if key not in cur:\n                    cur[key] = value\n                    changed = 1\n                    inserted = True\n            elif put_mode == 1:\n                if key in cur:\n                    cur[key] = value\n                    changed = 1\n                else:\n                    cur[key] = value\n                    changed = 1\n                    inserted = True\n            else:\n                if key in cur:\n                    cur[key] = value\n                    changed = 1\n                else:\n                    cur[key] = value\n                    changed = 1\n                    inserted = True\n            if instrument == 1 and inserted:\n                cur_log.append(key)\n            if conn == \"main\":\n                main_changes = changed\n                main_total += changed\n            else:\n                other_total += changed\n\n        def do_update(conn, key, value):\n            nonlocal main_changes, main_total, other_total\n            cur = items if not in_tx[conn] else tx_items[conn]\n            changed = 0\n            if key in cur:\n                cur[key] = value\n                changed = 1\n            if conn == \"main\":\n                main_changes = changed\n                main_total += changed\n            else:\n                other_total += changed\n\n        def do_delete(conn, key):\n            nonlocal main_changes, main_total, other_total\n            cur = items if not in_tx[conn] else tx_items[conn]\n            changed = 0\n            if key in cur:\n                del cur[key]\n                changed = 1\n            if conn == \"main\":\n                main_changes = changed\n                main_total += changed\n            else:\n                other_total += changed\n\n        for act in actions:\n            op = act.get(\"op\")\n            conn = act.get(\"connection\", \"main\")\n            if op == \"put\":\n                do_put(conn, act[\"key\"], act[\"value\"])\n            elif op == \"update\":\n                do_update(conn, act[\"key\"], act[\"value\"])\n            elif op == \"delete\":\n                do_delete(conn, act[\"key\"])\n            elif op == \"begin\":\n                in_tx[conn] = True\n                tx_items[conn] = dict(items)\n                tx_log[conn] = list(log)\n            elif op == \"commit\":\n                if in_tx[conn]:\n                    items = tx_items[conn]\n                    log = tx_log[conn]\n                    in_tx[conn] = False\n                    tx_items[conn] = None\n                    tx_log[conn] = None\n            elif op == \"rollback\":\n                if in_tx[conn]:\n                    in_tx[conn] = False\n                    tx_items[conn] = None\n                    tx_log[conn] = None\n\n        if channel_mode == 0:\n            ch = main_changes\n        elif channel_mode == 1:\n            ch = main_total\n        else:\n            ch = main_total + other_total\n        return ch, len(items), sum(items.values())\n\n    candidates = []\n    for pm in range(3):\n        for inst in range(2):\n            for cm in range(3):\n                ok = True\n                for rec in history:\n                    ch, cc, cs = simulate(rec[\"actions\"], pm, inst, cm)\n                    obs = rec[\"observed\"]\n                    if ch != obs[\"channel\"] or cc != obs[\"committed_count\"] or cs != obs[\"committed_sum\"]:\n                        ok = False\n                        break\n                if ok:\n                    candidates.append((pm, inst, cm))\n\n    if not candidates:\n        return {\"value\": None, \"unresolved\": True}\n\n    goal = context.get(\"goal\")\n    actions = context.get(\"actions\", [])\n    results = set()\n    for pm, inst, cm in candidates:\n        ch, cc, cs = simulate(actions, pm, inst, cm)\n        if goal == \"channel\":\n            results.add(ch)\n        elif goal == \"committed_count\":\n            results.add(cc)\n        elif goal == \"committed_sum\":\n            results.add(cs)\n        else:\n            return {\"value\": None, \"unresolved\": True}\n\n    if len(results) == 1:\n        return {\"value\": results.pop(), \"unresolved\": False}\n    return {\"value\": None, \"unresolved\": True}\n",
+            "scope": "Family-consistent simulation over put mode, trigger instrumentation, and channel counter; answer only when all consistent members agree.",
+            "lesson": "Calibration receipts constrain the 18-member family; simulate each candidate and intersect predictions for the queried sequence."
+          },
+          "parent_sha256": "0b23d04382e822df20a2f4e5457b0ca0a886f5e8a7e2cc883c75d5a31e782a8f",
+          "candidate_sha256": "b015bbda899bb69bbf84da8e2849971107f32d1497e36470a38683b29e2bab27",
+          "accepted": true,
+          "regressions": 0,
+          "unchanged": false,
+          "candidate_summary": {
+            "correct": 12,
+            "total": 12,
+            "errors": 0
+          },
+          "feedback": [
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "channel",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "actual": {
+                "value": 2,
+                "unresolved": false
+              },
+              "error": null,
+              "correct": true
+            },
+            {
+              "actions": [
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 1
+                },
+                {
+                  "connection": "main",
+                  "key": "a",
+                  "op": "put",
+                  "value": 2
+                }
+              ],
+              "goal": "committed_count",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "actual": {
+                "value": 1,
+                "unresolved": false
+              },
+              "error": null,
+              "correct": true
+            }
+          ],
+          "old": {
+            "correct": 12,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2394e01b20ed864036238b4e723f8a51816deff8c721a70619fa4a82287a32fd",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "5b0807c34a6a349476f582ba08030577e07bcf952b9d53c7c7a7f89c6d9f0697",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "17f8bcd0f32d79be7fa0b0842c4e7275754a1ec1e7abb1b0e905b0d0ef01d879",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "3d7a3196cd3c8fd81736494e5f8a4c7fc59492efb4c359c5977e606410718cfe",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "73d6085319eb3451b6ac8298797fcb69c9dad8f926b8d0ba9905e71036b3b97c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2e5d80fa87d26ee9fbb17643848ec8b52572d89593a55aed70a68ca81b68df81",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "c4d68b0926855441c1de39d992d41f2f3ea440b3c1a7479d1118fcc0c10cbe50",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "68ee21e0d119ac21005b5072af18831bf04a3cc5c5dc60c36c93bb8fe5bddc47",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "1cd671d82c7baabfa20fc8515e7e29d2e2729682cd0f6f8ac18632d816697a8c",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "fb0c91c71e087b912fc716e197d374e81480fd9b8119b5375f79e54d3eba1838",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "28f7e630bf0adbbf3921a422981f36cdbf082dc6449512ae2e357a65b5d0f9a0",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "569ad5280b4d701c9c8194cfcf53026f4222252a781cefe27436da707a13c0ea",
+                "expected": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              }
+            ]
+          },
+          "candidate": {
+            "correct": 12,
+            "total": 12,
+            "unsupported": 0,
+            "errors": 0,
+            "rows": [
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2394e01b20ed864036238b4e723f8a51816deff8c721a70619fa4a82287a32fd",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "5b0807c34a6a349476f582ba08030577e07bcf952b9d53c7c7a7f89c6d9f0697",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "17f8bcd0f32d79be7fa0b0842c4e7275754a1ec1e7abb1b0e905b0d0ef01d879",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "3d7a3196cd3c8fd81736494e5f8a4c7fc59492efb4c359c5977e606410718cfe",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "73d6085319eb3451b6ac8298797fcb69c9dad8f926b8d0ba9905e71036b3b97c",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "2e5d80fa87d26ee9fbb17643848ec8b52572d89593a55aed70a68ca81b68df81",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "c4d68b0926855441c1de39d992d41f2f3ea440b3c1a7479d1118fcc0c10cbe50",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "68ee21e0d119ac21005b5072af18831bf04a3cc5c5dc60c36c93bb8fe5bddc47",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "1cd671d82c7baabfa20fc8515e7e29d2e2729682cd0f6f8ac18632d816697a8c",
+                "expected": {
+                  "value": 3,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "fb0c91c71e087b912fc716e197d374e81480fd9b8119b5375f79e54d3eba1838",
+                "expected": {
+                  "value": 2,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "28f7e630bf0adbbf3921a422981f36cdbf082dc6449512ae2e357a65b5d0f9a0",
+                "expected": {
+                  "value": 1,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              },
+              {
+                "answer": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "trace": [
+                  {
+                    "table": "history",
+                    "rows": 4,
+                    "sha256": "fd52674782af1c4bdc7d005ef09f3f623d627559464a0f14b1cbe931ce92fd6a"
+                  }
+                ],
+                "error": null,
+                "id": "569ad5280b4d701c9c8194cfcf53026f4222252a781cefe27436da707a13c0ea",
+                "expected": {
+                  "value": 88,
+                  "unresolved": false
+                },
+                "correct": true,
+                "unsupported": false
+              }
+            ]
+          },
+          "response_error": null
+        }
+      ],
+      "checkpoints": []
+    },
+    "fresh": {
+      "champion": {
+        "source": "def investigate(context, acquire):\n    return {\"value\": None, \"unresolved\": True}\n",
+        "scope": "No learned source model.",
+        "lesson": ""
+      },
+      "rounds": [],
+      "checkpoints": []
+    }
+  }
+}

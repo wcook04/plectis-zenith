@@ -49,6 +49,9 @@ class BudgetedTests(unittest.TestCase):
             self.addCleanup(admission.stop)
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
+        gates = patch('zenith.provider_policy._inference_root', return_value=self.root/'inference')
+        gates.start()
+        self.addCleanup(gates.stop)
         self.env = patch.dict(os.environ, {"OPENROUTER_API_KEY": SECRET}, clear=True)
         self.env.start()
         self.addCleanup(self.env.stop)
@@ -74,7 +77,7 @@ class BudgetedTests(unittest.TestCase):
     def ledger(self):
         return json.loads((self.root / "shared" / "budget.json").read_text())
 
-    def pinned_provider(self, run="PIN", *, endpoint=None, row=None, caller=None, slug=SLUG):
+    def pinned_provider(self, run="PIN", *, endpoint=None, row=None, caller=None, slug=SLUG, inference_mode='serial'):
         seen = []
         def catalogue(url, headers, timeout):
             self.assertNotIn("Authorization", headers)
@@ -85,7 +88,7 @@ class BudgetedTests(unittest.TestCase):
             return {"data": {"id": MODEL, "endpoints": [endpoint or PINNED]}}
         provider = OpenRouterBudgetedProvider(self.root / run, MODEL, ".25", 40, 1024,
             self.root / "shared", caller=caller or Mock(return_value=reply(provider="Synthetic Host")),
-            catalogue_get=catalogue, provider_slug=slug)
+            catalogue_get=catalogue, provider_slug=slug, inference_mode=inference_mode)
         provider.catalogue_seen = seen
         return provider
 
@@ -97,6 +100,164 @@ class BudgetedTests(unittest.TestCase):
                 "failed_call_id": call_id, "failed_call_sha256": digest(ledger["entries"][call_id]),
                 "authorization_ref": "synthetic-human-instruction-1", "reason": "explicitly retain unknown 429 reservation",
                 "accept_unknown_cost": True}
+
+    def test_bounded_mode_requires_pinned_route_and_rejects_unknown_mode(self):
+        for mode in ('bounded', 'unlimited'):
+            with self.assertRaises(ValueError):
+                OpenRouterBudgetedProvider(self.root/'invalid', MODEL, '.25', 40, 1024,
+                    self.root/'shared', inference_mode=mode)
+        self.assertFalse((self.root/'shared/budget.json').exists())
+
+    def test_bounded_requests_overlap_and_budget_remains_atomic_outside_http(self):
+        active = peak = 0
+        mutex = threading.Lock()
+        entered = threading.Event()
+        release = threading.Event()
+        def post(*args):
+            nonlocal active, peak
+            with mutex:
+                active += 1
+                peak = max(peak, active)
+                if active == 3:
+                    entered.set()
+            try:
+                self.assertTrue(release.wait(3))
+                return reply(provider='Synthetic Host')
+            finally:
+                with mutex:
+                    active -= 1
+        providers = [self.pinned_provider(f'bounded-{i}', slug=f'host-{i}/fp8',
+            endpoint={**PINNED, 'tag': f'host-{i}/fp8'}, caller=post, inference_mode='bounded') for i in range(3)]
+        with ThreadPoolExecutor(3) as pool:
+            futures = [pool.submit(self.ask, provider) for provider in providers]
+            try:
+                self.assertTrue(entered.wait(3))
+                # An in-flight HTTP request must not retain the budget lock.
+                status = providers[0].budget_status()
+                self.assertEqual(status['attempt_count'], 3)
+                ledger = self.ledger()
+                self.assertTrue(all(e['status'] == 'attempt_started' for e in ledger['entries'].values()))
+                self.assertEqual(Decimal(ledger['total_reserved_usd']),
+                    sum(Decimal(e['reserved_cost_usd']) for e in ledger['entries'].values()))
+            finally:
+                release.set()
+            for future in futures:
+                self.assertEqual(future.result(timeout=3), 'valid synthetic output')
+        ledger = self.ledger()
+        self.assertEqual(peak, 3)
+        self.assertEqual(Decimal(ledger['total_reported_cost_usd']), Decimal('.0003'))
+        self.assertTrue(all(e['status'] == 'response_supplied' and e['inference_mode'] == 'bounded'
+                            and e['queue_elapsed_seconds'] >= 0 and e['network_elapsed_seconds'] > 0
+                            for e in ledger['entries'].values()))
+
+    def test_bounded_wait_cancel_has_no_false_attempt_and_active_call_settles(self):
+        entered, release, cancelled = threading.Event(), threading.Event(), threading.Event()
+        def post(*args):
+            entered.set()
+            self.assertTrue(release.wait(3))
+            return reply(provider='Synthetic Host')
+        active = self.pinned_provider('active', caller=post, inference_mode='bounded')
+        waiting_caller = Mock(return_value=reply(provider='Synthetic Host'))
+        waiting = self.pinned_provider('waiting', caller=waiting_caller, inference_mode='bounded')
+        with ThreadPoolExecutor(2) as pool:
+            a = pool.submit(self.ask, active)
+            self.assertTrue(entered.wait(3))
+            b = pool.submit(waiting.ask_ai, 'hello', {'meta': {'session_id': 'waiting', 'node_id': 'case1'}}, cancelled)
+            cancelled.set()
+            try:
+                with self.assertRaisesRegex(RuntimeError, 'cancelled'):
+                    b.result(timeout=1)
+                waiting_caller.assert_not_called()
+                self.assertEqual(len(self.ledger()['entries']), 1)
+                self.assertFalse((waiting.run_dir/'handoff/budgeted_binding.json').exists())
+            finally:
+                release.set()
+            self.assertEqual(a.result(timeout=3), 'valid synthetic output')
+        self.assertEqual(len(self.ledger()['entries']), 1)
+        self.assertFalse(self.ledger()['halted'])
+
+    def test_bounded_same_pinned_route_serializes_and_records_queue_time(self):
+        active = peak = 0
+        mutex = threading.Lock()
+        def post(*args):
+            nonlocal active, peak
+            with mutex:
+                active += 1
+                peak = max(peak, active)
+            time.sleep(.03)
+            with mutex:
+                active -= 1
+            return reply(provider='Synthetic Host')
+        providers = [self.pinned_provider(f'same-route-{i}', caller=post, inference_mode='bounded') for i in range(3)]
+        with ThreadPoolExecutor(3) as pool:
+            self.assertTrue(all(pool.map(self.ask, providers)))
+        self.assertEqual(peak, 1)
+        self.assertTrue(any(e['queue_elapsed_seconds'] >= .02 for e in self.ledger()['entries'].values()))
+
+    def test_bounded_mode_is_bound_and_none_reasoning_explicitly_disabled(self):
+        row = {**ROW, 'supported_parameters': ROW['supported_parameters'] + ['reasoning']}
+        endpoint = {**PINNED, 'supported_parameters': PINNED['supported_parameters'] + ['reasoning']}
+        post = Mock(return_value=reply(provider='Synthetic Host'))
+        provider = self.pinned_provider('reasoning-off-bounded', row=row, endpoint=endpoint,
+            caller=post, inference_mode='bounded')
+        self.ask(provider)
+        self.assertEqual(post.call_args.args[2]['reasoning'], {'enabled': False})
+        binding = json.loads((provider.run_dir/'handoff/budgeted_binding.json').read_text())
+        self.assertEqual(binding['inference_mode'], 'bounded')
+
+    def test_bounded_shared_max_calls_cannot_be_overreserved(self):
+        posted = []
+        mutex = threading.Lock()
+        def post(*args):
+            with mutex:
+                posted.append(1)
+            time.sleep(.01)
+            return reply(provider='Synthetic Host')
+        def ask(index):
+            slug = f'cap-{index}/fp8'
+            provider = self.pinned_provider(f'cap-{index}', slug=slug,
+                endpoint={**PINNED, 'tag': slug}, caller=post, inference_mode='bounded')
+            provider.options['max_calls'] = 4
+            try:
+                self.ask(provider)
+                return True
+            except RuntimeError as error:
+                self.assertIn('max_calls', str(error))
+                return False
+        with ThreadPoolExecutor(8) as pool:
+            results = list(pool.map(ask, range(12)))
+        ledger = self.ledger()
+        self.assertEqual(sum(results), 4)
+        self.assertEqual(len(posted), 4)
+        self.assertEqual(len(ledger['entries']), 4)
+        self.assertEqual(Decimal(ledger['total_reserved_usd']),
+            sum(Decimal(entry['reserved_cost_usd']) for entry in ledger['entries'].values()))
+        self.assertFalse(ledger['halted'])
+
+    def test_bounded_mode_cannot_rebind_a_legacy_paid_run(self):
+        legacy = self.pinned_provider('mode-binding')
+        self.ask(legacy)
+        post = Mock(return_value=reply(provider='Synthetic Host'))
+        bounded = self.pinned_provider('mode-binding', caller=post, inference_mode='bounded')
+        with self.assertRaisesRegex(RuntimeError, 'binding is immutable'):
+            self.ask(bounded)
+        post.assert_not_called()
+
+    def test_failed_transport_retains_network_timing_and_never_retries(self):
+        def failed(*args):
+            time.sleep(.01)
+            raise RuntimeError('synthetic transport failure')
+        post = Mock(side_effect=failed)
+        provider = self.pinned_provider('timed-failure', caller=post, inference_mode='bounded')
+        with self.assertRaisesRegex(RuntimeError, 'synthetic transport failure'):
+            self.ask(provider)
+        entry = next(iter(self.ledger()['entries'].values()))
+        self.assertEqual(entry['status'], 'failed')
+        self.assertGreater(entry['network_elapsed_seconds'], 0)
+        self.assertGreaterEqual(entry['queue_elapsed_seconds'], 0)
+        with self.assertRaises(RuntimeError):
+            self.ask(provider)
+        self.assertEqual(post.call_count, 1)
 
     def unknown_429(self, run="rate-limited"):
         provider = self.provider(run, caller=Mock(side_effect=RuntimeError("OpenRouter HTTP 429: capacity unavailable")))

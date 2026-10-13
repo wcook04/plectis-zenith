@@ -1,0 +1,244 @@
+{
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "history": [
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [],
+        "observed": {
+          "channel": 0,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "fa5ca8c06a99b267ac406e83c949178283258f6b32db50939e9e6fb6a5f9d7de"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "7427319d60f86de1425806620056f93795b66deca0b92deae055512ccc8ee7c6"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "other"
+          }
+        ],
+        "observed": {
+          "channel": 0,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "9bc14a68bc545efcad8635a6ab0e384ac84a9ebb3c4b3c954aff5f9aa6f0c325"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "a",
+            "value": 5,
+            "connection": "main"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 5
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "fb9f68a8e6c77718fde5fa706ccc422bc85e573bd857f9dae34f700768a41b46"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "b",
+            "value": 2,
+            "connection": "main"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 2,
+          "committed_sum": 4
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "108e033764c759db70934beb0666c1a4da4d109d479406795bcd58235ab438cd"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "b",
+            "value": 3,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "c",
+            "value": 4,
+            "connection": "main"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 3,
+          "committed_sum": 9
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "3a0913743a19dfb47342cac590fa3913221dbb9bef148d3b68eab0ba766ff8d5"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "3a8b9624089fca54f2d5fda07413800e4c671ad123508c84cf5a645b489bd9eb"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "update",
+            "key": "a",
+            "value": 2
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "a9c0849aa9d091df7be557e84e946fb2a7e40564d585202e3e0f1d1a8f9e4681"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "b",
+            "value": 4,
+            "connection": "other"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 2,
+          "committed_sum": 6
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "db318efc5e46257f63641362649c97596ae5bc04bb6f55cfe14f0967ad05e0f3"
+      }
+    ],
+    "interface": "Additionally define transition(state, action, context, acquire)\nand readout(state, context, acquire). transition initializes your own state when\nstate is None, and applies ONE ordinary action. readout returns the requested\nvalue/unresolved answer. investigate runs your transitions and readout. State\nrepresentation, source inference and numerical semantics are yours to implement.\nThe qualification driver starts with state=None, passes each action to transition,\nthen calls readout on the resulting state. For ZERO actions it calls readout(None,\ncontext, acquire) directly: readout MUST handle this empty-source initial state.\ncontext is always the normal query object, including actions, source_id and goal;\ncontext is never None. The driver is exactly:\n    state = None\n    for action in context[\"actions\"]:\n        state = transition(state, action, context, acquire)\n    return readout(state, context, acquire)\nYour exports and investigate must agree on every observed sequence, including [];\ndo not depend on investigate-only initialization before readout can run.\nInfer a source only from receipts. Cache acquired evidence in your own state if\nneeded: the whole query permits eight acquisitions. These two exports will be\nreused by a later caller. No savepoint implementation is requested at this stage.\ndependencies must be []. No module imports or external solver code are provided.",
+    "prior_trials": []
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "Complete ordinary Python function bodies."
+      },
+      "scope": {
+        "type": "string"
+      },
+      "lesson": {
+        "type": "string"
+      },
+      "dependencies": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "uniqueItems": true
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson",
+      "dependencies"
+    ],
+    "additionalProperties": false
+  },
+  "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n"
+}

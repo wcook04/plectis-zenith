@@ -1,0 +1,830 @@
+{
+  "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n",
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "history": [
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "757b535314967aa398da672ae28a80e8aaf1d937e7ac36c0b9bf14cd52a5bbb5"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "ef964a1aa7ad382bd4868886f79c262abbca0f2da96b97414497bd14dc08d667"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "cb30b901eb94712fd78206380c0da060b60f562d6a1160ef0199b22a391c0eb2"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 33
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 77
+          },
+          {
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 33
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "505d4f110fac454cc1496d01d42aa609739f2f17ed18ceb91a110a505e1baf2d"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "1acb0fa4f15fdbff650168940a401c02e261944cd198692011794bf304b5bbe8"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "other",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "0dcc4185405e69ab6df5f39338dc1cb35f5e607bb3f5dad9ac2cfcdc14643c21"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "ef2fdb40bd783897661cdf2d37c1e583192c7fbb811b261cc1b591da614bdff1"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 33
+          },
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 77
+          },
+          {
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 33
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "b11ab2c266516ae1aa2f300f05a3a02c88eeac14308208d09200690c09488822"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 10
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 20
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 30
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 10
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "96c45ce548f0e2d219f660537acfd47d44f3f39b9dd71ddf881de7fb2bb579e1"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 10
+          },
+          {
+            "connection": "other",
+            "key": "x",
+            "op": "put",
+            "value": 20
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 30
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 10
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "d702e9231f853a9ea4a5d28686ecb25799320cb41caa47a113d6ff65267ee612"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 10
+          },
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 20
+          },
+          {
+            "connection": "main",
+            "key": "x",
+            "op": "put",
+            "value": 30
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 10
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "2c707f70a6d62602e44939e781e4fd94ed1d29028406554c05db311fdf2ff4f0"
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 33
+          },
+          {
+            "connection": "other",
+            "key": "a",
+            "op": "put",
+            "value": 77
+          }
+        ],
+        "observed": {
+          "channel": 2,
+          "committed_count": 1,
+          "committed_sum": 33
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "9bb996303219d286f01bf1d8bf63f32e0e8e61171e5b6632b626db6c26a3214f"
+      }
+    ],
+    "champion": {
+      "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n\n    def simulate(actions, put_mode, trigger, channel_mode):\n        committed = {}\n        conns = {'main': {'txn': False, 'pending': {}}, 'other': {'txn': False, 'pending': {}}}\n        total = {'main': 0, 'other': 0}\n\n        def get_view(conn):\n            view = dict(committed)\n            for k, v in conns[conn]['pending'].items():\n                if v is None:\n                    view.pop(k, None)\n                else:\n                    view[k] = v\n            return view\n\n        for act in actions:\n            op = act.get('op')\n            conn = act.get('connection', 'main')\n            if op == 'begin':\n                conns[conn]['txn'] = True\n                conns[conn]['pending'] = {}\n            elif op == 'commit':\n                for k, v in conns[conn]['pending'].items():\n                    if v is None:\n                        committed.pop(k, None)\n                    else:\n                        committed[k] = v\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'rollback':\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'put':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                changed = 0\n                if put_mode == 'ignore':\n                    if key not in view:\n                        changed = 1\n                        if conns[conn]['txn']:\n                            conns[conn]['pending'][key] = val\n                        else:\n                            committed[key] = val\n                elif put_mode == 'replace':\n                    if key in view:\n                        changed = 2\n                    else:\n                        changed = 1\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                else:\n                    changed = 1\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                if changed:\n                    total[conn] += changed\n                    if trigger:\n                        total[conn] += 1\n            elif op == 'update':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                    total[conn] += 1\n            elif op == 'delete':\n                key = act['key']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = None\n                    else:\n                        committed.pop(key, None)\n                    total[conn] += 1\n\n        if channel_mode == 'main':\n            ch = total['main']\n        else:\n            ch = total['main'] + total['other']\n        return ch, len(committed), sum(committed.values())\n\n    def consistent(put_mode, trigger, channel_mode):\n        for rec in history:\n            acts = rec.get('actions', [])\n            obs = rec.get('observed', {})\n            ch, cnt, sm = simulate(acts, put_mode, trigger, channel_mode)\n            if ch != obs.get('channel'):\n                return False\n            if cnt != obs.get('committed_count'):\n                return False\n            if sm != obs.get('committed_sum'):\n                return False\n        return True\n\n    candidates = []\n    for put_mode in ('ignore', 'replace', 'upsert'):\n        for trigger in (False, True):\n            for channel_mode in ('main', 'both'):\n                if consistent(put_mode, trigger, channel_mode):\n                    candidates.append((put_mode, trigger, channel_mode))\n\n    actions = context.get('actions', [])\n    goal = context.get('goal')\n\n    if not candidates:\n        return {'value': None, 'unresolved': True}\n\n    results = []\n    for put_mode, trigger, channel_mode in candidates:\n        ch, cnt, sm = simulate(actions, put_mode, trigger, channel_mode)\n        if goal == 'channel':\n            results.append(ch)\n        elif goal == 'committed_count':\n            results.append(cnt)\n        elif goal == 'committed_sum':\n            results.append(sm)\n        else:\n            return {'value': None, 'unresolved': True}\n\n    first = results[0]\n    for r in results:\n        if r != first:\n            return {'value': None, 'unresolved': True}\n    return {'value': first, 'unresolved': False}\n",
+      "scope": "Enumerate all 12 family members (put in {IGNORE, REPLACE, UPSERT}, trigger in {absent, present}, channel in {main total_changes, main+other total_changes}), filter by calibration receipts, and return a goal only when all surviving members agree.",
+      "lesson": "Receipts show repeated put keeps first value (IGNORE) and channel=2 for a single successful insert, implying trigger present and total_changes. Other connection only did ignored puts, so main vs main+other total_changes stays ambiguous; resolve only when survivors agree."
+    },
+    "champion_score": {
+      "correct": 36,
+      "total": 36,
+      "errors": 0
+    },
+    "champion_feedback": [
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "goal": "channel",
+        "expected": {
+          "value": 2,
+          "unresolved": false
+        },
+        "actual": {
+          "value": 2,
+          "unresolved": false
+        },
+        "error": null,
+        "correct": true
+      },
+      {
+        "actions": [
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "k",
+            "op": "put",
+            "value": 2
+          }
+        ],
+        "goal": "committed_count",
+        "expected": {
+          "value": 1,
+          "unresolved": false
+        },
+        "actual": {
+          "value": 1,
+          "unresolved": false
+        },
+        "error": null,
+        "correct": true
+      }
+    ],
+    "request": "Author a complete reusable observation program. Use the measured errors to change the computation, including coupled changes when necessary. A correct calibration score alone does not establish a correct model of new compositions. Preserve uncertainty where evidence cannot determine a goal.",
+    "construction_archive": [
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n    # Family: put is one of IGNORE, REPLACE, UPSERT(value).\n    # Instrumentation: none or AFTER INSERT trigger logging one row.\n    # Channel: main changes(), main total_changes, or main+other total_changes.\n    # From receipts: repeated put on same key leaves committed_sum = first value,\n    # so put is INSERT OR IGNORE (not REPLACE/UPSERT).\n    # Channel observed is 2 for two puts on same key (one ignored).\n    # changes() would be 1 for second put (ignored), total_changes would be 2.\n    # Observed channel=2 => total_changes (main) or main+other total_changes.\n    # Need to distinguish main total_changes vs main+other total_changes.\n    # Receipt with other connection put: channel=2, committed_sum=33.\n    # main put 33 (changes 1), other put 77 ignored (changes 0).\n    # main total_changes = 1, main+other = 1. But observed 2.\n    # Wait: trigger? If AFTER INSERT trigger logs, total_changes counts trigger inserts too.\n    # main put 33: insert + trigger insert = 2 changes. other put ignored: 0.\n    # main total_changes = 2, main+other = 2. Observed 2. Consistent.\n    # Without trigger: main total_changes=1, main+other=1. Observed 2 => trigger present.\n    # So instrumentation = AFTER INSERT trigger, channel = main total_changes or main+other.\n    # Distinguish: need case where other connection does a successful insert.\n    # Receipt: main put 1, other put 2 (ignored), main put 3 (ignored): channel=2.\n    # main total_changes: main put 1 -> insert+trigger=2, other ignored=0, main ignored=0 => 2.\n    # main+other: same => 2. Not distinguishing.\n    # Receipt: main put 1, begin, main put 2, rollback: channel=2.\n    # main total_changes: put1=2, put2 in txn=2, rollback doesn't reduce => 4? But observed 2.\n    # Hmm. Actually total_changes counts all changes including rolled back. So 4.\n    # Observed 2. So channel is not total_changes? Or trigger not firing in txn?\n    # Wait, maybe put is INSERT OR REPLACE? Then put1: insert+trigger=2. put2 in txn: replace = delete+insert+trigger=3? total=5.\n    # Observed 2. Hmm.\n    # Let's reconsider: maybe channel is changes() (last statement).\n    # put1: changes()=1 (or 2 with trigger). put2 ignored: changes()=0. Observed 2? No.\n    # Actually changes() after trigger: changes() returns rows changed by top-level statement, not trigger. So 1.\n    # Observed 2 for two puts. Hmm.\n    # Maybe channel is total_changes but trigger not counted? total_changes counts trigger changes too.\n    # Let's re-examine: receipt 1: put k=1, put k=2 => channel 2, committed_sum 1.\n    # If IGNORE: first insert changes 1, second ignored changes 0. total_changes=1. changes()=0.\n    # Observed 2. So maybe put is REPLACE? first insert 1, second replace: delete+insert=2, total=3. changes()=1.\n    # Observed 2. Hmm.\n    # Maybe channel = total_changes and put is IGNORE with trigger: first insert+trigger=2, second ignored=0 => 2. Yes!\n    # changes() would be 1 (top-level only). total_changes=2. Observed 2 => total_changes with trigger.\n    # Receipt 2: put1, begin, put2, rollback => channel 2.\n    # total_changes: put1=2, put2 in txn=2 => 4. Observed 2. Contradiction.\n    # Unless trigger doesn't fire in transaction? No.\n    # Or maybe channel is changes() and put is REPLACE? put1 changes=1, put2 replace changes=1 => last changes=1. Observed 2. No.\n    # Hmm, maybe channel is total_changes but rollback resets? No, total_changes is cumulative.\n    # Wait, maybe the trigger is AFTER INSERT and the log table insert is also counted, but rollback...\n    # Actually total_changes is not reset by rollback. So 4.\n    # Let me reconsider: maybe put is INSERT OR IGNORE and channel is changes() but with trigger changes() returns 2? No, changes() returns top-level.\n    # Actually in SQLite, changes() returns number of rows modified by most recent INSERT/UPDATE/DELETE, not counting triggers.\n    # So changes()=1 for insert.\n    # Observed 2 for two puts. So channel must be total_changes.\n    # But rollback case gives 2 not 4. Unless... the second put in transaction is ignored because key exists?\n    # put k=1 committed. begin. put k=2: key k exists, IGNORE => 0 changes. rollback. total_changes=2. Yes!\n    # That works. So put is IGNORE, trigger present, channel=total_changes.\n    # Receipt 3: put1, begin, put2, commit => channel 2, committed_sum 1. Same: put2 ignored. total=2.\n    # Receipt 4: begin, put a=33, put a=77, commit => channel 2, committed_sum 33.\n    # put a=33: insert+trigger=2. put a=77: ignored=0. total=2. Yes.\n    # Receipt 5: put a=1, put a=2, put a=3 => channel 2, sum 1. total=2. Yes.\n    # Receipt 6: main put a=1, other put a=2, main put a=3 => channel 2, sum 1.\n    # main put a=1: 2. other put a=2: ignored (key exists) => 0. main put a=3: ignored => 0. total=2. Yes.\n    # Receipt 7: put a=1, begin, put a=2, put a=3, rollback => channel 2, sum 1. total=2. Yes.\n    # Receipt 8: put a=33, begin, put a=77, rollback => channel 2, sum 33. total=2. Yes.\n    # Receipt 9: put x=10, put x=20, put x=30 => channel 2, sum 10. total=2. Yes.\n    # Receipt 10: main put x=10, other put x=20, main put x=30 => channel 2, sum 10. total=2. Yes.\n    # Receipt 11: put x=10, begin, put x=20, put x=30, rollback => channel 2, sum 10. total=2. Yes.\n    # Receipt 12: main put a=33, other put a=77 => channel 2, sum 33. total=2. Yes.\n    # All consistent with: put=INSERT OR IGNORE, trigger AFTER INSERT logging one row,\n    # channel = main total_changes (or main+other total_changes, indistinguishable so far).\n    # Need to distinguish main total_changes vs main+other total_changes.\n    # In all receipts, other connection only did ignored puts (0 changes).\n    # So both give same. We need a case where other does a successful insert.\n    # No such receipt. So channel is ambiguous between main total_changes and main+other total_changes.\n    # But wait: does the trigger fire on other connection's insert? Yes, trigger is on table.\n    # So if other inserts new key, main total_changes doesn't count it, main+other does.\n    # Since no receipt distinguishes, we must consider both possibilities.\n    # Also need to check: is trigger definitely present? Without trigger, total_changes for put1=1, put2 ignored=0 => 1. Observed 2. So trigger present.\n    # Could channel be changes() with trigger? changes()=1 for insert. Observed 2. No.\n    # So channel is total_changes (main or main+other).\n    # Now for a query, we need to predict channel, committed_count, committed_sum.\n    # committed state: IGNORE means first put wins, updates/deletes apply.\n    # We need to simulate actions.\n    # Since channel ambiguous, if query involves other connection doing successful insert,\n    # main total_changes and main+other total_changes differ => unresolved for channel.\n    # Otherwise, if no other successful insert, both agree => resolved.\n    # Also need to handle update/delete: update changes value, delete removes.\n    # Trigger only on INSERT, so update/delete don't fire trigger.\n    # total_changes counts update/delete rows too.\n    # Let's write simulator.\n    # State: dict key->value for committed, plus transaction state per connection.\n    # Actually transactions: begin on a connection, writes on that connection are in txn.\n    # Other connection can write after commit/rollback. While txn open on main, other can write? \n    # Documentation: \"While a transaction is open, writes and transaction actions use that connection; the other connection can write after commit or rollback.\"\n    # So other cannot write while main txn open? Or can? It says other can write after commit or rollback. So during txn, other writes might be blocked or not allowed. We'll assume actions are valid.\n    # We need to track uncommitted changes per connection.\n    # Since at most 32 actions, simple simulation.\n    # Let's model: committed = {} (key->value).\n    # For each connection, pending = None or dict of changes (key->value or None for delete).\n    # Actually SQLite transaction: changes are applied to database but not committed; other connections don't see them.\n    # For simulation, we can keep a working copy for the transaction.\n    # When begin: pending = copy of committed? Or just track changes.\n    # Simpler: maintain committed dict. For a connection in txn, maintain a local dict of changes.\n    # On put: if key in local changes, apply IGNORE (if key exists in local or committed, ignore).\n    # Actually IGNORE checks against the current view (committed + local changes).\n    # On commit: apply local changes to committed.\n    # On rollback: discard local changes.\n    # For total_changes: count rows changed by each statement.\n    # For INSERT OR IGNORE: if inserted, changes=1 (plus trigger=1 if trigger present). If ignored, changes=0.\n    # For UPDATE: if key exists, changes=1 (no trigger). If not, changes=0.\n    # For DELETE: if key exists, changes=1. If not, 0.\n    # total_changes accumulates across all statements on that connection.\n    # For main total_changes: sum over main connection statements.\n    # For main+other: sum over both.\n    # Trigger: AFTER INSERT inserts one row into log. That's an extra change counted in total_changes.\n    # So each successful insert adds 2 to total_changes (1 for insert, 1 for trigger).\n    # Wait, does total_changes count trigger changes? Yes, total_changes includes changes by triggers.\n    # So insert = 2, update = 1, delete = 1.\n    # Let's verify with receipts: put1 (insert) = 2. put2 ignored = 0. total=2. Yes.\n    # Now committed_count and committed_sum: from committed dict at end.\n    # Note: if sequence ends with open transaction, committed state is what's committed (not including pending).\n    # So we simulate and at end, committed dict is the state.\n    # Let's write code.\n    \n    def simulate(actions, channel_mode):\n        # channel_mode: 'main' or 'both'\n        committed = {}\n        # per connection: txn_active, local_changes (dict key->value or None for delete)\n        # We'll use a simple approach: for each connection, if in txn, we have a working dict.\n        # Actually easier: maintain committed dict, and for each connection a pending dict of changes.\n        # When reading (for IGNORE check), use committed plus pending of that connection.\n        # But other connection's pending not visible.\n        # Let's implement.\n        conns = {'main': {'txn': False, 'pending': {}}, 'other': {'txn': False, 'pending': {}}}\n        total = {'main': 0, 'other': 0}\n        \n        def get_view(conn):\n            # returns dict of key->value visible to this connection\n            view = dict(committed)\n            for k, v in conns[conn]['pending'].items():\n                if v is None:\n                    view.pop(k, None)\n                else:\n                    view[k] = v\n            return view\n        \n        for act in actions:\n            op = act.get('op')\n            conn = act.get('connection', 'main')\n            if op == 'begin':\n                conns[conn]['txn'] = True\n                conns[conn]['pending'] = {}\n            elif op == 'commit':\n                # apply pending to committed\n                for k, v in conns[conn]['pending'].items():\n                    if v is None:\n                        committed.pop(k, None)\n                    else:\n                        committed[k] = v\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'rollback':\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'put':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                if key in view:\n                    # IGNORE: no change\n                    pass\n                else:\n                    # insert\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                    total[conn] += 2  # insert + trigger\n            elif op == 'update':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                    total[conn] += 1\n            elif op == 'delete':\n                key = act['key']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = None\n                    else:\n                        committed.pop(key, None)\n                    total[conn] += 1\n        \n        if channel_mode == 'main':\n            ch = total['main']\n        else:\n            ch = total['main'] + total['other']\n        cnt = len(committed)\n        sm = sum(committed.values())\n        return ch, cnt, sm\n    \n    # Determine put behavior from history: we already inferred IGNORE, trigger, total_changes.\n    # But we should verify with history to be safe. Actually we can just use the model.\n    # However, we need to check if history is consistent with our model.\n    # Let's just use the model. But we must consider ambiguity: channel could be main or both.\n    # Also, could put be REPLACE or UPSERT? Let's check receipts: committed_sum=1 for put1,put2 => first wins => IGNORE.\n    # So put=IGNORE.\n    # Could trigger be absent? Then insert=1, total for put1,put2=1. Observed 2 => trigger present.\n    # Could channel be changes()? changes() for put1=1, put2=0 => last changes=0. Observed 2. No.\n    # So model is fixed except channel mode.\n    \n    # Now for the query, we need to predict goal.\n    # We have context with actions and goal.\n    actions = context.get('actions', [])\n    goal = context.get('goal')\n    \n    # Simulate both channel modes\n    ch_main, cnt_main, sm_main = simulate(actions, 'main')\n    ch_both, cnt_both, sm_both = simulate(actions, 'both')\n    \n    if goal == 'channel':\n        if ch_main == ch_both:\n            return {'value': ch_main, 'unresolved': False}\n        else:\n            return {'value': None, 'unresolved': True}\n    elif goal == 'committed_count':\n        if cnt_main == cnt_both:\n            return {'value': cnt_main, 'unresolved': False}\n        else:\n            return {'value': None, 'unresolved': True}\n    elif goal == 'committed_sum':\n        if sm_main == sm_both:\n            return {'value': sm_main, 'unresolved': False}\n        else:\n            return {'value': None, 'unresolved': True}\n    else:\n        return {'value': None, 'unresolved': True}\n",
+          "scope": "Model: put=INSERT OR IGNORE, AFTER INSERT trigger logging one row, channel=main total_changes or main+other total_changes. Simulate actions to predict channel, committed_count, committed_sum. Unresolved when the two channel modes disagree.",
+          "lesson": "From receipts: repeated put on same key leaves first value (IGNORE). Channel=2 for two puts implies trigger present and total_changes (not changes()). Other connection only did ignored puts, so main vs main+other total_changes is ambiguous; resolve only when they agree."
+        },
+        "accepted": true,
+        "development_score": {
+          "correct": 36,
+          "total": 36,
+          "errors": 0
+        },
+        "feedback": [
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "channel",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 2,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          },
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "committed_count",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          }
+        ],
+        "response_error": null
+      },
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n\n    def simulate(actions, channel_mode):\n        committed = {}\n        conns = {'main': {'txn': False, 'pending': {}}, 'other': {'txn': False, 'pending': {}}}\n        total = {'main': 0, 'other': 0}\n\n        def get_view(conn):\n            view = dict(committed)\n            for k, v in conns[conn]['pending'].items():\n                if v is None:\n                    view.pop(k, None)\n                else:\n                    view[k] = v\n            return view\n\n        for act in actions:\n            op = act.get('op')\n            conn = act.get('connection', 'main')\n            if op == 'begin':\n                conns[conn]['txn'] = True\n                conns[conn]['pending'] = {}\n            elif op == 'commit':\n                for k, v in conns[conn]['pending'].items():\n                    if v is None:\n                        committed.pop(k, None)\n                    else:\n                        committed[k] = v\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'rollback':\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'put':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                if key not in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                    total[conn] += 2\n            elif op == 'update':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                    total[conn] += 1\n            elif op == 'delete':\n                key = act['key']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = None\n                    else:\n                        committed.pop(key, None)\n                    total[conn] += 1\n\n        if channel_mode == 'main':\n            ch = total['main']\n        else:\n            ch = total['main'] + total['other']\n        return ch, len(committed), sum(committed.values())\n\n    actions = context.get('actions', [])\n    goal = context.get('goal')\n\n    ch_main, cnt_main, sm_main = simulate(actions, 'main')\n    ch_both, cnt_both, sm_both = simulate(actions, 'both')\n\n    if goal == 'channel':\n        if ch_main == ch_both:\n            return {'value': ch_main, 'unresolved': False}\n        return {'value': None, 'unresolved': True}\n    if goal == 'committed_count':\n        if cnt_main == cnt_both:\n            return {'value': cnt_main, 'unresolved': False}\n        return {'value': None, 'unresolved': True}\n    if goal == 'committed_sum':\n        if sm_main == sm_both:\n            return {'value': sm_main, 'unresolved': False}\n        return {'value': None, 'unresolved': True}\n    return {'value': None, 'unresolved': True}\n",
+          "scope": "Model: put=INSERT OR IGNORE, AFTER INSERT trigger logging one row, channel=main total_changes or main+other total_changes. Simulate actions to predict channel, committed_count, committed_sum. Unresolved when the two channel modes disagree.",
+          "lesson": "From receipts: repeated put on same key leaves first value (IGNORE). Channel=2 for two puts implies trigger present and total_changes (not changes()). Other connection only did ignored puts, so main vs main+other total_changes is ambiguous; resolve only when they agree."
+        },
+        "accepted": true,
+        "development_score": {
+          "correct": 36,
+          "total": 36,
+          "errors": 0
+        },
+        "feedback": [
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "channel",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 2,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          },
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "committed_count",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          }
+        ],
+        "response_error": null
+      },
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n\n    def simulate(actions, put_mode, trigger, channel_mode):\n        committed = {}\n        conns = {'main': {'txn': False, 'pending': {}}, 'other': {'txn': False, 'pending': {}}}\n        total = {'main': 0, 'other': 0}\n\n        def get_view(conn):\n            view = dict(committed)\n            for k, v in conns[conn]['pending'].items():\n                if v is None:\n                    view.pop(k, None)\n                else:\n                    view[k] = v\n            return view\n\n        for act in actions:\n            op = act.get('op')\n            conn = act.get('connection', 'main')\n            if op == 'begin':\n                conns[conn]['txn'] = True\n                conns[conn]['pending'] = {}\n            elif op == 'commit':\n                for k, v in conns[conn]['pending'].items():\n                    if v is None:\n                        committed.pop(k, None)\n                    else:\n                        committed[k] = v\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'rollback':\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'put':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                changed = 0\n                if put_mode == 'ignore':\n                    if key not in view:\n                        changed = 1\n                        if conns[conn]['txn']:\n                            conns[conn]['pending'][key] = val\n                        else:\n                            committed[key] = val\n                elif put_mode == 'replace':\n                    if key in view:\n                        changed = 2\n                    else:\n                        changed = 1\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                else:\n                    if key in view:\n                        changed = 1\n                    else:\n                        changed = 1\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                if changed:\n                    total[conn] += changed\n                    if trigger:\n                        total[conn] += 1\n            elif op == 'update':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                    total[conn] += 1\n            elif op == 'delete':\n                key = act['key']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = None\n                    else:\n                        committed.pop(key, None)\n                    total[conn] += 1\n\n        if channel_mode == 'main':\n            ch = total['main']\n        else:\n            ch = total['main'] + total['other']\n        return ch, len(committed), sum(committed.values())\n\n    def consistent(put_mode, trigger, channel_mode):\n        for rec in history:\n            acts = rec.get('actions', [])\n            obs = rec.get('observed', {})\n            ch, cnt, sm = simulate(acts, put_mode, trigger, channel_mode)\n            if ch != obs.get('channel'):\n                return False\n            if cnt != obs.get('committed_count'):\n                return False\n            if sm != obs.get('committed_sum'):\n                return False\n        return True\n\n    candidates = []\n    for put_mode in ('ignore', 'replace', 'upsert'):\n        for trigger in (False, True):\n            for channel_mode in ('main', 'both'):\n                if consistent(put_mode, trigger, channel_mode):\n                    candidates.append((put_mode, trigger, channel_mode))\n\n    actions = context.get('actions', [])\n    goal = context.get('goal')\n\n    if not candidates:\n        return {'value': None, 'unresolved': True}\n\n    results = []\n    for put_mode, trigger, channel_mode in candidates:\n        ch, cnt, sm = simulate(actions, put_mode, trigger, channel_mode)\n        if goal == 'channel':\n            results.append(ch)\n        elif goal == 'committed_count':\n            results.append(cnt)\n        elif goal == 'committed_sum':\n            results.append(sm)\n        else:\n            return {'value': None, 'unresolved': True}\n\n    first = results[0]\n    for r in results:\n        if r != first:\n            return {'value': None, 'unresolved': True}\n    return {'value': first, 'unresolved': False}\n",
+          "scope": "Enumerate all 12 family members (put in {IGNORE, REPLACE, UPSERT}, trigger in {absent, present}, channel in {main total_changes, main+other total_changes}), filter by calibration receipts, and return a goal only when all surviving members agree.",
+          "lesson": "Receipts show repeated put keeps first value (IGNORE) and channel=2 for a single successful insert, implying trigger present and total_changes. Other connection only did ignored puts, so main vs main+other total_changes stays ambiguous; resolve only when survivors agree."
+        },
+        "accepted": true,
+        "development_score": {
+          "correct": 36,
+          "total": 36,
+          "errors": 0
+        },
+        "feedback": [
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "channel",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 2,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          },
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "committed_count",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          }
+        ],
+        "response_error": null
+      },
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n\n    def simulate(actions, put_mode, trigger, channel_mode):\n        committed = {}\n        conns = {'main': {'txn': False, 'pending': {}}, 'other': {'txn': False, 'pending': {}}}\n        total = {'main': 0, 'other': 0}\n\n        def get_view(conn):\n            view = dict(committed)\n            for k, v in conns[conn]['pending'].items():\n                if v is None:\n                    view.pop(k, None)\n                else:\n                    view[k] = v\n            return view\n\n        for act in actions:\n            op = act.get('op')\n            conn = act.get('connection', 'main')\n            if op == 'begin':\n                conns[conn]['txn'] = True\n                conns[conn]['pending'] = {}\n            elif op == 'commit':\n                for k, v in conns[conn]['pending'].items():\n                    if v is None:\n                        committed.pop(k, None)\n                    else:\n                        committed[k] = v\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'rollback':\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'put':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                changed = 0\n                if put_mode == 'ignore':\n                    if key not in view:\n                        changed = 1\n                        if conns[conn]['txn']:\n                            conns[conn]['pending'][key] = val\n                        else:\n                            committed[key] = val\n                elif put_mode == 'replace':\n                    if key in view:\n                        changed = 2\n                    else:\n                        changed = 1\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                else:\n                    changed = 1\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                if changed:\n                    total[conn] += changed\n                    if trigger:\n                        total[conn] += 1\n            elif op == 'update':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                    total[conn] += 1\n            elif op == 'delete':\n                key = act['key']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = None\n                    else:\n                        committed.pop(key, None)\n                    total[conn] += 1\n\n        if channel_mode == 'main':\n            ch = total['main']\n        else:\n            ch = total['main'] + total['other']\n        return ch, len(committed), sum(committed.values())\n\n    def consistent(put_mode, trigger, channel_mode):\n        for rec in history:\n            acts = rec.get('actions', [])\n            obs = rec.get('observed', {})\n            ch, cnt, sm = simulate(acts, put_mode, trigger, channel_mode)\n            if ch != obs.get('channel'):\n                return False\n            if cnt != obs.get('committed_count'):\n                return False\n            if sm != obs.get('committed_sum'):\n                return False\n        return True\n\n    candidates = []\n    for put_mode in ('ignore', 'replace', 'upsert'):\n        for trigger in (False, True):\n            for channel_mode in ('main', 'both'):\n                if consistent(put_mode, trigger, channel_mode):\n                    candidates.append((put_mode, trigger, channel_mode))\n\n    actions = context.get('actions', [])\n    goal = context.get('goal')\n\n    if not candidates:\n        return {'value': None, 'unresolved': True}\n\n    results = []\n    for put_mode, trigger, channel_mode in candidates:\n        ch, cnt, sm = simulate(actions, put_mode, trigger, channel_mode)\n        if goal == 'channel':\n            results.append(ch)\n        elif goal == 'committed_count':\n            results.append(cnt)\n        elif goal == 'committed_sum':\n            results.append(sm)\n        else:\n            return {'value': None, 'unresolved': True}\n\n    first = results[0]\n    for r in results:\n        if r != first:\n            return {'value': None, 'unresolved': True}\n    return {'value': first, 'unresolved': False}\n",
+          "scope": "Enumerate all 12 family members (put in {IGNORE, REPLACE, UPSERT}, trigger in {absent, present}, channel in {main total_changes, main+other total_changes}), filter by calibration receipts, and return a goal only when all surviving members agree.",
+          "lesson": "Receipts show repeated put keeps first value (IGNORE) and channel=2 for a single successful insert, implying trigger present and total_changes. Other connection only did ignored puts, so main vs main+other total_changes stays ambiguous; resolve only when survivors agree."
+        },
+        "accepted": true,
+        "development_score": {
+          "correct": 36,
+          "total": 36,
+          "errors": 0
+        },
+        "feedback": [
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "channel",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 2,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          },
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "committed_count",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          }
+        ],
+        "response_error": null
+      },
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    history = acquire(\"history\")\n\n    def simulate(actions, put_mode, trigger, channel_mode):\n        committed = {}\n        conns = {'main': {'txn': False, 'pending': {}}, 'other': {'txn': False, 'pending': {}}}\n        total = {'main': 0, 'other': 0}\n\n        def get_view(conn):\n            view = dict(committed)\n            for k, v in conns[conn]['pending'].items():\n                if v is None:\n                    view.pop(k, None)\n                else:\n                    view[k] = v\n            return view\n\n        for act in actions:\n            op = act.get('op')\n            conn = act.get('connection', 'main')\n            if op == 'begin':\n                conns[conn]['txn'] = True\n                conns[conn]['pending'] = {}\n            elif op == 'commit':\n                for k, v in conns[conn]['pending'].items():\n                    if v is None:\n                        committed.pop(k, None)\n                    else:\n                        committed[k] = v\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'rollback':\n                conns[conn]['txn'] = False\n                conns[conn]['pending'] = {}\n            elif op == 'put':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                changed = 0\n                if put_mode == 'ignore':\n                    if key not in view:\n                        changed = 1\n                        if conns[conn]['txn']:\n                            conns[conn]['pending'][key] = val\n                        else:\n                            committed[key] = val\n                elif put_mode == 'replace':\n                    if key in view:\n                        changed = 2\n                    else:\n                        changed = 1\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                else:\n                    changed = 1\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                if changed:\n                    total[conn] += changed\n                    if trigger:\n                        total[conn] += 1\n            elif op == 'update':\n                key = act['key']\n                val = act['value']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = val\n                    else:\n                        committed[key] = val\n                    total[conn] += 1\n            elif op == 'delete':\n                key = act['key']\n                view = get_view(conn)\n                if key in view:\n                    if conns[conn]['txn']:\n                        conns[conn]['pending'][key] = None\n                    else:\n                        committed.pop(key, None)\n                    total[conn] += 1\n\n        if channel_mode == 'main':\n            ch = total['main']\n        else:\n            ch = total['main'] + total['other']\n        return ch, len(committed), sum(committed.values())\n\n    def consistent(put_mode, trigger, channel_mode):\n        for rec in history:\n            acts = rec.get('actions', [])\n            obs = rec.get('observed', {})\n            ch, cnt, sm = simulate(acts, put_mode, trigger, channel_mode)\n            if ch != obs.get('channel'):\n                return False\n            if cnt != obs.get('committed_count'):\n                return False\n            if sm != obs.get('committed_sum'):\n                return False\n        return True\n\n    candidates = []\n    for put_mode in ('ignore', 'replace', 'upsert'):\n        for trigger in (False, True):\n            for channel_mode in ('main', 'both'):\n                if consistent(put_mode, trigger, channel_mode):\n                    candidates.append((put_mode, trigger, channel_mode))\n\n    actions = context.get('actions', [])\n    goal = context.get('goal')\n\n    if not candidates:\n        return {'value': None, 'unresolved': True}\n\n    results = []\n    for put_mode, trigger, channel_mode in candidates:\n        ch, cnt, sm = simulate(actions, put_mode, trigger, channel_mode)\n        if goal == 'channel':\n            results.append(ch)\n        elif goal == 'committed_count':\n            results.append(cnt)\n        elif goal == 'committed_sum':\n            results.append(sm)\n        else:\n            return {'value': None, 'unresolved': True}\n\n    first = results[0]\n    for r in results:\n        if r != first:\n            return {'value': None, 'unresolved': True}\n    return {'value': first, 'unresolved': False}\n",
+          "scope": "Enumerate all 12 family members (put in {IGNORE, REPLACE, UPSERT}, trigger in {absent, present}, channel in {main total_changes, main+other total_changes}), filter by calibration receipts, and return a goal only when all surviving members agree.",
+          "lesson": "Receipts show repeated put keeps first value (IGNORE) and channel=2 for a single successful insert, implying trigger present and total_changes. Other connection only did ignored puts, so main vs main+other total_changes stays ambiguous; resolve only when survivors agree."
+        },
+        "accepted": true,
+        "development_score": {
+          "correct": 36,
+          "total": 36,
+          "errors": 0
+        },
+        "feedback": [
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "channel",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 2,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          },
+          {
+            "actions": [
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 1
+              },
+              {
+                "connection": "main",
+                "key": "k",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "goal": "committed_count",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "actual": {
+              "value": 1,
+              "unresolved": false
+            },
+            "error": null,
+            "correct": true
+          }
+        ],
+        "response_error": null
+      }
+    ]
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "Complete executable Python program defining investigate(context, acquire), including the function body. Never a label or bare signature."
+      },
+      "scope": {
+        "type": "string",
+        "description": "Short statement of the supported scope."
+      },
+      "lesson": {
+        "type": "string",
+        "description": "Short technical account of the revision."
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson"
+    ],
+    "additionalProperties": false
+  }
+}

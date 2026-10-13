@@ -1,0 +1,83 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "b",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "c",
+        "value": 10
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "d",
+        "value": 20
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "e",
+        "value": 30
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "f",
+        "value": 40
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "g",
+        "value": 50
+      }
+    ]
+  ],
+  "purpose": "Three fresh experiments separating conflict handling, trigger instrumentation, rollback effects on channel counters, and main-vs-other total_changes channel behavior."
+}
