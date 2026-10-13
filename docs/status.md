@@ -1,4 +1,25 @@
-# Current experiment
+# Returned-research audit — 13 October 2026
+
+The [ten-return synthesis](research-returns-20261013.md) has been checked against
+source and the original packet. All 5,532 original manifest entries matched;
+the ten returned prototype suites passed **279 tests** locally. The six original
+candidate forecasts and validation gains reproduced exactly, and the full
+February numerical catalogue was rerun: all 720 permitted target-query forecasts
+are positive. Director's frozen menu can remove at most 8.296% of the original
+loss even with hindsight. Enforcing the reviewed Q1 rejection alone slightly
+worsens that case. These are conditional computational findings, not forecast
+policies or measured learning.
+
+The source supports earlier temporal-meaning errors and an omitted dependency
+from measured repair results to the next inspected Evolve input. The
+[receipt](research-returns-20261013.json) preserves source witnesses, archive
+hashes, numerical results and verification scope. The proposed typed interfaces,
+feedback loop and simpler controller remain unimplemented and untested with a
+new model campaign. All supplied dates remain development evidence. The
+[programme](../program.md#next-experiment-after-the-ten-research-returns) now
+records the recommended order for the next experiment.
+
+# Recorded full-graph experiment
 
 The February financial case completed the full **25-node Lab → 28-node Oracle → three-node Evolve** loop and local replay through the native engine. Oracle received the complete Lab graph and reconstructible original inputs. Every reasoning record has a validated schema and code-bound evidence references.
 

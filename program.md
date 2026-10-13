@@ -9,6 +9,33 @@ owns the current full-graph contracts; [status](docs/status.md) owns measured
 results. The earlier reduced basket experiment and System A fixture remain
 separate evidence.
 
+## Next experiment after the ten research returns
+
+The [13 October synthesis](docs/research-returns-20261013.md) and
+[verification receipt](docs/research-returns-20261013.json) review all ten returns
+against source. Their prototypes and architecture changes remain proposals.
+The first supported teaching target is preservation of temporal meaning:
+trailing observations, predictor age and the future target are distinct.
+
+First compare typed input, an explicit rule and a worked contrast on the same
+reader task, with an unchanged view as reference and legitimate matched-period
+comparisons as controls. Then measure whether the distinction changes a real
+investigation or decision. Keep engineering corrections and numerical references
+common across learning arms. A researcher-supplied lesson is a teaching control,
+not autonomous discovery.
+
+Close Evolve's feedback dependency: the next proposal must receive the measured
+result of its previous edit, and it must be allowed to propose no change. Test
+the exact staged edit rather than another model's paraphrase. Preserve the
+current graph as a named comparator; evaluate the adaptive-controller proposal
+separately with matched tools and resources.
+
+The original February catalogue cannot express a negative forecast, so reversing
+that case's direction is not a valid Director-only instruction target. All packet
+outcomes are now exposed development evidence. New confirmatory work needs a
+separately protected evaluation boundary. This order is research guidance; the
+native runtime below has not yet implemented these returned proposals.
+
 ## Question and task
 
 Can a directed second pass find useful evidence that the first summaries omitted, and can measured comparisons teach it when to perform those investigations?
