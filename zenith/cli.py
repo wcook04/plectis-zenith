@@ -8,13 +8,16 @@ from . import runtime
 
 
 def parser() -> argparse.ArgumentParser:
-    cli = argparse.ArgumentParser(description=__doc__)
+    cli = argparse.ArgumentParser(description=__doc__ + " This is not financial advice. "
+                                  "Experimental research software; see RESEARCH_NOTICE.md.")
     cli.add_argument("--root", type=Path, default=runtime.DEFAULT_ROOT, help="standalone substrate root")
     commands = cli.add_subparsers(dest="command", required=True)
     demo = commands.add_parser("prepare-demo", help="assemble local real inputs with explicit macro/news replacements; no network or model calls")
     demo.add_argument("--earlier-source", type=Path, required=True)
     demo.add_argument("--later-source", type=Path, required=True)
     demo.add_argument("--output", type=Path, required=True)
+    offline = commands.add_parser("demo", help="run a fully synthetic offline teaching example over the native Lab graph; no network or model calls")
+    offline.add_argument("--output", type=Path, required=True, help="new or empty directory; all generated files stay here")
     website = commands.add_parser("serve", help="serve the read-only teaching website API; no provider calls")
     website.add_argument("--host", default="127.0.0.1")
     website.add_argument("--port", type=int, default=4175)
@@ -106,6 +109,9 @@ def dispatch(args) -> dict:
     if args.command == "prepare-demo":
         from .demo import prepare
         return prepare(root, args.earlier_source, args.later_source, args.output)
+    if args.command == "demo":
+        from .offline_example import run
+        return run(root, args.output)
     if args.command == "serve":
         from .web import serve
         return serve(root, host=args.host, port=args.port, local_runs=args.local_runs,
@@ -175,8 +181,10 @@ def main(argv=None) -> int:
         result = dispatch(args)
     except (ValueError, KeyError, OSError, RuntimeError) as exc:
         from system.lib.openrouter_free_runtime import safe_error
-        print(json.dumps({"status": "rejected", "error": safe_error(exc)}))
+        print(json.dumps({"status": "rejected", "error": safe_error(exc),
+                          "notice": "This is not financial advice.", "notice_path": "RESEARCH_NOTICE.md"}))
         return 1
+    result = {**result, "notice": "This is not financial advice.", "notice_path": "RESEARCH_NOTICE.md"}
     print(json.dumps(result, indent=2, ensure_ascii=False, default=str))
     if result.get("ok") is False or result.get("status") == "failed" or result.get("catalogue_status") == "error":
         return 1

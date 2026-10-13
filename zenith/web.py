@@ -21,6 +21,8 @@ class Response:
 
 
 def json_response(value: dict, private: bool = False) -> Response:
+    value = {**value, "notice": "This is not financial advice.",
+             "notice_url": f"{API}/documents/notice"}
     return Response(json.dumps(value, ensure_ascii=False, allow_nan=False).encode(), private=private)
 
 
@@ -102,7 +104,8 @@ class Website:
             return {key: values[0] for key, values in query.items()}
         if path == f"{API}/graph":
             values = options({"mission", "focus"})
-            return json_response(self.content.graph(values.get("mission", "all"), values.get("focus")))
+            return json_response({**self.content.graph(values.get("mission", "all"), values.get("focus")),
+                                  "content_kind": "authored_research_definitions"})
         if path == f"{API}/runs":
             if not self.runs:
                 raise FileNotFoundError("Local records are disabled")
@@ -125,7 +128,8 @@ class Website:
             if kind == "documents":
                 return json_response(self.content.document(identifier))
             if kind == "nodes":
-                return json_response(self.content.node(identifier))
+                return json_response({**self.content.node(identifier),
+                                      "content_kind": "authored_research_definition"})
             if kind == "evidence":
                 return json_response(self.content.evidence(identifier))
         if len(parts) == 4 and parts[0] == "runs" and parts[2] == "nodes":

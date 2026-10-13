@@ -77,6 +77,17 @@ def test_teaching_material_uses_current_sources(website):
     assert site["capabilities"]["execute_model"] is False
 
 
+@pytest.mark.parametrize("path", ["/api/v1/graph", "/api/v1/nodes/lab_director",
+                                  "/api/v1/evidence/replacements", "/api/v1/evidence/demo-result"])
+def test_standalone_api_output_retains_research_notice(website, path):
+    value = json.loads(website.get(path).body)
+    assert value["notice"] == "This is not financial advice."
+    notice = json.loads(website.get(value["notice_url"]).body)
+    assert notice["content"] == (ROOT / "RESEARCH_NOTICE.md").read_text()
+    if path in ("/api/v1/graph", "/api/v1/nodes/lab_director"):
+        assert value["content_kind"].startswith("authored_research_definition")
+
+
 def test_public_http_head_etag_and_private_exclusion(server):
     status, headers, pdf = request(server, "/assets/paper.pdf")
     assert status == 200 and pdf.startswith(b"%PDF")
