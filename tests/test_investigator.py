@@ -154,6 +154,10 @@ def test_native_complete_loop_exact_feedback_and_whole_replay(setup,tmp_path):
         outcome=panel.outcome(dates[550]);policy=investigation_policy(DEFAULT_PROCEDURE)
         feed=review_feed(tmp_path/'review',subject,policy,outcome,[])
         audit=read(feed,'investigator_review_feed')['decision_audit']
+        capability=read(feed,'investigator_review_feed')['capability_audit']
+        assert capability['legal_recipe_count']==21
+        assert capability['executed_comparisons']==1
+        assert capability['untried_recipe_count']==20
         for row in audit['rows']:
             options=row['ordered_available_options']
             assert [o['validation_mse'] for o in options]==sorted(o['validation_mse'] for o in options)
@@ -209,7 +213,7 @@ def test_documented_coordinator_uses_same_native_path(setup,tmp_path,no_change):
     env=tmp_path/'local.env';env.write_text('# no external calls in this fixture\n')
     dest=tmp_path/'episode';Fixture.invalid=False
     with patch.object(study,'Panel',return_value=panel),patch.object(runtime,'DEFAULT_ROOT',root),patch.object(runtime,'provider_for',side_effect=lambda d,s:EpisodeFixture(d)):
-        study.prepare(panel.folder,dest,cutoff=dates[550])
+        study.prepare(panel.folder,dest,model="deepseek/fixture",cutoff=dates[550])
         result=study.run(dest,env)
         assert result['feedback_delivered_exactly'] and not result['adopted']
         assert (result['candidate'] is None)==no_change

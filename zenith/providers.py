@@ -9,6 +9,7 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from .provider_policy import require_model, serialized_inference
 
 
 def digest(value: Any) -> str:
@@ -152,13 +153,15 @@ class CapturedProvider(Provider):
 class OpenRouterFreeProvider(Provider):
     """Explicit, free-only API calls with durable requested/actual model receipts."""
 
-    def __init__(self, run_dir: Path, model: str = "openrouter/free", caller=None):
+    def __init__(self, run_dir: Path, model: str | None = None, caller=None):
         super().__init__(run_dir)
-        if model != "openrouter/free" and not model.endswith(":free"):
-            raise ValueError("OpenRouter adapter permits only openrouter/free or :free model IDs")
+        require_model(model)
+        if not model.endswith(":free"):
+            raise ValueError("OpenRouter free adapter requires an explicit allowlisted :free model ID")
         self.model = model
         self.caller = caller
 
+    @serialized_inference
     def ask_ai(self, prompt: str, config: dict | None = None, cancel=None) -> str:
         identity = self.identity(prompt, config)
         call_id = digest({**identity, "requested_model": self.model})
@@ -190,6 +193,7 @@ class OpenRouterFreeProvider(Provider):
                                            "temperature": 0, "max_tokens": 12000, "timeout_s": 120})
             from system.lib.openrouter_free_runtime import redact
             packet = redact(packet)
+            require_model(packet.get("model"))
             response = packet["response_text"]
             record.update(status="response_supplied", provider_receipt=packet)
             write_json(call_path, record)
@@ -234,61 +238,5 @@ class NvidiaNimProvider(Provider):
     """Own-key NVIDIA hosted NIM connector; model and account access are explicit."""
     def __init__(self, run_dir: Path, model: str, caller=None):
         super().__init__(run_dir)
-        if not isinstance(model, str) or not model.strip():
-            raise ValueError("nvidia_nim requires an explicit --model from NVIDIA's current catalogue")
-        if "/" not in model or any(character.isspace() for character in model):
-            raise ValueError("NVIDIA model must be an explicit namespace/model ID")
-        self.model = model.strip()
-        self.caller = caller or _nvidia_http_post
-
-    def ask_ai(self, prompt: str, config: dict | None = None, cancel=None) -> str:
-        from system.lib.openrouter_free_runtime import redact, safe_error
-        identity = self.identity(prompt, config)
-        call_id = digest({**identity, "requested_model": self.model, "provider": "nvidia_nim"})
-        path = self.run_dir / "handoff" / "api_calls" / "nvidia_nim" / (call_id + ".json")
-        with self._lock:
-            if path.exists():
-                previous = json.loads(path.read_text())
-                if previous.get("status") == "response_supplied":
-                    packet = previous["provider_receipt"]
-                    self.receipt(identity, provider="nvidia_nim", status="loaded_previous_response",
-                                 requested_model=self.model, actual_model=packet.get("model"),
-                                 endpoint=NVIDIA_ENDPOINT, usage=packet.get("usage"), cost=None)
-                    return packet["response_text"]
-                raise RuntimeError("this exact NVIDIA attempt already failed or was interrupted; it will not be silently resent")
-            record = {"schema": "zenith_api_call_v1", **identity, "provider": "nvidia_nim",
-                      "requested_model": self.model, "endpoint": NVIDIA_ENDPOINT, "status": "attempt_started", "recorded_at": now()}
-            write_json(path, redact(record))
-        self.receipt(identity, provider="nvidia_nim", status="attempt_started", requested_model=self.model,
-                     actual_model=None, endpoint=NVIDIA_ENDPOINT, usage=None, cost=None)
-        try:
-            if cancel is not None and cancel.is_set():
-                raise RuntimeError("NVIDIA provider call cancelled")
-            token = str(os.environ.get("NVIDIA_API_KEY") or "").strip()
-            if not token:
-                raise RuntimeError("NVIDIA_API_KEY is not configured")
-            data = self.caller(NVIDIA_ENDPOINT, {"Authorization": "Bearer " + token, "Content-Type": "application/json"},
-                               {"model": self.model, "messages": [{"role": "user", "content": prompt}],
-                                "stream": False, "temperature": 0, "max_tokens": 12000}, 120)
-            choices = data.get("choices", [])
-            if not choices or not isinstance(choices[0], dict):
-                raise RuntimeError("NVIDIA response did not include a valid choice")
-            text = choices[0].get("message", {}).get("content")
-            if not isinstance(text, str) or not text.strip():
-                raise RuntimeError("NVIDIA response did not include nonempty assistant content")
-            packet = redact({"model": data.get("model"), "requested_model": self.model,
-                             "response_text": text, "usage": data.get("usage"), "cost": None,
-                             "endpoint": NVIDIA_ENDPOINT, "generation_id": data.get("id")}, secrets=(token,))
-            record.update(status="response_supplied", provider_receipt=packet)
-            write_json(path, record)
-            self.receipt(identity, provider="nvidia_nim", status="response_supplied", requested_model=self.model,
-                         actual_model=packet["model"], endpoint=NVIDIA_ENDPOINT, usage=packet["usage"], cost=None,
-                         response_sha256=text_digest(packet["response_text"]))
-            return packet["response_text"]
-        except Exception as exc:
-            message = safe_error(exc)
-            record.update(status="failed", error=message)
-            write_json(path, redact(record))
-            self.receipt(identity, provider="nvidia_nim", status="failed", requested_model=self.model,
-                         actual_model=None, endpoint=NVIDIA_ENDPOINT, usage=None, cost=None, error=message)
-            raise RuntimeError(message) from None
+        require_model(model)
+        raise ValueError("NVIDIA hosted route has unverified pricing; use the price-verified budgeted route")

@@ -177,7 +177,7 @@ def provider_for(run_dir: Path, spec: dict):
     if name == "captured":
         return CapturedProvider(run_dir, Path(spec["responses"]))
     if name == "openrouter_free":
-        return OpenRouterFreeProvider(run_dir, spec.get("model") or "openrouter/free")
+        return OpenRouterFreeProvider(run_dir, spec.get("model"))
     if name == "nvidia_nim":
         return NvidiaNimProvider(run_dir, spec.get("model"))
     if name == "openrouter_budgeted":
@@ -331,7 +331,7 @@ def start(root: Path, *, mission: str, run_id: str, provider: str = "agent", tar
         raise ValueError("nvidia_nim requires an explicit --model")
     if provider == "openrouter_free" and not model:
         import os
-        model = os.environ.get("OPENROUTER_CHAT_MODEL") or "openrouter/free"
+        model = os.environ.get("OPENROUTER_CHAT_MODEL")
     paid_budget = None
     if provider == "openrouter_budgeted":
         from .budgeted import budget_options, normalize_provider_slug

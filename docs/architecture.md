@@ -1,3 +1,7 @@
+# Active and historical architectures
+
+The active adaptive investigator is specified in [the native method](investigator.md). Its bounded action/result graph is generated per profile and records actual execution. The retained default graph documented below is a historical comparison and teaching fixture. New provider policy applies to every live profile; old execution receipts remain unchanged.
+
 # Architecture
 
 **Experimental research prototype.** The active financial profile runs the full

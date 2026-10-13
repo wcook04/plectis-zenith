@@ -4,6 +4,10 @@ Read README.md and program.md. The active research unit is one adaptive Lab inve
 
 ## Execution and evidence
 
+Experimental API inference uses only inexpensive Chinese-developed models from the current official catalogue. GPT-4.1 and all other non-allowlisted families are banned in `zenith/provider_policy.py`; do not bypass this policy or switch to an expensive host after failure. Prefer the newest compatible cheap release. Price ceilings are $0.50 input and $1.50 output per million tokens, with no per-request fee or paid fallback. Inference is serialized across threads, processes, runs and checkouts on this host. Explicit pinned routes use their verified tariff, not a model page's minimum price. Start with the scored decision audit and one capped native smoke before a larger campaign.
+
+Review evidence is losslessly deduplicated, never silently truncated. Preserve and reconstruct original request hashes. Report correctness of interpretation, available actions, behaviour change and later predictive score separately. A model's unsupported repair hypothesis must not become an adopted rule. Do not expand a graph or lower the success criterion after seeing outcomes merely to produce a favourable result.
+
 Use the existing engine, providers, budgets, numerical store and evaluator. Every basket can use the entire permitted universe; feed partitions must not isolate targets. Code owns quantities, candidate IDs, target mappings and complete forecast vectors. The financial investigator's references are explicit options, not fallback forecasts after invalid output.
 
 Preserve observation and availability cutoffs, label maturity, quote ages, basket lineage and frozen horizons. Separate historical and synthetic evidence. Constructed baskets are not traded ETFs; price histories do not establish market causes. RESEARCH_NOTICE.md owns the research boundary.

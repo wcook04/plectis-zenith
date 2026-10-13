@@ -1,3 +1,11 @@
+# Cheap-model repair and calibration — 13 October 2026
+
+The [repair report](model-repair-20261013.md) and [cost receipt](model-repair-20261013.json) record the current engineering baseline. New experiments enforce inexpensive Chinese-developed models, verified tariff ceilings and host-wide serialized inference. GPT-4.1 is banned. Lossless reviewer inputs remove repeated evidence, and the capability inventory distinguishes all legal recipes from the subset already tried.
+
+Thirteen modern-model calls cost **$0.046824887272**. DeepSeek completed the native Lab with unchanged zero forecasts and passed 16/16 component questions in valid format. Qwen answered the same questions correctly but violated the object schema; that attempt remains a format failure. A later Qwen review returned no change, while still making a false directional claim. No procedure was adopted, and no predictive or learning improvement is established. These are different workloads, not a controlled aggregate model comparison.
+
+The next research task is to identify a useful, information-sufficient decision and a decisive test of learned improvement. The market case and every previous failed run remain development evidence below.
+
 # Native adaptive investigator — 13 October 2026
 
 The new profile runs one answer-conditioned investigator through inspect, compare and commit, followed by one graph-aware diagnosis/procedure proposal, complete unchanged/candidate replay, and a review receiving the exact measured result. [Method](investigator.md), [three-page paper](../paper/zenith.pdf) and [curated evidence receipt](investigator-evidence.json) describe this active design.
@@ -8,7 +16,7 @@ The reviewer incorrectly ranked larger MSEs below smaller ones and proposed an u
 
 A separately frozen reviewer-interface correction supplied code-owned ordering, explicit feedback instructions and phase-specific decisions. **One additional call**, costing **$0.375084**, withdrew the false ordering diagnosis and rejected the proposal. It still treated an advisory default as mandatory and incorrectly placed the candidate commitment at turn three rather than four. This is a limited engineering result, not reliable semantic review or autonomous improvement. Total reported cost: **$1.618656 across 13 calls**; no automatic retries.
 
-The current retained suite passes **410 tests**. The original experiment and revised interface have separate source archives and input hashes in the evidence receipt. Private raw runs remain local. All exposed packet cases remain development evidence.
+At that historical checkpoint the retained suite passed **410 tests**. The original experiment and revised interface have separate source archives and input hashes in the evidence receipt. Private raw runs remain local. All exposed packet cases remain development evidence.
 
 # Returned-research audit — 13 October 2026
 

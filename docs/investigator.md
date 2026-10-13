@@ -20,7 +20,7 @@ A proposal supplies a witness, an alternative account, the exact replacement, a 
 
 The exact measured repair receipt enters the next actual reviewer request. The coordinator verifies both the structured input and its serialized presence in the provider prompt. Failures and adverse results remain evidence. Candidate retention is a recorded recommendation for further evaluation; nothing is automatically adopted.
 
-## Run one complete episode
+## Run a small first episode
 
 From the repository root, with the research dependencies installed:
 
@@ -28,12 +28,12 @@ From the repository root, with the research dependencies installed:
 python -m zenith plan lab --task-profile financial_investigator_v1
 python -m research.investigator_study prepare \
   --data work/data/nepse-through-2025-final \
-  --study work/investigator-development --model openai/gpt-4.1
+  --study work/investigator-development --smoke
 python -m research.investigator_study run \
   --study work/investigator-development --env-file /path/to/local.env
 ```
 
-Preparation is offline. The runner freezes input hashes, runtime implementation, model, procedure, budget and schedule. Run uses one shared $5 maximum and 26 attempted-call maximum. The schedule is subject → review → unchanged control → candidate if proposed → receipt-bearing review. Invalid responses are terminal and never automatically resampled. Reinvocation consumes already completed artifacts; a failed attempt stays failed.
+Preparation makes no inference call; automatic model selection checks the live catalogue. An explicit allowed model can be supplied for an offline preparation. The runner freezes input hashes, runtime implementation and source archive, model, procedure, budget and schedule. Run uses one shared $0.25 maximum and, in the shown smoke mode, at most nine calls: Lab then one review, without candidate replay. Omit `--smoke` for the full 26-call schedule. The schedule is subject → review → unchanged control → candidate if proposed → receipt-bearing review. Invalid responses are terminal and never automatically resampled. Reinvocation consumes already completed artifacts; a failed attempt stays failed.
 
 Native direct run/prepare and agent handoff also support this profile. Whole-Lab procedure replay uses `--replay-from <subject> --replay-node investigator_entry`. The old financial local-node replay keeps its original rules.
 
@@ -65,3 +65,23 @@ It makes at most one call, preserves the old evidence, freezes the new interface
 - `tests/test_investigator.py`: synthetic engineering witnesses, never model-learning evidence.
 
 The ten further responses agree on the adaptive loop and measured feedback. They differ on numerical recipes and whether diagnosis/proposal need separate calls. This version takes one coherent representation-comparison family, keeps one numerical implementation, combines diagnosis and exact edit in one response, and records the programme that actually executes. It does not merge ten independent frameworks.
+
+
+## Model policy and review context
+
+The [model repair report](model-repair-20261013.md) records the subsequent cheap-model runs and their limitations. All live adapters enforce the model allowlist; paid requests verify tariff ceilings and interface capabilities. Automatic selection prefers the newest eligible release. One host-wide lock serializes inference; unavailable endpoints stop without a model fallback. Pin a verified endpoint with `--provider-slug` when an experiment needs fixed hosting. These controls apply even to old study protocols if someone attempts to execute them again.
+
+Review contract `zenith_investigator_review_v4_capability` uses a lossless evidence bank with reconstructible original requests, explicit legal source/summary combinations and comparison allowance. It distinguishes observed defects from future preventive ideas. A larger context or a valid schema does not guarantee a correct diagnosis.
+
+A new, explicitly versioned review of an already completed Lab can be prepared and run without repeating the Lab:
+
+    python -m research.investigator_study review-only \
+      --previous work/investigator-development --study work/review-new-version \
+      --env-file /path/to/local.env --max-cost-usd 0.08
+
+The previous failure remains recorded. A separate component calibration costs at most $0.01 and permits one attempt:
+
+    python -m research.decision_audit --output work/decision-audit \
+      --env-file /path/to/local.env
+
+This is an interpretation and format check on supplied facts. It is not a forecast or learning benchmark; code already supplies its perfect reference. Do not promote its answer key into the provider's input or repair malformed output invisibly.

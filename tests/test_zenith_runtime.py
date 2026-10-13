@@ -335,15 +335,15 @@ class FreeProviderTests(unittest.TestCase):
             seen = []
             def call(prompt, config):
                 seen.append(config)
-                return {"response_text": "synthetic", "model": "actual/model:free", "usage": {"total_tokens": 7}, "cost": 0}
-            provider = OpenRouterFreeProvider(run, caller=call)
+                return {"response_text": "synthetic", "model": "qwen/actual-model:free", "usage": {"total_tokens": 7}, "cost": 0}
+            provider = OpenRouterFreeProvider(run, model="qwen/fixture:free", caller=call)
             self.assertEqual(provider.ask_ai("hello", {"meta": {"node_id": "lab_seed_state", "session_id": "RUN"}}), "synthetic")
             self.assertTrue(seen[0]["free_only"])
             self.assertFalse(seen[0]["allow_paid"])
             receipts = [json.loads(path.read_text()) for path in (run / "handoff/receipts").glob("*.json")]
             returned = next(row for row in receipts if row["status"] == "response_supplied")
-            self.assertEqual(returned["actual_model"], "actual/model:free")
-            self.assertEqual(returned["requested_model"], "openrouter/free")
+            self.assertEqual(returned["actual_model"], "qwen/actual-model:free")
+            self.assertEqual(returned["requested_model"], "qwen/fixture:free")
             self.assertEqual(returned["usage"]["total_tokens"], 7)
             provider.ask_ai("hello", {"meta": {"node_id": "lab_seed_state", "session_id": "RUN"}})
             self.assertEqual(len(seen), 1, "resume must reuse the durable response without another API attempt")
@@ -355,12 +355,12 @@ class FreeProviderTests(unittest.TestCase):
                 count.append(1)
                 raise RuntimeError("synthetic network failure")
             run = Path(directory) / "RUN"
-            provider = OpenRouterFreeProvider(run, caller=fail)
+            provider = OpenRouterFreeProvider(run, model="qwen/fixture:free", caller=fail)
             config = {"meta": {"node_id": "lab_seed_state", "session_id": "RUN"}}
             with self.assertRaisesRegex(RuntimeError, "synthetic network failure"):
                 provider.ask_ai("prompt", config)
             with self.assertRaisesRegex(RuntimeError, "not be silently resent"):
-                OpenRouterFreeProvider(run, caller=fail).ask_ai("prompt", config)
+                OpenRouterFreeProvider(run, model="qwen/fixture:free", caller=fail).ask_ai("prompt", config)
             self.assertEqual(len(count), 1)
 
 

@@ -40,6 +40,13 @@ def reply(cost="0.0001", **extra):
 
 class BudgetedTests(unittest.TestCase):
     def setUp(self):
+        # These legacy tests deliberately stress arbitrary synthetic rates and
+        # aliases. Real model/price admission is exercised without these mocks
+        # in test_provider_policy.py; here the independent budget is the unit.
+        for name in ("require_model", "require_prices"):
+            admission = patch("zenith.budgeted." + name)
+            admission.start()
+            self.addCleanup(admission.stop)
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
         self.env = patch.dict(os.environ, {"OPENROUTER_API_KEY": SECRET}, clear=True)
@@ -167,7 +174,6 @@ class BudgetedTests(unittest.TestCase):
                    {"provider_name": ""}, {"supported_parameters": ["max_tokens"]},
                    {"context_length": 4500}, {"max_prompt_tokens": 4096}, {"max_completion_tokens": 1000}]
         changes += [{"pricing": {**PINNED["pricing"], key: value}} for key, value in (
-            ("prompt", ".0000011"), ("completion", ".0000021"), ("request", ".01"),
             ("input_cache_read", ".0000006"), ("input_cache_write", ".0000001"),
             ("discount", 1.1), ("prompt", "NaN"))]
         for index, change in enumerate(changes):

@@ -71,9 +71,13 @@ class InvestigatorEngine(GodModeEngine):
         prompt,config = super().prepare_reasoning_prompt(node,inputs,config)
         if node.id == "investigator_review":
             packet = inputs["investigator_review_feed"]["data"]
+            from .review_context import compact_subject, compact_json
+            view = {**packet, "subject": compact_subject(packet["subject"])}
+            prompt = "REVIEW_EVIDENCE\n" + compact_json(view)
             feedback = bool(packet["repair_history"])
             schema = review_schema(list(packet["subject"]["graph"]),packet["baskets"],feedback)
             system = REVIEW_INSTRUCTION+"\nCONTRACT: "+REVIEW_CONTRACT
+            system += "\nThe subject uses lossless evidence references. Every original input, output, system instruction and exact prompt is reconstructible from the bank and bindings. Do not mistake deduplicated references for missing evidence."
             if feedback:
                 system += "\nACTIVE TASK NOW: assess the tested proposal using repair_history at the start of the input. This is NOT a fresh initial diagnosis. State what the control and candidate actually did, including unchanged results, then reject, revise, retain_for_evaluation or no_change. A repeated initial proposal is not a continuation. Check the code-owned decision_audit before asserting numerical ordering; the default reference is advisory, not a requirement to minimize every displayed MSE. If your earlier diagnosis is contradicted, withdraw it explicitly. Do not infer semantic success from a signature alone."
             else:

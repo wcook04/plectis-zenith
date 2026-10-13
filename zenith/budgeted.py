@@ -13,6 +13,7 @@ from pathlib import Path
 
 from system.lib import openrouter_free_runtime as api
 from .providers import Provider, digest, now, text_digest, write_json
+from .provider_policy import require_model, require_prices, serialized_inference
 
 ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 INPUT_OVERHEAD_TOKENS = 4096
@@ -80,6 +81,7 @@ def reservation_prices(pricing):
 
 
 def budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir):
+    require_model(model)
     if not isinstance(model, str) or "/" not in model or any(c.isspace() for c in model):
         raise ValueError("openrouter_budgeted requires an explicit namespace/model ID")
     if model.startswith("openrouter/") or ":" in model:
@@ -95,6 +97,7 @@ def budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir
 
 
 def verified_model(model: str, *, http_get=None):
+    require_model(model)
     matches = [row for row in api._catalogue_rows(http_get=http_get) if row.get("id") == model]
     if len(matches) != 1:
         raise RuntimeError("budgeted model must exist exactly once in the current public catalogue")
@@ -103,6 +106,7 @@ def verified_model(model: str, *, http_get=None):
     if not isinstance(pricing, dict) or not {"prompt", "completion"} <= pricing.keys():
         raise RuntimeError("budgeted model lacks known prompt/completion pricing")
     prices = reservation_prices(pricing)
+    require_prices(prices)
     if prices.get("input_cache_read", Decimal(0)) > prices["prompt"]:
         raise RuntimeError("cached input read price must not exceed the full prompt price")
     for key, value in prices.items():
@@ -143,14 +147,16 @@ def verified_endpoint(model, slug, prices, *, parameters, http_get=None):
         raise RuntimeError("pinned endpoint lacks known prompt/completion pricing")
     # OpenRouter's endpoint discount is descriptive metadata, not a fee.
     rates = reservation_prices({k: v for k, v in pricing.items() if k != 'discount'})
+    require_prices(rates)
     if "discount" in pricing and amount(pricing["discount"], "endpoint discount") > 1:
         raise RuntimeError("pinned endpoint discount metadata is invalid")
     if rates.get("input_cache_read", Decimal(0)) > rates["prompt"]:
         raise RuntimeError("pinned endpoint cached input price exceeds full prompt price")
     if any(v != 0 for k, v in rates.items() if k not in ("prompt", "completion", "request", "input_cache_read")):
         raise RuntimeError("pinned endpoint has unsupported ancillary charges")
-    if any(rates.get(k, Decimal(0)) > prices.get(k, Decimal(0)) for k in ("prompt", "completion", "request")):
-        raise RuntimeError("pinned endpoint pricing exceeds model catalogue reservation rates")
+    # The catalogue advertises a model's cheapest route. A pinned route may
+    # have a different (still policy-capped) tariff; reserve that exact tariff
+    # below instead of mistaking the catalogue minimum for every host's price.
     positive_int(endpoint.get("context_length"), "endpoint context_length")
     positive_int(endpoint.get("max_completion_tokens"), "endpoint max_completion_tokens")
     if endpoint.get("max_prompt_tokens") is not None:
@@ -361,6 +367,7 @@ class OpenRouterBudgetedProvider(Provider):
             raise RuntimeError("a paid node already had its single attempt; repair prompts and retries are disabled")
         return None
 
+    @serialized_inference
     def ask_ai(self, prompt: str, config: dict | None = None, cancel=None) -> str:
         system_prompt=(config or {}).get("system_prompt")
         if system_prompt is not None and not isinstance(system_prompt,str):raise ValueError("system_prompt must be text")
@@ -386,6 +393,7 @@ class OpenRouterBudgetedProvider(Provider):
         api._official_base_url()
         token = api._resolve_api_key(None)
         row, prices, context_length = verified_model(self.model, http_get=self.catalogue_get)
+        catalogue_prices = dict(prices)
         if response_format is not None and not {"response_format","structured_outputs"} <= set(row["supported_parameters"]):
             raise RuntimeError("model must advertise structured output and response_format support")
         endpoint = None
@@ -393,6 +401,9 @@ class OpenRouterBudgetedProvider(Provider):
             parameters = ["max_tokens", "temperature"] + (["response_format","structured_outputs"] if response_format is not None else []) + (["reasoning"] if "reasoning" in row["supported_parameters"] else [])
             endpoint = verified_endpoint(self.model, self.provider_slug, prices, parameters=parameters,
                                          http_get=self.catalogue_get)
+            endpoint_prices = reservation_prices({k:v for k,v in endpoint["pricing"].items() if k != "discount"})
+            prices = {k:max(prices.get(k,Decimal(0)),endpoint_prices.get(k,Decimal(0))) for k in prices.keys() | endpoint_prices.keys()}
+            require_prices(prices)
             context_length = min(context_length, endpoint["context_length"])
         # One token per UTF8 byte plus a disclosed conservative framing allowance.
         input_bound = len(prompt.encode("utf-8")) + len((system_prompt or "").encode("utf-8")) + (len(json.dumps(response_format).encode()) if response_format else 0) + INPUT_OVERHEAD_TOKENS
@@ -415,7 +426,8 @@ class OpenRouterBudgetedProvider(Provider):
                   "reserved_cost_usd": str(reservation), "input_token_bound": input_bound,
                   "input_bound_method": "UTF8 bytes plus 4096 framing tokens",
                   "max_output_tokens": output_bound, "context_length": context_length,
-                  "catalogue_pricing": {k: str(v) for k, v in prices.items()},
+                  "catalogue_pricing": {k: str(v) for k, v in catalogue_prices.items()},
+                  "reservation_pricing": {k: str(v) for k, v in prices.items()},
                   "catalogue_sha256": digest(row), "budget_dir": str(self.budget_dir)}
         if endpoint is not None:
             record.update(requested_provider_slug=self.provider_slug, verified_provider_name=endpoint["provider_name"],
@@ -475,6 +487,7 @@ class OpenRouterBudgetedProvider(Provider):
             actual_model = data.get("model")
             if not isinstance(actual_model, str) or not actual_model.strip():
                 raise RuntimeError("paid response omitted actual model identity")
+            require_model(actual_model)
             actual_provider = data.get("provider")
             record["actual_provider"] = actual_provider
             if endpoint is not None and actual_provider != endpoint["provider_name"]:

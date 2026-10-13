@@ -21,6 +21,7 @@ DOCUMENTS = {
     "diagnosis": "docs/failure-diagnosis.md",
     "reasoning-ontology": "docs/reasoning-ontology.md",
     "investigator": "docs/investigator.md",
+    "model-repair": "docs/model-repair-20261013.md",
     "worked-case": "docs/full-graph-case.md",
     "research-direction": "docs/research-direction.md",
     "walkthrough": "docs/zenith-walkthrough-script.md",
@@ -28,6 +29,7 @@ DOCUMENTS = {
 }
 EVIDENCE = {
     "investigator-result": "docs/investigator-evidence.json",
+    "model-repair-result": "docs/model-repair-20261013.json",
     "sources": "examples/demo/provenance.json",
     "replacements": "examples/demo/replacements.json",
     "demo-result": "examples/demo/result.json",
@@ -55,7 +57,7 @@ CHAPTERS = (
 )
 CHAPTER_EVIDENCE = {
     "idea": (), "lab": (), "oracle": ("investigator-result",), "evolve": ("investigator-result",),
-    "results": ("investigator-result",), "next": (),
+    "results": ("model-repair-result", "investigator-result",), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
                   "evolve": "trace", "results": "results", "next": "research"}

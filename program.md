@@ -1,6 +1,6 @@
 # Zenith research programme
 
-The active design is one competent adaptive investigator, one graph-aware reviewer, and a controlled test of one reusable investigation procedure. The question is whether a supported diagnosis can improve what the investigator does on further cases. A successful first forecast is neither necessary nor sufficient.
+The active design is one competent adaptive investigator, one graph-aware reviewer, and a controlled test of one reusable investigation procedure. The question is whether a supported diagnosis can improve what the investigator does on further cases. A successful first forecast is neither necessary nor sufficient. The next task must make a useful decision that the supplied evidence can support; market return prediction is a retained stress test, not an assumed final objective.
 
 The [paper](paper/zenith.pdf) explains the research. [Native investigator](docs/investigator.md) owns the executable method; [status](docs/status.md) and its linked receipts own measured results.
 
@@ -18,12 +18,20 @@ Evaluate these claims separately:
 
 1. The exact change executed and its measured consequence reached the next review.
 2. The intended behaviour changed beyond ordinary repeated-execution variation.
-3. The full forecast vector improved under the declared loss and cost accounting.
+3. The task outcome improved under the declared loss and cost accounting (the full forecast vector for the retained market task).
 4. A frozen reusable change transferred to protected further cases, without hiding failures or regressions.
 
 The first native episode establishes the first claim only. Its reviewer made a false numerical diagnosis and repeated it after unchanged replay. Correcting the review interface creates a new engineering version; it does not demonstrate autonomous learning.
 
 The numerical comparator and unchanged adaptive investigator are the essential controls. Match observations, tools and budgets when comparing architectures; explicitly disclose unmatched search allowances. Do not build a separate neural controller, enlarge the graph or add reasoning fields until a measured limitation justifies that complexity.
+
+## Next research: ambition with an observable learning signal
+
+The [modern-model calibration](docs/model-repair-20261013.md) separates basic interpretation from long-context review, format compliance and downstream value. Cheap inference removes one obstacle; it does not choose a suitable task or make diagnoses true.
+
+The next research round is an open redesign of the central theory: what can accumulate across Lab, Oracle and Evolve that makes the system increasingly capable? Investigate learned concepts, adaptive investigation, compositional reasoning and repair, and an executable body of theory; an independent challenger may replace this framing altogether. Each proposal should be a complete, ambitious account of the whole system, not one isolated engineering component. Ranking, investigation selection and forecast triage are candidates. Do not settle for a toy merely because it produces clean scores, or keep financial prediction merely because it is already implemented.
+
+A good proposal should expose the information needed at decision time, a real user of the output, a strong code-only or one-call baseline, and an affordable failure test. A more ambitious task or architecture is welcome when it earns its complexity. Novelty and practical value require evidence; neither follows from the Lab/Oracle/Evolve naming or cheap calls.
 
 ## Evaluation boundary
 

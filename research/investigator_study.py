@@ -13,19 +13,37 @@ from zenith.basket_panel import Panel, investigator_snapshot, InvestigationStore
 from zenith.investigator import read, subject_record
 from zenith.investigator_contracts import PROFILE, REVIEW_CONTRACT, DEFAULT_PROCEDURE, MAX_TURNS
 from system.lib.reasoning_policy import investigation_policy
+from zenith.provider_policy import latest_model, require_model
 
 
 def load(path):
     return json.loads(Path(path).read_text())
 
 
-def prepare(data, study, model="openai/gpt-4.1", cutoff="2025-02-02", max_cost_usd="5"):
+def archive_runtime(study):
+    """Save the exact executable sources before another experiment can edit them."""
+    from zipfile import ZipFile, ZIP_DEFLATED
+    root=Path(runtime.__file__).resolve().parents[1]
+    paths=set(runtime.implementation_hashes())
+    paths.update(str(p.relative_to(root)) for p in (root/'research').rglob('*.py'))
+    paths.update(str(p.relative_to(root)) for p in (root/'codex').rglob('*.json'))
+    paths.add('master_config.json')
+    target=Path(study)/'runtime-source.zip'
+    with ZipFile(target,'x',compression=ZIP_DEFLATED) as archive:
+        for relative in sorted(paths):archive.write(root/relative,relative)
+    return {'path':str(target),'sha256':sha256(target),'scope':'Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads'}
+
+
+def prepare(data, study, model=None, cutoff="2025-02-02", max_cost_usd="0.25", *, provider_slug=None, smoke=False):
+    model = model or latest_model()
+    require_model(model)
     study = Path(study).resolve()
     if study.exists():
         raise ValueError("study exists; use a new identity rather than overwrite evidence")
     panel = Panel(data)
     i = panel.cutoff_index(cutoff)
     study.mkdir(parents=True)
+    runtime_archive=archive_runtime(study)
     source = study/"input"
     investigator_snapshot(panel,cutoff,source)
     # A genuinely calculated earlier example, shared by every arm. No outcome is
@@ -47,7 +65,7 @@ def prepare(data, study, model="openai/gpt-4.1", cutoff="2025-02-02", max_cost_u
     write_json(study/"incumbent-policy.json",policy)
     protocol = {"schema":"zenith_investigator_study_v1","task_profile":PROFILE,"data":str(Path(data).resolve()),
         "root":str(runtime.DEFAULT_ROOT),"case":{"cutoff":cutoff,"target_date":str(panel.dates[i+5]),"source":str(source)},
-        "model":model,"max_cost_usd":str(max_cost_usd),"max_calls":3*MAX_TURNS+2,"max_output_tokens":4096,"review_contract":REVIEW_CONTRACT,
+        "model":model,"provider_slug":provider_slug,"smoke":smoke,"runtime_archive":runtime_archive,"max_cost_usd":str(max_cost_usd),"max_calls":MAX_TURNS+1 if smoke else 3*MAX_TURNS+2,"max_output_tokens":4096,"review_contract":REVIEW_CONTRACT,
         "implementation":runtime.implementation_hashes(),"runner_sha256":sha256(__file__),
         "input_hashes":runtime._source_hashes([source]),"incumbent_policy_sha256":policy["policy_sha256"],
         "schedule":["subject","review","unchanged_control","exact_candidate_if_proposed","feedback_review"],
@@ -142,9 +160,20 @@ def review_feed(destination, subject, incumbent, outcome, history):
             "default_id":case["default_selection"][b],"selected_matches_default":chosen["candidate_id"]==case["default_selection"][b],
             "lowest_available_validation_id":ranked[0]["candidate_id"],"selected_is_validation_minimum":chosen["validation_mse"]==ranked[0]["validation_mse"],
             "ordered_available_options":[{k:o[k] for k in ("candidate_id","validation_mse")} for o in ranked]})
+    from zenith.investigator_contracts import MAX_COMPARISONS
+    legal = {(source,quantity) for source in [*outcome["returns"],"ALL"] for quantity in SUMMARY_QUANTITIES}
+    executed = [row["action"] for name,row in record["outputs"].items()
+        if name.startswith("investigator_turn_") and row.get("action",{}).get("kind")=="compare"]
+    tested = {(a["source"],a["quantity"]) for a in executed}
+    capability = {"legal_recipe_count":len(legal),"executed_comparisons":len(executed),
+        "distinct_tested_recipe_count":len(tested),"untried_recipe_count":len(legal-tested),
+        "remaining_comparison_allowance":MAX_COMPARISONS-len(executed),
+        "recipe_axes":{"source":[*outcome["returns"],"ALL"],"quantity":list(SUMMARY_QUANTITIES)},
+        "meaning":"A recipe is a source AND summary pair. Testing each summary for one source does not exhaust all recipes. The final Lab slot is commit-only. Untested recipes need not be useful; this is a capability boundary, not a requirement to spend every call."}
     packet = {"schema":"zenith_investigator_review_feed_v2","active_phase":"feedback" if history else "initial_diagnosis",
         "repair_history":history,"history_sha256":digest(history),
         "decision_audit":{"rows":audit,"interpretation":"code-owned arithmetic, not a mandatory argmin policy. Departure from default is permitted and is not by itself a defect."},
+        "capability_audit":capability,
         "incumbent_policy":incumbent,"baskets":list(outcome["returns"]),
         "later_outcome_evidence":{"outcome":outcome,"score":score(read(subject,"investigator_final"),outcome)},
         "subject":record,
@@ -185,7 +214,7 @@ def run(study,env_file):
         else:
             try:
                 status = runtime.start(runtime.DEFAULT_ROOT,mission=mission,run_id=name,task_profile=PROFILE,
-                    provider="openrouter_budgeted",model=p["model"],max_cost_usd=p["max_cost_usd"],
+                    provider="openrouter_budgeted",model=p["model"],provider_slug=p.get("provider_slug"),max_cost_usd=p["max_cost_usd"],
                     max_calls=p["max_calls"],max_output_tokens=p["max_output_tokens"],budget_dir=study/"budget",
                     feed_source=str(source),policy=str(policy_path) if policy_path else None,
                     time_anchor=(case["cutoff"] if mission=="lab" else case["target_date"])+"T23:59:59+00:00",
@@ -207,6 +236,13 @@ def run(study,env_file):
     source = review_feed(study/"review-input",subject,policy,outcome,[])
     review = execute("review","refinement",source)
     proposal = read(review,"investigator_review")
+    if p.get("smoke"):
+        result = {"schema":"zenith_investigator_smoke_v1","subject":str(subject),"review":str(review),
+            "review_output":proposal,"model":p["model"],"adopted":False,
+            "scope":"One native Lab and review only; no learning or predictive improvement claim",
+            "budget":load(study/"budget"/"budget.json") if (study/"budget"/"budget.json").exists() else None}
+        write_json(study/"result.json",result)
+        return result
     control = execute("control","lab",case["source"],study/"incumbent-policy.json",subject)
     candidate, failure = None, None
     if proposal["disposition"] in ("propose","revise"):
@@ -319,23 +355,57 @@ def continue_review(previous, study, env_file, max_cost_usd="3"):
         raise
 
 
+def review_only(previous, study, env_file, *, model=None, provider_slug=None, max_cost_usd="0.08"):
+    """Versioned review-interface intervention; never rerun the frozen Lab."""
+    from system.lib.openrouter_free_runtime import load_env_file
+    previous, study = Path(previous).resolve(), Path(study).resolve()
+    if study.exists():
+        raise ValueError("review-only study exists; failed and completed attempts are terminal")
+    old = load(previous/"protocol.json")
+    subject = runtime.runs_root(runtime.DEFAULT_ROOT)/(previous.name+"-subject")
+    if runtime.status(runtime.DEFAULT_ROOT,subject.name)["status"]!="completed":
+        raise ValueError("review-only requires a completed frozen Lab")
+    model=model or latest_model();require_model(model)
+    study.mkdir(parents=True)
+    source=review_feed(study/"input",subject,load(previous/"incumbent-policy.json"),load(previous/"outcome.json"),[])
+    protocol={"schema":"zenith_review_only_v1","previous_protocol_sha256":digest(old),"subject":str(subject),
+        "input_hashes":runtime._source_hashes([source]),"implementation":runtime.implementation_hashes(),
+        "runner_sha256":sha256(__file__),"model":model,"provider_slug":provider_slug,
+        "max_cost_usd":str(max_cost_usd),"max_calls":1,"contract":REVIEW_CONTRACT,"runtime_archive":archive_runtime(study),
+        "scope":"Review-interface intervention over a completed development Lab; no resampling of the failed attempt or learning claim"}
+    write_json(study/"protocol.json",protocol)
+    load_env_file(Path(env_file))
+    status=runtime.start(runtime.DEFAULT_ROOT,mission="refinement",run_id=study.name,task_profile=PROFILE,
+        provider="openrouter_budgeted",model=model,provider_slug=provider_slug,max_cost_usd=max_cost_usd,
+        max_calls=1,max_output_tokens=4096,budget_dir=study/"budget",feed_source=str(source),
+        time_anchor=old["case"]["target_date"]+"T23:59:59+00:00")
+    result={"status":status,"adopted":False}
+    if status["status"]=="completed":result["output"]=read(runtime.runs_root(runtime.DEFAULT_ROOT)/study.name,"investigator_review")
+    write_json(study/"result.json",result)
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action",choices=("prepare","run","continue-review"))
+    parser.add_argument("action",choices=("prepare","run","continue-review","review-only"))
     parser.add_argument("--study",type=Path,required=True)
     parser.add_argument("--data",type=Path)
-    parser.add_argument("--model",default="openai/gpt-4.1")
+    parser.add_argument("--model",help="Default: newest catalogue-verified cheap Chinese model")
+    parser.add_argument("--provider-slug",help="Exact verified OpenRouter endpoint; unavailable routes fail without fallback")
+    parser.add_argument("--smoke",action="store_true",help="Prepare only one Lab and one review, without a learning campaign")
     parser.add_argument("--cutoff",default="2025-02-02")
-    parser.add_argument("--max-cost-usd",default="5")
+    parser.add_argument("--max-cost-usd",default="0.25")
     parser.add_argument("--env-file",type=Path)
     parser.add_argument("--previous",type=Path)
     args = parser.parse_args()
-    if args.action=="prepare" and not args.data or args.action in ("run","continue-review") and not args.env_file or args.action=="continue-review" and not args.previous:
+    if args.action=="prepare" and not args.data or args.action in ("run","continue-review","review-only") and not args.env_file or args.action in ("continue-review","review-only") and not args.previous:
         parser.error("prepare requires --data; run requires --env-file; continue-review requires --previous and --env-file")
     if args.action=="prepare":
-        result = prepare(args.data,args.study,args.model,args.cutoff,args.max_cost_usd)
+        result = prepare(args.data,args.study,args.model,args.cutoff,args.max_cost_usd,provider_slug=args.provider_slug,smoke=args.smoke)
     elif args.action=="run":
         result = run(args.study,args.env_file)
+    elif args.action=="review-only":
+        result = review_only(args.previous,args.study,args.env_file,model=args.model,provider_slug=args.provider_slug,max_cost_usd=args.max_cost_usd)
     else:
         result = continue_review(args.previous,args.study,args.env_file,args.max_cost_usd)
     print(json.dumps(result,indent=2))

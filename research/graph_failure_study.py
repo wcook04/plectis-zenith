@@ -48,6 +48,8 @@ def prepare_feeds(panel, cutoff, destination):
 
 
 def prepare(data, study):
+    from zenith.provider_policy import latest_model
+    model=latest_model()
     study=Path(study).resolve()
     if study.exists(): raise ValueError("study exists; preserve its evidence")
     panel=Panel(data);study.mkdir(parents=True)
@@ -61,7 +63,7 @@ def prepare(data, study):
         cases.append({"cutoff":cutoff,"target_date":str(panel.dates[i+5]),"source":str(destination)})
     plans={m:runtime.plan(runtime.DEFAULT_ROOT,m,task_profile="financial") for m in ("lab","oracle","refinement")}
     protocol={"schema":"zenith_full_graph_failure_study_v1","root":str(runtime.DEFAULT_ROOT),
-        "data":str(Path(data).resolve()),"cases":cases,"model":"openai/gpt-4.1-mini",
+        "data":str(Path(data).resolve()),"cases":cases,"model":model,
         "max_cost_usd":"5","max_calls":240,"max_output_tokens":4096,
         "implementation":runtime.implementation_hashes(),"study_code_sha256":sha256(__file__),
         "input_hashes":runtime._source_hashes([Path(c["source"]) for c in cases]),"plans":plans,"universe":panel.manifest,
