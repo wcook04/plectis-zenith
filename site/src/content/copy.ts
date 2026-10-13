@@ -9,7 +9,7 @@ export const EVIDENCE_KIND_LABEL: Record<string, { label: string; note: string }
   },
   authored_mechanism: {
     label: 'Defined in the code',
-    note: 'The graph as it is written in the repository today.',
+    note: 'The procedure implemented in the repository today.',
   },
   measured_experiment: { label: 'Measured experiment', note: 'Saved execution evidence; not necessarily an improvement.' },
   measured_execution: {
@@ -27,14 +27,14 @@ export const EVIDENCE_KIND_LABEL: Record<string, { label: string; note: string }
 };
 
 export const SECTION_LABEL: Record<string, string> = {
-  idea: 'Section 1, A competent investigator', lab: 'Section 2, One measured repair',
-  oracle: 'Section 2, Review', trace: 'Section 2, Controlled replay',
-  research: 'Section 4, Scope and next evidence', results: 'Section 4, Measured results',
+  idea: 'Section 1, Knowledge that can do work', lab: 'Section 1, The operational task',
+  oracle: 'Section 2, Repair and reuse', trace: 'Section 2, Frozen procedures',
+  research: 'Section 4, Interpretation and next evidence', results: 'Section 4, Measured evidence',
 };
 
 export const HERO = {
-  lede: 'Can an investigator improve a reusable procedure by testing a diagnosis of its own work?',
-  question: 'Zenith runs an adaptive Lab, reviews its recorded evidence, and tests exact procedure changes. The current results separate cheap-model competence from unreliable review and unchanged forecasts. Historical graph views remain available alongside the active method and receipts.',
+  lede: 'Can a measured failure become a computation that keeps working?',
+  question: 'Zenith turns operational investigations into reusable programs. Lab executes, Oracle measures the errors, and Evolve proposes a repair. New cases test whether that computation survives beyond the examples used to develop it.',
 };
 
 // Counts come from the graph the backend serves, never from this file.
@@ -65,35 +65,32 @@ export function labParagraphs(f: GraphFacts | null): string[] {
 }
 
 export const CHAPTER_COPY: Record<string, { kicker: string; paragraphs: string[] }> = {
-  idea: { kicker: 'The research question', paragraphs: [
-    'Lab investigates the evidence available at a cutoff and freezes a decision. Oracle reviews what it actually received and did; Evolve proposes a reusable procedure change when the evidence supports one.',
-    'Code reruns the complete investigation under unchanged and candidate procedures and supplies the measured consequence to the next review. Successful execution, changed behaviour, useful decisions and transfer are separate claims.',
-    'The next task must support a useful decision with the available information. Ranking, investigation selection and forecast triage are candidates; the historical market case remains a stress test.',
+  idea: { kicker: 'Knowledge that can do work', paragraphs: [
+    'Retain an executable investigation, its scope and the counterexamples used to repair it. The next case can use that computation without buying the same reasoning again.',
+    'An answer can contain supported findings and unresolved checks together. Duplicated telemetry does not rule out a real regression; missing requests can prevent a numerical conclusion while other findings remain valid.',
   ] },
-  lab: { kicker: 'Investigate before deciding', paragraphs: [
-    'The active Lab is one adaptive investigator. It chooses inspect, compare or commit after seeing the previous numerical result. The CLI records the actual actions and exact supplied contexts.',
-    'Code owns the target identities, cutoffs, numerical recipes and reference forecasts. A small interpretation calibration checks basic distinctions before a larger learning experiment.',
-    'The older multi-stage graph shown in retained viewers is historical evidence. A larger graph must earn its cost against the adaptive controller and strong numerical baselines.',
+  lab: { kicker: 'Compute the requested quantity', paragraphs: [
+    'Acquire operation intervals and request populations. Read the quantity contract: active time, elapsed time and billed work treat overlap and idle gaps differently.',
+    'The model authors Python; a restricted process executes it and records acquired tables. Source contracts, units, repeated records and workload proportions must survive the calculation.',
   ] },
-  oracle: { kicker: 'Locate a supported defect', paragraphs: [
-    'The reviewer receives the executed graph, reconstructible original contexts, numerical receipts and separately labelled later outcomes. A lossless evidence bank removes repeated copies without truncating the record.',
-    'A wrong outcome does not locate a reasoning error. Diagnosis must distinguish missing information, missing inputs, inadequate actions, faulty interpretation and execution failure. No supported defect is a valid result.',
+  oracle: { kicker: 'Make failure observable', paragraphs: [
+    'An independent evaluator compares the actual findings, unresolved conditions and numerical ratio with the expected answer. The next request receives measured witnesses, including rejected programs and their execution errors.',
+    'The full development suite determines whether a proposal improves the incumbent without breaking previously correct cases. A plausible explanation alone cannot pass that test.',
   ] },
-  evolve: { kicker: 'Test one exact change', paragraphs: [
-    'Diagnosis and proposal share one response. The editable object is a complete reusable investigation procedure. The model cannot silently change the tools, outcome or evaluator.',
-    'The candidate and unchanged procedure both rerun from the same snapshot. Measured actions and task outcomes reach the next review. Nothing is adopted automatically; useful learning requires protected cases and controls for ordinary variation.',
+  evolve: { kicker: 'Keep a tested computation', paragraphs: [
+    'Freeze the accepted program before evaluating further cases. A renamed-schema test may change field bindings, but it cannot rewrite the numerical solver.',
+    'The first model proposal, unchanged incumbent, direct answers and prose-memory answers remain comparison controls. Compilation, improvement during development and real-world transfer are separate claims.',
   ] },
-  results: { kicker: 'What actually ran', paragraphs: [
-    'The original episode completed without improving forecasts. Subsequent cheap-model checks passed simple interpretation questions, but long-context reviewers still made unsupported claims.',
-    'The linked receipts retain costs, failures and interface versions. Correct semantic answers in the wrong output shape remain a format failure. Calibration does not establish predictive or learning benefit.',
+  results: { kicker: 'Replay the evidence', paragraphs: [
+    'The table below reads versioned campaign receipts. Each complete campaign reports every learner, including failures; the first learner is the declared primary comparison.',
+    'Published programs, input tables, evaluator and execution harness replay offline. These are synthetic combinations of known factors, not independent real-world problems.',
   ] },
   'results:verified_preparation': { kicker: 'Historical fixture preparation', paragraphs: [
-    'The retained System A fixture uses invented observations. Its preparation receipt loaded inputs and prepared a request without inference. It is separate from the later adaptive-investigator experiments.',
+    'The retained System A fixture uses invented observations. Its preparation receipt loaded inputs and prepared a request without inference.',
   ] },
-  next: { kicker: 'A decisive next experiment', paragraphs: [
-    'Choose a useful task with sufficient available information and a verifiable outcome. Identify why language adds value over code, then compare the smallest plausible architectures under matched observations and budgets.',
-    'Freeze a procedure and evaluation before testing a model-authored repair on protected further cases. Keep proposal-search cost, format failures, regressions and no-change outcomes in the record.',
-    'Novelty and practical advantage remain open. Cheap inference makes disciplined experiments affordable; it does not establish that a particular graph or learning mechanism works.',
+  next: { kicker: 'Make the knowledge cumulative', paragraphs: [
+    'Compare equal-tool, equal-budget learners on new semantic contracts and real operational data with obtainable answers. Test whether retained procedures reduce discovery cost without hiding changed applicability.',
+    'Extend the library when one program is demonstrably insufficient. Preserve scope counterexamples and revoke dependent conclusions when their evidence stops supporting them.',
   ] },
 };
 

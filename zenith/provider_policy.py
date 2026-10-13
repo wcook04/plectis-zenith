@@ -21,9 +21,9 @@ _THREAD_LOCK = threading.Lock()
 
 def require_model(model):
     if not isinstance(model, str) or model.split("/", 1)[0] not in DEVELOPERS:
-        raise ValueError("Provider policy: only inexpensive Chinese-developed models are allowed; GPT-4.1 and other non-allowlisted models are banned")
-    if "gpt-4.1" in model.lower() or model.count("/") != 1:
-        raise ValueError("Provider policy: invalid or banned model")
+        raise ValueError("Provider policy: select a recent, capable, inexpensive Chinese-developed model")
+    if model.count("/") != 1:
+        raise ValueError("Provider policy: invalid model identifier")
 
 
 def require_prices(prices):

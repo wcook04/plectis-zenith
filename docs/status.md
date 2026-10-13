@@ -1,14 +1,55 @@
-# Cheap-model repair and calibration — 13 October 2026
+# Executable investigations — 13 October 2026
 
-The [repair report](model-repair-20261013.md) and [cost receipt](model-repair-20261013.json) record the current engineering baseline. New experiments enforce inexpensive Chinese-developed models, verified tariff ceilings and host-wide serialized inference. GPT-4.1 is banned. Lossless reviewer inputs remove repeated evidence, and the capability inventory distinguishes all legal recipes from the subset already tried.
+Zenith now tests actual model-authored numerical procedures, with measured repair and frozen reuse. The five new research returns reproduced with **198 passing tests** and informed one native implementation. Their finite authored grammars are distinguished from the new live-model experiments. [Method and synthesis](executable-investigations.md), [three-page paper](../paper/zenith.pdf), [complete versioned receipt](investigation-learning-20261013.json).
+
+The task investigates operational measurements with explicit quantity contracts. It separates active time, elapsed time and billed work; accounts for workload mix, coverage, units and record multiplicity; and preserves supported findings alongside unresolved checks. This replaces unconstrained market prediction as the active research task.
+
+## What the model learned
+
+The broad-feedback DeepSeek V4.1 Flash campaign (V5) made **38 calls for $0.0900402720**. The primary learner's accepted development scores improved **12→52→60 of 64**, without regressions on previously correct development cases. Every failed and rejected proposal remains recorded. On new combinations of known factors:
+
+| Campaign / learner | First model proposal / 256 | Frozen final / 256 | Renamed schema / 64 |
+|---|---:|---:|---:|
+| V5 broad / 1 (primary) | 94 | 232 | 61 |
+| V5 broad / 2 | 8 | 177 | 43 |
+| V5 broad / 3 | 94 | 177 | 43 |
+| V6 compact / 1 (primary) | 156 | 170 | 46 |
+| V6 compact / 2 | 150 | 6 | 3 |
+| V6 compact / 3 | 171 | 177 | 48 |
+
+The V5 primary corrected **144** heldout answers and regressed **six** relative to its first proposal. That first proposal was rejected for four development regressions, so the table is not a sequence of accepted programs. The final program solved **128/128 unresolved** and **104/128 numerically answerable** cases. All 24 remaining heldout errors and three schema-transfer errors counted duplicate deliveries as additional billed work. Detecting a duplicate was insufficient: the arithmetic still included it.
+
+On 32 paired cases, the V5 primary program scored **28/32**, direct model answers **2/32**, and a prose translation of the learned algorithm **2/32**. Those controls lack execution tools: this measures the entire compilation/execution arrangement, not an isolated graph or memory effect. An independent handwritten reference scored **256/256**; removing the learned program restored the naive incumbent's **6/256**.
+
+V6 supplied two failing and two passing witnesses with explicit numerical/label residuals, versus twelve failing and four passing raw witnesses in V5. It did not establish an improvement. Its second learner repeatedly returned the same 48/64 proposal, which broke four previously correct development cases; the promotion rule correctly retained the incumbent. A blocking counterexample was present in every repair prompt. Missing feedback is therefore not an adequate explanation of this repetition. Fresh seeds do not isolate the effect of context selection, and these are repeated temperature-zero runs, not independent model replications.
+
+All V6 programs and the direct-answer arm completed. The provider returned **HTTP 402 on the last prose-control call**, so that control arm and the overall campaign remain incomplete. Completed learner outcomes are preserved and replayable; the missing control is not filled in or counted as a completed comparison.
+
+## Costs, custody and execution
+
+Across all six versions: **108 attempted calls, $0.1874167392 reported cost**. One credit-rejected call has no provider-reported charge; its conservative reservation is **$0.00881412**. No credits, fallback route or provider account settings were changed. V2–V4 are retained token-limit/schema failures, not successful learner runs. They are concise entries in the receipt, rather than the research's central claim.
+
+Every inference call used a verified inexpensive Chinese-developed model and a serialized route. The completed V5 campaign used DeepSeek V4.1 Flash through DeepInfra. The current runner defaults to broad feedback; `--feedback-style compact` preserves the follow-up option. Current model selection uses catalogue recency, price and capability checks; the documented reproduction command names the tested route.
+
+The public bundles contain all completed frozen learners, full synthetic datasets, acquisition traces and exact archived executor/evaluator source. The curator verifies protocol, source archive, program and data hashes. Run `python scripts/build_learning_report.py replay` with no credentials or model calls. Historical syntax failures remain failures under their original executor.
+
+These results demonstrate useful bounded compilation and some development improvement. They do not establish reliable autonomous repair, cumulative multi-program learning, learned acquisition value, real-world transfer, forecasting advantage or a novel general architecture. The [programme](../program.md) defines the next discriminating experiments: equal execution tools and discovery budgets, new semantic contracts, revocation and real operational measurements with obtainable answers.
+
+The implementation, paper and site now present the same active study. Historical evidence follows without being relabelled.
+
+---
+
+# Historical model calibration — 13 October 2026
+
+The [repair report](model-repair-20261013.md) and [cost receipt](model-repair-20261013.json) record the earlier engineering baseline. New experiments enforce inexpensive Chinese-developed models, verified tariff ceilings and host-wide serialized inference. Lossless reviewer inputs remove repeated evidence, and the capability inventory distinguishes all legal recipes from the subset already tried.
 
 Thirteen modern-model calls cost **$0.046824887272**. DeepSeek completed the native Lab with unchanged zero forecasts and passed 16/16 component questions in valid format. Qwen answered the same questions correctly but violated the object schema; that attempt remains a format failure. A later Qwen review returned no change, while still making a false directional claim. No procedure was adopted, and no predictive or learning improvement is established. These are different workloads, not a controlled aggregate model comparison.
 
-The next research task is to identify a useful, information-sufficient decision and a decisive test of learned improvement. The market case and every previous failed run remain development evidence below.
+This earlier checkpoint motivated the operational investigation study above. The market case and every previous failed run remain development evidence below.
 
 # Native adaptive investigator — 13 October 2026
 
-The new profile runs one answer-conditioned investigator through inspect, compare and commit, followed by one graph-aware diagnosis/procedure proposal, complete unchanged/candidate replay, and a review receiving the exact measured result. [Method](investigator.md), [three-page paper](../paper/zenith.pdf) and [curated evidence receipt](investigator-evidence.json) describe this active design.
+The historical profile runs one answer-conditioned investigator through inspect, compare and commit, followed by one graph-aware diagnosis/procedure proposal, complete unchanged/candidate replay, and a review receiving the exact measured result. [Method](investigator.md), [curated evidence receipt](investigator-evidence.json) describe that historical design.
 
 The first real GPT-4.1 episode completed **12 calls**, costing **$1.243572**. All three Lab arms chose zero forecasts for all six baskets; MSE was **0.000642668662**. The original investigator compared B04 concentration; the unchanged control compared B04 participation; the proposed-procedure arm compared B04 and B06 concentration. Action variation is real, but one pair cannot attribute it to the proposal or establish useful behaviour change. The exhaustive numerical comparator also chose zero, with its larger 21-comparison allowance disclosed.
 

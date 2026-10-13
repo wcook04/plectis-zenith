@@ -1,7 +1,7 @@
 # Zenith teaching website
 
-**Experimental research prototype.** The active financial experiment uses licensed historical observations.
-The older System A fixture uses invented observations. See
+**Experimental research prototype.** The active executable-investigation campaign uses synthetic operational measurements.
+Financial experiments and the older System A fixture remain separately labelled historical profiles. See
 the [research notice](../RESEARCH_NOTICE.md).
 
 A React frontend for the read-only website API in
@@ -84,12 +84,12 @@ colour-blind separation in both themes.
 
 The shared-universe backend adds `basket`, `basket_serial` and `basket_evolve` mission scopes to `/api/v1/graph`. `/api/v1/documents/experiment` describes the numerical protocol; `/api/v1/evidence/basket-result`, `basket-protocol` and `basket-trace` expose reviewed research evidence. `/api/v1/documents/synthetic-fixture` retains the earlier System A instructions.
 
-The site metadata labels the active data as `historical_research`. Public mode serves allowlisted evidence only; it does not expose the downloaded panel, local credentials or arbitrary run files. Model execution stays in the explicit CLI. No frontend redesign is required to use these endpoints.
+The site metadata labels the active investigation data as `synthetic_research`; historical basket receipts retain their own provenance. Public mode serves allowlisted evidence only; it does not expose the downloaded panel, local credentials or arbitrary run files. Model execution stays in the explicit CLI. No frontend redesign is required to use these endpoints.
 
 `/api/v1/evidence/basket-repair` serves the successful new-date interface check separately from the original pilot result. Graph API records for basket nodes link to their own protocol and do not attach a legacy System A dossier.
 
 ## Full reasoning-graph backend
 
-The paper's current chapters point to the adaptive investigator method and curated episode evidence. `/api/v1/documents/investigator`, `/api/v1/evidence/investigator-result` and `/assets/graphs/investigator-detail.svg` expose those reviewed public artifacts. Actual private investigator runs remain local CLI artifacts. The full financial graph routes below remain historical comparators.
+The paper's current chapters point to `/api/v1/documents/executable-investigations` and `/api/v1/evidence/investigation-learning-result`. The frontend renders every completed campaign and reads costs from that receipt. Historical investigator routes remain available. `/api/v1/documents/investigator`, `/api/v1/evidence/investigator-result` and `/assets/graphs/investigator-detail.svg` expose those reviewed public artifacts. Actual private investigator runs remain local CLI artifacts. The full financial graph routes below remain historical comparators.
 
 Use `financial_lab`, `financial_oracle` and `financial_refinement` as graph mission parameters. Responses expose effective dependencies, instructions and the persisted reasoning schema at each model node. `/api/v1/documents/reasoning-ontology` explains the contracts. `/api/v1/evidence/reasoning-schemas` exports them, and the `full-graph-result` and `full-graph-trace` evidence routes serve the completed experiment when present. The trace includes the frozen Lab graph and original-input bindings available to Oracle. This change concerns the backend and evidence; it does not redesign the frontend.

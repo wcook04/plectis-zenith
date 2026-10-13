@@ -1,43 +1,41 @@
 # Plectis Zenith
 
-Zenith tests whether an adaptive investigator can improve one reusable procedure by diagnosing and testing its own work. Lab chooses numerical investigations and commits forecasts. A combined Oracle/Evolve reviewer examines the recorded computation and later outcome, then proposes an exact procedure replacement or no change. Code reruns the whole Lab and returns the measured consequence to the next review.
+Zenith tests whether a model can turn failed investigations into executable knowledge that keeps working. Lab runs a procedure over acquired observations. Oracle compares its answer with measured evidence. Evolve writes a replacement, which must improve a complete development replay without breaking previously correct cases. The frozen procedure then faces new cases and source schemas.
 
-The loop is implemented in the existing engine. **The first real episode completed, but its proposed repair did not improve forecasts.** The reviewer misread numerical evidence and repeated an unsupported diagnosis after unchanged replay. Modern cheap models pass a small interpretation calibration, but semantic review remains fallible and no useful learned repair has been demonstrated. Engineering, valid execution and demonstrated learning are separate claims.
+The active task investigates operational time series: did the requested latency or work quantity change, did measurement change, or are essential facts still missing? It retains simultaneous findings and unresolved checks. A language model supplies reusable code; deterministic execution supplies quantities. The financial forecasting experiments remain separately documented historical stress tests.
 
 - [Three-page paper](paper/zenith.pdf)
-- [Run the native investigator](docs/investigator.md)
-- [Model, cost and task repair](docs/model-repair-20261013.md)
-- [Measured results](docs/status.md) and [source-bound evidence](docs/investigator-evidence.json)
+- [Executable investigations: synthesis and method](docs/executable-investigations.md)
+- [Measured results](docs/status.md)
 - [Research programme](program.md)
-- [Data, licence and limitations](docs/data.md)
+- [Five-return reproduction receipt](docs/breakthrough-returns-20261013.json)
 
 ## Run
 
-Install the research dependencies and prepare the historical panel:
+```sh
+python -m pip install -e '.[test,research]'
+python -m research.investigation_learning_study prepare --output work/learning-run --model deepseek/deepseek-v4.1-flash --provider-slug deepinfra/fp8
+python -m research.investigation_learning_study run --output work/learning-run --env-file /path/to/local.env
+```
 
-    python -m pip install -e '.[test,research]'
-    python -m zenith validate
-    python -m zenith basket fetch --output work/data/nepse-source
-    python -m zenith basket ingest --source work/data/nepse-source \
-      --output work/data/nepse-panel --through 2025-12-31
+Preparation freezes data, protocol and executable source without inference. Execution uses a current inexpensive Chinese-developed model on an explicit verified route. Calls are serialized, prices and total spend are bounded, and failed attempts remain recorded. The campaign ceiling is $1.50; the size follows the research question. Credentials and private request records stay local.
 
-Prepare a bounded smoke episode, then explicitly execute it:
+## Source map and validation
 
-    python -m zenith plan lab --task-profile financial_investigator_v1
-    python -m research.investigator_study prepare \
-      --data work/data/nepse-panel --study work/investigator-development --smoke
-    python -m research.investigator_study run \
-      --study work/investigator-development --env-file /path/to/local.env
+| Owner | Role |
+|---|---|
+| [Restricted execution](zenith/investigation_program.py) | Run proposed code with logged table acquisition and resource limits |
+| [Operational cases](research/operational_cases.py) | Synthetic cases, independent evaluator and observed-data reference |
+| [Learning campaign](research/investigation_learning_study.py) | Proposals, failed-candidate feedback, promotion, frozen transfer and controls |
+| [Budgeted provider](zenith/budgeted.py) | Explicit model route, reasoning setting, immutable requests and cost ledger |
+| [Model selection](zenith/provider_policy.py) | Current cheap models and host-wide serialization |
 
-The default maximum is $0.25; smoke mode allows at most nine calls (Lab plus review), while a complete paired episode allows 26. Preparation verifies the latest compatible cheap Chinese model when no model is specified; it makes no inference call. New inference is serialized across the host, with verified price ceilings and no non-allowlisted models. Invalid responses are terminal, with no automatic retry, forecast fallback or adoption. Credentials and raw runtime artifacts stay local. See the [method](docs/investigator.md) for contracts, controls and interpretation.
+```sh
+python -m pytest tests
+python scripts/build_graphs.py
+python scripts/check_extraction.py
+python scripts/build_learning_report.py replay
+tectonic paper/zenith.tex
+```
 
-## Development and retained evidence
-
-    python -m pytest tests
-    python scripts/build_graphs.py
-    python scripts/check_extraction.py
-    tectonic paper/zenith.tex
-
-The [historical full-graph case](docs/full-graph-case.md), [smaller basket pilot](docs/baskets.md) and [synthetic System A fixture](docs/demo.md) remain reproducible. They are not the active investigator specification. The real NEPSE panel and constructed research baskets do not establish trading performance or economic causality.
-
-The [read-only API and site](site/README.md) serve allowlisted definitions, paper and historical public receipts. Private execution is explicit and local. The adaptive profile currently runs through the CLI; its exact artifacts are recorded locally.
+The [financial investigator](docs/investigator.md), [full financial graph](docs/full-graph-case.md), [basket pilot](docs/baskets.md) and [System A fixture](docs/demo.md) remain runnable with their original evidence boundaries. The [read-only API and site](site/README.md) expose allowlisted documents and receipts; private execution remains explicit and local. [Research notice](RESEARCH_NOTICE.md).

@@ -21,6 +21,7 @@ DOCUMENTS = {
     "diagnosis": "docs/failure-diagnosis.md",
     "reasoning-ontology": "docs/reasoning-ontology.md",
     "investigator": "docs/investigator.md",
+    "executable-investigations": "docs/executable-investigations.md",
     "model-repair": "docs/model-repair-20261013.md",
     "worked-case": "docs/full-graph-case.md",
     "research-direction": "docs/research-direction.md",
@@ -28,6 +29,7 @@ DOCUMENTS = {
     "notice": "RESEARCH_NOTICE.md",
 }
 EVIDENCE = {
+    "investigation-learning-result": "docs/investigation-learning-20261013.json",
     "investigator-result": "docs/investigator-evidence.json",
     "model-repair-result": "docs/model-repair-20261013.json",
     "sources": "examples/demo/provenance.json",
@@ -49,15 +51,15 @@ EVIDENCE = {
 FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail", "basket-detail", "basket-serial-detail", "investigator-detail")
 CHAPTERS = (
     ("idea", "The idea", "introduction", None, None, "authored_mechanism"),
-    ("lab", "An adaptive investigator", "investigator", "investigator-detail", None, "authored_mechanism"),
-    ("oracle", "Review the recorded computation", "investigator", None, None, "authored_mechanism"),
-    ("evolve", "Test one exact procedure change", "investigator", None, None, "authored_mechanism"),
+    ("lab", "Execute an investigation", "executable-investigations", None, None, "authored_mechanism"),
+    ("oracle", "Measure success and failure", "executable-investigations", None, None, "authored_mechanism"),
+    ("evolve", "Retain a tested computation", "executable-investigations", None, None, "authored_mechanism"),
     ("results", "Measured results", "results", None, None, "measured_experiment"),
     ("next", "What still needs testing", "research-direction", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
-    "idea": (), "lab": (), "oracle": ("investigator-result",), "evolve": ("investigator-result",),
-    "results": ("model-repair-result", "investigator-result",), "next": (),
+    "idea": (), "lab": (), "oracle": ("investigation-learning-result",), "evolve": ("investigation-learning-result",),
+    "results": ("investigation-learning-result",), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
                   "evolve": "trace", "results": "results", "next": "research"}
@@ -277,8 +279,8 @@ class PublicContent:
                 "documents": {k: f"{API}/documents/{k}" for k, v in DOCUMENTS.items() if (self.root / v).is_file()},
                 "figures": {k: f"/assets/graphs/{k}.svg" for k in FIGURES},
                 "evidence": {k: f"{API}/evidence/{k}" for k,v in EVIDENCE.items() if (self.root / v).is_file()},
-                "data_mode": "historical_research",
-                "data_note": "Published historical NEPSE observations and constructed research baskets; retrospective replay with stale-mark and availability limitations. System A remains a separate synthetic fixture. Read the result receipt for measured outcomes.",
+                "data_mode": "synthetic_research",
+                "data_note": "Generated operational measurements test executable investigation, repair and frozen reuse. Financial studies and System A remain separately labelled historical profiles. Read the source-bound receipt for outcomes, failures and comparison limits.",
                 "local_runs_enabled": local_runs,
                 "run_index_url": f"{API}/runs" if local_runs else None,
                 "capabilities": {"read_graph": True, "read_paper": True, "read_local_runs": local_runs,

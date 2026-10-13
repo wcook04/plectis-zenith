@@ -21,7 +21,7 @@ export function latexToText(latex: string): string {
 // bibliography at the end of the page.
 export function shortCitation(latex: string): string {
   const text = latexToText(latex);
-  const year = /\b(19|20)\d{2}\b(?!.*\b(19|20)\d{2}\b)/.exec(text)?.[0];
+  const year = Array.from(text.matchAll(/\b(?:19|20)\d{2}\b(?!\.\d)/g)).at(-1)?.[0];
   const person = /^(?:[A-Z]\.\s?)+([A-Z][\w\u00C0-\u017F'-]+)(\s+et al\.)?/.exec(text);
   if (person) return `${person[1]}${person[2] ? ' et al.' : ''}${year ? ` ${year}` : ''}`;
   const [author, title] = text.split(/\.\s+/);

@@ -18,6 +18,7 @@ export type PaperSection = {
 export type EvidenceKind =
   | 'proposed_process'
   | 'authored_mechanism'
+  | 'measured_experiment'
   | 'measured_execution'
   | 'verified_preparation'
   | 'research_proposal';

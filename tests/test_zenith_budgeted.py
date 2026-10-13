@@ -125,6 +125,21 @@ class BudgetedTests(unittest.TestCase):
             unsupported.ask_ai('hi',{'meta':{'session_id':'UNSUPPORTED','node_id':'s'},'response_format':shape})
         unsupported.caller.assert_not_called()
 
+    def test_reasoning_is_explicit_bound_and_within_existing_output_budget(self):
+        row=copy.deepcopy(ROW)
+        row['supported_parameters'].append('reasoning')
+        caller=Mock(return_value=reply())
+        provider=self.provider(row=row,caller=caller)
+        provider.ask_ai('hello',{'meta':{'session_id':'RUN','node_id':'reason'},'reasoning_effort':'medium'})
+        payload=caller.call_args.args[2]
+        self.assertEqual(payload['reasoning'],{'effort':'medium','exclude':True})
+        self.assertEqual(payload['max_tokens'],1024)
+        self.assertEqual(next(iter(self.ledger()['entries'].values()))['reasoning_effort'],'medium')
+        unsupported=self.provider(run='UNSUPPORTED',caller=Mock())
+        with self.assertRaisesRegex(RuntimeError,'reasoning support'):
+            unsupported.ask_ai('hello',{'meta':{'session_id':'UNSUPPORTED','node_id':'reason'},'reasoning_effort':'medium'})
+        unsupported.caller.assert_not_called()
+
     def test_provider_slug_is_explicit_and_run_binding_is_immutable(self):
         self.assertIsNone(normalize_provider_slug(None))
         self.assertEqual(normalize_provider_slug("deepinfra/fp8"), "deepinfra/fp8")

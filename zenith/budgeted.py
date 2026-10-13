@@ -369,6 +369,9 @@ class OpenRouterBudgetedProvider(Provider):
 
     @serialized_inference
     def ask_ai(self, prompt: str, config: dict | None = None, cancel=None) -> str:
+        reasoning_effort = (config or {}).get('reasoning_effort', 'none')
+        if reasoning_effort not in ('none', 'low', 'medium', 'high'):
+            raise ValueError('reasoning_effort must be none, low, medium or high')
         system_prompt=(config or {}).get("system_prompt")
         if system_prompt is not None and not isinstance(system_prompt,str):raise ValueError("system_prompt must be text")
         response_format=(config or {}).get("response_format")
@@ -376,6 +379,7 @@ class OpenRouterBudgetedProvider(Provider):
             if not isinstance(response_format,dict) or response_format.get("type")!="json_schema":
                 raise ValueError("only explicit JSON Schema response formats are supported")
         identity = self.identity(prompt, config)
+        if reasoning_effort != 'none':identity['reasoning_effort'] = reasoning_effort
         if response_format is not None:identity["response_format_sha256"]=digest(response_format)
         if system_prompt is not None:identity["system_prompt_sha256"]=text_digest(system_prompt)
         self._bind_run()
@@ -393,6 +397,8 @@ class OpenRouterBudgetedProvider(Provider):
         api._official_base_url()
         token = api._resolve_api_key(None)
         row, prices, context_length = verified_model(self.model, http_get=self.catalogue_get)
+        if reasoning_effort != 'none' and 'reasoning' not in row['supported_parameters']:
+            raise RuntimeError('selected model does not advertise reasoning support')
         catalogue_prices = dict(prices)
         if response_format is not None and not {"response_format","structured_outputs"} <= set(row["supported_parameters"]):
             raise RuntimeError("model must advertise structured output and response_format support")
@@ -460,7 +466,8 @@ class OpenRouterBudgetedProvider(Provider):
             if system_prompt is not None:payload["messages"].insert(0,{"role":"system","content":system_prompt})
             if response_format is not None:payload["response_format"]=response_format
             if "reasoning" in row["supported_parameters"]:
-                payload["reasoning"] = {"enabled": False}
+                payload["reasoning"] = ({"enabled": False} if reasoning_effort == 'none' else
+                                        {"effort": reasoning_effort, "exclude": True})
             if self.provider_slug is not None:
                 payload["provider"]["only"] = [self.provider_slug]
             data = self.caller(ENDPOINT, {"Authorization": "Bearer " + token,

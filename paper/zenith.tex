@@ -1,5 +1,5 @@
 \documentclass[11pt]{article}
-\usepackage[a4paper,margin=23mm]{geometry}
+\usepackage[a4paper,margin=22mm]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern,microtype,booktabs,amsmath,array}
 \usepackage[colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
@@ -11,196 +11,194 @@
 \PackageError{zenith}{Paper exceeds three pages}{Shorten the paper before publishing.}\fi}
 \begin{document}
 \begin{center}
-{\Large\bfseries Zenith: testing repairs to an adaptive investigator}\\[4pt]
+{\Large\bfseries Zenith: learning executable investigations}\\[4pt]
 Will Cook \quad\textbullet\quad 13 October 2026
 \end{center}
 \hypertarget{idea}{}
 \textbf{Abstract.}
-Can an investigator improve its reusable procedure by testing a diagnosis of its
-own work? Zenith implements a small loop: Lab chooses numerical investigations,
-Oracle reviews the recorded computation against later observations, and Evolve
-proposes an exact procedure replacement. Code reruns the whole investigation
-under unchanged and candidate procedures and returns the measured difference
-to the next review. The first historical episode did not improve forecasts.
-A subsequent cheap-model audit separates elementary interpretation, output
-format, long-context review and task value. Modern models solve small supplied
-facts yet still make unsupported review claims. We repair cost controls and
-context duplication, and motivate an information-sufficient task with a useful
-learning signal. Neither execution nor calibration demonstrates learning.
+What should accumulate when a language-model investigator learns from failure?
+Zenith retains an executable procedure, its claimed scope, measured counterexamples
+and versioned dependencies. An investigation returns supported findings alongside
+unresolved evidence obligations. A measured failure can prompt a replacement
+computation; complete replay decides whether to retain it. We synthesise five
+independently returned prototypes into an implemented test of model-authored
+programs, using operational time-series measurements rather than unsupported
+market prediction. The experiment separates one-shot compilation, repair,
+frozen reuse and source-schema adaptation, with costs and failed attempts retained.
+The contribution is a testable implementation and evidence, not a claim of
+new general intelligence or an unprecedented learning architecture.
 
-\textbf{1. Start with a competent investigator.}
-A repair system needs something worth repairing. We supply a working
-investigator, accurate numerical tools, sensible references and an earlier
-worked example before evaluating model-authored changes. These are engineering
-choices, not discoveries attributed to the learning loop.
+\textbf{1. Knowledge that can do work.}
+A useful retained object should answer a later question, acquire missing evidence,
+or determine that a conclusion remains unsupported. More text or more graph
+nodes need not achieve any of these. We therefore make the editable object an
+investigation program $P$, with context $c$ and an acquisition interface $Q$:
+\[
+                 P(c,Q)\longmapsto(F,U,\rho).
+\]
+$F$ contains established findings, $U$ contains unresolved checks, and $\rho$ is
+a numerical comparison when identifiable from the supplied evidence. The
+executed graph records acquired tables and their hashes; it is a computation
+trace, not a graph of causes in the external world.
 
-Lab is one adaptive model using three actions. It can \emph{inspect} observations,
-\emph{compare} a registered numerical representation, or \emph{commit} forecasts.
-Each answer is available before the next action. A question must say what its
-possible answers would change. Lab can stop early, retain a reference or
-investigate across baskets; there is no compulsory question for each target.
-
-The retained stress test forecasts every basket's five-session return from the shared
-history of 147 eligible NEPSE instruments and 17 indices~\cite{nepse}. Six
-research baskets have membership fixed using earlier observations and fixed
-shares following equal initial-value allocation. For value $V_b$, the target is
-$r_{b,t}=V_b(t+5)/V_b(t)-1$. These are constructed indices, not traded ETFs.
-Missing quotes retain their last mark and expose its age.
-
-The tools preserve distinctions that matter: past returns versus future targets;
-member participation versus value contribution; predictive association versus
-accounting; and improvement over a weak comparator versus improvement over the
-selected reference. A distinction earns its place when it changes a useful
-question, decision or test. Requiring a long reasoning schema at every step is
-not itself a scientific contribution.
-
-\textbf{The numerical boundary.}
-Code supplies ridge, zero-return and mature-training-mean references for each
-basket. Its advisory default minimises past validation error. An inspection
-returns constituent contributions and dated features. A comparison adds one
-summary---positive value weight, top-three absolute-contribution share or fresh
-quote weight---from any basket or the whole universe to the same ridge model.
-It keeps feature-count normalisation, regularisation, training rules and eight
-validation origins fixed, and reports paired results for all six targets.
-
-The model chooses registered candidate IDs; code supplies their forecasts and
-target identities. Commitment requires all six targets. Invalid output stops
-the attempt without retry or a substitute forecast. Repeated searches over eight
-origins remain exploratory model selection. Price histories do not establish
-market causes.
-\newpage
 \hypertarget{lab}{}
-\textbf{2. One procedure, one measured repair.}
-The native engine executes action/result pairs, with at most eight model turns
-and six comparisons. Early commitment makes the remaining slots inactive.
-The exported graph records the calls and supplied contexts that actually
-executed; its edges describe information flow, not economic causality.
-Public justifications and tool receipts are inspectable records, not access
-to the model's private internal reasoning.
+\textbf{A concrete operational task.}
+Child-operation intervals describe requests before and after a deployment.
+The quantity contract distinguishes active time, elapsed time and billed work:
+\[
+q_{\rm active}=\left|\bigcup_j[a_j,b_j]\right|,\qquad
+q_{\rm elapsed}=\max_j b_j-\min_j a_j,\qquad
+q_{\rm work}=\sum_j(b_j-a_j).
+\]
+Overlap and idle gaps make these quantities differ even for identical records.
+Repeated delivery of one operation is not extra work. Time units must agree;
+request populations include failures as well as successes. To separate workload
+mix from within-class change, both periods use the before-period class weights:
+\[
+\rho=\frac{\sum_g w_g^{\rm before}\,\overline q_g^{\rm after}}
+           {\sum_g w_g^{\rm before}\,\overline q_g^{\rm before}}.
+\]
+Ratios above $1.2$ indicate regression, below $0.8$ improvement, and otherwise
+stability, with declared numerical tolerances. These meanings and labels are
+supplied task definitions; the model authors their executable realization.
+
+A record can establish duplicate delivery and changed workload mix while
+missing requests prevent a latency conclusion. Conversely, a measurement fault
+and a real regression can coexist. Collapsing the result to one fault label
+would erase independently supported evidence. Missing coverage, unknown clock
+units and conflicting operation records therefore remain explicit obligations.
+\newpage
+\hypertarget{oracle}{}
+\textbf{2. Repair the computation, then reuse it.}
+Lab executes the incumbent. Oracle receives its measured outputs and the
+independent evaluator's comparison. Evolve writes a complete replacement
+procedure. The next review must also receive a rejected candidate's execution
+errors: repeatedly showing incumbent failures cannot explain why a proposed
+repair never ran.
 
 \begin{center}
 \begin{tikzpicture}[font=\small,box/.style={draw,rounded corners,align=center,
-minimum height=10mm,text width=39mm},>=Stealth,node distance=8mm]
-\node[box] (lab) {Lab\\inspect, compare\\commit};
-\node[box,right=of lab] (review) {Oracle + Evolve\\diagnose and propose};
-\node[box,right=of review] (test) {Controlled replay\\control + candidate};
+minimum height=12mm,text width=38mm},>=Stealth,node distance=8mm]
+\node[box] (lab) {Lab\\execute and acquire};
+\node[box,right=of lab] (review) {Oracle + Evolve\\measure and rewrite};
+\node[box,right=of review] (test) {Full replay\\accept or reject};
 \draw[->] (lab)--(review);
 \draw[->] (review)--(test);
-\draw[->] (test.south)--++(0,-7mm)-|node[pos=.25,below]{measured receipt} (review.south);
+\draw[->] (test.south)--++(0,-7mm)-|node[pos=.25,below]{including rejected-program errors} (review.south);
 \end{tikzpicture}
 \end{center}
 
-\hypertarget{oracle}{}
-Oracle diagnosis and Evolve's proposal share one model response. The reviewer
-receives the executed Lab graph, exact instructions and inputs, actions,
-numerical receipts and a separately labelled later outcome. A wrong forecast
-does not by itself locate an error. A proposed defect must cite an actual step,
-consider an alternative explanation and remain within available capabilities.
-No supported repair is a valid conclusion.
-
-The editable object is one reusable investigation procedure of at most 4,096
-characters. A candidate replaces it in full. The reviewer cannot silently alter
-the tools, model, targets or evaluator. Its proposal names an expected first
-action signature, an interpretation, a valid counterexample and a disconfirmer.
-The signature is a limited observable: an action occurring does not establish
-that the reasoning improved.
-
 \hypertarget{trace}{}
-The coordinator freezes the procedure, snapshot, runtime, model and resource
-limits. It runs the complete Lab from entry with both the unchanged procedure
-and the exact proposed text. This tests changes to question selection as well
-as final choices. The receipt separates changed actions, numerical recipes,
-forecasts and losses. It retains failures. No candidate is automatically adopted.
+A proposal becomes a learner's experimental incumbent only when its
+whole-development score improves and no previously correct case regresses.
+Source, dataset, evaluator, model route and budget are frozen before inference.
+Every candidate and attempted call remains recorded. The numerical executor
+receives no answer key or generator case identifier. A restricted Python subset
+runs in a separate process with logged table acquisition and resource limits.
+It permits model-authored computations beyond a finite catalogue of supplied
+recipes; it is not a general-purpose security sandbox.
 
-The next actual reviewer request contains that exact receipt, verified in both
-the saved input and provider prompt. The reviewer must assess the tested proposal
-before revising, rejecting, retaining it for evaluation or making no change.
-Delivery is necessary for feedback use; it does not prove that the model
-understood or used it.
+The retained source, scope statement and evidence references form one reusable
+object. Scope language is a model claim, not a proof; executable checks and
+counterexamples test it. For a renamed source, a model returns a field mapping.
+A fixed host transformation changes names only, preserving values and the
+frozen numerical source. This tests schema binding without smuggling in a new
+solver. It does not demonstrate discovery of an unfamiliar domain.
 
-\textbf{3. What would count as learning?}
-Engineering fixes to tools or prompts first create a new baseline. Learning is
-then a model-authored procedure change evaluated within a frozen baseline.
-Keep these claims separate:
-\begin{itemize}
-\item \textbf{Execution:} the exact proposal ran and its measured effects reached the next review.
-\item \textbf{Behaviour:} the intended investigation or decision changed beyond ordinary repeated-run variation.
-\item \textbf{Predictive value:} the complete forecast vector improved under the declared loss and cost accounting.
-\item \textbf{Transfer:} a frozen reusable change helped on protected further cases, including counterexamples and regressions.
-\end{itemize}
-A same-case repair chosen after seeing the outcome supplies development evidence.
-One unchanged/candidate pair cannot establish a stochastic treatment effect.
-Numerical enumeration is an essential simpler comparator, with any larger search
-allowance disclosed. A multi-agent architecture must earn its extra cost against
-this adaptive controller using the same observations and tools.
+\textbf{3. A campaign with separable claims.}
+Three repeated temperature-zero learners receive at most six proposal rounds.
+They use the same model and initial material, not independent models or curricula.
+There are 64 development cases, 256 held-out cases, and 64 renamed-schema cases.
+Held-out fault combinations exclude those used in development; half require a
+numerical conclusion and half require unresolved checks. The factors themselves
+are authored and known. These are dependent synthetic tests of composition,
+not 256 independent real-world problems.
+
+The first proposal is scored after freezing alongside the final program. Findings
+and unresolved sets must match exactly; ratios allow 1\% relative or 0.005 absolute error.
+Deleting the learned object restores a naive summed-duration incumbent. An
+independent handwritten reference uses the same observed tables; the latent-data
+evaluator computes interval coverage by a different algorithm. On 32 paired
+cases, direct and prose-memory controls receive all raw tables. The latter gets
+a translation of the first learner's final algorithm. Neither has a code executor,
+so differences measure the entire compilation/execution arrangement, not memory
+alone. Prose equivalence is intended but not certified; the primary learner is
+chosen in advance, never by held-out score.
+
+Researcher changes to syntax, prompts, providers or reasoning settings create
+new versions. Inspected cases become development evidence for subsequent design;
+fresh seeds do not erase knowledge of the task family. Rejected and malformed
+attempts remain failures. Current inexpensive Chinese-developed models are
+selected from verified catalogue and endpoint metadata, with serialized calls,
+a fixed spending ceiling and no expensive fallback.
 \newpage
 \hypertarget{results}{}
-\textbf{4. Cost, competence and the remaining failure.}
-On the exposed 2 February 2025 case, the original GPT-4.1 episode used 12 calls
-and cost \$1.243572. It sent 635,022 input tokens: repeated full contexts made
-review requests unusually large. This model was explicitly selected; the
-receipts do not show overload forcing an expensive fallback.
+\textbf{4. Measured evidence.}
+Five supplied prototypes reproduced locally with 198 passing tests. Their
+strong shared result was bounded executable investigation with applicability
+and counterexamples. Their searches used researcher-authored grammars, and
+simpler code controls matched key results. We retain those contributions without
+attributing their primitives to a language model.
 
-Original, unchanged and proposed-procedure Lab runs all chose six zero-return
-forecasts, with MSE $0.000642668662$. The reviewer falsely ranked a larger MSE
-below a smaller one and proposed an unnecessary minimum-error rule. A separately
-versioned correction cost \$0.375084 and withdrew that diagnosis, but retained
-other unsupported claims. No repair was adopted.
-
-New inference verifies cheap Chinese-developed models and endpoint tariffs,
-serialises requests, and stops without expensive fallback. A lossless evidence
-bank shrank the inspected subject from 2,115,068 to 258,745 bytes with exact
-request reconstruction. A capability inventory distinguishes the 21 legal
-recipes from those already tried.
-
-\begin{center}\small
-\begin{tabular}{@{}lrl@{}}
+The broad-feedback campaign used DeepSeek V4.1 Flash for 38 calls costing
+\$0.0900. The predeclared primary learner's accepted development scores
+rose from 12/64 to 52/64 and then 60/64. Its first model proposal, rejected for
+four development regressions, nevertheless provides a one-shot comparator:
+\begin{center}
+\begin{tabular}{lrrr}
 \toprule
-Modern-model condition & Calls & Observed result\\
+Repeated learner & First proposal & Frozen final & Renamed schema\\
 \midrule
-DeepSeek, original reviewer request & 1 & Correct ordering; unsupported proposal\\
-DeepSeek, native Lab & 8 & Six zero forecasts; unchanged MSE\\
-DeepSeek, lossless review & 1 & Misread remaining action space\\
-Qwen, component calibration & 1 & 16/16 semantic; wrong JSON shape\\
-DeepSeek, component calibration & 1 & 16/16; valid JSON shape\\
-Qwen, capability-aware review & 1 & No change; false directional claim\\
+1 (primary) & 94/256 & 232/256 & 61/64\\
+2 & 8/256 & 177/256 & 43/64\\
+3 & 94/256 & 177/256 & 43/64\\
 \bottomrule
 \end{tabular}
 \end{center}
+For the primary learner, development corrected 144 held-out answers and
+regressed six relative to its first proposal. The final program answered all
+128 unresolved cases and 104/128 numerical cases. All remaining errors counted
+duplicate deliveries as additional billed work. On 32 paired cases, the frozen
+program answered 28 correctly; direct and prose controls each answered two.
+The handwritten reference answered 256/256; deleting the learned program
+restored 6/256. Execution tools differ between the model-answer controls and
+the program, so this does not isolate a memory advantage.
 
-These 13 calls cost \$0.046824887272. Workloads and interfaces differ; this is
-not a controlled overall comparison. Models were DeepSeek V4.1 Flash and
-Qwen 3.8 Omni Flash. Two other attempts stopped at endpoint checks without
-inference. A Lab review exceeded the byte cap before a charge; its lossless
-continuation is separately versioned.
-
-The calibration tests ranking, interval matching, reachable actions and
-mandatory versus advisory rules. Code solves it exactly; it establishes no LLM
-advantage. Qwen's malformed response remains a failure despite correct answers.
-Its later review called neutral forecasts directionally correct for falling
-baskets. No change is not proof of sound review.
+A follow-up reduced the witness context and exposed numerical residuals.
+Its frozen learners scored 170/256, 6/256 and 177/256: compact feedback did not
+establish better repair. One learner repeatedly ignored an actionable regression
+already present in its feedback. The final prose-control call was credit-rejected,
+so that campaign's controls remain incomplete. Across six versions, including
+three earlier failed attempts: 108 calls attempted, \$0.1874 reported cost and
+\$0.0088 reserved for the unpriced rejected call. Frozen programs, evaluators,
+inputs and individual outputs replay offline without inference.
 
 \hypertarget{research}{}
-\textbf{Scope and next evidence.}
-The larger question is what can accumulate across the loop: better concepts,
-better investigations, composable reasoning procedures, or an executable theory
-of an observed system. These are research possibilities, not measured results.
-The next design may replace the graph or task. It must explain a useful decision
-from available information and show a complete worked learning cycle. Ranking
-and forecast triage are examples, not the limit of the ambition.
+\textbf{Interpretation and next boundary.}
+The promising direction is to spend language-model inference on acquiring a
+reusable computation and semantic binding, then run that computation cheaply
+on further observations. The necessary evidence is useful frozen reuse, accurate
+scope checks and retained competence as later procedures are added. A correct
+first program demonstrates compilation; improvement after feedback requires a
+separate comparison. Added examples and additional attempts can explain gains
+without a uniquely effective repair mechanism.
 
-February, May and August are exposed development cases. Shared conditions,
-overlapping horizons, possible pretraining knowledge and uncertified release
-vintages preclude trading-performance claims. DSPy~\cite{dspy}, MIPRO~\cite{mipro}
-and TextGrad~\cite{textgrad} already optimise model programmes or feedback.
-Novelty and practical advantage remain open. Source-bound cost, input and execution receipts accompany the repository.
+Program execution for model reasoning already appears in PAL~\cite{pal};
+executable skill accumulation appears in Voyager~\cite{voyager}; and library
+learning is central to DreamCoder~\cite{dreamcoder}. Zenith does not claim those
+ideas as new. Its present question is narrower: can measured failures produce
+scoped investigations that compose supported findings without suppressing
+unresolved evidence? Equal-tool, equal-discovery-budget comparisons on new
+semantic contracts and real operational data are the next decisive tests.
+The retained financial studies establish no forecasting or causal advantage.
 
-\begin{thebibliography}{4}\small
+\begin{thebibliography}{3}\small
 \setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
-\bibitem{nepse} SocrateAI. \emph{NEPSE Open Data}, pinned source
-\href{https://github.com/socrateai-official/nepse-open-data/tree/497e27238a107de00c6f435a4f4f76983205577d}{\texttt{497e27238a10}}. Dataset-specific MIT-form licence.
-\bibitem{dspy} O. Khattab et al. \emph{DSPy}. 2023. \href{https://arxiv.org/abs/2310.03714}{arXiv:2310.03714}.
-\bibitem{mipro} K. Opsahl-Ong et al. \emph{Optimizing Instructions and Demonstrations for Multi-Stage Language Model Programs}. 2024. \href{https://arxiv.org/abs/2406.11695}{arXiv:2406.11695}.
-\bibitem{textgrad} M. Yuksekgonul et al. \emph{TextGrad: Automatic Differentiation via Text}. 2024. \href{https://arxiv.org/abs/2406.07496}{arXiv:2406.07496}.
+\bibitem{pal} L. Gao et al. \emph{PAL: Program-aided Language Models}. 2022.
+\href{https://arxiv.org/abs/2211.10435}{arXiv:2211.10435}.
+\bibitem{voyager} G. Wang et al. \emph{Voyager: An Open-Ended Embodied Agent with Large Language Models}. 2023.
+\href{https://arxiv.org/abs/2305.16291}{arXiv:2305.16291}.
+\bibitem{dreamcoder} K. Ellis et al. \emph{DreamCoder: Growing generalizable, interpretable knowledge with wake-sleep Bayesian program learning}. 2020.
+\href{https://arxiv.org/abs/2006.08381}{arXiv:2006.08381}.
 \end{thebibliography}
 \end{document}

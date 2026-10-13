@@ -183,7 +183,8 @@ function useGraph(url: string | null) {
 
 function Page({ site, paper }: { site: Site; paper: Paper | null }) {
   const byId = useMemo(() => new Map(site.chapters.map((c) => [c.id, c])), [site]);
-  const lab = useGraph(byId.get('lab')?.graph_url ?? '/api/v1/graph?mission=lab');
+  const learningActive = Boolean(site.evidence['investigation-learning-result']);
+  const lab = useGraph(byId.get('lab')?.graph_url ?? null);
   const deepLink = useMemo(() => new URLSearchParams(window.location.search).get('node'), []);
   const byline = useByline(site);
   const latex = usePaperLatex(site);
@@ -202,7 +203,7 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
             Read the paper (PDF)
           </a>
           <a className="button button--ghost" href="#lab">
-            Open the Lab graph
+            Explore the investigation
           </a>
           {byline && <span className="hero__byline">{byline}</span>}
         </div>
@@ -243,21 +244,21 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           paper={paper}
           latex={latex}
           paragraphs={
-            chapter.id === 'lab'
+            chapter.id === 'lab' && !learningActive
               ? labParagraphs(lab.status === 'ready' && lab.value ? graphFacts(lab.value) : null)
               : CHAPTER_COPY[`${chapter.id}:${chapter.evidence_kind}`]?.paragraphs
           }
         >
-          {chapter.id === 'idea' && <><LoopDiagram /><ApplicationExample /></>}
-          {chapter.id === 'lab' && (
+          {chapter.id === 'idea' && !learningActive && <><LoopDiagram /><ApplicationExample /></>}
+          {chapter.id === 'lab' && !learningActive && (
             <LabFigure site={site} graph={lab.status === 'ready' ? lab.value : null} deepLink={deepLink} />
           )}
-          {chapter.id === 'oracle' && <OracleFigure chapter={chapter} />}
-          {chapter.id === 'evolve' && <EvolveFigure chapter={chapter} />}
+          {chapter.id === 'oracle' && !learningActive && <OracleFigure chapter={chapter} />}
+          {chapter.id === 'evolve' && !learningActive && <EvolveFigure chapter={chapter} />}
           {chapter.id === 'results' && (
             <ResultsFigure chapter={chapter} labGraph={lab.status === 'ready' ? lab.value : null} site={site} />
           )}
-          {chapter.id === 'next' && <NextFigure chapter={chapter} />}
+          {chapter.id === 'next' && !learningActive && <NextFigure chapter={chapter} />}
         </ChapterSection>
       ))}
 
@@ -266,7 +267,7 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
         <div className="wrap footer__inner">
           <p>
             <strong>Experimental research prototype.</strong> The example contains invented observations.
-            It demonstrates an evaluation protocol, not reliable prediction of a real system.
+            Its synthetic results do not establish reliable real-world operation.
           </p>
           <p>
             <a href="https://github.com/wcook04/plectis-zenith" target="_blank" rel="noreferrer">
@@ -319,11 +320,10 @@ function ApplicationExample() {
 // One line under the hero with where the work actually stands, read from the
 // receipt bound to the results chapter.
 function StatusStrip({ site }: { site: Site }) {
-  const chapter = site.chapters.find((c) => c.evidence_kind === 'measured_execution' || c.evidence_kind === 'verified_preparation');
+  const chapter = site.chapters.find((c) => c.evidence_kind === 'measured_experiment' || c.evidence_kind === 'measured_execution' || c.evidence_kind === 'verified_preparation');
   const url = chapter?.evidence_urls[0];
   const evidence = useAsync<Evidence | null>(() => (url ? api.evidence(url) : Promise.resolve(null)), [url]);
-  if (!chapter) return null;
-  const sourcesUrl = site.evidence.sources;
+  const sourcesUrl = site.evidence['investigation-learning-result'] ? undefined : site.evidence.sources;
   const sources = useAsync<Evidence | null>(() => (sourcesUrl ? api.evidence(sourcesUrl) : Promise.resolve(null)), [sourcesUrl]);
   const composition = sources.status === 'ready' && sources.value ? compositionSentence(sources.value) : null;
   let summary: string | null = null;
@@ -331,13 +331,15 @@ function StatusStrip({ site }: { site: Site }) {
     const schema = String(evidence.value.data.schema ?? '');
     if (schema.startsWith('zenith_demo_preparation')) summary = preparationSummary(evidence.value);
     else if (schema.startsWith('zenith_original_feed_window')) summary = windowSummary(evidence.value);
+    else if (schema === 'zenith_learning_evidence_v1') summary = `${evidence.value.data.total_calls} model calls; $${Number(evidence.value.data.total_reported_cost_usd).toFixed(4)} reported cost across all recorded attempts.`;
   }
+  if (!chapter) return null;
   return (
     <section className="status-strip" aria-label="Current status">
       <div className="wrap status-strip__inner">
         <div>
           <p className="status-strip__lead">
-            <strong>{summary ?? 'The full loop has not run end to end.'}</strong>
+            <strong>{summary ?? 'Loading the recorded experiment status…'}</strong>
           </p>
           {(composition ?? site.data_note) && <p className="status-strip__note">{composition ?? site.data_note}</p>}
         </div>
@@ -588,6 +590,32 @@ function EvolveFigure({ chapter }: { chapter: Chapter }) {
   );
 }
 
+type InvestigationScore = { correct: number; total: number };
+type InvestigationCampaign = {
+  id: string; model: string; complete: boolean; reported_cost_usd: string;
+  learners?: Array<{ first_proposal_heldout: InvestigationScore; heldout: InvestigationScore; transfer: InvestigationScore }>;
+};
+
+function InvestigationResults({ result }: { result: Evidence }) {
+  const campaigns = result.data.campaigns as InvestigationCampaign[];
+  const score = (s: InvestigationScore) => `${s.correct}/${s.total}`;
+  return <div className="diagnosis">
+    {campaigns.filter(c => c.learners?.length).map(c => <section key={c.id}>
+      <h3 className="block-head">{c.id}{c.complete ? '' : ' — controls incomplete'}</h3>
+      <p>{c.model} · ${Number(c.reported_cost_usd).toFixed(4)} reported inference cost</p>
+      <table className="diagnosis__table">
+        <thead><tr><th>Learner</th><th>First proposal</th><th>Frozen final</th><th>Renamed schema</th></tr></thead>
+        <tbody>{c.learners?.map((l, i) => <tr key={i}>
+          <th>{i + 1}{i === 0 ? ' (primary)' : ''}</th><td>{score(l.first_proposal_heldout)}</td><td>{score(l.heldout)}</td><td>{score(l.transfer)}</td>
+        </tr>)}</tbody>
+      </table>
+    </section>)}
+    <p>{campaigns.filter(c => !c.complete).length} incomplete attempts remain in the receipt and total cost. Ratios use the declared numerical tolerance; findings and unresolved sets must match exactly.</p>
+    <p>Repeated learners share the same model and inputs. Improvements across versions do not isolate changes to model, prompts or execution.</p>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete evidence receipt</a>
+  </div>;
+}
+
 function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph: Graph | null; site: Site }) {
   const windowUrl = chapter.evidence_urls.find((u) => u.endsWith('window-result')) ?? site.evidence['window-result'];
   const condUrl = chapter.evidence_urls.find((u) => u.endsWith('conditional-result')) ?? site.evidence['conditional-result'];
@@ -608,6 +636,9 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
         : Promise.resolve(null),
     [kind.status, isPreparation, windowUrl, condUrl],
   );
+  if (kind.status === 'ready' && kind.value?.data.schema === 'zenith_learning_evidence_v1') {
+    return <InvestigationResults result={kind.value} />;
+  }
   if (isPreparation && labGraph && kind.status === 'ready' && kind.value) {
     return (
       <>

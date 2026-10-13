@@ -24,11 +24,11 @@ if args.refresh:
         row.update(path=label,export_sha256=checksum)
         if changed or row.get('disposition')=='standalone_adaptation':
             row['disposition']='standalone_adaptation'
-            row['adaptation']='Observed-system runtime and cutoff-bound basket research; preserve source identity, empirical contracts, historical/synthetic evidence labels and frozen horizons.'
+            row['adaptation']='Executable investigations and retained historical research; preserve source identity, empirical contracts, historical/synthetic evidence labels and frozen horizons.'
             row.pop('source_path',None)
         rows.append(row)
     manifest['files']=rows
-    manifest['copy_basis']='Original custody hashes are retained where available. Current export hashes describe the observed-system and basket-research edition; removed source modules remain in Git history.'
+    manifest['copy_basis']='Original custody hashes are retained where available. Current export hashes describe the executable-investigation and retained historical-research edition; removed source modules remain in Git history.'
     path.write_text(json.dumps(manifest,indent=2)+'\n')
 failures=[row['path'] for row in manifest['files'] if not (ROOT/row['path']).is_file() or hashlib.sha256((ROOT/row['path']).read_bytes()).hexdigest()!=row['export_sha256']]
 print(json.dumps({'ok':not failures,'checked_files':len(manifest['files']),'changed_or_missing':failures}))

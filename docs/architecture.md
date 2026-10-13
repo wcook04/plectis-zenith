@@ -1,10 +1,10 @@
 # Active and historical architectures
 
-The active adaptive investigator is specified in [the native method](investigator.md). Its bounded action/result graph is generated per profile and records actual execution. The retained default graph documented below is a historical comparison and teaching fixture. New provider policy applies to every live profile; old execution receipts remain unchanged.
+The active executable-investigation architecture is specified in [the current method](executable-investigations.md). It reuses the provider, budget and source-custody layers, while `zenith/investigation_program.py` owns restricted program execution and `research/investigation_learning_study.py` owns experimental coordination. The financial investigator and graph described below are retained historical profiles, not the active task. Their interfaces and evidence remain available.
 
 # Architecture
 
-**Experimental research prototype.** The active financial profile runs the full
+**Historical architecture.** The financial profile runs the full
 Lab → Oracle → Evolve structure with the [shared reasoning ontology](reasoning-ontology.md).
 It uses historical financial observations. The generic System A fixture and the
 reduced basket pilot are separate profiles; their results do not transfer automatically.

@@ -7,6 +7,7 @@ import { clearApiCache } from '../api';
 import { GraphExplorer } from '../components/graph/GraphExplorer';
 import { Markdown } from '../components/Markdown';
 import fixture from './fixtures/lab-topology.json';
+import App from '../App';
 
 const lab = fixture as unknown as Graph;
 
@@ -37,6 +38,37 @@ beforeEach(() => {
   mockMatchMedia(true);
 });
 afterEach(() => cleanup());
+
+it('renders current investigation evidence without waiting for historical graphs', async () => {
+  const source = { path: 'receipt.json', sha256: 'test', url: 'https://example.org/receipt.json' };
+  const evidenceUrl = '/api/v1/evidence/investigation-learning-result';
+  const chapters = ['lab', 'oracle', 'evolve', 'results'].map(id => ({
+    id, title: id, evidence_kind: id === 'results' ? 'measured_experiment' : 'authored_mechanism',
+    graph_url: null, figure_url: null, document_url: null, paper_section: null,
+    evidence_urls: id === 'results' ? [evidenceUrl] : [], available: true,
+  }));
+  const score = { correct: 23, total: 32 };
+  mockFetch(url => {
+    if (url.endsWith('/site')) return { body: { title: 'Zenith', chapters, documents: {}, figures: {},
+      evidence: { 'investigation-learning-result': evidenceUrl }, notice: 'Synthetic research', capabilities: {} } };
+    if (url === evidenceUrl) return { body: { source, data: { schema: 'zenith_learning_evidence_v1',
+      total_calls: 7, total_reported_cost_usd: '0.01', campaigns: [
+        { id: 'test-completed', model: 'test-model', complete: true, reported_cost_usd: '0.009',
+          learners: [{ first_proposal_heldout: { correct: 4, total: 32 }, heldout: score, transfer: score }] },
+        { id: 'test-failed', complete: false, reported_cost_usd: '0.001' },
+      ] } } };
+    if (url.endsWith('/documents/paper')) return { body: { content: '', source } };
+    if (url.endsWith('/paper')) return { body: { source, citations: [], sections: [], pdf_sha256: 'test' } };
+    throw new Error(`Unexpected request: ${url}`);
+  });
+  render(<App />);
+  expect(await screen.findByRole('heading', { name: 'test-completed' })).toBeInTheDocument();
+  expect(screen.getByText('4/32')).toBeInTheDocument();
+  expect(screen.getAllByText('23/32')).toHaveLength(2);
+  expect(screen.getByText(/1 incomplete attempts/)).toBeInTheDocument();
+  expect(screen.queryByText(/Loading the .* graph/)).toBeNull();
+  expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph'))).toBe(true);
+});
 
 describe('node inspector', () => {
   it('opens a node, shows its current instruction and walks to an upstream input', async () => {

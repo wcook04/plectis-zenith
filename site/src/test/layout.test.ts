@@ -78,6 +78,7 @@ describe('paper and figure helpers', () => {
   it('labels margin citations by author and year', () => {
     expect(shortCitation('D. Silver et al. Mastering the game of Go without human knowledge. \\emph{Nature} 550:354--359, 2017.')).toBe('Silver et al. 2017');
     expect(shortCitation('Zenith. \\href{https://x}{Original-feed window experiment}, 12 October 2026.')).toBe('Zenith 2026: Original-feed window experiment');
+    expect(shortCitation('K. Ellis et al. DreamCoder. 2020. \\href{https://arxiv.org/abs/2006.08381}{arXiv:2006.08381}.')).toBe('Ellis et al. 2020');
   });
 
   it('reads section titles from the manuscript', () => {

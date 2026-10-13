@@ -60,7 +60,7 @@ def test_teaching_material_uses_current_sources(website):
         assert doc["content"] == (ROOT / doc["source"]["path"]).read_text()
     paper = json.loads(website.get(site["paper_url"]).body)
     assert paper["pdf_sha256"] == hashlib.sha256((ROOT / "paper/zenith.pdf").read_bytes()).hexdigest()
-    assert {c["id"] for c in paper["citations"]} >= {"nepse", "dspy", "mipro"}
+    assert {c["id"] for c in paper["citations"]} >= {"pal", "voyager", "dreamcoder"}
     assert all(c["used_at"] for c in paper["citations"])
     for chapter in site["chapters"]:
         section = chapter["paper_section"]
@@ -69,11 +69,12 @@ def test_teaching_material_uses_current_sources(website):
         assert section["pdf_url"].endswith("#nameddest=" + section["id"])
         assert all(website.get(url).body for url in chapter["evidence_urls"])
     results = next(c for c in site["chapters"] if c["id"] == "results")
-    assert results["evidence_urls"] == ["/api/v1/evidence/model-repair-result", "/api/v1/evidence/investigator-result"]
-    repair=json.loads(website.get(results["evidence_urls"][0]).body)["data"]
-    assert repair["modern_charged_calls"]==13
-    assert repair["modern_reported_cost_usd"]=="0.046824887272"
-    evidence=json.loads(website.get(results["evidence_urls"][1]).body)["data"]
+    assert results["evidence_urls"] == ["/api/v1/evidence/investigation-learning-result"]
+    learning=json.loads(website.get(results["evidence_urls"][0]).body)["data"]
+    assert learning['schema']=='zenith_learning_evidence_v1'
+    assert any(c['complete'] for c in learning['campaigns'])
+    assert site['data_mode']=='synthetic_research'
+    evidence=json.loads(website.get('/api/v1/evidence/investigator-result').body)["data"]
     assert evidence["profile"]=="financial_investigator_v1" and not evidence["learning_demonstrated"]
     assert website.get("/assets/graphs/investigator-detail.svg").body
     for url in site["evidence"].values():
@@ -170,7 +171,7 @@ def test_dossier_is_current_generic_source(website):
     assert dossier["data"] == json.loads(path.read_text())
     assert dossier["source"]["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
     assert dossier["data"]["perspective"] == "interventions"
-    assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "historical_research"
+    assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "synthetic_research"
 
 
 def test_basket_nodes_use_their_own_protocol(website):
