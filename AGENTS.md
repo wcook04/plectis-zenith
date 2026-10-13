@@ -39,3 +39,8 @@ and old run records outside public responses; no blanket synthetic relabelling.
 
 Derive runtime response counts and budget minima from the native graph; changing
 a lane must update downstream scopes, prompts, examples and publication receipts.
+
+For repository layout changes, follow the role map in README.md and
+`docs/architecture.md`. Preserve source-compatible paths and update their callers
+when moving an owner. Run `python3 scripts/check_structure.py` and the regression
+fixtures in `tests/test_structure.py`; new source areas require a documented role.

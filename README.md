@@ -71,6 +71,12 @@ the change helped. The [research direction](docs/research-direction.md) also
 proposes a controller that chooses small prompt variations from available context;
 that controller has not been trained or evaluated.
 
+## Repository map
+
+The runtime, research code and authored graph retain their existing paths. Start
+with the CLI in `zenith/`; [architecture](docs/architecture.md) traces a snapshot
+through its owners.
+
 | Purpose | Files |
 |---|---|
 | Node instructions and dependencies | `codex/substrate/nodes/` |
@@ -79,5 +85,16 @@ that controller has not been trained or evaluated.
 | Compare versions and diagnose failures | `research/` |
 | Inspect the mixed demonstration | `examples/demo/`, `docs/demo.md` |
 | Paper and diagrams | `paper/`, `docs/graphs.md` |
+| Feed acquisition, refinement and shared execution | `tools/`, `system/` |
+| Input adapters and reviewed graph variants | `benchmarks/`, `variants/` |
+| Web frontend and its interaction tests | `site/` |
+| Offline regression tests | `tests/` |
+| Graph projections and source checks | `scripts/` |
+| Agent guidance and CI | `AGENTS.md`, `.agents/`, `.github/` |
 
-Run `python -m pytest tests` for the offline checks. Keep the prototype small.
+Run `python -m pytest tests` for the offline checks and `make validate` for graph,
+extraction and layout checks. The layout checker reads Git's tracked and visible
+new files, including staged changes, while skipping ignored build trees. It
+rejects misplaced Python tests, programs in narrative directories and new root
+areas without an assigned role. Add a role to the map and checker when an actual
+new boundary is needed. Keep the prototype small.
