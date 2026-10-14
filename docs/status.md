@@ -6,6 +6,10 @@ The ten frontier returns have been synthesized into one implemented loop: model-
 
 Eight further returns have been inspected and reproduced within the boundaries in the [new synthesis and custody receipt](next-returns-20261014.md). Returns04 and06 failed to arrive. This pass makes no paid model calls and does not change the runtime. It advances reusable experiments, dependency-aware revision, preserving alternatives and nonmonotone repair search as hypotheses, while prioritizing a useful workload and a clear acquired-capability result. Authored prototype successes are not new model-learning results; return09's optional bank replay has a recorded partial mismatch. Historical measurements below remain unchanged.
 
+## Fifteen deep returns and revised research direction
+
+All fifteen deep returns have now been inspected; **769 manifest payloads** match their recorded bytes and membership. Their simulations and suites were **not rerun** in this pass, so their numerical outcomes remain author-reported. The [synthesis](deep-returns-20261014.md) advances learning the decomposition: context-informed revision of state, interfaces, reusable computations and experiments. It also corrects the old SQLite repair narrative: an improving `15→4→0` path exists alongside `15→16→0`, so that example does not require regression. Source-dependent acquisition inside a supplied learning language remains genuine learning even when ordinary code ties it. No reflective model-node experiment, paid call or runtime change was made in this assimilation; the [programme](../program.md) states the proposed comparison separately from the measured results below.
+
 ## Small tests after the native campaign
 
 **Fresh reconstruction repaired failures that repeated edits did not.** Three failed V5 programs were selected retrospectively. Generic repair, counterexample-focused repair and a cold restart received identical native observations and two proposals per source. Each model made 18 calls. The final programs were frozen before structurally new screening sequences were scored.

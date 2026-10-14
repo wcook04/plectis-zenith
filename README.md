@@ -4,6 +4,8 @@ Zenith tests whether investigations can accumulate useful executable knowledge. 
 
 The working object is a program with its source binding, observations, tests and optional executable dependencies. Small experiments compare repair, fresh candidate search and learned composition. Historical graphs remain available; the [programme](program.md#relation-to-the-graph-ambition) separates useful program learning from graph superiority and improvement of the learning algorithm itself.
 
+The next research target is **learning the decomposition**: can a node use its caller, consumers and failures to discover a missing distinction, change an interface or design a better experiment? The fifteen latest returns motivate this direction; a reflective graph has not yet been implemented or validated. [Synthesis and proposed comparison](docs/deep-returns-20261014.md).
+
 The active experiment uses real SQLite executions in controlled source configurations. Duplicate writes, insertion triggers, rollbacks and separate connections make the reported counter differ from committed state. The model receives action descriptions and measured examples, then authors its own computation. A fresh compiler and an execution-enabled archive receive the same evidence and total coding allowance.
 
 The initial comparison made **126 calls for $0.1295**, but its final incremental code tied an unchanged early program. Small follow-on screens found a better direction: preserve evidence and executable alternatives, then test what to reuse. A mixed DeepSeek/Qwen pool scored **279/288** on separate confirmation sequences, versus **191/288** and **194/288** for four-proposal single-model pools. A later test with the larger historical archive reached **286/288** after two native observations per source, with **zero new model calls**. The panels and search budgets differ; these are useful bounded results, not recursive self-improvement. [Results, controls and limits](docs/status.md).
@@ -12,6 +14,7 @@ The initial comparison made **126 calls for $0.1295**, but its final incremental
 - [Method and experiment](docs/executable-investigations.md)
 - [Measured results](docs/status.md)
 - [Research programme](program.md)
+- [Fifteen deep returns: learned decomposition and research direction](docs/deep-returns-20261014.md)
 - [Eight next-round returns: synthesis, decisions and reproduction](docs/next-returns-20261014.md)
 - [Ten frontier returns: synthesis and reproduction](docs/frontier-returns-20261013.md)
 
