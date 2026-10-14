@@ -12,6 +12,7 @@ The initial comparison made **126 calls for $0.1295**, but its final incremental
 - [Method and experiment](docs/executable-investigations.md)
 - [Measured results](docs/status.md)
 - [Research programme](program.md)
+- [Eight next-round returns: synthesis, decisions and reproduction](docs/next-returns-20261014.md)
 - [Ten frontier returns: synthesis and reproduction](docs/frontier-returns-20261013.md)
 
 ## Run

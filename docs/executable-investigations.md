@@ -97,3 +97,9 @@ The [follow-on index](observation-screens-20261013.json) binds each campaign sep
 ## Historical experiments
 
 The earlier operational campaign used supplied active-time, elapsed-time and billed-work contracts. It established useful model-authored compilation and some measured repair, but its direct/prose controls lacked execution and its strict promotion gate could stall. Its [versioned receipt](investigation-learning-20261013.json), frozen code and `scripts/build_learning_report.py replay` remain available unchanged. The financial investigator, full graph, basket pilot and System A fixture retain their own evidence boundaries. None establishes forecasting or causal advantage.
+
+## Next-return research boundary
+
+The [eight-return assimilation](next-returns-20261014.md) distinguishes the implemented method above from proposed changes. Its prototype witnesses support preserving distinct executable alternatives, revisiting deductions after a dependency fails, and retaining experiments that challenge a shared model class. They also motivate search through useful regressing intermediates and separating fitting from query-time serving. None of these witnesses establishes that a language model acquires the supplied decomposition, grammar or controller. Do not silently replace an immutable campaign's selection rule with a new search policy.
+
+The next design must make explicit what experience adds and how that helps later useful work. Partial output reuse needs a defensible component contract; surviving marginal fits alone do not justify a coupled answer. A compressed failure basis is relative to its candidate inventory and must be revalidated after changes. An ordinary library, direct native execution, caching and a fresh compiler remain serious controls. The next fifteen research inquiries will choose among these mechanisms before a new live campaign.

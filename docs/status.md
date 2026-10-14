@@ -1,6 +1,10 @@
-# Executable observation models — 13 October 2026
+# Executable observation models — 14 October 2026
 
 The ten frontier returns have been synthesized into one implemented loop: model-proposed source experiments, host-recorded measurements, model-written predictors and measured revision. All ten returns were audited with **337 passing return-specific tests**. [Synthesis and custody](frontier-returns-20261013.md), [active method](executable-investigations.md), [three-page paper](../paper/zenith.pdf).
+
+## Next-return assimilation
+
+Eight further returns have been inspected and reproduced within the boundaries in the [new synthesis and custody receipt](next-returns-20261014.md). Returns04 and06 failed to arrive. This pass makes no paid model calls and does not change the runtime. It advances reusable experiments, dependency-aware revision, preserving alternatives and nonmonotone repair search as hypotheses, while prioritizing a useful workload and a clear acquired-capability result. Authored prototype successes are not new model-learning results; return09's optional bank replay has a recorded partial mismatch. Historical measurements below remain unchanged.
 
 ## Small tests after the native campaign
 

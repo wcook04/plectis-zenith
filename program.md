@@ -34,6 +34,14 @@ An apparent winner is a lead to confirm, not a result to promote immediately. Fr
 
 The [ten-return synthesis](docs/frontier-returns-20261013.md) records accepted ideas and negative results. It rejects default elaborate routing, an unearned general ontology and a universal veto on every empirical regression. The paper and [status](docs/status.md) own the current claim; receipts own measured outcomes. Historical financial and operational studies remain available with their original versions and limitations.
 
+## Direction after the next eight returns
+
+The [next-return synthesis](docs/next-returns-20261014.md) sharpens the target: experience should create a reusable computation or representation that makes later externally specified work easier. Retain both executable alternatives and experiments that reveal their limits. A useful contradiction can reduce coverage; a necessary intermediate repair can regress. Search may preserve such alternatives while serving and final selection remain governed by their declared rules.
+
+Current-answer equivalence is not future equivalence. Rejection of one output permits partial reuse only under a justified component contract, with previously dependent deductions reopened. Independent challenges must test assumptions shared by every candidate. These are design requirements and experimental hypotheses, not a claim that the returned prototype libraries have been integrated.
+
+Prioritize a useful observable workload and a demonstrated acquisition step before expanding the disclosed SQLite family. Maintaining a changing keyed mirror is one concrete lead, but its authored controller ties ordinary code and its canary misses another write path. The next round must choose a task with obtainable feedback, credible economics and room for acquired capability. Fifteen independent inquiries explore that decision and the mechanisms it needs; they are not fifteen mandatory subsystems.
+
 ## Relation to the graph ambition
 
 The initial study tested one potential learned component. Experiment plans specify interventions; native executions supply observations; predictor programs make forecasts of those observations; measured errors guide program revision or fresh reconstruction. A shared planner sees the observation history, while each construction condition sees its own program failures. The follow-on composition test adds model-written transition/readout nodes and explicit dependencies, with a flat-library control. Neither study trains the underlying language model or demonstrates improvement of the learning algorithm itself.
