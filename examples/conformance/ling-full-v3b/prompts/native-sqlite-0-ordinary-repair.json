@@ -1,0 +1,382 @@
+{
+  "prompt": {
+    "task": {
+      "id": "native-sqlite-0",
+      "source_id": "sqlite-0",
+      "contract": "Native SQLite diagnostic source. Each query starts an empty\nin-memory database with one table whose id column is INTEGER PRIMARY KEY\nAUTOINCREMENT. Input is exactly {\"actions\": [action, ...]}, at most 32 actions.\nAn action is exactly {\"op\":\"put\", \"id\":n}, {\"op\":\"delete\", \"id\":n}, or\n{\"op\":\"begin\"}, {\"op\":\"commit\"}, {\"op\":\"rollback\"}. IDs are integers\n1..1000. Put inserts the explicit ID; it must be absent in the current\ntransactional view. Delete may name an absent ID. Transactions cannot nest;\ncommit/rollback require an open transaction. The sequence may end with an\nopen transaction. Operations and the final measurement use the same connection.\nAfter the actions, insert one row without specifying an ID and return its\nautomatically allocated ID as an integer. The source has no other tables,\ntriggers, conflicts, connections or hidden modes. An allowed source probe uses\nexactly this schema and returns this native measurement. There are no\nacquisition tables. Implement investigate(context, acquire), returning a JSON\ninteger. No initial program is supplied; author a fresh behavioral model.\n",
+      "examples": [
+        {
+          "input": {
+            "actions": []
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "delete",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 9
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 3
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 4
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 6
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 6
+              }
+            ]
+          },
+          "expected": 7
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 2
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 7
+              }
+            ]
+          },
+          "expected": 8
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 7
+              },
+              {
+                "op": "delete",
+                "id": 7
+              },
+              {
+                "op": "put",
+                "id": 1
+              }
+            ]
+          },
+          "expected": 8
+        }
+      ]
+    },
+    "parent_source": "def investigate(context, acquire):\n    actions = context.get('actions', [])\n    present = set()\n    high = 0\n    open_txn = False\n    saved = None\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            ident = action.get('id')\n            present.add(ident)\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            ident = action.get('id')\n            if ident in present:\n                present.remove(ident)\n        elif op == 'begin':\n            open_txn = True\n            saved = (set(present), high)\n        elif op == 'commit':\n            open_txn = False\n            saved = None\n        elif op == 'rollback':\n            open_txn = False\n            if saved is not None:\n                present, high = saved\n                saved = None\n    return high + 1\n",
+    "parent_examples": {
+      "correct": 8,
+      "total": 8,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": []
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 5,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": true
+        },
+        {
+          "answer": 5,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "delete",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 9
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 4,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 3
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 4,
+          "correct": true
+        },
+        {
+          "answer": 7,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 6
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 6
+              }
+            ]
+          },
+          "expected": 7,
+          "correct": true
+        },
+        {
+          "answer": 8,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 2
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 7
+              }
+            ]
+          },
+          "expected": 8,
+          "correct": true
+        },
+        {
+          "answer": 8,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 7
+              },
+              {
+                "op": "delete",
+                "id": 7
+              },
+              {
+                "op": "put",
+                "id": 1
+              }
+            ]
+          },
+          "expected": 8,
+          "correct": true
+        }
+      ]
+    },
+    "investigation": {
+      "receipts": [
+        {
+          "slot": 1,
+          "query": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 5
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 9
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "id": 7
+              }
+            ]
+          },
+          "expected": 8,
+          "parent_answer": 8,
+          "parent_error": null,
+          "verified_counterexample": false,
+          "query_units": 7,
+          "note": {
+            "hypothesis": "AUTOINCREMENT tracks the largest ever inserted ID, not the current maximum; rollback restores rows but not sqlite_sequence"
+          }
+        },
+        {
+          "slot": 2,
+          "stopped": true,
+          "note": {
+            "reason": "duplicate"
+          }
+        }
+      ],
+      "native_probes": 1,
+      "query_attempts": 1,
+      "query_units": 7,
+      "policy_executions": 2,
+      "slots_used": 2,
+      "detected": false,
+      "semantic_defect": false,
+      "technical_defect": false,
+      "witness_sha256": null
+    },
+    "instruction": "Repair the complete ordinary program using all measured outcomes. Investigator notes are hypotheses: inspect the code and receipts yourself. You may change any function, interface or state, remove the decomposition or preserve correct code. Retain all previously correct obligations, not only the latest witness. Return source, scope and change."
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, I/O or global state.\nThe single local name _ is allowed; other leading-underscore names are not.\nUse x*x and x*x*x rather than exponentiation (**); do not use function defaults.\nFor and while loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nAll execution remains bounded by the worker CPU, memory and wall-time limits.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange repr reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

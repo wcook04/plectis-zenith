@@ -20,18 +20,8 @@ def load(path):
     return json.loads(Path(path).read_text())
 
 
-def archive_runtime(study):
-    """Save the exact executable sources before another experiment can edit them."""
-    from zipfile import ZipFile, ZIP_DEFLATED
-    root=Path(runtime.__file__).resolve().parents[1]
-    paths=set(runtime.implementation_hashes())
-    paths.update(str(p.relative_to(root)) for p in (root/'research').rglob('*.py'))
-    paths.update(str(p.relative_to(root)) for p in (root/'codex').rglob('*.json'))
-    paths.add('master_config.json')
-    target=Path(study)/'runtime-source.zip'
-    with ZipFile(target,'x',compression=ZIP_DEFLATED) as archive:
-        for relative in sorted(paths):archive.write(root/relative,relative)
-    return {'path':str(target),'sha256':sha256(target),'scope':'Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads'}
+# Retained import path for older study owners. New callers use the custody owner.
+from zenith.source_snapshot import archive_runtime
 
 
 def prepare(data, study, model=None, cutoff="2025-02-02", max_cost_usd="0.25", *, provider_slug=None, smoke=False):

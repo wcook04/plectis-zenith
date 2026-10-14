@@ -1,0 +1,360 @@
+{
+  "schema": "zenith_conformance_study_v3",
+  "created_at": "2026-10-14T19:48:29.237024+00:00",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "providers": [
+    "deepinfra/fp8",
+    "baidu/fp8",
+    "morph/fp8"
+  ],
+  "arms": [
+    "ordinary",
+    "witness",
+    "fixed"
+  ],
+  "max_calls": 18,
+  "max_cost_usd": "0.60",
+  "max_output_tokens": 16384,
+  "reasoning_effort": "low",
+  "workers": 3,
+  "probe_cap": 8,
+  "task_routes": {
+    "native-sqlite-0": "deepinfra/fp8",
+    "native-lru-0": "baidu/fp8",
+    "native-utf8-0": "morph/fp8"
+  },
+  "task_arm_order": {
+    "native-sqlite-0": [
+      "ordinary",
+      "witness",
+      "fixed"
+    ],
+    "native-lru-0": [
+      "witness",
+      "fixed",
+      "ordinary"
+    ],
+    "native-utf8-0": [
+      "fixed",
+      "ordinary",
+      "witness"
+    ]
+  },
+  "dataset_sha256": "6019cd20ab504ec501828e73ed2be45cddc90e847616fb80c909cf02b296a947",
+  "dependencies": {
+    "research/conformance_study.py": "d69197f3cb367c3106cc463247e11edc63285217b74bb47f5e3bc8ace707a8ca",
+    "research/native_conformance_tasks.py": "b9d111643bce9a71ca3c483f5c9bf761c6dae96e050d9299b061ce82dc1dc283",
+    "research/decomposition_study.py": "940568ed4e90ce9835a991b1654455f63ea39a32b764a17d4533d85ae34a1f01",
+    "research/decomposition_tasks.py": "5a3b2853402c390d297d73058d5d913ac9600e2546ac84cd6217fc133017d42c",
+    "zenith/source_snapshot.py": "34bbbbfc59d79d6a3caaa4a1227b5ec204d82544832ac5267d2d943632b2619f",
+    "zenith/investigation_program.py": "c78f0c99ebda234771a425b284d8b4ad9e3e648b84986049f94b0f41890875c7",
+    "zenith/budgeted.py": "1a4640b57af3ae7d5cf1ce029c596b77f03ede16ce77d24c65d8b63682de7bd1",
+    "zenith/provider_policy.py": "5e1ce647a4f4481cb4bdce545a08df36dc406dab141e2989c5ae800b9d251b1d",
+    "zenith/providers.py": "45d131dd915c65ece8211abd9459008c66eca0411f777f904df196d70db8f4d1",
+    "system/lib/openrouter_free_runtime.py": "3b45810bf5105d3d7ed4ef4053ee2f4f800bdd04d548f748d520eb4b0cecb3eb"
+  },
+  "source": {
+    "path": "runtime-source.zip",
+    "sha256": "18c1746619b135a53988e277fb2e8dcb2a2aad690f331204b9927c1b1de96281",
+    "scope": "Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads"
+  },
+  "model_evidence": {
+    "schema": "zenith_public_provider_refresh_v1",
+    "observed_at": "2026-10-14T18:49:55.823316+00:00",
+    "compiled_at": "2026-10-14T18:53:22.237083+00:00",
+    "boundary": "Public unauthenticated catalogue, endpoint metadata and official model documentation only; offline checks through unmodified repository policy code. No inference, credentials, account mutation, maintained edits, commitments or budget reservations.",
+    "primary_model": "deepseek/deepseek-v4.1-flash",
+    "primary_catalogue_created_utc": "2026-09-10T06:21:25+00:00",
+    "primary_reasoning_effort": "low",
+    "selection_basis": "Keep the existing proven low-reasoning model and endpoint custody for this pilot. Newest model now has metadata-compatible structured JSON but no observed local execution evidence; recency alone does not establish better research-task delivery.",
+    "primary_routes": [
+      {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "provider_slug": "deepinfra/fp8",
+        "reasoning_effort": "low",
+        "request_reasoning": {
+          "effort": "low",
+          "exclude": true
+        },
+        "status": 0,
+        "input_usd_per_million": "0.14000000",
+        "output_usd_per_million": "0.42000000",
+        "request_fee_usd": "0",
+        "context_length": 1048576,
+        "max_completion_tokens": 131072,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "stop",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "top_k",
+          "seed",
+          "min_p",
+          "logit_bias",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "response_format",
+          "reasoning_effort"
+        ],
+        "reasoning_none_eligible": true,
+        "reasoning_low_eligible": true,
+        "model_reasoning": {
+          "mandatory": false,
+          "default_enabled": true,
+          "supported_efforts": [
+            "max",
+            "high",
+            "low"
+          ],
+          "default_effort": "high"
+        },
+        "endpoint_pricing_raw": {
+          "prompt": "0.00000014",
+          "completion": "0.00000042",
+          "input_cache_read": "0.0000000042",
+          "discount": 0.3
+        },
+        "reservation_input_usd_per_million": "0.14000000",
+        "reservation_output_usd_per_million": "0.891000000",
+        "endpoint_url": "https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints"
+      },
+      {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "provider_slug": "baidu/fp8",
+        "reasoning_effort": "low",
+        "request_reasoning": {
+          "effort": "low",
+          "exclude": true
+        },
+        "status": 0,
+        "input_usd_per_million": "0.1497000000",
+        "output_usd_per_million": "0.5988000000",
+        "request_fee_usd": "0",
+        "context_length": 1048576,
+        "max_completion_tokens": 393216,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "temperature",
+          "top_p",
+          "max_tokens",
+          "stop",
+          "response_format",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "reasoning_effort"
+        ],
+        "reasoning_none_eligible": true,
+        "reasoning_low_eligible": true,
+        "model_reasoning": {
+          "mandatory": false,
+          "default_enabled": true,
+          "supported_efforts": [
+            "max",
+            "high",
+            "low"
+          ],
+          "default_effort": "high"
+        },
+        "endpoint_pricing_raw": {
+          "prompt": "0.0000001497",
+          "completion": "0.0000005988",
+          "input_cache_read": "0.000000002994",
+          "discount": 0.501
+        },
+        "reservation_input_usd_per_million": "0.1497000000",
+        "reservation_output_usd_per_million": "0.891000000",
+        "endpoint_url": "https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints"
+      },
+      {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "provider_slug": "morph/fp8",
+        "reasoning_effort": "low",
+        "request_reasoning": {
+          "effort": "low",
+          "exclude": true
+        },
+        "status": 0,
+        "input_usd_per_million": "0.022000000",
+        "output_usd_per_million": "0.7000000",
+        "request_fee_usd": "0",
+        "context_length": 1048576,
+        "max_completion_tokens": 943718,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "stop",
+          "top_p",
+          "top_k",
+          "min_p",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "seed",
+          "logit_bias",
+          "response_format",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "reasoning_effort"
+        ],
+        "reasoning_none_eligible": true,
+        "reasoning_low_eligible": true,
+        "model_reasoning": {
+          "mandatory": false,
+          "default_enabled": true,
+          "supported_efforts": [
+            "max",
+            "high",
+            "low"
+          ],
+          "default_effort": "high"
+        },
+        "endpoint_pricing_raw": {
+          "prompt": "0.000000022",
+          "completion": "0.0000007",
+          "input_cache_read": "0.000000009",
+          "discount": 0
+        },
+        "reservation_input_usd_per_million": "0.022000000",
+        "reservation_output_usd_per_million": "0.891000000",
+        "endpoint_url": "https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints"
+      }
+    ],
+    "latest_strict_eligible_model": {
+      "model": "inclusionai/ling-3.1-flash",
+      "catalogue_created_utc": "2026-10-02T14:07:04+00:00",
+      "provider_slug": "deepinfra/fp4",
+      "input_usd_per_million": "0.30",
+      "output_usd_per_million": "0.90",
+      "status": 0,
+      "context_length": 262144,
+      "max_completion_tokens": 235929,
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "max_tokens",
+        "temperature",
+        "top_p",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "repetition_penalty",
+        "top_k",
+        "seed",
+        "min_p",
+        "logit_bias",
+        "structured_outputs",
+        "tools",
+        "tool_choice",
+        "response_format"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true
+      },
+      "reasoning_note": "Optional reasoning supported; reasoning_effort levels not enumerated. Official Ant Ling effort tutorial currently scopes effort levels to Ring-2.6-1T, so do not infer Ling low support. Disabled reasoning can be represented for a separately frozen interface qualification. No current or historical local execution canary observed on this new DeepInfra route.",
+      "recommendation": "Optional separately frozen candidate, not a substitution or fallback during paired comparisons.",
+      "novita_route_note": "Cheapest novita $0.075/$0.225 route still lacks response_format and structured_outputs."
+    },
+    "other_eligible_comparators": [
+      {
+        "model": "qwen/qwen3.8-omni-flash",
+        "catalogue_created_utc": "2026-09-21T03:05:54Z",
+        "provider_slug": "alibaba",
+        "input_usd_per_million": "0.15",
+        "output_usd_per_million": "0.47",
+        "reasoning_effort": "none",
+        "historical_evidence": "October13 none interface canary 4/4; model effort enumeration unavailable."
+      },
+      {
+        "model": "z-ai/glm-5.3-flash",
+        "catalogue_created_utc": "2026-08-26T13:59:01Z",
+        "provider_slug": "fireworks",
+        "input_usd_per_million": "0.15",
+        "output_usd_per_million": "0.50",
+        "reasoning_effort": "low",
+        "historical_evidence": "October13 low interface canary 4/4; none failed HTTP400. Reasoning mandatory."
+      }
+    ],
+    "modest_pilot_cost_scenario": {
+      "calls": 24,
+      "assumed_actual_input_tokens_per_call": 5000,
+      "assumed_total_billed_completion_tokens_per_call_including_reasoning": 3000,
+      "all_deepinfra_estimated_invoice_usd": "0.04704",
+      "eight_calls_per_primary_route_estimated_invoice_usd": "0.0537192000",
+      "illustrative_range_usd": [
+        "0.0212312000",
+        "0.1024512000"
+      ],
+      "range_assumptions": "24 calls, 8/route; low 3000 input+1000 billed completion/call, high 8000 input+6000 billed completion/call; no cached-input discounts assumed.",
+      "suggested_hard_ceiling_usd": "0.50",
+      "suggested_max_output_tokens": 6144,
+      "reservation_scenario": {
+        "conservative_input_token_bound_per_call": 20000,
+        "output_token_cap_per_call": 6144,
+        "eight_calls_per_primary_route_reservation_usd": "0.1812552960"
+      },
+      "boundary": "Illustrative token scenario, not measured expected spend or invoice prediction. A $0.50 maximum is a proposed ceiling, not expected spend, new authorization or a reservation. Final frozen prompt-byte bounds and provider receipts determine reservations/charges."
+    },
+    "policy": {
+      "max_input_usd_per_million": "0.50",
+      "max_output_usd_per_million": "1.50",
+      "request_fee_usd": "0",
+      "global_active_call_limit": 3,
+      "per_exact_provider_slug_limit": 1,
+      "automatic_fallbacks": false,
+      "automatic_retries": false
+    },
+    "comparison_contract": "One model and reasoning setting across arms; all paired arms for a task stay on the same exact pinned provider_slug. Only independent trajectories share up to three host slots. Keep dependent calls ordered, atomically reserve a shared budget, and drain all calls before stop/checkpoint. Legacy callers serial.",
+    "reservation_note": "Adapter reserves the greater catalogue/endpoint price per component. DeepSeek catalogue output is $0.891/M, so output reservation is $0.891/M even at pinned DeepInfra $0.42/M. Advertised endpoint prices already include discounts; do not apply discount again. Retain all billed reasoning/output tokens.",
+    "changes_since_earlier_today": [
+      "Ling3.1 Flash now has strict-JSON-capable deepinfra/fp4 endpoint at $0.30/$0.90 and is the newest strict eligible model.",
+      "DeepSeek morph/fp8 price fell from $0.028/$0.80 to $0.022/$0.70.",
+      "DeepSeek catalogue minimum prompt price is now $0.01584/M; catalogue completion remains $0.891/M.",
+      "GLM inference-net/fp4 input price is now $0.075/M; completion $0.15/M."
+    ],
+    "official_sources": [
+      {
+        "url": "https://huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash",
+        "interpretation": "Official current model identity/card and capabilities; historical release September10."
+      },
+      {
+        "url": "https://developer.ant-ling.com/en/docs/models/ling/",
+        "interpretation": "Current official Ling3.1 model identity, hybrid reasoning, coding/agent-task positioning."
+      },
+      {
+        "url": "https://developer.ant-ling.com/en/docs/tutorials/effort/",
+        "interpretation": "Effort controls currently documented only for Ring2.6, not Ling3.1."
+      },
+      {
+        "url": "https://openrouter.ai/api/v1/models",
+        "interpretation": "Current official public model catalogue."
+      }
+    ],
+    "historical_sources": [
+      {
+        "path": "examples/observation-learning/v1/protocol.json",
+        "role": "Historical DeepSeek low-reasoning frozen model evidence."
+      },
+      {
+        "path": "examples/observation-learning/model-qualification-20261013.json",
+        "role": "Historical Qwen/GLM interface canaries; no new execution."
+      }
+    ],
+    "offline_validation_file": "offline-policy-validation.json",
+    "followup_rationale": "After the complete Ling no-reasoning pilot, test all three same native contract families with fresh unfiltered parents under a recent low-reasoning Chinese model. This is a separate exploratory 18-call construction, not a causal isolated reasoning comparison or independent-domain replication; no model outputs/panels used to tune runtime or prompts."
+  },
+  "selection": "Fresh unfiltered first parents; native counterexamples; repair selected on supplied examples plus its own measured probes only, preserving every measured parent success. Every arm receives repair even without a counterexample; repair gains alone do not identify probe value.",
+  "comparison": "Ordinary/witness each use one generated policy call plus one repair; fixed uses no policy call and one repair. Each has eight probe slots, no mandatory shared probe floor. First parent is the no-change control. Notes differ in prompting only; no privileged routing.",
+  "boundary": "Exploratory comparison on authored wrappers for native software semantics. Six model parents are not six independent source mechanisms. No acquired update rule, protected novelty or production-value claim."
+}

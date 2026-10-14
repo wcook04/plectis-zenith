@@ -18,7 +18,7 @@ import time
 from jsonschema import validate
 
 from research.decomposition_tasks import build_dataset, public_task
-from research.investigator_study import archive_runtime
+from zenith.source_snapshot import archive_runtime
 from zenith.budgeted import OpenRouterBudgetedProvider, budget_options
 from zenith.investigation_program import execute, validate_source
 from zenith.providers import digest, now, write_json
@@ -37,13 +37,14 @@ fresh. context contains the task input only. There are no external tables.
 Use the measured development examples to infer the source-specific behaviour.
 Do not hardcode the example outputs; later queries have new values/combinations.
 Only function definitions at module level. No imports, annotations, decorators,
-default arguments, private names, exceptions, while loops, I/O or global state.
+default arguments, private names, exceptions, I/O or global state.
 The single local name _ is allowed; other leading-underscore names are not.
 Use x*x and x*x*x rather than exponentiation (**); do not use function defaults.
-For loops, comprehensions, lambda, nonlocal closure variables and arithmetic
+For and while loops, comprehensions, lambda, nonlocal closure variables and arithmetic
 except power are permitted. No classes, try/except, yield or recursion tricks.
+All execution remains bounded by the worker CPU, memory and wall-time limits.
 Builtins: abs all any bool dict enumerate float int isinstance len list max min
-range reversed round set sorted str sum tuple zip.
+range repr reversed round set sorted str sum tuple zip.
 Methods: get items keys values append extend sort lower upper strip split
 setdefault add discard copy count index pop remove clear update.
 Limit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a
@@ -142,7 +143,7 @@ def prompt_for(task, arm, current, trials):
 
 def dependencies():
     paths = ('research/decomposition_study.py', 'research/decomposition_tasks.py',
-             'research/investigator_study.py', 'zenith/investigation_program.py',
+             'zenith/source_snapshot.py', 'zenith/investigation_program.py',
              'zenith/budgeted.py', 'zenith/provider_policy.py', 'zenith/providers.py',
              'system/lib/openrouter_free_runtime.py')
     return {p: hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}

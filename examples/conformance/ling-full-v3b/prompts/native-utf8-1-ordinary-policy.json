@@ -1,0 +1,433 @@
+{
+  "prompt": {
+    "task": {
+      "id": "native-utf8-1",
+      "source_id": "utf8-1",
+      "contract": "Native strict codecs UTF8 incremental-decoder diagnostic.\nA fresh query is exactly {\"events\":[event,...]}, with at most 32 events.\nAn event is exactly {\"op\":\"feed\",\"bytes\":[integer,...]}, {\"op\":\"finish\"},\nor {\"op\":\"reset\"}. Each byte is an integer 0..255, excluding booleans; each\nchunk has at most 64 bytes and the entire query at most 256 bytes. Empty chunks\nare legal. Feed invokes decode(bytes, final=False); finish invokes decode with\nempty bytes and final=True. Count Unicode code points in strings successfully\nreturned by these calls, not bytes or graphemes. A UnicodeDecodeError is a\nmeasured result: status becomes \"error\", and the failing call contributes ZERO\ncharacters, including any valid prefix in that same chunk. Successful finish\nsets status \"finished\". Otherwise status is \"open\", including incomplete byte\nprefixes. After either terminal status, only reset is legal. Reset creates a\nfresh strict decoder and sets count=0,status=\"open\". Reset may also occur while\nopen. Return {\"count\":integer,\"status\":\"open\"|\"finished\"|\"error\"}. Each query\nstarts fresh. Invalid/incomplete UTF8 bytes are allowed inputs; malformed query\nshapes and events after a terminal result without reset are illegal queries.\nImplement investigate(context, acquire). No initial program is supplied.\n",
+      "examples": [
+        {
+          "input": {
+            "events": []
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  163
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  66,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  97
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        }
+      ]
+    },
+    "parent_source": "def investigate(context, acquire):\n    def feed(state, data):\n        if state['status'] != 'open':\n            return\n        pending = state['pending'] + list(data)\n        index = 0\n        total = len(pending)\n        count = 0\n        while index < total:\n            first = pending[index]\n            if first < 128:\n                index += 1\n                count += 1\n            elif first < 192:\n                state['pending'] = []\n                state['status'] = 'error'\n                return\n            elif first < 224:\n                length = 2\n                low = 128\n                high = 191\n            elif first < 240:\n                length = 3\n                if first < 226:\n                    low = 128\n                    high = 191\n                elif first == 226:\n                    low = 128\n                    high = 159\n                elif first < 237:\n                    low = 128\n                    high = 191\n                elif first == 237:\n                    low = 128\n                    high = 159\n                else:\n                    low = 128\n                    high = 191\n            elif first < 248:\n                length = 4\n                if first == 240:\n                    low = 144\n                    high = 191\n                elif first < 244:\n                    low = 128\n                    high = 191\n                elif first == 244:\n                    low = 128\n                    high = 143\n                else:\n                    low = 128\n                    high = 191\n            else:\n                state['pending'] = []\n                state['status'] = 'error'\n                return\n            if index + length > total:\n                break\n            valid = True\n            for offset in range(1, length):\n                byte = pending[index + offset]\n                if byte < low or byte > high:\n                    valid = False\n                    break\n                if offset == 1:\n                    low = 128\n                    high = 191\n            if not valid:\n                state['pending'] = []\n                state['status'] = 'error'\n                return\n            index += length\n            count += 1\n        state['pending'] = pending[index:]\n        state['count'] += count\n\n    def finish(state):\n        if state['status'] != 'open':\n            return\n        if len(state['pending']) != 0:\n            state['pending'] = []\n            state['status'] = 'error'\n        else:\n            state['status'] = 'finished'\n\n    def reset(state):\n        state['count'] = 0\n        state['status'] = 'open'\n        state['pending'] = []\n\n    state = {'count': 0, 'status': 'open', 'pending': []}\n    for event in context['events']:\n        operation = event['op']\n        if operation == 'feed':\n            feed(state, event['bytes'])\n        elif operation == 'finish':\n            finish(state)\n        elif operation == 'reset':\n            reset(state)\n    return {'count': state['count'], 'status': state['status']}\n",
+    "parent_examples": {
+      "correct": 5,
+      "total": 8,
+      "errors": 3,
+      "rows": [
+        {
+          "answer": {
+            "count": 0,
+            "status": "open"
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": []
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          },
+          "correct": true
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        },
+        {
+          "answer": {
+            "count": 0,
+            "status": "open"
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "count": 1,
+            "status": "finished"
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  163
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "count": 1,
+            "status": "finished"
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "count": 0,
+            "status": "error"
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          },
+          "correct": true
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  66,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  97
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        }
+      ]
+    },
+    "functions": [
+      {
+        "name": "investigate",
+        "arguments": [
+          "context",
+          "acquire"
+        ],
+        "calls": [],
+        "called_by": []
+      }
+    ],
+    "instruction": "Write the strongest small adaptive investigation program you can. Inspect the whole parent code and public native contract. Seek a legal input on which the parent disagrees with the native source. Use code inspection, examples, receipts, stateful testing and boundaries freely. Avoid duplicate queries; null stops. Up to eight native query slots are available. You may include a brief note useful for a later repair. No particular decomposition is required.",
+    "probe_slots": 8,
+    "context_fields": [
+      "source_id",
+      "contract",
+      "parent_source",
+      "examples",
+      "receipts",
+      "remaining_slots"
+    ],
+    "note_status": "Optional proposal, not verified introspection or evidence."
+  },
+  "system": "You write an EXPERIMENT SELECTOR, not the program being tested.\nReturn one JSON object with source, scope and change strings. source defines\ninvestigate(context, acquire). Its result MUST be an object with query and\noptional note: {\"query\": a legal native input object or null, \"note\": short JSON}.\nNever return the native source's answer shape. The quoted native contract and\nexamples describe the system you are testing, not your own return contract.\ncontext contains source_id, contract, parent_source, examples, receipts,\nremaining_slots. Inspect this context to choose one revealing input. The host\nexecutes that input on the native source and parent program, then invokes you\nagain with the resulting receipt. No API calls or external tables are available.\nPast receipts include query errors, native expected values, parent answers/errors,\nand verified_counterexample. Do not supply an expected answer yourself. Avoid\nqueries already in examples or receipts. Null stops. You have eight query slots.\nOptional notes are hypotheses for later whole-program repair, at most2048bytes.\nWrite a concise selector; do not recreate the entire native library unless a\nsmall local simulation actually helps select a discriminating input.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, I/O or global state.\nThe single local name _ is allowed; other leading-underscore names are not.\nUse x*x and x*x*x rather than exponentiation (**); do not use function defaults.\nFor and while loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nAll execution remains bounded by the worker CPU, memory and wall-time limits.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange repr reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

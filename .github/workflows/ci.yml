@@ -15,7 +15,7 @@ concurrency:
 jobs:
   source-checkout:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - name: Check out source
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -37,5 +37,18 @@ jobs:
           python scripts/check_extraction.py
           python scripts/build_learning_report.py replay
           python scripts/build_observation_report.py replay
+      - name: Replay current experiments without inference
+        run: |
+          python scripts/build_conformance_report.py replay examples/conformance/deepseek-low-v1
+          python scripts/build_conformance_report.py replay examples/conformance/ling-qualification-v2
+          python scripts/build_conformance_report.py replay examples/conformance/ling-interrupted-v3
+          python scripts/build_conformance_report.py replay examples/conformance/ling-full-v3b
+          python scripts/build_conformance_report.py replay examples/conformance/deepseek-reasoning-v3c
+          python scripts/build_advance_report.py
+          git diff --exit-code -- docs/advance-campaign-20261014.json
+          python -m zipfile -e examples/continuation-memory/leave-one-out-v1/source.zip "$RUNNER_TEMP/zenith-memory"
+          cd "$RUNNER_TEMP/zenith-memory"
+          python -I verify_all.py --out run-v1
+          python -I verify_all.py --out run-v2
       - name: Run offline regression suite
         run: python -m pytest tests

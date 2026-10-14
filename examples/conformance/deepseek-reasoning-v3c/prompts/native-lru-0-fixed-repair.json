@@ -1,0 +1,789 @@
+{
+  "prompt": {
+    "task": {
+      "id": "native-lru-0",
+      "source_id": "lru-0",
+      "contract": "Native functools.lru_cache diagnostic. A fresh query is exactly\n{\"capacity\": integer, \"events\": [event, ...]}, with capacity 1..4 and at most\n32 events. An event is exactly {\"op\":\"call\", \"key\":integer} with key 0..31,\nor {\"op\":\"reset\"}. Booleans are not integers. A fresh capacity-sized cache\nwraps a function returning its integer argument. Calls and resets operate in\nlist order. Reset calls cache_clear, clearing contents and hit/miss counters.\nReturn {\"hits\":integer,\"misses\":integer,\"size\":integer} from cache_info after\nthe events. Each query has an independent fresh cache. The source has no hidden\ncapacity or external data. Implement investigate(context, acquire), returning\nthat JSON object. No initial program is supplied. An allowed native probe uses\nexactly the same query schema.\n",
+      "examples": [
+        {
+          "input": {
+            "capacity": 1,
+            "events": []
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          }
+        },
+        {
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          }
+        },
+        {
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          }
+        },
+        {
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 2,
+            "size": 2
+          }
+        },
+        {
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 2
+          }
+        },
+        {
+          "input": {
+            "capacity": 3,
+            "events": [
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          }
+        },
+        {
+          "input": {
+            "capacity": 4,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 4
+          }
+        },
+        {
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 31
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "reset"
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          }
+        }
+      ]
+    },
+    "parent_source": "def investigate(context, acquire):\n    capacity = context[\"capacity\"]\n    events = context[\"events\"]\n    cache = {}\n    hits = 0\n    misses = 0\n    for event in events:\n        op = event[\"op\"]\n        if op == \"call\":\n            key = event[\"key\"]\n            if key in cache:\n                hits = hits + 1\n                cache.pop(key)\n                cache[key] = key\n            else:\n                misses = misses + 1\n                cache[key] = key\n                if len(cache) > capacity:\n                    first = list(cache.keys())[0]\n                    cache.pop(first)\n        else:\n            cache.clear()\n            hits = 0\n            misses = 0\n    return {\"hits\": hits, \"misses\": misses, \"size\": len(cache)}\n",
+    "parent_examples": {
+      "correct": 8,
+      "total": 8,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 1,
+            "events": []
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 2,
+            "size": 2
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 2,
+            "size": 2
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 4,
+            "size": 2
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 2
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 3,
+            "events": [
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 4,
+            "size": 4
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 4,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 4
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 31
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "reset"
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "correct": true
+        }
+      ]
+    },
+    "investigation": {
+      "receipts": [
+        {
+          "slot": 1,
+          "query": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 31
+              },
+              {
+                "op": "call",
+                "key": 0
+              },
+              {
+                "op": "call",
+                "key": 31
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          },
+          "parent_answer": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          },
+          "parent_error": null,
+          "verified_counterexample": false,
+          "query_units": 4,
+          "note": null
+        },
+        {
+          "slot": 2,
+          "query": {
+            "capacity": 4,
+            "events": [
+              {
+                "op": "call",
+                "key": 0
+              },
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 0
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 6,
+            "size": 4
+          },
+          "parent_answer": {
+            "hits": 1,
+            "misses": 6,
+            "size": 4
+          },
+          "parent_error": null,
+          "verified_counterexample": false,
+          "query_units": 8,
+          "note": null
+        },
+        {
+          "slot": 3,
+          "query": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 0
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "call",
+                "key": 0
+              },
+              {
+                "op": "call",
+                "key": 0
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          },
+          "parent_answer": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          },
+          "parent_error": null,
+          "verified_counterexample": false,
+          "query_units": 5,
+          "note": null
+        },
+        {
+          "slot": 4,
+          "query": {
+            "capacity": 3,
+            "events": [
+              {
+                "op": "call",
+                "key": 0
+              },
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 0
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 5,
+            "size": 3
+          },
+          "parent_answer": {
+            "hits": 1,
+            "misses": 5,
+            "size": 3
+          },
+          "parent_error": null,
+          "verified_counterexample": false,
+          "query_units": 7,
+          "note": null
+        },
+        {
+          "slot": 5,
+          "query": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "parent_answer": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "parent_error": null,
+          "verified_counterexample": false,
+          "query_units": 2,
+          "note": null
+        },
+        {
+          "slot": 6,
+          "query": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 2,
+            "size": 1
+          },
+          "parent_answer": {
+            "hits": 0,
+            "misses": 2,
+            "size": 1
+          },
+          "parent_error": null,
+          "verified_counterexample": false,
+          "query_units": 3,
+          "note": null
+        },
+        {
+          "slot": 7,
+          "query": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 2,
+            "size": 2
+          },
+          "parent_answer": {
+            "hits": 0,
+            "misses": 2,
+            "size": 2
+          },
+          "parent_error": null,
+          "verified_counterexample": false,
+          "query_units": 3,
+          "note": null
+        },
+        {
+          "slot": 8,
+          "query": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "parent_answer": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "parent_error": null,
+          "verified_counterexample": false,
+          "query_units": 2,
+          "note": null
+        }
+      ],
+      "native_probes": 8,
+      "query_attempts": 8,
+      "query_units": 34,
+      "policy_executions": 0,
+      "slots_used": 8,
+      "detected": false,
+      "semantic_defect": false,
+      "technical_defect": false,
+      "witness_sha256": null
+    },
+    "instruction": "Repair the complete ordinary program using all measured outcomes. Investigator notes are hypotheses: inspect the code and receipts yourself. You may change any function, interface or state, remove the decomposition or preserve correct code. Retain all previously correct obligations, not only the latest witness. Return source, scope and change."
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, I/O or global state.\nThe single local name _ is allowed; other leading-underscore names are not.\nUse x*x and x*x*x rather than exponentiation (**); do not use function defaults.\nFor and while loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nAll execution remains bounded by the worker CPU, memory and wall-time limits.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange repr reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

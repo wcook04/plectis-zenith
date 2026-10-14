@@ -1,0 +1,1138 @@
+{
+  "schema": "zenith_learned_regressions_v1",
+  "boundary": "One acquired input retained as an ordinary regression test. The test has posthoc diagnostic value on four exposed programs of the same UTF8 contract. No cross-mechanism transfer, improved learning policy, graph advantage or production claim.",
+  "regressions": [
+    {
+      "id": "utf8-early-invalid-prefix",
+      "source_binding": {
+        "contract_family": "utf8",
+        "source_versions": {
+          "python": "3.12.7",
+          "sqlite": "3.45.3",
+          "lru": "stdlib functools.lru_cache",
+          "utf8": "stdlib codecs strict utf-8"
+        },
+        "native_contract": "Native strict codecs UTF8 incremental-decoder diagnostic.\nA fresh query is exactly {\"events\":[event,...]}, with at most 32 events.\nAn event is exactly {\"op\":\"feed\",\"bytes\":[integer,...]}, {\"op\":\"finish\"},\nor {\"op\":\"reset\"}. Each byte is an integer 0..255, excluding booleans; each\nchunk has at most 64 bytes and the entire query at most 256 bytes. Empty chunks\nare legal. Feed invokes decode(bytes, final=False); finish invokes decode with\nempty bytes and final=True. Count Unicode code points in strings successfully\nreturned by these calls, not bytes or graphemes. A UnicodeDecodeError is a\nmeasured result: status becomes \"error\", and the failing call contributes ZERO\ncharacters, including any valid prefix in that same chunk. Successful finish\nsets status \"finished\". Otherwise status is \"open\", including incomplete byte\nprefixes. After either terminal status, only reset is legal. Reset creates a\nfresh strict decoder and sets count=0,status=\"open\". Reset may also occur while\nopen. Return {\"count\":integer,\"status\":\"open\"|\"finished\"|\"error\"}. Each query\nstarts fresh. Invalid/incomplete UTF8 bytes are allowed inputs; malformed query\nshapes and events after a terminal result without reset are illegal queries.\nImplement investigate(context, acquire). No initial program is supplied.\n"
+      },
+      "query": {
+        "events": [
+          {
+            "op": "feed",
+            "bytes": [
+              224,
+              128
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "count": 0,
+        "status": "error"
+      },
+      "acquired_from": {
+        "bundle": "examples/conformance/ling-full-v3b",
+        "policy_call_id": "native-utf8-1-ordinary-policy",
+        "provider_call_id": "6903310d698aa19fcd04aacf106776bb0b53470299b5f7ea3da2ad46012292c0",
+        "policy_source_sha256": "dc2515194444f895e0ae26de6b378449a1e0571fc2906675c5cb78ecd53f6edd",
+        "policy_raw_sha256": "a62e92b37179514a22100b67bef6cfd512bcada0eef48b97c6fa96f4d3a9bb22",
+        "policy_prompt_sha256": "feef526a5e7bf615ddb1132d8b412384d2595330135ee41ba9bf7bb16db7647d",
+        "query_receipt": {
+          "slot": 1,
+          "query": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  224,
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          },
+          "parent_answer": {
+            "count": 0,
+            "status": "open"
+          },
+          "parent_error": null,
+          "verified_counterexample": true,
+          "query_units": 4,
+          "note": {
+            "hypothesis": "Parent applies the E0 A0 lower-bound to all continuation bytes, but native UTF-8 only constrains byte 1; E0 80 is valid U+0000."
+          }
+        },
+        "query_receipt_sha256": "eb157ce28fc9ac07d7e3e9f6ed2bfb3a677bd66097733ec97d47343ff325a501",
+        "frozen_sha256": "107f61b44196ddc273db640517e3ed429d9c5534bfe3917d90c4dc3c339bda08",
+        "source_archive_sha256": "7843d1c72bb508a4b135ebb2b11d52932cfc5d56ff7bbc6455df44dfee926ae2"
+      },
+      "untrusted_hypothesis": {
+        "status": "Preserved original model note, contradicted by the native observation: E0 80 is an invalid overlong prefix, not a valid NUL encoding. The note is not certified evidence.",
+        "original_note": {
+          "hypothesis": "Parent applies the E0 A0 lower-bound to all continuation bytes, but native UTF-8 only constrains byte 1; E0 80 is valid U+0000."
+        }
+      },
+      "acquisition_cost": {
+        "policy_calls": 1,
+        "policy_cost_usd": "0.00090378",
+        "original_native_probes": 1,
+        "original_query_units": 4,
+        "shared_parent_calls": 1,
+        "shared_parent_cost_usd": "0.0010965",
+        "combined_calls_if_parent_charged": 2,
+        "combined_cost_usd": "0.00200028",
+        "new_model_calls_in_reuse_check": 0,
+        "native_queries_in_reuse_check": 36
+      },
+      "posthoc_targets": [
+        {
+          "task_id": "native-utf8-0",
+          "version": "parent",
+          "call_id": "native-utf8-0-parent",
+          "source_sha256": "6051ee5264899778c697c9f210061d6f9ba7b2f5b03c7cf1f7714cd21f0abe70",
+          "observation": {
+            "slot": 1,
+            "query": {
+              "events": [
+                {
+                  "op": "feed",
+                  "bytes": [
+                    224,
+                    128
+                  ]
+                }
+              ]
+            },
+            "expected": {
+              "count": 0,
+              "status": "error"
+            },
+            "parent_answer": {
+              "count": 0,
+              "status": "open"
+            },
+            "parent_error": null,
+            "verified_counterexample": true,
+            "query_units": 4,
+            "note": {
+              "hypothesis": "Parent applies the E0 A0 lower-bound to all continuation bytes, but native UTF-8 only constrains byte 1; E0 80 is valid U+0000."
+            }
+          },
+          "full_fixed_pack": [
+            {
+              "index": 0,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      0
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "finished"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'needed' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 4
+            },
+            {
+              "index": 1,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      240,
+                      159,
+                      152
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "error"
+              },
+              "actual": {
+                "count": 0,
+                "status": "error"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 6
+            },
+            {
+              "index": 2,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      237,
+                      160,
+                      128
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "error"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": true,
+              "query_units": 5
+            },
+            {
+              "index": 3,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      97
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      98,
+                      255
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "error"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'needed' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 6
+            },
+            {
+              "index": 4,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      65
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'needed' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 3
+            },
+            {
+              "index": 5,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      194
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      163
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 5
+            },
+            {
+              "index": 6,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      240,
+                      159,
+                      152,
+                      128
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 0,
+                "status": "error"
+              },
+              "error": null,
+              "counterexample": true,
+              "query_units": 6
+            },
+            {
+              "index": 7,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      226,
+                      130
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  },
+                  {
+                    "op": "reset"
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      97
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'needed' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 8
+            }
+          ],
+          "fixed_semantic_failures": 2,
+          "fixed_technical_failures": 4,
+          "query_absent_from_full_fixed_pack": true
+        },
+        {
+          "task_id": "native-utf8-0",
+          "version": "fixed_selected",
+          "call_id": "native-utf8-0-fixed-repair",
+          "source_sha256": "f7d141350689e7a984514d630e5effdf0abb166582b2585e1f588cc1be8bec72",
+          "observation": {
+            "slot": 1,
+            "query": {
+              "events": [
+                {
+                  "op": "feed",
+                  "bytes": [
+                    224,
+                    128
+                  ]
+                }
+              ]
+            },
+            "expected": {
+              "count": 0,
+              "status": "error"
+            },
+            "parent_answer": {
+              "count": 0,
+              "status": "open"
+            },
+            "parent_error": null,
+            "verified_counterexample": true,
+            "query_units": 4,
+            "note": {
+              "hypothesis": "Parent applies the E0 A0 lower-bound to all continuation bytes, but native UTF-8 only constrains byte 1; E0 80 is valid U+0000."
+            }
+          },
+          "full_fixed_pack": [
+            {
+              "index": 0,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      0
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "finished"
+              },
+              "actual": {
+                "count": 1,
+                "status": "finished"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 4
+            },
+            {
+              "index": 1,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      240,
+                      159,
+                      152
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "error"
+              },
+              "actual": {
+                "count": 0,
+                "status": "error"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 6
+            },
+            {
+              "index": 2,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      237,
+                      160,
+                      128
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "error"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": true,
+              "query_units": 5
+            },
+            {
+              "index": 3,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      97
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      98,
+                      255
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "error"
+              },
+              "actual": {
+                "count": 2,
+                "status": "error"
+              },
+              "error": null,
+              "counterexample": true,
+              "query_units": 6
+            },
+            {
+              "index": 4,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      65
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 3
+            },
+            {
+              "index": 5,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      194
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      163
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 5
+            },
+            {
+              "index": 6,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      240,
+                      159,
+                      152,
+                      128
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 0,
+                "status": "error"
+              },
+              "error": null,
+              "counterexample": true,
+              "query_units": 6
+            },
+            {
+              "index": 7,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      226,
+                      130
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  },
+                  {
+                    "op": "reset"
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      97
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 8
+            }
+          ],
+          "fixed_semantic_failures": 3,
+          "fixed_technical_failures": 0,
+          "query_absent_from_full_fixed_pack": true
+        },
+        {
+          "task_id": "native-utf8-1",
+          "version": "parent",
+          "call_id": "native-utf8-1-parent",
+          "source_sha256": "929c43261b909a051ee83870516247d0288767bf39cb2d7051560a110fef97b3",
+          "observation": {
+            "slot": 1,
+            "query": {
+              "events": [
+                {
+                  "op": "feed",
+                  "bytes": [
+                    224,
+                    128
+                  ]
+                }
+              ]
+            },
+            "expected": {
+              "count": 0,
+              "status": "error"
+            },
+            "parent_answer": {
+              "count": 0,
+              "status": "open"
+            },
+            "parent_error": null,
+            "verified_counterexample": true,
+            "query_units": 4,
+            "note": {
+              "hypothesis": "Parent applies the E0 A0 lower-bound to all continuation bytes, but native UTF-8 only constrains byte 1; E0 80 is valid U+0000."
+            }
+          },
+          "full_fixed_pack": [
+            {
+              "index": 0,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      0
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "finished"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 4
+            },
+            {
+              "index": 1,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      240,
+                      159,
+                      152
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "error"
+              },
+              "actual": {
+                "count": 0,
+                "status": "error"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 6
+            },
+            {
+              "index": 2,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      237,
+                      160,
+                      128
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "error"
+              },
+              "actual": {
+                "count": 0,
+                "status": "error"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 5
+            },
+            {
+              "index": 3,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      97
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      98,
+                      255
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "error"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 6
+            },
+            {
+              "index": 4,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      65
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 3
+            },
+            {
+              "index": 5,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      194
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      163
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 5
+            },
+            {
+              "index": 6,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      240,
+                      159,
+                      152,
+                      128
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 6
+            },
+            {
+              "index": 7,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      226,
+                      130
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  },
+                  {
+                    "op": "reset"
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      97
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 8
+            }
+          ],
+          "fixed_semantic_failures": 0,
+          "fixed_technical_failures": 4,
+          "query_absent_from_full_fixed_pack": true
+        },
+        {
+          "task_id": "native-utf8-1",
+          "version": "fixed_selected",
+          "call_id": "native-utf8-1-fixed-repair",
+          "source_sha256": "6da36c4605133342f469a24145071e0d2d3ea12ea51c55919bfa9c482478a392",
+          "observation": {
+            "slot": 1,
+            "query": {
+              "events": [
+                {
+                  "op": "feed",
+                  "bytes": [
+                    224,
+                    128
+                  ]
+                }
+              ]
+            },
+            "expected": {
+              "count": 0,
+              "status": "error"
+            },
+            "parent_answer": {
+              "count": 0,
+              "status": "open"
+            },
+            "parent_error": null,
+            "verified_counterexample": true,
+            "query_units": 4,
+            "note": {
+              "hypothesis": "Parent applies the E0 A0 lower-bound to all continuation bytes, but native UTF-8 only constrains byte 1; E0 80 is valid U+0000."
+            }
+          },
+          "full_fixed_pack": [
+            {
+              "index": 0,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      0
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "finished"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 4
+            },
+            {
+              "index": 1,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      240,
+                      159,
+                      152
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "error"
+              },
+              "actual": {
+                "count": 0,
+                "status": "error"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 6
+            },
+            {
+              "index": 2,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      237,
+                      160,
+                      128
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "error"
+              },
+              "actual": {
+                "count": 0,
+                "status": "error"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 5
+            },
+            {
+              "index": 3,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      97
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      98,
+                      255
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "error"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 6
+            },
+            {
+              "index": 4,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      65
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 3
+            },
+            {
+              "index": 5,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      194
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      163
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 5
+            },
+            {
+              "index": 6,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      240,
+                      159,
+                      152,
+                      128
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": {
+                "count": 1,
+                "status": "open"
+              },
+              "error": null,
+              "counterexample": false,
+              "query_units": 6
+            },
+            {
+              "index": 7,
+              "query": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      226,
+                      130
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  },
+                  {
+                    "op": "reset"
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      97
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "open"
+              },
+              "actual": null,
+              "error": "UnboundLocalError: cannot access local variable 'length' where it is not associated with a value",
+              "counterexample": true,
+              "query_units": 8
+            }
+          ],
+          "fixed_semantic_failures": 0,
+          "fixed_technical_failures": 4,
+          "query_absent_from_full_fixed_pack": true
+        }
+      ],
+      "scoped_benefit": "The exact acquired input yields a non-error semantic mismatch on all four exposed target programs and is absent from each complete eight-query fixed pack. For UTF8-1 parent and fixed repair, that pack finds four runtime errors but no semantic mismatch. For UTF8-0 fixed repair, the pack already finds three other semantic mismatches. Retain this additional input in an ordinary library; there is no claim that it improves overall conformance over the fixed tester."
+    }
+  ]
+}

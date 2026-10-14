@@ -1,4 +1,41 @@
-# Executable observation models — 14 October 2026
+# Programs, experiments and useful memory — 14 October 2026
+
+All fifteen ADVANCE returns have been assimilated with per-return reproduction boundaries and exact payload custody. The implemented unit is a program, source-bound measurements and executable questions. The host verifies discrepancies; whole-program repair preserves each measured parent success; later evaluation remains hidden until selection freezes. [Synthesis](advance-returns-20261014.md), [current paper source](../paper/zenith.tex), [campaign receipt](advance-campaign-20261014.json).
+
+## What the new experiments show
+
+**Acquired questions can help beyond cached answers, within the same learner.** Six declared leave-one-out conditions saved 208–791 extension teacher executions (11.2%–63.1%) with identical initial measurement caches. But joint acquisition still cost 5427–5698 executions over its lifetime; ordinary separate modules cost 3071. Carrying every acquired suffix into the simpler ordinary learner helped only one target and hurt five. All final models passed their checks. The positive ablation does not establish the best architecture or a generally improved learning method. [Both protocols, controls and exact replay](continuation-memory.md).
+
+**Fixed investigation beat model-written investigation in the native pilot.** Ling3.1Flash completed 36 calls for $0.03205644. All six fresh parents and every invalid proposal remain included. No post-screen tuning occurred.
+
+| Arm | Screen / 288 | Confirmation / 288 | Semantic defects found | Execution defects found |
+|---|---:|---:|---:|---:|
+| Unchanged parent | 218 | 216 | — | — |
+| Ordinary investigator | 218 | 216 | 1 | 0 |
+| Diagnostic investigator | 224 | 218 | 0 | 0 |
+| Fixed tester | 241 | 239 | 1 | 2 |
+
+Generated-policy arms use one more model call per parent than fixed testing. Every arm gets repair even without a discrepancy; the diagnostic arm's small gain cannot be credited to detected defects. The 288 rows are repeated cases from three authored native contracts, not 288 independent mechanisms. Two parents per contract do not establish a general ranking of model capabilities. [Exact method and original outputs](conformance-study.md).
+
+**One model-invented question is worth retaining.** The ordinary policy's `[224,128]` UTF-8 input exposes an overlong-prefix error on both parents and both selected fixed repairs in a post-hoc reuse check. On one parent/repair pair, the complete eight-query fixed pack finds execution errors but no semantic discrepancy, while this test does. The policy cost $0.00090378 and one native probe; its original explanation was false. We retain the measured regression, not the explanation. These are exposed programs under the same contract, not cross-mechanism confirmation. [Retained question and provenance](../examples/conformance/learned-regressions.json).
+
+## Decision
+
+Keep ordinary code and fixed tests as the working baseline. Retain useful measured evidence. The most promising research question is **when acquired questions help a later investigation enough to pay for acquiring and selecting them**. The controlled memory result motivates it; the failed transfer and native comparison constrain it. A special graph, indiscriminate memory transfer and a claim of recursive self-improvement have not earned acceptance.
+
+## Accounting and incomplete attempts
+
+The full campaign cost about three cents. Separately, the stopped DeepSeek run recorded ten attempts/$0.0212692244; a Ling interface qualification recorded three calls/$0.0037983; a storage-interrupted Ling run recorded fourteen delivered responses/$0.01240110 and one further attempt with unknown final charge. A separate DeepSeek low-reasoning follow-up on the corrected interface recorded fifteen attempts/$0.045197154672 before one response exhausted its 16,384-token allowance without assistant content. Its complete and orphan responses remain preserved, with no protected evaluation. Across these five studies, 79 reserved provider attempts have $0.114722219072 in known reported charges, plus the unresolved attempt. Its $0.0154065 reservation is a ceiling, not an invoice. None of those earlier panels is pooled with the full comparison. All construction and custody statuses remain visible in the machine-readable receipt.
+
+All five native bundles replay from their own archived runtime without inference; both memory studies pass independent reconstruction of all 42 acquisitions. The retained suite ran 856 checks: 855 passed initially, and one correctly rejected a runtime snapshot because the website source changed during the run. That exact test passed after the website edits finished. The final publication/API group passes 53 checks, and both subsequently added retained-regression tests pass; the frontend passes 34 tests and builds successfully.
+
+The paper source was updated in its existing editor and checked with the built-in compiler. The repository's PDF download retains the previous edition until a current export is available.
+
+---
+
+The following entries describe their historical stages. Their original outcomes remain unchanged; statements about “next” or “active” below refer to those dates and stages.
+
+# Earlier research record — 14 October 2026
 
 The ten frontier returns have been synthesized into one implemented loop: model-proposed source experiments, host-recorded measurements, model-written predictors and measured revision. All ten returns were audited with **337 passing return-specific tests**. [Synthesis and custody](frontier-returns-20261013.md), [active method](executable-investigations.md), [three-page paper](../paper/zenith.pdf).
 

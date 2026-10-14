@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    return {'query': {'events': [{'op': 'feed', 'bytes': [240, 159, 152, 128]}, {'op': 'finish'}]}, 'note': {'obligation': 'strict UTF8 incremental decode with exact code-point count and terminal status', 'suspected': 'parent treats a complete 4-byte sequence as incomplete/error because its boundary test uses index+needed>=length instead of index+needed+1>length', 'evidence': 'receipt for [240,159,152,128]+finish returned count=0,status=error; native expects count=1,status=finished', 'change': 'require all needed continuation bytes to be present; accept when index+needed+1 <= length, otherwise buffer only if not final'}}\",\"scope\":\"complete 4-byte UTF-8 sequence split across feed and finish; distinguishes boundary-length error from continuation validation\",\"change\":\"feed [240,159,152,128] then finish\"}",
+  "prompt_sha256": "d3b47868f4a55051bddf1ea7bb95d5addadb0cb0c5560879b10df6233cfadf2c"
+}

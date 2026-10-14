@@ -265,14 +265,9 @@ def _source_hashes(directories: list[Path]) -> dict:
 
 
 def implementation_hashes() -> dict:
-    """Freeze actual executing Python implementation, independent of data-root placement."""
-    import hashlib
-    package_root = Path(__file__).resolve().parents[1]
-    paths = []
-    for folder in ("zenith", "system/core", "system/lib", "tools", "variants"):
-        paths.extend((package_root / folder).rglob("*.py"))
-    return {str(path.relative_to(package_root)): hashlib.sha256(path.read_bytes()).hexdigest()
-            for path in sorted(paths) if path.is_file()}
+    """Compatibility API for the shared implementation-custody owner."""
+    from .source_snapshot import implementation_hashes as source_hashes
+    return source_hashes()
 
 
 def _check_frozen_graph(root: Path, spec: dict) -> None:

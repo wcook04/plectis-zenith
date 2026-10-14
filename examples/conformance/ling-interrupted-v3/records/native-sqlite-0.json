@@ -1,0 +1,3012 @@
+{
+  "task_id": "native-sqlite-0",
+  "source_id": "sqlite-0",
+  "arms": {
+    "ordinary": {
+      "policy": {
+        "source": "def investigate(context, acquire):\n    return {\"query\": {\"actions\": [{\"op\": \"put\", \"id\": 5}, {\"op\": \"delete\", \"id\": 5}, {\"op\": \"put\", \"id\": 2}]}, \"note\": {\"hypothesis\": \"SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6.\"}}",
+        "scope": "Compare AUTOINCREMENT allocation after delete/reinsert against parent's live-row maximum model.",
+        "change": "Use put 5, delete 5, then put 2: parent high becomes 2 and predicts 3; native sqlite_sequence retains 5 and should allocate 6.",
+        "error": null,
+        "call_id": "native-sqlite-0-ordinary-policy",
+        "prompt_sha256": "61a9730e6faabd4d8027870bec03130902859826a56b835d57051c8ed25d0eb3",
+        "raw_sha256": "74c0a4cb95dac6d7ce780905c0a35f923a5ffa51650de00ebab8c716df501aa0",
+        "elapsed_seconds": 8.157902208011365
+      },
+      "investigation": {
+        "receipts": [
+          {
+            "slot": 1,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "expected": 6,
+            "parent_answer": 6,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 5,
+            "note": {
+              "hypothesis": "SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6."
+            }
+          },
+          {
+            "slot": 2,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "hypothesis": "SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6."
+            }
+          },
+          {
+            "slot": 3,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "hypothesis": "SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6."
+            }
+          },
+          {
+            "slot": 4,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "hypothesis": "SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6."
+            }
+          },
+          {
+            "slot": 5,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "hypothesis": "SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6."
+            }
+          },
+          {
+            "slot": 6,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "hypothesis": "SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6."
+            }
+          },
+          {
+            "slot": 7,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "hypothesis": "SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6."
+            }
+          },
+          {
+            "slot": 8,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "hypothesis": "SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6."
+            }
+          }
+        ],
+        "native_probes": 1,
+        "query_attempts": 1,
+        "query_units": 5,
+        "policy_executions": 8,
+        "slots_used": 8,
+        "detected": false,
+        "semantic_defect": false,
+        "technical_defect": false,
+        "witness_sha256": null
+      },
+      "investigation_elapsed_seconds": 0.27256479201605543,
+      "candidate": {
+        "source": "def investigate(context, acquire):\n    table = {}\n    high = 0\n    stack = []\n    for action in context['actions']:\n        op = action['op']\n        if op == 'begin':\n            stack.append((dict(table), high))\n        elif op == 'commit':\n            stack.pop()\n        elif op == 'rollback':\n            table, high = stack.pop()\n        elif op == 'put':\n            ident = action['id']\n            table[ident] = True\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            table.pop(action['id'], None)\n    return high + 1\n",
+        "scope": "The parent model already matches all eight measured examples and the one native receipt: AUTOINCREMENT allocates max-ever-inserted-ID + 1, deletion does not lower the watermark, rollback restores the prior table and watermark, and commit preserves it. The receipt's expected value 6 is inconsistent with the native SQLite measurement for put 5, delete 5, put 2, which is 3; no code change is warranted.",
+        "change": "No change. Retain the complete parent implementation because it satisfies every verified outcome; the single receipt is a duplicate-slot hypothesis note rather than a valid counterexample.",
+        "error": null,
+        "call_id": "native-sqlite-0-ordinary-repair",
+        "prompt_sha256": "233beccd56b997c704d432b0070c6e0680ef0a38b3e5695f7e3bc3b5f99fd57d",
+        "raw_sha256": "bcd9546ef861976d2cb864c54832a72788f5afaf0204e63877c47cece2d7e968",
+        "elapsed_seconds": 11.838843083009124
+      },
+      "selected": {
+        "source": "def investigate(context, acquire):\n    table = {}\n    high = 0\n    stack = []\n    for action in context['actions']:\n        op = action['op']\n        if op == 'begin':\n            stack.append((dict(table), high))\n        elif op == 'commit':\n            stack.pop()\n        elif op == 'rollback':\n            table, high = stack.pop()\n        elif op == 'put':\n            ident = action['id']\n            table[ident] = True\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            table.pop(action['id'], None)\n    return high + 1\n",
+        "call_id": "native-sqlite-0-ordinary-repair",
+        "error": null,
+        "development": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 6,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 5
+                  },
+                  {
+                    "op": "delete",
+                    "id": 5
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 6,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_selected": true,
+        "preserves_measured_parent_successes": true,
+        "parent_on_final_evidence": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 6,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 5
+                  },
+                  {
+                    "op": "delete",
+                    "id": 5
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 6,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_on_final_evidence": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 6,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 5
+                  },
+                  {
+                    "op": "delete",
+                    "id": 5
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 6,
+              "correct": true
+            }
+          ]
+        }
+      }
+    },
+    "witness": {
+      "policy": {
+        "source": "def investigate(context, acquire):\n    return {\"query\": {\"actions\": [{\"op\": \"put\", \"id\": 5}, {\"op\": \"delete\", \"id\": 5}, {\"op\": \"put\", \"id\": 2}]}, \"note\": {\"obligation\": \"predict SQLite AUTOINCREMENT allocation after explicit put/delete\", \"suspected_boundary\": \"sqlite_sequence tracks the largest ever allocated ID and is not lowered by delete\", \"evidence\": \"parent returns max(current IDs)+1 = 3; examples show delete does not reset high, but no example reuses a lower ID after deleting the maximum\", \"proposed_change\": \"track a persistent high-water mark updated on every put, independent of current row set\"}}",
+        "scope": "AUTOINCREMENT high-water mark versus current maximum after deletion",
+        "change": "Probe put 5, delete 5, put 2; parent predicts 3 while SQLite should allocate 6",
+        "error": null,
+        "call_id": "native-sqlite-0-witness-policy",
+        "prompt_sha256": "27ad23c3a8801987adc7b6469788d2f657e53c5359fc3cd835376603cdc0130c",
+        "raw_sha256": "5b4a21dd8a936429b8e738f143368f2993951746f65f5a16244bade974912b54",
+        "elapsed_seconds": 7.225431041995762
+      },
+      "investigation": {
+        "receipts": [
+          {
+            "slot": 1,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "expected": 6,
+            "parent_answer": 6,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 5,
+            "note": {
+              "obligation": "predict SQLite AUTOINCREMENT allocation after explicit put/delete",
+              "suspected_boundary": "sqlite_sequence tracks the largest ever allocated ID and is not lowered by delete",
+              "evidence": "parent returns max(current IDs)+1 = 3; examples show delete does not reset high, but no example reuses a lower ID after deleting the maximum",
+              "proposed_change": "track a persistent high-water mark updated on every put, independent of current row set"
+            }
+          },
+          {
+            "slot": 2,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "obligation": "predict SQLite AUTOINCREMENT allocation after explicit put/delete",
+              "suspected_boundary": "sqlite_sequence tracks the largest ever allocated ID and is not lowered by delete",
+              "evidence": "parent returns max(current IDs)+1 = 3; examples show delete does not reset high, but no example reuses a lower ID after deleting the maximum",
+              "proposed_change": "track a persistent high-water mark updated on every put, independent of current row set"
+            }
+          },
+          {
+            "slot": 3,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "obligation": "predict SQLite AUTOINCREMENT allocation after explicit put/delete",
+              "suspected_boundary": "sqlite_sequence tracks the largest ever allocated ID and is not lowered by delete",
+              "evidence": "parent returns max(current IDs)+1 = 3; examples show delete does not reset high, but no example reuses a lower ID after deleting the maximum",
+              "proposed_change": "track a persistent high-water mark updated on every put, independent of current row set"
+            }
+          },
+          {
+            "slot": 4,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "obligation": "predict SQLite AUTOINCREMENT allocation after explicit put/delete",
+              "suspected_boundary": "sqlite_sequence tracks the largest ever allocated ID and is not lowered by delete",
+              "evidence": "parent returns max(current IDs)+1 = 3; examples show delete does not reset high, but no example reuses a lower ID after deleting the maximum",
+              "proposed_change": "track a persistent high-water mark updated on every put, independent of current row set"
+            }
+          },
+          {
+            "slot": 5,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "obligation": "predict SQLite AUTOINCREMENT allocation after explicit put/delete",
+              "suspected_boundary": "sqlite_sequence tracks the largest ever allocated ID and is not lowered by delete",
+              "evidence": "parent returns max(current IDs)+1 = 3; examples show delete does not reset high, but no example reuses a lower ID after deleting the maximum",
+              "proposed_change": "track a persistent high-water mark updated on every put, independent of current row set"
+            }
+          },
+          {
+            "slot": 6,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "obligation": "predict SQLite AUTOINCREMENT allocation after explicit put/delete",
+              "suspected_boundary": "sqlite_sequence tracks the largest ever allocated ID and is not lowered by delete",
+              "evidence": "parent returns max(current IDs)+1 = 3; examples show delete does not reset high, but no example reuses a lower ID after deleting the maximum",
+              "proposed_change": "track a persistent high-water mark updated on every put, independent of current row set"
+            }
+          },
+          {
+            "slot": 7,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "obligation": "predict SQLite AUTOINCREMENT allocation after explicit put/delete",
+              "suspected_boundary": "sqlite_sequence tracks the largest ever allocated ID and is not lowered by delete",
+              "evidence": "parent returns max(current IDs)+1 = 3; examples show delete does not reset high, but no example reuses a lower ID after deleting the maximum",
+              "proposed_change": "track a persistent high-water mark updated on every put, independent of current row set"
+            }
+          },
+          {
+            "slot": 8,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 5
+                },
+                {
+                  "op": "delete",
+                  "id": 5
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "query_error": "Duplicate of an example or earlier query; slot consumed.",
+            "note": {
+              "obligation": "predict SQLite AUTOINCREMENT allocation after explicit put/delete",
+              "suspected_boundary": "sqlite_sequence tracks the largest ever allocated ID and is not lowered by delete",
+              "evidence": "parent returns max(current IDs)+1 = 3; examples show delete does not reset high, but no example reuses a lower ID after deleting the maximum",
+              "proposed_change": "track a persistent high-water mark updated on every put, independent of current row set"
+            }
+          }
+        ],
+        "native_probes": 1,
+        "query_attempts": 1,
+        "query_units": 5,
+        "policy_executions": 8,
+        "slots_used": 8,
+        "detected": false,
+        "semantic_defect": false,
+        "technical_defect": false,
+        "witness_sha256": null
+      },
+      "investigation_elapsed_seconds": 0.25622629100689664,
+      "candidate": {
+        "source": "def investigate(context, acquire):\n    table = {}\n    high = 0\n    stack = []\n    for action in context['actions']:\n        op = action['op']\n        if op == 'begin':\n            stack.append((dict(table), high))\n        elif op == 'commit':\n            stack.pop()\n        elif op == 'rollback':\n            table, high = stack.pop()\n        elif op == 'put':\n            ident = action['id']\n            table[ident] = True\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            table.pop(action['id'], None)\n    return high + 1\n",
+        "scope": "The parent model already matches all eight measured examples and the receipt query: AUTOINCREMENT allocation is one greater than the largest ID ever inserted in the current transactional view. Deleting rows does not lower the high-water mark; rollback restores both the row set and the high-water mark; commit retains them. The receipt's proposed persistent high-water mark is already represented by `high`, and its claimed parent answer of 3 is inconsistent with the supplied parent trace, which returns 6.",
+        "change": "No source change is required. Preserve the existing transactional high-water-mark model: update `high` only on put, restore it on rollback, and return `high + 1` after the final implicit insert.",
+        "error": null,
+        "call_id": "native-sqlite-0-witness-repair",
+        "prompt_sha256": "833b4f3cf235374db1b405d989a40babb22aa8dc92ab42338160c44a59e9edbe",
+        "raw_sha256": "3a682f9efe385e5cb00985e66c24d0366167903e63a327f22c1e48966bed0cd8",
+        "elapsed_seconds": 12.514931209007045
+      },
+      "selected": {
+        "source": "def investigate(context, acquire):\n    table = {}\n    high = 0\n    stack = []\n    for action in context['actions']:\n        op = action['op']\n        if op == 'begin':\n            stack.append((dict(table), high))\n        elif op == 'commit':\n            stack.pop()\n        elif op == 'rollback':\n            table, high = stack.pop()\n        elif op == 'put':\n            ident = action['id']\n            table[ident] = True\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            table.pop(action['id'], None)\n    return high + 1\n",
+        "call_id": "native-sqlite-0-witness-repair",
+        "error": null,
+        "development": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 6,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 5
+                  },
+                  {
+                    "op": "delete",
+                    "id": 5
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 6,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_selected": true,
+        "preserves_measured_parent_successes": true,
+        "parent_on_final_evidence": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 6,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 5
+                  },
+                  {
+                    "op": "delete",
+                    "id": 5
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 6,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_on_final_evidence": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 6,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 5
+                  },
+                  {
+                    "op": "delete",
+                    "id": 5
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 6,
+              "correct": true
+            }
+          ]
+        }
+      }
+    },
+    "fixed": {
+      "policy": null,
+      "investigation": {
+        "receipts": [
+          {
+            "slot": 1,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 1
+                },
+                {
+                  "op": "delete",
+                  "id": 1
+                }
+              ]
+            },
+            "expected": 2,
+            "parent_answer": 2,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 4,
+            "note": null
+          },
+          {
+            "slot": 2,
+            "query": {
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "put",
+                  "id": 1000
+                }
+              ]
+            },
+            "expected": 1001,
+            "parent_answer": 1001,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 4,
+            "note": null
+          },
+          {
+            "slot": 3,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 2
+                },
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "delete",
+                  "id": 2
+                },
+                {
+                  "op": "put",
+                  "id": 1000
+                },
+                {
+                  "op": "rollback"
+                }
+              ]
+            },
+            "expected": 3,
+            "parent_answer": 3,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 7,
+            "note": null
+          },
+          {
+            "slot": 4,
+            "query": {
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "put",
+                  "id": 1000
+                },
+                {
+                  "op": "commit"
+                },
+                {
+                  "op": "delete",
+                  "id": 1000
+                }
+              ]
+            },
+            "expected": 1001,
+            "parent_answer": 1001,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 6,
+            "note": null
+          },
+          {
+            "slot": 5,
+            "query": {
+              "actions": [
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "put",
+                  "id": 9
+                }
+              ]
+            },
+            "expected": 10,
+            "parent_answer": 10,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 4,
+            "note": null
+          },
+          {
+            "slot": 6,
+            "query": {
+              "actions": [
+                {
+                  "op": "begin"
+                }
+              ]
+            },
+            "expected": 1,
+            "parent_answer": 1,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 3,
+            "note": null
+          },
+          {
+            "slot": 7,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 3
+                },
+                {
+                  "op": "begin"
+                },
+                {
+                  "op": "put",
+                  "id": 11
+                }
+              ]
+            },
+            "expected": 12,
+            "parent_answer": 12,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 5,
+            "note": null
+          },
+          {
+            "slot": 8,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 3
+                },
+                {
+                  "op": "begin"
+                }
+              ]
+            },
+            "expected": 4,
+            "parent_answer": 4,
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 4,
+            "note": null
+          }
+        ],
+        "native_probes": 8,
+        "query_attempts": 8,
+        "query_units": 37,
+        "policy_executions": 0,
+        "slots_used": 8,
+        "detected": false,
+        "semantic_defect": false,
+        "technical_defect": false,
+        "witness_sha256": null
+      },
+      "investigation_elapsed_seconds": 0.2225561669911258,
+      "candidate": {
+        "source": "def investigate(context, acquire):\n    table = {}\n    high = 0\n    stack = []\n    for action in context['actions']:\n        op = action['op']\n        if op == 'begin':\n            stack.append((dict(table), high))\n        elif op == 'commit':\n            stack.pop()\n        elif op == 'rollback':\n            table, high = stack.pop()\n        elif op == 'put':\n            ident = action['id']\n            table[ident] = True\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            table.pop(action['id'], None)\n    return high + 1\n",
+        "scope": "The model tracks the committed/current row set and the largest ever allocated AUTOINCREMENT ID. begin snapshots both, rollback restores them, commit discards the snapshot, put updates the maximum, and delete removes a row without lowering the maximum. This matches SQLite AUTOINCREMENT behavior, where deleted rows do not reuse IDs and rolled-back inserts do not advance the sequence.",
+        "change": "No repair is needed. The supplied program reproduces all 8 development examples and all 8 native probe receipts, including rollback of an open transaction, commit followed by delete, deletion of the maximum row, and an uncommitted maximum put.",
+        "error": null,
+        "call_id": "native-sqlite-0-fixed-repair",
+        "prompt_sha256": "7a60c59eb8c11cc0f08c6b19d93b6004eb2f2c4218286df635c4b2bbb9542011",
+        "raw_sha256": "71043e7ec02b403a3dfcadda504f262ea1d01770f5a31dcbd7ac8c1b9b130a9a",
+        "elapsed_seconds": 15.78859250000096
+      },
+      "selected": {
+        "source": "def investigate(context, acquire):\n    table = {}\n    high = 0\n    stack = []\n    for action in context['actions']:\n        op = action['op']\n        if op == 'begin':\n            stack.append((dict(table), high))\n        elif op == 'commit':\n            stack.pop()\n        elif op == 'rollback':\n            table, high = stack.pop()\n        elif op == 'put':\n            ident = action['id']\n            table[ident] = True\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            table.pop(action['id'], None)\n    return high + 1\n",
+        "call_id": "native-sqlite-0-fixed-repair",
+        "error": null,
+        "development": {
+          "correct": 16,
+          "total": 16,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 2,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 2,
+              "correct": true
+            },
+            {
+              "answer": 1001,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 1000
+                  }
+                ]
+              },
+              "expected": 1001,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 1000
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 3,
+              "correct": true
+            },
+            {
+              "answer": 1001,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 1000
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1000
+                  }
+                ]
+              },
+              "expected": 1001,
+              "correct": true
+            },
+            {
+              "answer": 10,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  }
+                ]
+              },
+              "expected": 10,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 12,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  }
+                ]
+              },
+              "expected": 12,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_selected": true,
+        "preserves_measured_parent_successes": true,
+        "parent_on_final_evidence": {
+          "correct": 16,
+          "total": 16,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 2,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 2,
+              "correct": true
+            },
+            {
+              "answer": 1001,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 1000
+                  }
+                ]
+              },
+              "expected": 1001,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 1000
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 3,
+              "correct": true
+            },
+            {
+              "answer": 1001,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 1000
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1000
+                  }
+                ]
+              },
+              "expected": 1001,
+              "correct": true
+            },
+            {
+              "answer": 10,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  }
+                ]
+              },
+              "expected": 10,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 12,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  }
+                ]
+              },
+              "expected": 12,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_on_final_evidence": {
+          "correct": 16,
+          "total": 16,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 2,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 2,
+              "correct": true
+            },
+            {
+              "answer": 1001,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 1000
+                  }
+                ]
+              },
+              "expected": 1001,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 1000
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 3,
+              "correct": true
+            },
+            {
+              "answer": 1001,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 1000
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1000
+                  }
+                ]
+              },
+              "expected": 1001,
+              "correct": true
+            },
+            {
+              "answer": 10,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  }
+                ]
+              },
+              "expected": 10,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 12,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  }
+                ]
+              },
+              "expected": 12,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            }
+          ]
+        }
+      }
+    }
+  },
+  "parent": {
+    "source": "def investigate(context, acquire):\n    table = {}\n    high = 0\n    stack = []\n    for action in context['actions']:\n        op = action['op']\n        if op == 'begin':\n            stack.append((dict(table), high))\n        elif op == 'commit':\n            stack.pop()\n        elif op == 'rollback':\n            table, high = stack.pop()\n        elif op == 'put':\n            ident = action['id']\n            table[ident] = True\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            table.pop(action['id'], None)\n    return high + 1\n",
+    "scope": "Models the single AUTOINCREMENT table by tracking committed row IDs and the largest ever allocated ID. BEGIN snapshots both, COMMIT discards the snapshot, ROLLBACK restores it, PUT records the ID and raises the high-water mark, and DELETE only removes the row. The final implicit insert receives high + 1.",
+    "change": "Fresh implementation from the public contract; no prior program was supplied.",
+    "error": null,
+    "call_id": "native-sqlite-0-parent",
+    "prompt_sha256": "7b9fb188237ec3925a869471b33077b494b48cce1072b87a891f13d3d5ef5125",
+    "raw_sha256": "2f253a7939ba0087008941e1c2636029cad78d301fbaa3c2e96cd7e9018ed382",
+    "elapsed_seconds": 11.803917874989565,
+    "development": {
+      "correct": 8,
+      "total": 8,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": []
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 5,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": true
+        },
+        {
+          "answer": 5,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "delete",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 9
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 4,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 3
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 4,
+          "correct": true
+        },
+        {
+          "answer": 7,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 6
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 6
+              }
+            ]
+          },
+          "expected": 7,
+          "correct": true
+        },
+        {
+          "answer": 8,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 2
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 7
+              }
+            ]
+          },
+          "expected": 8,
+          "correct": true
+        },
+        {
+          "answer": 8,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 7
+              },
+              {
+                "op": "delete",
+                "id": 7
+              },
+              {
+                "op": "put",
+                "id": 1
+              }
+            ]
+          },
+          "expected": 8,
+          "correct": true
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    actions = [{'op': 'put', 'id': 5}, {'op': 'begin'}, {'op': 'put', 'id': 8}, {'op': 'rollback'}, {'op': 'put', 'id': 2}]\\n    return acquire({'actions': actions})\\n\",\"scope\":\"The parent tracks only the maximum ever inserted ID and ignores rollback. A rollback of a transaction containing a high put must restore the AUTOINCREMENT sequence to its pre-transaction value, while a later lower put should not lower it.\",\"change\":\"Use begin/put/rollback followed by a lower put: native should allocate 6 (pre-rollback max 5 plus one), whereas parent returns 9 (rolled-back max 8 plus one).\"}",
+  "prompt_sha256": "4523c19dc0e18e2c07bffa9cb954ece11406d4f9f89ea7b943418e0097ce76d3"
+}

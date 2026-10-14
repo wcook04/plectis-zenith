@@ -1,0 +1,86 @@
+{
+  "schema": "zenith_conformance_study_v2",
+  "created_at": "2026-10-14T19:19:59.199170+00:00",
+  "model": "inclusionai/ling-3.1-flash",
+  "providers": [
+    "deepinfra/fp4"
+  ],
+  "arms": [
+    "ordinary"
+  ],
+  "max_calls": 3,
+  "max_cost_usd": "0.10",
+  "max_output_tokens": 12288,
+  "reasoning_effort": "none",
+  "workers": 1,
+  "probe_cap": 8,
+  "task_routes": {
+    "native-utf8-0": "deepinfra/fp4"
+  },
+  "task_arm_order": {
+    "native-utf8-0": [
+      "ordinary"
+    ]
+  },
+  "dataset_sha256": "6bb53a76a7a6bacc84fa0c6409218f7adb708a978fa7f8787af68da488d7ad81",
+  "dependencies": {
+    "research/conformance_study.py": "baf0c2350da8621d3c2324db1051e2e18373640ba654e9bad64484c31d135030",
+    "research/native_conformance_tasks.py": "b9d111643bce9a71ca3c483f5c9bf761c6dae96e050d9299b061ce82dc1dc283",
+    "research/decomposition_study.py": "f943677203834a27c15bc6a9160710e7d69845533391e833373aa74269c35073",
+    "research/decomposition_tasks.py": "5a3b2853402c390d297d73058d5d913ac9600e2546ac84cd6217fc133017d42c",
+    "zenith/source_snapshot.py": "34bbbbfc59d79d6a3caaa4a1227b5ec204d82544832ac5267d2d943632b2619f",
+    "zenith/investigation_program.py": "a17d758acb5b140fa5bffbedb370b6f1c7b5ba4cd4785ee8282ab6c88909a3d9",
+    "zenith/budgeted.py": "1a4640b57af3ae7d5cf1ce029c596b77f03ede16ce77d24c65d8b63682de7bd1",
+    "zenith/provider_policy.py": "5e1ce647a4f4481cb4bdce545a08df36dc406dab141e2989c5ae800b9d251b1d",
+    "zenith/providers.py": "45d131dd915c65ece8211abd9459008c66eca0411f777f904df196d70db8f4d1",
+    "system/lib/openrouter_free_runtime.py": "3b45810bf5105d3d7ed4ef4053ee2f4f800bdd04d548f748d520eb4b0cecb3eb"
+  },
+  "source": {
+    "path": "runtime-source.zip",
+    "sha256": "bbb6a3d3161392a6869e5ff3f4301bb9cf97609af30c64b0f104e86e8c5f3e31",
+    "scope": "Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads"
+  },
+  "model_evidence": {
+    "observed_at": "2026-10-14T18:49:55.823316+00:00",
+    "selected": {
+      "model": "inclusionai/ling-3.1-flash",
+      "catalogue_created_utc": "2026-10-02T14:07:04+00:00",
+      "provider_slug": "deepinfra/fp4",
+      "input_usd_per_million": "0.30",
+      "output_usd_per_million": "0.90",
+      "status": 0,
+      "context_length": 262144,
+      "max_completion_tokens": 235929,
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "max_tokens",
+        "temperature",
+        "top_p",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "repetition_penalty",
+        "top_k",
+        "seed",
+        "min_p",
+        "logit_bias",
+        "structured_outputs",
+        "tools",
+        "tool_choice",
+        "response_format"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true
+      },
+      "reasoning_note": "Optional reasoning supported; reasoning_effort levels not enumerated. Official Ant Ling effort tutorial currently scopes effort levels to Ring-2.6-1T, so do not infer Ling low support. Disabled reasoning can be represented for a separately frozen interface qualification. No current or historical local execution canary observed on this new DeepInfra route.",
+      "recommendation": "Optional separately frozen candidate, not a substitution or fallback during paired comparisons.",
+      "novita_route_note": "Cheapest novita $0.075/$0.225 route still lacks response_format and structured_outputs."
+    },
+    "purpose": "Qualify current newest eligible model on the repaired experiment-selector interface before a full comparison."
+  },
+  "selection": "Fresh unfiltered first parents; native counterexamples; repair selected on supplied examples plus its own measured probes only, preserving every measured parent success. Every arm receives repair even without a counterexample; repair gains alone do not identify probe value.",
+  "comparison": "Ordinary/witness each use one generated policy call plus one repair; fixed uses no policy call and one repair. Each has eight probe slots, no mandatory shared probe floor. First parent is the no-change control. Notes differ in prompting only; no privileged routing.",
+  "boundary": "Exploratory comparison on authored wrappers for native software semantics. Six model parents are not six independent source mechanisms. No acquired update rule, protected novelty or production-value claim."
+}

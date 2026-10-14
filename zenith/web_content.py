@@ -25,6 +25,9 @@ DOCUMENTS = {
     "observation-learning": "docs/executable-investigations.md",
     "decomposition-study": "docs/decomposition-study.md",
     "decomposition-results": "docs/decomposition-20261014.md",
+    "conformance-study": "docs/conformance-study.md",
+    "continuation-memory": "docs/continuation-memory.md",
+    "advance-synthesis": "docs/advance-returns-20261014.md",
     "research-programme": "program.md",
     "model-repair": "docs/model-repair-20261013.md",
     "worked-case": "docs/full-graph-case.md",
@@ -33,6 +36,7 @@ DOCUMENTS = {
     "notice": "RESEARCH_NOTICE.md",
 }
 EVIDENCE = {
+    "advance-campaign": "docs/advance-campaign-20261014.json",
     "decomposition-result": "docs/decomposition-20261014.json",
     "observation-learning-result": "docs/observation-learning-20261013.json",
     "observation-screens": "docs/observation-screens-20261013.json",
@@ -58,15 +62,15 @@ EVIDENCE = {
 FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail", "basket-detail", "basket-serial-detail", "investigator-detail")
 CHAPTERS = (
     ("idea", "The idea", "introduction", None, None, "authored_mechanism"),
-    ("lab", "Observe a native source", "observation-learning", None, None, "authored_mechanism"),
-    ("oracle", "Measure success and failure", "observation-learning", None, None, "authored_mechanism"),
-    ("evolve", "Revise the computation", "observation-learning", None, None, "authored_mechanism"),
-    ("results", "Study and measured results", "results", None, None, "measured_experiment"),
-    ("next", "What still needs testing", "research-direction", None, None, "research_proposal"),
+    ("lab", "Investigate native behavior", "conformance-study", None, None, "authored_mechanism"),
+    ("oracle", "Check experiments and repairs", "conformance-study", None, None, "authored_mechanism"),
+    ("evolve", "Retain useful continuation state", "continuation-memory", None, None, "authored_mechanism"),
+    ("results", "Current campaign and limits", "advance-synthesis", None, None, "measured_execution"),
+    ("next", "What still needs testing", "research-programme", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
-    "idea": (), "lab": (), "oracle": ("observation-learning-result",), "evolve": ("observation-learning-result",),
-    "results": ("observation-learning-result", "decomposition-result"), "next": (),
+    "idea": (), "lab": (), "oracle": ("advance-campaign",), "evolve": ("advance-campaign",),
+    "results": ("advance-campaign",), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
                   "evolve": "trace", "results": "results", "next": "research"}
@@ -154,6 +158,10 @@ class PublicContent:
         return {"title": title[1] if title else "Zenith", "source": source["source"],
                 "source_url": f"{API}/documents/paper", "pdf_url": "/assets/paper.pdf",
                 "pdf_sha256": digest(pdf), "citations": citations, "sections": sections,
+                # The current source has changed without an exported PDF and
+                # there is no verified source-to-PDF binding receipt.
+                "pdf_current": False, "pdf_edition": "retained_previous_edition",
+                "pdf_note": "The LaTeX source is current. The retained PDF is a previous edition without a verified current-source binding.",
                 "notice_url": f"{API}/documents/notice"}
 
     def node(self, identifier: str, task_profile: str = "generic") -> dict:
@@ -270,15 +278,14 @@ class PublicContent:
 
     def site(self, local_runs: bool) -> dict:
         chapters = []
-        observation = (self.evidence("observation-learning-result")["data"]
-                       if (self.root / EVIDENCE["observation-learning-result"]).is_file() else None)
+        current_available = (self.root / EVIDENCE["advance-campaign"]).is_file()
         paper = self.paper()
         sections = {section["id"]: section for section in paper["sections"]}
         for identifier, title, document, figure, mission, kind in CHAPTERS:
             if identifier == "results":
-                complete = (observation is not None and observation.get("complete") is True
-                            and observation.get("status") == "complete" and observation.get("aggregate") is not None)
-                kind = "measured_experiment" if complete else "measured_execution" if observation is not None else "research_proposal"
+                # Analysis completion does not certify construction, protected
+                # outcomes or learning success for every constituent study.
+                kind = "measured_execution" if current_available else "research_proposal"
             available = (self.root / DOCUMENTS[document]).is_file()
             chapters.append({"id": identifier, "title": title, "evidence_kind": kind,
                              "document_url": f"{API}/documents/{document}" if available else None,
@@ -292,9 +299,9 @@ class PublicContent:
                 "documents": {k: f"{API}/documents/{k}" for k, v in DOCUMENTS.items() if (self.root / v).is_file()},
                 "figures": {k: f"/assets/graphs/{k}.svg" for k in FIGURES},
                 "evidence": {k: f"{API}/evidence/{k}" for k,v in EVIDENCE.items() if (self.root / v).is_file()},
-                "active_evidence_id": "observation-learning-result",
-                "data_mode": "native_observation_research",
-                "data_note": "Constructed action sequences produce actual native SQLite observations. Frozen compositions test source-specific programs under a bounded identification family. Operational latency studies, financial studies and System A remain historical profiles.",
+                "active_evidence_id": "advance-campaign",
+                "data_mode": "source_bound_acquisition_research",
+                "data_note": "Native conformance investigations and continuation-memory checks retain their separate evidence boundaries. Completed analysis includes failed and incomplete attempts. Observation learning, decomposition, financial studies and System A remain available as historical profiles.",
                 "local_runs_enabled": local_runs,
                 "run_index_url": f"{API}/runs" if local_runs else None,
                 "capabilities": {"read_graph": True, "read_paper": True, "read_local_runs": local_runs,

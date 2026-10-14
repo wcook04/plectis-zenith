@@ -19,6 +19,7 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { CopyButton } from './components/CopyButton';
 
 const RECEIPT_LABEL: Record<string, string> = {
+  'advance-campaign': 'Current conformance campaign and continuation-memory evidence',
   'decomposition-result': 'Structural revision and synthetic rule-induction studies',
   'observation-learning-result': 'Native observation-learning study',
   'observation-screens': 'Follow-on repair, candidate search and composition tests',
@@ -30,6 +31,19 @@ const RECEIPT_LABEL: Record<string, string> = {
   'window-result': 'Window experiment record',
   'conditional-result': 'Conditional continuation record',
 };
+
+const ADVANCE_COPY: Record<string, string[]> = {
+  idea: ['Experience should change useful distinctions, computations, interfaces or experiments. The research programme tests whether that retained knowledge makes later work more capable or less costly.'],
+  lab: ['Model-written investigators propose bounded native experiments. The host records legal measurements, invalid queries and delivery failures separately.'],
+  oracle: ['Measured outcomes and the failed program reach repair. Selection preserves every measured obligation the parent already satisfied, then freezes the chosen program before later panels.'],
+  evolve: ['Continuation and fork operations test what retained state can support. Authored mechanism checks remain separate from model acquisition.'],
+  results: ['The current receipt separates conformance studies and continuation-memory checks. Calls and reported costs are totalled; outcomes from different studies are not pooled.'],
+  next: ['Useful transfer, composition and improvement of the learning rule remain research questions. The programme preserves simpler ordinary-code controls and unresolved conclusions.'],
+};
+
+function activeEvidenceUrl(site: Site, chapter?: Chapter): string | undefined {
+  return site.active_evidence_id ? site.evidence[site.active_evidence_id] : chapter?.evidence_urls[0];
+}
 
 const FIGURE_LABEL: Record<string, string> = {
   replay: 'The full loop',
@@ -187,7 +201,8 @@ function useGraph(url: string | null) {
 
 function Page({ site, paper }: { site: Site; paper: Paper | null }) {
   const byId = useMemo(() => new Map(site.chapters.map((c) => [c.id, c])), [site]);
-  const learningActive = Boolean(site.active_evidence_id === 'observation-learning-result'
+  const advanceActive = site.active_evidence_id === 'advance-campaign';
+  const learningActive = Boolean(site.active_evidence_id
     || site.evidence['observation-learning-result'] || site.evidence['investigation-learning-result']);
   const lab = useGraph(byId.get('lab')?.graph_url ?? null);
   const deepLink = useMemo(() => new URLSearchParams(window.location.search).get('node'), []);
@@ -205,7 +220,7 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
         <p className="hero__question">{HERO.question}</p>
         <div className="hero__actions">
           <a className="button" href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">
-            Read the paper (PDF)
+            Previous edition (PDF)
           </a>
           <a className="button button--ghost" href="#lab">
             Explore the investigation
@@ -249,7 +264,7 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           paper={paper}
           latex={latex}
           paragraphs={
-            chapter.id === 'lab' && !learningActive
+            advanceActive ? ADVANCE_COPY[chapter.id] : chapter.id === 'lab' && !learningActive
               ? labParagraphs(lab.status === 'ready' && lab.value ? graphFacts(lab.value) : null)
               : CHAPTER_COPY[`${chapter.id}:${chapter.evidence_kind}`]?.paragraphs
           }
@@ -271,8 +286,8 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
       <footer className="footer">
         <div className="wrap footer__inner">
           <p>
-            <strong>Experimental research prototype.</strong> Constructed experiments measure native SQLite behavior.
-            Their bounded results do not establish reliable production operation. Earlier synthetic examples remain historical.
+            <strong>Experimental research prototype.</strong> Native diagnostics and authored mechanism checks retain separate scopes.
+            Their bounded results do not establish reliable production operation. Earlier studies remain historical.
           </p>
           <p>
             <a href="https://github.com/wcook04/plectis-zenith" target="_blank" rel="noreferrer">
@@ -327,17 +342,21 @@ function ApplicationExample() {
 function StatusStrip({ site }: { site: Site }) {
   const chapter = site.chapters.find((c) => c.id === 'results')
     ?? site.chapters.find((c) => c.evidence_kind === 'measured_experiment' || c.evidence_kind === 'measured_execution' || c.evidence_kind === 'verified_preparation');
-  const url = chapter?.evidence_urls[0];
+  const url = activeEvidenceUrl(site, chapter);
   const evidence = useAsync<Evidence | null>(() => (url ? api.evidence(url) : Promise.resolve(null)), [url]);
-  const observationActive = site.active_evidence_id === 'observation-learning-result'
-    || Boolean(site.evidence['observation-learning-result']);
-  const sourcesUrl = observationActive || site.evidence['investigation-learning-result'] ? undefined : site.evidence.sources;
+  const advanceActive = site.active_evidence_id === 'advance-campaign';
+  const observationActive = site.active_evidence_id === 'observation-learning-result';
+  const sourcesUrl = site.active_evidence_id || site.evidence['investigation-learning-result'] ? undefined : site.evidence.sources;
   const sources = useAsync<Evidence | null>(() => (sourcesUrl ? api.evidence(sourcesUrl) : Promise.resolve(null)), [sourcesUrl]);
   const composition = sources.status === 'ready' && sources.value ? compositionSentence(sources.value) : null;
   let summary: string | null = null;
   if (evidence.status === 'ready' && evidence.value) {
     const schema = String(evidence.value.data.schema ?? '');
-    if (schema.startsWith('zenith_demo_preparation')) summary = preparationSummary(evidence.value);
+    if (schema === 'zenith_advance_campaign_v1' && validAdvanceReceipt(evidence.value.data)) {
+      const data = evidence.value.data;
+      summary = `${data.status === 'complete' ? 'Current campaign analysis complete' : 'Current campaign analysis pending'}; ${data.total_calls} recorded call attempts; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
+    }
+    else if (schema.startsWith('zenith_demo_preparation')) summary = preparationSummary(evidence.value);
     else if (schema.startsWith('zenith_original_feed_window')) summary = windowSummary(evidence.value);
     else if (schema === 'zenith_learning_evidence_v1') summary = `${evidence.value.data.total_calls} model calls; $${Number(evidence.value.data.total_reported_cost_usd).toFixed(4)} reported cost across all recorded attempts.`;
     else if (schema === 'zenith_observation_learning_evidence_v1') {
@@ -345,7 +364,10 @@ function StatusStrip({ site }: { site: Site }) {
       summary = `Initial native comparison: ${observationStatus(data)}; ${data.total_calls} calls including canary attempts; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
     }
   }
-  if (observationActive && !url) summary = 'Observation study results pending.';
+  if (advanceActive && !url) summary = 'Current campaign results pending.';
+  else if (advanceActive && evidence.status === 'error') summary = 'Current-campaign receipt unavailable.';
+  else if (advanceActive && evidence.status === 'ready' && (!evidence.value || !validAdvanceReceipt(evidence.value.data))) summary = 'Current-campaign receipt schema unsupported.';
+  else if (observationActive && !url) summary = 'Observation study results pending.';
   else if (observationActive && evidence.status === 'error') summary = 'Observation-study receipt unavailable.';
   else if (observationActive && evidence.status === 'ready' && evidence.value
     && evidence.value.data.schema !== 'zenith_observation_learning_evidence_v1') summary = 'Observation-study receipt schema unsupported.';
@@ -633,6 +655,61 @@ function InvestigationResults({ result }: { result: Evidence }) {
 }
 
 type ObservationScore = { correct: number; total: number; unsupported: number; errors: number };
+type AdvanceStudy = {
+  id: string; complete: boolean; calls: number; reported_cost_usd: string;
+  model: string; reasoning_effort: string;
+};
+type AdvanceReceipt = Record<string, unknown> & {
+  schema: 'zenith_advance_campaign_v1'; summary: string; status: string;
+  total_calls: number; total_reported_cost_usd: string;
+  conformance_studies: AdvanceStudy[]; memory: Record<string, unknown>;
+};
+
+function validAdvanceReceipt(data: Record<string, unknown>): data is AdvanceReceipt {
+  const cost = (value: unknown) => typeof value === 'string' && value.trim() !== ''
+    && Number.isFinite(Number(value)) && Number(value) >= 0;
+  const count = (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 0;
+  return data.schema === 'zenith_advance_campaign_v1' && typeof data.summary === 'string'
+    && typeof data.status === 'string' && count(data.total_calls) && cost(data.total_reported_cost_usd)
+    && data.memory !== null && typeof data.memory === 'object' && !Array.isArray(data.memory)
+    && Array.isArray(data.conformance_studies) && data.conformance_studies.every(value => {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+      const row = value as Record<string, unknown>;
+      return typeof row.id === 'string' && typeof row.complete === 'boolean'
+        && count(row.calls) && cost(row.reported_cost_usd)
+        && typeof row.model === 'string' && typeof row.reasoning_effort === 'string';
+    });
+}
+
+function AdvanceResults({ result, site }: { result: Evidence; site: Site }) {
+  const data = result.data as AdvanceReceipt;
+  return <div className="diagnosis">
+    <h3 className="block-head">{data.status === 'complete' ? 'Campaign analysis complete' : 'Campaign analysis pending'}</h3>
+    <p>{data.summary}</p>
+    <p>{data.total_calls} recorded call attempts; ${Number(data.total_reported_cost_usd).toFixed(4)} reported inference cost across the recorded campaign.</p>
+    {typeof data.accounting_boundary === 'string' && <p>{data.accounting_boundary}</p>}
+    <p>Analysis completion includes stopped studies and unresolved results. Each study retains its own construction and evaluation status.</p>
+    <table className="diagnosis__table">
+      <caption>Recorded conformance studies; outcomes remain separate</caption>
+      <thead><tr><th>Study, model and reasoning</th><th>Construction</th><th>Recorded attempts and reported cost</th></tr></thead>
+      <tbody>{data.conformance_studies.map(study => <tr key={study.id}>
+        <th scope="row">{study.id}<br />{study.model}; {study.reasoning_effort}</th>
+        <td>{study.complete ? 'Complete' : 'Incomplete'}</td>
+        <td>{study.calls} attempts<br />${Number(study.reported_cost_usd).toFixed(4)}</td>
+      </tr>)}</tbody>
+    </table>
+    {typeof data.memory.summary === 'string' && <p>{data.memory.summary}</p>}
+    <p>Continuation-memory checks retain their own source, costs and limits in the repository explanation.</p>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete current-campaign receipt</a>
+    <HistoricalReceipts site={site} />
+  </div>;
+}
+
+function HistoricalReceipts({ site }: { site: Site }) {
+  return <p>{['observation-learning-result', 'decomposition-result', 'investigation-learning-result'].map(id =>
+    site.evidence[id] ? <span key={id}><a href={apiUrl(site.evidence[id])} target="_blank" rel="noreferrer">Historical: {RECEIPT_LABEL[id]}</a>{' '}</span> : null)}</p>;
+}
+
 type ObservationComparison = {
   worlds: number; mean_accuracy_difference: number; paired_bootstrap_95_percentile: [number, number];
   wins: number; ties: number; losses: number;
@@ -705,7 +782,8 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
   const condUrl = chapter.evidence_urls.find((u) => u.endsWith('conditional-result')) ?? site.evidence['conditional-result'];
   // The chapter binds whichever receipt the current edition has; the view
   // follows the receipt's schema.
-  const bound = chapter.evidence_urls[0];
+  const bound = activeEvidenceUrl(site, chapter);
+  const advanceActive = site.active_evidence_id === 'advance-campaign';
   const kind = useAsync<Evidence | null>(() => (bound ? api.evidence(bound) : Promise.resolve(null)), [bound]);
   const isPreparation = kind.status === 'ready' && String(kind.value?.data.schema ?? '').startsWith('zenith_demo_preparation');
   const sourcesUrl = site.evidence.sources;
@@ -715,11 +793,19 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
   );
   const evidence = useAsync<[Evidence, Evidence] | null>(
     () =>
-      kind.status === 'ready' && !isPreparation && windowUrl && condUrl
+      kind.status === 'ready' && !isPreparation && !advanceActive && windowUrl && condUrl
         ? Promise.all([api.evidence(windowUrl), api.evidence(condUrl)])
         : Promise.resolve(null),
-    [kind.status, isPreparation, windowUrl, condUrl],
+    [kind.status, isPreparation, advanceActive, windowUrl, condUrl],
   );
+  if (advanceActive) {
+    if (!bound) return <><p role="status">Current campaign results pending. No current receipt is published; historical receipts remain separate.</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'error') return <><p role="status">The current-campaign receipt is unavailable: {kind.message}</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'ready') return kind.value && validAdvanceReceipt(kind.value.data)
+      ? <AdvanceResults result={kind.value} site={site} />
+      : <><p role="status">The current-campaign receipt has an unsupported schema; no outcomes are displayed.</p><HistoricalReceipts site={site} /></>;
+    return <Loading what="the current-campaign receipt" />;
+  }
   if (kind.status === 'ready' && kind.value?.data.schema === 'zenith_learning_evidence_v1') {
     return <InvestigationResults result={kind.value} />;
   }
@@ -728,7 +814,7 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
       {site.evidence['observation-screens'] && <p><a href={site.evidence['observation-screens']} target="_blank" rel="noreferrer">Read the follow-on repair, candidate search and composition receipts</a></p>}
     </>;
   }
-  if (site.active_evidence_id === 'observation-learning-result' || site.evidence['observation-learning-result']) {
+  if (site.active_evidence_id === 'observation-learning-result') {
     if (kind.status === 'error') return <p role="status">The observation-study receipt is unavailable: {kind.message}</p>;
     if (!bound) return <p role="status">Results pending. The current study has no published observation receipt. Protected scores will appear only after measured evaluation.</p>;
     if (kind.status === 'ready') return <p role="status">The observation-study receipt has an unsupported schema; no scores are displayed.</p>;
@@ -793,16 +879,16 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
           <h2 id="paper-title">The paper and its evidence</h2>
           <p>
             <a className="button" href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">
-              Read the paper (PDF)
+              Previous edition (PDF)
             </a>
           </p>
           {paper && (
             <div className="paper-band__hash">
               <a href={paper.source.url} target="_blank" rel="noreferrer">
-                LaTeX source on GitHub
+                Current LaTeX source on GitHub
               </a>
               <details>
-                <summary>Verify the PDF</summary>
+                <summary>Verify the retained PDF bytes</summary>
                 <p>
                   SHA-256 <code className="hash">{paper.pdf_sha256}</code>
                 </p>
@@ -810,6 +896,7 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
               </details>
             </div>
           )}
+          <p>The LaTeX source is current. The retained PDF is a previous edition awaiting a verified export.</p>
           <h3 className="paper-aside__head">Records</h3>
           <ul className="plain-list">
             {Object.entries(site.evidence).map(([id, url]) => (

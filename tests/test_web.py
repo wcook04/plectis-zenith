@@ -55,12 +55,15 @@ def test_native_scopes_sources_and_focus(website):
 def test_teaching_material_uses_current_sources(website):
     site = json.loads(website.get("/api/v1/site").body)
     assert [chapter["id"] for chapter in site["chapters"]] == ["idea", "lab", "oracle", "evolve", "results", "next"]
-    assert site['active_evidence_id'] == 'observation-learning-result'
+    assert site['active_evidence_id'] == 'advance-campaign'
     for url in site["documents"].values():
         doc = json.loads(website.get(url).body)
         assert doc["content"] == (ROOT / doc["source"]["path"]).read_text()
     paper = json.loads(website.get(site["paper_url"]).body)
     assert paper["pdf_sha256"] == hashlib.sha256((ROOT / "paper/zenith.pdf").read_bytes()).hexdigest()
+    assert paper['pdf_current'] is False
+    assert paper['pdf_edition'] == 'retained_previous_edition'
+    assert paper['source']['sha256'] == hashlib.sha256((ROOT / 'paper/zenith.tex').read_bytes()).hexdigest()
     assert paper["citations"]
     assert all(c["used_at"] for c in paper["citations"])
     for chapter in site["chapters"]:
@@ -70,15 +73,17 @@ def test_teaching_material_uses_current_sources(website):
         assert section["pdf_url"].endswith("#nameddest=" + section["id"])
         assert all(website.get(url).body for url in chapter["evidence_urls"])
     results = next(c for c in site["chapters"] if c["id"] == "results")
-    active = site['evidence'].get('observation-learning-result')
-    assert results["evidence_urls"] == [site['evidence'][name] for name in
-        ('observation-learning-result', 'decomposition-result') if name in site['evidence']]
+    active = site['evidence'].get('advance-campaign')
+    assert results["evidence_urls"] == ([active] if active else [])
     if not active:
         assert results['evidence_kind'] == 'research_proposal'
     learning=json.loads(website.get('/api/v1/evidence/investigation-learning-result').body)["data"]
     assert learning['schema']=='zenith_learning_evidence_v1'
     assert any(c['complete'] for c in learning['campaigns'])
-    assert site['data_mode']=='native_observation_research'
+    assert site['data_mode']=='source_bound_acquisition_research'
+    assert '/documents/conformance-study' in next(c for c in site['chapters'] if c['id'] == 'lab')['document_url']
+    assert '/documents/continuation-memory' in next(c for c in site['chapters'] if c['id'] == 'evolve')['document_url']
+    assert '/documents/advance-synthesis' in results['document_url']
     current_method=json.loads(website.get('/api/v1/documents/observation-learning').body)
     historical_method=json.loads(website.get('/api/v1/documents/executable-investigations').body)
     assert current_method['source'] == historical_method['source']
@@ -180,15 +185,15 @@ def test_dossier_is_current_generic_source(website):
     assert dossier["data"] == json.loads(path.read_text())
     assert dossier["source"]["sha256"] == hashlib.sha256(path.read_bytes()).hexdigest()
     assert dossier["data"]["perspective"] == "interventions"
-    assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "native_observation_research"
+    assert json.loads(website.get("/api/v1/site").body)["data_mode"] == "source_bound_acquisition_research"
 
 
-@pytest.mark.parametrize('status,complete,aggregate,kind', [
-    ('partial_snapshot', False, None, 'measured_execution'),
-    ('failed', False, None, 'measured_execution'),
-    ('complete', True, {'incremental': {'correct': 1, 'total': 2}}, 'measured_experiment'),
+@pytest.mark.parametrize('status,complete,aggregate', [
+    ('partial_snapshot', False, None),
+    ('failed', False, None),
+    ('complete', True, {'incremental': {'correct': 1, 'total': 2}}),
 ])
-def test_active_observation_receipt_is_source_bound_without_relabelling_history(tmp_path, status, complete, aggregate, kind):
+def test_historical_observation_receipt_remains_source_bound_without_becoming_active(tmp_path, status, complete, aggregate):
     # Controlled API fixture; no model outcome is published by this test.
     for directory in ('codex', 'paper', 'docs', 'examples'):
         shutil.copytree(ROOT/directory, tmp_path/directory)
@@ -201,14 +206,47 @@ def test_active_observation_receipt_is_source_bound_without_relabelling_history(
     app = Website(tmp_path)
     site = json.loads(app.get('/api/v1/site').body)
     results = next(chapter for chapter in site['chapters'] if chapter['id'] == 'results')
-    assert results['evidence_urls'] == ['/api/v1/evidence/observation-learning-result',
-                                       '/api/v1/evidence/decomposition-result']
-    assert results['evidence_kind'] == kind
-    served = json.loads(app.get(results['evidence_urls'][0]).body)
+    assert site['active_evidence_id'] == 'advance-campaign'
+    assert '/api/v1/evidence/observation-learning-result' not in results['evidence_urls']
+    assert '/api/v1/evidence/decomposition-result' not in results['evidence_urls']
+    served = json.loads(app.get('/api/v1/evidence/observation-learning-result').body)
     assert served['data'] == receipt
     assert served['source']['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
     historical = json.loads(app.get('/api/v1/evidence/investigation-learning-result').body)
     assert historical['data']['schema'] == 'zenith_learning_evidence_v1'
+
+
+@pytest.mark.parametrize('published', [False, True])
+def test_current_campaign_routing_preserves_historical_receipts_and_analysis_scope(tmp_path, published):
+    for directory in ('codex', 'paper', 'docs', 'examples'):
+        shutil.copytree(ROOT/directory, tmp_path/directory)
+    shutil.copy2(ROOT/'master_config.json', tmp_path/'master_config.json')
+    path = tmp_path/'docs/advance-campaign-20261014.json'
+    path.unlink(missing_ok=True)
+    receipt = {'schema': 'zenith_advance_campaign_v1', 'status': 'complete',
+               'summary': 'Controlled analysis fixture, including incomplete construction.',
+               'total_calls': 10, 'total_reported_cost_usd': '0.0213',
+               'conformance_studies': [{'id': 'fixture-stopped', 'complete': False,
+                   'calls': 10, 'reported_cost_usd': '0.0213', 'model': 'fixture-model',
+                   'reasoning_effort': 'low'}], 'memory': {'summary': 'Authored mechanism fixture.'}}
+    if published:
+        path.write_text(json.dumps(receipt))
+    app = Website(tmp_path)
+    site = json.loads(app.get('/api/v1/site').body)
+    chapter = next(c for c in site['chapters'] if c['id'] == 'results')
+    assert site['active_evidence_id'] == 'advance-campaign'
+    assert chapter['evidence_urls'] == (['/api/v1/evidence/advance-campaign'] if published else [])
+    assert chapter['evidence_kind'] == ('measured_execution' if published else 'research_proposal')
+    for identifier in ('observation-learning-result', 'decomposition-result'):
+        assert site['evidence'][identifier] == f'/api/v1/evidence/{identifier}'
+        assert app.get(site['evidence'][identifier]).body
+    if published:
+        served = json.loads(app.get('/api/v1/evidence/advance-campaign').body)
+        assert served['data'] == receipt
+        assert served['source']['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
+    else:
+        with pytest.raises(FileNotFoundError):
+            app.get('/api/v1/evidence/advance-campaign')
 
 
 def test_basket_nodes_use_their_own_protocol(website):

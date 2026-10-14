@@ -16,6 +16,7 @@ const EVIDENCE_LABEL: Record<string, string> = {
 
 export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper: Paper | null; latex: string | null }) {
   const section = chapter.paper_section;
+  const currentPdf = paper !== null && 'pdf_current' in paper && paper.pdf_current === true;
   const citations = section && paper ? paper.citations.filter((c) => section.citation_ids.includes(c.id)) : [];
   return (
     <aside className="paper-aside" aria-label={`Sources for ${chapter.title}`}>
@@ -23,16 +24,17 @@ export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper:
         <div className="paper-aside__block">
           <h3 className="paper-aside__head">In the paper</h3>
           <p>
-            <a href={apiUrl(section.pdf_url)} target="_blank" rel="noreferrer">
+            <a href={section.source_url} target="_blank" rel="noreferrer">
               {(latex && sectionTitle(latex, section.start_line, section.end_line)) ?? SECTION_LABEL[section.id] ?? 'Paper section'}
             </a>
             <span className="paper-aside__quiet">
               {' '}
-              (PDF), or the{' '}
-              <a href={section.source_url} target="_blank" rel="noreferrer">
-                LaTeX source, lines {section.start_line}&ndash;{section.end_line}
-              </a>
+              (current LaTeX source, lines {section.start_line}&ndash;{section.end_line})
             </span>
+            <br />
+            <a href={apiUrl(section.pdf_url)} target="_blank" rel="noreferrer">
+              {currentPdf ? 'Section PDF' : 'Previous edition PDF'}
+            </a>
           </p>
         </div>
       )}

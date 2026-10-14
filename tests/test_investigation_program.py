@@ -1,3 +1,6 @@
+import subprocess
+import time
+
 import pytest
 
 from zenith.investigation_program import (execute, execute_local, validate_source,
@@ -39,7 +42,6 @@ def test_incumbent_has_measurable_failure_and_records_real_acquisition():
 @pytest.mark.parametrize('source', [
     'import os\ndef investigate(context, acquire): return {}',
     'def investigate(context, acquire): return context.__class__',
-    'def investigate(context, acquire):\n while True: pass',
     'def investigate(context, acquire): return 10 ** 100000',
     'x = 1\ndef investigate(context, acquire): return {}',
     'def investigate(context, acquire):\n return [x for x in context.__class__.__bases__]',
@@ -58,6 +60,77 @@ def test_worker_has_no_import_and_no_unacquired_tables():
         assert result['answer'] is None
         assert result['error']
         assert result['trace'] == []
+
+
+def test_policy_can_deduplicate_json_queries_with_repr():
+    source = '''def investigate(context, acquire):
+    seen = set(repr(row["query"]) for row in context["receipts"])
+    for query in context["candidates"]:
+        if repr(query) not in seen:
+            return {"query": query}
+    return {"query": None}
+'''
+    case = {'receipts': [{'query': {'events': [{'op':'reset'}]}}],
+            'candidates': [{'events': [{'op':'reset'}]}, {'events': []}]}
+    result = execute(source, [case], answer_contract='json')[0]
+    assert result['error'] is None
+    assert result['answer'] == {'query': {'events': []}}
+
+
+def test_while_scanner_supports_break_continue_and_fresh_case_state():
+    source = '''def investigate(context, acquire):
+    index = 0
+    total = 0
+    while index < len(context["values"]):
+        value = context["values"][index]
+        index += 1
+        if value < 0:
+            continue
+        total += value
+        if value == 0:
+            break
+    return total
+'''
+    cases = [{'tables': {}, 'values': [2, -5, 3, 0, 99]},
+             {'tables': {}, 'values': []},
+             {'tables': {}, 'values': [4, 8]}]
+    results = execute(source, cases, answer_contract='json')
+    assert [row['answer'] for row in results] == [5, 0, 12]
+    assert all(row['error'] is None for row in results)
+    assert cases[0]['values'] == [2, -5, 3, 0, 99]
+
+
+def test_infinite_while_is_killed_by_the_worker_deadline_and_next_execution_works(monkeypatch):
+    # Exercise the real subprocess/cleanup path with a short test deadline;
+    # production still requests its unchanged 30-second wall timeout.
+    original = subprocess.Popen.communicate
+    workers = []
+
+    def short_worker_deadline(process, input=None, timeout=None):
+        if isinstance(process.args, list) and '--worker' in process.args and input is not None:
+            workers.append(process)
+            assert timeout == 30
+            return original(process, input=input, timeout=1)
+        return original(process, input=input, timeout=timeout)
+
+    monkeypatch.setattr(subprocess.Popen, 'communicate', short_worker_deadline)
+    source = '''def investigate(context, acquire):
+    while True:
+        pass
+'''
+    validate_source(source)
+    start = time.monotonic()
+    results = execute(source, [{'tables': {}}], answer_contract='json')
+    assert time.monotonic() - start < 5
+    assert len(results) == 1
+    assert results[0]['answer'] is None
+    assert results[0]['trace'] == []
+    assert 'timed out' in results[0]['error']
+    assert len(workers) == 1 and workers[0].poll() is not None
+    healthy = execute('def investigate(context, acquire):\n    return 7\n',
+                      [{'tables': {}}], answer_contract='json')
+    assert healthy[0]['answer'] == 7
+    assert healthy[0]['error'] is None
 
 
 def test_execution_resets_state_and_copies_table_data():

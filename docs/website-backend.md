@@ -59,7 +59,7 @@ measured result is attached to that chapter. `evidence_kind` separates a propose
 an authored mechanism, verified preparation and a research proposal.
 
 `/api/v1/paper` reads the current title and bibliography, including PDF and LaTeX
-hashes, citation IDs, URLs and the manuscript lines where citations are used.
+hashes, citation IDs, URLs and the manuscript lines where citations are used. The current source compiles in the existing editor, while the retained PDF is a previous edition (`pdf_current=false`, `pdf_edition=retained_previous_edition`). Source and PDF are labelled separately; independent file hashes do not prove that they match.
 `/api/v1/documents/paper` returns the exact LaTeX source. Browser-readable
 explanations come from the existing Markdown, including the
 [research direction](research-direction.md) and [spoken walkthrough](zenith-walkthrough-script.md).

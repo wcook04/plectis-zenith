@@ -17,8 +17,8 @@ import threading
 
 METHODS = frozenset('get items keys values append extend sort lower upper strip split setdefault add discard copy count index pop remove clear update'.split())
 BUILTINS = {name: value for name, value in vars(__import__('builtins')).items()
-            if name in 'abs all any bool dict enumerate float int isinstance len list max min range reversed round set sorted str sum tuple zip'.split()}
-NODES = frozenset('Module FunctionDef arguments arg Return Assign AugAssign Delete Nonlocal Expr If For Break Continue Pass '
+            if name in 'abs all any bool dict enumerate float int isinstance len list max min range repr reversed round set sorted str sum tuple zip'.split()}
+NODES = frozenset('Module FunctionDef arguments arg Return Assign AugAssign Delete Nonlocal Expr If For While Break Continue Pass '
                   'Name Load Store Del Constant List Tuple Dict Set Subscript Slice Attribute Call keyword '
                   'BinOp UnaryOp BoolOp Compare IfExp ListComp SetComp DictComp GeneratorExp comprehension Lambda '
                   'Add Sub Mult Div FloorDiv Mod BitOr BitAnd BitXor UAdd USub Not And Or Eq NotEq Lt LtE Gt GtE In NotIn Is IsNot'.split())
