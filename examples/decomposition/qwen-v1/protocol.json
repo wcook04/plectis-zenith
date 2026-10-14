@@ -1,0 +1,87 @@
+{
+  "schema": "zenith_decomposition_study_v1",
+  "created_at": "2026-10-14T15:56:13.553766+00:00",
+  "model": "qwen/qwen3.8-omni-flash",
+  "providers": [
+    "alibaba"
+  ],
+  "task_routes": {
+    "task-0": "alibaba",
+    "task-1": "alibaba",
+    "task-2": "alibaba",
+    "task-3": "alibaba"
+  },
+  "task_arm_order": {
+    "task-0": [
+      "global",
+      "contextual",
+      "contracts",
+      "fixed"
+    ],
+    "task-1": [
+      "contextual",
+      "contracts",
+      "fixed",
+      "global"
+    ],
+    "task-2": [
+      "contracts",
+      "fixed",
+      "global",
+      "contextual"
+    ],
+    "task-3": [
+      "fixed",
+      "global",
+      "contextual",
+      "contracts"
+    ]
+  },
+  "arms": [
+    "global",
+    "contextual",
+    "contracts",
+    "fixed"
+  ],
+  "proposals": 2,
+  "max_calls": 32,
+  "seed": 20261014,
+  "max_cost_usd": "0.75",
+  "max_output_tokens": 6144,
+  "reasoning_effort": "none",
+  "workers": 3,
+  "dataset_sha256": "02651f9b6067c40cc6e88fbb72c65670a5b468e97d2719e0c27c7297c962f232",
+  "runtime_dependencies": {
+    "research/decomposition_study.py": "d456bf4704a36c573b6a70562fe08da53cdaaacf2e2fe0908cb5c9e7f95200c4",
+    "research/decomposition_tasks.py": "5a3b2853402c390d297d73058d5d913ac9600e2546ac84cd6217fc133017d42c",
+    "research/investigator_study.py": "82015199d676c21ccef89b94f33fb19efb367bdf1928167b8d7f7cd43eaa93b1",
+    "zenith/investigation_program.py": "f523a325ff8207b99945365d4ebc6830c30705c7c859611fed2105fe5985b49f",
+    "zenith/budgeted.py": "1a4640b57af3ae7d5cf1ce029c596b77f03ede16ce77d24c65d8b63682de7bd1",
+    "zenith/provider_policy.py": "5e1ce647a4f4481cb4bdce545a08df36dc406dab141e2989c5ae800b9d251b1d",
+    "zenith/providers.py": "45d131dd915c65ece8211abd9459008c66eca0411f777f904df196d70db8f4d1",
+    "system/lib/openrouter_free_runtime.py": "3b45810bf5105d3d7ed4ef4053ee2f4f800bdd04d548f748d520eb4b0cecb3eb"
+  },
+  "source": {
+    "path": "runtime-source.zip",
+    "sha256": "d4c740ddec79f692fba166187b153eddc32544887ad899999d6e2ceadaf52f95",
+    "scope": "Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads"
+  },
+  "model_evidence": {
+    "model": "qwen/qwen3.8-omni-flash",
+    "canonical_slug": "qwen/qwen3.8-omni-flash-20260918",
+    "provider_slug": "alibaba",
+    "model_catalogue_created_utc": "2026-09-21T03:05:54+00:00",
+    "prices_usd_per_million_tokens": {
+      "prompt": "0.15000000",
+      "completion": "0.47000000",
+      "input_cache_read": "0.016000000"
+    },
+    "request_fee_usd": "0",
+    "endpoint_source_url": "https://openrouter.ai/api/v1/models/qwen/qwen3.8-omni-flash/endpoints",
+    "observed_at": "2026-10-14T15:49:36.989664+00:00"
+  },
+  "selection": "All visible calibration+development (correct,-errors), later attempt on ties. Arm order rotated across tasks. All arms frozen before either protected panel. Fixed is diagnostic; global versus contextual/contracts is primary.",
+  "boundary": "Authored mechanism tasks; only allocator is native SQLite. No autonomous goal or representation-language invention, production-value or general intelligence claim. All model outputs preserved unedited.",
+  "feedback": "All arms share measured development inputs/labels; each receives its own complete candidate and actual execution outcomes. No protected labels in prompts.",
+  "structure": "Ordinary Python function calls; no forced code expansion or special graph execution."
+}

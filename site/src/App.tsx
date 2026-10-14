@@ -19,6 +19,7 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { CopyButton } from './components/CopyButton';
 
 const RECEIPT_LABEL: Record<string, string> = {
+  'decomposition-result': 'Structural revision and synthetic rule-induction studies',
   'observation-learning-result': 'Native observation-learning study',
   'observation-screens': 'Follow-on repair, candidate search and composition tests',
   'investigation-learning-result': 'Historical operational investigation campaigns',

@@ -23,6 +23,9 @@ DOCUMENTS = {
     "investigator": "docs/investigator.md",
     "executable-investigations": "docs/executable-investigations.md",
     "observation-learning": "docs/executable-investigations.md",
+    "decomposition-study": "docs/decomposition-study.md",
+    "decomposition-results": "docs/decomposition-20261014.md",
+    "research-programme": "program.md",
     "model-repair": "docs/model-repair-20261013.md",
     "worked-case": "docs/full-graph-case.md",
     "research-direction": "docs/research-direction.md",
@@ -30,6 +33,7 @@ DOCUMENTS = {
     "notice": "RESEARCH_NOTICE.md",
 }
 EVIDENCE = {
+    "decomposition-result": "docs/decomposition-20261014.json",
     "observation-learning-result": "docs/observation-learning-20261013.json",
     "observation-screens": "docs/observation-screens-20261013.json",
     "investigation-learning-result": "docs/investigation-learning-20261013.json",
@@ -62,7 +66,7 @@ CHAPTERS = (
 )
 CHAPTER_EVIDENCE = {
     "idea": (), "lab": (), "oracle": ("observation-learning-result",), "evolve": ("observation-learning-result",),
-    "results": ("observation-learning-result",), "next": (),
+    "results": ("observation-learning-result", "decomposition-result"), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
                   "evolve": "trace", "results": "results", "next": "research"}

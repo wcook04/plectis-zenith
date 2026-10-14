@@ -71,7 +71,8 @@ def test_teaching_material_uses_current_sources(website):
         assert all(website.get(url).body for url in chapter["evidence_urls"])
     results = next(c for c in site["chapters"] if c["id"] == "results")
     active = site['evidence'].get('observation-learning-result')
-    assert results["evidence_urls"] == ([active] if active else [])
+    assert results["evidence_urls"] == [site['evidence'][name] for name in
+        ('observation-learning-result', 'decomposition-result') if name in site['evidence']]
     if not active:
         assert results['evidence_kind'] == 'research_proposal'
     learning=json.loads(website.get('/api/v1/evidence/investigation-learning-result').body)["data"]
@@ -200,7 +201,8 @@ def test_active_observation_receipt_is_source_bound_without_relabelling_history(
     app = Website(tmp_path)
     site = json.loads(app.get('/api/v1/site').body)
     results = next(chapter for chapter in site['chapters'] if chapter['id'] == 'results')
-    assert results['evidence_urls'] == ['/api/v1/evidence/observation-learning-result']
+    assert results['evidence_urls'] == ['/api/v1/evidence/observation-learning-result',
+                                       '/api/v1/evidence/decomposition-result']
     assert results['evidence_kind'] == kind
     served = json.loads(app.get(results['evidence_urls'][0]).body)
     assert served['data'] == receipt

@@ -1,0 +1,4 @@
+{
+  "raw": "{\n  \"source\": \"def calibrate(x, s=5, b=11):\\n    return s * x + b\\n\\ndef investigate(context, acquire):\\n    rows = context.get(\\\"rows\\\", [])\\n    if not rows:\\n        return 0\\n    total = sum(calibrate(r) for r in rows)\\n    return total\",\n  \"scope\": \"The synthetic_sensor family applies an affine calibration (s*x + b) to each reading before summing. The current implementation incorrectly sums raw values and scales the total instead of applying per-reading calibration.\",\n  \"change\": \"Replaced the flawed `sum_readings` and global `calibrate(total)` logic with a direct per-element application of the inferred affine transformation (s=5, b=11). Empty inputs now correctly return 0 without invoking calibration.\"\n}",
+  "prompt_sha256": "4434ecb52a50094aec6cc6a8581f5119956c6102507efaa7767fb9be4429bbba"
+}

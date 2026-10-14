@@ -1,0 +1,2859 @@
+{
+  "prompt": {
+    "task": {
+      "id": "task-2",
+      "family": "synthetic_keyed_stream",
+      "description": "Synthetic diagnostic keyed-event source. Input is exactly\n{\"events\": [{\"key\":text,\"time\":integer,\"value\":integer}, ...], \"keys\":[text,...]}.\nThere are 0..32 events and 0..8 distinct requested keys. Keys are nonempty ASCII\nletters, digits, '_' or '-', at most 20 characters. Times are integers\n-1000..1000 and values -100..100. Arrival order is list order. The source uses\none fixed, private member of this disclosed two-rule family: either select the\nlast arriving event for each key, or select the event with greatest event\ntimestamp for each key (last arrival wins equal timestamps). Missing keys have\nvalue null. Return [{\"key\":key,\"value\":selected-value-or-null}, ...] in the\nrequested-key order. No sum, sorting of requested keys or cross-key selection\nis performed. Observed receipts distinguish the possible rules. An allowed\nsource probe uses exactly this input schema and returns that JSON list. There\nare no acquisition tables, clocks or ambient context. Implement\ninvestigate(context, acquire). The seed program is an experimental hypothesis.\n",
+      "focus_function": "select_latest",
+      "calibration": [
+        {
+          "input": {
+            "events": [],
+            "keys": [
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 1,
+                "value": 4
+              }
+            ],
+            "keys": [
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 1,
+                "value": 4
+              },
+              {
+                "key": "a",
+                "time": 9,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 8
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 9,
+                "value": 4
+              },
+              {
+                "key": "a",
+                "time": 1,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 9,
+                "value": 4
+              },
+              {
+                "key": "b",
+                "time": 1,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "a",
+              "b"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 4
+            },
+            {
+              "key": "b",
+              "value": 8
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "b",
+                "time": 9,
+                "value": 4
+              },
+              {
+                "key": "a",
+                "time": 1,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "a",
+              "b"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 8
+            },
+            {
+              "key": "b",
+              "value": 4
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 3,
+                "value": 4
+              },
+              {
+                "key": "a",
+                "time": 3,
+                "value": -2
+              }
+            ],
+            "keys": [
+              "a",
+              "missing"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": -2
+            },
+            {
+              "key": "missing",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 8,
+                "value": 0
+              },
+              {
+                "key": "b",
+                "time": 7,
+                "value": 0
+              },
+              {
+                "key": "a",
+                "time": 2,
+                "value": 9
+              }
+            ],
+            "keys": [
+              "b",
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "b",
+              "value": 0
+            },
+            {
+              "key": "a",
+              "value": 0
+            }
+          ]
+        }
+      ],
+      "development": [
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": 13
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": 2
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": 5
+              },
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": -18
+              }
+            ],
+            "keys": [
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -13,
+                "value": 0
+              },
+              {
+                "key": "k0_0",
+                "time": -10,
+                "value": -20
+              },
+              {
+                "key": "k0_0",
+                "time": 13,
+                "value": -10
+              },
+              {
+                "key": "k0_1",
+                "time": -1,
+                "value": 0
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 0
+            },
+            {
+              "key": "k0_0",
+              "value": -10
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -25,
+                "value": 6
+              },
+              {
+                "key": "k0_0",
+                "time": 15,
+                "value": 18
+              },
+              {
+                "key": "k0_1",
+                "time": -1,
+                "value": 1
+              },
+              {
+                "key": "k0_0",
+                "time": -8,
+                "value": 20
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": 18
+            },
+            {
+              "key": "k0_1",
+              "value": 1
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 23,
+                "value": 4
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": -11
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": 2
+              },
+              {
+                "key": "k0_0",
+                "time": 23,
+                "value": 11
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 2
+            },
+            {
+              "key": "k0_0",
+              "value": 11
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -14,
+                "value": -1
+              },
+              {
+                "key": "k0_0",
+                "time": 16,
+                "value": -1
+              },
+              {
+                "key": "k0_0",
+                "time": -5,
+                "value": -11
+              },
+              {
+                "key": "k0_1",
+                "time": 4,
+                "value": -4
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -4
+            },
+            {
+              "key": "k0_0",
+              "value": -1
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 3,
+                "value": -7
+              },
+              {
+                "key": "k0_0",
+                "time": 0,
+                "value": -9
+              },
+              {
+                "key": "k0_1",
+                "time": 28,
+                "value": 17
+              },
+              {
+                "key": "k0_0",
+                "time": 12,
+                "value": -14
+              }
+            ],
+            "keys": [
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 17
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -20,
+                "value": -1
+              },
+              {
+                "key": "k0_1",
+                "time": 15,
+                "value": 11
+              },
+              {
+                "key": "k0_1",
+                "time": 15,
+                "value": 5
+              },
+              {
+                "key": "k0_0",
+                "time": -20,
+                "value": -15
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 5
+            },
+            {
+              "key": "k0_0",
+              "value": -15
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -25,
+                "value": -17
+              },
+              {
+                "key": "k0_0",
+                "time": 14,
+                "value": -2
+              },
+              {
+                "key": "k0_0",
+                "time": -24,
+                "value": 2
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": -19
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -19
+            },
+            {
+              "key": "k0_0",
+              "value": -2
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 26,
+                "value": -5
+              },
+              {
+                "key": "k0_1",
+                "time": -16,
+                "value": 16
+              },
+              {
+                "key": "k0_1",
+                "time": -17,
+                "value": -19
+              },
+              {
+                "key": "k0_0",
+                "time": -24,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -5
+            },
+            {
+              "key": "k0_1",
+              "value": 16
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": -5
+              },
+              {
+                "key": "k0_1",
+                "time": 2,
+                "value": -11
+              },
+              {
+                "key": "k0_1",
+                "time": 2,
+                "value": 5
+              },
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": 9
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": 9
+            },
+            {
+              "key": "k0_1",
+              "value": 5
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -28,
+                "value": -2
+              },
+              {
+                "key": "k0_1",
+                "time": -1,
+                "value": -15
+              },
+              {
+                "key": "k0_1",
+                "time": 17,
+                "value": 7
+              },
+              {
+                "key": "k0_0",
+                "time": -26,
+                "value": 7
+              }
+            ],
+            "keys": [
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 7
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -30,
+                "value": -11
+              },
+              {
+                "key": "k0_0",
+                "time": 1,
+                "value": 8
+              },
+              {
+                "key": "k0_1",
+                "time": 12,
+                "value": 11
+              },
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": -9
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -9
+            },
+            {
+              "key": "k0_1",
+              "value": 11
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -10,
+                "value": 16
+              },
+              {
+                "key": "k0_1",
+                "time": -15,
+                "value": -13
+              },
+              {
+                "key": "k0_0",
+                "time": -10,
+                "value": 4
+              },
+              {
+                "key": "k0_1",
+                "time": -15,
+                "value": -18
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": 4
+            },
+            {
+              "key": "k0_1",
+              "value": -18
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 20,
+                "value": -2
+              },
+              {
+                "key": "k0_0",
+                "time": -15,
+                "value": 0
+              },
+              {
+                "key": "k0_0",
+                "time": 15,
+                "value": 3
+              },
+              {
+                "key": "k0_1",
+                "time": -23,
+                "value": 4
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -2
+            },
+            {
+              "key": "k0_0",
+              "value": 3
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -12,
+                "value": 18
+              },
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": -4
+              },
+              {
+                "key": "k0_1",
+                "time": -10,
+                "value": -13
+              },
+              {
+                "key": "k0_0",
+                "time": 5,
+                "value": -9
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -4
+            },
+            {
+              "key": "k0_1",
+              "value": -13
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 5,
+                "value": -17
+              },
+              {
+                "key": "k0_1",
+                "time": -26,
+                "value": -6
+              },
+              {
+                "key": "k0_1",
+                "time": -26,
+                "value": 1
+              },
+              {
+                "key": "k0_0",
+                "time": 5,
+                "value": -2
+              }
+            ],
+            "keys": [
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -2
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 15,
+                "value": -11
+              },
+              {
+                "key": "k0_0",
+                "time": 27,
+                "value": 10
+              },
+              {
+                "key": "k0_0",
+                "time": -30,
+                "value": -4
+              },
+              {
+                "key": "k0_1",
+                "time": -5,
+                "value": 1
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -11
+            },
+            {
+              "key": "k0_0",
+              "value": 10
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -14,
+                "value": 10
+              },
+              {
+                "key": "k0_0",
+                "time": -29,
+                "value": 6
+              },
+              {
+                "key": "k0_1",
+                "time": 24,
+                "value": 15
+              },
+              {
+                "key": "k0_0",
+                "time": -4,
+                "value": -10
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -10
+            },
+            {
+              "key": "k0_1",
+              "value": 15
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 23,
+                "value": 18
+              },
+              {
+                "key": "k0_0",
+                "time": -12,
+                "value": -5
+              },
+              {
+                "key": "k0_1",
+                "time": 23,
+                "value": 0
+              },
+              {
+                "key": "k0_0",
+                "time": -12,
+                "value": -6
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 0
+            },
+            {
+              "key": "k0_0",
+              "value": -6
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 0,
+                "value": 3
+              },
+              {
+                "key": "k0_0",
+                "time": -24,
+                "value": -6
+              },
+              {
+                "key": "k0_1",
+                "time": 15,
+                "value": 1
+              },
+              {
+                "key": "k0_0",
+                "time": -2,
+                "value": -6
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -6
+            },
+            {
+              "key": "k0_1",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -9,
+                "value": -13
+              },
+              {
+                "key": "k0_1",
+                "time": 0,
+                "value": -8
+              },
+              {
+                "key": "k0_1",
+                "time": -13,
+                "value": 13
+              },
+              {
+                "key": "k0_0",
+                "time": 29,
+                "value": 0
+              }
+            ],
+            "keys": [
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -8
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -10,
+                "value": 16
+              },
+              {
+                "key": "k0_0",
+                "time": -23,
+                "value": 10
+              },
+              {
+                "key": "k0_0",
+                "time": -23,
+                "value": -10
+              },
+              {
+                "key": "k0_1",
+                "time": -10,
+                "value": 18
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -10
+            },
+            {
+              "key": "k0_1",
+              "value": 18
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -22,
+                "value": 14
+              },
+              {
+                "key": "k0_1",
+                "time": -26,
+                "value": -4
+              },
+              {
+                "key": "k0_1",
+                "time": -2,
+                "value": -15
+              },
+              {
+                "key": "k0_0",
+                "time": 17,
+                "value": -1
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -15
+            },
+            {
+              "key": "k0_0",
+              "value": -1
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ]
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -7,
+                "value": -14
+              },
+              {
+                "key": "k0_0",
+                "time": -22,
+                "value": 5
+              },
+              {
+                "key": "k0_0",
+                "time": -8,
+                "value": -17
+              },
+              {
+                "key": "k0_1",
+                "time": -8,
+                "value": 10
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -17
+            },
+            {
+              "key": "k0_1",
+              "value": -14
+            }
+          ]
+        }
+      ]
+    },
+    "instruction": "Improve the whole ordinary program using the task specification and measured examples. You may freely refactor any function, change interfaces or retained state, add/remove helpers, or replace the whole implementation. Diagnose the actual cause; a local edit is not required. Preserve a correct program when no useful change is needed.",
+    "current_program": "def project_values(events):\n    return [event[\"value\"] for event in events]\n\ndef select_latest(values, keys):\n    value = values[-1] if values else None\n    return [{\"key\": key, \"value\": value} for key in keys]\n\ndef investigate(context, acquire):\n    return select_latest(project_values(context[\"events\"]), context[\"keys\"])\n",
+    "current_development": {
+      "correct": 5,
+      "total": 32,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": [
+            {
+              "key": "a",
+              "value": null
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [],
+            "keys": [
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": null
+            }
+          ],
+          "correct": true
+        },
+        {
+          "answer": [
+            {
+              "key": "a",
+              "value": 4
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 1,
+                "value": 4
+              }
+            ],
+            "keys": [
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 4
+            }
+          ],
+          "correct": true
+        },
+        {
+          "answer": [
+            {
+              "key": "a",
+              "value": 8
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 1,
+                "value": 4
+              },
+              {
+                "key": "a",
+                "time": 9,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 8
+            }
+          ],
+          "correct": true
+        },
+        {
+          "answer": [
+            {
+              "key": "a",
+              "value": 8
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 9,
+                "value": 4
+              },
+              {
+                "key": "a",
+                "time": 1,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 4
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "a",
+              "value": 8
+            },
+            {
+              "key": "b",
+              "value": 8
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 9,
+                "value": 4
+              },
+              {
+                "key": "b",
+                "time": 1,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "a",
+              "b"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 4
+            },
+            {
+              "key": "b",
+              "value": 8
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "a",
+              "value": 8
+            },
+            {
+              "key": "b",
+              "value": 8
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "b",
+                "time": 9,
+                "value": 4
+              },
+              {
+                "key": "a",
+                "time": 1,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "a",
+              "b"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": 8
+            },
+            {
+              "key": "b",
+              "value": 4
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "a",
+              "value": -2
+            },
+            {
+              "key": "missing",
+              "value": -2
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 3,
+                "value": 4
+              },
+              {
+                "key": "a",
+                "time": 3,
+                "value": -2
+              }
+            ],
+            "keys": [
+              "a",
+              "missing"
+            ]
+          },
+          "expected": [
+            {
+              "key": "a",
+              "value": -2
+            },
+            {
+              "key": "missing",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "b",
+              "value": 9
+            },
+            {
+              "key": "a",
+              "value": 9
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "a",
+                "time": 8,
+                "value": 0
+              },
+              {
+                "key": "b",
+                "time": 7,
+                "value": 0
+              },
+              {
+                "key": "a",
+                "time": 2,
+                "value": 9
+              }
+            ],
+            "keys": [
+              "b",
+              "a"
+            ]
+          },
+          "expected": [
+            {
+              "key": "b",
+              "value": 0
+            },
+            {
+              "key": "a",
+              "value": 0
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": -18
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": 13
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": 2
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": 5
+              },
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": -18
+              }
+            ],
+            "keys": [
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 5
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": 0
+            },
+            {
+              "key": "k0_0",
+              "value": 0
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -13,
+                "value": 0
+              },
+              {
+                "key": "k0_0",
+                "time": -10,
+                "value": -20
+              },
+              {
+                "key": "k0_0",
+                "time": 13,
+                "value": -10
+              },
+              {
+                "key": "k0_1",
+                "time": -1,
+                "value": 0
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 0
+            },
+            {
+              "key": "k0_0",
+              "value": -10
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": 20
+            },
+            {
+              "key": "k0_1",
+              "value": 20
+            },
+            {
+              "key": "absent0",
+              "value": 20
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -25,
+                "value": 6
+              },
+              {
+                "key": "k0_0",
+                "time": 15,
+                "value": 18
+              },
+              {
+                "key": "k0_1",
+                "time": -1,
+                "value": 1
+              },
+              {
+                "key": "k0_0",
+                "time": -8,
+                "value": 20
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": 18
+            },
+            {
+              "key": "k0_1",
+              "value": 1
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": 11
+            },
+            {
+              "key": "k0_0",
+              "value": 11
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 23,
+                "value": 4
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": -11
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": 2
+              },
+              {
+                "key": "k0_0",
+                "time": 23,
+                "value": 11
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 2
+            },
+            {
+              "key": "k0_0",
+              "value": 11
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": -4
+            },
+            {
+              "key": "k0_0",
+              "value": -4
+            },
+            {
+              "key": "absent0",
+              "value": -4
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -14,
+                "value": -1
+              },
+              {
+                "key": "k0_0",
+                "time": 16,
+                "value": -1
+              },
+              {
+                "key": "k0_0",
+                "time": -5,
+                "value": -11
+              },
+              {
+                "key": "k0_1",
+                "time": 4,
+                "value": -4
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -4
+            },
+            {
+              "key": "k0_0",
+              "value": -1
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": -14
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 3,
+                "value": -7
+              },
+              {
+                "key": "k0_0",
+                "time": 0,
+                "value": -9
+              },
+              {
+                "key": "k0_1",
+                "time": 28,
+                "value": 17
+              },
+              {
+                "key": "k0_0",
+                "time": 12,
+                "value": -14
+              }
+            ],
+            "keys": [
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 17
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": -15
+            },
+            {
+              "key": "k0_0",
+              "value": -15
+            },
+            {
+              "key": "absent0",
+              "value": -15
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -20,
+                "value": -1
+              },
+              {
+                "key": "k0_1",
+                "time": 15,
+                "value": 11
+              },
+              {
+                "key": "k0_1",
+                "time": 15,
+                "value": 5
+              },
+              {
+                "key": "k0_0",
+                "time": -20,
+                "value": -15
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 5
+            },
+            {
+              "key": "k0_0",
+              "value": -15
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": -19
+            },
+            {
+              "key": "k0_0",
+              "value": -19
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -25,
+                "value": -17
+              },
+              {
+                "key": "k0_0",
+                "time": 14,
+                "value": -2
+              },
+              {
+                "key": "k0_0",
+                "time": -24,
+                "value": 2
+              },
+              {
+                "key": "k0_1",
+                "time": 18,
+                "value": -19
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -19
+            },
+            {
+              "key": "k0_0",
+              "value": -2
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": 8
+            },
+            {
+              "key": "k0_1",
+              "value": 8
+            },
+            {
+              "key": "absent0",
+              "value": 8
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 26,
+                "value": -5
+              },
+              {
+                "key": "k0_1",
+                "time": -16,
+                "value": 16
+              },
+              {
+                "key": "k0_1",
+                "time": -17,
+                "value": -19
+              },
+              {
+                "key": "k0_0",
+                "time": -24,
+                "value": 8
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -5
+            },
+            {
+              "key": "k0_1",
+              "value": 16
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": 9
+            },
+            {
+              "key": "k0_1",
+              "value": 9
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": -5
+              },
+              {
+                "key": "k0_1",
+                "time": 2,
+                "value": -11
+              },
+              {
+                "key": "k0_1",
+                "time": 2,
+                "value": 5
+              },
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": 9
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": 9
+            },
+            {
+              "key": "k0_1",
+              "value": 5
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": 7
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -28,
+                "value": -2
+              },
+              {
+                "key": "k0_1",
+                "time": -1,
+                "value": -15
+              },
+              {
+                "key": "k0_1",
+                "time": 17,
+                "value": 7
+              },
+              {
+                "key": "k0_0",
+                "time": -26,
+                "value": 7
+              }
+            ],
+            "keys": [
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 7
+            }
+          ],
+          "correct": true
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": -9
+            },
+            {
+              "key": "k0_1",
+              "value": -9
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -30,
+                "value": -11
+              },
+              {
+                "key": "k0_0",
+                "time": 1,
+                "value": 8
+              },
+              {
+                "key": "k0_1",
+                "time": 12,
+                "value": 11
+              },
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": -9
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -9
+            },
+            {
+              "key": "k0_1",
+              "value": 11
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": -18
+            },
+            {
+              "key": "k0_1",
+              "value": -18
+            },
+            {
+              "key": "absent0",
+              "value": -18
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -10,
+                "value": 16
+              },
+              {
+                "key": "k0_1",
+                "time": -15,
+                "value": -13
+              },
+              {
+                "key": "k0_0",
+                "time": -10,
+                "value": 4
+              },
+              {
+                "key": "k0_1",
+                "time": -15,
+                "value": -18
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": 4
+            },
+            {
+              "key": "k0_1",
+              "value": -18
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": 4
+            },
+            {
+              "key": "k0_0",
+              "value": 4
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 20,
+                "value": -2
+              },
+              {
+                "key": "k0_0",
+                "time": -15,
+                "value": 0
+              },
+              {
+                "key": "k0_0",
+                "time": 15,
+                "value": 3
+              },
+              {
+                "key": "k0_1",
+                "time": -23,
+                "value": 4
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -2
+            },
+            {
+              "key": "k0_0",
+              "value": 3
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": -9
+            },
+            {
+              "key": "k0_1",
+              "value": -9
+            },
+            {
+              "key": "absent0",
+              "value": -9
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -12,
+                "value": 18
+              },
+              {
+                "key": "k0_0",
+                "time": 20,
+                "value": -4
+              },
+              {
+                "key": "k0_1",
+                "time": -10,
+                "value": -13
+              },
+              {
+                "key": "k0_0",
+                "time": 5,
+                "value": -9
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -4
+            },
+            {
+              "key": "k0_1",
+              "value": -13
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": -2
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": 5,
+                "value": -17
+              },
+              {
+                "key": "k0_1",
+                "time": -26,
+                "value": -6
+              },
+              {
+                "key": "k0_1",
+                "time": -26,
+                "value": 1
+              },
+              {
+                "key": "k0_0",
+                "time": 5,
+                "value": -2
+              }
+            ],
+            "keys": [
+              "k0_0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -2
+            }
+          ],
+          "correct": true
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": 1
+            },
+            {
+              "key": "k0_0",
+              "value": 1
+            },
+            {
+              "key": "absent0",
+              "value": 1
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 15,
+                "value": -11
+              },
+              {
+                "key": "k0_0",
+                "time": 27,
+                "value": 10
+              },
+              {
+                "key": "k0_0",
+                "time": -30,
+                "value": -4
+              },
+              {
+                "key": "k0_1",
+                "time": -5,
+                "value": 1
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -11
+            },
+            {
+              "key": "k0_0",
+              "value": 10
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": -10
+            },
+            {
+              "key": "k0_1",
+              "value": -10
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -14,
+                "value": 10
+              },
+              {
+                "key": "k0_0",
+                "time": -29,
+                "value": 6
+              },
+              {
+                "key": "k0_1",
+                "time": 24,
+                "value": 15
+              },
+              {
+                "key": "k0_0",
+                "time": -4,
+                "value": -10
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -10
+            },
+            {
+              "key": "k0_1",
+              "value": 15
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": -6
+            },
+            {
+              "key": "k0_0",
+              "value": -6
+            },
+            {
+              "key": "absent0",
+              "value": -6
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 23,
+                "value": 18
+              },
+              {
+                "key": "k0_0",
+                "time": -12,
+                "value": -5
+              },
+              {
+                "key": "k0_1",
+                "time": 23,
+                "value": 0
+              },
+              {
+                "key": "k0_0",
+                "time": -12,
+                "value": -6
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": 0
+            },
+            {
+              "key": "k0_0",
+              "value": -6
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": -6
+            },
+            {
+              "key": "k0_1",
+              "value": -6
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": 0,
+                "value": 3
+              },
+              {
+                "key": "k0_0",
+                "time": -24,
+                "value": -6
+              },
+              {
+                "key": "k0_1",
+                "time": 15,
+                "value": 1
+              },
+              {
+                "key": "k0_0",
+                "time": -2,
+                "value": -6
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -6
+            },
+            {
+              "key": "k0_1",
+              "value": 1
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": 0
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -9,
+                "value": -13
+              },
+              {
+                "key": "k0_1",
+                "time": 0,
+                "value": -8
+              },
+              {
+                "key": "k0_1",
+                "time": -13,
+                "value": 13
+              },
+              {
+                "key": "k0_0",
+                "time": 29,
+                "value": 0
+              }
+            ],
+            "keys": [
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -8
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": 18
+            },
+            {
+              "key": "k0_1",
+              "value": 18
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -10,
+                "value": 16
+              },
+              {
+                "key": "k0_0",
+                "time": -23,
+                "value": 10
+              },
+              {
+                "key": "k0_0",
+                "time": -23,
+                "value": -10
+              },
+              {
+                "key": "k0_1",
+                "time": -10,
+                "value": 18
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -10
+            },
+            {
+              "key": "k0_1",
+              "value": 18
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_1",
+              "value": -1
+            },
+            {
+              "key": "k0_0",
+              "value": -1
+            },
+            {
+              "key": "absent0",
+              "value": -1
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_0",
+                "time": -22,
+                "value": 14
+              },
+              {
+                "key": "k0_1",
+                "time": -26,
+                "value": -4
+              },
+              {
+                "key": "k0_1",
+                "time": -2,
+                "value": -15
+              },
+              {
+                "key": "k0_0",
+                "time": 17,
+                "value": -1
+              }
+            ],
+            "keys": [
+              "k0_1",
+              "k0_0",
+              "absent0"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_1",
+              "value": -15
+            },
+            {
+              "key": "k0_0",
+              "value": -1
+            },
+            {
+              "key": "absent0",
+              "value": null
+            }
+          ],
+          "correct": false
+        },
+        {
+          "answer": [
+            {
+              "key": "k0_0",
+              "value": 10
+            },
+            {
+              "key": "k0_1",
+              "value": 10
+            }
+          ],
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "key": "k0_1",
+                "time": -7,
+                "value": -14
+              },
+              {
+                "key": "k0_0",
+                "time": -22,
+                "value": 5
+              },
+              {
+                "key": "k0_0",
+                "time": -8,
+                "value": -17
+              },
+              {
+                "key": "k0_1",
+                "time": -8,
+                "value": 10
+              }
+            ],
+            "keys": [
+              "k0_0",
+              "k0_1"
+            ]
+          },
+          "expected": [
+            {
+              "key": "k0_0",
+              "value": -17
+            },
+            {
+              "key": "k0_1",
+              "value": -14
+            }
+          ],
+          "correct": false
+        }
+      ]
+    },
+    "prior_attempts": [],
+    "required_return": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scope",
+        "change"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

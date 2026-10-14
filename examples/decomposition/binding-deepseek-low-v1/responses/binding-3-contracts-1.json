@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    values = context[\\\"values\\\"]\\n    if len(values) == 0:\\n        return 0\\n    contributions = []\\n    for i in range(len(values)):\\n        x = values[i]\\n        term = -x + 2 * x * x\\n        if i > 0:\\n            term = term + 2 * x * values[i - 1]\\n        contributions.append(term)\\n    for _ in range(4):\\n        total = 0\\n        for i in range(len(contributions)):\\n            total = total + contributions[i]\\n            contributions[i] = total\\n    return contributions[-1]\\n\",\"scope\":\"investigate reads context['values'], builds per-position contributions p(x)=-x+2*x*x plus 2*x*previous for i>0, applies four cumulative-sum passes, and returns the final last entry.\",\"change\":\"Retained the verified predictor; no interface or state changes were needed.\"}",
+  "prompt_sha256": "6632a9a968ca47a43015ab2238b8ed732dac4429cecf06360bb00eb00b3ac76c"
+}

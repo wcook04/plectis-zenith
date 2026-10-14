@@ -1,0 +1,4 @@
+{
+  "raw": "{\"change\":\"Replaced the sum-only predictor with the inferred closed form. For the fixed private choices, the contributions collapse to L = S*S + sum(x*x*(1-x)) where S is the total sum of input values.\",\"scope\":\"investigate reads context['values'], computes the total sum S and the sum of x*x*(1-x) over all values, then returns S*S plus that extra sum. This matches the inferred polynomial, preceding-sum interaction, gain, and one cumulative pass.\",\"source\":\"def investigate(context, acquire):\\n    total = 0\\n    extra = 0\\n    for x in context[\\\"values\\\"]:\\n        total = total + x\\n        extra = extra + x * x * (1 - x)\\n    return total * total + extra\\n\"}",
+  "prompt_sha256": "6470bb24342e0b3d0dd0d382a030bfc6d4fd91ab8d16c0860eb9849ef587f2be"
+}

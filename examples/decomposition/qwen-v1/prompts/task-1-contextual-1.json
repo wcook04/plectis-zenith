@@ -1,0 +1,2322 @@
+{
+  "prompt": {
+    "task": {
+      "id": "task-1",
+      "family": "native_sqlite",
+      "description": "Native SQLite diagnostic source. Each query starts an empty\nin-memory database with one table whose id column is INTEGER PRIMARY KEY\nAUTOINCREMENT. Input is exactly {\"actions\": [action, ...]}, at most 32 actions.\nAn action is exactly {\"op\":\"put\", \"id\":n}, {\"op\":\"delete\", \"id\":n}, or\n{\"op\":\"begin\"}, {\"op\":\"commit\"}, {\"op\":\"rollback\"}. IDs are integers\n1..1000. Put inserts the explicit ID; it must be absent in the current\ntransactional view. Delete may name an absent ID. Transactions cannot nest;\ncommit/rollback require an open transaction. The sequence may end with an\nopen transaction. Operations and the final measurement use the same connection.\nAfter the actions, insert one row without specifying an ID and return its\nautomatically allocated ID as an integer. The source has no other tables,\ntriggers, conflicts, connections or hidden modes. An allowed source probe uses\nexactly this schema and returns this native measurement. There are no\nacquisition tables. Implement investigate(context, acquire), returning a JSON\ninteger. The seed program is an experimental hypothesis.\n",
+      "focus_function": "next_id",
+      "calibration": [
+        {
+          "input": {
+            "actions": []
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "delete",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 2
+              },
+              {
+                "op": "put",
+                "id": 7
+              },
+              {
+                "op": "delete",
+                "id": 7
+              }
+            ]
+          },
+          "expected": 8
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 9
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 3
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 4
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 6
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 6
+              }
+            ]
+          },
+          "expected": 7
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 10
+              },
+              {
+                "op": "delete",
+                "id": 10
+              },
+              {
+                "op": "put",
+                "id": 2
+              }
+            ]
+          },
+          "expected": 11
+        }
+      ],
+      "development": [
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 166
+              },
+              {
+                "op": "delete",
+                "id": 166
+              }
+            ]
+          },
+          "expected": 167
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 16
+              },
+              {
+                "op": "put",
+                "id": 160
+              },
+              {
+                "op": "delete",
+                "id": 160
+              }
+            ]
+          },
+          "expected": 161
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 170
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 26
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 116
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "delete",
+                "id": 26
+              }
+            ]
+          },
+          "expected": 27
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 130
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 130
+              }
+            ]
+          },
+          "expected": 131
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 145
+              },
+              {
+                "op": "delete",
+                "id": 145
+              },
+              {
+                "op": "put",
+                "id": 26
+              }
+            ]
+          },
+          "expected": 146
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 4
+              },
+              {
+                "op": "put",
+                "id": 151
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 5
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 30
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 30
+              },
+              {
+                "op": "put",
+                "id": 179
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 179
+              }
+            ]
+          },
+          "expected": 180
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 26
+              },
+              {
+                "op": "put",
+                "id": 125
+              },
+              {
+                "op": "delete",
+                "id": 125
+              }
+            ]
+          },
+          "expected": 126
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 132
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 171
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "delete",
+                "id": 11
+              }
+            ]
+          },
+          "expected": 12
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 190
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 190
+              }
+            ]
+          },
+          "expected": 191
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 132
+              },
+              {
+                "op": "delete",
+                "id": 132
+              },
+              {
+                "op": "put",
+                "id": 27
+              }
+            ]
+          },
+          "expected": 133
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 12
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 12
+              },
+              {
+                "op": "put",
+                "id": 113
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 13
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 12
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 12
+              },
+              {
+                "op": "put",
+                "id": 193
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 193
+              }
+            ]
+          },
+          "expected": 194
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 196
+              },
+              {
+                "op": "delete",
+                "id": 196
+              }
+            ]
+          },
+          "expected": 197
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 25
+              },
+              {
+                "op": "put",
+                "id": 196
+              },
+              {
+                "op": "delete",
+                "id": 196
+              }
+            ]
+          },
+          "expected": 197
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 140
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 15
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 107
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "delete",
+                "id": 15
+              }
+            ]
+          },
+          "expected": 16
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 179
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 179
+              }
+            ]
+          },
+          "expected": 180
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 140
+              },
+              {
+                "op": "delete",
+                "id": 140
+              },
+              {
+                "op": "put",
+                "id": 25
+              }
+            ]
+          },
+          "expected": 141
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 15
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 15
+              },
+              {
+                "op": "put",
+                "id": 151
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 16
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 4
+              },
+              {
+                "op": "put",
+                "id": 117
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 117
+              }
+            ]
+          },
+          "expected": 118
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 164
+              },
+              {
+                "op": "delete",
+                "id": 164
+              }
+            ]
+          },
+          "expected": 165
+        }
+      ]
+    },
+    "instruction": "Treat the functions and their callers/consumers as a revisable decomposition. Start from the indicated local focus and its surrounding context. Decide whether its current inputs, retained state and role suffice for its downstream obligation. You may change ANY function or interface, split/merge/remove helpers, add state, or replace the whole program. Make the smallest useful computational change; no graph growth is required.",
+    "current_program": "def simulate_actions(actions):\n    committed_ids = []\n    pending_ids = []\n    in_transaction = False\n    snapshot_committed = None\n    \n    for action in actions:\n        op = action[\"op\"]\n        if op == \"put\":\n            target_id = action[\"id\"]\n            if in_transaction:\n                pending_ids.append(target_id)\n            else:\n                committed_ids.append(target_id)\n        elif op == \"delete\":\n            target_id = action[\"id\"]\n            if in_transaction:\n                if target_id in pending_ids:\n                    pending_ids.remove(target_id)\n                elif target_id in committed_ids:\n                    # Mark deletion by removing from a logical view, but we need to track max ever inserted.\n                    # Actually, simpler: just maintain the list of currently visible rows? \n                    # No, AUTOINCREMENT depends on history. \n                    # Let's stick to tracking 'max_ever_allocated' separately or deriving it.\n                    pass\n            else:\n                if target_id in committed_ids:\n                    committed_ids.remove(target_id)\n        elif op == \"begin\":\n            if not in_transaction:\n                in_transaction = True\n                snapshot_committed = list(committed_ids)\n                pending_ids = []\n        elif op == \"commit\":\n            if in_transaction:\n                committed_ids.extend(pending_ids)\n                pending_ids = []\n                in_transaction = False\n                snapshot_committed = None\n        elif op == \"rollback\":\n            if in_transaction:\n                committed_ids = snapshot_committed\n                pending_ids = []\n                in_transaction = False\n                snapshot_committed = None\n                \n    return committed_ids + pending_ids\n\ndef get_max_allocated_id(actions):\n    max_id = 0\n    in_transaction = False\n    temp_max_in_txn = -1\n    \n    for action in actions:\n        op = action[\"op\"]\n        if op == \"put\":\n            current_id = action[\"id\"]\n            if in_transaction:\n                if current_id > temp_max_in_txn:\n                    temp_max_in_txn = current_id\n            else:\n                if current_id > max_id:\n                    max_id = current_id\n        elif op == \"begin\":\n            if not in_transaction:\n                in_transaction = True\n                temp_max_in_txn = -1\n        elif op == \"commit\":\n            if in_transaction:\n                if temp_max_in_txn > max_id:\n                    max_id = temp_max_in_txn\n                in_transaction = False\n                temp_max_in_txn = -1\n        elif op == \"rollback\":\n            if in_transaction:\n                in_transaction = False\n                temp_max_in_txn = -1\n                \n    return max_id\n\ndef investigate(context, acquire):\n    actions = context.get(\"actions\", [])\n    max_alloc = get_max_allocated_id(actions)\n    return max_alloc + 1",
+    "current_development": {
+      "correct": 32,
+      "total": 32,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": []
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 5,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": true
+        },
+        {
+          "answer": 5,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "delete",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": true
+        },
+        {
+          "answer": 8,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 2
+              },
+              {
+                "op": "put",
+                "id": 7
+              },
+              {
+                "op": "delete",
+                "id": 7
+              }
+            ]
+          },
+          "expected": 8,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 9
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 4,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 3
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 4,
+          "correct": true
+        },
+        {
+          "answer": 7,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 6
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 6
+              }
+            ]
+          },
+          "expected": 7,
+          "correct": true
+        },
+        {
+          "answer": 11,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 10
+              },
+              {
+                "op": "delete",
+                "id": 10
+              },
+              {
+                "op": "put",
+                "id": 2
+              }
+            ]
+          },
+          "expected": 11,
+          "correct": true
+        },
+        {
+          "answer": 167,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 166
+              },
+              {
+                "op": "delete",
+                "id": 166
+              }
+            ]
+          },
+          "expected": 167,
+          "correct": true
+        },
+        {
+          "answer": 161,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 16
+              },
+              {
+                "op": "put",
+                "id": 160
+              },
+              {
+                "op": "delete",
+                "id": 160
+              }
+            ]
+          },
+          "expected": 161,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 170
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 27,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 26
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 116
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "delete",
+                "id": 26
+              }
+            ]
+          },
+          "expected": 27,
+          "correct": true
+        },
+        {
+          "answer": 131,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 130
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 130
+              }
+            ]
+          },
+          "expected": 131,
+          "correct": true
+        },
+        {
+          "answer": 146,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 145
+              },
+              {
+                "op": "delete",
+                "id": 145
+              },
+              {
+                "op": "put",
+                "id": 26
+              }
+            ]
+          },
+          "expected": 146,
+          "correct": true
+        },
+        {
+          "answer": 5,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 4
+              },
+              {
+                "op": "put",
+                "id": 151
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": true
+        },
+        {
+          "answer": 180,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 30
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 30
+              },
+              {
+                "op": "put",
+                "id": 179
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 179
+              }
+            ]
+          },
+          "expected": 180,
+          "correct": true
+        },
+        {
+          "answer": 126,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 26
+              },
+              {
+                "op": "put",
+                "id": 125
+              },
+              {
+                "op": "delete",
+                "id": 125
+              }
+            ]
+          },
+          "expected": 126,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 132
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 12,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 171
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "delete",
+                "id": 11
+              }
+            ]
+          },
+          "expected": 12,
+          "correct": true
+        },
+        {
+          "answer": 191,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 190
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 190
+              }
+            ]
+          },
+          "expected": 191,
+          "correct": true
+        },
+        {
+          "answer": 133,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 132
+              },
+              {
+                "op": "delete",
+                "id": 132
+              },
+              {
+                "op": "put",
+                "id": 27
+              }
+            ]
+          },
+          "expected": 133,
+          "correct": true
+        },
+        {
+          "answer": 13,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 12
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 12
+              },
+              {
+                "op": "put",
+                "id": 113
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 13,
+          "correct": true
+        },
+        {
+          "answer": 194,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 12
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 12
+              },
+              {
+                "op": "put",
+                "id": 193
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 193
+              }
+            ]
+          },
+          "expected": 194,
+          "correct": true
+        },
+        {
+          "answer": 197,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 196
+              },
+              {
+                "op": "delete",
+                "id": 196
+              }
+            ]
+          },
+          "expected": 197,
+          "correct": true
+        },
+        {
+          "answer": 197,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 25
+              },
+              {
+                "op": "put",
+                "id": 196
+              },
+              {
+                "op": "delete",
+                "id": 196
+              }
+            ]
+          },
+          "expected": 197,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 140
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 16,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 15
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 107
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "delete",
+                "id": 15
+              }
+            ]
+          },
+          "expected": 16,
+          "correct": true
+        },
+        {
+          "answer": 180,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 179
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 179
+              }
+            ]
+          },
+          "expected": 180,
+          "correct": true
+        },
+        {
+          "answer": 141,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 140
+              },
+              {
+                "op": "delete",
+                "id": 140
+              },
+              {
+                "op": "put",
+                "id": 25
+              }
+            ]
+          },
+          "expected": 141,
+          "correct": true
+        },
+        {
+          "answer": 16,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 15
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 15
+              },
+              {
+                "op": "put",
+                "id": 151
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 16,
+          "correct": true
+        },
+        {
+          "answer": 118,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "id": 4
+              },
+              {
+                "op": "put",
+                "id": 117
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 117
+              }
+            ]
+          },
+          "expected": 118,
+          "correct": true
+        },
+        {
+          "answer": 165,
+          "trace": [],
+          "error": null,
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 164
+              },
+              {
+                "op": "delete",
+                "id": 164
+              }
+            ]
+          },
+          "expected": 165,
+          "correct": true
+        }
+      ]
+    },
+    "prior_attempts": [
+      {
+        "source": "def simulate_actions(actions):\n    committed_ids = []\n    pending_ids = []\n    in_transaction = False\n    snapshot_committed = None\n    \n    for action in actions:\n        op = action[\"op\"]\n        if op == \"put\":\n            target_id = action[\"id\"]\n            if in_transaction:\n                pending_ids.append(target_id)\n            else:\n                committed_ids.append(target_id)\n        elif op == \"delete\":\n            target_id = action[\"id\"]\n            if in_transaction:\n                if target_id in pending_ids:\n                    pending_ids.remove(target_id)\n                elif target_id in committed_ids:\n                    # Mark deletion by removing from a logical view, but we need to track max ever inserted.\n                    # Actually, simpler: just maintain the list of currently visible rows? \n                    # No, AUTOINCREMENT depends on history. \n                    # Let's stick to tracking 'max_ever_allocated' separately or deriving it.\n                    pass\n            else:\n                if target_id in committed_ids:\n                    committed_ids.remove(target_id)\n        elif op == \"begin\":\n            if not in_transaction:\n                in_transaction = True\n                snapshot_committed = list(committed_ids)\n                pending_ids = []\n        elif op == \"commit\":\n            if in_transaction:\n                committed_ids.extend(pending_ids)\n                pending_ids = []\n                in_transaction = False\n                snapshot_committed = None\n        elif op == \"rollback\":\n            if in_transaction:\n                committed_ids = snapshot_committed\n                pending_ids = []\n                in_transaction = False\n                snapshot_committed = None\n                \n    return committed_ids + pending_ids\n\ndef get_max_allocated_id(actions):\n    max_id = 0\n    in_transaction = False\n    temp_max_in_txn = -1\n    \n    for action in actions:\n        op = action[\"op\"]\n        if op == \"put\":\n            current_id = action[\"id\"]\n            if in_transaction:\n                if current_id > temp_max_in_txn:\n                    temp_max_in_txn = current_id\n            else:\n                if current_id > max_id:\n                    max_id = current_id\n        elif op == \"begin\":\n            if not in_transaction:\n                in_transaction = True\n                temp_max_in_txn = -1\n        elif op == \"commit\":\n            if in_transaction:\n                if temp_max_in_txn > max_id:\n                    max_id = temp_max_in_txn\n                in_transaction = False\n                temp_max_in_txn = -1\n        elif op == \"rollback\":\n            if in_transaction:\n                in_transaction = False\n                temp_max_in_txn = -1\n                \n    return max_id\n\ndef investigate(context, acquire):\n    actions = context.get(\"actions\", [])\n    max_alloc = get_max_allocated_id(actions)\n    return max_alloc + 1",
+        "scope": "The `investigate` function simulates SQLite's AUTOINCREMENT behavior by tracking the maximum ID explicitly allocated via PUT operations across all transactions (committed ones persisting their effect on the counter, rolled-back ones discarding it). It ignores DELETEs for the purpose of determining the next auto-generated ID.",
+        "change": "Replaced the flawed logic that calculated next_id based on remaining rows with a simulation that tracks the highest ID ever successfully assigned (via commit) or currently held in an open transaction, mirroring SQLite's internal sequence table behavior.",
+        "node_id": "task-1-contextual-0",
+        "response_error": null,
+        "constraint_error": null,
+        "development": {
+          "correct": 32,
+          "total": 32,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 11,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 10
+                  },
+                  {
+                    "op": "delete",
+                    "id": 10
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 11,
+              "correct": true
+            },
+            {
+              "answer": 167,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 166
+                  },
+                  {
+                    "op": "delete",
+                    "id": 166
+                  }
+                ]
+              },
+              "expected": 167,
+              "correct": true
+            },
+            {
+              "answer": 161,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 16
+                  },
+                  {
+                    "op": "put",
+                    "id": 160
+                  },
+                  {
+                    "op": "delete",
+                    "id": 160
+                  }
+                ]
+              },
+              "expected": 161,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 170
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 27,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 26
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 116
+                  },
+                  {
+                    "op": "rollback"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 26
+                  }
+                ]
+              },
+              "expected": 27,
+              "correct": true
+            },
+            {
+              "answer": 131,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 130
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 130
+                  }
+                ]
+              },
+              "expected": 131,
+              "correct": true
+            },
+            {
+              "answer": 146,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 145
+                  },
+                  {
+                    "op": "delete",
+                    "id": 145
+                  },
+                  {
+                    "op": "put",
+                    "id": 26
+                  }
+                ]
+              },
+              "expected": 146,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  },
+                  {
+                    "op": "put",
+                    "id": 151
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 180,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 30
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 30
+                  },
+                  {
+                    "op": "put",
+                    "id": 179
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 179
+                  }
+                ]
+              },
+              "expected": 180,
+              "correct": true
+            },
+            {
+              "answer": 126,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 26
+                  },
+                  {
+                    "op": "put",
+                    "id": 125
+                  },
+                  {
+                    "op": "delete",
+                    "id": 125
+                  }
+                ]
+              },
+              "expected": 126,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 132
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 12,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 171
+                  },
+                  {
+                    "op": "rollback"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 11
+                  }
+                ]
+              },
+              "expected": 12,
+              "correct": true
+            },
+            {
+              "answer": 191,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 190
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 190
+                  }
+                ]
+              },
+              "expected": 191,
+              "correct": true
+            },
+            {
+              "answer": 133,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 132
+                  },
+                  {
+                    "op": "delete",
+                    "id": 132
+                  },
+                  {
+                    "op": "put",
+                    "id": 27
+                  }
+                ]
+              },
+              "expected": 133,
+              "correct": true
+            },
+            {
+              "answer": 13,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 12
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 12
+                  },
+                  {
+                    "op": "put",
+                    "id": 113
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 13,
+              "correct": true
+            },
+            {
+              "answer": 194,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 12
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 12
+                  },
+                  {
+                    "op": "put",
+                    "id": 193
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 193
+                  }
+                ]
+              },
+              "expected": 194,
+              "correct": true
+            },
+            {
+              "answer": 197,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 196
+                  },
+                  {
+                    "op": "delete",
+                    "id": 196
+                  }
+                ]
+              },
+              "expected": 197,
+              "correct": true
+            },
+            {
+              "answer": 197,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 25
+                  },
+                  {
+                    "op": "put",
+                    "id": 196
+                  },
+                  {
+                    "op": "delete",
+                    "id": 196
+                  }
+                ]
+              },
+              "expected": 197,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 140
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 16,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 15
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 107
+                  },
+                  {
+                    "op": "rollback"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 15
+                  }
+                ]
+              },
+              "expected": 16,
+              "correct": true
+            },
+            {
+              "answer": 180,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 179
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 179
+                  }
+                ]
+              },
+              "expected": 180,
+              "correct": true
+            },
+            {
+              "answer": 141,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 140
+                  },
+                  {
+                    "op": "delete",
+                    "id": 140
+                  },
+                  {
+                    "op": "put",
+                    "id": 25
+                  }
+                ]
+              },
+              "expected": 141,
+              "correct": true
+            },
+            {
+              "answer": 16,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 15
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 15
+                  },
+                  {
+                    "op": "put",
+                    "id": 151
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 16,
+              "correct": true
+            },
+            {
+              "answer": 118,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  },
+                  {
+                    "op": "put",
+                    "id": 117
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 117
+                  }
+                ]
+              },
+              "expected": 118,
+              "correct": true
+            },
+            {
+              "answer": 165,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 164
+                  },
+                  {
+                    "op": "delete",
+                    "id": 164
+                  }
+                ]
+              },
+              "expected": 165,
+              "correct": true
+            }
+          ]
+        },
+        "prompt_sha256": "3d0bd4e1c83cdda7d7f74c2d3db8b57f70f60d37189df062687029bc26c91b03",
+        "raw_sha256": "dcd0e743997bd5f67646749e28454740128d30bf57ae790ae679d4310c77baa4",
+        "elapsed_seconds": 26.22653254099714,
+        "structure": [
+          {
+            "name": "simulate_actions",
+            "arguments": [
+              "actions"
+            ],
+            "calls": [],
+            "called_by": []
+          },
+          {
+            "name": "get_max_allocated_id",
+            "arguments": [
+              "actions"
+            ],
+            "calls": [],
+            "called_by": [
+              "investigate"
+            ]
+          },
+          {
+            "name": "investigate",
+            "arguments": [
+              "context",
+              "acquire"
+            ],
+            "calls": [
+              "get_max_allocated_id"
+            ],
+            "called_by": []
+          }
+        ]
+      }
+    ],
+    "required_return": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scope",
+        "change"
+      ],
+      "additionalProperties": false
+    },
+    "local_context": {
+      "focus": "next_id",
+      "nodes": [
+        {
+          "name": "simulate_actions",
+          "arguments": [
+            "actions"
+          ],
+          "calls": [],
+          "called_by": []
+        },
+        {
+          "name": "get_max_allocated_id",
+          "arguments": [
+            "actions"
+          ],
+          "calls": [],
+          "called_by": [
+            "investigate"
+          ]
+        },
+        {
+          "name": "investigate",
+          "arguments": [
+            "context",
+            "acquire"
+          ],
+          "calls": [
+            "get_max_allocated_id"
+          ],
+          "called_by": []
+        }
+      ]
+    }
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

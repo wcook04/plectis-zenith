@@ -4,15 +4,16 @@ Zenith tests whether investigations can accumulate useful executable knowledge. 
 
 The working object is a program with its source binding, observations, tests and optional executable dependencies. Small experiments compare repair, fresh candidate search and learned composition. Historical graphs remain available; the [programme](program.md#relation-to-the-graph-ambition) separates useful program learning from graph superiority and improvement of the learning algorithm itself.
 
-The next research target is **learning the decomposition**: can a node use its caller, consumers and failures to discover a missing distinction, change an interface or design a better experiment? The fifteen latest returns motivate this direction; a reflective graph has not yet been implemented or validated. [Synthesis and proposed comparison](docs/deep-returns-20261014.md).
+The latest campaign implements **structural revision and source-rule induction**. A model can change ordinary code, its interfaces and retained state using measured examples and execution feedback. Explicit local graph context is tested against unrestricted ordinary code and function contracts. [Method](docs/decomposition-study.md), [full results](docs/decomposition-20261014.md).
 
-The active experiment uses real SQLite executions in controlled source configurations. Duplicate writes, insertion triggers, rollbacks and separate connections make the reported counter differ from committed state. The model receives action descriptions and measured examples, then authors its own computation. A fresh compiler and an execution-enabled archive receive the same evidence and total coding allowance.
+The complete pass made **122 calls for $0.178**. On six fresh synthetic source settings, DeepSeek V4.1 Flash with low reasoning and a plain coding prompt scored **144/144** on each of two later panels; contracts with low reasoning scored **120/144**, and contracts without reasoning **52/144**. All six winning first proposals already worked, so repeated revision earns no benefit here. The operation family is supplied and each query includes its whole history: this is acquired predictive computation, not compact-state discovery or recursive self-improvement.
 
-The initial comparison made **126 calls for $0.1295**, but its final incremental code tied an unchanged early program. Small follow-on screens found a better direction: preserve evidence and executable alternatives, then test what to reuse. A mixed DeepSeek/Qwen pool scored **279/288** on separate confirmation sequences, versus **191/288** and **194/288** for four-proposal single-model pools. A later test with the larger historical archive reached **286/288** after two native observations per source, with **zero new model calls**. The panels and search budgets differ; these are useful bounded results, not recursive self-improvement. [Results, controls and limits](docs/status.md).
+An earlier native SQLite comparison and its follow-ons remain available with their original source settings, panels and budgets. They favor preserving evidence and executable alternatives. A new four-task structural test repairs information loss and rollback-sensitive state, but ordinary contracts outperform the explicit local-context condition. [Results, controls and limits](docs/status.md), [research programme](program.md).
 
 - [Three-page paper](paper/zenith.pdf)
 - [Method and experiment](docs/executable-investigations.md)
 - [Measured results](docs/status.md)
+- [Structural revision and rule-induction method](docs/decomposition-study.md)
 - [Research programme](program.md)
 - [Fifteen deep returns: learned decomposition and research direction](docs/deep-returns-20261014.md)
 - [Eight next-round returns: synthesis, decisions and reproduction](docs/next-returns-20261014.md)
@@ -22,12 +23,17 @@ The initial comparison made **126 calls for $0.1295**, but its final incremental
 
 ```sh
 python -m pip install -e '.[test,research]'
-python -m research.observation_learning_study prepare work/observation-run --model deepseek/deepseek-v4.1-flash --provider deepinfra/fp8 --providers deepinfra/fp8 baidu/fp8 morph/fp8 --workers 3 --reasoning-effort none
-python -m research.observation_learning_study run work/observation-run --env-file /path/to/local.env
-python -m research.observation_learning_study replay work/observation-run
+python -m research.decomposition_study prepare work/rule-run \
+  --dataset bindings --seed 20261015 --model deepseek/deepseek-v4.1-flash \
+  --providers deepinfra/fp8 baidu/fp8 morph/fp8 --arms global \
+  --reasoning-effort low --max-output-tokens 12288 --max-cost-usd 0.60
+python -m research.decomposition_study run work/rule-run --env-file /path/to/local.env
+python -m research.decomposition_study confirm work/rule-run
 ```
 
-Preparation freezes the source, dataset and protocol before inference. The default design permits 126 calls across six configured sources. Its $2 ceiling is a hard maximum, not an expected invoice: receipts record actual token usage and charges separately from conservative reservations. Use current model and endpoint metadata, then an execution check, to select a recent capable inexpensive Chinese-developed model. Independent worlds run with a host-wide limit of three calls and one per pinned endpoint. Each learning trajectory stays ordered. A first-round engineering checkpoint stops unusable runs before further calls; there is no automatic retry or expensive fallback. Credentials and private transport records remain local.
+This reproduces the six-source design with new model outputs, not the original experiment. The recorded twelve-call version cost **$0.0274**; the $0.60 ceiling is only a maximum. For exact offline reproduction, use `python scripts/build_decomposition_report.py replay examples/decomposition/binding-deepseek-low-global-v1`. Original source archives preserve older execution rules.
+
+Preparation freezes source, data, protocol and both later panels. Select recent capable inexpensive Chinese-developed models from current metadata and actual delivery; this campaign favored DeepSeek with low reasoning. Independent trials use at most three concurrent calls across the host and one per pinned endpoint. Each trajectory stays ordered. There are no automatic retries or expensive fallbacks; credentials and transport records remain local. [Historical native-source campaign commands](docs/executable-investigations.md) remain available.
 
 ## Source map and validation
 
@@ -35,6 +41,10 @@ Preparation freezes the source, dataset and protocol before inference. The defau
 |---|---|
 | [Restricted execution](zenith/investigation_program.py) | Run proposed code with logged table acquisition and resource limits |
 | [Native source world](research/observation_world.py) | SQLite observations and a separate evaluator |
+| [Structural revision](research/decomposition_study.py) | Matched whole-program, local-context and ordinary-contract repairs with frozen later cases |
+| [Mechanism tasks](research/decomposition_tasks.py) | Information-losing interfaces, native SQLite allocation and a correct-code control |
+| [Rule induction](research/state_discovery_tasks.py) | Synthetic source rules, identifying observations and longer unseen sequences |
+| [Structural evidence replay](scripts/build_decomposition_report.py) | Exact returned code, billing and portable archived-source replay |
 | [Observation learning](research/observation_learning_study.py) | Model-proposed probes, retained programs, equal-budget controls and frozen audit |
 | [Counterexample repair screen](research/observation_repair_screen.py) | Matched repairs of selected failures, structural screening and separate confirmation |
 | [Candidate-pool screen](research/observation_candidate_pool_screen.py) | Development-selected mixed and single-model pools with four proposals per source |
@@ -52,6 +62,7 @@ python scripts/build_graphs.py
 python scripts/check_extraction.py
 python scripts/build_learning_report.py replay
 python scripts/build_observation_report.py replay
+python scripts/build_decomposition_report.py replay examples/decomposition/binding-deepseek-low-global-v1
 tectonic paper/zenith.tex
 ```
 

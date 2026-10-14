@@ -73,6 +73,22 @@ def test_execution_resets_state_and_copies_table_data():
     assert results[0]['trace'] == results[1]['trace']
 
 
+def test_discard_loop_name_executes_without_exposing_private_names():
+    source = '''def investigate(context, acquire):
+    total = 0
+    for _ in context["values"]:
+        total += 1
+    return total
+'''
+    cases = [{'tables': {}, 'values': [3, 7]}, {'tables': {}, 'values': []}]
+    results = execute(source, cases, answer_contract='json')
+    assert [row['answer'] for row in results] == [2, 0]
+    assert all(row['error'] is None for row in results)
+    for name in ('_private', '__builtins__', '__import__'):
+        with pytest.raises(ValueError, match='private names'):
+            validate_source(source.replace('for _ in', 'for '+name+' in'))
+
+
 def test_nonlocal_simulator_state_is_mutable_and_resets_between_cases():
     source = '''def investigate(context, acquire):
     state = {}

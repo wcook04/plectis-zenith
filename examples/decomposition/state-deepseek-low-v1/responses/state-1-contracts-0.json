@@ -1,0 +1,4 @@
+{
+  "raw": "{\"change\":\"Replaced sum-only readout with inferred polynomial contribution p(x)=x+2*x*x+2*x*x*x and three cumulative-sum passes; final entry computed by weighted sum with weight (n-i)*(n-i+1)//2.\",\"scope\":\"Behavior of investigate(context, acquire): maps context[\\\"values\\\"] to one integer, with empty input returning 0.\",\"source\":\"def poly(x):\\n    return x + 2 * x * x + 2 * x * x * x\\n\\ndef investigate(context, acquire):\\n    values = context[\\\"values\\\"]\\n    n = len(values)\\n    total = 0\\n    for i in range(n):\\n        x = values[i]\\n        weight = (n - i) * (n - i + 1) // 2\\n        total += poly(x) * weight\\n    return total\"}",
+  "prompt_sha256": "c3f5ad522d8ec05ef190f9bfdd1aab82e320947430e23bfb949618222c6f27bf"
+}

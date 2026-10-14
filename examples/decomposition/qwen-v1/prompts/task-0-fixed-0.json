@@ -1,0 +1,841 @@
+{
+  "prompt": {
+    "task": {
+      "id": "task-0",
+      "family": "synthetic_sensor",
+      "description": "Synthetic diagnostic sensor source. A fresh query is exactly\n{\"rows\": [integer, ...]}, with 0..32 readings, each -100..100. Each individual\nreading is converted by one stable, source-private affine calibration s*x+b;\ns is an integer 1..5 and b is an integer -15..15. The answer is the integer sum\nof the calibrated individual readings, zero for an empty group. Individual\nand grouped observed receipts are available; infer the calibration from them.\nAn allowed source probe uses exactly this same input schema and returns that\ninteger. There are no acquisition tables, ambient context fields or clocks.\nImplement investigate(context, acquire), returning a JSON integer. The supplied\nprogram is an experimental starting point, not a source specification.\n",
+      "focus_function": "calibrate",
+      "calibration": [
+        {
+          "input": {
+            "rows": []
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "rows": [
+              0
+            ]
+          },
+          "expected": 11
+        },
+        {
+          "input": {
+            "rows": [
+              1
+            ]
+          },
+          "expected": 16
+        },
+        {
+          "input": {
+            "rows": [
+              -1
+            ]
+          },
+          "expected": 6
+        },
+        {
+          "input": {
+            "rows": [
+              3
+            ]
+          },
+          "expected": 26
+        },
+        {
+          "input": {
+            "rows": [
+              1,
+              2
+            ]
+          },
+          "expected": 37
+        },
+        {
+          "input": {
+            "rows": [
+              4,
+              -1
+            ]
+          },
+          "expected": 37
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": 33
+        }
+      ],
+      "development": [
+        {
+          "input": {
+            "rows": [
+              0,
+              10
+            ]
+          },
+          "expected": 72
+        },
+        {
+          "input": {
+            "rows": [
+              17,
+              12,
+              17
+            ]
+          },
+          "expected": 263
+        },
+        {
+          "input": {
+            "rows": [
+              20,
+              -20,
+              0,
+              13
+            ]
+          },
+          "expected": 109
+        },
+        {
+          "input": {
+            "rows": [
+              2,
+              -11,
+              14,
+              7,
+              -1,
+              8
+            ]
+          },
+          "expected": 161
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -3
+            ]
+          },
+          "expected": 7
+        },
+        {
+          "input": {
+            "rows": [
+              -5,
+              -17,
+              -5
+            ]
+          },
+          "expected": -102
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              0,
+              20,
+              17
+            ]
+          },
+          "expected": 229
+        },
+        {
+          "input": {
+            "rows": [
+              20,
+              5,
+              0,
+              -4,
+              7,
+              16
+            ]
+          },
+          "expected": 286
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -16
+            ]
+          },
+          "expected": -58
+        },
+        {
+          "input": {
+            "rows": [
+              1,
+              -7,
+              1
+            ]
+          },
+          "expected": 8
+        },
+        {
+          "input": {
+            "rows": [
+              4,
+              -4,
+              -20,
+              -17
+            ]
+          },
+          "expected": -141
+        },
+        {
+          "input": {
+            "rows": [
+              3,
+              -3,
+              5,
+              -13,
+              7,
+              4
+            ]
+          },
+          "expected": 81
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -12
+            ]
+          },
+          "expected": -38
+        },
+        {
+          "input": {
+            "rows": [
+              -11,
+              -3,
+              -11
+            ]
+          },
+          "expected": -92
+        },
+        {
+          "input": {
+            "rows": [
+              -17,
+              17,
+              -12,
+              -17
+            ]
+          },
+          "expected": -101
+        },
+        {
+          "input": {
+            "rows": [
+              -7,
+              -20,
+              -2,
+              13,
+              15,
+              -20
+            ]
+          },
+          "expected": -39
+        },
+        {
+          "input": {
+            "rows": [
+              -15,
+              3,
+              -15
+            ]
+          },
+          "expected": -102
+        },
+        {
+          "input": {
+            "rows": [
+              11,
+              -11,
+              2,
+              -20
+            ]
+          },
+          "expected": -46
+        },
+        {
+          "input": {
+            "rows": [
+              -4,
+              -20,
+              -13,
+              16,
+              10,
+              -19
+            ]
+          },
+          "expected": -84
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -20
+            ]
+          },
+          "expected": -78
+        },
+        {
+          "input": {
+            "rows": [
+              -10,
+              -7,
+              -10
+            ]
+          },
+          "expected": -102
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              0,
+              3,
+              -2
+            ]
+          },
+          "expected": 49
+        },
+        {
+          "input": {
+            "rows": [
+              -20,
+              -7,
+              -11,
+              -14,
+              17,
+              17
+            ]
+          },
+          "expected": -24
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -5
+            ]
+          },
+          "expected": -3
+        }
+      ]
+    },
+    "instruction": "Diagnostic condition: you may edit ONLY the BODY of the named focus function. Keep its signature, all other functions, their order, and every other body unchanged. Do not add/delete functions. Infer the best valid local implementation from the examples. If that boundary cannot solve the task, preserve the best valid program and state the limitation in scope/change.",
+    "current_program": "def sum_readings(rows):\n    return sum(rows)\n\ndef calibrate(total):\n    return 2 * total\n\ndef investigate(context, acquire):\n    return calibrate(sum_readings(context[\"rows\"]))\n",
+    "current_development": {
+      "correct": 1,
+      "total": 32,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": []
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0
+            ]
+          },
+          "expected": 11,
+          "correct": false
+        },
+        {
+          "answer": 2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              1
+            ]
+          },
+          "expected": 16,
+          "correct": false
+        },
+        {
+          "answer": -2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -1
+            ]
+          },
+          "expected": 6,
+          "correct": false
+        },
+        {
+          "answer": 6,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              3
+            ]
+          },
+          "expected": 26,
+          "correct": false
+        },
+        {
+          "answer": 6,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              1,
+              2
+            ]
+          },
+          "expected": 37,
+          "correct": false
+        },
+        {
+          "answer": 6,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              4,
+              -1
+            ]
+          },
+          "expected": 37,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": 33,
+          "correct": false
+        },
+        {
+          "answer": 20,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              10
+            ]
+          },
+          "expected": 72,
+          "correct": false
+        },
+        {
+          "answer": 92,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              17,
+              12,
+              17
+            ]
+          },
+          "expected": 263,
+          "correct": false
+        },
+        {
+          "answer": 26,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              20,
+              -20,
+              0,
+              13
+            ]
+          },
+          "expected": 109,
+          "correct": false
+        },
+        {
+          "answer": 38,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              2,
+              -11,
+              14,
+              7,
+              -1,
+              8
+            ]
+          },
+          "expected": 161,
+          "correct": false
+        },
+        {
+          "answer": -6,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -3
+            ]
+          },
+          "expected": 7,
+          "correct": false
+        },
+        {
+          "answer": -54,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -5,
+              -17,
+              -5
+            ]
+          },
+          "expected": -102,
+          "correct": false
+        },
+        {
+          "answer": 74,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              0,
+              20,
+              17
+            ]
+          },
+          "expected": 229,
+          "correct": false
+        },
+        {
+          "answer": 88,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              20,
+              5,
+              0,
+              -4,
+              7,
+              16
+            ]
+          },
+          "expected": 286,
+          "correct": false
+        },
+        {
+          "answer": -32,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -16
+            ]
+          },
+          "expected": -58,
+          "correct": false
+        },
+        {
+          "answer": -10,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              1,
+              -7,
+              1
+            ]
+          },
+          "expected": 8,
+          "correct": false
+        },
+        {
+          "answer": -74,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              4,
+              -4,
+              -20,
+              -17
+            ]
+          },
+          "expected": -141,
+          "correct": false
+        },
+        {
+          "answer": 6,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              3,
+              -3,
+              5,
+              -13,
+              7,
+              4
+            ]
+          },
+          "expected": 81,
+          "correct": false
+        },
+        {
+          "answer": -24,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -12
+            ]
+          },
+          "expected": -38,
+          "correct": false
+        },
+        {
+          "answer": -50,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -11,
+              -3,
+              -11
+            ]
+          },
+          "expected": -92,
+          "correct": false
+        },
+        {
+          "answer": -58,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -17,
+              17,
+              -12,
+              -17
+            ]
+          },
+          "expected": -101,
+          "correct": false
+        },
+        {
+          "answer": -42,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -7,
+              -20,
+              -2,
+              13,
+              15,
+              -20
+            ]
+          },
+          "expected": -39,
+          "correct": false
+        },
+        {
+          "answer": -54,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -15,
+              3,
+              -15
+            ]
+          },
+          "expected": -102,
+          "correct": false
+        },
+        {
+          "answer": -36,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              11,
+              -11,
+              2,
+              -20
+            ]
+          },
+          "expected": -46,
+          "correct": false
+        },
+        {
+          "answer": -60,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -4,
+              -20,
+              -13,
+              16,
+              10,
+              -19
+            ]
+          },
+          "expected": -84,
+          "correct": false
+        },
+        {
+          "answer": -40,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -20
+            ]
+          },
+          "expected": -78,
+          "correct": false
+        },
+        {
+          "answer": -54,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -10,
+              -7,
+              -10
+            ]
+          },
+          "expected": -102,
+          "correct": false
+        },
+        {
+          "answer": 2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              0,
+              3,
+              -2
+            ]
+          },
+          "expected": 49,
+          "correct": false
+        },
+        {
+          "answer": -36,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -20,
+              -7,
+              -11,
+              -14,
+              17,
+              17
+            ]
+          },
+          "expected": -24,
+          "correct": false
+        },
+        {
+          "answer": -10,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -5
+            ]
+          },
+          "expected": -3,
+          "correct": false
+        }
+      ]
+    },
+    "prior_attempts": [],
+    "required_return": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scope",
+        "change"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

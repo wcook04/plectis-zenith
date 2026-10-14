@@ -93,7 +93,9 @@ def validate_source(source):
             raise ValueError(f'unsupported syntax: {type(node).__name__}')
         if isinstance(node, (ast.FunctionDef, ast.arg, ast.Name)):
             name = node.name if isinstance(node, ast.FunctionDef) else node.arg if isinstance(node, ast.arg) else node.id
-            if name.startswith('_'):
+            # A single underscore is an ordinary discard/local variable, not
+            # access to an ambient or interpreter-private name.
+            if name.startswith('_') and not (name == '_' and not isinstance(node, ast.FunctionDef)):
                 raise ValueError('private names are not permitted')
         if isinstance(node, ast.Nonlocal) and any(name.startswith('_') for name in node.names):
             raise ValueError('private names are not permitted')

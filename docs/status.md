@@ -2,6 +2,14 @@
 
 The ten frontier returns have been synthesized into one implemented loop: model-proposed source experiments, host-recorded measurements, model-written predictors and measured revision. All ten returns were audited with **337 passing return-specific tests**. [Synthesis and custody](frontier-returns-20261013.md), [active method](executable-investigations.md), [three-page paper](../paper/zenith.pdf).
 
+## Structural revision and rule acquisition
+
+The [new campaign](decomposition-20261014.md) completed seven studies: **122 calls, $0.177964589964 reported inference**. A 32-call Qwen structural test confirms ordinary contracts at 96/96, unrestricted global code and local context at 88/96. The difference is one SQLite task's rollback/open-transaction state; this is no graph advantage.
+
+Follow-on synthetic rule-induction tests distinguish actual reasoning failures from code delivery. We fixed the executor's unnecessary rejection of a single `_` local variable and preserved all earlier failures under their archived runtimes. On six fresh configurations with matched data and routes, DeepSeek contracts without reasoning scored 52/144, contracts with low reasoning 120/144, and global ordinary code with low reasoning 144/144 on both later panels. Low reasoning has a larger output allowance. The first global proposals already achieved 144/144: later revision added no measured gain.
+
+These are source-specific predictive rules within a supplied finite family. Full input histories remain available; no compact-state or learning-policy result is claimed. The [machine-readable receipt](decomposition-20261014.json) keeps each study, first-proposal control, cost and later panel separate. All seven exact bundles replay without new model calls. Historical results below remain unchanged.
+
 ## Next-return assimilation
 
 Eight further returns have been inspected and reproduced within the boundaries in the [new synthesis and custody receipt](next-returns-20261014.md). Returns04 and06 failed to arrive. This pass makes no paid model calls and does not change the runtime. It advances reusable experiments, dependency-aware revision, preserving alternatives and nonmonotone repair search as hypotheses, while prioritizing a useful workload and a clear acquired-capability result. Authored prototype successes are not new model-learning results; return09's optional bank replay has a recorded partial mismatch. Historical measurements below remain unchanged.
