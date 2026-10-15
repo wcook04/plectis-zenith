@@ -40,6 +40,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       '/api': { target: backend, changeOrigin: false },
+      '/assets/repair-loop.svg': { target: backend, changeOrigin: false },
       '/assets/paper.pdf': { target: backend, changeOrigin: false },
       '/assets/graphs': { target: backend, changeOrigin: false },
     },

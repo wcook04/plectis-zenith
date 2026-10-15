@@ -8,9 +8,11 @@ Zenith is an unfinished research testbed with three separate studies, shared exe
 |---|---|---|
 | Native investigation and repair | [conformance_study.py](../research/conformance_study.py), [direct_investigation.py](../research/direct_investigation.py), [native_conformance_tasks.py](../research/native_conformance_tasks.py) | Questions produce measurements that can expose a discrepancy; a model proposes a whole-program repair. |
 | Client test reuse | [client_investigation_study.py](../research/client_investigation_study.py), [client_investigation_tasks.py](../research/client_investigation_tasks.py) | Earlier investigations produce frozen testers, compared with ordinary reuse and fresh investigation on later clients. |
-| Continuation learning | [continuation_learning.py](../research/continuation_learning.py), [demo_continuation_learning.py](../scripts/demo_continuation_learning.py) | An authored rational-linear learner adds state coordinates while retaining the histories and continuations that justify them. |
+| Continuation learning | [continuation_learning.py](../research/continuation_learning.py), [demo_continuation_learning.py](../scripts/demo_continuation_learning.py) | An authored rational-linear learner expands an observation table through counterexample refinement, retaining access histories with their distinguishing continuations. |
 
-These mechanisms are not one integrated learner. In particular, the continuation learner is not called by the client-test or native-repair campaigns. Model weights remain fixed.
+These mechanisms are not one integrated learner. In particular, the continuation learner is not called by the client-test or native-repair campaigns. Language-model weights remain fixed.
+
+The continuation repair restores the paired rank-growth invariant in the [weighted-automata source](https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf), Proposition 1, pp. 2–3. Its measured finite challenges do not provide the global equivalence oracle assumed there. [Predictive state representations](https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf) supply conceptual context for future-test coordinates in stochastic systems, with a known model and normalized updates; they are not a runtime dependency or the implemented learner.
 
 ## Execution and evidence boundaries
 
@@ -32,6 +34,8 @@ The preservation rule is finite; it does not prove a repaired program correct on
 | [source_snapshot.py](../zenith/source_snapshot.py) | Implementation hashes and frozen runtime archives, without importing an experiment or the market/graph runtime. |
 | [decomposition_study.py](../research/decomposition_study.py) | Retained execution/schema/scoring helpers also used by current native and client studies. Its historical experiment is not credited as part of their results. |
 | [web.py](../zenith/web.py), [web_content.py](../zenith/web_content.py), [site/](../site/README.md) | Read-only projection of manuscript, public evidence and retained graphs. Public mode excludes private runs and has no inference or editing endpoint. |
+| [references.json](../paper/references.json), [build_paper_references.py](../scripts/build_paper_references.py) | Reviewed source editions and claim support, with a generated inline bibliography and checks binding citations to exact manuscript passages. [test_paper_references.py](../tests/test_paper_references.py) checks this boundary. These files add no experiment runtime. |
+| [paper_reading.py](../zenith/paper_reading.py), [build_paper_reading.py](../scripts/build_paper_reading.py) | Restricted TeX-to-Markdown paper projection and a builder rendering the existing TikZ figure into `paper/repair-loop.svg`. Unsupported content is rejected; `tests/test_paper_reading.py` checks projection and stale-output boundaries. |
 
 Direct investigation uses the conformance runner's invocation helper. Some retained module names therefore remain in the active import path. Renaming these files alone would not simplify execution and would disturb published import and replay interfaces.
 
@@ -58,6 +62,14 @@ The root keeps package/build configuration, contributor guidance and stable rese
 
 Current findings stay in [status.md](status.md). Maintained native methods, results and funding records live in `docs/studies/native/`; client interpretations live in `docs/studies/client/`. Earlier methods, dated return syntheses and the older status chronology live in `docs/history/`. The paper stays under `paper/`, and graph/image assets keep their existing locations. No new document index replaces the study owners.
 
+`paper/references.json` belongs to the existing manuscript role. It records reviewed editions of the seven cited sources, source-file hashes and locators, the supported claims and their limits, and exact supporting manuscript passages with hashes. `scripts/build_paper_references.py` projects that metadata into the inline bibliography and checks that every citation remains inside a reviewed passage; `--check` reads the working files and `--index` reads staged files. A changed claim requires source re-review before its binding changes. A matching hash identifies the reviewed passage; it does not certify the paper's scientific claim.
+
+The seven sources have different roles: ILF learns a testing policy; CoverUp supplies an authored coverage/error-feedback driver; Voyager retains an executable skill library; STOP optimizes a code-improvement scaffold; Hyperagents edits task and meta-agent code. The two state-learning sources above describe predictive state and weighted-automata methods. Exact version links and source support live in the [paper guide](../paper/README.md#reviewed-sources-and-their-use) and source records. No upstream runtime is imported by citing them. Bounded development-only tester refinement and the frozen-improver comparison remain proposals in [program.md](../program.md), with no new result or unused runtime layer.
+
+The website's artifact-currency labels have a separate owner: `zenith/web_content.py::PAPER_EDITION` pairs the reviewed manuscript SHA-256 with the reviewed PDF SHA-256, and separately pairs the TikZ diagram-source hash with the SVG hash. Inspect every PDF page and the SVG before updating the affected pair together. Citation support and output currency are separate checks; neither hash establishes scientific validity.
+
+The paper's web edition also reads `paper/zenith.tex` through `zenith/web_content.py` and the restricted `zenith/paper_reading.py` converter. The `/api/v1/paper` response exposes `reading` content derived from the manuscript's exact paragraphs, table and citations, which the existing frontend reading components render. The diagram stays with its manuscript owner: `paper/repair-loop.svg` is generated from the existing TikZ figure and served at `/assets/repair-loop.svg`; the caption is projected from TeX. `scripts/export_site_snapshot.py` publishes the same response and SVG for static hosting. These projections share the manuscript as their content owner.
+
 This consolidation moves the former flat `docs/` reports to those owners and updates maintained links. Existing `/api/v1/documents/*` and `/api/v1/evidence/*` IDs remain stable; their source metadata names the new paths. The three client evidence IDs now read each immutable bundle’s `report.json` directly, rather than duplicate JSON files in `docs/`. Old GitHub `main/docs/<moved-name>` links migrate to these paths; historical commit links remain unchanged.
 
 Four frozen protocol files remain at their original `docs/` paths: the v1/v2 client protocols and v4/v5 Progress protocols. Their bytes and logical identities are part of recorded experiments. Published bundles, archived source, prompts and responses under `examples/` remain unchanged. The research-direction route uses `program.md`; the small feed-coverage note is included in the historical data guide.
@@ -72,7 +84,9 @@ Use the source checkout with an editable install on Linux, macOS or a suitable W
 | `make replay` | Behavioral replay of the latest published client condition; no inference. |
 | `make test-current` | Current study, shared execution and publication regressions. |
 | `make test` | Complete retained suite, including historical studies. |
-| `make validate` | Layout/routes, exported custody hashes and retained native graph validation. |
+| `make validate` | Reviewed citations, layout/routes, exported custody hashes and retained native graph validation. |
+| `python scripts/build_paper_references.py --check` | Checks the generated bibliography, reviewed source editions and manuscript support bindings; `--index` checks staged copies. |
+| `python scripts/build_paper_reading.py` | Renders the manuscript's TikZ figure through Tectonic and Poppler's `pdftocairo` to `paper/repair-loop.svg`; inspect before binding reviewed hashes. |
 | `python -m zenith serve …` | Existing read-only website server; build the frontend first. |
 
 [build_client_investigation_report.py](../scripts/build_client_investigation_report.py) and [build_conformance_report.py](../scripts/build_conformance_report.py) own the public study exports and archived-runtime replay. [build_progress_report.py](../scripts/build_progress_report.py) derives the current campaign summary; [analyze_progress_campaign.py](../scripts/analyze_progress_campaign.py) reconstructs paired comparisons. [continue_conformance_budget.py](../scripts/continue_conformance_budget.py) preserves settled responses during an explicitly authorized funding-only continuation.

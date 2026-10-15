@@ -1,0 +1,402 @@
+{
+  "schema": "zenith_reviewed_references_v1",
+  "sources": [
+    {
+      "id": "psr",
+      "authors": [
+        "Michael L. Littman",
+        "Richard S. Sutton",
+        "Satinder Singh"
+      ],
+      "title": "Predictive Representations of State",
+      "author_label": "M. L. Littman, R. S. Sutton and S. Singh",
+      "venue": "NeurIPS 14",
+      "year_label": "2001",
+      "url": "https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf",
+      "reviewed_source": {
+        "filename": "NIPS-2001-predictive-representations-of-state-Paper.pdf",
+        "sha256": "0d9199d40bab3dc468fb95e52d5e4bf9a78e07c6a63250397d336bda215d17b8",
+        "edition": "NIPS 2001 proceedings, volume 14, pp. 1555–1561; supplied 14-physical-page PDF",
+        "annex_id": "littman-sutton-singh-2001-predictive-representations-of-state",
+        "attribution_note": "All three authors are verified on the PDF title page; the proceedings HTML/BibTeX omits Singh. Physical PDF pages 1, 3, 5, 7, 9, 11, 13 are content pages 1–7 and proceedings pp. 1555–1561; every even physical page is blank.",
+        "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the supplied PDF.",
+        "distribution_policy": "local_only"
+      },
+      "verification_state": "source_verified",
+      "application": "Conceptual context: future-test probabilities motivate predictive state. Zenith’s implemented deterministic rational-linear learner is not the stochastic PSR construction or evidence of its proposed learning advantages.",
+      "source_locators": [
+        {
+          "id": "future-test-state",
+          "locator": "§1, Eqs. (1)–(3); physical PDF pp. 5, 7 / content pp. 3–4 / proceedings pp. 1557–1558",
+          "supports": "A predictive state determines probabilities of all future action-observation tests; conditioning uses a normalized ratio of linear functions.",
+          "boundary": "A linear PSR does not have an unnormalized linear state update. Its stochastic sufficiency requirement does not certify Zenith’s finite deterministic checks."
+        },
+        {
+          "id": "known-model-construction",
+          "locator": "§2, Theorem 1 and Lemma 1; physical PDF pp. 7, 9, 11 / content pp. 4–6 / proceedings pp. 1558–1560",
+          "supports": "A finite POMDP has a linear PSR using no more tests than states in its minimal POMDP; the construction uses the supplied POMDP model.",
+          "boundary": "This is a known-model representation result, not a black-box acquisition algorithm or a theorem that arbitrary software has finite rank."
+        },
+        {
+          "id": "learning-prospects",
+          "locator": "§3; physical PDF pp. 11, 13 / content pp. 6–7 / proceedings pp. 1560–1561",
+          "supports": "Learnability and generalization are proposed advantages for future investigation.",
+          "boundary": "The paper does not establish empirical learning, cross-task question transfer or recursive self-improvement."
+        }
+      ],
+      "artifact_links": [
+        {
+          "path": "paper/zenith.tex",
+          "expected_text": "Predictive state representations encode stochastic state through probabilities\nof future tests. The cited theorem constructs a representation from a known\nfinite POMDP; it does not supply a black-box learning algorithm~\\cite[Theorem 1; \\S2]{psr}.\nOur continuation learner instead fits exact integer observations in a\nrational-linear model. The conceptual connection is the use of future tests\nto distinguish histories.",
+          "excerpt_sha256": "b092be9a6b6f9a9d2d423a7d4baf8bfc560b70018c42412deb909de8dc9cb76f",
+          "source_locator_ids": [
+            "future-test-state",
+            "known-model-construction"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "weighted",
+      "authors": [
+        "James Worrell"
+      ],
+      "title": "Exactly Learning Weighted Automata over a Field",
+      "author_label": "J. Worrell",
+      "venue": "Oxford teaching notes",
+      "year_label": "undated",
+      "url": "https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf",
+      "reviewed_source": {
+        "filename": "MA-learning.pdf",
+        "sha256": "b50288b01850ecf938590603612ea8482acdb177e2eb5b3b0599033e60e24d48",
+        "edition": "Supplied three-page Oxford teaching note; no printed date or byline",
+        "annex_id": "weighted-automata-exact-learning-notes",
+        "attribution_note": "Attribution to James Worrell comes from his Oxford teaching index, https://www.cs.ox.ac.uk/people/james.worrell/lectures.html. PDF build metadata dated 23 February 2017 is not a verified publication year. The note credits the algorithm to Beimel, Bergadano, Bshouty, Kushilevitz and Varricchio (JACM 2000).",
+        "license": "No explicit redistribution license established; only metadata and source-located summaries are published.",
+        "distribution_policy": "local_only"
+      },
+      "verification_state": "source_verified",
+      "application": "Implemented antecedent: Zenith’s continuation learner fits a weighted-linear observation table and retains paired history/test rank witnesses. Its finite challenge sequence replaces the note’s global equivalence oracle, so the repair restores an established invariant without proving general source equivalence.",
+      "source_locators": [
+        {
+          "id": "observation-table",
+          "locator": "pp. 1–2, field-valued series and unnumbered observation-table construction",
+          "supports": "Histories index Hankel rows, continuations index columns, and a square full-rank table determines transition maps through H M(σ) = Hσ.",
+          "boundary": "The model class and exact field arithmetic are assumptions; dimension bounds are relative to this linear representation."
+        },
+        {
+          "id": "paired-rank-witness",
+          "locator": "Proposition 1, pp. 2–3, Eqs. (1)–(2)",
+          "supports": "Counterexample refinement adds both an access history and a distinguishing continuation, increasing the observation table’s rank.",
+          "boundary": "Keeping a question alone does not preserve its rank witness. Zenith’s regression checks this established requirement; it is not a new learning theorem."
+        },
+        {
+          "id": "oracle-assumptions",
+          "locator": "p. 1, membership and equivalence queries; Proposition 1, pp. 2–3",
+          "supports": "Exact membership answers and a counterexample whenever the hypothesis is globally wrong support the learning procedure.",
+          "boundary": "Finite challenges cannot supply that equivalence guarantee; the note does not establish transfer savings or lifetime economy for native software."
+        }
+      ],
+      "artifact_links": [
+        {
+          "path": "paper/zenith.tex",
+          "expected_text": "Access histories $h$ and continuation tests $t$ index an observation table,\n$H_{h,t}=f(ht)$, for deterministic observations $f$. Given exact field-valued\nanswers and a square full-rank table, a counterexample supplies a history--test\npair whose nonzero residual increases the rank~\\cite[Proposition 1, pp.\\ 2--3]{weighted}.\nOur repair preserves the paired access history and distinguishing test required\nby this construction. It does not discover the model class. Finite challenges\nreplace the global equivalence oracle, so a completed fit establishes agreement\nonly on those challenges.",
+          "excerpt_sha256": "2daf1223b835ec891160bb83228f1614f3ffd1c0afca0c5cf50b28c31b6dcbe3",
+          "source_locator_ids": [
+            "observation-table",
+            "paired-rank-witness",
+            "oracle-assumptions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ilf",
+      "authors": [
+        "Jingxuan He",
+        "Mislav Balunović",
+        "Nodar Ambroladze",
+        "Petar Tsankov",
+        "Martin Vechev"
+      ],
+      "title": "Learning to Fuzz from Symbolic Execution with Application to Smart Contracts",
+      "author_label": "J. He et al.",
+      "venue": "CCS",
+      "year_label": "2019",
+      "url": "https://doi.org/10.1145/3319535.3363230",
+      "reviewed_source": {
+        "filename": "ccs19-ilf.pdf",
+        "sha256": "e43953b8837d3d210f82c6554051cd99312f82c5113db9d3d966aa9ed9cb3917",
+        "edition": "CCS 2019, pp. 531–548; supplied 18-page author PDF",
+        "annex_id": "he-2019-learning-to-fuzz-from-symbolic-execution",
+        "attribution_note": "Author list and title verified on the supplied first page. One-based PDF p. 1 corresponds to proceedings p. 531. Publication metadata cross-checked against the authors’ SRI Lab publication page.",
+        "license": "Author PDF carries ACM personal/classroom copying and attribution conditions; no blanket paper redistribution is asserted. The separate ILF code repository uses Apache-2.0.",
+        "distribution_policy": "local_only"
+      },
+      "verification_state": "source_verified",
+      "application": "Context and evaluation precedent: expensive symbolic demonstrations train a reusable fuzzing policy. Zenith does not implement ILF’s neural policy training or Ethereum representation; any future testing comparison must include acquisition and training as well as deployment.",
+      "source_locators": [
+        {
+          "id": "trained-testing-policy",
+          "locator": "PDF p. 7, §4.2 “Learning from Expert”; pp. 7–9, §§5.1–5.2, Table 2 and Algorithm 1",
+          "supports": "A symbolic expert supplies coverage-improving transaction sequences; imitation learning updates neural policy weights, and the deployed policy consumes contract/history features.",
+          "boundary": "Runtime history adaptation is distinct from retraining. Ethereum-specific features are authored; the paper does not discover arbitrary representation boundaries or improve its own training algorithm."
+        },
+        {
+          "id": "withheld-contracts",
+          "locator": "PDF pp. 9–10, §6.2, Tables 4–5",
+          "supports": "The evaluation deduplicates the collected contracts and uses random five-fold contract-level cross-validation on 18,496 contracts.",
+          "boundary": "Exact deduplication and contract withholding do not establish a project/lineage, functionality-family, chronological or unrelated-domain split."
+        },
+        {
+          "id": "acquisition-and-deployment",
+          "locator": "PDF pp. 9–10, §§6.1–6.3, Figures 7–9",
+          "supports": "The source separates symbolic expert execution, policy training and fast deployment; the useful result is amortization on further contracts.",
+          "boundary": "Deployment throughput is not total lifetime cost. Coverage and detector results are empirical, domain-specific and do not establish correctness or vulnerability completeness."
+        }
+      ],
+      "artifact_links": [
+        {
+          "path": "paper/zenith.tex",
+          "expected_text": "ILF trains a testing policy from symbolic-execution traces~\\cite[\\S\\S4--5]{ilf};\nZenith does not train model weights.",
+          "excerpt_sha256": "ede37f51bdb13073ce8fd801b53e23b66a481fab20a0ce8e8c2a517542e3d861",
+          "source_locator_ids": [
+            "trained-testing-policy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "coverup",
+      "authors": [
+        "Juan Altmayer Pizzorno",
+        "Emery D. Berger"
+      ],
+      "title": "CoverUp: Effective High Coverage Test Generation for Python",
+      "author_label": "J. Altmayer Pizzorno and E. D. Berger",
+      "venue": "PACMSE 2 (FSE)",
+      "year_label": "2025",
+      "url": "https://arxiv.org/abs/2403.16218v4",
+      "reviewed_source": {
+        "filename": "arXiv-2403.16218v4.tar.gz",
+        "sha256": "59bbb9c1a554be68d8d724d72cd015fc2616325527643cfa15137eb5d242ad4f",
+        "edition": "arXiv:2403.16218v4, 9 May 2025; PACMSE 2 (FSE), article FSE128, 23 pages",
+        "annex_id": "arxiv-2403-16218",
+        "attribution_note": "Supplied main.tex sets arxivfalse and selects the published Effective High Coverage title; its conditional Coverage-Guided title is not the selected title. The actual v4 PDF has 23 pages despite the stale 21-page arXiv comment. Altmayer Pizzorno is the first author’s surname.",
+        "license": "Supplied source declares ACM publication rights; no blanket paper redistribution is asserted. The separate CoverUp code repository uses Apache-2.0.",
+        "distribution_policy": "local_only"
+      },
+      "verification_state": "source_verified",
+      "application": "Context and proposed control: an authored coverage/error-feedback driver refines generated tests using a fixed LLM. A future Zenith preparation protocol may give both retained-code arms bounded development-only execution and refinement; no CoverUp runtime or target feedback is imported.",
+      "source_locators": [
+        {
+          "id": "measured-test-refinement",
+          "locator": "implementation.tex, §§3–3.3, labels impl:prompting and impl:dialogue; FSE128:4–9",
+          "supports": "Source and coverage context guide test generation; execution errors and missing coverage prompt bounded follow-up dialogue, retaining passing tests that add coverage.",
+          "boundary": "The authored driver remains fixed; this is not a learned policy transferred from earlier projects. Coverage against source assumed correct does not certify semantic correctness."
+        },
+        {
+          "id": "integration-and-yield",
+          "locator": "implementation.tex, §§3.5–3.6, labels impl:integration-check and impl:handling-flakies; evaluation.tex, §4.6, Table 4 and Figures 17–18; FSE128:10–12,19–20",
+          "supports": "Integration/flaky-test checks and component ablations distinguish valid tests, useful added coverage and redundant generations.",
+          "boundary": "A changed test or additional successful generation alone does not identify the causal value of feedback; ablations remove interacting components."
+        },
+        {
+          "id": "comparison-and-cost",
+          "locator": "evaluation.tex, §§4.1–4.5; table-cm.tex, Table 1; Table 3; FSE128:13–18",
+          "supports": "The evaluation records model-matched comparisons, cumulative passes, tokens, model dollars and deployed wall time.",
+          "boundary": "Cumulative passes are not independent acquisitions; asynchronous versus serial wall time is not a matched-compute advantage, and reported historical model prices are not current quotes."
+        }
+      ],
+      "artifact_links": [
+        {
+          "path": "paper/zenith.tex",
+          "expected_text": "CoverUp guides a fixed LLM with source,\ncoverage and execution feedback to generate regression tests~\\cite[\\S3]{coverup};\ncoverage is not fault detection.",
+          "excerpt_sha256": "1a938f42a46d172b005af0c8aef8a307d93f514c820999f0e60375f1d8c148db",
+          "source_locator_ids": [
+            "measured-test-refinement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "voyager",
+      "authors": [
+        "Guanzhi Wang",
+        "Yuqi Xie",
+        "Yunfan Jiang",
+        "Ajay Mandlekar",
+        "Chaowei Xiao",
+        "Yuke Zhu",
+        "Linxi Fan",
+        "Anima Anandkumar"
+      ],
+      "title": "Voyager: An Open-Ended Embodied Agent with Large Language Models",
+      "author_label": "G. Wang et al.",
+      "venue": "arXiv",
+      "year_label": "2023",
+      "url": "https://arxiv.org/abs/2305.16291v2",
+      "reviewed_source": {
+        "filename": "arXiv-2305.16291v2.tar.gz",
+        "sha256": "fc8eb405fdd52906a3423eb56111c956636da71342a761fbf66f92cbcfb3edc2",
+        "edition": "arXiv:2305.16291v2, 19 October 2023",
+        "annex_id": "arxiv-2305-16291",
+        "attribution_note": "Title and all eight authors verified in ms.tex:160–177; edition metadata checked against the exact arXiv record.",
+        "license": "Paper: arXiv nonexclusive distribution license. The separate official Voyager code is MIT-licensed.",
+        "distribution_policy": "local_only",
+        "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/license.html"
+      },
+      "verification_state": "source_verified",
+      "application": "Context: executable skill retention, composition and execution feedback precede Zenith’s retained tester code. The reported method does not learn a successor acquisition procedure; Zenith has not reproduced its new-world skill results.",
+      "source_locators": [
+        {
+          "id": "skill-retention",
+          "locator": "2-method.tex:20–35, §2.2, label sec:method_skill_library",
+          "supports": "Executable skills are retained and retrieved through embedded descriptions, task plans and environment feedback for composition into later skills.",
+          "boundary": "Skill-library growth is not evidence that the acquisition or retrieval algorithm itself improves."
+        },
+        {
+          "id": "fixed-feedback-loop",
+          "locator": "2-method.tex:37–47, §2.3; appendix/pseudocode/voyager.py:1–51",
+          "supports": "A fixed four-attempt loop revises code using environment observations, execution errors and a separate GPT-4 critic before retaining successful skills.",
+          "boundary": "A separate model critic is fallible, not an independently correct executable reference; the foundation models and acquisition machinery remain fixed."
+        },
+        {
+          "id": "new-world-transfer",
+          "locator": "3-experiment.tex:44–49 and tables/downstream_table.tex, label table:downstream",
+          "supports": "Cleared inventory and a new Minecraft world test four new tasks in three trials each; retained skills improve success or prompting efficiency.",
+          "boundary": "Transfer stays within Minecraft mechanics/APIs. The no-library ablation also solves three tasks in all trials; the table does not show unrestricted cross-domain or recursive improvement."
+        }
+      ],
+      "artifact_links": [
+        {
+          "path": "paper/zenith.tex",
+          "expected_text": "Voyager retains executable skills within a\nfixed acquisition loop~\\cite[\\S2]{voyager}.",
+          "excerpt_sha256": "a573c3325a50b40c60cdd8920bac4bceab58e79fc0dbe45f7701aaea03295ec3",
+          "source_locator_ids": [
+            "skill-retention",
+            "fixed-feedback-loop"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "stop",
+      "authors": [
+        "Eric Zelikman",
+        "Eliana Lorch",
+        "Lester Mackey",
+        "Adam Tauman Kalai"
+      ],
+      "title": "Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation",
+      "author_label": "E. Zelikman et al.",
+      "venue": "COLM",
+      "year_label": "2024",
+      "url": "https://arxiv.org/abs/2310.02304v3",
+      "reviewed_source": {
+        "filename": "arXiv-2310.02304v3.tar.gz",
+        "sha256": "c8bbe77187dd9d9d187e43c1a13e085a8ed43f0274d03b456343fea2e197e6a7",
+        "edition": "arXiv:2310.02304v3, 16 August 2024; COLM 2024",
+        "annex_id": "arxiv-2310-02304",
+        "attribution_note": "Reviewed edition is the COLM 2024 paper, not the 2023 first preprint. The source author block abbreviates Adam Kalai; official metadata supplies Adam Tauman Kalai.",
+        "license": "Paper: arXiv nonexclusive distribution license. The separate official STOP code is MIT-licensed.",
+        "distribution_policy": "local_only",
+        "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/license.html"
+      },
+      "verification_state": "source_verified",
+      "application": "Proposed comparison: recursive improvement of an executable code-generation scaffold directly precedes Zenith’s O0/O1/O2 ambition. No such acquired improver is implemented or evaluated by the current Zenith campaigns.",
+      "source_locators": [
+        {
+          "id": "recursive-scaffold",
+          "locator": "main.tex:414–508, §§3–4, labels sec:problem and sec:stop; equation eq:it",
+          "supports": "Meta-utility measures an improver’s downstream task utility; the preceding improver is applied recursively to its own source.",
+          "boundary": "The LM, utilities, resource limits and experiment controller remain outside the edited scaffold. Better downstream optimization need not imply better self-optimization."
+        },
+        {
+          "id": "heldout-and-transfer",
+          "locator": "main.tex:596–675, §§5.1–5.2, label sec:fixed and Table tbl:transfer",
+          "supports": "Independent LPN instances test improved scaffolds; a selected improver from four rounds improves the seed on five additional algorithmic tasks without further optimization.",
+          "boundary": "The transfer table concerns a selected improver and bounded tasks, not uniform generalization over acquired improvers or open-ended acceleration."
+        },
+        {
+          "id": "fixed-host-and-cost",
+          "locator": "main.tex:809–864, §§6.2–7; main.tex:2026–2069 and 2818–2826, appendices ap:metautilitydesc and ap:nuances",
+          "supports": "Constraint circumvention and reward-shape errors motivate host-enforced budgets and output semantics; nested utility/model evaluations make acquisition costly.",
+          "boundary": "The authors qualify full recursive self-improvement because the LM is unchanged. A downstream deployment bill cannot stand in for all-stage acquisition and evaluation cost."
+        }
+      ],
+      "artifact_links": [
+        {
+          "path": "paper/zenith.tex",
+          "expected_text": "STOP recursively rewrites its code-improvement scaffold~\\cite[\\S4]{stop}.",
+          "excerpt_sha256": "6b50dd1c6f5f15fd17fa89902058ce338ee9d056102470a4621e1468d96e79a2",
+          "source_locator_ids": [
+            "recursive-scaffold"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hyperagents",
+      "authors": [
+        "Jenny Zhang",
+        "Bingchen Zhao",
+        "Wannan Yang",
+        "Jakob Foerster",
+        "Jeff Clune",
+        "Minqi Jiang",
+        "Sam Devlin",
+        "Tatiana Shavrina"
+      ],
+      "title": "Hyperagents",
+      "author_label": "J. Zhang et al.",
+      "venue": "arXiv",
+      "year_label": "2026",
+      "url": "https://arxiv.org/abs/2603.19461v1",
+      "reviewed_source": {
+        "filename": "arXiv-2603.19461v1.tar.gz",
+        "sha256": "befb6be557d8e77c922470b68fd221aa27769cf3b36072305d8d25ffc53b90cb",
+        "edition": "arXiv:2603.19461v1, 19 March 2026",
+        "annex_id": "arxiv-2603-19461",
+        "attribution_note": "Title and eight-author list verified against paper.tex:86–95 and exact arXiv metadata; source title uses a typographic HyperAgents macro.",
+        "license": "Paper: CC BY 4.0. The separate official HyperAgents code repository is CC BY-NC-SA 4.0; no upstream code is copied here.",
+        "distribution_policy": "local_only",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/"
+      },
+      "verification_state": "source_verified",
+      "application": "Proposed protocol: freeze acquired meta-agents and compare their improvements on identical fresh solvers, selecting children before untouched evaluation. Current Zenith has no learned self-improver; the source’s architecture and meta-evaluation are precedents, not local results.",
+      "source_locators": [
+        {
+          "id": "editable-meta-fixed-outer-loop",
+          "locator": "paper.tex:178–208, §§3–4; paper.tex:317–326, §7; algorithm algo:DGM-H",
+          "supports": "Task and meta-agent code share an editable program and archive; main experiments keep task distribution, parent selection and evaluation protocols fixed.",
+          "boundary": "Self-editing code is not unrestricted self-modification. Fixed foundation models do not include downstream robotics policies trained by RL."
+        },
+        {
+          "id": "frozen-meta-transfer",
+          "locator": "paper.tex:254–283, §5.2; paper.tex:707–753, appendices app:genk-metric and app:transfer-selection",
+          "supports": "Improvement@k holds the meta-agent fixed, and validation-selected task agents test the usefulness of source-acquired improvement machinery in a new domain.",
+          "boundary": "The transfer carries both task and meta implementations, and initial format failures create headroom. Follow the main development/validation-before-test protocol rather than selecting the maximum test score from the appendix display."
+        },
+        {
+          "id": "compounding-boundary",
+          "locator": "paper.tex:293–305, §5.3, label sec:results-compound",
+          "supports": "Continued runs compare transferred and initial agents; the 200-iteration transfer-versus-fresh result is explicitly not statistically significant.",
+          "boundary": "The reported 0.640 versus 0.610 comparison has p > 0.05; stronger task-agent improvements and qualitative memory examples do not by themselves establish accelerating recursive self-improvement."
+        }
+      ],
+      "artifact_links": [
+        {
+          "path": "paper/zenith.tex",
+          "expected_text": "Hyperagents edits task and meta-agent code, then evaluates a fixed acquired\nmeta-agent in another domain. Its reported cross-domain compounding comparison\ndoes not establish a statistically significant advantage~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+          "excerpt_sha256": "7e44d6d8cbb930d6c1bb0217b85ade7303ce5ebf36481921794e7f26524cd102",
+          "source_locator_ids": [
+            "editable-meta-fixed-outer-loop",
+            "frozen-meta-transfer",
+            "compounding-boundary"
+          ]
+        }
+      ]
+    }
+  ]
+}

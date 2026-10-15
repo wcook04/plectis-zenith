@@ -7,10 +7,11 @@ import re
 from pathlib import Path
 
 from . import runtime
+from .paper_reading import diagram_source, paper_reading
 
 API = "/api/v1"
-# Reviewed source/PDF pair. Update together after compiling and inspecting all pages.
-PAPER_EDITION = {"source_sha256": "898d0bb122d48a3dc276cf870dd98cf18d11fe87bbb19843d66e4e61593cc4af", "pdf_sha256": "03510c6be1baacee1b10c8f65b5f2e689124d913bc4efe8d24e9a82af4fed01d"}
+# Reviewed source/PDF and TikZ/SVG pairs. Update after compiling and visual inspection.
+PAPER_EDITION = {"source_sha256": "b15077b01d5345ea75f6d7c6ba528030554dd5d05192f96be28e5b4d5ad0b788", "pdf_sha256": "2d87ccc5007d4b023f537f25950ce04c34aaeae5ef5d288e017fe5c7e9e27d52", "figure_source_sha256": "c905bebf5be49a93d0c3ee4e8f0a4865a4bbc5cd9a1e7c47c68a7f7227adc2fe", "figure_sha256": "e63032ffa13264806412e13626fd8d00d1d60a2bbe6d28584b00e435fada5e92"}
 DOCUMENTS = {
     "introduction": "README.md",
     "paper": "paper/zenith.tex",
@@ -114,6 +115,102 @@ def safe_read(root: Path, relative: str, limit: int = 8 * 1024 * 1024) -> bytes:
     return data
 
 
+REFERENCE_PATH = "paper/references.json"
+CITE = re.compile(r"\\cite(?:\[([^\]]*)\])?\{([^}]+)\}")
+BIBLIOGRAPHY = re.compile(r"\\begin\{thebibliography\}\{\d+\}.*?\\end\{thebibliography\}", re.S)
+
+
+def reviewed_references(root: Path) -> tuple[list[dict], bytes]:
+    """Read portable source-edition records, not the private annex source bodies."""
+    raw = safe_read(root, REFERENCE_PATH)
+    data = json.loads(raw)
+    if data.get("schema") != "zenith_reviewed_references_v1":
+        raise ValueError("Unknown reviewed-reference schema")
+    records = data.get("sources", [])
+    keys = [record["id"] for record in records]
+    if not keys or len(set(keys)) != len(keys):
+        raise ValueError("Reviewed references need unique bibliography keys")
+    for record in records:
+        for field in ("id", "title", "author_label", "venue", "year_label", "url", "application"):
+            if not isinstance(record.get(field), str) or not record[field].strip():
+                raise ValueError(f"Reference {record['id']} lacks {field}")
+        source = record["reviewed_source"]
+        if not re.fullmatch(r"[0-9a-f]{64}", source.get("sha256", "")) or not source.get("edition"):
+            raise ValueError(f"Reference {record['id']} lacks an exact reviewed edition")
+        if not record["url"].startswith("https://") or record.get("verification_state") != "source_verified":
+            raise ValueError(f"Reference {record['id']} lacks source verification")
+        locators = record.get("source_locators", [])
+        ids = [locator["id"] for locator in locators]
+        if not ids or len(set(ids)) != len(ids) or not record.get("artifact_links"):
+            raise ValueError(f"Reference {record['id']} lacks unique locators or manuscript bindings")
+        if any(not locator.get(field) for locator in locators for field in ("locator", "supports", "boundary")):
+            raise ValueError(f"Reference {record['id']} has incomplete source support")
+    return records, raw
+
+
+def reference_bibliography(records: list[dict]) -> str:
+    """One bibliography projection from the reviewed metadata."""
+    def tex(value: str) -> str:
+        return re.sub(r"([&#%_{}])", r"\\\1", value)
+
+    lines = [f"\\begin{{thebibliography}}{{{len(records)}}}\\footnotesize",
+             r"\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}"]
+    for record in records:
+        lines.append(r"\bibitem{" + record["id"] + "} " + tex(record["author_label"].rstrip(".")) + ". "
+                     + r"\href{" + record["url"] + "}{" + tex(record["title"]) + "}. "
+                     + tex(record["venue"]) + ", " + tex(record["year_label"]) + ".")
+    return "\n".join([*lines, r"\end{thebibliography}"])
+
+
+def paper_citations(root: Path, tex: str) -> tuple[list[dict], bytes]:
+    """Bind every citation to a reviewed edition and unchanged supporting passage.
+
+    This checks custody and review coverage; hashes do not certify source claims.
+    The supported TeX surface is the manuscript's inline bibliography and \\cite.
+    """
+    records, raw = reviewed_references(root)
+    bibliographies = list(BIBLIOGRAPHY.finditer(tex))
+    if len(bibliographies) != 1 or bibliographies[0][0] != reference_bibliography(records):
+        raise ValueError("Bibliography differs from reviewed metadata; run scripts/build_paper_references.py")
+    prose = tex[:bibliographies[0].start()]
+    # Ignore commented citations while retaining original line coordinates.
+    visible = re.sub(r"(?<!\\)%[^\n]*", lambda match: " " * len(match[0]), prose)
+    all_uses = list(CITE.finditer(visible))
+    known = {record["id"] for record in records}
+    for use in all_uses:
+        if set(key.strip() for key in use[2].split(",")) - known:
+            raise ValueError(f"Unknown bibliography key: {use[2]}")
+    bodies = {match[1]: match[2].strip() for match in re.finditer(
+        r"\\bibitem\{([^}]+)\}(.*?)(?=\\bibitem|\\end\{thebibliography\})", tex, re.S)}
+    citations = []
+    for record in records:
+        key = record["id"]
+        uses = [use for use in all_uses if key in [value.strip() for value in use[2].split(",")]]
+        if not uses:
+            raise ValueError(f"Unused reviewed reference: {key}")
+        ranges = []
+        locator_ids = {locator["id"] for locator in record["source_locators"]}
+        for binding in record["artifact_links"]:
+            excerpt = binding.get("expected_text", "")
+            if (binding.get("path") != "paper/zenith.tex" or not excerpt
+                    or prose.count(excerpt) != 1 or digest(excerpt.encode()) != binding.get("excerpt_sha256")):
+                raise ValueError(f"Stale manuscript binding for {key}")
+            support = binding.get("source_locator_ids", [])
+            if not support or set(support) - locator_ids:
+                raise ValueError(f"Unknown source support for {key}")
+            first = prose.index(excerpt)
+            ranges.append((first, first + len(excerpt)))
+        used = []
+        for use in uses:
+            line = visible[:use.start()].count("\n") + 1
+            if not any(first <= use.start() and use.end() <= last for first, last in ranges):
+                raise ValueError(f"Unreviewed citation use for {key} at line {line}")
+            used.append({"line": line, "locator": use[1] or None})
+        citations.append({"id": key, "latex": bodies[key], "urls": [record["url"]],
+                          "used_at": used, "review": record})
+    return citations, raw
+
+
 class PublicContent:
     def __init__(self, root: Path):
         self.root = Path(root).resolve()
@@ -148,16 +245,12 @@ class PublicContent:
         source = self.document("paper")
         tex = source["content"]
         title = re.search(r"\\Large\\bfseries\s+([^}\n]+)", tex)
-        citations = []
-        for match in re.finditer(r"\\bibitem\{([^}]+)\}(.*?)(?=\\bibitem|\\end\{thebibliography\})", tex, re.S):
-            key, body = match[1], match[2].strip()
-            used = []
-            for cite in re.finditer(r"\\cite\{([^}]+)\}", tex):
-                if key in [v.strip() for v in cite[1].split(",")]:
-                    used.append({"line": tex[:cite.start()].count("\n") + 1})
-            citations.append({"id": key, "latex": body,
-                              "urls": re.findall(r"\\(?:url|href)\{([^}]+)\}", body), "used_at": used})
+        citations, references_raw = paper_citations(self.root, tex)
         pdf = safe_read(self.root, "paper/zenith.pdf")
+        figure = safe_read(self.root, "paper/repair-loop.svg")
+        if (digest(figure) != PAPER_EDITION.get("figure_sha256") or
+                digest(diagram_source(tex).encode()) != PAPER_EDITION.get("figure_source_sha256")):
+            raise ValueError("The paper diagram differs from the reviewed source/SVG pair")
         current_pdf = (source["source"]["sha256"] == PAPER_EDITION["source_sha256"]
                        and digest(pdf) == PAPER_EDITION["pdf_sha256"])
         anchors = list(re.finditer(r"\\hypertarget\{([a-z-]+)\}\{\}", tex))
@@ -175,6 +268,9 @@ class PublicContent:
         return {"title": title[1] if title else "Zenith", "source": source["source"],
                 "source_url": f"{API}/documents/paper", "pdf_url": "/assets/paper.pdf",
                 "pdf_sha256": digest(pdf), "citations": citations, "sections": sections,
+                "references_source": self.source(REFERENCE_PATH, references_raw),
+                "reading": paper_reading(tex, [record["id"] for record in citations]),
+                "figure_source": self.source("paper/repair-loop.svg", figure),
                 "pdf_current": current_pdf,
                 "pdf_edition": "reviewed_current_source" if current_pdf else "retained_previous_edition",
                 "pdf_note": ("The PDF and manuscript match the pair compiled and visually reviewed on 15 October 2026."

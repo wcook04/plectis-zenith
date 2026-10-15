@@ -88,7 +88,12 @@ function mockSite(data: unknown, { published = true, status = 200, clientData = 
       id: 'progress-synthesis', format: 'markdown', content: '# Current synthesis\n\nBounded evidence.',
       source: { ...source, path: 'docs/history/progress-returns-20261014.md' },
       base_url: 'https://example.org/docs/', headings: [] };
-    else if (url.endsWith('/paper')) body = { source, citations: [], sections: [], pdf_sha256: 'fixture', pdf_current: currentPdf, pdf_url: '/assets/paper.pdf' };
+    else if (url.endsWith('/paper')) body = { source, citations: [{ id: 'fixture-source', latex: 'A. Author. A measured method.',
+      urls: ['https://example.org/paper/v2'], used_at: [{ line: 12, locator: 'Section 2' }],
+      review: { reviewed_source: { edition: 'Reviewed v2 edition', sha256: 'a'.repeat(64) },
+        application: 'Background for the proposed evaluation.',
+        source_locators: [{ id: 'method', locator: 'Section 2', supports: 'A fixed feedback driver.',
+          boundary: 'This is not a transfer result.' }] } }], sections: [], pdf_sha256: 'fixture', pdf_current: currentPdf, pdf_url: '/assets/paper.pdf' };
     else throw new Error(`Unexpected request: ${url}`);
     return new Response(JSON.stringify(body), { status: code, headers: { 'Content-Type': 'application/json' } });
   }) as typeof fetch;
@@ -329,4 +334,18 @@ it.each([
   expect(await screen.findByText(message)).toBeInTheDocument();
   expect(screen.queryByRole('rowheader', { name: 'Saved learned tester' })).toBeNull();
   expect(screen.getByRole('heading', { name: 'Repairing database, cache and text programs' })).toBeInTheDocument();
+});
+
+
+it('exposes the reviewed edition, source support and application boundary', async () => {
+  mockSite(receipt(), { currentPdf: true });
+  render(<App />);
+  const summary = await screen.findByText('How this source relates to Zenith');
+  fireEvent.click(summary);
+  const details = summary.closest('details')!;
+  expect(details).toHaveAttribute('open');
+  expect(within(details).getByText('Reviewed v2 edition')).toBeVisible();
+  expect(within(details).getByText('Section 2')).toBeVisible();
+  expect(within(details).getByText('A fixed feedback driver.')).toBeVisible();
+  expect(within(details).getByText('This is not a transfer result.')).toBeVisible();
 });

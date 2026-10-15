@@ -16,36 +16,44 @@ Will Cook \quad\textbullet\quad 15 October 2026
 \end{center}
 \hypertarget{idea}{}
 \textbf{Abstract.}
-Zenith asks whether solving one problem can improve how the next is investigated.
-It retains programs, measured evidence and questions that expose their limits.
-Three separate mechanisms currently run: model-driven program repair, reuse of
-generated testers, and an authored continuation learner. Repair alone improves
-259/576 later answers to 365/576; added investigation does not beat it.
-Two generated testers find three of four authored faults; fixed tests find all
-four. Retained questions help in a controlled memory comparison, while the whole
-learner still costs more than ordinary alternatives. These results motivate a
-question about improving future improvement, without demonstrating a new general
-learning method or recursive self-improvement. We describe the missing connection,
-a possible mathematics application and the comparisons needed to test them.
+We investigate whether retaining programs and their supporting experiments improves
+performance on subsequent tasks. We evaluate three mechanisms separately:
+model-driven program repair, reuse of generated testers, and an authored
+continuation learner. Repair alone increases correct later answers from
+259/576 to 365/576; additional investigation does not improve on this baseline.
+Each of two generated testers detects three of four authored faults, whereas
+fixed tests detect all four. Retained continuation tests reduce acquisition
+queries in a controlled ablation, but the learner's total cost exceeds that of
+ordinary alternatives. These results identify implementation requirements and
+limitations; they do not establish a new learning algorithm or recursive
+self-improvement. We outline experiments on transferable investigation
+procedures and discuss mathematics as a possible evaluation domain.
 
-\textbf{1. Programs, evidence and questions.}
-The retained object is $(P,E,Q)$: a program, source-bound observations and
-executable tests or distinguishing continuations. A useful addition must improve
+\textbf{1. Introduction and experimental setting.}
+We represent retained artifacts as $(P,E,Q)$: a program, source-bound
+observations, and executable tests or distinguishing continuations. A useful addition must improve
 later behavior or reduce the work required to acquire it. Cached answers,
 learned representations and better investigation procedures require separate
 controls. Model weights remain fixed in these studies.
 
+Predictive state representations encode stochastic state through probabilities
+of future tests. The cited theorem constructs a representation from a known
+finite POMDP; it does not supply a black-box learning algorithm~\cite[Theorem 1; \S2]{psr}.
+Our continuation learner instead fits exact integer observations in a
+rational-linear model. The conceptual connection is the use of future tests
+to distinguish histories.
+
 \hypertarget{lab}{}
-\textbf{Find what needs to change.}
+\textbf{Failure diagnosis.}
 A wrong answer may reflect discarded history, an incorrect use of sufficient
 state, or behavior never observed. The archived SQLite program retained pending
 inserts but ignored them when reading allocation state; another rows-only helper
-really did discard necessary history. These need different interventions.
+discarded necessary history. These need different interventions.
 The records expose the distinction; they do not establish reliable autonomous
 diagnosis. A model's explanation of a failure remains a hypothesis.
 
 \hypertarget{oracle}{}
-\textbf{The implemented loop.}
+\textbf{Program repair.}
 In the native study, a model receives a task contract, a whole candidate program,
 examples and the measurements available to its condition. It proposes queries;
 the host compares candidate and reference answers. A repair request proposes
@@ -55,41 +63,61 @@ proposals and failures remain recorded. Passing these finite checks does not
 prove general correctness. Lab, Oracle and Evolve name execution, review and
 revision roles; they need not be separate agents.
 \begin{center}
-\begin{tikzpicture}[font=\small,box/.style={draw,rounded corners,align=center,
-minimum height=12mm,text width=38mm},>=Stealth,node distance=8mm]
-\node[box] (lab) {Propose a question\\measure the source};
-\node[box,right=of lab] (review) {Compare the program\\repair from evidence};
-\node[box,right=of review] (test) {Freeze and test\\retain useful questions};
-\draw[->] (lab)--(review);\draw[->] (review)--(test);
-\draw[->] (test.south)--++(0,-7mm)-|node[pos=.25,below]{measured evidence and retained experiments} (lab.south);
+\begin{tikzpicture}[font=\footnotesize,
+box/.style={draw,rounded corners,align=center,inner sep=1.3mm,
+minimum height=14mm,text width=25mm},
+>=Stealth,node distance=5mm]
+\node[box] (lab) {\textbf{Propose query}\\model};
+\node[box,right=of lab] (measure) {\textbf{Execute query}\\parent + reference};
+\node[box,right=of measure] (review) {\textbf{Propose repair}\\model\\measured evidence};
+\node[box,right=of review] (select) {\textbf{Select program}\\development cases\\preserve successes};
+\node[box,right=of select] (test) {\textbf{Held-out test}\\frozen program};
+
+% The external panel opens only after source selection is frozen.
+\draw[densely dashed]
+([xshift=2.5mm,yshift=-10mm]select.east) --
+([xshift=2.5mm,yshift=11mm]select.east)
+node[above=1mm,font=\scriptsize]{freeze};
+\draw[->] (lab)--(measure);
+\draw[->,rounded corners=1.5mm]
+(measure.north)--++(0,4mm)-|
+node[pos=.25,above=1mm,font=\scriptsize]{outputs + errors} (review.north);
+\draw[->] (review)--(select);
+\draw[->] (select)--(test);
+\draw[->,rounded corners=1.5mm]
+(measure.south)--++(0,-4mm)-|
+node[pos=.25,below=1mm,font=\scriptsize]{feedback in adaptive arms} (lab.south);
 \end{tikzpicture}
+
+{\footnotesize Native repair: measured evidence informs the proposed repair.
+Development selection preserves measured successes and requires a
+non-decreasing aggregate score. Held-out outcomes are withheld from repair.
+Tester reuse and continuation learning are separate studies.}
 \end{center}
-The client study separately compiles testers from development investigations,
-then freezes them for later clients whose interface is supplied in advance.
-The continuation learner below is not called by either model-driven study.
-A graph can expose dependencies between code and evidence, but it may shrink
-or disappear when simpler code works better. Its existence is not a result.
+Separately, the client study generates and freezes testers before evaluation on
+later clients with a predeclared interface. A tester proposes queries from
+supplied context under a fixed driver. The continuation learner is not called
+by either model-driven study.
 \newpage
 \hypertarget{evolve}{}
-\textbf{2. What the experiments establish.}
-\textbf{Question memory and learner repair.}
-A continuation asks what a source returns after further actions. Two histories
-with the same current output can have different future consequences. An authored
-rational-linear learner uses answers to selected continuations as coordinates,
-then fits transition and readout maps. Predictive state representations and
-weighted automata learning are established precedents~\cite{psr,weighted};
-Zenith does not discover this model class.
-
-The earlier learner sometimes retained a distinguishing question but discarded
-the access history witnessing it. Keeping both repairs this defect. The smallest
-queue example fits in ten source calls and agrees on lengths 0--32. Its five
+\textbf{2. Experiments and limitations.}
+\textbf{Continuation learning and counterexample refinement.}
+Access histories $h$ and continuation tests $t$ index an observation table,
+$H_{h,t}=f(ht)$, for deterministic observations $f$. Given exact field-valued
+answers and a square full-rank table, a counterexample supplies a history--test
+pair whose nonzero residual increases the rank~\cite[Proposition 1, pp.\ 2--3]{weighted}.
+Our repair preserves the paired access history and distinguishing test required
+by this construction. It does not discover the model class. Finite challenges
+replace the global equivalence oracle, so a completed fit establishes agreement
+only on those challenges. The smallest
+queue example fits in ten source executions and agrees on lengths 0--32. Its five
 rational-linear coordinates are relative to the imposed class: one nonlinear
 integer counter represents that queue more simply.
 
 \hypertarget{trace}{}
 Across eight inspected native configurations, both the repaired refinement and
 a generic bank of one-symbol questions complete every fit. Generic questions
-cost 11,379 acquisition calls versus 11,395. Later finite checks retain errors:
+cost 11,379 acquisition source executions versus 11,395. Later finite checks retain errors:
 UTF-8 scores 4,903/4,913; SQLite rowid 190/192 and AUTOINCREMENT 191/192.
 These are diagnostic fixtures, not eight independent applications.
 
@@ -112,7 +140,7 @@ Target execution finishes before a separate 400-case panel opens.
 \toprule
 Method & Faults / 4 & Native probes & Target model calls\\
 \midrule
-Retained procedure & 3 & 5 & 0\\
+Retained tester & 3 & 5 & 0\\
 Ordinary code reuse & 3 & 5 & 0\\
 Same-history fresh & 3 & 15 & 19\\
 Cold investigation & 3 & 15 & 15\\
@@ -144,55 +172,51 @@ is erased or counted twice.
 % END current_native_result
 \newpage
 \hypertarget{research}{}
-\textbf{3. A direction to test, open to correction.}
-The candidate connection is to retain the experiment that reveals a missing
-distinction, the histories and outcomes justifying it, the revised program, and
-a procedure for recognising when a similar investigation would help elsewhere.
-Selective, economical transfer between representation and investigation remains
-unbuilt. The current contribution is a repaired learner and reproducible
-comparisons with informative negative controls.
+\textbf{3. Related work and research directions.}
+We propose to retain distinguishing tests, their supporting histories and
+observations, revised programs, and procedures for selecting informative tests
+on subsequent tasks. Selective transfer between representation learning and
+test generation remains unimplemented. The current contribution is an
+implementation repair and reproducible comparisons with negative controls.
 
-\textbf{Relation to earlier work.}
-Learning tests or reusable procedures is already studied in
-ILF~\cite{ilf}, CoverUp~\cite{coverup} and Voyager~\cite{voyager}.
-STOP~\cite{stop} applies a code improver to itself;
-Hyperagents~\cite{hyperagents} makes the task agent and its improvement machinery
-editable. Self-editing, a graph or fixed foundation-model weights cannot establish
-Zenith's novelty. A contribution would require a specified mechanism linking
-measured distinctions to better subsequent improvement, and evidence beyond
-these neighbours and strong ordinary alternatives.
+\textbf{Related work.}
+ILF trains a testing policy from symbolic-execution traces~\cite[\S\S4--5]{ilf};
+Zenith does not train model weights. CoverUp guides a fixed LLM with source,
+coverage and execution feedback to generate regression tests~\cite[\S3]{coverup};
+coverage is not fault detection. Voyager retains executable skills within a
+fixed acquisition loop~\cite[\S2]{voyager}.
+STOP recursively rewrites its code-improvement scaffold~\cite[\S4]{stop}.
+Hyperagents edits task and meta-agent code, then evaluates a fixed acquired
+meta-agent in another domain. Its reported cross-domain compounding comparison
+does not establish a statistically significant advantage~\cite[\S\S5.2--5.3]{hyperagents}.
+These precedents motivate comparisons with ordinary program and test reuse;
+Zenith has not established an advantage over these alternatives.
 
-\textbf{Testing improvement of the improver.}
-Let an initial improver produce a successor. Compare both on untouched copies
-of the same starting solvers and fresh task families under matched lifetime
-budgets. Then compare reinvesting the successor to produce another generation
-with continuing the original improver. Keep the evaluator independent of edits;
-count failed proposals, acquisition, evaluation, execution and human intervention.
-Remove the learned questions or procedure while retaining the same observations
-and saved code. Better final answers alone do not show that the improver became
-better. Any positive result would be bounded by the tested tasks and budgets,
-without establishing open-ended acceleration.
+\textbf{Evaluating an acquired improvement procedure.}
+Let an initial improver produce a successor. Freeze each improver while it edits
+identical untouched starting solvers on fresh families. Select children on
+development evidence, freeze their identities, then evaluate once on held-out
+inputs; never select the best test score. Keep the evaluator outside the edits
+and count acquisition, failures, evaluation, execution and human intervention.
+Ablate the learned questions while preserving observations and saved code.
+Only then compare reinvesting the successor against continuing the original
+improver. Any gain remains bounded by the tested tasks and budgets.
 
-\textbf{Why mathematics might help.}
+\textbf{Mathematical evaluation tasks.}
 The \href{https://github.com/wcook04/plectis-erdos}{Plectis mathematical corpus}
-contains Lean proofs, partial results and open obligations. Its argument-continuation
-exporter identifies candidate theorems for a required hypothesis and remaining
-obligations. This suggests decisions to study: prove a prerequisite, try another
-route, or seek a counterexample. \href{https://github.com/wcook04/plectis-atlas}{Plectis Atlas}
-helps readers inspect OpenAI's mathematics release and attributed outside
-assessments; the mathematics and assessments belong to their named authors.
-Neither project is a demonstrated learning integration with Zenith.
-A useful record would connect what was known, the action, measured outcome,
-cost and effect on the target. Finished proofs do not supply missing histories
-of alternatives. Lean checks a supplied proof; failed search does not establish
-falsehood, and correct lemmas need evidence of relevance. Begin with cheap
-software tests; mathematics is a possible harder transfer domain.
+contains Lean proofs and open obligations. Its argument-continuation exporter
+identifies candidate prerequisite theorems and remaining obligations.
+\href{https://github.com/wcook04/plectis-atlas}{Plectis Atlas} presents OpenAI's
+mathematics release and attributed outside assessments. Neither is a demonstrated
+learning integration with Zenith. We would need action, outcome, cost and target
+relevance records; finished proofs omit alternative attempts. Lean checks supplied
+proofs; failed search does not establish falsehood. Mathematics is a possible
+harder transfer domain after cheap software tests.
 
 \textbf{Collaboration.}
-I am building Zenith with AI coding agents and learning as I go, with limited
-experience in this research area. This is my current understanding. I welcome
-corrections, collaboration and guidance on prior work, evaluations, real tasks
-and the mathematics connection through the
+Zenith is an exploratory project developed with AI coding agents. This account
+reflects my current understanding as I learn the field. I welcome corrections,
+collaboration and guidance on prior work, evaluations and useful tasks through the
 \href{https://github.com/wcook04/plectis-zenith/issues}{project's issues}.
 \href{https://github.com/wcook04/plectis-zenith/blob/main/docs/status.md}{Results and replay links}
 retain failures and exact costs; the
@@ -201,12 +225,12 @@ expands the proposed comparisons.
 
 \begin{thebibliography}{7}\footnotesize
 \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
-\bibitem{psr} M. Littman, R. Sutton and S. Singh. \href{https://proceedings.neurips.cc/paper/2001/hash/1e4d36177d71bbb3558e43af9577d70e-Abstract.html}{Predictive Representations of State}. NeurIPS, 2001.
-\bibitem{weighted} J. Worrell. \href{https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf}{Exactly Learning Weighted Automata over a Field}. Oxford notes.
-\bibitem{ilf} J. He et al. \href{https://eth-sri.github.io/publications/he19ilf}{Learning to Fuzz from Symbolic Execution}. CCS, 2019.
-\bibitem{coverup} J. A. Pizzorno and E. D. Berger. \href{https://arxiv.org/abs/2403.16218}{CoverUp: Effective High Coverage Test Generation for Python}. 2025.
-\bibitem{voyager} G. Wang et al. \href{https://arxiv.org/abs/2305.16291}{Voyager: An Open-Ended Embodied Agent with Large Language Models}. 2023.
-\bibitem{stop} E. Zelikman et al. \href{https://arxiv.org/abs/2310.02304}{Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation}. 2023.
-\bibitem{hyperagents} J. Zhang et al. \href{https://arxiv.org/abs/2603.19461}{Hyperagents}. 2026.
+\bibitem{psr} M. L. Littman, R. S. Sutton and S. Singh. \href{https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf}{Predictive Representations of State}. NeurIPS 14, 2001.
+\bibitem{weighted} J. Worrell. \href{https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf}{Exactly Learning Weighted Automata over a Field}. Oxford teaching notes, undated.
+\bibitem{ilf} J. He et al. \href{https://doi.org/10.1145/3319535.3363230}{Learning to Fuzz from Symbolic Execution with Application to Smart Contracts}. CCS, 2019.
+\bibitem{coverup} J. Altmayer Pizzorno and E. D. Berger. \href{https://arxiv.org/abs/2403.16218v4}{CoverUp: Effective High Coverage Test Generation for Python}. PACMSE 2 (FSE), 2025.
+\bibitem{voyager} G. Wang et al. \href{https://arxiv.org/abs/2305.16291v2}{Voyager: An Open-Ended Embodied Agent with Large Language Models}. arXiv, 2023.
+\bibitem{stop} E. Zelikman et al. \href{https://arxiv.org/abs/2310.02304v3}{Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation}. COLM, 2024.
+\bibitem{hyperagents} J. Zhang et al. \href{https://arxiv.org/abs/2603.19461v1}{Hyperagents}. arXiv, 2026.
 \end{thebibliography}
 \end{document}
