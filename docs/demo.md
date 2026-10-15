@@ -12,4 +12,4 @@ This teaches the protocol. It does not validate physical dynamics, predictive ac
 
 ## Synthetic offline first run
 
-Run `python -m zenith offline-example --output work/first-run` to execute authored Lab and Oracle responses without an API key or network. It demonstrates contracts and retains an intentionally rejected response. It is not model inference or a forecasting result. See the generated `summary.json` and README.
+Run `python -m zenith demo --output work/first-run` to execute authored Lab responses without an API key or network. It demonstrates contracts and retains an intentionally rejected response. It is not model inference or a forecasting result. See the generated `summary.json` and README.
