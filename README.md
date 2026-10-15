@@ -74,6 +74,10 @@ Lean checks a supplied proof; it does not tell us whether an unproved statement 
 
 I'm building Zenith with AI coding agents and learning the research methods as I go. This is an ambitious target, and I have limited experience in this area. The account here is my current understanding, open to correction. I'd welcome collaboration and guidance on the closest prior work, fair evaluations, useful real software tasks, or whether this mathematics connection makes sense. Small reproductions, stronger baselines and reasons a proposed approach will fail are useful contributions too. [Open an issue](https://github.com/wcook04/plectis-zenith/issues) or start with the [contribution guide](CONTRIBUTING.md).
 
+## Video introduction
+
+The [Plectis introduction](https://www.youtube.com/watch?v=uO2lbstEH9M) places Zenith among the research and tools I'm building with AI agents. Zenith has a short section in that wider tour; there is no separate Zenith video yet.
+
 ## Try it without an account
 
 Use Python 3.11 or newer from a source checkout on Linux, macOS or a suitable WSL environment. The runtime uses POSIX facilities. The examples below make no model calls.
