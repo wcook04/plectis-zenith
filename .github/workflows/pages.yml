@@ -40,13 +40,15 @@ jobs:
           python -m zenith validate
           python scripts/check_structure.py
           python scripts/check_extraction.py
+      - name: Install and test the frontend
+        run: |
+          npm ci --prefix site
+          npm test --prefix site
       - name: Build the existing frontend with static public data
         env:
           VITE_ZENITH_SNAPSHOT: "1"
           VITE_ZENITH_API: ${{ steps.pages.outputs.base_path }}
         run: |
-          npm ci --prefix site
-          npm test --prefix site
           npm run build --prefix site -- --base="${{ steps.pages.outputs.base_path }}/"
           python scripts/export_site_snapshot.py site/dist
       - name: Upload website
