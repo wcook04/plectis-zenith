@@ -24,4 +24,10 @@ Retain the financial investigator, full graph, basket pilot and System A fixture
 
 Run relevant offline tests and the retained suite after runtime changes. Regenerate graphs and extraction receipts with their owners. Keep paper, programme, README, status and website document routes aligned with the active research, without relabelling historical artifacts. Commit only owned changes and preserve other work. Put a reusable lesson into the smallest relevant contract or test; avoid parallel frameworks and duplicate roadmaps.
 
+## Public explanations
+
+Write website copy, headings, tooltips and README introductions for someone who has never used Zenith or written a program. State who does what to which program or input. When saying a check passed, explain the comparison or requirement and what that result establishes. A valid output format does not prove a prediction correct; agreement on selected inputs does not prove correctness for every input. Define terms at first use: a run is one saved execution, a node is a data source or program step, a graph arrow means one step reads another's output, and a receipt is a saved result record. Explain task-specific terms such as profile, qualification, protected evaluation and source hash before using them to describe a result. Prefer the ordinary explanation in navigation labels.
+
+Review the complete rendered page, including expanded results, errors and diagrams; a word blacklist is not a clarity check. Preserve technical IDs, exact saved evidence, counts, comparison groups and limitations. Read the humanizer skill when available, and record substantive ambiguous-to-literal examples in the change description. Check that source links, result withholding and research qualifications still work after editing copy.
+
 For repository layout changes, preserve source-compatible paths and run `python scripts/check_structure.py` with `tests/test_structure.py`. Document new source roles in README.md and docs/architecture.md.

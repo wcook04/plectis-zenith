@@ -17,7 +17,7 @@ The active implementation studies how to investigate and repair ordinary program
 | `zenith/source_snapshot.py` | Archive the exact implementation used by a study |
 | `scripts/build_conformance_report.py` | Publish allowlisted evidence and replay the archived runtime without inference |
 | `scripts/continue_conformance_budget.py` | Preserve a terminal funding stop, verify exact settled responses and continue only unattempted calls under an explicit larger reservation ceiling |
-| `scripts/export_site_snapshot.py` | Derive static public API responses and assets from the existing read-only backend for the same website renderer |
+| `scripts/export_site_snapshot.py` | Derive static public API responses, assets, `llms.txt`, the agent map and route index from the existing read-only backend; publish each mission/profile without browser execution |
 | `scripts/build_client_investigation_report.py` | Export exact client-study records, derive lifecycle costs and replay the archived runtime with strict or explicitly behavioral comparison |
 | `scripts/analyze_progress_campaign.py` | Check paired comparisons and reconstruct scores and costs from recorded outputs |
 | `scripts/demo_continuation_learning.py` | Reproduce the learner repair and eight authored native configurations without API access |
