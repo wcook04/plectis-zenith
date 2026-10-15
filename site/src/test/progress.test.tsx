@@ -123,7 +123,9 @@ it('uses the current receipt, separate study scores and retained historical link
   expect(screen.getByRole('link', { name: /Historical: Native observation-learning study/ })).toHaveAttribute('href', historical);
   expect(screen.queryByRole('heading', { name: 'Protected evaluation complete' })).toBeNull();
   expect(screen.queryByText('13 recorded call attempts')).toBeNull();
-  expect(screen.getAllByRole('link', { name: 'Previous edition (PDF)' })).toHaveLength(2);
+  expect(screen.getAllByRole('link', { name: 'Previous edition (PDF)' })).toHaveLength(1);
+  expect(screen.getByRole('link', { name: 'Current paper source' })).toHaveAttribute('href', source.url);
+  expect(screen.getByRole('link', { name: 'Current LaTeX source on GitHub' })).toHaveAttribute('href', source.url);
   expect(screen.queryByRole('link', { name: 'Read the paper (PDF)' })).toBeNull();
   expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph') && String(url) !== historical)).toBe(true);
   const toggle = screen.getByText('Read the repository’s own explanation').parentElement as HTMLDetailsElement;

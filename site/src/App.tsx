@@ -235,8 +235,8 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
         <p className="hero__lede">{HERO.lede}</p>
         <p className="hero__question">{HERO.question}</p>
         <div className="hero__actions">
-          <a className="button" href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">
-            Previous edition (PDF)
+          <a className="button" href={apiUrl(paper?.source.url ?? site.documents.paper ?? '/api/v1/documents/paper')} target="_blank" rel="noreferrer">
+            Current paper source
           </a>
           <a className="button button--ghost" href="#lab">
             Explore the investigation
