@@ -1,5 +1,7 @@
 # Zenith teaching website
 
+[Open the public research website](https://wcook04.github.io/plectis-zenith/).
+
 **Experimental research prototype.** The active programme compares executable investigations on native SQLite, LRU caching and UTF-8 decoding, with a separate continuation-memory study.
 Operational latency campaigns, financial experiments and the older System A fixture remain separately labelled historical profiles. See
 the [research notice](../RESEARCH_NOTICE.md).

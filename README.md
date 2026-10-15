@@ -2,6 +2,10 @@
 
 **Public research draft.** The experiments and offline examples run; a general advantage from learned investigation remains an open question.
 
+[Research website](https://wcook04.github.io/plectis-zenith/) · [Results](docs/status.md) · [Paper source](paper/zenith.tex) · [Run locally](#try-it-without-an-account) · [Credits](#credits-and-license)
+
+![Zenith’s reading website, with chapters and the completed campaign status](https://raw.githubusercontent.com/wcook04/plectis-zenith/main/docs/images/zenith-research.png)
+
 **Learn a program together with the questions that expose its limits.** Zenith lets a model propose experiments, measures their answers against native software, and uses the evidence to repair ordinary code. A later test checks whether the repair helped. The longer-term question is whether experience can make the next investigation cheaper or more effective.
 
 The working implementation is deliberately small: programs, queries, measured receipts and a selection rule. A graph can organize these dependencies, but extra nodes and persuasive explanations are not success measures. Fixed tests and a repair call without new investigation are first-class competitors.
