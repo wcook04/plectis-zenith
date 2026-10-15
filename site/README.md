@@ -90,11 +90,18 @@ colour-blind separation in both themes.
 
 ## README screenshot
 
-[The root README image](../docs/images/zenith-lab.png) is a 1440 × 1000 browser
-capture of this frontend served by the public-mode backend from source revision
-`26f2d80`, with the button pointer-target correction in this branch. It shows the Lab definition graph with Saved feeds expanded, `lab_decide` selected, its
-inspector open and the graph fitted to the remaining canvas. The implementation
-is [GraphExplorer](src/components/graph/GraphExplorer.tsx) with
-[Inspector](src/components/Inspector.tsx); the visual styling and fonts are unchanged.
-No private saved run is enabled. This is an interface example, not execution
-evidence.
+[The root README image](../docs/images/zenith-lab.png) is a 1036 × 522 browser
+capture of this frontend served by the public-mode backend. It shows the full
+Lab definition graph fitted to the canvas, with the three native six-node
+groups collapsed. The controls and legend are included; no private saved run is
+enabled. This is an interface example, not execution evidence.
+
+The graph implementation is carried forward from source revision `ec15921`:
+[GraphExplorer](src/components/graph/GraphExplorer.tsx),
+[GraphNodes](src/components/graph/GraphNodes.tsx),
+[SkipEdge](src/components/graph/SkipEdge.tsx) and
+[layout](src/components/graph/layout.ts). It uses short local channels for skip
+links and groups an expanded frame's external links. This branch adds explicit
+button pointer targets and a full-width canvas when the inspector sits below
+it. The Lab definitions come from public revision `26f2d80`; this capture does
+not represent the separate research checkout's current learning results.

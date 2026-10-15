@@ -1,36 +1,42 @@
 /* Graph explorer, node cards and inspector. */
 
-.explorer { border: 1px solid var(--rule-strong); border-radius: var(--radius); background: var(--surface); overflow: hidden; font-family: var(--font-sans); box-shadow: var(--shadow); }
-.explorer__bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--rule); background: var(--page); }
+.explorer { border: 1px solid var(--rule); border-radius: var(--radius); background: var(--surface); overflow: hidden; font-family: var(--font-sans); box-shadow: var(--shadow); }
+.explorer__bar { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--rule); background: var(--surface); }
+.explorer__find { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; flex: 1 1 520px; }
+.explorer--compact .explorer__bar { justify-content: flex-end; }
+.z-quiet-button { min-width: 32px; min-height: 32px; padding: 0 8px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); font: inherit; font-size: 0.875rem; cursor: pointer; }
+.z-quiet-button:hover { background: var(--surface-sunk); color: var(--ink); }
+.explorer__below { border-top: 1px solid var(--rule-strong); }
+.explorer__below .inspector { border-left: 0; max-height: 640px; }
 .explorer__actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .explorer__stage { display: grid; grid-template-columns: minmax(0, 1fr); }
 .explorer.has-inspector .explorer__stage { grid-template-columns: minmax(0, 1fr) minmax(340px, 420px); }
-.explorer__canvas { position: relative; min-width: 0; height: 100%; background:
-  radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--rule-strong) 70%, transparent) 1px, transparent 0) 0 0 / 22px 22px,
-  var(--surface); }
+.explorer.inspector-below .explorer__stage { grid-template-columns: minmax(0, 1fr); }
+.explorer__canvas { position: relative; min-width: 0; height: 100%; background: var(--page); }
+
 .explorer .react-flow__pane { cursor: grab; }
 .explorer .react-flow__pane.dragging { cursor: grabbing; }
 .explorer .react-flow__node { font-family: var(--font-sans); }
 
 /* Edges */
 .z-edge path.react-flow__edge-path { stroke-width: 1.5; opacity: 0.7; transition: opacity 120ms ease-out; }
-.z-edge--skip path.react-flow__edge-path { stroke-dasharray: 5 4; opacity: 0.55; }
-.z-edge--direct path.react-flow__edge-path { stroke-width: 2.4; opacity: 1; }
+.z-edge--skip path.react-flow__edge-path { stroke-width: 1.2; opacity: 0.5; }
+.z-edge--direct path.react-flow__edge-path { stroke-width: 2.2; opacity: 1; }
 .z-edge--lineage path.react-flow__edge-path { opacity: 0.45; }
 .z-edge--rest path.react-flow__edge-path { opacity: 0.7; }
-.z-edge--dim path.react-flow__edge-path { opacity: 0.08; }
+.z-edge--dim path.react-flow__edge-path { opacity: 0.12; }
 @media (prefers-reduced-motion: reduce) { .z-edge path.react-flow__edge-path { transition: none; } }
 
 /* Node card */
 .z-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--lane); flex: none; }
 .z-node { width: 100%; height: 100%; transition: opacity 120ms ease-out; }
-.z-node__hit { all: unset; pointer-events: auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%; height: 100%; padding: 10px 12px 9px; border-radius: var(--radius); background: var(--surface); border: 1.2px solid var(--rule-control); cursor: pointer; color: var(--ink); box-shadow: 0 1px 2px rgba(27, 20, 35, 0.06); }
+.z-node__hit { all: unset; pointer-events: auto; box-sizing: border-box; display: flex; flex-direction: column; gap: 3px; width: 100%; height: 100%; padding: 10px 12px 9px; border-radius: var(--radius); background: var(--surface); border: 1.2px solid var(--rule-control); cursor: pointer; color: var(--ink); box-shadow: 0 1px 2px rgba(27, 20, 35, 0.08), 0 4px 14px rgba(27, 20, 35, 0.06); }
 .z-node--tool .z-node__hit { border-radius: 2px; background: var(--surface-sunk); }
-.z-node--checkpoint .z-node__hit { border-radius: 2px; border: 1.6px solid var(--ink); background: var(--accent-wash); }
+.z-node--checkpoint .z-node__hit { border-radius: 2px; border-color: var(--ink); background: var(--accent-wash); }
 .z-node__hit:hover { border-color: var(--ink); box-shadow: 0 2px 10px rgba(27, 20, 35, 0.14); }
 .z-node__hit:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
-.z-node__name { font-family: var(--font-serif); font-size: 1.05rem; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.z-node__role { font-size: 0.84rem; line-height: 1.3; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.z-node__name { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.z-node__role { font-size: 0.86rem; line-height: 1.3; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .z-node__foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: auto; min-height: 15px; font-size: 0.72rem; color: var(--muted); }
 .z-node__lane { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .z-node__lane--cp { font-weight: 600; color: var(--ink-soft); }
@@ -38,15 +44,17 @@
 .z-band__title { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600; color: var(--ink); }
 .z-band__detail { font-size: 0.875rem; color: var(--muted); }
 .explorer__hint { position: absolute; right: 12px; top: 10px; margin: 0; z-index: 5; font-size: 0.8125rem; color: var(--muted); background: color-mix(in srgb, var(--surface) 92%, transparent); padding: 4px 8px; border-radius: 6px; pointer-events: none; }
-.explorer__zoom { display: inline-flex; gap: 4px; margin-left: 6px; }
+.explorer__zoom { display: inline-flex; gap: 2px; margin-left: auto; }
 
 
-/* Emphasis tiers (after EMPHASIS_TIERS in the original GraphViewer) */
-.em-background { opacity: 0.22; }
-.em-ancestor, .em-descendant { opacity: 0.72; }
-.em-selected .z-node__hit, .em-selected .z-group__hit { border: 2.5px solid var(--ink); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent), var(--shadow); }
-.em-input .z-node__hit, .em-input .z-group__hit { border-color: var(--ink-soft); border-width: 1.8px; }
-.em-consumer .z-node__hit, .em-consumer .z-group__hit { border-color: var(--ink-soft); border-width: 1.8px; border-style: solid; }
+/* Emphasis tiers (after EMPHASIS_TIERS in the original GraphViewer). Every
+   card stays readable and clickable; emphasis changes borders and secondary
+   text, and selection is an outer ring so a status border survives it. */
+.em-background .z-node__hit, .em-background .z-group__hit { border-color: var(--rule); box-shadow: none; }
+.em-background .z-node__role, .em-background .z-node__foot, .em-background .z-group__summary, .em-background .z-group__foot { opacity: 0.55; }
+.em-background .z-node__name, .em-background .z-group__name { color: var(--ink-soft); }
+.em-selected .z-node__hit, .em-selected .z-group__hit { outline: 3px solid var(--ink); outline-offset: 3px; box-shadow: var(--shadow); }
+.em-input .z-node__hit, .em-input .z-group__hit, .em-consumer .z-node__hit, .em-consumer .z-group__hit { border-color: var(--ink); }
 
 /* Run states: border style and a printed label */
 .z-state { display: inline-flex; align-items: center; gap: 5px; font-family: var(--font-sans); font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
@@ -59,10 +67,11 @@
 .z-state--failure .z-state__glyph { border-radius: 1px; transform: rotate(45deg); background: currentColor; width: 8px; height: 8px; }
 .z-state--not_started, .z-state--not_reached, .z-state--unknown { color: var(--state-idle); font-weight: 500; }
 .z-state--not_started .z-state__glyph, .z-state--not_reached .z-state__glyph, .z-state--unknown .z-state__glyph { border-style: dashed; }
-.z-node.is-failure .z-node__hit, .z-group.is-failure .z-group__hit { border-color: var(--state-fail); border-width: 2px; background: var(--state-fail-wash); }
+.z-node.is-failure .z-node__hit, .z-group.is-failure .z-group__hit { border-color: var(--state-fail); background: var(--state-fail-wash); box-shadow: inset 0 0 0 1px var(--state-fail); }
 .z-node.is-not_started .z-node__hit, .z-node.is-not_reached .z-node__hit, .z-group.is-not_started .z-group__hit, .z-group.is-not_reached .z-group__hit { border-style: dashed; background: transparent; }
-.z-node.is-not_started .z-node__name, .z-node.is-not_reached .z-node__name { color: var(--muted); }
-.z-node.is-loaded .z-node__hit, .z-group.is-loaded .z-group__hit { border-style: double; border-width: 3px; }
+.z-node.is-not_started .z-node__hit, .z-node.is-not_reached .z-node__hit { box-shadow: none; }
+.z-node.is-loaded .z-node__hit { border-color: var(--state-loaded); box-shadow: inset 0 0 0 2px var(--surface), inset 0 0 0 3px var(--state-loaded); }
+.z-group.is-loaded .z-group__hit { border-color: var(--state-loaded); }
 
 /* Collapsed group */
 .z-group { width: 100%; height: 100%; transition: opacity 120ms ease-out; }
@@ -70,8 +79,8 @@
 .z-group__hit:hover { border-color: var(--ink-soft); }
 .z-group__hit:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 2px; }
 .z-group__head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.z-group__name { font-family: var(--font-serif); font-size: 1.02rem; font-weight: 600; line-height: 1.2; }
-.z-group__summary { font-size: 0.84rem; color: var(--muted); line-height: 1.3; margin-top: 3px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+.z-group__name { font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600; line-height: 1.2; }
+.z-group__summary { font-size: 0.86rem; color: var(--muted); line-height: 1.3; margin-top: 3px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 .z-group__foot { display: flex; align-items: center; gap: 8px; margin-top: auto; white-space: nowrap; font-size: 0.75rem; color: var(--muted); }
 .z-group__dots { display: inline-flex; gap: 3px; }
 .z-group__dots .z-dot { width: 7px; height: 7px; }
@@ -197,17 +206,51 @@
 .z-origin { display: inline-block; flex: none; font-family: var(--font-sans); font-size: 0.7rem; font-weight: 600; line-height: 1; padding: 3px 6px; border-radius: 4px; border: 1px solid var(--rule-control); color: var(--ink-soft); white-space: nowrap; }
 .z-origin--real_saved_input { background: var(--surface); border-color: var(--ink-soft); }
 .z-origin--authored_synthetic { border-style: dashed; background: var(--select-bg); color: var(--ink); }
-.z-origin--derived_mixed_inputs { background: transparent; }
+.z-origin--derived_synthetic_inputs { background: transparent; }
 .provenance { padding: 12px 14px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--rule); }
 .provenance--authored_synthetic { border-style: dashed; }
 .provenance__payload { margin-top: 10px; }
 .provenance__hashes summary { cursor: pointer; font-size: 0.8125rem; color: var(--accent); margin-top: 8px; }
 .z-state--pending { color: var(--accent); }
 .z-state--pending .z-state__glyph { border-style: solid; background: radial-gradient(circle, currentColor 35%, transparent 40%); }
-.z-node.is-pending .z-node__hit { border-color: var(--accent); border-width: 2px; border-style: dashed; }
+.z-node.is-pending .z-node__hit { border-color: var(--accent); border-style: dashed; }
 .state-block.is-pending { border-color: var(--accent); border-style: dashed; }
 .jv-table-wrap { overflow-x: auto; }
 .jv-table { border-collapse: collapse; font-size: 0.8125rem; margin: 2px 0 8px; }
 .jv-table th, .jv-table td { text-align: left; padding: 4px 10px 4px 0; border-bottom: 1px solid var(--rule); white-space: nowrap; }
 .jv-table th { color: var(--muted); font-weight: 600; }
 .jv-table td.is-num { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Card regions: title, short purpose (two lines reserved), footer. The
+   footer exists in every context, so recorded states never squeeze the
+   purpose text. */
+.z-node__hit { display: grid !important; grid-template-rows: auto minmax(0, 1fr) auto; gap: 2px; }
+.z-node__name, .z-group__name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.z-node__role, .z-group__summary { min-height: 0; overflow: hidden; }
+.z-node__role { align-self: start; }
+.z-node__foot { margin-top: 0; align-self: end; }
+.z-group__hit { display: grid !important; grid-template-rows: auto minmax(0, 1fr) auto auto; gap: 2px; }
+.z-group__summary { margin-top: 0; align-self: start; }
+.z-group__state { display: flex; align-items: center; min-height: 1.1rem; }
+.z-group__foot { margin-top: 0; justify-content: space-between; }
+
+.explorer-figure { margin: 0; }
+.explorer__context { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; margin: 0 0 10px; max-width: none; }
+.explorer__context-label { font-family: var(--font-serif); font-size: 1.0625rem; font-weight: 600; color: var(--ink); }
+.explorer__context-help { font-family: var(--font-sans); font-size: 0.875rem; color: var(--muted); }
+.explorer__mode { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.explorer__mode-note { font-size: 0.8125rem; color: var(--muted); }
+.legend__group { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.legend__group + .legend__group { padding-left: 18px; border-left: 1px solid var(--rule); }
+.legend__group-label { font-weight: 600; color: var(--ink-soft); }
+.z-group__hit { box-shadow: 3px 3px 0 -1px var(--surface), 3px 3px 0 0 var(--rule-control), 6px 6px 0 -1px var(--surface), 6px 6px 0 0 var(--rule-strong); }
+.z-node.is-not_started .z-node__name, .z-node.is-not_reached .z-node__name { color: var(--ink); }
+
+.z-node__foot { min-width: 0; }
+.z-node__foot .z-node__lane { flex: 1 1 auto; min-width: 0; }
+.z-node__foot .z-state, .z-group__foot .z-state { flex: none; }
+.z-node__top { min-width: 0; }
+
+/* Band labels mask the lines that pass behind them. */
+.z-band__title, .z-band__detail { background: var(--page); padding: 2px 8px; border-radius: 4px; }
+.z-band__title { margin-left: -8px; }

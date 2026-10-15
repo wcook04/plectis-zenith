@@ -76,7 +76,7 @@ export const ZNode = memo(function ZNode({ data }: NodeProps<ZNodeData>) {
           <span className="z-node__name">{nodeName(node.id)}</span>
           {origin && <span className={`z-origin z-origin--${node.demo_provenance!.input_origin}`}>{origin}</span>}
         </span>
-        {role && <span className="z-node__role">{role}</span>}
+        <span className="z-node__role">{role}</span>
         <span className="z-node__foot">
           {node.lane !== 'SPINE' ? (
             <span className="z-node__lane">
@@ -84,7 +84,7 @@ export const ZNode = memo(function ZNode({ data }: NodeProps<ZNodeData>) {
               {laneLabel(node.lane)}
             </span>
           ) : checkpoint ? (
-            <span className="z-node__lane z-node__lane--cp">Checkpoint</span>
+            <span className="z-node__lane z-node__lane--cp">Checkpoint node</span>
           ) : (
             <span />
           )}
@@ -112,16 +112,17 @@ export const ZGroup = memo(function ZGroup({ data }: NodeProps<ZGroupData>) {
         }}
       >
         <span className="z-group__name">{family.label}</span>
-        <span className="z-group__summary">{family.summary}</span>
-        <span className="z-group__foot">
-          <span className="z-group__dots" aria-hidden="true" title={lanes.map(laneLabel).join(', ')}>
-            {lanes.map((lane) => (
-              <span key={lane} className="z-dot" style={{ ['--lane' as string]: laneColor(lane) }} />
-            ))}
-          </span>
-          <span className="z-group__count">{members.length}</span>
+        <span className="z-group__summary" title={lanes.map(laneLabel).join(', ')}>
+          {family.summary}
+        </span>
+        <span className="z-group__state">
           <StateMark state={state} />
-          <span className="z-group__expand" aria-hidden="true">Expand</span>
+        </span>
+        <span className="z-group__foot">
+          <span className="z-group__count">{members.length} nodes</span>
+          <span className="z-group__expand" aria-hidden="true">
+            Expand
+          </span>
         </span>
       </button>
       <Handle type="source" position={Position.Right} style={handleStyle} isConnectable={false} />
@@ -132,6 +133,8 @@ export const ZGroup = memo(function ZGroup({ data }: NodeProps<ZGroupData>) {
 export const ZFrame = memo(function ZFrame({ data }: NodeProps<ZFrameData>) {
   return (
     <div className="z-frame">
+      <Handle type="target" position={Position.Left} style={handleStyle} isConnectable={false} />
+      <Handle type="source" position={Position.Right} style={handleStyle} isConnectable={false} />
       <span className="z-frame__label">
         {data.family.label}
         <button type="button" className="z-frame__collapse" onClick={() => data.onCollapse(data.family.key)}>
