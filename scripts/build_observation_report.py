@@ -23,7 +23,7 @@ from zipfile import ZipFile
 
 ROOT = Path(__file__).resolve().parents[1]
 BUNDLE = "examples/observation-learning/v1"
-REPORT = "docs/observation-learning-20261013.json"
+REPORT = "docs/history/observation-learning-20261013.json"
 CANARIES = ("qwen", "qwen-funded", "deepseek")
 CALL_FIELDS = ("call_id", "run_id", "node_id", "status", "requested_model", "actual_provider",
                "requested_provider_slug", "verified_provider_name", "reasoning_effort", "cost",

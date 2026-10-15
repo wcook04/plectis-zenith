@@ -30,6 +30,7 @@ import json
 from pathlib import Path
 
 from system.lib.lab_contract_audit import compute_lab_contract_audit
+from system.lib.system_fusion_readiness import build_readiness_gate
 
 
 def _write_artifact(artifacts_dir: Path, node_id: str, data) -> None:
@@ -168,6 +169,12 @@ def test_contract_audit_question_mark_scan_excludes_director_output(tmp_path: Pa
 
 
 def test_contract_audit_refuses_system_fusion_candidate_claims(tmp_path: Path) -> None:
+    gate = build_readiness_gate()
+    root = Path(__file__).resolve().parents[2]
+    assert (root / gate["authority_boundary"]["source_authority"]).is_file()
+    assert all((root / ref).exists() for ref in gate["source_surfaces"])
+    assert all((root / hook["path"]).is_file() for hook in gate["consumer_hook_state"].values())
+    assert "upstream extraction identifiers" in gate["historical_evidence_reference_boundary"]
     artifacts = tmp_path / "artifacts"
     _write_artifact(
         artifacts,

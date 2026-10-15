@@ -1,30 +1,14 @@
-"""
-[PURPOSE]
-- Teleology: Reject ambiguous duplicate-key JSON and classify authority/projection artifact policies.
-- Mechanism: Use an object-pairs hook for strict parsing, validate object-only JSONL rows when requested and match paths against declared JsonArtifactRule patterns.
+"""JSON readers that reject duplicate object keys and retain source context.
 
-[INTERFACE]
-- Exports: loads_json_strict, read_json_strict, read_jsonl_strict, artifact_rule_for_path, artifact_class_for_path, strict_json_artifact_report, artifact_rules_payload and strict error classes.
-
-[FLOW]
-- Reads: Caller JSON text and selected JSON/JSONL files.
-- Schema: Artifact reports describe parsing validity and owner/authority/duplicate-key/event-chain/rebuild policies.
-
-[DEPENDENCIES]
-- Couples: ARTIFACT_RULES binds path patterns to owning ledger/projection standards; ledger-specific chain validation remains with each ledger.
-
-[CONSTRAINTS]
-- Writes: None.
-- Fails: Duplicate keys raise DuplicateJsonKeyError; syntax errors raise StrictJsonError; non-object JSONL rows raise StrictJsonObjectError when objects are required.
-- Guarantee: A missing JSONL path yields an empty list.
+JSONL readers can require object rows, ignore blank lines and treat a missing
+file as an empty log. Artifact ownership and rebuild policies belong to their
+actual producing tools, rather than this parsing module.
 """
 from __future__ import annotations
 
-import fnmatch
 import json
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any
 
 
 class StrictJsonError(ValueError):
@@ -37,142 +21,6 @@ class DuplicateJsonKeyError(StrictJsonError):
 
 class StrictJsonObjectError(StrictJsonError):
     """Raised when a JSONL row must be an object but is not."""
-
-
-@dataclass(frozen=True)
-class JsonArtifactRule:
-    artifact_class: str
-    authority: str
-    duplicate_key_policy: str
-    event_chain_policy: str
-    rebuild_check: str
-    owner_tool: str | None
-    dirty_tree_policy: str
-    failure_behavior: str
-    patterns: tuple[str, ...]
-
-    def to_row(self) -> dict[str, Any]:
-        return {
-            "artifact_class": self.artifact_class,
-            "authority": self.authority,
-            "duplicate_key_policy": self.duplicate_key_policy,
-            "event_chain_policy": self.event_chain_policy,
-            "rebuild_check": self.rebuild_check,
-            "owner_tool": self.owner_tool,
-            "dirty_tree_policy": self.dirty_tree_policy,
-            "failure_behavior": self.failure_behavior,
-            "patterns": list(self.patterns),
-        }
-
-
-ARTIFACT_RULES: tuple[JsonArtifactRule, ...] = (
-    JsonArtifactRule(
-        artifact_class="task_ledger_event_jsonl",
-        authority="state/task_ledger/events.jsonl",
-        duplicate_key_policy="fail",
-        event_chain_policy="validate_previous_event_hash_and_event_hash",
-        rebuild_check="./repo-python tools/meta/factory/task_ledger_project.py rebuild --check",
-        owner_tool="./repo-python tools/meta/factory/task_ledger_apply.py",
-        dirty_tree_policy="strict_validation_if_touched",
-        failure_behavior="block_commit_until_repaired_or_residual_captured",
-        patterns=("state/task_ledger/events.jsonl",),
-    ),
-    JsonArtifactRule(
-        artifact_class="prompt_trace_event_jsonl",
-        authority="state/prompt_ledger/events.jsonl",
-        duplicate_key_policy="fail",
-        event_chain_policy="validate_previous_event_hash_and_event_hash",
-        rebuild_check="./repo-python tools/meta/observability/prompt_ledger.py rebuild --check",
-        owner_tool="./repo-python tools/meta/observability/prompt_ledger.py",
-        dirty_tree_policy="strict_validation_if_touched",
-        failure_behavior="block_commit_until_repaired_or_residual_captured",
-        patterns=("state/prompt_ledger/events.jsonl",),
-    ),
-    JsonArtifactRule(
-        artifact_class="work_ledger_event_jsonl",
-        authority="codex/ledger/*/work_ledger.jsonl",
-        duplicate_key_policy="fail",
-        event_chain_policy="owner_tool_validation_when_available",
-        rebuild_check="./repo-python tools/meta/factory/work_ledger.py session-status --overview",
-        owner_tool="./repo-python tools/meta/factory/work_ledger.py",
-        dirty_tree_policy="strict_validation_if_touched",
-        failure_behavior="block_destructive_or_conflicting_session_mutation",
-        patterns=("codex/ledger/*/work_ledger.jsonl",),
-    ),
-    JsonArtifactRule(
-        artifact_class="generated_projection_json",
-        authority="owning event log or source artifact",
-        duplicate_key_policy="fail",
-        event_chain_policy="not_applicable",
-        rebuild_check="owner_tool_rebuild_check_required",
-        owner_tool="owner_tool_registry",
-        dirty_tree_policy="owner_tool_or_adoption_receipt_required_if_targeted",
-        failure_behavior="do_not_hand_edit_projection",
-        patterns=(
-            "state/task_ledger/ledger.json",
-            "state/task_ledger/sign_offs.json",
-            "state/task_ledger/views/*.json",
-            "state/prompt_ledger/ledger.json",
-            "state/prompt_ledger/views/*.json",
-            "codex/ledger/*/work_ledger_index.json",
-        ),
-    ),
-    JsonArtifactRule(
-        artifact_class="standard_json",
-        authority="codex/standards/*.json",
-        duplicate_key_policy="fail",
-        event_chain_policy="not_applicable",
-        rebuild_check="strict_json_parse",
-        owner_tool=None,
-        dirty_tree_policy="strict_validation_if_touched",
-        failure_behavior="block_commit_until_schema_or_duplicate_key_failure_is_fixed",
-        patterns=("codex/standards/*.json", "codex/standards/**/*.json"),
-    ),
-    JsonArtifactRule(
-        artifact_class="provider_receipt_json",
-        authority="provider receipt event log or receipt file",
-        duplicate_key_policy="fail",
-        event_chain_policy="drift_fuse_required_when_adopted",
-        rebuild_check="provider_owner_tool_when_available",
-        owner_tool=None,
-        dirty_tree_policy="strict_validation_if_touched_once_adopted",
-        failure_behavior="block_adoption_until_receipt_is_valid",
-        patterns=("state/provider_receipts/**/*.json", "state/provider_receipts/**/*.jsonl"),
-    ),
-    JsonArtifactRule(
-        artifact_class="runtime_run_artifact_json",
-        authority="run-producing tool and run summary under state/runs/<run_id>",
-        duplicate_key_policy="fail",
-        event_chain_policy="not_applicable_unless_declared",
-        rebuild_check="run_artifact_owner_or_strict_json_parse",
-        owner_tool=None,
-        dirty_tree_policy="preserve_unrelated_runtime_receipts_validate_if_adopted",
-        failure_behavior="do_not_treat_index_named_run_receipts_as_generated_projection_owner_gaps",
-        patterns=("state/runs/**/*.json", "state/runs/**/*.jsonl"),
-    ),
-    JsonArtifactRule(
-        artifact_class="raw_seed_projection_json",
-        authority="raw seed owner lane",
-        duplicate_key_policy="fail",
-        event_chain_policy="not_applicable",
-        rebuild_check="raw_seed_owner_tool_required",
-        owner_tool="raw_seed_projection_owner_tool",
-        dirty_tree_policy="preserve_unless_owner_tool_scoped",
-        failure_behavior="do_not_hand_edit_raw_operator_voice_or_generated_projection",
-        patterns=("obsidian/**/raw_seed/**/*.json", "codex/hologram/raw_seed_projection/*.json"),
-    ),
-    JsonArtifactRule(
-        artifact_class="synth_seed_json",
-        authority="phase synth_seed.json",
-        duplicate_key_policy="fail",
-        event_chain_policy="not_applicable",
-        rebuild_check="./repo-python kernel.py --sync-synth <phase>",
-        owner_tool="./repo-python kernel.py --sync-synth",
-        dirty_tree_policy="strict_validation_if_touched",
-        failure_behavior="block_sync_until_duplicate_key_or_schema_failure_is_fixed",
-        patterns=("obsidian/**/synth_seed.json",),
-    ),
-)
 
 
 def _reject_duplicate_keys(source: str):
@@ -212,62 +60,3 @@ def read_jsonl_strict(path: Path, *, require_object: bool = True) -> list[Any]:
             raise StrictJsonObjectError(f"{path}:{line_number} is not a JSON object")
         rows.append(item)
     return rows
-
-
-def _matches_pattern(rel_path: str, pattern: str) -> bool:
-    return fnmatch.fnmatchcase(rel_path, pattern) or Path(rel_path).match(pattern) or rel_path == pattern
-
-
-def artifact_rule_for_path(path: str | Path) -> JsonArtifactRule | None:
-    rel_path = str(path).lstrip("./")
-    for rule in ARTIFACT_RULES:
-        if any(_matches_pattern(rel_path, pattern) for pattern in rule.patterns):
-            return rule
-    return None
-
-
-def artifact_class_for_path(path: str | Path) -> str:
-    rule = artifact_rule_for_path(path)
-    return rule.artifact_class if rule is not None else "unknown_json_artifact"
-
-
-def strict_json_artifact_report(paths: Iterable[str | Path]) -> dict[str, Any]:
-    rows: list[dict[str, Any]] = []
-    class_counts: dict[str, int] = {}
-    unknown_paths: list[str] = []
-    for raw_path in paths:
-        rel_path = str(raw_path).lstrip("./")
-        rule = artifact_rule_for_path(rel_path)
-        if rule is None:
-            artifact_class = "unknown_json_artifact"
-            row: dict[str, Any] = {
-                "path": rel_path,
-                "artifact_class": artifact_class,
-                "strict_validation_required": rel_path.endswith((".json", ".jsonl")),
-                "owner_tool_required": False,
-            }
-            unknown_paths.append(rel_path)
-        else:
-            artifact_class = rule.artifact_class
-            row = rule.to_row()
-            row.update(
-                {
-                    "path": rel_path,
-                    "strict_validation_required": rule.duplicate_key_policy == "fail",
-                    "owner_tool_required": bool(rule.owner_tool),
-                }
-            )
-        rows.append(row)
-        class_counts[artifact_class] = class_counts.get(artifact_class, 0) + 1
-
-    return {
-        "schema_version": "strict_json_artifact_report_v1",
-        "checked_count": len(rows),
-        "class_counts": class_counts,
-        "unknown_paths": unknown_paths,
-        "items": rows,
-    }
-
-
-def artifact_rules_payload() -> list[dict[str, Any]]:
-    return [rule.to_row() for rule in ARTIFACT_RULES]

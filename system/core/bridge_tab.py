@@ -18,7 +18,7 @@
 [CONSTRAINTS]
 - All methods access self.X (BridgeManager state) — works only as a mixin.
 - When-needed: Open when provider preflight, tab reuse/open, or tab sweeping behavior needs inspection below the BridgeManager facade.
-- Escalates-to: system/core/bridge.py::BridgeManager; codex/doctrine/skills/bridge_runtime/bridge_preflight.md; system/core/bridge_cdp.py::CDPTransportMixin._run_prompt_transport_attempt
+- Related source: system/core/bridge.py::BridgeManager; system/core/bridge_cdp.py::CDPTransportMixin._run_prompt_transport_attempt
 - Navigation-group: bridge_runtime
 """
 from __future__ import annotations

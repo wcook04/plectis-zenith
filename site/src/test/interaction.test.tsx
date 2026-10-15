@@ -241,14 +241,14 @@ describe('markdown from the backend', () => {
   it('drops raw HTML and unsafe links and resolves relative links', () => {
     const { container } = render(
       <Markdown
-        base="https://github.com/wcook04/plectis-zenith/blob/main/docs/"
+        base="https://github.com/wcook04/plectis-zenith/blob/main/docs/history/"
         source={'<script>alert(1)</script>\n\n[bad](javascript:alert(1)) [doc](graphs.md)'}
       />,
     );
     expect(container.querySelector('script')).toBeNull();
     const links = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
     expect(links).not.toContain('javascript:alert(1)');
-    expect(links).toContain('https://github.com/wcook04/plectis-zenith/blob/main/docs/graphs.md');
+    expect(links).toContain('https://github.com/wcook04/plectis-zenith/blob/main/docs/history/graphs.md');
   });
 });
 

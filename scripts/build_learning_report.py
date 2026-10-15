@@ -122,12 +122,12 @@ def build(studies):
     unpriced = [call for c in report['campaigns'] for call in c['calls'] if call['cost'] is None]
     report['unreported_cost_calls'] = len(unpriced)
     report['unreported_cost_reservations_usd'] = str(sum((Decimal(call['reserved_cost_usd']) for call in unpriced), Decimal(0)))
-    write(ROOT/'docs/investigation-learning-20261013.json', report)
+    write(ROOT/'docs/history/investigation-learning-20261013.json', report)
     return report
 
 
 def replay():
-    report = json.loads((ROOT/'docs/investigation-learning-20261013.json').read_text())
+    report = json.loads((ROOT/'docs/history/investigation-learning-20261013.json').read_text())
     checks = []
     for campaign in report['campaigns']:
         if 'bundle' not in campaign:

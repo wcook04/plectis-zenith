@@ -22,16 +22,13 @@ SOURCE = '''def investigate(context, acquire):
 '''
 
 
-@pytest.mark.parametrize('bundle_name,report_name', [
-    ('client-reuse-v1', 'client-investigation-20261014.json'),
-    ('client-reuse-v2', 'client-investigation-v2-20261015.json'),
-    ('client-reuse-v2-low', 'client-investigation-v2-low-20261015.json'),
+@pytest.mark.parametrize('bundle_name', [
+    'client-reuse-v1', 'client-reuse-v2', 'client-reuse-v2-low',
 ])
-def test_published_report_copy_matches_verified_client_bundle(bundle_name, report_name):
+def test_canonical_published_report_is_in_verified_client_bundle(bundle_name):
     bundle = publication.ROOT/'examples/conformance'/bundle_name
     checked = publication.verify_manifest(bundle)
     assert checked['complete'] and checked['panel_opened']
-    assert (publication.ROOT/'docs'/report_name).read_bytes() == (bundle/'report.json').read_bytes()
     assert checked['calls'] == publication.read(bundle/'report.json')['model_attempts']
 
 

@@ -12,7 +12,7 @@ from zenith.budgeted import OpenRouterBudgetedProvider
 from zenith.investigation_program import execute, validate_source
 from zenith.providers import digest, write_json
 from zenith.provider_policy import latest_model
-from research.investigator_study import archive_runtime
+from zenith.source_snapshot import archive_runtime
 from research.operational_cases import INCUMBENT, TASK, grade, make_case, suite, novel_suite, typed_reference, rename_fields, FIELDS
 
 PROGRAM_SCHEMA = {'type': 'object', 'properties': {k: {'type': 'string'} for k in ['source', 'scope', 'lesson']},

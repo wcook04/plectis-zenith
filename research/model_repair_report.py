@@ -42,7 +42,7 @@ def build(root=ROOT):
         'modern_charged_calls': sum(r['charged_calls'] for r in modern),
         'modern_reported_cost_usd': str(sum((Decimal(r['reported_cost_usd']) for r in modern), Decimal(0))),
         'interpretation': 'Different workloads and interfaces: not a controlled overall quality or cost comparison. See model-repair-20261013.md for semantic assessment and limits.'}
-    (root / 'docs/model-repair-20261013.json').write_text(json.dumps(report, indent=2) + '\n')
+    (root / 'docs/history/model-repair-20261013.json').write_text(json.dumps(report, indent=2) + '\n')
     return report
 
 

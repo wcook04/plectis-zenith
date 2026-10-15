@@ -21,7 +21,7 @@
 - Orders: deep_merge precedence is override-wins; to_jsonable sorts set/frozenset with key=str for determinism.
 - Fails: Path resolution, invalid numeric timestamps, cyclic conversion inputs, or custom object conversion can raise; root/run fallbacks cover the explicitly checked absent or escaping-path cases.
 - When-needed: Open when shared runtime helpers such as repo-root resolution, JSON normalization, or canonical runs-dir guarding are needed instead of re-implementing them ad hoc.
-- Escalates-to: system/lib/types.py; system/lib/workstream_scaffold.py; system/lib/codex_paths.py
+- Related source: system/lib/types.py; zenith/runtime.py
 - Navigation-group: kernel_lib
 """
 from __future__ import annotations
