@@ -36,14 +36,12 @@ def _prepare_output(output: Path) -> None:
 
 def _feed_artifact(node_id: str) -> dict:
     """Authored synthetic payloads; ids come from the native graph, not a fixed list."""
-    if node_id == "global_stock_feed":
-        data = {"columns": ["Ticker", "Price"], "rows": [["ZENX", 100.0]],
-                "evidence_dictionary": [{"ledger_id": "S_ABCD0001", "subject": "ZENX"}]}
-    elif node_id == "global_etf_feed":
-        data = {"columns": ["Ticker", "Price"], "rows": [["ZETF", 50.0]],
-                "evidence_dictionary": [{"ledger_id": "E_ABCD0002", "subject": "ZETF"}]}
-    elif node_id == "global_macro_feed":
-        data = {"columns": ["ticker", "Proxy", "pct_change", "z_score"],
+    if node_id in ("global_measurements_feed", "global_subsystems_feed"):
+        target = "SIGNAL_A" if node_id == "global_measurements_feed" else "SUBSYSTEM_A"
+        data = {"columns": ["target_id", "Value"], "rows": [[target, 100.0]],
+                "evidence_dictionary": [{"ledger_id": "S_ABCD0001", "subject": "SIGNAL_A"}]}
+    elif node_id == "global_environment_feed":
+        data = {"columns": ["target_id", "Proxy", "pct_change", "z_score"],
                 "rows": [["SYNTH_RATE", 4.0, 0.1, 0.2]]}
     else:
         data = {"items": [], "synthetic_fixture": True}
@@ -64,18 +62,20 @@ def _author_feeds(root: Path, source: Path) -> list[str]:
 
 
 def _cp1() -> dict:
-    return {"evidence_dictionary": [{"ref_id": "[1]", "ledger_id": "S_ABCD0001", "subject": "ZENX",
-                                     "signal_summary": "Synthetic teaching anchor for the fictional ZENX."}],
+    return {"evidence_dictionary": [{"ref_id": "[1]", "ledger_id": "S_ABCD0001", "subject": "SIGNAL_A",
+                                     "signal_summary": "Synthetic teaching anchor for SIGNAL_A."}],
             "epicentre_thesis": "[1] " + ("Synthetic teaching transmission persists unless the fictional "
-                                          "ZENX price drops below its declared baseline. " * 20)}
+                                          "SIGNAL_A value drops below its declared baseline. " * 20)}
 
 
 def _cp2() -> dict:
     payload = _cp1()
-    payload["predictions_t"] = [{"target_id": "ZENX", "direction": "UP", "snapshot_price": 100.0,
-                                 "target_price": 105.0, "invalidation": "ZENX below 98 at horizon"}]
-    payload["trade_rationale"] = "[1] " + ("Synthetic teaching consequence uses the same baseline and an "
-                                           "explicit horizon invalidation. " * 15)
+    payload["predictions_t"] = [{"target_id": "SIGNAL_A", "direction": "UP", "unit": "dimensionless",
+                                 "snapshot_value": 100.0, "target_value": 105.0,
+                                 "snapshot_time": ANCHOR, "target_time_iso": HORIZON,
+                                 "invalidation": "SIGNAL_A below 98 at horizon"}]
+    payload["forecast_rationale"] = "[1] " + ("Synthetic teaching consequence uses the same baseline and an "
+                                              "explicit horizon invalidation. " * 15)
     return payload
 
 
@@ -89,10 +89,10 @@ def _authored_response(node_id: str) -> str:
         return json.dumps({"swarms": [], "bifurcations": [], "orphans": [], "confidence_asymmetries": []})
     if node_id == "lab_cross_corr_v2":
         return json.dumps({"target_swarms": [], "directional_conflicts": [],
-                           "solo_targets": [{"id": "zen_solo", "name": "Synthetic ZENX",
-                                             "summary": "Fixture grounding only", "tickers": ["ZENX"],
-                                             "lanes": ["STOCK"], "direction_consensus": "BULLISH"}],
-                           "thesis_stress": [], "valid_prediction_targets": ["ZENX"]})
+                           "solo_targets": [{"id": "synthetic_solo", "name": "Synthetic SIGNAL_A",
+                                             "summary": "Fixture grounding only", "target_ids": ["SIGNAL_A"],
+                                             "lanes": ["MEASUREMENTS"], "direction_consensus": "INCREASE"}],
+                           "thesis_stress": [], "valid_prediction_targets": ["SIGNAL_A"]})
     return "Synthetic teaching response; contract plumbing only. " + NOTICE
 
 

@@ -8,11 +8,13 @@ import json
 import math
 import os
 import re
+import time
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 from system.lib import openrouter_free_runtime as api
 from .providers import Provider, digest, now, text_digest, write_json
+from .provider_policy import require_model, require_prices, inference_gate
 
 ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 INPUT_OVERHEAD_TOKENS = 4096
@@ -80,6 +82,7 @@ def reservation_prices(pricing):
 
 
 def budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir):
+    require_model(model)
     if not isinstance(model, str) or "/" not in model or any(c.isspace() for c in model):
         raise ValueError("openrouter_budgeted requires an explicit namespace/model ID")
     if model.startswith("openrouter/") or ":" in model:
@@ -95,6 +98,7 @@ def budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir
 
 
 def verified_model(model: str, *, http_get=None):
+    require_model(model)
     matches = [row for row in api._catalogue_rows(http_get=http_get) if row.get("id") == model]
     if len(matches) != 1:
         raise RuntimeError("budgeted model must exist exactly once in the current public catalogue")
@@ -103,10 +107,11 @@ def verified_model(model: str, *, http_get=None):
     if not isinstance(pricing, dict) or not {"prompt", "completion"} <= pricing.keys():
         raise RuntimeError("budgeted model lacks known prompt/completion pricing")
     prices = reservation_prices(pricing)
+    require_prices(prices)
     if prices.get("input_cache_read", Decimal(0)) > prices["prompt"]:
         raise RuntimeError("cached input read price must not exceed the full prompt price")
     for key, value in prices.items():
-        if key not in ("prompt", "completion", "request", "input_cache_read") and value != 0:
+        if key not in ("prompt", "completion", "request", "input_cache_read", "web_search") and value != 0:
             raise RuntimeError("budgeted adapter rejects ancillary charges")
     architecture = row.get("architecture", {})
     if architecture.get("output_modalities") != ["text"] or "text" not in architecture.get("input_modalities", []):
@@ -143,14 +148,16 @@ def verified_endpoint(model, slug, prices, *, parameters, http_get=None):
         raise RuntimeError("pinned endpoint lacks known prompt/completion pricing")
     # OpenRouter's endpoint discount is descriptive metadata, not a fee.
     rates = reservation_prices({k: v for k, v in pricing.items() if k != 'discount'})
+    require_prices(rates)
     if "discount" in pricing and amount(pricing["discount"], "endpoint discount") > 1:
         raise RuntimeError("pinned endpoint discount metadata is invalid")
     if rates.get("input_cache_read", Decimal(0)) > rates["prompt"]:
         raise RuntimeError("pinned endpoint cached input price exceeds full prompt price")
     if any(v != 0 for k, v in rates.items() if k not in ("prompt", "completion", "request", "input_cache_read")):
         raise RuntimeError("pinned endpoint has unsupported ancillary charges")
-    if any(rates.get(k, Decimal(0)) > prices.get(k, Decimal(0)) for k in ("prompt", "completion", "request")):
-        raise RuntimeError("pinned endpoint pricing exceeds model catalogue reservation rates")
+    # The catalogue advertises a model's cheapest route. A pinned route may
+    # have a different (still policy-capped) tariff; reserve that exact tariff
+    # below instead of mistaking the catalogue minimum for every host's price.
     positive_int(endpoint.get("context_length"), "endpoint context_length")
     positive_int(endpoint.get("max_completion_tokens"), "endpoint max_completion_tokens")
     if endpoint.get("max_prompt_tokens") is not None:
@@ -267,14 +274,21 @@ class OpenRouterBudgetedProvider(Provider):
     ``caller`` is the existing HTTP POST protocol (url, headers, payload, timeout).
     ``catalogue_get`` is its metadata-only GET counterpart. Both are injection
     seams for tests; default transports accept only the official HTTPS host.
+    ``inference_mode='bounded'`` opts a pinned route into host-wide bounded
+    admission. The default remains legacy serial execution.
     """
     def __init__(self, run_dir: Path, model: str, max_cost_usd, max_calls: int,
                  max_output_tokens: int = 4096, budget_dir: Path | None = None,
-                 caller=None, catalogue_get=None, provider_slug=None):
+                 caller=None, catalogue_get=None, provider_slug=None, inference_mode='serial'):
         super().__init__(run_dir)
         self.options = budget_options(model, max_cost_usd, max_calls, max_output_tokens, budget_dir)
         self.model = model
         self.provider_slug = normalize_provider_slug(provider_slug)
+        if inference_mode not in ('serial', 'bounded'):
+            raise ValueError('inference_mode must be serial or bounded')
+        if inference_mode == 'bounded' and self.provider_slug is None:
+            raise ValueError('bounded inference requires a pinned provider_slug')
+        self.inference_mode = inference_mode
         self.budget_dir = Path(self.options["budget_dir"])
         self.caller = caller or api._default_http_post
         self.catalogue_get = catalogue_get
@@ -285,6 +299,8 @@ class OpenRouterBudgetedProvider(Provider):
         binding = {"schema": "zenith_paid_run_binding_v1", "model": self.model, "limits": self.options}
         if self.provider_slug is not None:
             binding["provider_slug"] = self.provider_slug
+        if self.inference_mode != 'serial':
+            binding['inference_mode'] = self.inference_mode
         with self._lock, (handoff / ".budgeted.lock").open("a+") as lock:
             fcntl.flock(lock, fcntl.LOCK_EX)
             try:
@@ -362,7 +378,25 @@ class OpenRouterBudgetedProvider(Provider):
         return None
 
     def ask_ai(self, prompt: str, config: dict | None = None, cancel=None) -> str:
+        with inference_gate(self.inference_mode, self.provider_slug, cancel) as timing:
+            return self._ask_ai(prompt, config, cancel, timing)
+
+    def _ask_ai(self, prompt, config, cancel, timing):
+        reasoning_effort = (config or {}).get('reasoning_effort', 'none')
+        if reasoning_effort not in ('none', 'low', 'medium', 'high'):
+            raise ValueError('reasoning_effort must be none, low, medium or high')
+        system_prompt=(config or {}).get("system_prompt")
+        if system_prompt is not None and not isinstance(system_prompt,str):raise ValueError("system_prompt must be text")
+        response_format=(config or {}).get("response_format")
+        if response_format is not None:
+            if not isinstance(response_format,dict) or response_format.get("type")!="json_schema":
+                raise ValueError("only explicit JSON Schema response formats are supported")
         identity = self.identity(prompt, config)
+        if self.inference_mode != 'serial':
+            identity['inference_mode'] = self.inference_mode
+        if reasoning_effort != 'none':identity['reasoning_effort'] = reasoning_effort
+        if response_format is not None:identity["response_format_sha256"]=digest(response_format)
+        if system_prompt is not None:identity["system_prompt_sha256"]=text_digest(system_prompt)
         self._bind_run()
         call_binding = {**identity, "provider": "openrouter_budgeted", "requested_model": self.model}
         if self.provider_slug is not None:
@@ -378,14 +412,22 @@ class OpenRouterBudgetedProvider(Provider):
         api._official_base_url()
         token = api._resolve_api_key(None)
         row, prices, context_length = verified_model(self.model, http_get=self.catalogue_get)
+        if reasoning_effort != 'none' and 'reasoning' not in row['supported_parameters']:
+            raise RuntimeError('selected model does not advertise reasoning support')
+        catalogue_prices = dict(prices)
+        if response_format is not None and not {"response_format","structured_outputs"} <= set(row["supported_parameters"]):
+            raise RuntimeError("model must advertise structured output and response_format support")
         endpoint = None
         if self.provider_slug is not None:
-            parameters = ["max_tokens", "temperature"] + (["reasoning"] if "reasoning" in row["supported_parameters"] else [])
+            parameters = ["max_tokens", "temperature"] + (["response_format","structured_outputs"] if response_format is not None else []) + (["reasoning"] if "reasoning" in row["supported_parameters"] else [])
             endpoint = verified_endpoint(self.model, self.provider_slug, prices, parameters=parameters,
                                          http_get=self.catalogue_get)
+            endpoint_prices = reservation_prices({k:v for k,v in endpoint["pricing"].items() if k != "discount"})
+            prices = {k:max(prices.get(k,Decimal(0)),endpoint_prices.get(k,Decimal(0))) for k in prices.keys() | endpoint_prices.keys()}
+            require_prices(prices)
             context_length = min(context_length, endpoint["context_length"])
         # One token per UTF8 byte plus a disclosed conservative framing allowance.
-        input_bound = len(prompt.encode("utf-8")) + INPUT_OVERHEAD_TOKENS
+        input_bound = len(prompt.encode("utf-8")) + len((system_prompt or "").encode("utf-8")) + (len(json.dumps(response_format).encode()) if response_format else 0) + INPUT_OVERHEAD_TOKENS
         output_bound = self.options["max_output_tokens"]
         if input_bound + output_bound > context_length:
             raise RuntimeError("conservative UTF8 input bound plus output cap exceeds verified model context")
@@ -405,8 +447,10 @@ class OpenRouterBudgetedProvider(Provider):
                   "reserved_cost_usd": str(reservation), "input_token_bound": input_bound,
                   "input_bound_method": "UTF8 bytes plus 4096 framing tokens",
                   "max_output_tokens": output_bound, "context_length": context_length,
-                  "catalogue_pricing": {k: str(v) for k, v in prices.items()},
-                  "catalogue_sha256": digest(row), "budget_dir": str(self.budget_dir)}
+                  "catalogue_pricing": {k: str(v) for k, v in catalogue_prices.items()},
+                  "reservation_pricing": {k: str(v) for k, v in prices.items()},
+                  "catalogue_sha256": digest(row), "budget_dir": str(self.budget_dir),
+                  **timing, 'network_elapsed_seconds': 0.0}
         if endpoint is not None:
             record.update(requested_provider_slug=self.provider_slug, verified_provider_name=endpoint["provider_name"],
                           endpoint_metadata_sha256=digest(endpoint), endpoint_metadata=endpoint)
@@ -414,6 +458,8 @@ class OpenRouterBudgetedProvider(Provider):
             cached = self._previous(ledger, call_id, identity)
             if cached is not None:
                 return cached
+            if cancel is not None and cancel.is_set():
+                raise RuntimeError('paid call cancelled before reservation')
             if len(ledger["entries"]) >= self.options["max_calls"]:
                 raise RuntimeError("shared paid budget max_calls reached")
             if amount(ledger["total_reserved_usd"]) + reservation > amount(self.options["max_cost_usd"]):
@@ -433,12 +479,21 @@ class OpenRouterBudgetedProvider(Provider):
                                         "prompt": float(prices["prompt"] * 1000000),
                                         "completion": float(prices["completion"] * 1000000),
                                         "request": float(prices.get("request", Decimal(0))), "image": 0}}}
+            # This text-only adapter never enables web-search plugins or :online routing.
+            # A catalogue's optional web_search price therefore is not a requested charge.
+            if system_prompt is not None:payload["messages"].insert(0,{"role":"system","content":system_prompt})
+            if response_format is not None:payload["response_format"]=response_format
             if "reasoning" in row["supported_parameters"]:
-                payload["reasoning"] = {"enabled": False}
+                payload["reasoning"] = ({"enabled": False} if reasoning_effort == 'none' else
+                                        {"effort": reasoning_effort, "exclude": True})
             if self.provider_slug is not None:
                 payload["provider"]["only"] = [self.provider_slug]
-            data = self.caller(ENDPOINT, {"Authorization": "Bearer " + token,
-                                       "Content-Type": "application/json", "Accept": "application/json"}, payload, 120)
+            network_started = time.monotonic()
+            try:
+                data = self.caller(ENDPOINT, {"Authorization": "Bearer " + token,
+                                           "Content-Type": "application/json", "Accept": "application/json"}, payload, 120)
+            finally:
+                record['network_elapsed_seconds'] = time.monotonic() - network_started
             data = api.redact(durable(data), secrets=(token,))
             record["provider_response"] = data
             usage = data.get("usage")
@@ -461,6 +516,7 @@ class OpenRouterBudgetedProvider(Provider):
             actual_model = data.get("model")
             if not isinstance(actual_model, str) or not actual_model.strip():
                 raise RuntimeError("paid response omitted actual model identity")
+            require_model(actual_model)
             actual_provider = data.get("provider")
             record["actual_provider"] = actual_provider
             if endpoint is not None and actual_provider != endpoint["provider_name"]:
@@ -475,7 +531,8 @@ class OpenRouterBudgetedProvider(Provider):
                          requested_model=self.model, actual_model=actual_model, usage=usage, cost=str(cost),
                          reserved_cost_usd=str(reservation), endpoint=ENDPOINT, budget_dir=str(self.budget_dir),
                          response_sha256=text_digest(content), requested_provider_slug=self.provider_slug,
-                         verified_provider_name=record.get("verified_provider_name"), actual_provider=actual_provider)
+                         verified_provider_name=record.get("verified_provider_name"), actual_provider=actual_provider,
+                         **timing, network_elapsed_seconds=record['network_elapsed_seconds'])
             return content
         except BaseException as exc:
             message = api.safe_error(exc, secrets=(token,))
@@ -487,7 +544,8 @@ class OpenRouterBudgetedProvider(Provider):
                          usage=record.get("provider_response", {}).get("usage"), cost=record.get("cost"),
                          reserved_cost_usd=str(reservation), error=message, endpoint=ENDPOINT,
                          requested_provider_slug=self.provider_slug, verified_provider_name=record.get("verified_provider_name"),
-                         actual_provider=record.get("provider_response", {}).get("provider"))
+                         actual_provider=record.get("provider_response", {}).get("provider"),
+                         **timing, network_elapsed_seconds=record['network_elapsed_seconds'])
             raise RuntimeError(message) from None
 
     def _settle(self, call_id, record, call_path, *, halt=False):

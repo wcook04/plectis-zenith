@@ -1,22 +1,9 @@
 # Zenith paper
 
-> **This is not financial advice.** This is experimental research. Historical
-> examples and model outputs are not investment recommendations and must not be
-> used to make financial decisions. See the [research notice](../RESEARCH_NOTICE.md).
+[zenith.pdf](zenith.pdf) is the three-page paper; [zenith.tex](zenith.tex) is its editable source. It describes the native adaptive investigator and controlled procedure-repair loop, including the original expensive-model failure, cheap-model calibration, lossless context repair and unchanged forecasts.
 
-[zenith.pdf](zenith.pdf) is the four-page paper. [zenith.tex](zenith.tex) is its
-complete source, including diagrams and references. Build with
-`tectonic paper/zenith.tex` from the repository root.
+No useful autonomous repair or predictive improvement has been demonstrated. Engineering changes, measured behaviour and protected-case learning remain distinct. The earlier 25/28/3 graph is historical evidence, not the active design.
 
-The paper follows the original idea through mixed earlier/later feed packets and the native
-reasoning graphs. The current receipt records preparation only. It distinguishes
-runtime repairs from improved forecasts. Update its example from configuration-bound receipts;
-keep borrowed methods and data cited where used. Keep it within four pages.
+[Model repair report](../docs/model-repair-20261013.md), [execution status](../docs/status.md), [the evidence receipt](../docs/investigator-evidence.json), [native method](../docs/investigator.md) and [programme](../program.md) provide the implementation and evidence behind the paper.
 
-The paper uses *language-model program*, *discrete prompt optimisation* and
-*context-conditioned prompt selection* to distinguish the graph, its adjustable
-text and the proposed controller. DSPy, MIPRO, ProTeGi and TextGrad are cited at
-their specific uses. Page 3 separates prediction-time prompt assembly from
-development-time fitting; prompt settings and learned controller weights are
-different objects. The [research direction](../docs/research-direction.md)
-contains the fuller terminology and source comparisons.
+Build from the repository root with: tectonic paper/zenith.tex. The source rejects exports longer than three pages.

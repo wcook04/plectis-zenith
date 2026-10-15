@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    return {\\\"query\\\": {\\\"actions\\\": [{\\\"op\\\": \\\"put\\\", \\\"id\\\": 5}, {\\\"op\\\": \\\"delete\\\", \\\"id\\\": 5}, {\\\"op\\\": \\\"put\\\", \\\"id\\\": 2}]}, \\\"note\\\": {\\\"hypothesis\\\": \\\"SQLite AUTOINCREMENT tracks sqlite_sequence maximum even after deletion; parent tracks only live rows, so it returns 3 while native should return 6.\\\"}}\",\"scope\":\"Compare AUTOINCREMENT allocation after delete/reinsert against parent's live-row maximum model.\",\"change\":\"Use put 5, delete 5, then put 2: parent high becomes 2 and predicts 3; native sqlite_sequence retains 5 and should allocate 6.\"}",
+  "prompt_sha256": "61a9730e6faabd4d8027870bec03130902859826a56b835d57051c8ed25d0eb3"
+}

@@ -165,7 +165,7 @@ def freeze(spec_path, study):
     from datetime import timedelta
     if not dev or (hold and max(dev) + timedelta(days=raw['embargo_days']) > min(hold)):
         raise ValueError('development horizons plus embargo must precede holdout')
-    # Native feedback freezes the exact price basis/calendar definition.
+    # Native feedback freezes the exact value basis/calendar definition.
     feedback.policy_from(base / raw['feedback_policy'])
     for key in ('feedback_policy', 'truth_source'):
         relative = f'inputs/{key}.json'
@@ -358,7 +358,7 @@ def _compare(study, spec, state, phase):
                 pending.append(key + ':truth')
                 continue
             # Equal weight per issue, then per preregistered target within issue.
-            loss = sum(r['metrics']['target_price_relative_error'] for r in result['evaluations']) / len(result['evaluations'])
+            loss = sum(r['metrics']['target_value_relative_error'] for r in result['evaluations']) / len(result['evaluations'])
             per_issue_scores[candidate_id][issue_id] = loss
             coverage['status'] = 'complete'
             rows.append(loss)
@@ -378,8 +378,8 @@ def _compare(study, spec, state, phase):
               'paired_delta_interpretation': 'candidate minus baseline issue loss; negative favors candidate; descriptive, not uncertainty or causal attribution',
               'per_issue_coverage': per_issue_coverage,
               'clustered_weeks': len(weeks), 'synthetic_fixture': fixture_flags == {True},
-              'metric': 'mean_issue_mean_target_price_relative_error',
-              'interpretation': 'CP2 target-price error; no return, significance, or LLM forecasting claim',
+              'metric': 'mean_issue_mean_target_value_relative_error',
+              'interpretation': 'CP2 target-value error; no return, significance, or LLM forecasting claim',
               'decisions': {}, 'live_mutation_permission': False}
     result['identity_basis'] = 'declared_agent_response_metadata' if spec['candidates'][0]['provider'] == 'agent' else 'captured_replay_metadata' if spec['candidates'][0]['provider'] == 'captured' else 'provider_attempt_metadata'
     result['evaluation_posture'] = 'matured_frozen_cohort; no prospective preregistration claim'

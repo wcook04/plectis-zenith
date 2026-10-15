@@ -1,0 +1,958 @@
+{
+  "complete": true,
+  "failures": [],
+  "records": [
+    {
+      "task_id": "native-utf8-0",
+      "source_id": "utf8-0",
+      "arms": {
+        "ordinary": {
+          "policy": {
+            "source": "def investigate(context, acquire):\n    receipts = context.get('receipts') or []\n    seen = set()\n    for row in receipts:\n        query = row.get('query') if isinstance(row, dict) else None\n        if isinstance(query, dict):\n            seen.add(repr(query.get('events')))\n    for example in context.get('examples') or []:\n        if isinstance(example, dict) and isinstance(example.get('input'), dict):\n            seen.add(repr(example['input'].get('events')))\n    candidates = [\n        [{'op':'feed','bytes':[224,128]},{'op':'finish'}],\n        [{'op':'feed','bytes':[224,160]},{'op':'finish'}],\n        [{'op':'feed','bytes':[240,143]},{'op':'finish'}],\n        [{'op':'feed','bytes':[240,144]},{'op':'finish'}],\n        [{'op':'feed','bytes':[244,143]},{'op':'finish'}],\n        [{'op':'feed','bytes':[244,144]},{'op':'finish'}],\n        [{'op':'feed','bytes':[237,159]},{'op':'finish'}],\n        [{'op':'feed','bytes':[237,160]},{'op':'finish'}]\n    ]\n    for events in candidates:\n        if repr(events) not in seen:\n            return {'query': {'events': events}, 'note': {'hypothesis': 'Parent uses a single low/high pair for all continuation bytes, so it mishandles 3- and 4-byte UTF-8 boundary sequences such as E0 A0, F0 8F, F4 8F, and ED 9F.'}}\n    return {'query': None, 'note': {'hypothesis': 'No unused discriminating candidate remained.'}}",
+            "scope": "Compare native strict UTF-8 incremental decoding against the parent on boundary continuation bytes for 3- and 4-byte sequences, where the parent reuses one low/high range for every continuation position.",
+            "change": "First unused boundary probe: feed an incomplete E0 A0 prefix then finish, expecting native error while the parent likely accepts it as a complete 3-byte sequence.",
+            "error": null,
+            "call_id": "native-utf8-0-ordinary-policy",
+            "prompt_sha256": "56e0faf56037fd685998df92c19639f8b9f64bcb57a9168bcfe147fcf726ddab",
+            "raw_sha256": "d26c585706170cc11bdf263973130bd5146ba9d85693870e0de198d9108cec7a",
+            "elapsed_seconds": 21.52298358400003
+          },
+          "investigation": {
+            "receipts": [
+              {
+                "slot": 1,
+                "policy_error": "NameError: name 'repr' is not defined"
+              }
+            ],
+            "native_probes": 0,
+            "query_attempts": 0,
+            "query_units": 0,
+            "policy_executions": 1,
+            "slots_used": 1,
+            "detected": false,
+            "semantic_defect": false,
+            "technical_defect": false,
+            "witness_sha256": null
+          },
+          "investigation_elapsed_seconds": 0.044334375008475035,
+          "candidate": {
+            "source": "def investigate(context, acquire):\n    events = context.get('events')\n    if events is None:\n        events = []\n    count = 0\n    status = 'open'\n    pending = []\n    for event in events:\n        op = event.get('op')\n        if op == 'feed':\n            chunk = list(event.get('bytes'))\n            data = pending + chunk\n            pending = []\n            index = 0\n            total = len(data)\n            while index < total:\n                lead = data[index]\n                needed = 0\n                low = 128\n                high = 191\n                if lead < 128:\n                    count += 1\n                    index += 1\n                    continue\n                elif lead < 192:\n                    status = 'error'\n                    break\n                elif lead < 224:\n                    needed = 1\n                    low = 128\n                    high = 191\n                elif lead < 240:\n                    needed = 2\n                    if lead < 225:\n                        low = 160\n                    else:\n                        low = 128\n                    if lead < 237:\n                        high = 191\n                    elif lead == 237:\n                        high = 159\n                    else:\n                        low = 128\n                        high = 191\n                elif lead < 248:\n                    needed = 3\n                    if lead == 240:\n                        low = 144\n                    elif lead < 245:\n                        low = 128\n                    else:\n                        low = 128\n                    if lead < 244:\n                        high = 191\n                    elif lead == 244:\n                        high = 143\n                    else:\n                        low = 128\n                        high = 191\n                else:\n                    status = 'error'\n                    break\n                if index + needed >= total:\n                    pending = data[index:]\n                    index = total\n                    break\n                valid = True\n                position = index + 1\n                step = 0\n                while step < needed:\n                    byte = data[position]\n                    if byte < low or byte > high:\n                        valid = False\n                    position += 1\n                    step += 1\n                    low = 128\n                    high = 191\n                if not valid:\n                    status = 'error'\n                    break\n                count += 1\n                index = position\n            if status == 'error':\n                pending = []\n        elif op == 'finish':\n            if len(pending) > 0:\n                status = 'error'\n                pending = []\n            else:\n                status = 'finished'\n        elif op == 'reset':\n            count = 0\n            status = 'open'\n            pending = []\n    return {'count': count, 'status': status}\n",
+            "scope": "Strict UTF-8 incremental decoder over feed/finish/reset events; preserves pending incomplete sequences, strict lead/continuation range checks, zero contribution on error, and reset semantics.",
+            "change": "Initialize needed, low, and high before every lead-byte branch so ASCII and invalid-lead paths cannot raise UnboundLocalError; use continue for ASCII advancement and retain all prior decoding behavior.",
+            "error": null,
+            "call_id": "native-utf8-0-ordinary-repair",
+            "prompt_sha256": "9a9c0c8e2fe739a887264cca400c3939ee876d1971511483beb68c52daf35bf1",
+            "raw_sha256": "6a420f487b18e4dabf65ec96eb9412419401c88a31add5c96abb2b2672334e73",
+            "elapsed_seconds": 26.031105333997402
+          },
+          "selected": {
+            "source": "def investigate(context, acquire):\n    events = context.get('events')\n    if events is None:\n        events = []\n    count = 0\n    status = 'open'\n    pending = []\n    for event in events:\n        op = event.get('op')\n        if op == 'feed':\n            chunk = list(event.get('bytes'))\n            data = pending + chunk\n            pending = []\n            index = 0\n            total = len(data)\n            while index < total:\n                lead = data[index]\n                needed = 0\n                low = 128\n                high = 191\n                if lead < 128:\n                    count += 1\n                    index += 1\n                    continue\n                elif lead < 192:\n                    status = 'error'\n                    break\n                elif lead < 224:\n                    needed = 1\n                    low = 128\n                    high = 191\n                elif lead < 240:\n                    needed = 2\n                    if lead < 225:\n                        low = 160\n                    else:\n                        low = 128\n                    if lead < 237:\n                        high = 191\n                    elif lead == 237:\n                        high = 159\n                    else:\n                        low = 128\n                        high = 191\n                elif lead < 248:\n                    needed = 3\n                    if lead == 240:\n                        low = 144\n                    elif lead < 245:\n                        low = 128\n                    else:\n                        low = 128\n                    if lead < 244:\n                        high = 191\n                    elif lead == 244:\n                        high = 143\n                    else:\n                        low = 128\n                        high = 191\n                else:\n                    status = 'error'\n                    break\n                if index + needed >= total:\n                    pending = data[index:]\n                    index = total\n                    break\n                valid = True\n                position = index + 1\n                step = 0\n                while step < needed:\n                    byte = data[position]\n                    if byte < low or byte > high:\n                        valid = False\n                    position += 1\n                    step += 1\n                    low = 128\n                    high = 191\n                if not valid:\n                    status = 'error'\n                    break\n                count += 1\n                index = position\n            if status == 'error':\n                pending = []\n        elif op == 'finish':\n            if len(pending) > 0:\n                status = 'error'\n                pending = []\n            else:\n                status = 'finished'\n        elif op == 'reset':\n            count = 0\n            status = 'open'\n            pending = []\n    return {'count': count, 'status': status}\n",
+            "call_id": "native-utf8-0-ordinary-repair",
+            "error": null,
+            "development": {
+              "correct": 7,
+              "total": 8,
+              "errors": 0,
+              "rows": [
+                {
+                  "answer": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": []
+                  },
+                  "expected": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          65
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          194
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          194
+                        ]
+                      },
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          163
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          240,
+                          159,
+                          152,
+                          128
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 0,
+                    "status": "error"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          128
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 0,
+                    "status": "error"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 2,
+                    "status": "error"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          65
+                        ]
+                      },
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          66,
+                          255
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "error"
+                  },
+                  "correct": false
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          226,
+                          130
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      },
+                      {
+                        "op": "reset"
+                      },
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          97
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                }
+              ]
+            },
+            "candidate_selected": true,
+            "preserves_measured_parent_successes": true,
+            "parent_on_final_evidence": {
+              "correct": 6,
+              "total": 8,
+              "errors": 2,
+              "rows": [
+                {
+                  "answer": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": []
+                  },
+                  "expected": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": null,
+                  "trace": [],
+                  "error": "UnboundLocalError: cannot access local variable 'needed' where it is not associated with a value",
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          65
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": false
+                },
+                {
+                  "answer": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          194
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          194
+                        ]
+                      },
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          163
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          240,
+                          159,
+                          152,
+                          128
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 0,
+                    "status": "error"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          128
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 0,
+                    "status": "error"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": null,
+                  "trace": [],
+                  "error": "UnboundLocalError: cannot access local variable 'needed' where it is not associated with a value",
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          65
+                        ]
+                      },
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          66,
+                          255
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "error"
+                  },
+                  "correct": false
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          226,
+                          130
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      },
+                      {
+                        "op": "reset"
+                      },
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          97
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                }
+              ]
+            },
+            "candidate_on_final_evidence": {
+              "correct": 7,
+              "total": 8,
+              "errors": 0,
+              "rows": [
+                {
+                  "answer": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": []
+                  },
+                  "expected": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          65
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          194
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 0,
+                    "status": "open"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          194
+                        ]
+                      },
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          163
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          240,
+                          159,
+                          152,
+                          128
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 0,
+                    "status": "error"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          128
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 0,
+                    "status": "error"
+                  },
+                  "correct": true
+                },
+                {
+                  "answer": {
+                    "count": 2,
+                    "status": "error"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          65
+                        ]
+                      },
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          66,
+                          255
+                        ]
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "error"
+                  },
+                  "correct": false
+                },
+                {
+                  "answer": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "trace": [],
+                  "error": null,
+                  "input": {
+                    "events": [
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          226,
+                          130
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      },
+                      {
+                        "op": "reset"
+                      },
+                      {
+                        "op": "feed",
+                        "bytes": [
+                          97
+                        ]
+                      },
+                      {
+                        "op": "finish"
+                      }
+                    ]
+                  },
+                  "expected": {
+                    "count": 1,
+                    "status": "finished"
+                  },
+                  "correct": true
+                }
+              ]
+            }
+          }
+        }
+      },
+      "parent": {
+        "source": "def investigate(context, acquire):\n    events = context.get('events')\n    if events is None:\n        events = []\n    count = 0\n    status = 'open'\n    pending = []\n    for event in events:\n        op = event.get('op')\n        if op == 'feed':\n            chunk = list(event.get('bytes'))\n            data = pending + chunk\n            pending = []\n            index = 0\n            total = len(data)\n            while index < total:\n                lead = data[index]\n                if lead < 128:\n                    count += 1\n                    index += 1\n                elif lead < 192:\n                    status = 'error'\n                    break\n                elif lead < 224:\n                    needed = 1\n                    low = 128\n                    high = 191\n                elif lead < 240:\n                    needed = 2\n                    if lead < 225:\n                        low = 160\n                    else:\n                        low = 128\n                    if lead < 237:\n                        high = 191\n                    elif lead == 237:\n                        high = 159\n                    else:\n                        low = 128\n                        high = 191\n                elif lead < 248:\n                    needed = 3\n                    if lead == 240:\n                        low = 144\n                    elif lead < 245:\n                        low = 128\n                    else:\n                        low = 128\n                    if lead < 244:\n                        high = 191\n                    elif lead == 244:\n                        high = 143\n                    else:\n                        low = 128\n                        high = 191\n                else:\n                    status = 'error'\n                    break\n                if index + needed >= total:\n                    pending = data[index:]\n                    index = total\n                    break\n                valid = True\n                position = index + 1\n                step = 0\n                while step < needed:\n                    byte = data[position]\n                    if byte < low or byte > high:\n                        valid = False\n                    position += 1\n                    step += 1\n                    low = 128\n                    high = 191\n                if not valid:\n                    status = 'error'\n                    break\n                count += 1\n                index = position\n            if status == 'error':\n                pending = []\n        elif op == 'finish':\n            if len(pending) > 0:\n                status = 'error'\n                pending = []\n            else:\n                status = 'finished'\n        elif op == 'reset':\n            count = 0\n            status = 'open'\n            pending = []\n    return {'count': count, 'status': status}\n",
+        "scope": "Strict incremental UTF-8 decoder over feed/finish/reset events, tracking pending lead bytes and validating continuation ranges for 2-, 3-, and 4-byte sequences.",
+        "change": "Count code points only from successful non-final feeds and a clean finish; any invalid byte or incomplete prefix at finish yields error with zero contribution from that call, while reset clears all state.",
+        "error": null,
+        "call_id": "native-utf8-0-parent",
+        "prompt_sha256": "7528dc381c423d5e822fdaa5074bf47a267b207b9213c0b1ab1d469aea4cf86c",
+        "raw_sha256": "ab6e0e54af8fb33921cda544467c40db61d3130fed493fcc357d6c0acd98dc1b",
+        "elapsed_seconds": 26.589234999992186,
+        "development": {
+          "correct": 6,
+          "total": 8,
+          "errors": 2,
+          "rows": [
+            {
+              "answer": {
+                "count": 0,
+                "status": "open"
+              },
+              "trace": [],
+              "error": null,
+              "input": {
+                "events": []
+              },
+              "expected": {
+                "count": 0,
+                "status": "open"
+              },
+              "correct": true
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "UnboundLocalError: cannot access local variable 'needed' where it is not associated with a value",
+              "input": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      65
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "finished"
+              },
+              "correct": false
+            },
+            {
+              "answer": {
+                "count": 0,
+                "status": "open"
+              },
+              "trace": [],
+              "error": null,
+              "input": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      194
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "open"
+              },
+              "correct": true
+            },
+            {
+              "answer": {
+                "count": 1,
+                "status": "finished"
+              },
+              "trace": [],
+              "error": null,
+              "input": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      194
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      163
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "finished"
+              },
+              "correct": true
+            },
+            {
+              "answer": {
+                "count": 1,
+                "status": "finished"
+              },
+              "trace": [],
+              "error": null,
+              "input": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      240,
+                      159,
+                      152,
+                      128
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "finished"
+              },
+              "correct": true
+            },
+            {
+              "answer": {
+                "count": 0,
+                "status": "error"
+              },
+              "trace": [],
+              "error": null,
+              "input": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      128
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 0,
+                "status": "error"
+              },
+              "correct": true
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "UnboundLocalError: cannot access local variable 'needed' where it is not associated with a value",
+              "input": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      65
+                    ]
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      66,
+                      255
+                    ]
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "error"
+              },
+              "correct": false
+            },
+            {
+              "answer": {
+                "count": 1,
+                "status": "finished"
+              },
+              "trace": [],
+              "error": null,
+              "input": {
+                "events": [
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      226,
+                      130
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  },
+                  {
+                    "op": "reset"
+                  },
+                  {
+                    "op": "feed",
+                    "bytes": [
+                      97
+                    ]
+                  },
+                  {
+                    "op": "finish"
+                  }
+                ]
+              },
+              "expected": {
+                "count": 1,
+                "status": "finished"
+              },
+              "correct": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "protocol_sha256": "4a3578aad941b25f85663341f75e96b4e48373c3515f08002543741b46907ebe"
+}

@@ -1,17 +1,17 @@
 {
-    "id": "version_committer",
-    "type": "tool",
-    "lane": "SPINE",
-    "group": "refinement",
-    "is_artifact": true,
-    "teleology": "Apply dossier_updater CRUD operations to the target dossier JSON file atomically, then record a git commit that links the mutation to the triggering run_id and observation_report.json path.",
-    "mechanism": "Tool node. Reads CRUD array from dossier_updater artifact. Applies set/delete operations to the target dossier file using temp->rename atomic write (consistent with engine._write_artifact). Calls system.lib.git_client.get_head_hash for audit linking. Commits with justification string: 'refine(dossier): {lane} updated by run {run_id} from {observation_report_path}'.",
-    "expectation": "JSON artifact: {applied_ops: int, skipped_ops: int, commit_hash: string, dossier_path: string, run_id: string}.",
-    "instruction": "TOOL NODE — no LLM prompt needed. Execution logic lives in the tool module.\n\nThis node applies CRUD ops produced by dossier_updater to the target dossier file and commits the result to git.\n\nOutputs:\n- applied_ops: number of operations successfully applied\n- skipped_ops: number of operations skipped (e.g., delete on non-existent key)\n- commit_hash: SHA of the git commit made, or 'NO_GIT' if git unavailable\n- dossier_path: repo-relative path of the dossier file mutated\n- run_id: the run_id that triggered this refinement",
-    "config": {
-        "module": "tools.refinement.version_committer"
-    },
-    "dependencies": [
-        "dossier_updater"
-    ]
+  "id": "version_committer",
+  "type": "tool",
+  "lane": "SPINE",
+  "group": "refinement",
+  "is_artifact": true,
+  "teleology": "Apply dossier_updater CRUD operations to the target dossier JSON file atomically, then record a git commit that links the mutation to the triggering run_id and observation_report.json path.",
+  "mechanism": "Tool node. Reads CRUD array from dossier_updater artifact. Applies set/delete operations to the target dossier file using temp->rename atomic write (consistent with engine._write_artifact). Calls system.lib.git_client.get_head_hash for audit linking. Commits with justification string: 'refine(dossier): {lane} updated by run {run_id} from {observation_report_path}'.",
+  "expectation": "JSON artifact: {applied_ops: int, skipped_ops: int, commit_hash: string, dossier_path: string, run_id: string}.",
+  "instruction": "TOOL NODE \u2014 no LLM prompt needed. Execution logic lives in the tool module.\n\nThis node applies CRUD ops produced by dossier_updater to the target dossier file and commits the result to git.\n\nOutputs:\n- applied_ops: number of operations successfully applied\n- skipped_ops: number of operations skipped (e.g., delete on non-existent key)\n- commit_hash: SHA of the git commit made, or 'NO_GIT' if git unavailable\n- dossier_path: repo-relative path of the dossier file mutated\n- run_id: the run_id that triggered this refinement",
+  "config": {
+    "module": "tools.refinement.version_committer"
+  },
+  "dependencies": [
+    "dossier_updater"
+  ]
 }

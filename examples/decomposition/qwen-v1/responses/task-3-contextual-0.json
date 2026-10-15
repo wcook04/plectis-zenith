@@ -1,0 +1,4 @@
+{
+  "raw": "{\n  \"source\": \"def calibrate(x):\\n    return 3 * x\\n\\ndef investigate(context, acquire):\\n    rows = context.get(\\\"rows\\\", [])\\n    if not rows:\\n        return 0\\n    total = sum(calibrate(r) for r in rows)\\n    return total\",\n  \"scope\": \"The `calibrate` function applies the affine transformation s*x + b (with s=3 and b=0 inferred from examples). The `investigate` function processes each row using `calibrate`, sums up the results, and handles empty groups by returning 0.\",\n  \"change\": \"Replaced the previous implementation of `calibrate` to directly apply the affine transformation on individual readings instead of operating on their sum. Updated `investigate` to iterate over rows, applying `calibrate` per reading, and summing the calibrated values.\"\n}",
+  "prompt_sha256": "c6604c867ef284b45b9a54043a4c26a9de2527f24eaa56787aba8b99299d082f"
+}

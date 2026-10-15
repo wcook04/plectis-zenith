@@ -12,6 +12,7 @@ from unittest.mock import patch
 from zenith import cli, offline_example, runtime
 from zenith.providers import NvidiaNimProvider, OpenRouterFreeProvider
 from system.core.loader import _NodeIndexer
+from system.lib.schema_validator import validate_cp1, validate_cp2, validate_cross_corr_v2
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -42,7 +43,7 @@ class OfflineExampleTests(unittest.TestCase):
         cls._temp = tempfile.TemporaryDirectory()
         cls.output = Path(cls._temp.name) / ".hidden parent" / "offline demo output"
         with patch.object(OpenRouterFreeProvider, "ask_ai", side_effect=AssertionError("no provider calls")), \
-                patch.object(NvidiaNimProvider, "ask_ai", side_effect=AssertionError("no provider calls")), \
+                patch.object(NvidiaNimProvider, "__init__", side_effect=AssertionError("no provider construction")), \
                 patch("system.lib.openrouter_free_runtime.chat_completion_packet",
                       side_effect=AssertionError("no network calls")):
             cls.result = offline_example.run(ROOT, cls.output)
@@ -74,6 +75,21 @@ class OfflineExampleTests(unittest.TestCase):
         self.assertFalse(archived["engine_validation"]["engine_accepted"])
         decide = json.loads((self.output / summary["evidence_paths"]["lab_decide_artifact"]).read_text())
         self.assertEqual(decide["status"], "success")
+
+    def test_generic_native_contracts_are_exercised(self):
+        run_dir = self.output / "demo_root" / "runs" / offline_example.RUN_ID
+        artifacts = run_dir / "artifacts"
+        measurements = json.loads((artifacts / "global_measurements_feed.json").read_text())
+        decide = json.loads((artifacts / "lab_decide.json").read_text())
+        director = json.loads((artifacts / "lab_director.json").read_text())
+        cross_corr = json.loads((artifacts / "lab_cross_corr_v2.json").read_text())
+
+        self.assertEqual(measurements["data"]["rows"], [["SIGNAL_A", 100.0]])
+        self.assertTrue(validate_cp1(decide["data"]).ok)
+        self.assertTrue(validate_cp2(director["data"], subject_run_dir=run_dir).ok)
+        self.assertTrue(validate_cross_corr_v2(cross_corr["data"]).ok)
+        self.assertEqual(director["data"]["predictions_t"][0]["target_id"], "SIGNAL_A")
+        self.assertEqual(cross_corr["data"]["solo_targets"][0]["target_ids"], ["SIGNAL_A"])
 
     def test_outputs_are_labelled_synthetic_and_offline(self):
         summary = json.loads((self.output / "summary.json").read_text())

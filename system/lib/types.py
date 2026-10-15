@@ -106,12 +106,12 @@ class StepStatus(str, Enum):
 
 VALID_LANES = frozenset({
     "SPINE",
-    "MACRO",
-    "STOCK",
-    "ETF",
-    "POLYMARKET",
-    "NEWS",
-    "CALCULATOR"
+    "ENVIRONMENT",
+    "MEASUREMENTS",
+    "SUBSYSTEMS",
+    "INTERVENTIONS",
+    "EVENTS",
+    "DERIVED"
 })
 
 # --- CONTRACTS ---

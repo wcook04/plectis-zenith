@@ -118,16 +118,16 @@ def test_oracle_engine_writes_additive_observation_report(tmp_path: Path) -> Non
                     {
                         "ref_id": "[1]",
                         "ledger_id": "S_CAFEBABE",
-                        "subject": "XOM",
-                        "signal_summary": "Subject-side stock support.",
+                        "subject": "SIGNAL_A",
+                        "signal_summary": "Subject-side measurements support.",
                     }
                 ],
                 "predictions_t": [
                     {
-                        "target_id": "XOM",
+                        "target_id": "SIGNAL_A",
                         "direction": "UP",
-                        "snapshot_price": 100.0,
-                        "target_price": 105.0,
+                        "unit": "dimensionless", "snapshot_value": 100.0,
+                        "target_value": 105.0,
                         "invalidation": "Lose support.",
                     }
                 ],
@@ -157,19 +157,19 @@ def test_oracle_engine_writes_additive_observation_report(tmp_path: Path) -> Non
     _write_json(
         engine.run_dir / "artifacts" / "prediction_reconciliation.json",
         {
-            "metadata": {"status": "success", "artifact_alias_of": "oracle_truth_diff_equity"},
+            "metadata": {"status": "success", "artifact_alias_of": "oracle_truth_diff_observations"},
             "data": {
                 "status": "AVAILABLE",
                 "subject_run_id": "RUN_SUBJECT",
                 "truth_run_id": "RUN_TRUTH",
                 "rows": [
                     {
-                        "target_id": "XOM",
-                        "asset_class": "STOCK",
+                        "target_id": "SIGNAL_A",
+                        "target_kind": "MEASUREMENTS",
                         "prediction_direction": "UP",
-                        "subject_snapshot_price": 100.0,
-                        "predicted_target_price": 105.0,
-                        "realized_truth_price": 105.0,
+                        "subject_snapshot_value": 100.0,
+                        "predicted_target_value": 105.0,
+                        "realized_truth_value": 105.0,
                         "absolute_delta": 0.0,
                         "percent_delta": 0.0,
                         "directional_correct": True,
@@ -180,8 +180,8 @@ def test_oracle_engine_writes_additive_observation_report(tmp_path: Path) -> Non
                     "row_count": 1,
                     "directionally_correct_count": 1,
                     "directionally_incorrect_count": 0,
-                    "largest_absolute_miss_target": "XOM",
-                    "largest_percent_miss_target": "XOM",
+                    "largest_absolute_miss_target": "SIGNAL_A",
+                    "largest_percent_miss_target": "SIGNAL_A",
                 },
             },
         },
@@ -191,20 +191,20 @@ def test_oracle_engine_writes_additive_observation_report(tmp_path: Path) -> Non
         {
             "metadata": {"status": "success", "artifact_alias_of": "oracle_attribution_map"},
             "data": {
-                "root_failure_mode": "priced_in_continuation_bias",
+                "root_failure_mode": "valued_in_continuation_bias",
                 "critique_items": [
                     {
                         "scope": "prediction",
-                        "target_or_claim": "XOM",
+                        "target_or_claim": "SIGNAL_A",
                         "subject_grounding_refs": ["[1]", "S_CAFEBABE"],
-                        "realized_refs": ["prediction_reconciliation:XOM"],
+                        "realized_refs": ["prediction_reconciliation:SIGNAL_A"],
                         "error_class": "PREDICTION_DRIFT",
                         "what_was_wrong": "Residual upside was smaller than the original target assumed.",
                     }
                 ],
                 "reconstruction_guidance": {
                     "dominant_force": "Residual energy continuation",
-                    "prefer_targets": ["XOM"],
+                    "prefer_targets": ["SIGNAL_A"],
                     "avoid_targets": ["UAL"],
                     "eligible_ledger_ids": ["S_CAFEBABE"],
                 },
@@ -218,16 +218,16 @@ def test_oracle_engine_writes_additive_observation_report(tmp_path: Path) -> Non
                 {
                     "ref_id": "[1]",
                     "ledger_id": "S_CAFEBABE",
-                    "subject": "XOM",
+                    "subject": "SIGNAL_A",
                     "signal_summary": "Oracle uses the same subject-side grounding.",
                 }
             ],
             "predictions_t": [
                 {
-                    "target_id": "XOM",
+                    "target_id": "SIGNAL_A",
                     "direction": "UP",
-                    "snapshot_price": 100.0,
-                    "target_price": 104.0,
+                    "unit": "dimensionless", "snapshot_value": 100.0,
+                    "target_value": 104.0,
                     "invalidation": "Lose support.",
                 }
             ],
@@ -241,8 +241,8 @@ def test_oracle_engine_writes_additive_observation_report(tmp_path: Path) -> Non
     assert payload["oracle_v1"]["subject_run_id"] == "RUN_SUBJECT"
     assert payload["oracle_v1"]["truth_run_id"] == "RUN_TRUTH"
     assert payload["oracle_v1"]["grading_summary"]["hit_rate"] == 1.0
-    assert payload["oracle_v1"]["attribution_summary"]["root_failure_mode"] == "priced_in_continuation_bias"
-    assert payload["oracle_v1"]["reconstruction_guidance_summary"]["prefer_targets"] == ["XOM"]
+    assert payload["oracle_v1"]["attribution_summary"]["root_failure_mode"] == "valued_in_continuation_bias"
+    assert payload["oracle_v1"]["reconstruction_guidance_summary"]["prefer_targets"] == ["SIGNAL_A"]
 
 
 def test_oracle_engine_writes_additive_observation_report_from_contract_aligned_diff(
@@ -276,16 +276,16 @@ def test_oracle_engine_writes_additive_observation_report_from_contract_aligned_
                     {
                         "ref_id": "[1]",
                         "ledger_id": "S_CAFEBABE",
-                        "subject": "XOM",
-                        "signal_summary": "Subject-side stock support.",
+                        "subject": "SIGNAL_A",
+                        "signal_summary": "Subject-side measurements support.",
                     }
                 ],
                 "predictions_t": [
                     {
-                        "target_id": "XOM",
+                        "target_id": "SIGNAL_A",
                         "direction": "UP",
-                        "snapshot_price": 100.0,
-                        "target_price": 105.0,
+                        "unit": "dimensionless", "snapshot_value": 100.0,
+                        "target_value": 105.0,
                         "invalidation": "Lose support.",
                     }
                 ],
@@ -315,19 +315,19 @@ def test_oracle_engine_writes_additive_observation_report_from_contract_aligned_
     _write_json(
         engine.run_dir / "artifacts" / "prediction_reconciliation.json",
         {
-            "metadata": {"status": "success", "artifact_alias_of": "oracle_truth_diff_equity"},
+            "metadata": {"status": "success", "artifact_alias_of": "oracle_truth_diff_observations"},
             "data": {
                 "status": "AVAILABLE",
                 "subject_run_id": "RUN_SUBJECT",
                 "truth_run_id": "RUN_TRUTH",
                 "rows": [
                     {
-                        "target_id": "XOM",
-                        "asset_class": "STOCK",
+                        "target_id": "SIGNAL_A",
+                        "target_kind": "MEASUREMENTS",
                         "prediction_direction": "UP",
-                        "subject_snapshot_price": 100.0,
-                        "predicted_target_price": 105.0,
-                        "realized_truth_price": 105.0,
+                        "subject_snapshot_value": 100.0,
+                        "predicted_target_value": 105.0,
+                        "realized_truth_value": 105.0,
                         "absolute_delta": 0.0,
                         "percent_delta": 0.0,
                         "directional_correct": True,
@@ -338,8 +338,8 @@ def test_oracle_engine_writes_additive_observation_report_from_contract_aligned_
                     "row_count": 1,
                     "directionally_correct_count": 1,
                     "directionally_incorrect_count": 0,
-                    "largest_absolute_miss_target": "XOM",
-                    "largest_percent_miss_target": "XOM",
+                    "largest_absolute_miss_target": "SIGNAL_A",
+                    "largest_percent_miss_target": "SIGNAL_A",
                 },
             },
         },
@@ -349,20 +349,20 @@ def test_oracle_engine_writes_additive_observation_report_from_contract_aligned_
         {
             "metadata": {"status": "success", "artifact_alias_of": "oracle_attribution_map"},
             "data": {
-                "root_failure_mode": "priced_in_continuation_bias",
+                "root_failure_mode": "valued_in_continuation_bias",
                 "critique_items": [
                     {
                         "scope": "prediction",
-                        "target_or_claim": "XOM",
+                        "target_or_claim": "SIGNAL_A",
                         "subject_grounding_refs": ["[1]", "S_CAFEBABE"],
-                        "realized_refs": ["prediction_reconciliation:XOM"],
+                        "realized_refs": ["prediction_reconciliation:SIGNAL_A"],
                         "error_class": "PREDICTION_DRIFT",
                         "what_was_wrong": "Residual upside was smaller than the original target assumed.",
                     }
                 ],
                 "reconstruction_guidance": {
                     "dominant_force": "Residual energy continuation",
-                    "prefer_targets": ["XOM"],
+                    "prefer_targets": ["SIGNAL_A"],
                     "avoid_targets": ["UAL"],
                     "eligible_ledger_ids": ["S_CAFEBABE"],
                 },
@@ -376,16 +376,16 @@ def test_oracle_engine_writes_additive_observation_report_from_contract_aligned_
                 {
                     "ref_id": "[1]",
                     "ledger_id": "S_CAFEBABE",
-                    "subject": "XOM",
+                    "subject": "SIGNAL_A",
                     "signal_summary": "Oracle uses the same subject-side grounding.",
                 }
             ],
             "predictions_t": [
                 {
-                    "target_id": "XOM",
+                    "target_id": "SIGNAL_A",
                     "direction": "UP",
-                    "snapshot_price": 100.0,
-                    "target_price": 104.0,
+                    "unit": "dimensionless", "snapshot_value": 100.0,
+                    "target_value": 104.0,
                     "invalidation": "Lose support.",
                 }
             ],
@@ -396,13 +396,13 @@ def test_oracle_engine_writes_additive_observation_report_from_contract_aligned_
     payload = json.loads(report_path.read_text(encoding="utf-8"))
 
     assert payload["oracle_v1"]["reconciliation_summary"]["row_count"] == 1
-    assert payload["oracle_v1"]["largest_miss_targets"]["absolute"] == "XOM"
-    assert payload["oracle_v1"]["largest_miss_targets"]["percent"] == "XOM"
+    assert payload["oracle_v1"]["largest_miss_targets"]["absolute"] == "SIGNAL_A"
+    assert payload["oracle_v1"]["largest_miss_targets"]["percent"] == "SIGNAL_A"
     assert payload["oracle_v1"]["grading_summary"]["hits"] == 1
     assert payload["oracle_v1"]["grading_summary"]["hit_rate"] == 1.0
     assert payload["oracle_v1"]["attribution_summary"]["critique_item_count"] == 1
     assert payload["oracle_v1"]["attribution_summary"]["critique_scopes"] == ["prediction"]
-    assert payload["oracle_v1"]["reconstruction_guidance_summary"]["prefer_targets"] == ["XOM"]
+    assert payload["oracle_v1"]["reconstruction_guidance_summary"]["prefer_targets"] == ["SIGNAL_A"]
     assert payload["oracle_v1"]["reconstruction_guidance_summary"]["eligible_ledger_id_count"] == 1
     assert "realized_target_table" not in payload["oracle_v1"]
     assert "top_movers" not in payload["oracle_v1"]
@@ -438,15 +438,15 @@ def test_engine_validates_structured_tool_output_when_output_schema_is_declared(
         )
 
     node = SimpleNamespace(
-        id="oracle_truth_diff_equity",
+        id="oracle_truth_diff_observations",
         meta={},
-        config={"module": "tools.oracle.truth_diff_equity"},
+        config={"module": "tools.oracle.truth_diff_observations"},
         output_schema="schema_prediction_reconciliation",
     )
 
     fake_module = SimpleNamespace(
         run=lambda config, run_dir=None: {
-            "metadata": {"tool": "oracle_truth_diff_equity", "status": "success"},
+            "metadata": {"tool": "oracle_truth_diff_observations", "status": "success"},
             "data": {"status": "AVAILABLE", "subject_run_id": "RUN_SUBJECT", "truth_run_id": "RUN_TRUTH"},
         }
     )

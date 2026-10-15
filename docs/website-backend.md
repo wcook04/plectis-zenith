@@ -1,11 +1,10 @@
 # Website backend
 
-Claude owns the frontend. This Python backend supplies the real graph, the paper
+The Python backend supplies the real graph, the paper
 and its citations, explanations, the preparation receipt, and optional local run
 evidence. It has no model-execution or editing endpoints.
 
-**This is not financial advice.** Keep the [research notice](../RESEARCH_NOTICE.md)
-visible in the website, especially beside financial examples and model output.
+Keep the experimental boundary visible beside examples and model output.
 
 ## Start
 
@@ -60,16 +59,61 @@ measured result is attached to that chapter. `evidence_kind` separates a propose
 an authored mechanism, verified preparation and a research proposal.
 
 `/api/v1/paper` reads the current title and bibliography, including PDF and LaTeX
-hashes, citation IDs, URLs and the manuscript lines where citations are used.
+hashes, citation IDs, URLs and the manuscript lines where citations are used. The current source compiles in the existing editor, while the retained PDF is a previous edition (`pdf_current=false`, `pdf_edition=retained_previous_edition`). Source and PDF are labelled separately; independent file hashes do not prove that they match.
 `/api/v1/documents/paper` returns the exact LaTeX source. Browser-readable
 explanations come from the existing Markdown, including the
 [research direction](research-direction.md) and [spoken walkthrough](zenith-walkthrough-script.md).
 A document response includes its hash, heading line numbers and `base_url` for
 relative links. Sanitize rendered Markdown and treat model output as data.
 
-The experiment has not produced a completed forecast. Successful local JSON
-validation must not be displayed as predictive success. Use the current result
+Use the recorded experiment status. Successful JSON validation alone must not be displayed as predictive success. Use the current result
 documents and receipts instead of hardcoding result counts into the frontend.
+
+The active synthesis is `/api/v1/documents/progress-synthesis`, bound to
+`docs/progress-returns-20261014.md`. Site metadata selects
+`/api/v1/evidence/progress-campaign`, bound to
+`docs/progress-campaign-20261014.json` when that receipt is published. Its
+schema is `zenith_progress_campaign_report_v1`. A missing receipt means current
+results pending; the frontend does not substitute an older campaign. The
+qualification and diagnostic stages retain separate parent populations,
+actual model attempts, known reported costs, unknown-charge attempts and
+confirmation panels. A forfeited protocol version remains visible as an
+engineering failure, not a diagnostic result. The source-bound receipt supplies
+all displayed scores and costs.
+
+The separate `/api/v1/evidence/client-investigation` route reads
+`docs/client-investigation-20261014.json` with schema
+`zenith_client_investigation_report_v1`. Its method is available at
+`/api/v1/documents/client-investigation-protocol`. The frontend renders this
+study's analysis from `/api/v1/documents/client-investigation`. It shows the
+SQLite client pilot independently of the native campaign, including when the
+native receipt is pending. `arm_metrics` supplies the failing-client detection
+denominator and target query counts; model attempts and exact reported cost
+include acquisition and compilation. Protected outcomes are withheld unless
+the pilot and panel are complete. Missing, unavailable or unsupported evidence
+never borrows outcomes from another study. These finite authored checks cannot
+establish independent transfer or a false-accusation rate.
+
+The v1 evidence and document IDs retain their meaning. The separate
+`client-investigation-v2` and `client-investigation-v2-low` evidence and document
+IDs expose the subsequent attempts, while `client-investigation-protocol-v2`
+owns their clarified protocol. The UI displays the latest available version
+and retains links and engineering outcomes for its predecessors. Invalid
+artifacts show skipped target runs, without a measured detection score. Target
+model calls remain separate from full lifecycle attempts and costs.
+
+For a static deployment, the same frontend can read a snapshot with schema
+`zenith_public_api_snapshot_v1`. Its `routes` map contains exact public API
+paths and the JSON bodies produced by this backend. Set `VITE_ZENITH_SNAPSHOT=1`
+and use `VITE_ZENITH_API` plus Vite's `--base` for the deployment prefix.
+One snapshot request supplies the API client; absent routes return an explicit
+404 error. Separate `.json` files preserve queryless API read links. This
+mode has no local-run access and cannot execute models or write state.
+
+`/api/v1/evidence/advance-campaign` and
+`/api/v1/documents/advance-synthesis` retain the earlier campaign. The older
+`observation-learning-result` and `investigation-learning-result` routes keep
+their original schemas and historical evidence boundaries.
 
 ## API
 
@@ -82,13 +126,13 @@ All JSON routes are under `/api/v1`. `GET` and `HEAD` are supported; writes retu
 | `/paper` | Manuscript metadata, citations, citation uses and PDF/source hashes |
 | `/documents/{id}` | Exact Markdown/LaTeX and its source binding |
 | `/graph?mission=lab&focus=lab_cross_corr_v1` | Native nodes, edges, waves and ancestors/descendants |
-| `/nodes/{id}` | Purpose, instruction, expected output, boundary, inputs, consumers and source |
+| `/nodes/{id}?task_profile=financial` | Effective role, instruction, schema, inputs, consumers and profile source |
 | `/evidence/{id}` | Public result/source JSON and its SHA-256 |
 | `/runs?q=JUL20&mission=lab&limit=20&offset=0` | Optional local run index with total and pagination |
 | `/runs/{run_id}/nodes/{node_id}` | Optional local artifact and recorded attempts |
 | `/health` | Version and enabled capabilities |
 
-Missions are `all`, `lab`, `oracle` and `refinement`; `evolve` aliases `refinement`.
+Historical graph missions include `financial_lab`, `financial_oracle` and `financial_refinement`. Their graph responses include effective node hashes, instructions, dependencies and `reasoning_schema`. The generic `all`, `lab`, `oracle` and `refinement` graphs remain available; `evolve` aliases generic `refinement`. Earlier `basket`, `basket_serial` and `basket_evolve` graphs describe the reduced pilot. The current Progress result renders from its source-bound receipt and does not require those historical graphs.
 Site metadata lists document and evidence IDs. The PDF is `/assets/paper.pdf`;
 figure URLs are `/assets/graphs/{id}.svg` and are listed by `/site`.
 
@@ -117,11 +161,10 @@ Local mode rejects remote binds, unapproved origins and nonlocal Host headers.
 ```js
 const api = 'http://127.0.0.1:4175';
 const site = await fetch(`${api}/api/v1/site`).then(r => r.json());
-const graphUrl = site.chapters.find(c => c.id === 'lab').graph_url;
-const graph = await fetch(`${api}${graphUrl}`).then(r => r.json());
-// On node click:
-const node = await fetch(`${api}/api/v1/nodes/${encodeURIComponent(selectedId)}`)
-  .then(r => r.json());
+const resultUrl = site.chapters.find(c => c.id === 'results').evidence_urls[0];
+const receipt = await fetch(`${api}${resultUrl}`).then(r => r.json());
+// Render status and costs even when protected scores are unavailable.
+// Historical graphs remain at /api/v1/graph; use their explicit mission profile.
 // Offer the run selector only when site.local_runs_enabled is true.
 ```
 
@@ -137,24 +180,41 @@ Checks cover native topology, manuscript links, result receipts, HTTP/ETags,
 private/public separation, CORS/Host/method rejection, traversal, symlinks,
 oversized and malformed evidence, and mounting a future frontend build.
 
-## Current mixed-data edition
+## Historical native observation edition
+
+The initial comparison receipt remains immutable. `/api/v1/evidence/observation-screens`
+serves `docs/observation-screens-20261013.json` for the later repair, candidate-pool,
+composition and fixed-inventory selection tests, with separate protocols and cost
+accounting. The historical receipt and manuscript retain their own population;
+they do not overwrite the current Progress comparison.
+
+In that historical edition, `site.data_mode` was `native_observation_research`. Constructed action sequences
+produce actual native SQLite counter and committed-state observations. The
+comparison remains conditional on the frozen software family. The source-bound
+receipt separates primary policies, controls, errors and unsupported exact
+answers; it does not certify arbitrary semantic discovery or production use.
+
+## Retained synthetic edition
 
 Use `site.data_mode`, `site.data_note` and each node's `demo_provenance`.
-The graph has 50 nodes: Lab includes 25 nodes/86 edges, Oracle 28/53.
-The five source lanes plus derived CALC are the current graph; do not hardcode
-historical counts or lanes in the frontend.
+The optional `dossier` contains that lane's current role and evidence contract,
+with its own source path and hash; the inspector exposes it beside the instruction.
+Read current node and edge counts from the API rather than hardcoding them.
+Five synthetic source perspectives describe an invented System A: measurements,
+subsystems, environment, events and interventions. Derived summaries are
+recomputed from supplied inputs. Quantities are abstract and have arbitrary
+or dimensionless units; this is a demonstration of the protocol.
 
-`evidence/sources` now returns `zenith_mixed_demo_v1`: real saved stock, ETF and
-prediction-market inputs, synthetic macro/news, recomputed CALC. Input retention
-and public visibility are separate fields. The raw real inputs remain private.
-`evidence/replacements` contains the complete invented macro/news examples.
-`evidence/demo-result` records six loaded inputs, the pending Seed request and
-zero model calls. Results have evidence kind `verified_preparation`.
+`evidence/sources` describes provenance and hashes. Follow the current site
+manifest for complete synthetic observation payloads and the preparation
+receipt. `evidence/demo-result` establishes preparation only: inputs loaded,
+first request pending, zero model calls and no completed forecast.
+Results have evidence kind `verified_preparation`.
 
-The old `observations`, `window-result` and `conditional-result` routes return
-404. Do not copy their old payloads into a frontend fixture. Fetch the current
-site manifest and follow its evidence URLs. Keep labels visible when opening
-nodes. A missing output means not run; never fill it with a fabricated response.
-The current source instructions are available for every node. Recorded private
-run inputs/outputs are a separate opt-in local capability and are not public
-example data. See [data boundaries](data.md) and [the current demo](demo.md).
+Fetch current evidence URLs; do not restore historical result fixtures as
+results for this configuration. Keep provenance visible when opening nodes.
+Missing output means not run; never fill it with a fabricated response.
+Recorded private runs are an explicit opt-in local capability, excluded from
+public examples. See [data boundaries](data.md) and [the demo](demo.md).
+
+Financial graph node records include `detail_url` for profile-preserving inspection. The node route defaults to the generic fixture for compatibility; use the explicit financial parameter for the research graph. The completed experiment used reasoning schema v3; current contracts are v4 after correcting citation requirements and role separation. Public traces keep their original version.

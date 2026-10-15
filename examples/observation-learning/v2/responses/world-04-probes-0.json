@@ -1,0 +1,83 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "delete",
+        "connection": "main",
+        "key": "a",
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 3
+      }
+    ]
+  ],
+  "purpose": "These three sequences separate the three put conflict modes, the presence/absence of the AFTER INSERT trigger, and the three channel definitions. Sequence 1 distinguishes INSERT OR IGNORE (only first put changes a row) from INSERT OR REPLACE and ON CONFLICT DO UPDATE (all three puts change a row). Sequence 2 adds a delete before the final put, so REPLACE and DO UPDATE differ in whether the final put is an insert or an update, and the trigger fires only on inserts. Sequence 3 wraps the first two puts in a rolled-back transaction, so committed state is empty but channel counters may still reflect the rolled-back changes depending on whether the channel is changes(), total_changes, or total_changes plus other total_changes."
+}

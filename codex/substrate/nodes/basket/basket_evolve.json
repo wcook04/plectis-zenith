@@ -1,0 +1,23 @@
+{
+  "id": "basket_evolve",
+  "type": "reasoning",
+  "group": "basket_evolve",
+  "lane": "SPINE",
+  "dependencies": [
+    "basket_review_feed"
+  ],
+  "meta": {},
+  "is_artifact": true,
+  "teleology": "Propose one bounded investigation instruction from development evidence",
+  "output_schema": "json",
+  "instruction": "Review only these development traces and numerical losses. Propose one reusable change to the basket_plan investigation instruction, preserving its allowed query operations, six-query budget, all-target scoring and cutoff. Do not name a future date, memorise specific outcomes, or claim the change has improved held-out performance. Return JSON {\"skill_addon\":\"one procedural instruction, at most 512 characters\", \"diagnosis\":\"brief evidence-grounded hypothesis\", \"expected_effect\":\"what later comparison should test\"}. If no justified change exists return an empty skill_addon with your explanation. Base model stays fixed.",
+  "platform": "chatgpt",
+  "execution": {
+    "retries": 0,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 120
+  },
+  "routing_class": "SYNTHESIZE",
+  "boundary": "Use only supplied cutoff data. Do not infer physical causality or invent numerical results."
+}

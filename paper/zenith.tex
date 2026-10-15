@@ -1,331 +1,220 @@
 \documentclass[11pt]{article}
-\usepackage[a4paper,margin=23mm]{geometry}
+\usepackage[a4paper,margin=22mm]{geometry}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern,microtype,booktabs,array}
+\usepackage{lmodern,microtype,booktabs,amsmath,array}
 \usepackage[colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage{enumitem,tikz}
-\usetikzlibrary{arrows.meta,positioning,calc,backgrounds}
-\definecolor{ink}{HTML}{23343D}
-\definecolor{teal}{HTML}{246F65}
-\definecolor{wash}{HTML}{EDF5F2}
-\tikzset{record/.style={draw=ink!45,fill=white,rectangle,align=center,font=\small,text=ink,minimum height=12mm},
-operator/.style={draw=ink!50,fill=white,rounded corners=2pt,align=center,font=\small,text=ink,minimum height=12mm},
-checkpoint/.style={record,draw=teal,fill=wash},
-wire/.style={-{Stealth[length=2mm]},draw=ink!70,line width=.65pt,rounded corners=3pt},
-smallnote/.style={font=\footnotesize,text=ink!80,align=left}}
+\usetikzlibrary{arrows.meta,positioning}
 \setlist{nosep,leftmargin=*}
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt}
-\makeatletter
-\def\ps@research{%
-  \def\@oddhead{}\let\@evenhead\@oddhead
-  \def\@oddfoot{\hfil\footnotesize Research prototype. This is not financial advice.\quad\thepage\hfil}%
-  \let\@evenfoot\@oddfoot}
-\makeatother
-\pagestyle{research}
-% Preserve the author's four-page limit in the editor and exported builds.
-\AddToHook{shipout/before}{\ifnum\value{page}>4
-  \PackageError{zenith}{Paper exceeds four pages}{Shorten the paper before publishing.}\fi}
+\setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
+\AddToHook{shipout/before}{\ifnum\value{page}>3
+\PackageError{zenith}{Paper exceeds three pages}{Shorten the paper before publishing.}\fi}
 \begin{document}
 \begin{center}
-{\Large\bfseries Zenith: evaluating revisions to a reasoning graph}\\[4pt]
-Will Cook \quad\textbullet\quad 12 October 2026
+{\Large\bfseries Zenith: programs, experiments and useful memory}\\[4pt]
+Will Cook \quad\textbullet\quad 15 October 2026
 \end{center}
-
-{\small\textbf{This is not financial advice.} This paper describes experimental
-research. Historical examples and model outputs are not investment
-recommendations and must not be used to make financial decisions.}
-
 \hypertarget{idea}{}
-\textbf{Abstract.} Zenith studies whether recurring failures in a multi-stage
-language-model program can guide useful revisions. It records intermediate
-outputs, diagnoses errors and compares one revision with the original on later
-inputs. This edition prepares a mixed demonstration: real saved stock, ETF and
-prediction-market inputs, synthetic macro and news, and recomputed calculator
-summaries. The native graph loads the inputs and prepares its first reasoning
-request. No completed forecast or learned improvement is claimed. We also
-propose a controller that selects small prompt variations from context.
+\textbf{Abstract.}
+Zenith retains executable programs, measured evidence and questions that can
+expose a program's limits. A model proposes an investigation; the host executes
+it against a source; measured discrepancies inform whole-program repair.
+Two acquired testers run unchanged on five authored SQLite clients and detect
+three of four faults without target-stage model calls. Ordinary code reuse ties
+the retained-procedure condition; fixed tests detect all four. The complete
+DeepSeek V4.1 Flash run costs \$0.00712. A separate learner repair preserves the
+history witnessing each new distinction, but a generic control remains cheaper.
+Earlier memory experiments likewise distinguish a useful question from an
+advantageous learning architecture. These reproducible engineering results do
+not establish selective transfer, recursive self-improvement or a general
+advantage over ordinary testing.
 
-\textbf{1. Evaluation protocol.}
-Nodes read supplied evidence or earlier outputs and produce records for later
-nodes. \textbf{Lab} selects assets and forecasts from a saved information cutoff.
-\textbf{Oracle} compares the frozen forecast with later observations and
-proposes a diagnosis; \textbf{Evolve} proposes an instruction, context or
-dependency change. The base language model stays fixed during comparison.
+\textbf{1. Learn code and the questions that challenge it.}
+The retained object is $(P,E,Q)$: a program, source-bound observations and
+executable tests or distinguishing continuations. A useful addition must
+improve later behavior or reduce the work required to acquire it. Cached
+answers, acquired representations and better investigation procedures are
+different possible contributions; each needs its own removal control.
+A graph is one organisation of ordinary code and evidence. It may be revised,
+bypassed or removed when a simpler implementation works better.
 
-\begin{center}
-\begin{tikzpicture}
-\node[smallnote,anchor=west] at (-1.75,.9) {READ ONLY THE EARLIER SNAPSHOT};
-\node[record,minimum width=35mm] (before) at (0,0) {Earlier inputs\\at the cutoff};
-\node[operator,minimum width=37mm] (lab) at (5.2,0) {\textbf{Lab}\\select and predict};
-\node[checkpoint,minimum width=41mm] (frozen) at (10.4,0) {Frozen predictions\\+ node outputs};
-\draw[wire] (before)--(lab);
-\draw[wire] (lab)--(frozen);
-\node[smallnote,anchor=west] at (-1.75,-1.25) {OPEN THE LATER SNAPSHOT};
-\node[record,minimum width=35mm] (after) at (0,-2.15) {Later observations\\after the cutoff};
-\node[operator,minimum width=37mm] (oracle) at (5.2,-2.15) {\textbf{Oracle}\\measure and diagnose};
-\node[operator,minimum width=41mm] (evolve) at (10.4,-2.15) {\textbf{Evolve}\\propose one change};
-\draw[wire] (after)--(oracle);
-\draw[wire] (frozen.south)--(10.4,-.98)--(5.2,-.98)--(oracle.north);
-\draw[wire] (oracle)--(evolve);
-\node[record,draw=teal,dashed,minimum width=112mm,minimum height=17mm] (compare) at (5.2,-4.35)
- {\textbf{Compare on another window}\\Same later inputs: original graph and one revision\\Predeclare the score; record gains and regressions};
-\draw[wire,dashed] (evolve.south)--(10.4,-3.2)--(5.2,-3.2)--(compare.north);
-\end{tikzpicture}
-\end{center}
-{\small Figure 1. Proposed evaluation loop. Preserve the original record before
-revealing the outcome. The dashed step is a separate comparison, not evidence
-that a diagnosis or revision is correct.}
-
-Collect runs with the graph held fixed. Group failures across sliding windows
-and several widths, counting unique cases rather than overlapping windows.
-Freeze one revision and compare it with the baseline on matched later cases.
-Cases used to select a revision become development data for subsequent work.
-
-\textbf{Data and cutoffs.}
-The demonstration keeps real stock, ETF and prediction-market inputs unchanged.
-Only macro and news are independently invented replacements; calculator summaries
-are recomputed from the actual mixed inputs. Per-feed hashes and labels identify
-this construction~\cite{demo}. Real payloads remain private pending publication
-review. A packet can contain a current state or dated histories available at a
-cutoff. Predicting a later state and predicting a path need different targets
-and scores. Saved collection times do not verify every underlying availability
-time, and historical inputs cannot exclude later knowledge in model training.
-
-\textbf{Prior work.}
-DSPy composes LM modules~\cite{dspy}; MIPRO optimises their instructions and
-examples against a downstream metric~\cite{mipro}. These are direct precedents
-for prompt optimisation. AlphaGo Zero~\cite{alphago} and autoresearch~\cite{autores}
-motivated successive version comparisons. Zenith uses finite external histories;
-this prototype establishes no forecasting advantage.
-
-\typeout{ZENITH-END-PAGE-ONE: \thepage}
-\newpage
 \hypertarget{lab}{}
-\textbf{2. The executable graph and failure diagnosis.}
-The Lab has 25 nodes: six feed artifacts and 19 reasoning operators.
-Each miner is a feed-specific analysis step. Saved intermediate records let a
-reviewer locate an unsupported claim and inspect the evidence it received.
-
-\begin{center}
-\begin{tikzpicture}
-\node[record,minimum width=103mm] (feeds) at (5.15,0)
- {\textbf{Saved packet: five feeds + CALC}\\Stocks, ETFs, macro, news, prediction markets};
-\node[operator,minimum width=37mm] (seed) at (13.6,0) {\textbf{Seed}\\data inventory};
-\draw[wire] (feeds)--(seed);
-\node[operator,minimum width=153mm,minimum height=13mm] (first) at (7.65,-1.6)
- {\textbf{First pass: six parallel miners}\\Stock \quad ETF \quad Macro \quad News \quad Markets \quad CALC};
-\draw[wire] (feeds.south)--(5.15,-.98);
-\draw[wire] (seed.south)--(13.6,-.98);
-\node[operator,minimum width=37mm] (cross) at (1.85,-3.2) {\textbf{Synthesis}\\combine observations};
-\node[operator,minimum width=37mm] (orient) at (7.65,-3.2) {\textbf{Orient}\\competing theses};
-\node[checkpoint,minimum width=37mm] (decide) at (13.45,-3.2) {\textbf{Decide $\cdot$ CP1}\\freeze the thesis};
-\draw[wire] (1.85,-2.25)--(cross.north);
-\draw[wire] (cross)--(orient);\draw[wire] (orient)--(decide);
-\node[operator,minimum width=153mm,minimum height=13mm] (second) at (7.65,-4.8)
- {\textbf{Directed evidence pass}\\Six miners re-read the feeds; a second synthesis reconciles their findings};
-\draw[wire] (decide.south)--(13.45,-4.15);
-\node[checkpoint,minimum width=58mm] (director) at (4.3,-6.4)
- {\textbf{Director $\cdot$ CP2}\\freeze predictions};
-\node[operator,minimum width=58mm] (integrity) at (11,-6.4)
- {\textbf{Integrity}\\check both passes};
-\draw[wire] (4.3,-5.45)--(director.north);
-\draw[wire] (director)--(integrity);
-\end{tikzpicture}
-\end{center}
-
-{\small Figure 2. Lab's two passes. ``Synthesis'' denotes the nodes named
-Cross-correlation in the implementation; the second synthesis is grouped with
-the directed pass. CP1 is the saved thesis; in the quantile branch it also
-freezes forecast quantiles, which Director must preserve at CP2.}
+\textbf{Locate the failure before growing the graph.}
+A wrong output may reflect lost information, an incorrect update, an incorrect
+readout of sufficient state, or a boundary absent from the observations.
+The archived SQLite model, for example, retained pending inserts but omitted
+them when reading allocation state inside an open transaction. More state was
+not needed. A rows-only helper in another task really did discard history.
+A local impossibility claim requires two different obligations under the same
+\emph{complete} available input, including hidden state and caller context.
+A node's account of its own limitations is a proposal, not such a certificate.
 
 \hypertarget{oracle}{}
+\textbf{One executable loop.}
+In the native repair study, each investigator sees the public contract, whole
+parent program, examples and its own measured receipts. It returns a query and, optionally, a compact
+hypothesis about the obligation, suspected defect and useful change. The host
+compares the native answer with the parent's answer. A repair can change any
+function, interface or state; selection preserves every previously correct
+measured case as well as the aggregate development result. Ties are retained
+without being called improvements. All proposals and failures remain recorded.
+
 \begin{center}
-\begin{tikzpicture}
-\node[record,minimum width=36mm] (subject) at (0,.1) {Original Lab record};
-\node[record,minimum width=36mm] (truth) at (0,-1.3) {Later feeds};
-\node[operator,minimum width=44mm,minimum height=25mm] (reviews) at (5.5,-.6)
- {\textbf{Compare the evidence}\\Numeric differences\\+ six lane reviews};
-\node[operator,minimum width=37mm,minimum height=25mm] (map) at (11,-.6)
- {\textbf{Evidence summary}\\combined findings};
-\draw[wire] (subject.east)--(3.3,.1);
-\draw[wire] (truth.east)--(3.3,-1.3);
-\draw[wire] (reviews)--(map);
-\node[operator,minimum width=44mm] (explain) at (5.5,-3)
- {\textbf{Failure hypothesis}\\locate and explain the error};
-\node[checkpoint,minimum width=37mm] (out) at (11,-3)
- {\textbf{Oracle CP2}\\record for review};
-\draw[wire] (map.south)--(11,-2.2)--(5.5,-2.2)--(explain.north);
-\draw[wire] (explain)--(out);
+\begin{tikzpicture}[font=\small,box/.style={draw,rounded corners,align=center,
+minimum height=12mm,text width=38mm},>=Stealth,node distance=8mm]
+\node[box] (lab) {Propose a question\\measure the source};
+\node[box,right=of lab] (review) {Compare the program\\repair from evidence};
+\node[box,right=of review] (test) {Freeze and test\\retain useful questions};
+\draw[->] (lab)--(review);\draw[->] (review)--(test);
+\draw[->] (test.south)--++(0,-7mm)-|node[pos=.25,below]{measured evidence and retained experiments} (lab.south);
 \end{tikzpicture}
 \end{center}
-{\small Figure 3. Oracle reviews the saved run against later evidence. Its
-attribution is a hypothesis about a failure, not a causal identification.
-Square boxes are records; rounded boxes are operations or groups. Exact feed,
-skip and cross-pass dependencies are retained in \path{docs/graphs.md}.}
+A better program does not by itself establish a better learning rule. The
+client pilot therefore freezes a tester before later client execution and
+compares it with ordinary reusable code, fresh investigation and fixed tests.
+The public target interface is supplied during acquisition; the client programs
+and measured target outcomes are withheld. This tests reuse on a known task
+family, not discovery of an unseen interface. We charge the cost of getting there.
+\newpage
+\hypertarget{evolve}{}
+\textbf{2. Preserve the experience that justifies a new state.}
+A continuation asks what a source will return after more actions. Two histories
+can have the same present output but different future consequences. An authored
+rational-linear learner uses measured answers to selected continuations as
+state coordinates, then fits transition and readout maps. This follows ordinary
+weighted observation-table learning~\cite{weighted}; the model class and
+extraction procedure are supplied, not invented by a language model.
+
+\textbf{A reproduced learner defect.}
+The earlier implementation could keep a newly distinguishing continuation while
+discarding the access history that witnessed it. The next fitting step then
+lacked the independent evidence needed to represent that distinction. The
+maintained implementation retains both. It also initializes from a nonzero
+finite challenge when the empty word and one-symbol observations are all zero.
+A failed fit must not be interpreted as proof that the source needs a richer
+representation: the learner itself may have lost its witness.
+
+The smallest reproduction observes a queue with capacity four, receiving the
+same unit input repeatedly. Its output is $\min(n,4)$ after $n$ inputs. The
+repaired learner uses ten source calls, fits five rational-linear coordinates
+and agrees on lengths 0--32. That coordinate count is relative to the imposed
+linear class. One nonlinear integer counter with update
+$c\leftarrow\min(c+1,4)$ is simpler. The example demonstrates a concrete
+algorithm repair, not discovery of an optimal representation.
 
 \hypertarget{trace}{}
-Diagnosis first asks what information was available:
+\textbf{Native checks and an ordinary rival.}
+We adapt eight inspected fixtures: three bounded queues, two LRU capacities,
+incremental UTF-8 and two SQLite allocation modes. Both conditions use the
+same authored integer alphabet and finite challenge generator. The default
+refinement is compared with a generic bank of one-symbol questions; that bank
+uses no earlier task experience. Both complete all eight fits.
+
 \begin{center}\small
-\begin{tabular}{@{}p{40mm}p{116mm}@{}}\toprule
-Candidate failure & Question for the saved record \\\midrule
-Evidence unavailable & Was the relevant information absent from the saved input universe?\\
-Evidence not supplied & Was it in that universe but missing from the node's actual input?\\
-Reasoning error & Did the node receive the evidence but draw an unsupported conclusion?\\
-Execution failure & Did truncation, parsing or another runtime error prevent a usable output?\\\bottomrule
-\end{tabular}\end{center}
-Keep unresolved cases unknown. Research performed after the outcome can help
-explain an event, but cannot become evidence the earlier run supposedly had.
-A repeated failure motivates an intervention test; frequency alone does not
-identify its cause.
-
-\typeout{ZENITH-END-PAGE-TWO: \thepage}
-\newpage
-\hypertarget{research}{}
-\textbf{3. Proposed context-conditioned prompts.}
-Each reasoning node would keep a fixed task, input scope, output contract and
-work budget. A shared neural controller would read market-condition features
-available at the cutoff and select small wording variations for that node.
-We call its outputs \emph{prompt settings}: numbers in $[0,1]$ that index an
-ordered catalogue of text variants. They are distinct from the controller's
-learned numerical weights. This extension has not been implemented or tested.
-
-\begin{center}
-\begin{tikzpicture}
-\node[smallnote,anchor=west] at (.15,1) {A. ONE NODE AT PREDICTION TIME; CONTROLLER ALREADY FROZEN};
-\node[record,minimum width=51mm,minimum height=15mm] (signals) at (2.7,0)
- {\textbf{Available context}\\VIX, sentiment, other features};
-\node[operator,draw=teal,fill=wash,minimum width=78mm,minimum height=15mm] (controller) at (10,0)
- {\textbf{Neural prompt controller}\\Shared encoder + a small output head per node};
-\node[record,minimum width=78mm,minimum height=13mm] (settings) at (10,-2)
- {\textbf{Settings for this node}\\One number per component: $(0.1,\ 0.2,\ldots)$};
-\node[record,minimum width=51mm,minimum height=17mm] (core) at (2.7,-4)
- {\textbf{Fixed task specification}\\Job, evidence rules, ranking\\and required output};
-\node[operator,minimum width=78mm,minimum height=17mm] (prompt) at (10,-4)
- {\textbf{Assemble the prompt}\\Fixed instructions + selected text variants\\Save the exact text and version};
-\node[record,minimum width=51mm,minimum height=15mm] (input) at (2.7,-6.1)
- {\textbf{Permitted node inputs}\\Its feed + earlier node outputs};
-\node[operator,minimum width=78mm,minimum height=15mm] (node) at (10,-6.1)
- {\textbf{Perform the same reasoning task}\\Base language model weights stay fixed};
-\node[checkpoint,minimum width=78mm,minimum height=12mm] (output) at (10,-8)
- {\textbf{Saved node output}\\Passed to the next nodes in the graph};
-\begin{pgfonlayer}{background}
-\draw[wire] (signals)--(controller);
-\draw[wire] (controller)--(settings);
-\draw[wire] (settings)--(prompt);
-\draw[wire] (core)--(prompt);
-\draw[wire] (prompt)--(node);
-\draw[wire] (input)--(node);
-\draw[wire] (node)--(output);
-\end{pgfonlayer}
-\node[smallnote,align=left,text width=49mm,anchor=north west] at (.15,-7.45)
- {For the Polymarket miner:\\seed state + its market feed.\\Other nodes have their own\\inputs and prompt components.};
-\end{tikzpicture}
-\end{center}
-{\small Figure 4. Settings select text; they do not multiply evidence or directly
-scale the model's reasoning. For example, 0.1 could select ``consider sentiment
-as one explanation'' and 0.2 ``give sentiment slightly more interpretive weight
-where supported''. Factual filters and ranking rules stay fixed. Nearby settings
-need not produce smoothly varying behaviour.}
-
-\begin{center}
-\begin{tikzpicture}
-\node[smallnote,anchor=west] at (-2.3,.95) {B. DEVELOPMENT BEFORE LATER EVALUATION};
-\node[record,minimum width=46mm,minimum height=14mm] (runs) at (0,0)
- {Context, configurations\\and observed losses};
-\node[operator,minimum width=46mm,minimum height=14mm] (fit) at (5.3,0)
- {Fit or select the controller\\on development cases};
-\node[checkpoint,minimum width=46mm,minimum height=14mm] (freeze) at (10.6,0)
- {Freeze the controller\\then test on later cases};
-\draw[wire] (runs)--(fit);\draw[wire] (fit)--(freeze);
-\end{tikzpicture}
-\end{center}
-A first implementation could search a small catalogue, following discrete
-prompt optimisation~\cite{mipro}. A neural controller could instead learn
-from measured configuration losses. Backpropagation would train that
-controller; hard text selection and hosted LM calls provide no ordinary
-end-to-end derivative. ProTeGi~\cite{protegi} and TextGrad~\cite{textgrad}
-use verbal feedback as a gradient analogy. Such feedback can suggest a
-revision, but is neither a numerical derivative nor proof of its benefit.
-VIX and sentiment are incomplete context features, not a complete regime
-classification. Later test outcomes must remain outside development.
-
-\typeout{ZENITH-END-PAGE-THREE: \thepage}
-\newpage
-\hypertarget{results}{}
-\textbf{4. What the demonstration establishes.}
-The preparation command reads two saved input directories. It copies the real
-stock, ETF and prediction-market artifacts byte for byte, creates the labelled
-macro/news examples without reading their originals, and executes the existing
-calculator on the assembled inputs. The public manifest records source and
-input hashes; the public examples contain only the invented replacements~\cite{demo}.
-
-\begin{center}
-\begin{tabular}{lll}
+\begin{tabular}{lrr}
 \toprule
-Lane & Computation input & Public payload\\
+Acquisition method & Source calls & Completed fits\\
 \midrule
-Stocks, ETFs & Real saved tables & Withheld\\
-Prediction markets & Real saved input & Withheld\\
-Macro, news & Authored synthetic examples & Included\\
-Calculator & Derived from mixed inputs & Withheld\\
+Witness-preserving refinement & 11,395 & 8/8\\
+Generic singleton questions & 11,379 & 8/8\\
 \bottomrule
 \end{tabular}
 \end{center}
+The generic control saves sixteen calls on one queue and ties the other seven.
+There is no learned-memory advantage in this comparison. Later finite panels
+also reveal residual error: UTF-8 scores 4,903/4,913 on length-three words;
+SQLite rowid scores 190/192 and AUTOINCREMENT 191/192 on lengths 16--32.
+Other fixture/panel combinations pass. Acquisition costs exclude later audit
+executions. These eight configurations are an inspected diagnostic workload,
+not eight independent applications or universal equivalence certificates.
 
-Withholding a real payload from the website does not replace it in the actual
-computation. Synthetic examples are not anonymised observations and do not
-establish what happened in the historical market. The real-data source rights
-and permitted downstream uses remain under review; source-code availability
-alone does not settle those questions.
+\textbf{What remains of the earlier memory result.}
+A separate study of six previously acquired program teachers retained the same
+measurement cache in both arms. Keeping acquired questions reduced extension
+queries by 11.2--63.1\% in six declared conditions. Yet acquiring separate
+ordinary modules cost 3,071 source executions, below every joint lifetime
+(5,427--5,698). A frozen follow-up transferring every learned suffix into the
+simpler learner cost 3,541 versus 3,071 and hurt five of six targets. Exact
+certificates there concern supplied rational-linear references, not arbitrary
+native sources. These earlier populations and costs are not pooled with the
+new eight-fixture diagnostic.
 
-\textbf{Verified boundary.}
-The reduced graph passes topology validation. Native Lab execution loads all
-six artifacts and prepares the Seed request, where it awaits an agent response.
-The preparation uses zero model calls. It produces no completed CP1 or CP2,
-forecast, Oracle diagnosis or Evolve comparison. This is an executable input and
-handoff demonstration, not a financial backtest. Historical measurements from
-other configurations are not results for this one.
+A question can be useful memory without every representation or transfer rule
+being worthwhile. The next mechanism must select questions that pay for their
+acquisition and preserve the evidence needed to use them.
+\newpage
+\hypertarget{results}{}
+\textbf{3. Working test reuse and its limits.}
+Five authored SQLite batch clients supply development experience. A model
+compiles a retained investigation procedure and an ordinary reusable tester;
+both then run unchanged on five account-transfer clients, four faulty and one
+correct. Each arm has six query slots per client and stops at a host-verified
+reference/client discrepancy. Invalid and duplicate queries consume slots.
+All target executions finish before a separate 400-case client panel opens.
 
-\textbf{Next evaluation.}
-First fix an authorised data and model setup, with reliable observation clocks.
-Complete Lab, then measure selection coverage, forecast error and cost under
-fixed rules. Use the same fallback for unselected assets and a predeclared
-score, such as quantile loss at fixed levels~\cite{scores}. Compare one revision
-with the baseline on matched later cases. A selected subset can look accurate
-while missing useful targets; selection and conditional prediction error must
-both remain visible. Freeze the change before opening the comparison outcomes.
+\begin{center}\small
+\begin{tabular}{lrrr}
+\toprule
+Method & Faults / 4 & Native probes & Target model calls\\
+\midrule
+Retained procedure & 3 & 5 & 0\\
+Ordinary code reuse & 3 & 5 & 0\\
+Same-history fresh & 3 & 15 & 19\\
+Cold investigation & 3 & 15 & 15\\
+Fixed tester & 4 & 7 & 0\\
+\bottomrule
+\end{tabular}
+\end{center}
+Both compiled programs repeat one constant query and ignore feedback. Each
+spends ten slots on duplicates. Their tests miss a partial-debit fault that
+the fixed tester exposes. The result is working code reuse, not an adaptive
+policy advantage. The task family was inspected during engineering; supplied
+interfaces, shared clients and sequential condition selection preclude an
+independent-transfer or statistical-significance claim.
 
-The proposed controller adds a further hypothesis: whether context-dependent
-prompt choices outperform fixed prompts. Test it on later cases, including
-regime changes, costs and regressions. A mixed-input demonstration cannot
-establish forecasting performance using real macro/news, and a finite later
-sample cannot establish reliability in every possible regime.
+DeepSeek V4.1 Flash, pinned to Morph, used 46 calls for \$0.007117764,
+including development and compilation. Development plus procedure acquisition
+costs \$0.001148298; development plus ordinary preparation costs \$0.000981024.
+These alternatives share the same development cost. Study probes, public
+examples and later checks total 467 reference and 467 client executions.
+Two earlier versions produced stopping or invalid testers. All three versions
+remain published: 133 calls and \$0.019295552. The working condition requests
+low reasoning and a larger output allowance; the provider reports zero
+reasoning tokens. Its success cannot be attributed to reasoning alone.
 
-\begin{thebibliography}{8}\footnotesize
-\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}\setlength{\parsep}{0pt}
-\bibitem{demo} Zenith. \href{https://github.com/wcook04/plectis-zenith/blob/main/docs/demo.md}{Mixed-input demonstration},
-\href{https://github.com/wcook04/plectis-zenith/blob/main/examples/demo/provenance.json}{per-feed provenance} and
-\href{https://github.com/wcook04/plectis-zenith/blob/main/examples/demo/result.json}{preparation receipt}, 2026.
-\bibitem{alphago} D. Silver et al. Mastering the game of Go without human
-knowledge. \emph{Nature} 550:354--359, 2017.
-\href{https://doi.org/10.1038/nature24270}{doi:10.1038/nature24270}.
-\bibitem{autores} A. Karpathy. \emph{autoresearch}. Source inspected at
-\href{https://github.com/karpathy/autoresearch/tree/228791fb499a}{\texttt{228791fb499a}} (code).
-\bibitem{scores} T. Gneiting and A. E. Raftery. Strictly proper scoring rules,
-prediction, and estimation. \emph{JASA} 102(477):359--378, 2007.
-\href{https://doi.org/10.1198/016214506000001437}{doi:10.1198/016214506000001437}.
-\bibitem{dspy} O. Khattab et al. DSPy: Compiling Declarative Language Model Calls
-into Self-Improving Pipelines. \emph{ICLR}, 2024.
-\href{https://arxiv.org/abs/2310.03714}{arXiv:2310.03714}.
-\bibitem{mipro} K. Opsahl-Ong et al. Optimizing Instructions and Demonstrations
-for Multi-Stage Language Model Programs. \emph{EMNLP}, 2024.
-\href{https://arxiv.org/abs/2406.11695v2}{arXiv:2406.11695v2}.
-\bibitem{protegi} R. Pryzant et al. Automatic Prompt Optimization with
-``Gradient Descent'' and Beam Search. \emph{EMNLP}, 2023.
-\href{https://arxiv.org/abs/2305.03495}{arXiv:2305.03495}.
-\bibitem{textgrad} M. Yuksekgonul et al. TextGrad: Automatic
-``Differentiation'' via Text. 2024.
-\href{https://arxiv.org/abs/2406.07496v1}{arXiv:2406.07496v1}.
+% BEGIN current_native_result
+\textbf{Separate investigation diagnostic.}
+On twelve parent episodes from SQLite, LRU and UTF-8 contracts, repair without
+new investigation improves confirmation from 259/576 to 365/576 answers.
+Fixed testing scores 364, compiled investigation 354, a direct batch 339,
+feedback-aware two-turn requests 343 and outcome-masked requests 331.
+The paired feedback gain is twelve answers on one parent; eleven parents tie.
+Only five pairs reach a second decision. Eleven parent programs are unique,
+but there are only three authored mechanisms; case rows are not independent
+replications. No investigation arm beats repair alone. Ling3.1Flash on DeepInfra
+uses 130 calls for \$0.12982944. Separate qualification, failed host admission
+and a funding-only continuation retain their own receipts; no failed attempt
+is erased or counted twice.
+% END current_native_result
+
+\hypertarget{research}{}
+\textbf{Contribution and next test.}
+The open target is selective reuse of questions that pays for its acquisition
+on changed mechanisms, beyond an ordinary tester with the same experience.
+LLM testing with feedback~\cite{coverup,testgen} and reusable skills~\cite{voyager}
+are prior art. Our current contribution is a repaired learner, executable
+comparisons and inspectable negative controls, not a new general learning
+method. Original prompts, replies, failures, sources and offline replays are public.
+
+\begin{thebibliography}{4}\small
+\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
+\bibitem{weighted} J. Worrell. \emph{Exactly Learning Weighted Automata over a Field}.
+\href{https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf}{Oxford lecture notes}.
+\bibitem{coverup} J. A. Pizzorno and E. D. Berger. \emph{CoverUp: Effective High Coverage Test Generation for Python}. 2025.
+\href{https://arxiv.org/abs/2403.16218}{arXiv:2403.16218}.
+\bibitem{testgen} N. Alshahwan et al. \emph{Automated Unit Test Improvement using Large Language Models at Meta}. 2024.
+\href{https://arxiv.org/abs/2402.09171}{arXiv:2402.09171}.
+\bibitem{voyager} G. Wang et al. \emph{Voyager: An Open-Ended Embodied Agent with Large Language Models}. 2023.
+\href{https://arxiv.org/abs/2305.16291}{arXiv:2305.16291}.
 \end{thebibliography}
 \end{document}

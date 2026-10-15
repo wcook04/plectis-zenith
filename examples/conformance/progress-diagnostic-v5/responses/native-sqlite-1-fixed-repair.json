@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    actions = context.get('actions')\\n    if actions is None:\\n        actions = []\\n    high = 0\\n    for action in actions:\\n        op = action.get('op')\\n        if op == 'put':\\n            ident = action.get('id')\\n            if ident > high:\\n                high = ident\\n    return high + 1\\n\",\"scope\":\"Model the native SQLite AUTOINCREMENT allocation as the maximum explicitly inserted ID plus one. Deletes, absent IDs, and rolled-back transactions do not advance the persistent sequence; committed or uncommitted puts do.\",\"change\":\"Replaced the defective top-level program with a single module-level investigate function. It scans the action list, tracks the largest put ID, and returns that maximum plus one, matching all measured examples and the new receipt.\"}",
+  "prompt_sha256": "22eeb3d252da5500eb46a13db9fc93aae87fc544e2f99c108bde188bf5cfaa08"
+}

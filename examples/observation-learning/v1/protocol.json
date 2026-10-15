@@ -1,0 +1,46 @@
+{
+  "schema": "zenith_observation_learning_v1",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "provider_slug": "deepinfra/fp8",
+  "reasoning_effort": "low",
+  "max_cost_usd": "5",
+  "max_output_tokens": 16384,
+  "max_calls": 252,
+  "worlds": 12,
+  "seed": 20261013,
+  "episodes": 3,
+  "probes_per_episode": 3,
+  "proposals_per_episode": 2,
+  "arms": [
+    "incremental",
+    "archive",
+    "fresh"
+  ],
+  "dataset_sha256": "2e316468b8d5b8448941a3fe11d47982317ad6f386a0b6a04bc7e9bd262744de",
+  "source": {
+    "path": "/Users/willcook/src/plectis-zenith-distinctions/work/observation-learning-20261013-v1/runtime-source.zip",
+    "sha256": "e09e7da0d06ea5ad04386bd407e96ffead952a632e758090e8571934a44b8d18",
+    "scope": "Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads"
+  },
+  "acquisition": "One independent model planner proposes three experiments per episode. Host executes these and one fixed challenge. Exact same resulting receipts are broadcast to all arms. Invalid probes are retained as failed experiments, never replaced. This isolates evidence organization, not a causal advantage of acquisition policy.",
+  "construction": "Incremental and execution-enabled archive each receive two proposals at each of three growing evidence prefixes. Fresh compiler receives all final evidence and six proposals. Identical program interface, development scoring, candidate acceptance and total proposal allowance; no cross-arm messages.",
+  "promotion": "Latest valid candidate with development exact score >= champion wins; record all regressions and unchanged hashes. Ties are revisions, not measured improvements. Rejected candidates remain available as search parents. No protected feedback.",
+  "primary": "Final protected exact accuracy per configured world, paired incremental minus archive and incremental minus fresh. Twelve worlds are conditional replications in one native software family, not twelve domains.",
+  "controls": "Replay first accepted checkpoint with final raw evidence (freeze-and-grow), final program with empty evidence, and a cold abstaining program. Evaluate every checkpoint only after ALL model construction calls finish.",
+  "oracle": "Actual native SQLite execution and independent committed-state reader. Goal-specific identification conditional on the frozen 18-member evaluator family. Private configurations and family enumeration never appear in model prompts.",
+  "inference": "No automatic retries or model/provider fallback. Raw content preserved before schema validation. Provider failures stop the campaign; invalid program/schema outputs consume their slot and remain in the archive.",
+  "uncertainty": "World-level paired bootstrap is descriptive of these configured sources. Protected compositions are authored and bounded; no claim of arbitrary semantic discovery, broad intelligence or autonomous ontology invention.",
+  "model_evidence": {
+    "catalogue_sha256": "74c530ba58f4e0963ec6a98cbe0009977799a49793e1e2ea9b97ae492b2fb02e",
+    "verified_date": "2026-10-13",
+    "official_release": "https://www.deepseek.com/en/news/deepseek-v4-1-flash/",
+    "selection": "Recent capable inexpensive coding model; DeepSeek canary passes. The newer Qwen Omni canary returned non-executable source and is retained separately.",
+    "canary": "frontier-model-canary-20261013-deepseek",
+    "canary_reported_cost_usd": "0.00215446",
+    "endpoint_rates_per_million": {
+      "input": "0.14",
+      "output": "0.42"
+    },
+    "spending_ceiling_is_not_expected_cost": true
+  }
+}

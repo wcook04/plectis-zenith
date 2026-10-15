@@ -1,4 +1,4 @@
-"""Local CP2 price-error measurements and review-only recurring feedback."""
+"""Local CP2 value-error measurements and review-only recurring feedback."""
 
 from .engine import register, score, summary, propose
 

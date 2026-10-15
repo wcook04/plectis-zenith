@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { Graph } from '../api';
 import { layoutGraph, neighbourhood } from '../components/graph/layout';
 import { aggregateState, normalizeState } from '../lib/status';
-import { latexToText } from '../lib/latex';
+import { latexToText, sectionTitle, shortCitation } from '../lib/latex';
+import { figureUrl } from '../components/Markdown';
 import { nearestVariant, parseVariants } from '../components/Research';
 import fixture from './fixtures/lab-topology.json';
 
@@ -50,7 +51,7 @@ describe('graph layout', () => {
   it('expands a family into its native members', () => {
     const layout = layoutGraph(lab, new Set(['miners']));
     const miners = layout.items.filter((i) => i.kind === 'node' && i.id.startsWith('lab_miner_') && !i.id.includes('v2'));
-    expect(miners).toHaveLength(7);
+    expect(miners).toHaveLength(6);
     expect(layout.frames.map((f) => f.id)).toContain('frame:miners');
   });
 
@@ -58,7 +59,7 @@ describe('graph layout', () => {
     const n = neighbourhood(lab, 'lab_cross_corr_v1');
     expect([...n.inputs].every((id) => id.startsWith('lab_miner_'))).toBe(true);
     expect(n.consumers.has('lab_orient')).toBe(true);
-    expect(n.ancestors.has('global_stock_feed')).toBe(true);
+    expect(n.ancestors.has('global_measurements_feed')).toBe(true);
     expect(n.descendants.has('lab_integrity')).toBe(true);
   });
 });
@@ -70,6 +71,26 @@ describe('run states', () => {
     expect(normalizeState('not_reached')).toBe('not_reached');
     expect(aggregateState(['loaded', 'loaded'])).toBe('loaded');
     expect(aggregateState(['loaded', 'failure'])).toBe('failure');
+  });
+});
+
+describe('paper and figure helpers', () => {
+  it('labels margin citations by author and year', () => {
+    expect(shortCitation('D. Silver et al. Mastering the game of Go without human knowledge. \\emph{Nature} 550:354--359, 2017.')).toBe('Silver et al. 2017');
+    expect(shortCitation('Zenith. \\href{https://x}{Original-feed window experiment}, 12 October 2026.')).toBe('Zenith 2026: Original-feed window experiment');
+    expect(shortCitation('K. Ellis et al. DreamCoder. 2020. \\href{https://arxiv.org/abs/2006.08381}{arXiv:2006.08381}.')).toBe('Ellis et al. 2020');
+  });
+
+  it('reads section titles from the manuscript', () => {
+    const tex = ['\\hypertarget{lab}{}', '\\textbf{2. The executable graph and failure diagnosis.}', 'text', '\\hypertarget{oracle}{}', 'figure'].join('\n');
+    expect(sectionTitle(tex, 1, 3)).toBe('Section 2, The executable graph and failure diagnosis');
+    expect(sectionTitle(tex, 4, 5)).toBe('Section 2, The executable graph and failure diagnosis');
+  });
+
+  it('maps repository figures to the backend asset routes', () => {
+    const figures = { lab: '/assets/graphs/lab.svg' };
+    expect(figureUrl('https://github.com/wcook04/plectis-zenith/blob/main/docs/graphs/lab.svg', figures)).toBe('/assets/graphs/lab.svg');
+    expect(figureUrl('https://example.org/x.png', figures)).toBe('https://example.org/x.png');
   });
 });
 

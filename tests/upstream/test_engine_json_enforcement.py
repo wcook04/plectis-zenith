@@ -55,8 +55,8 @@ def _words(n: int, cite: str = "") -> str:
 
 def _minimal_evidence_cp1() -> List[Dict[str, Any]]:
     return [
-        {"ref_id": "[1]", "ledger_id": "M_DEADBEEF", "subject": "MACRO_REGIME", "signal_summary": "A macro signal."},
-        {"ref_id": "[2]", "ledger_id": "S_CAFEBABE", "subject": "XLK", "signal_summary": "XLK stock signal."},
+        {"ref_id": "[1]", "ledger_id": "M_DEADBEEF", "subject": "ENVIRONMENT_REGIME", "signal_summary": "A environment signal."},
+        {"ref_id": "[2]", "ledger_id": "S_CAFEBABE", "subject": "SUBSYSTEM_C", "signal_summary": "SUBSYSTEM_C measurements signal."},
     ]
 
 
@@ -71,39 +71,39 @@ def _minimal_cp2_payload() -> Dict[str, Any]:
     base = _minimal_cp1_payload()
     base["predictions_t"] = [
         {
-            "target_id": "XLK",
+            "target_id": "SUBSYSTEM_C",
             "direction": "DOWN",
-            "snapshot_price": 100.0,
-            "target_price": 95.0,
-            "invalidation": "Invalidated if XLK reclaims VWAP and holds above 197 by 15:30 ET.",
+            "unit": "dimensionless", "snapshot_value": 100.0,
+            "target_value": 95.0,
+            "invalidation": "Invalidated if SUBSYSTEM_C reclaims VWAP and holds above 197 by 15:30 ET.",
         }
     ]
-    base["trade_rationale"] = _words(103, "[1] [2]")
+    base["forecast_rationale"] = _words(103, "[1] [2]")
     return base
 
 
 def _minimal_realized_hindsight_brief_payload() -> Dict[str, Any]:
     return {
         "status": "AVAILABLE",
-        "realized_dominant_force": "Oil shock continuation with partial residual repricing.",
+        "realized_dominant_force": "Oil shock continuation with partial residual change.",
         "regime_summary": "Energy led realized upside while residual breadth stayed constrained.",
         "driver_classification": [
             {
                 "driver": "Oil shock continuation",
-                "classification": "PARTIAL_REPRICING",
+                "classification": "PARTIAL_CHANGE",
                 "why": "Continuation was visible at T-n, but the final magnitude still surprised.",
-                "supporting_lanes": ["STOCK", "ETF", "MACRO"],
-                "affected_targets": ["XOM", "XLE"],
+                "supporting_lanes": ["MEASUREMENTS", "SUBSYSTEMS", "ENVIRONMENT"],
+                "affected_targets": ["SIGNAL_A", "XLE"],
             }
         ],
-        "already_priced_packages": ["Baseline energy continuation"],
+        "already_observed_packages": ["Baseline energy continuation"],
         "surprise_packages": ["Residual supply squeeze"],
-        "partial_repricing_packages": ["Oil shock continuation"],
+        "partial_change_packages": ["Oil shock continuation"],
         "prediction_target_outcomes": [
             {
-                "target_id": "XOM",
-                "what_happened": "XOM rallied but by less than the forward target implied.",
-                "pricing_judgement": "PARTIAL_REPRICING",
+                "target_id": "SIGNAL_A",
+                "what_happened": "SIGNAL_A rallied but by less than the forward target implied.",
+                "availability_judgement": "PARTIAL_CHANGE",
             }
         ],
     }
@@ -112,13 +112,13 @@ def _minimal_realized_hindsight_brief_payload() -> Dict[str, Any]:
 def _minimal_cp2_critique_payload() -> Dict[str, Any]:
     return {
         "status": "AVAILABLE",
-        "root_failure_mode": "priced_in_continuation_bias",
+        "root_failure_mode": "valued_in_continuation_bias",
         "critique_items": [
             {
                 "scope": "prediction",
-                "target_or_claim": "XOM",
+                "target_or_claim": "SIGNAL_A",
                 "subject_grounding_refs": ["[1]", "S_CAFEBABE"],
-                "realized_refs": ["prediction_reconciliation:XOM"],
+                "realized_refs": ["prediction_reconciliation:SIGNAL_A"],
                 "error_class": "PREDICTION_DRIFT",
                 "what_was_wrong": "The target level overstated residual upside.",
                 "comparison_to_ideal": "Ideal CP2 should have kept the name but narrowed the magnitude.",
@@ -127,28 +127,28 @@ def _minimal_cp2_critique_payload() -> Dict[str, Any]:
         "comparison_to_ideal_summary": "Lab generally found the right lane but overshot the consequence sizing.",
         "reconstruction_guidance": {
             "dominant_force": "Residual energy continuation",
-            "prefer_targets": ["XOM"],
+            "prefer_targets": ["SIGNAL_A"],
             "avoid_targets": ["UAL"],
             "eligible_ledger_ids": ["S_CAFEBABE"],
         },
     }
 
 
-def _write_stock_feed(artifacts_dir: Path, tickers: List[str]) -> None:
-    """Write a minimal STOCK feed artifact for CP2 universe check."""
+def _write_measurements_feed(artifacts_dir: Path, target_ids: List[str]) -> None:
+    """Write a minimal MEASUREMENTS feed artifact for CP2 universe check."""
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     feed = {
         "metadata": {"as_of": "2026-01-01"},
         "data": {
             "topic": {
                 "row": {
-                    "columns": ["Ticker", "Price"],
-                    "rows": [[t, "100.0"] for t in tickers],
+                    "columns": ["target_id", "Value"],
+                    "rows": [[t, "100.0"] for t in target_ids],
                 }
             }
         },
     }
-    (artifacts_dir / "global_stock_feed.json").write_text(json.dumps(feed))
+    (artifacts_dir / "global_measurements_feed.json").write_text(json.dumps(feed))
 
 
 def _write_subject_snapshot_cp_artifact(artifacts_dir: Path) -> None:
@@ -159,14 +159,14 @@ def _write_subject_snapshot_cp_artifact(artifacts_dir: Path) -> None:
             {
                 "ref_id": "[1]",
                 "ledger_id": "M_DEADBEEF",
-                "subject": "MACRO_REGIME",
-                "signal_summary": "Macro snapshot evidence.",
+                "subject": "ENVIRONMENT_REGIME",
+                "signal_summary": "Environment snapshot evidence.",
             },
             {
                 "ref_id": "[2]",
                 "ledger_id": "S_CAFEBABE",
-                "subject": "XLK",
-                "signal_summary": "Stock snapshot evidence.",
+                "subject": "SUBSYSTEM_C",
+                "signal_summary": "Measurements snapshot evidence.",
             },
         ]
     }
@@ -193,7 +193,7 @@ def _make_node(
     node.instruction = "Test prompt"
     node.output_schema = output_schema
     node.execution = {"retries": retries}
-    node.lane = "STOCK"
+    node.lane = "MEASUREMENTS"
     node.config = {}
     node.config_ref = ""
     node.merged_hash = ""
@@ -449,7 +449,7 @@ class TestCP1Validation:
 class TestCP2Validation:
     def test_cp2_validation_success(self, tmp_path):
         engine = _make_engine(tmp_path)
-        _write_stock_feed(engine.run_dir / "artifacts", ["XLK", "SPY", "AAPL"])
+        _write_measurements_feed(engine.run_dir / "artifacts", ["SUBSYSTEM_C", "SUBSYSTEM_A", "SIGNAL_B"])
         node = _make_node(output_schema="isomorphic_cp2")
         payload = _minimal_cp2_payload()
         engine.bridge.manager.ask_ai.return_value = json.dumps(payload)
@@ -460,10 +460,10 @@ class TestCP2Validation:
         assert "predictions_t" in data
 
     def test_cp2_validation_with_oracle_subject_run_dir(self, tmp_path):
-        # Create a fake "lab run" with stock feed for universe check
+        # Create a fake "lab run" with measurements feed for universe check
         lab_run_dir = tmp_path / "lab_run"
         lab_run_dir.mkdir()
-        _write_stock_feed(lab_run_dir / "artifacts", ["XLK", "SPY", "AAPL"])
+        _write_measurements_feed(lab_run_dir / "artifacts", ["SUBSYSTEM_C", "SUBSYSTEM_A", "SIGNAL_B"])
         _write_subject_snapshot_cp_artifact(lab_run_dir / "artifacts")
 
         engine = _make_engine(tmp_path, oracle_subject_run_dir=str(lab_run_dir))
@@ -474,15 +474,15 @@ class TestCP2Validation:
         meta, data = engine._exec_reasoning(node, {}, {"platform": "chatgpt"})
 
         assert isinstance(data, dict)
-        assert data["predictions_t"][0]["target_id"] == "XLK"
+        assert data["predictions_t"][0]["target_id"] == "SUBSYSTEM_C"
 
     def test_cp2_out_of_universe_via_oracle_dir(self, tmp_path):
-        """Oracle subject_run_dir has feed without XLK → OUT_OF_UNIVERSE → hard-fail."""
+        """Oracle subject_run_dir has feed without SUBSYSTEM_C → OUT_OF_UNIVERSE → hard-fail."""
         from system.core.engine import LogicalFailure
 
         lab_run_dir = tmp_path / "lab_run"
         lab_run_dir.mkdir()
-        _write_stock_feed(lab_run_dir / "artifacts", ["SPY", "AAPL"])  # no XLK
+        _write_measurements_feed(lab_run_dir / "artifacts", ["SUBSYSTEM_A", "SIGNAL_B"])  # no SUBSYSTEM_C
         _write_subject_snapshot_cp_artifact(lab_run_dir / "artifacts")
 
         engine = _make_engine(tmp_path, oracle_subject_run_dir=str(lab_run_dir))
@@ -508,7 +508,7 @@ class TestOracleStructuredJsonValidation:
 
         assert isinstance(data, dict)
         assert data["status"] == "AVAILABLE"
-        assert data["driver_classification"][0]["classification"] == "PARTIAL_REPRICING"
+        assert data["driver_classification"][0]["classification"] == "PARTIAL_CHANGE"
 
     def test_cp2_critique_validation_failure_retry_success(self, tmp_path):
         engine = _make_engine(tmp_path)
@@ -519,7 +519,7 @@ class TestOracleStructuredJsonValidation:
         )
         invalid_payload = {
             "status": "AVAILABLE",
-            "root_failure_mode": "priced_in_continuation_bias",
+            "root_failure_mode": "valued_in_continuation_bias",
             "critique_items": [{"scope": "bad_scope"}],
         }
         valid_payload = _minimal_cp2_critique_payload()
@@ -542,7 +542,7 @@ class TestOracleStructuredJsonValidation:
 class TestAliasCoercion:
     def test_isomorphic_v1_alias_coercion(self, tmp_path, caplog):
         engine = _make_engine(tmp_path)
-        _write_stock_feed(engine.run_dir / "artifacts", ["XLK", "SPY", "AAPL"])
+        _write_measurements_feed(engine.run_dir / "artifacts", ["SUBSYSTEM_C", "SUBSYSTEM_A", "SIGNAL_B"])
         node = _make_node(output_schema="isomorphic_v1")
         payload = _minimal_cp2_payload()
         engine.bridge.manager.ask_ai.return_value = json.dumps(payload)
@@ -582,7 +582,7 @@ class TestToolRuntimeConfigInjection:
         engine = _make_engine(tmp_path)
         node = _make_node()
         node.type = NodeType.TOOL
-        node.config = {"module": "tools.calculator.calculator"}
+        node.config = {"module": "tools.derived.derived"}
 
         merged = engine._merge_runtime_config(node)
 
@@ -597,7 +597,7 @@ class TestToolRuntimeConfigInjection:
         node = _make_node()
         node.type = NodeType.TOOL
         node.config = {
-            "module": "tools.macro.macro",
+            "module": "tools.environment.environment",
             "runtime": {
                 "time_anchor": "2025-01-01T00:00:00+00:00",
                 "lookback_years": 5,
@@ -639,18 +639,18 @@ class TestOracleFeedHydration:
         truth_dir = tmp_path / "truth_run"
         subject_dir.mkdir()
         truth_dir.mkdir()
-        _write_stock_feed(subject_dir / "artifacts", ["SUBJ"])
-        _write_stock_feed(truth_dir / "artifacts", ["TRUTH"])
+        _write_measurements_feed(subject_dir / "artifacts", ["SUBJ"])
+        _write_measurements_feed(truth_dir / "artifacts", ["TRUTH"])
 
         engine = _make_engine(
             tmp_path,
             oracle_subject_run_dir=str(subject_dir),
             oracle_truth_run_dir=str(truth_dir),
         )
-        node = _make_node(node_id="global_stock_feed")
+        node = _make_node(node_id="global_measurements_feed")
         node.type = NodeType.TOOL
         node.meta = {"is_feed": True}
-        node.config = {"module": "tools.stock.stock"}
+        node.config = {"module": "tools.measurements.measurements"}
 
         meta, data = engine._exec_tool(node, {}, {"platform": "chatgpt"})
 
@@ -666,26 +666,26 @@ class TestExecutionScopeResolution:
     def test_scope_includes_group_siblings_and_target_dependencies(self, tmp_path):
         engine = _make_engine(tmp_path)
         engine._universe = {
-            "global_calculator_feed": CodexNode(
-                id="global_calculator_feed",
+            "global_derived_feed": CodexNode(
+                id="global_derived_feed",
                 type=NodeType.TOOL,
                 group="feeds",
-                dependencies=("global_stock_feed", "global_macro_feed"),
+                dependencies=("global_measurements_feed", "global_environment_feed"),
             ),
-            "global_stock_feed": CodexNode(
-                id="global_stock_feed",
-                type=NodeType.TOOL,
-                group="feeds",
-                dependencies=(),
-            ),
-            "global_macro_feed": CodexNode(
-                id="global_macro_feed",
+            "global_measurements_feed": CodexNode(
+                id="global_measurements_feed",
                 type=NodeType.TOOL,
                 group="feeds",
                 dependencies=(),
             ),
-            "global_news_feed": CodexNode(
-                id="global_news_feed",
+            "global_environment_feed": CodexNode(
+                id="global_environment_feed",
+                type=NodeType.TOOL,
+                group="feeds",
+                dependencies=(),
+            ),
+            "global_events_feed": CodexNode(
+                id="global_events_feed",
                 type=NodeType.TOOL,
                 group="feeds",
                 dependencies=(),
@@ -698,25 +698,25 @@ class TestExecutionScopeResolution:
             ),
         }
 
-        engine._resolve_execution_scope("global_calculator_feed")
+        engine._resolve_execution_scope("global_derived_feed")
 
-        assert "global_calculator_feed" in engine._execution_scope
-        assert "global_stock_feed" in engine._execution_scope
-        assert "global_macro_feed" in engine._execution_scope
-        assert "global_news_feed" in engine._execution_scope
+        assert "global_derived_feed" in engine._execution_scope
+        assert "global_measurements_feed" in engine._execution_scope
+        assert "global_environment_feed" in engine._execution_scope
+        assert "global_events_feed" in engine._execution_scope
         assert "lab_director" not in engine._execution_scope
 
     def test_scope_includes_upstream_dependencies_outside_group(self, tmp_path):
         engine = _make_engine(tmp_path)
         engine._universe = {
-            "global_calculator_feed": CodexNode(
-                id="global_calculator_feed",
+            "global_derived_feed": CodexNode(
+                id="global_derived_feed",
                 type=NodeType.TOOL,
                 group="feeds",
-                dependencies=("global_stock_feed",),
+                dependencies=("global_measurements_feed",),
             ),
-            "global_stock_feed": CodexNode(
-                id="global_stock_feed",
+            "global_measurements_feed": CodexNode(
+                id="global_measurements_feed",
                 type=NodeType.TOOL,
                 group="feeds",
                 dependencies=("shared_seed",),
@@ -729,7 +729,7 @@ class TestExecutionScopeResolution:
             ),
         }
 
-        engine._resolve_execution_scope("global_calculator_feed")
+        engine._resolve_execution_scope("global_derived_feed")
 
         assert "shared_seed" in engine._execution_scope
 
@@ -884,51 +884,20 @@ class TestWebSearchContractInjection:
         assert data["status"] == "OPTIONAL"
 
 
-def test_gather_inputs_compresses_dense_stock_feed_for_reasoning_nodes(tmp_path: Path) -> None:
+def test_gather_inputs_preserves_every_dense_observation_for_reasoning_nodes(tmp_path: Path) -> None:
     engine = _make_engine(tmp_path)
-    artifacts_dir = engine.artifacts_dir
-    artifacts_dir.mkdir(parents=True, exist_ok=True)
-
-    rows: List[List[Any]] = []
-    for idx in range(100):
-        rows.append(
-            [
-                "tech",
-                f"T{idx:03d}",
-                f"Ticker {idx}",
-                100.0 + idx,
-                0.2,
-                float(idx - 50),
-                float(idx - 25),
-                0.5,
-                0.25,
-            ]
-        )
-
-    envelope = {
-        "metadata": {"tool": "stock", "diagnostics": {}},
-        "data": {
-            "columns": ["Category", "Ticker", "Identity", "Price", "Vol_20d", "Chg_5d", "Chg_63d", "Z_Short", "Z_Long"],
-            "rows": rows,
-        },
-    }
-    (artifacts_dir / "global_stock_feed.json").write_text(json.dumps(envelope), encoding="utf-8")
-
-    node = MagicMock()
-    node.dependencies = ("global_stock_feed",)
-    node.type = NodeType.REASONING
-
-    inputs = engine._gather_inputs(node)
-
-    compressed = inputs["global_stock_feed"]
-    compressed_data = compressed["data"]
-    assert compressed_data["full_row_count"] == 100
-    assert len(compressed_data["rows"]) < 100
-    assert compressed_data["semantic_compression"]["mode"] == "omit_the_middle"
-    assert compressed["metadata"]["prompt_input_compression"] == "omit_the_middle"
+    engine.artifacts_dir.mkdir(parents=True, exist_ok=True)
+    rows = [[f"TARGET_{idx:03d}",float(idx-50),"dimensionless"] for idx in range(100)]
+    envelope={"metadata":{"tool":"local_observations"},"data":{"columns":["target_id","Value","unit"],"rows":rows}}
+    (engine.artifacts_dir/"global_measurements_feed.json").write_text(json.dumps(envelope))
+    node=MagicMock();node.dependencies=("global_measurements_feed",);node.type=NodeType.REASONING
+    projected=engine._gather_inputs(node)["global_measurements_feed"]
+    assert projected["data"]["rows"]==rows
+    assert len(projected["data"]["rows"])==100
+    assert "prompt_input_compression" not in projected.get("metadata",{})
 
 
-def test_gather_inputs_preserves_full_stock_feed_for_oracle_mode(tmp_path: Path) -> None:
+def test_gather_inputs_preserves_full_measurements_feed_for_oracle_mode(tmp_path: Path) -> None:
     oracle_path = tmp_path / "subject_run"
     oracle_path.mkdir()
     engine = _make_engine(tmp_path, oracle_subject_run_dir=str(oracle_path))
@@ -936,23 +905,23 @@ def test_gather_inputs_preserves_full_stock_feed_for_oracle_mode(tmp_path: Path)
     artifacts_dir.mkdir(parents=True, exist_ok=True)
 
     rows = [
-        ["tech", f"T{idx:03d}", f"Ticker {idx}", 100.0 + idx, 0.2, float(idx), float(idx), 0.5, 0.25]
+        ["tech", f"T{idx:03d}", f"target_id {idx}", 100.0 + idx, 0.2, float(idx), float(idx), 0.5, 0.25]
         for idx in range(60)
     ]
     envelope = {
-        "metadata": {"tool": "stock", "diagnostics": {}},
+        "metadata": {"tool": "measurements", "diagnostics": {}},
         "data": {
-            "columns": ["Category", "Ticker", "Identity", "Price", "Vol_20d", "Chg_5d", "Chg_63d", "Z_Short", "Z_Long"],
+            "columns": ["Category", "target_id", "Identity", "Value", "Vol_20d", "Chg_5d", "Chg_63d", "Z_Short", "Z_Long"],
             "rows": rows,
         },
     }
-    (artifacts_dir / "global_stock_feed.json").write_text(json.dumps(envelope), encoding="utf-8")
+    (artifacts_dir / "global_measurements_feed.json").write_text(json.dumps(envelope), encoding="utf-8")
 
     node = MagicMock()
-    node.dependencies = ("global_stock_feed",)
+    node.dependencies = ("global_measurements_feed",)
     node.type = NodeType.REASONING
 
     inputs = engine._gather_inputs(node)
 
-    assert len(inputs["global_stock_feed"]["data"]["rows"]) == 60
-    assert "semantic_compression" not in inputs["global_stock_feed"]["data"]
+    assert len(inputs["global_measurements_feed"]["data"]["rows"]) == 60
+    assert "semantic_compression" not in inputs["global_measurements_feed"]["data"]

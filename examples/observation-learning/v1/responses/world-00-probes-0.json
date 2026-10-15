@@ -1,0 +1,107 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "update",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "delete",
+        "connection": "main",
+        "key": "a",
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "b",
+        "value": 1
+      }
+    ],
+    [
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "update",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "delete",
+        "connection": "main",
+        "key": "a",
+        "value": null
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "b",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "update",
+        "connection": "main",
+        "key": "a",
+        "value": 3
+      },
+      {
+        "op": "update",
+        "connection": "main",
+        "key": "missing",
+        "value": 4
+      },
+      {
+        "op": "delete",
+        "connection": "main",
+        "key": "missing",
+        "value": null
+      },
+      {
+        "op": "delete",
+        "connection": "main",
+        "key": "a",
+        "value": null
+      }
+    ]
+  ],
+  "purpose": "Distinguish main-only vs other-only vs both-connection counters, rolled-back attempted writes vs committed effects, and duplicate-put conflict handling vs nonexistent update/delete effects."
+}

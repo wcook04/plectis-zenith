@@ -1,13 +1,13 @@
 """
 [PURPOSE]
 - Teleology: Validate CP1 and CP2 schema validators deterministically across happy and failure paths.
-- Mechanism: Inline fixtures; assert-helper pattern; tmp_path for CP2 ticker-universe tests.
+- Mechanism: Inline fixtures; assert-helper pattern; tmp_path for CP2 target_id-universe tests.
 - Non-goal: Engine integration, retry loop, or artifact persistence (covered in later phases).
 
 [INTERFACE]
 - Tests: CP1, CP2, cross-correlation, hindsight, critique, oracle-meta, and validation-result contract coverage.
-- Reads: system/lib/schema_validator.py validator functions plus tmp_path artifact fixtures for ticker-universe checks.
-- Writes: Temporary stock and ETF feed artifacts under tmp_path only.
+- Reads: system/lib/schema_validator.py validator functions plus tmp_path artifact fixtures for target_id-universe checks.
+- Writes: Temporary measurements and SUBSYSTEMS feed artifacts under tmp_path only.
 
 [FLOW]
 - Fixture helpers build minimal valid payloads and targeted invalid variants.
@@ -83,14 +83,14 @@ def _minimal_evidence_cp1() -> List[Dict[str, Any]]:
         {
             "ref_id": "[1]",
             "ledger_id": "M_DEADBEEF",
-            "subject": "MACRO_REGIME",
-            "signal_summary": "A macro signal.",
+            "subject": "ENVIRONMENT_REGIME",
+            "signal_summary": "A environment signal.",
         },
         {
             "ref_id": "[2]",
             "ledger_id": "S_CAFEBABE",
-            "subject": "XLK",
-            "signal_summary": "XLK stock signal.",
+            "subject": "SUBSYSTEM_C",
+            "signal_summary": "SUBSYSTEM_C measurements signal.",
         },
     ]
 
@@ -107,34 +107,34 @@ def _minimal_cp2_payload() -> Dict[str, Any]:
     """Minimal valid CP2 payload (no subject_run_dir context needed for structure)."""
     base = _minimal_cp1_payload()
     base["predictions_t"] = [{
-        "target_id": "XLK",
+        "target_id": "SUBSYSTEM_C",
         "direction": "DOWN",
-        "snapshot_price": 100.0,
-        "target_price": 95.0,
+        "unit": "dimensionless", "snapshot_value": 100.0,
+        "target_value": 95.0,
         "snapshot_time": "2026-03-04T00:00:00+00:00",
         "target_time_iso": "2026-03-04T21:00:00+00:00",
-        "invalidation": "Invalidated if XLK reclaims VWAP and holds above 197 by 15:30 ET.",
+        "invalidation": "Invalidated if SUBSYSTEM_C reclaims VWAP and holds above 197 by 15:30 ET.",
     }]
-    # trade_rationale: base=75, per_pred=30 × 1 prediction = 105 words minimum
-    base["trade_rationale"] = _words(103, "[1] [2]")
+    # forecast_rationale: base=75, per_pred=30 × 1 prediction = 105 words minimum
+    base["forecast_rationale"] = _words(103, "[1] [2]")
     return base
 
 
-def _write_stock_feed(artifacts_dir: Path, tickers: List[str]) -> None:
-    """Write a minimal STOCK feed artifact to artifacts_dir/global_stock_feed.json."""
+def _write_measurements_feed(artifacts_dir: Path, target_ids: List[str]) -> None:
+    """Write a minimal MEASUREMENTS feed artifact to artifacts_dir/global_measurements_feed.json."""
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     feed = {
         "metadata": {"as_of": "2026-01-01"},
         "data": {
             "topic": {
                 "row": {
-                    "columns": ["Ticker", "Price"],
-                    "rows": [[t, "100.0"] for t in tickers],
+                    "columns": ["target_id", "Value"],
+                    "rows": [[t, "100.0"] for t in target_ids],
                 }
             }
         },
     }
-    (artifacts_dir / "global_stock_feed.json").write_text(json.dumps(feed))
+    (artifacts_dir / "global_measurements_feed.json").write_text(json.dumps(feed))
 
 
 def _minimal_cross_corr_v1_payload() -> Dict[str, Any]:
@@ -143,8 +143,8 @@ def _minimal_cross_corr_v1_payload() -> Dict[str, Any]:
             {
                 "id": "sw_1",
                 "name": "Energy Cohort",
-                "lanes": ["STOCK", "ETF", "NEWS"],
-                "subjects": ["XOM", "CVX"],
+                "lanes": ["MEASUREMENTS", "SUBSYSTEMS", "EVENTS"],
+                "subjects": ["SIGNAL_A", "CVX"],
                 "summary": "Multiple lanes align on the same energy cohort.",
             }
         ],
@@ -152,16 +152,16 @@ def _minimal_cross_corr_v1_payload() -> Dict[str, Any]:
             {
                 "id": "bf_1",
                 "name": "Credit Divergence",
-                "lanes": ["MACRO", "STOCK"],
+                "lanes": ["ENVIRONMENT", "MEASUREMENTS"],
                 "subjects": ["HY_OAS", "KRE"],
-                "summary": "Macro and equity lanes conflict on credit tone.",
+                "summary": "Environment and observation lanes conflict on credit tone.",
             }
         ],
         "orphans": [
             {
                 "id": "or_1",
                 "name": "Single-lane Signal",
-                "lanes": ["POLYMARKET"],
+                "lanes": ["INTERVENTIONS"],
                 "subjects": ["event_slug"],
                 "summary": "Only one lane carries this signal.",
             }
@@ -170,8 +170,8 @@ def _minimal_cross_corr_v1_payload() -> Dict[str, Any]:
             {
                 "id": "ca_1",
                 "name": "Confidence Mix",
-                "lanes": ["STOCK", "ETF"],
-                "subjects": ["NVDA"],
+                "lanes": ["MEASUREMENTS", "SUBSYSTEMS"],
+                "subjects": ["SIGNAL_A"],
                 "summary": "Lanes disagree on confidence strength.",
             }
         ],
@@ -184,18 +184,18 @@ def _minimal_cross_corr_v2_payload() -> Dict[str, Any]:
             {
                 "id": "ts_1",
                 "name": "Energy Targets",
-                "tickers": ["XOM", "CVX"],
-                "lanes": ["STOCK", "ETF"],
-                "direction_consensus": "BULLISH",
-                "summary": "Multiple lanes converge on energy tickers.",
+                "target_ids": ["SIGNAL_A", "CVX"],
+                "lanes": ["MEASUREMENTS", "SUBSYSTEMS"],
+                "direction_consensus": "INCREASE",
+                "summary": "Multiple lanes converge on energy target_ids.",
             }
         ],
         "directional_conflicts": [
             {
                 "id": "dc_1",
                 "name": "Defense Conflict",
-                "tickers": ["RTX"],
-                "lanes": ["STOCK", "ETF"],
+                "target_ids": ["RTX"],
+                "lanes": ["MEASUREMENTS", "SUBSYSTEMS"],
                 "direction_consensus": "CONTESTED",
                 "summary": "Lanes disagree on direction for RTX.",
             }
@@ -204,9 +204,9 @@ def _minimal_cross_corr_v2_payload() -> Dict[str, Any]:
             {
                 "id": "so_1",
                 "name": "Solo Name",
-                "tickers": ["UAL"],
-                "lanes": ["NEWS"],
-                "direction_consensus": "BEARISH",
+                "target_ids": ["UAL"],
+                "lanes": ["EVENTS"],
+                "direction_consensus": "DECREASE",
                 "summary": "One lane highlights UAL.",
             }
         ],
@@ -214,38 +214,38 @@ def _minimal_cross_corr_v2_payload() -> Dict[str, Any]:
             {
                 "id": "st_1",
                 "name": "Stress Check",
-                "tickers": ["NONE"],
-                "lanes": ["MACRO"],
+                "target_ids": ["NONE"],
+                "lanes": ["ENVIRONMENT"],
                 "direction_consensus": "N/A",
-                "summary": "Macro regime dampens thesis confidence.",
+                "summary": "Environment regime dampens thesis confidence.",
             }
         ],
-        "valid_prediction_targets": ["XOM", "CVX", "UAL"],
+        "valid_prediction_targets": ["SIGNAL_A", "CVX", "UAL"],
     }
 
 
 def _minimal_realized_hindsight_brief_payload() -> Dict[str, Any]:
     return {
         "status": "AVAILABLE",
-        "realized_dominant_force": "Oil shock continuation with partial residual repricing.",
+        "realized_dominant_force": "Oil shock continuation with partial residual change.",
         "regime_summary": "Energy led realized upside while residual breadth stayed constrained.",
         "driver_classification": [
             {
                 "driver": "Oil shock continuation",
-                "classification": "PARTIAL_REPRICING",
+                "classification": "PARTIAL_CHANGE",
                 "why": "Continuation was visible at T-n, but the final magnitude still surprised.",
-                "supporting_lanes": ["STOCK", "ETF", "MACRO"],
-                "affected_targets": ["XOM", "XLE"],
+                "supporting_lanes": ["MEASUREMENTS", "SUBSYSTEMS", "ENVIRONMENT"],
+                "affected_targets": ["SIGNAL_A", "XLE"],
             }
         ],
-        "already_priced_packages": ["Baseline energy continuation"],
+        "already_observed_packages": ["Baseline energy continuation"],
         "surprise_packages": ["Residual supply squeeze"],
-        "partial_repricing_packages": ["Oil shock continuation"],
+        "partial_change_packages": ["Oil shock continuation"],
         "prediction_target_outcomes": [
             {
-                "target_id": "XOM",
-                "what_happened": "XOM rallied but by less than the forward target implied.",
-                "pricing_judgement": "PARTIAL_REPRICING",
+                "target_id": "SIGNAL_A",
+                "what_happened": "SIGNAL_A rallied but by less than the forward target implied.",
+                "availability_judgement": "PARTIAL_CHANGE",
             }
         ],
     }
@@ -254,13 +254,13 @@ def _minimal_realized_hindsight_brief_payload() -> Dict[str, Any]:
 def _minimal_cp2_critique_payload() -> Dict[str, Any]:
     return {
         "status": "AVAILABLE",
-        "root_failure_mode": "priced_in_continuation_bias",
+        "root_failure_mode": "valued_in_continuation_bias",
         "critique_items": [
             {
                 "scope": "prediction",
-                "target_or_claim": "XOM",
+                "target_or_claim": "SIGNAL_A",
                 "subject_grounding_refs": ["[1]", "S_CAFEBABE"],
-                "realized_refs": ["prediction_reconciliation:XOM"],
+                "realized_refs": ["prediction_reconciliation:SIGNAL_A"],
                 "error_class": "PREDICTION_DRIFT",
                 "what_was_wrong": "The target level overstated residual upside.",
                 "comparison_to_ideal": "Ideal CP2 should have kept the name but narrowed the magnitude.",
@@ -269,7 +269,7 @@ def _minimal_cp2_critique_payload() -> Dict[str, Any]:
         "comparison_to_ideal_summary": "Lab generally found the right lane but overshot the consequence sizing.",
         "reconstruction_guidance": {
             "dominant_force": "Residual energy continuation",
-            "prefer_targets": ["XOM"],
+            "prefer_targets": ["SIGNAL_A"],
             "avoid_targets": ["UAL"],
             "eligible_ledger_ids": ["S_CAFEBABE"],
         },
@@ -283,12 +283,12 @@ def _minimal_prediction_reconciliation_payload() -> Dict[str, Any]:
         "truth_run_id": "RUN_TRUTH",
         "rows": [
             {
-                "target_id": "XOM",
-                "asset_class": "STOCK",
+                "target_id": "SIGNAL_A",
+                "target_kind": "MEASUREMENTS",
                 "prediction_direction": "UP",
-                "subject_snapshot_price": 100.0,
-                "predicted_target_price": 110.0,
-                "realized_truth_price": 105.0,
+                "subject_snapshot_value": 100.0,
+                "predicted_target_value": 110.0,
+                "realized_truth_value": 105.0,
                 "absolute_delta": 5.0,
                 "percent_delta": 4.545454545,
                 "directional_correct": True,
@@ -299,8 +299,8 @@ def _minimal_prediction_reconciliation_payload() -> Dict[str, Any]:
             "row_count": 1,
             "directionally_correct_count": 1,
             "directionally_incorrect_count": 0,
-            "largest_absolute_miss_target": "XOM",
-            "largest_percent_miss_target": "XOM",
+            "largest_absolute_miss_target": "SIGNAL_A",
+            "largest_percent_miss_target": "SIGNAL_A",
         },
     }
 
@@ -351,7 +351,7 @@ def test_validate_cp1_optional_bifurcation_resolutions_validated_when_present() 
             "bifurcation_id": "bf_1",
             "selected_side": "energy_shock",
             "rationale": "Cross-lane evidence is stronger for supply shock.",
-            "opposite_side_invalidation": "If macro disinflation persists and crude mean-reverts rapidly.",
+            "opposite_side_invalidation": "If environment disinflation persists and crude mean-reverts rapidly.",
         }
     ]
     assert_ok(validate_cp1(payload))
@@ -407,7 +407,7 @@ def test_validate_cp1_invalid_ledger_id_unknown_prefix() -> None:
     assert_has_error(validate_cp1(payload), "INVALID_LEDGER_ID")
 
 
-def test_validate_cp1_accepts_etf_ledger_id_prefix_from_config() -> None:
+def test_validate_cp1_accepts_subsystems_ledger_id_prefix_from_config() -> None:
     payload = _minimal_cp1_payload()
     payload["evidence_dictionary"][0]["ledger_id"] = "E_DEADBEEF"
     assert_ok(validate_cp1(payload))
@@ -418,11 +418,11 @@ def test_validate_cp1_ledger_prefixes_follow_config_map(monkeypatch: pytest.Monk
 
     custom_cfg = {
         "epicentre_thesis_min_words": 150,
-        "trade_rationale_base_words": 75,
-        "trade_rationale_per_prediction_words": 30,
+        "forecast_rationale_base_words": 75,
+        "forecast_rationale_per_prediction_words": 30,
         "lane_prefix_map": {
             "Q": "QUANT",
-            "S": "STOCK",
+            "S": "MEASUREMENTS",
         },
     }
     monkeypatch.setattr(schema_validator, "_load_config", lambda: custom_cfg)
@@ -501,7 +501,7 @@ def test_validate_cp2_tolerates_optional_oracle_meta() -> None:
     payload = _minimal_cp2_payload()
     payload["oracle_meta"] = {
         "truth_influence_refs": ["realized_hindsight_brief:oil_shock"],
-        "realized_diff_refs": ["prediction_reconciliation:XLK"],
+        "realized_diff_refs": ["prediction_reconciliation:SUBSYSTEM_C"],
         "explicit_exclusions": [
             {
                 "kind": "TRUTH_ONLY_SIGNAL",
@@ -516,11 +516,11 @@ def test_validate_cp2_tolerates_optional_oracle_meta() -> None:
 
 
 # ---------------------------------------------------------------------------
-# CP2 — happy path (with ticker context)
+# CP2 — happy path (with target_id context)
 # ---------------------------------------------------------------------------
 
 def test_validate_cp2_happy_path_with_context(tmp_path: Path) -> None:
-    _write_stock_feed(tmp_path / "artifacts", ["XLK", "SPY", "AAPL"])
+    _write_measurements_feed(tmp_path / "artifacts", ["SUBSYSTEM_C", "SUBSYSTEM_A", "SIGNAL_B"])
     result = validate_cp2(_minimal_cp2_payload(), subject_run_dir=tmp_path)
     assert_ok(result)
 
@@ -541,33 +541,33 @@ def test_validate_cp2_empty_predictions_t() -> None:
     assert_has_error(validate_cp2(payload), "MISSING_FIELD")
 
 
-def test_validate_cp2_missing_trade_rationale() -> None:
+def test_validate_cp2_missing_forecast_rationale() -> None:
     payload = _minimal_cp2_payload()
-    payload.pop("trade_rationale")
+    payload.pop("forecast_rationale")
     assert_has_error(validate_cp2(payload), "MISSING_FIELD")
 
 
-def test_validate_cp2_missing_snapshot_price() -> None:
+def test_validate_cp2_missing_snapshot_value() -> None:
     payload = _minimal_cp2_payload()
-    payload["predictions_t"][0].pop("snapshot_price")
-    assert_has_error(validate_cp2(payload), "MISSING_SNAPSHOT_PRICE")
+    payload["predictions_t"][0].pop("snapshot_value")
+    assert_has_error(validate_cp2(payload), "MISSING_SNAPSHOT_VALUE")
 
 
-def test_validate_cp2_invalid_snapshot_price() -> None:
+def test_validate_cp2_invalid_snapshot_value() -> None:
     payload = _minimal_cp2_payload()
-    payload["predictions_t"][0]["snapshot_price"] = "not-a-number"
+    payload["predictions_t"][0]["snapshot_value"] = "not-a-number"
     assert_has_error(validate_cp2(payload), "INVALID_FIELD")
 
 
-def test_validate_cp2_missing_target_price() -> None:
+def test_validate_cp2_missing_target_value() -> None:
     payload = _minimal_cp2_payload()
-    payload["predictions_t"][0].pop("target_price")
-    assert_has_error(validate_cp2(payload), "MISSING_TARGET_PRICE")
+    payload["predictions_t"][0].pop("target_value")
+    assert_has_error(validate_cp2(payload), "MISSING_TARGET_VALUE")
 
 
-def test_validate_cp2_invalid_target_price() -> None:
+def test_validate_cp2_invalid_target_value() -> None:
     payload = _minimal_cp2_payload()
-    payload["predictions_t"][0]["target_price"] = "not-a-number"
+    payload["predictions_t"][0]["target_value"] = "not-a-number"
     assert_has_error(validate_cp2(payload), "INVALID_FIELD")
 
 
@@ -590,7 +590,7 @@ def test_validate_cp2_invalid_direction_lowercase() -> None:
 def test_validate_cp2_valid_direction_up() -> None:
     payload = _minimal_cp2_payload()
     payload["predictions_t"][0]["direction"] = "UP"
-    payload["predictions_t"][0]["target_price"] = 101.0
+    payload["predictions_t"][0]["target_value"] = 101.0
     result = validate_cp2(payload)
     assert_ok(result)
 
@@ -598,14 +598,14 @@ def test_validate_cp2_valid_direction_up() -> None:
 def test_validate_cp2_invalid_target_direction_up() -> None:
     payload = _minimal_cp2_payload()
     payload["predictions_t"][0]["direction"] = "UP"
-    payload["predictions_t"][0]["target_price"] = 99.0
+    payload["predictions_t"][0]["target_value"] = 99.0
     assert_has_error(validate_cp2(payload), "INVALID_TARGET_DIRECTION")
 
 
 def test_validate_cp2_invalid_target_direction_down() -> None:
     payload = _minimal_cp2_payload()
     payload["predictions_t"][0]["direction"] = "DOWN"
-    payload["predictions_t"][0]["target_price"] = 101.0
+    payload["predictions_t"][0]["target_value"] = 101.0
     assert_has_error(validate_cp2(payload), "INVALID_TARGET_DIRECTION")
 
 
@@ -628,47 +628,47 @@ def test_validate_cp2_temporal_mismatch_with_expected_runtime_values() -> None:
 
 
 # ---------------------------------------------------------------------------
-# CP2 — trade_rationale word count
+# CP2 — forecast_rationale word count
 # ---------------------------------------------------------------------------
 
-def test_validate_cp2_trade_rationale_below_min() -> None:
+def test_validate_cp2_forecast_rationale_below_min() -> None:
     payload = _minimal_cp2_payload()
     # 1 prediction → min = 75 + 30 = 105 words; give only 10
-    payload["trade_rationale"] = _words(8, "[1] [2]")
+    payload["forecast_rationale"] = _words(8, "[1] [2]")
     assert_has_error(validate_cp2(payload), "BELOW_MIN_WORD_COUNT")
 
 
-def test_validate_cp2_trade_rationale_formula_two_predictions() -> None:
+def test_validate_cp2_forecast_rationale_formula_two_predictions() -> None:
     payload = _minimal_cp2_payload()
-    # Add second prediction; grounding evidence also needs subject=SPY with S_ ledger
+    # Add second prediction; grounding evidence also needs subject=SUBSYSTEM_A with S_ ledger
     payload["evidence_dictionary"].append({
         "ref_id": "[3]",
         "ledger_id": "S_BADDCAFE",
-        "subject": "SPY",
-        "signal_summary": "SPY signal.",
+        "subject": "SUBSYSTEM_A",
+        "signal_summary": "SUBSYSTEM_A signal.",
     })
     payload["predictions_t"].append({
-        "target_id": "SPY",
+        "target_id": "SUBSYSTEM_A",
         "direction": "UP",
-        "snapshot_price": 101.0,
-        "target_price": 105.0,
+        "unit": "dimensionless", "snapshot_value": 101.0,
+        "target_value": 105.0,
         "snapshot_time": "2026-03-04T00:00:00+00:00",
         "target_time_iso": "2026-03-04T21:00:00+00:00",
-        "invalidation": "Invalidated if SPY fails to hold above prior range high.",
+        "invalidation": "Invalidated if SUBSYSTEM_A fails to hold above prior range high.",
     })
     # 2 predictions → min = 75 + 30×2 = 135 words
-    payload["trade_rationale"] = _words(133, "[1] [2]")
+    payload["forecast_rationale"] = _words(133, "[1] [2]")
     assert_ok(validate_cp2(payload))
 
 
 # ---------------------------------------------------------------------------
-# CP2 — trade_rationale citation resolution
+# CP2 — forecast_rationale citation resolution
 # ---------------------------------------------------------------------------
 
-def test_validate_cp2_trade_rationale_citation_unresolved() -> None:
+def test_validate_cp2_forecast_rationale_citation_unresolved() -> None:
     payload = _minimal_cp2_payload()
-    # trade_rationale cites [5] which doesn't exist in evidence
-    payload["trade_rationale"] = _words(103, "[1] [5]")
+    # forecast_rationale cites [5] which doesn't exist in evidence
+    payload["forecast_rationale"] = _words(103, "[1] [5]")
     assert_has_error(validate_cp2(payload), "CITATION_UNRESOLVED")
 
 
@@ -678,28 +678,28 @@ def test_validate_cp2_trade_rationale_citation_unresolved() -> None:
 
 def test_validate_cp2_grounding_wrong_lane() -> None:
     payload = _minimal_cp2_payload()
-    # XLK's evidence entry has M_ (MACRO) ledger instead of S_ (STOCK)
+    # SUBSYSTEM_C's evidence entry has M_ (ENVIRONMENT) ledger instead of S_ (MEASUREMENTS)
     payload["evidence_dictionary"][1]["ledger_id"] = "M_CAFEBABE"
     assert_has_error(validate_cp2(payload), "GROUNDING_FAILED_WRONG_LANE")
 
 
 def test_validate_cp2_grounding_no_matching_subject() -> None:
     payload = _minimal_cp2_payload()
-    # Change prediction to MSFT which has no evidence entry at all
-    payload["predictions_t"][0]["target_id"] = "MSFT"
+    # Change prediction to SIGNAL_C which has no evidence entry at all
+    payload["predictions_t"][0]["target_id"] = "SIGNAL_C"
     assert_has_error(validate_cp2(payload), "GROUNDING_FAILED_WRONG_LANE")
 
 
 def test_validate_cp2_grounding_case_insensitive() -> None:
     payload = _minimal_cp2_payload()
     # subject in evidence is lowercase — should still ground correctly
-    payload["evidence_dictionary"][1]["subject"] = "xlk"
-    payload["predictions_t"][0]["target_id"] = "XLK"
+    payload["evidence_dictionary"][1]["subject"] = "subsystem_c"
+    payload["predictions_t"][0]["target_id"] = "SUBSYSTEM_C"
     result = validate_cp2(payload)
     assert_ok(result)
 
 
-def test_validate_cp2_grounding_accepts_etf_prefix() -> None:
+def test_validate_cp2_grounding_accepts_subsystems_prefix() -> None:
     payload = _minimal_cp2_payload()
     payload["evidence_dictionary"][1]["ledger_id"] = "E_CAFEBABE"
     result = validate_cp2(payload)
@@ -723,17 +723,17 @@ def test_validate_cp2_missing_context_empty_artifacts_dir(tmp_path: Path) -> Non
 
 
 def test_validate_cp2_out_of_universe(tmp_path: Path) -> None:
-    # XLK is the prediction but feed only has SPY and AAPL
-    _write_stock_feed(tmp_path / "artifacts", ["SPY", "AAPL"])
+    # SUBSYSTEM_C is the prediction but feed only has SUBSYSTEM_A and SIGNAL_B
+    _write_measurements_feed(tmp_path / "artifacts", ["SUBSYSTEM_A", "SIGNAL_B"])
     result = validate_cp2(_minimal_cp2_payload(), subject_run_dir=tmp_path)
     assert_has_error(result, "OUT_OF_UNIVERSE")
 
 
 def test_validate_cp2_out_of_universe_case_normalized(tmp_path: Path) -> None:
-    # Feed has lowercase ticker; target_id is uppercase — should still pass
-    _write_stock_feed(tmp_path / "artifacts", ["xlk", "SPY"])
+    # Feed has lowercase target_id; target_id is uppercase — should still pass
+    _write_measurements_feed(tmp_path / "artifacts", ["subsystem_c", "SUBSYSTEM_A"])
     result = validate_cp2(_minimal_cp2_payload(), subject_run_dir=tmp_path)
-    # "xlk".upper() == "XLK" == target "XLK".upper() — should be in universe
+    # "subsystem_c".upper() == "SUBSYSTEM_C" == target "SUBSYSTEM_C".upper() — should be in universe
     assert_ok(result)
 
 
@@ -746,9 +746,9 @@ def test_validate_cp2_no_subject_run_dir_skips_universe_check() -> None:
 def test_validate_cp2_engine_audit_snapshot_mismatch() -> None:
     payload = _minimal_cp2_payload()
     payload["_engine_audit_errors"] = [
-        "SNAPSHOT_PRICE_MISMATCH: predictions_t[0] target_id=XLK snapshot_price=120.0 feed_price=100.0"
+        "SNAPSHOT_VALUE_MISMATCH: predictions_t[0] target_id=SUBSYSTEM_C snapshot_value=120.0 feed_value=100.0"
     ]
-    assert_has_error(validate_cp2(payload), "SNAPSHOT_PRICE_MISMATCH")
+    assert_has_error(validate_cp2(payload), "SNAPSHOT_VALUE_MISMATCH")
 
 
 # ---------------------------------------------------------------------------
@@ -777,13 +777,13 @@ def test_validate_cross_corr_v2_happy_path() -> None:
 
 def test_validate_cross_corr_v2_rejects_invalid_target_union() -> None:
     payload = _minimal_cross_corr_v2_payload()
-    payload["valid_prediction_targets"] = ["XOM"]  # incomplete vs union(XOM,CVX,UAL)
+    payload["valid_prediction_targets"] = ["SIGNAL_A"]  # incomplete vs union(SIGNAL_A,CVX,UAL)
     assert_has_error(validate_cross_corr_v2(payload), "INVALID_FIELD")
 
 
-def test_validate_cross_corr_v2_requires_tickers() -> None:
+def test_validate_cross_corr_v2_requires_target_ids() -> None:
     payload = _minimal_cross_corr_v2_payload()
-    payload["target_swarms"][0].pop("tickers")
+    payload["target_swarms"][0].pop("target_ids")
     assert_has_error(validate_cross_corr_v2(payload), "MISSING_FIELD")
 
 
@@ -831,7 +831,7 @@ def test_validate_cp2_critique_rejects_invalid_scope() -> None:
 
 def test_validate_cp2_critique_rejects_invalid_realized_handle_format() -> None:
     payload = _minimal_cp2_critique_payload()
-    payload["critique_items"][0]["realized_refs"] = ["prediction_reconciliation:XOM:extra"]
+    payload["critique_items"][0]["realized_refs"] = ["prediction_reconciliation:SIGNAL_A:extra"]
     assert_has_error(validate_cp2_critique(payload), "INVALID_HANDLE_FORMAT")
 
 
@@ -844,7 +844,7 @@ def test_validate_oracle_cp2_meta_accepts_format_only_handles() -> None:
     payload = _minimal_cp2_payload()
     payload["oracle_meta"] = {
         "truth_influence_refs": ["realized_hindsight_brief:oil_shock"],
-        "realized_diff_refs": ["prediction_reconciliation:XOM"],
+        "realized_diff_refs": ["prediction_reconciliation:SIGNAL_A"],
         "explicit_exclusions": [
             {
                 "kind": "TRUTH_ONLY_SIGNAL",
@@ -861,7 +861,7 @@ def test_validate_oracle_cp2_meta_rejects_invalid_handle_format_without_lookup()
     payload = _minimal_cp2_payload()
     payload["oracle_meta"] = {
         "truth_influence_refs": ["missing_handle"],
-        "realized_diff_refs": ["prediction_reconciliation:XOM:extra"],
+        "realized_diff_refs": ["prediction_reconciliation:SIGNAL_A:extra"],
         "explicit_exclusions": [
             {
                 "kind": "TRUTH_ONLY_SIGNAL",
@@ -896,48 +896,48 @@ def test_validation_result_failure_deduplicates() -> None:
 
 
 # ---------------------------------------------------------------------------
-# CP2 — split stock/ETF feed universe checks (Locked Decision 13)
+# CP2 — split measurements/SUBSYSTEMS feed universe checks (Locked Decision 13)
 # ---------------------------------------------------------------------------
 
-def _write_etf_feed(artifacts_dir: Path, tickers: List[str]) -> None:
-    """Write a minimal ETF feed artifact to artifacts_dir/global_etf_feed.json."""
+def _write_subsystems_feed(artifacts_dir: Path, target_ids: List[str]) -> None:
+    """Write a minimal SUBSYSTEMS feed artifact to artifacts_dir/global_subsystems_feed.json."""
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     feed = {
         "metadata": {"as_of": "2026-01-01"},
         "data": {
-            "columns": ["Category", "Ticker", "Price"],
-            "rows": [["etf", t, "100.0"] for t in tickers],
+            "columns": ["Category", "target_id", "Value"],
+            "rows": [["subsystems", t, "100.0"] for t in target_ids],
         },
     }
-    (artifacts_dir / "global_etf_feed.json").write_text(json.dumps(feed))
+    (artifacts_dir / "global_subsystems_feed.json").write_text(json.dumps(feed))
 
 
-def test_validate_cp2_target_in_etf_feed_passes(tmp_path: Path) -> None:
-    """Target ticker in ETF feed (not stock feed) must pass OUT_OF_UNIVERSE check via union."""
-    # Stock feed has unrelated tickers; ETF feed has the target XLK
-    _write_stock_feed(tmp_path / "artifacts", ["AAPL", "NVDA"])
-    _write_etf_feed(tmp_path / "artifacts", ["XLK", "SPY"])
+def test_validate_cp2_target_in_subsystems_feed_passes(tmp_path: Path) -> None:
+    """Target target_id in SUBSYSTEMS feed (not measurements feed) must pass OUT_OF_UNIVERSE check via union."""
+    # Measurements feed has unrelated target_ids; SUBSYSTEMS feed has the target SUBSYSTEM_C
+    _write_measurements_feed(tmp_path / "artifacts", ["SIGNAL_B", "SIGNAL_A"])
+    _write_subsystems_feed(tmp_path / "artifacts", ["SUBSYSTEM_C", "SUBSYSTEM_A"])
     result = validate_cp2(_minimal_cp2_payload(), subject_run_dir=tmp_path)
     assert_ok(result)
 
 
-def test_validate_cp2_target_in_stock_feed_only_passes(tmp_path: Path) -> None:
-    """Stock-only universe still passes when target is in the stock feed."""
-    _write_stock_feed(tmp_path / "artifacts", ["XLK", "AAPL"])
+def test_validate_cp2_target_in_measurements_feed_only_passes(tmp_path: Path) -> None:
+    """Measurements-only universe still passes when target is in the measurements feed."""
+    _write_measurements_feed(tmp_path / "artifacts", ["SUBSYSTEM_C", "SIGNAL_B"])
     result = validate_cp2(_minimal_cp2_payload(), subject_run_dir=tmp_path)
     assert_ok(result)
 
 
 def test_validate_cp2_target_absent_from_both_feeds_fails(tmp_path: Path) -> None:
-    """Target not in stock feed OR ETF feed must produce OUT_OF_UNIVERSE error."""
-    _write_stock_feed(tmp_path / "artifacts", ["AAPL", "NVDA"])
-    _write_etf_feed(tmp_path / "artifacts", ["SPY", "TLT"])
+    """Target not in measurements feed OR SUBSYSTEMS feed must produce OUT_OF_UNIVERSE error."""
+    _write_measurements_feed(tmp_path / "artifacts", ["SIGNAL_B", "SIGNAL_A"])
+    _write_subsystems_feed(tmp_path / "artifacts", ["SUBSYSTEM_A", "CONTEXT_A"])
     result = validate_cp2(_minimal_cp2_payload(), subject_run_dir=tmp_path)
     assert_has_error(result, "OUT_OF_UNIVERSE")
 
 
-def test_validate_cp2_etf_only_feed_missing_context(tmp_path: Path) -> None:
-    """Empty artifacts dir (no equity feeds) still produces MISSING_CONTEXT."""
+def test_validate_cp2_subsystems_only_feed_missing_context(tmp_path: Path) -> None:
+    """Empty artifacts dir (no observation feeds) still produces MISSING_CONTEXT."""
     (tmp_path / "artifacts").mkdir()
     result = validate_cp2(_minimal_cp2_payload(), subject_run_dir=tmp_path)
     assert_has_error(result, "MISSING_CONTEXT")

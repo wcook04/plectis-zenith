@@ -1,0 +1,59 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "b",
+        "value": 2
+      }
+    ]
+  ],
+  "purpose": "Distinguish the three put conflict-handling modes and the three channel definitions. Experiment 1: a duplicate-key put on the same connection separates INSERT OR IGNORE (no change, channel 0) from INSERT OR REPLACE and ON CONFLICT DO UPDATE (one change, channel 1), and also reveals whether an AFTER INSERT trigger fires on the ignored insert. Experiment 2: a put inside a rolled-back transaction separates changes()/total_changes (which count the attempted write even though it is rolled back) from committed-state effects, and shows whether the trigger's log insert is rolled back with the transaction. Experiment 3: writes on both main and other connections separate main-only total_changes from main+other total_changes, while also testing whether the trigger fires on the other connection's insert."
+}

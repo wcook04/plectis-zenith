@@ -1,0 +1,673 @@
+{
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "history": [
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [],
+        "observed": {
+          "channel": 0,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "fa5ca8c06a99b267ac406e83c949178283258f6b32db50939e9e6fb6a5f9d7de"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "7427319d60f86de1425806620056f93795b66deca0b92deae055512ccc8ee7c6"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "other"
+          }
+        ],
+        "observed": {
+          "channel": 0,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "9bc14a68bc545efcad8635a6ab0e384ac84a9ebb3c4b3c954aff5f9aa6f0c325"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "a",
+            "value": 5,
+            "connection": "main"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 5
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "fb9f68a8e6c77718fde5fa706ccc422bc85e573bd857f9dae34f700768a41b46"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "b",
+            "value": 2,
+            "connection": "main"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 2,
+          "committed_sum": 4
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "108e033764c759db70934beb0666c1a4da4d109d479406795bcd58235ab438cd"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "b",
+            "value": 3,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "c",
+            "value": 4,
+            "connection": "main"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 3,
+          "committed_sum": 9
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "3a0913743a19dfb47342cac590fa3913221dbb9bef148d3b68eab0ba766ff8d5"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "rollback"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "3a8b9624089fca54f2d5fda07413800e4c671ad123508c84cf5a645b489bd9eb"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "update",
+            "key": "a",
+            "value": 2
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 2
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "a9c0849aa9d091df7be557e84e946fb2a7e40564d585202e3e0f1d1a8f9e4681"
+      },
+      {
+        "source_id": "source-14b99a8dd1e8c3320ae0",
+        "actions": [
+          {
+            "op": "put",
+            "key": "a",
+            "value": 2,
+            "connection": "main"
+          },
+          {
+            "op": "put",
+            "key": "b",
+            "value": 4,
+            "connection": "other"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 2,
+          "committed_sum": 6
+        },
+        "authority": "native SQLite; independent committed-state connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "db318efc5e46257f63641362649c97596ae5bc04bb6f55cfe14f0967ad05e0f3"
+      }
+    ],
+    "interface": "Additionally define transition(state, action, context, acquire)\nand readout(state, context, acquire). transition initializes your own state when\nstate is None, and applies ONE ordinary action. readout returns the requested\nvalue/unresolved answer. investigate runs your transitions and readout. State\nrepresentation, source inference and numerical semantics are yours to implement.\nThe qualification driver starts with state=None, passes each action to transition,\nthen calls readout on the resulting state. For ZERO actions it calls readout(None,\ncontext, acquire) directly: readout MUST handle this empty-source initial state.\ncontext is always the normal query object, including actions, source_id and goal;\ncontext is never None. The driver is exactly:\n    state = None\n    for action in context[\"actions\"]:\n        state = transition(state, action, context, acquire)\n    return readout(state, context, acquire)\nYour exports and investigate must agree on every observed sequence, including [];\ndo not depend on investigate-only initialization before readout can run.\nInfer a source only from receipts. Cache acquired evidence in your own state if\nneeded: the whole query permits eight acquisitions. These two exports will be\nreused by a later caller. No savepoint implementation is requested at this stage.\ndependencies must be []. No module imports or external solver code are provided.",
+    "prior_trials": [
+      {
+        "proposal": {
+          "source": "def investigate(context, acquire):\n    return {\"value\": None, \"unresolved\": True}\n",
+          "scope": "No learned source model.",
+          "lesson": "",
+          "dependencies": []
+        },
+        "result": {
+          "correct": 0,
+          "total": 27,
+          "unsupported": 0,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "600627bcc05a8efb1d0d64e5b831a1e90cd452b30e265e0906c9908f0f6ce981",
+              "expected": {
+                "value": 0,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "fb05e8f61711be7952487a63ce4d5e40f6f78bf8d0c5a42378a7562d6c5dd62c",
+              "expected": {
+                "value": 0,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "466a064a98ebc86b056998d0d505c05714866a167e76e64df1aca94dc5240cc6",
+              "expected": {
+                "value": 0,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "c8040881e8e3067aef08250c9b03b5e0b342a42d60f536ce46956a1e7cfe83fd",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "716cc65f7378b8973532391f0f936c70d43f5f52c18360034073a63d7b31c4f4",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "da1ad452211025db1e0f10a119c1077fafbfeb905f1143cc4717041a9fddf46f",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "224195fc4c7364c2f8b477ba9a5a8faee5ab45a5902fe23e6ca509f524ac3e3c",
+              "expected": {
+                "value": 0,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "c657e374930868c9da95eebac1af8bd2c4f03107616a4048a0c719d540d0dbff",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "cd03738924f9fdc56c65e554367e43315aebcf65792c328809304d3cac11ea98",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "4e19ce3b6677733e4ffda65124dc7e2f2aa7bbcd3d9a3d12686cd17b903ad1b7",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "ca680af5e1bcb240716c8a4b2ddf18c4c0d240caed0da8a8f0f71ad8687ed846",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "4eaf1dd5f5f8d1606a7c37341b5f48a8c2cbb0290fee30ab623000d1ef6a51c2",
+              "expected": {
+                "value": 5,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "538bc2704069dff7301391bdf102ab058d87802d112c62364cee1bf633d77e3d",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "1650d5a85facb37f90ec8678db0eda5b6201a3f2935ea9231219a28f83d554ff",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "a2e5dcc4cdda1397928025827cabd55c05637cf61ebc13facf1c1f6e4ed50c34",
+              "expected": {
+                "value": 4,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "ef882034529eae294c77e9ae68b327abd0550835673bbd4ae2725a0b487493c6",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "d322115d9a0e3a99a34d0a73a77678e20655ea11cd0158fbcf530e6751aec3fd",
+              "expected": {
+                "value": 3,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "a0539e80daed4f9877bfe4f7f1654e6ea789933abfd7e87edef227285dece40f",
+              "expected": {
+                "value": 9,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "3ed6b7007909e59462eab5160d3b601793af21d45b3c8a2a02166939a9f3c4e5",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "e3b45d8ac68e59e947525d2f6585ac578910d1682f0677c05c47059f0c4212c5",
+              "expected": {
+                "value": 0,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "bc649ddc7348b40cf63486aecdeae546196d342a79bc8388126bfe77f7391891",
+              "expected": {
+                "value": 0,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "3d979ceb126a1fad9958a311518da2052d48fbc7690949cb7fb9025cc293bec4",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "9f96d6c9cf3bb8de7a0ab75b0716a692d72161c5e94ab4c0a827f0f9612cf98d",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "d381d5085cef068cfd7b80ddf30a7f3ea84eb4567e5d3694db9dba4bf6a4ea1f",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "071447fd9e4713294ce166898fd96c0af8f95e91f535e1306dae85e070aac649",
+              "expected": {
+                "value": 1,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "3ef027b865b5a35141aff169929cf338b10e624d8b88b2f1f6507ae3a2b9c03a",
+              "expected": {
+                "value": 2,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            },
+            {
+              "answer": {
+                "value": null,
+                "unresolved": true
+              },
+              "trace": [],
+              "error": null,
+              "id": "ad052cff337b6d96abf71f21a5c294df4b695f33af71746393eb10d1a0072fba",
+              "expected": {
+                "value": 6,
+                "unresolved": false
+              },
+              "correct": false,
+              "unsupported": false
+            }
+          ]
+        },
+        "interface_result": null,
+        "response_content_sha256": "4678cf6f790ba0b3fedee4f078ea5ad2cd428f9f1686c99cd70b90806229cd07",
+        "response_error": {
+          "raw_content": "{\"dependencies\": [], \"lesson\": \"channel is main changes() (last direct statement); conflict is upsert-style\", \"scope\": \"disposable SQLite source; infer channel/conflict from receipts\", \"source\": \"def transition(state, action, context, acquire):\\n    if state is None:\\n        state = {\\\"actions\\\": [], \\\"hist\\\": None}\\n    state[\\\"actions\\\"].append(action)\\n    return state\\n\\n\\ndef simulate_all(cand, actions):\\n    committed = dict()\\n    pending = {\\\"main\\\": dict(), \\\"other\\\": dict()}\\n    total = {\\\"main\\\": 0, \\\"other\\\": 0}\\n    main_last = 0\\n    open_conn = None\\n    conflict = cand[\\\"conflict\\\"]\\n    trig = cand[\\\"trigger\\\"]\\n    for a in actions:\\n        op = a[\\\"op\\\"]\\n        if op == \\\"begin\\\":\\n            if open_conn is None:\\n                open_conn = a.get(\\\"connection\\\", \\\"main\\\")\\n        elif op == \\\"commit\\\":\\n            if open_conn is not None:\\n                p = pending[open_conn]\\n                for k in p:\\n                    committed[k] = p[k]\\n                pending[open_conn] = dict()\\n                open_conn = None\\n        elif op == \\\"rollback\\\":\\n            if open_conn is not None:\\n                pending[open_conn] = dict()\\n                open_conn = None\\n        else:\\n            conn = a.get(\\\"connection\\\", \\\"main\\\")\\n            target = conn\\n            view = committed\\n            if open_conn is not None:\\n                target = open_conn\\n                view = pending[target]\\n            key = a[\\\"key\\\"]\\n            ch = 0\\n            fired = False\\n            if op == \\\"put\\\":\\n                value = a[\\\"value\\\"]\\n                if key in view:\\n                    if conflict == \\\"ignore\\\":\\n                        ch = 0\\n                    elif conflict == \\\"replace\\\":\\n                        view[key] = value\\n                        ch = 2\\n                        fired = True\\n                    else:\\n                        view[key] = value\\n                        ch = 1\\n                else:\\n                    view[key] = value\\n                    ch = 1\\n                    fired = True\\n            elif op == \\\"update\\\":\\n                if key in view:\\n                    view[key] = a[\\\"value\\\"]\\n                    ch = 1\\n            elif op == \\\"delete\\\":\\n                if key in view:\\n                    view.pop(key)\\n                    ch = 1\\n            total[target] = total[target] + ch\\n            if trig and fired:\\n                total[target] = total[target] + 1\\n            if target == \\\"main\\\":\\n                main_last = ch\\n    if cand[\\\"channel\\\"] == \\\"changes\\\":\\n        chan = main_last\\n    elif cand[\\\"channel\\\"] == \\\"total\\\":\\n        chan = total[\\\"main\\\"]\\n    else:\\n        chan = total[\\\"main\\\"] + total[\\\"other\\\"]\\n    s = 0\\n    for v in committed.values():\\n        s = s + v\\n    return {\\\"channel\\\": chan, \\\"count\\\": len(committed), \\\"sum\\\": s}\\n\\n\\ndef consistent_candidates(hist, source_id):\\n    out = []\\n    for conflict in [\\\"ignore\\\", \\\"replace\\\", \\\"upsert\\\"]:\\n        for channel in [\\\"changes\\\", \\\"total\\\", \\\"both\\\"]:\\n            for trig in [False, True]:\\n                cand = {\\\"conflict\\\": conflict, \\\"channel\\\": channel, \\\"trigger\\\": trig}\\n                ok = True\\n                for r in hist:\\n                    if r.get(\\\"source_id\\\") != source_id:\\n                        continue\\n                    obs = r[\\\"observed\\\"]\\n                    res = simulate_all(cand, r[\\\"actions\\\"])\\n                    if res[\\\"channel\\\"] != obs[\\\"channel\\\"]:\\n                        ok = False\\n                    if res[\\\"count\\\"] != obs[\\\"committed_count\\\"]:\\n                        ok = False\\n                    if res[",
+          "error": "JSONDecodeError: Unterminated string starting at: line 1 column 196 (char 195)"
+        },
+        "interface_error": "ValueError: primitive must export transition and readout"
+      }
+    ]
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string",
+        "description": "Complete ordinary Python function bodies."
+      },
+      "scope": {
+        "type": "string"
+      },
+      "lesson": {
+        "type": "string"
+      },
+      "dependencies": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "uniqueItems": true
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson",
+      "dependencies"
+    ],
+    "additionalProperties": false
+  },
+  "system": "Write investigate(context, acquire) in ordinary restricted Python.\nPut the COMPLETE EXECUTABLE PYTHON PROGRAM in the JSON source field. Include\nthe function definition and body, never a label, description or bare signature.\nThe scope and lesson fields contain short technical claims.\ncontext has source_id, actions, goal and documentation. acquire(\"history\") returns\nall calibration receipts for this source. Use no case identifiers, private data,\nexternal tools or imports. Infer behavior from the actual observations and public\ndocumentation; generalize to new action combinations and values. Return exactly\n{\"value\": integer or null, \"unresolved\": boolean}. Do not merely memorize probe\noutputs. Resolve a goal only when the evidence supports it; source identity binds\nthe evidence, it does not explain behavior. scope and lesson are short technical\nclaims, not a chain-of-thought transcript.\n\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables, del of local\nnames or container entries, and arithmetic except power are permitted.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nAt most eight acquisitions per query. Source limit 60000 UTF8 bytes. Programs\nrun in a fresh resource-limited process. Emit one JSON object, never an array.\n"
+}

@@ -16,7 +16,7 @@
       "type": "string",
       "required": true,
       "constraint": "Word count >= epicentre_thesis_min_words (see contract_config.json). Must contain only resolved [N] citations.",
-      "semantics": "The causal center-of-gravity statement for the run. NOT a broad market recap. Must define the single dominant force at T-n and its expected consequences into T. See epicentre_thesis_contract for full semantic requirements."
+      "semantics": "The causal center-of-gravity statement for the run. NOT a broad system recap. Must define the single dominant force at T-n and its expected consequences into T. See epicentre_thesis_contract for full semantic requirements."
     },
     "bifurcation_resolutions": {
       "type": "array[BifurcationResolution]",
@@ -37,12 +37,7 @@
     "forecast_basis": {
       "type": "string",
       "required": false,
-      "constraint": "CAUSAL (default) or EMPIRICAL; declared empirical branch overrides causal-only semantic requirements."
-    },
-    "empirical_rule": {
-      "type": "object",
-      "required": false,
-      "constraint": "Required only in EMPIRICAL; exact supported rule validated by system/lib/empirical_forecast.py; locked from CP1 through CP2 and Oracle."
+      "constraint": "CAUSAL only; no unsupported branches."
     }
   },
   "bifurcation_resolution": {
@@ -90,7 +85,7 @@
       "type": "string",
       "required": true,
       "constraint": "Non-empty.",
-      "semantics": "Entity identifier. For STOCK entries: the ticker symbol (e.g. 'XLK'). For MACRO: canonical name (e.g. 'US_10Y'). Must match the identity used in the source lane."
+      "semantics": "Entity identifier. For MEASUREMENTS entries: the target_id symbol (e.g. 'SUBSYSTEM_C'). For ENVIRONMENT: canonical name (e.g. 'US_10Y'). Must match the identity used in the source lane."
     },
     "signal_summary": {
       "type": "string",
@@ -111,7 +106,7 @@
         "prohibition": "No evidence dumping without selecting a dominant force."
       },
       "transmission_path": {
-        "description": "Describe the mechanism from force -> affected lanes/assets.",
+        "description": "Describe the mechanism from force -> affected lanes/targets.",
         "prohibition": "No prediction list detached from causal chain."
       },
       "t_consequence_map": {
@@ -154,7 +149,7 @@
   "stage_responsibilities": {
     "lab_cross_corr_v1": {
       "role": "Structural findings only (swarms, bifurcations, orphans).",
-      "boundary": "Must NOT mint hypothesis slugs or interpret market meaning."
+      "boundary": "Must NOT mint hypothesis slugs or interpret system meaning."
     },
     "lab_orient": {
       "role": "Surface candidate causal chains from cross-correlation structure. Rank candidate epicentres by explanatory power and breadth.",
@@ -189,15 +184,9 @@
       "evidence_refs": "Nonempty references resolving to the supplied evidence dictionary",
       "semantics": "Explain why no supported forward thesis was selected; not a successful prediction or zero loss",
       "thesis": "Keep the cited 150-word explanation in epicentre_thesis; causal dominance requirements apply only to FORECAST",
-      "cp2": "predictions_t must be exactly []; trade_rationale remains required with citations and at least 75 words",
+      "cp2": "predictions_t must be exactly []; forecast_rationale remains required with citations and at least 75 words",
       "track": "INSUFFICIENT",
       "propagation": "Forward Director preserves locked CP1 status. Oracle may reconsider only from genuinely available subject-side evidence."
     }
-  },
-  "empirical_forecast_contract": {
-    "precedence": "EMPIRICAL replaces causal-only thesis requirements; ordinary CAUSAL remains unchanged.",
-    "instruction": "[EMPIRICAL FORECAST CONTRACT]\nThis explicit branch takes precedence over causal-only requirements below. Legacy forecasts have forecast_basis=\"CAUSAL\". A FORECAST may instead set forecast_basis=\"EMPIRICAL\" and dominant_evidence_track=\"EMPIRICAL\" to test an outcome mapping without claiming an identified market cause. The first supported control is empirical_rule={method:\"trailing_mean_return_v1\",lookback_returns:<integer 1..19>,scale:<nonzero number -1..1>,max_abs_return:<positive fraction <=0.1>,target_ids:[<stock symbols>],evidence_refs:[<exact [N] refs grounding every target>],selection_basis:<why this rule was selected before truth>,calibration_status:\"UNVALIDATED\"}. All fields are required; no extra rule fields. For each target take the last lookback_returns+1 consecutive as-of scalar prices, calculate the arithmetic mean of their simple returns (p[i]/p[i-1]-1), multiply by scale, clip to +/-max_abs_return, and set target_price=last_price*(1+clipped_return). Horizon is the next XNYS close. The engine independently checks the calculation, history boundary, source IDs and exact target set. Zero return is not an epsilon directional forecast; abstain if the rule cannot produce supported nonzero targets. These parameters are an experimental control, not fitted skill or a claim of edge. The full Lab still reviews all available feeds; this control's numeric mapping uses prices only and cannot establish the value of news. Retain evidence citations and ordinary word counts. In EMPIRICAL, epicentre_thesis states the testable predictive hypothesis, its input limits, rule selection and falsification, rather than inventing a dominant cause. Missing causal identification alone does not force ABSTAIN. Use ABSTAIN if usable inputs or an explicit supported mapping are absent. Do not change the rule after seeing later outcomes. Ordinary CAUSAL forecasts retain their existing requirements.\n",
-    "source_owner": "system/lib/empirical_forecast.py",
-    "cp1_lock": "Director preserves forecast_basis and empirical_rule; Oracle cannot refit an empirical subject to later truth."
   }
 }

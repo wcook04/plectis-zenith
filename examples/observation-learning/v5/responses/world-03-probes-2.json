@@ -1,0 +1,77 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "b",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "b",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "commit",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 3
+      }
+    ]
+  ],
+  "purpose": "Separate the three put conflict modes and the three channel definitions. Experiment 1: three puts on the same key. INSERT OR IGNORE changes nothing after the first put (channel 1, sum 1); INSERT OR REPLACE and ON CONFLICT DO UPDATE both change the row each time (channel 3, sum 3), so this isolates IGNORE from the other two. Experiment 2: two puts on key b via the other connection. If the channel is main changes() or main total_changes, the other connection's writes are invisible (channel 1); if it is main+other total_changes, they are counted (channel 3). Experiment 3: a committed transaction followed by a put on the same key. This distinguishes REPLACE from DO UPDATE only if the trigger instrumentation differs, and confirms whether changes() resets per statement versus accumulating across the transaction, since the committed put after commit adds one more change to the channel."
+}

@@ -1,0 +1,1493 @@
+{
+  "prompt": {
+    "task": {
+      "id": "binding-3",
+      "family": "synthetic_integer_sequence",
+      "description": "Synthetic resettable integer source. Input is exactly\n{\"values\":[integer,...]}, length 0..32, values -8..8. Return one JSON integer;\nthe empty sequence returns zero. Allowed probes use this same schema. There\nare no tables, clocks, external data or persistent state across queries.\n\nThe following finite family is supplied research bias. Choose a nonzero\npolynomial p(x)=a*x+b*x*x+c*x*x*x, with a,b,c each in {-2,-1,0,1,2}. For each\nlist position its contribution is p(x), optionally plus g*x times either the\nimmediately preceding value or the sum of all preceding values; g is in\n{-2,-1,1,2}, and missing preceding values contribute zero. Apply between one\nand four inclusive cumulative-sum passes to the contribution list, preserving\nlist order. Return the last entry after those passes. The source's choices\nare fixed and private; none is specified by the seed program. Use the measured\nexamples to infer a predictor. Implement investigate(context, acquire).\n\nExecution interface clarification: Use named or single-underscore loop\nvariables; other leading-underscore names remain forbidden. Use multiplication\nrather than **; no defaults.\n",
+      "focus_function": "readout",
+      "calibration": [
+        {
+          "input": {
+            "values": []
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              0
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              1
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "values": [
+              2
+            ]
+          },
+          "expected": 6
+        },
+        {
+          "input": {
+            "values": [
+              -1
+            ]
+          },
+          "expected": 3
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              0
+            ]
+          },
+          "expected": 4
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              1
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1
+            ]
+          },
+          "expected": 7
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": 10
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 25
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              2,
+              1
+            ]
+          },
+          "expected": 55
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              1,
+              0
+            ]
+          },
+          "expected": 80
+        }
+      ],
+      "development": [
+        {
+          "input": {
+            "values": [
+              2,
+              1
+            ]
+          },
+          "expected": 29
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              0,
+              0
+            ]
+          },
+          "expected": 150
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              2,
+              2,
+              2
+            ]
+          },
+          "expected": 330
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              3,
+              -3,
+              3,
+              -3
+            ]
+          },
+          "expected": 696
+        },
+        {
+          "input": {
+            "values": [
+              -4,
+              0,
+              0,
+              -2,
+              0,
+              0
+            ]
+          },
+          "expected": 2116
+        },
+        {
+          "input": {
+            "values": [
+              -4,
+              -3
+            ]
+          },
+          "expected": 189
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              -2
+            ]
+          },
+          "expected": 10
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              3,
+              3,
+              3,
+              3
+            ]
+          },
+          "expected": 1680
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              3,
+              -3,
+              3,
+              -3,
+              3
+            ]
+          },
+          "expected": 1110
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              0
+            ]
+          },
+          "expected": 24
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              0,
+              -3
+            ]
+          },
+          "expected": 171
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              2,
+              0,
+              -1
+            ]
+          },
+          "expected": 63
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              -4
+            ]
+          },
+          "expected": 36
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ]
+          },
+          "expected": 1316
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              2
+            ]
+          },
+          "expected": 38
+        },
+        {
+          "input": {
+            "values": [
+              -4,
+              0,
+              0
+            ]
+          },
+          "expected": 360
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              0,
+              0,
+              -2
+            ]
+          },
+          "expected": 310
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1,
+              -1,
+              3,
+              -2
+            ]
+          },
+          "expected": 139
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              -3,
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": 420
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              2
+            ]
+          },
+          "expected": 38
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": 94
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              0,
+              0,
+              2
+            ]
+          },
+          "expected": 426
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              0,
+              0,
+              0,
+              3
+            ]
+          },
+          "expected": 540
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              -1,
+              -2,
+              3,
+              -3,
+              -2
+            ]
+          },
+          "expected": 1835
+        }
+      ]
+    },
+    "instruction": "Improve the whole ordinary program using the task specification and measured examples. You may freely refactor any function, change interfaces or retained state, add/remove helpers, or replace the whole implementation. Diagnose the actual cause; a local edit is not required. Preserve a correct program when no useful change is needed.",
+    "current_program": "def investigate(context, acquire):\n    values = context[\"values\"]\n    if len(values) == 0:\n        return 0\n    contrib = []\n    prev = 0\n    for x in values:\n        p = -x + 2*x*x\n        term = 2*x*prev\n        contrib.append(p + term)\n        prev = x\n    for _ in range(4):\n        total = 0\n        for i in range(len(contrib)):\n            total = total + contrib[i]\n            contrib[i] = total\n    return contrib[-1]\n",
+    "current_development": {
+      "correct": 36,
+      "total": 36,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": []
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 6,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2
+            ]
+          },
+          "expected": 6,
+          "correct": true
+        },
+        {
+          "answer": 3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1
+            ]
+          },
+          "expected": 3,
+          "correct": true
+        },
+        {
+          "answer": 4,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              0
+            ]
+          },
+          "expected": 4,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              1
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 7,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1
+            ]
+          },
+          "expected": 7,
+          "correct": true
+        },
+        {
+          "answer": 10,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": 10,
+          "correct": true
+        },
+        {
+          "answer": 25,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 25,
+          "correct": true
+        },
+        {
+          "answer": 55,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              2,
+              1
+            ]
+          },
+          "expected": 55,
+          "correct": true
+        },
+        {
+          "answer": 80,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              1,
+              0
+            ]
+          },
+          "expected": 80,
+          "correct": true
+        },
+        {
+          "answer": 29,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              1
+            ]
+          },
+          "expected": 29,
+          "correct": true
+        },
+        {
+          "answer": 150,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              0,
+              0
+            ]
+          },
+          "expected": 150,
+          "correct": true
+        },
+        {
+          "answer": 330,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              2,
+              2,
+              2
+            ]
+          },
+          "expected": 330,
+          "correct": true
+        },
+        {
+          "answer": 696,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              3,
+              -3,
+              3,
+              -3
+            ]
+          },
+          "expected": 696,
+          "correct": true
+        },
+        {
+          "answer": 2116,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -4,
+              0,
+              0,
+              -2,
+              0,
+              0
+            ]
+          },
+          "expected": 2116,
+          "correct": true
+        },
+        {
+          "answer": 189,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -4,
+              -3
+            ]
+          },
+          "expected": 189,
+          "correct": true
+        },
+        {
+          "answer": 10,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              -2
+            ]
+          },
+          "expected": 10,
+          "correct": true
+        },
+        {
+          "answer": 1680,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              3,
+              3,
+              3,
+              3
+            ]
+          },
+          "expected": 1680,
+          "correct": true
+        },
+        {
+          "answer": 1110,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              3,
+              -3,
+              3,
+              -3,
+              3
+            ]
+          },
+          "expected": 1110,
+          "correct": true
+        },
+        {
+          "answer": 24,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              0
+            ]
+          },
+          "expected": 24,
+          "correct": true
+        },
+        {
+          "answer": 171,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              0,
+              -3
+            ]
+          },
+          "expected": 171,
+          "correct": true
+        },
+        {
+          "answer": 63,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              2,
+              0,
+              -1
+            ]
+          },
+          "expected": 63,
+          "correct": true
+        },
+        {
+          "answer": 36,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              -4
+            ]
+          },
+          "expected": 36,
+          "correct": true
+        },
+        {
+          "answer": 1316,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ]
+          },
+          "expected": 1316,
+          "correct": true
+        },
+        {
+          "answer": 38,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              2
+            ]
+          },
+          "expected": 38,
+          "correct": true
+        },
+        {
+          "answer": 360,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -4,
+              0,
+              0
+            ]
+          },
+          "expected": 360,
+          "correct": true
+        },
+        {
+          "answer": 310,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              0,
+              0,
+              -2
+            ]
+          },
+          "expected": 310,
+          "correct": true
+        },
+        {
+          "answer": 139,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1,
+              -1,
+              3,
+              -2
+            ]
+          },
+          "expected": 139,
+          "correct": true
+        },
+        {
+          "answer": 420,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              -3,
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": 420,
+          "correct": true
+        },
+        {
+          "answer": 38,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              2
+            ]
+          },
+          "expected": 38,
+          "correct": true
+        },
+        {
+          "answer": 94,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": 94,
+          "correct": true
+        },
+        {
+          "answer": 426,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              0,
+              0,
+              2
+            ]
+          },
+          "expected": 426,
+          "correct": true
+        },
+        {
+          "answer": 540,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              0,
+              0,
+              0,
+              3
+            ]
+          },
+          "expected": 540,
+          "correct": true
+        },
+        {
+          "answer": 1835,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              -1,
+              -2,
+              3,
+              -3,
+              -2
+            ]
+          },
+          "expected": 1835,
+          "correct": true
+        }
+      ]
+    },
+    "prior_attempts": [
+      {
+        "source": "def investigate(context, acquire):\n    values = context[\"values\"]\n    if len(values) == 0:\n        return 0\n    contrib = []\n    prev = 0\n    for x in values:\n        p = -x + 2*x*x\n        term = 2*x*prev\n        contrib.append(p + term)\n        prev = x\n    for _ in range(4):\n        total = 0\n        for i in range(len(contrib)):\n            total = total + contrib[i]\n            contrib[i] = total\n    return contrib[-1]\n",
+        "scope": "Synthetic integer sequence readout: contribution p(x)=-x+2*x*x plus 2*x*previous value, then four cumulative-sum passes; return final last entry.",
+        "change": "Replaced last-value passthrough with inferred polynomial, previous-value interaction, and four cumulative passes.",
+        "node_id": "binding-3-global-0",
+        "response_error": null,
+        "constraint_error": null,
+        "development": {
+          "correct": 36,
+          "total": 36,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 0,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": []
+              },
+              "expected": 0,
+              "correct": true
+            },
+            {
+              "answer": 0,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0
+                ]
+              },
+              "expected": 0,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 6,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2
+                ]
+              },
+              "expected": 6,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -1
+                ]
+              },
+              "expected": 3,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  0
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  1
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  1
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 10,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  0,
+                  0
+                ]
+              },
+              "expected": 10,
+              "correct": true
+            },
+            {
+              "answer": 25,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "expected": 25,
+              "correct": true
+            },
+            {
+              "answer": 55,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  2,
+                  1
+                ]
+              },
+              "expected": 55,
+              "correct": true
+            },
+            {
+              "answer": 80,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  1,
+                  0
+                ]
+              },
+              "expected": 80,
+              "correct": true
+            },
+            {
+              "answer": 29,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  1
+                ]
+              },
+              "expected": 29,
+              "correct": true
+            },
+            {
+              "answer": 150,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  3,
+                  0,
+                  0
+                ]
+              },
+              "expected": 150,
+              "correct": true
+            },
+            {
+              "answer": 330,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  2,
+                  2,
+                  2
+                ]
+              },
+              "expected": 330,
+              "correct": true
+            },
+            {
+              "answer": 696,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -3,
+                  3,
+                  -3,
+                  3,
+                  -3
+                ]
+              },
+              "expected": 696,
+              "correct": true
+            },
+            {
+              "answer": 2116,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -4,
+                  0,
+                  0,
+                  -2,
+                  0,
+                  0
+                ]
+              },
+              "expected": 2116,
+              "correct": true
+            },
+            {
+              "answer": 189,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -4,
+                  -3
+                ]
+              },
+              "expected": 189,
+              "correct": true
+            },
+            {
+              "answer": 10,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  0,
+                  -2
+                ]
+              },
+              "expected": 10,
+              "correct": true
+            },
+            {
+              "answer": 1680,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  3,
+                  3,
+                  3,
+                  3,
+                  3
+                ]
+              },
+              "expected": 1680,
+              "correct": true
+            },
+            {
+              "answer": 1110,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -3,
+                  3,
+                  -3,
+                  3,
+                  -3,
+                  3
+                ]
+              },
+              "expected": 1110,
+              "correct": true
+            },
+            {
+              "answer": 24,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  0
+                ]
+              },
+              "expected": 24,
+              "correct": true
+            },
+            {
+              "answer": 171,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  3,
+                  0,
+                  -3
+                ]
+              },
+              "expected": 171,
+              "correct": true
+            },
+            {
+              "answer": 63,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  2,
+                  0,
+                  -1
+                ]
+              },
+              "expected": 63,
+              "correct": true
+            },
+            {
+              "answer": 36,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  -4
+                ]
+              },
+              "expected": 36,
+              "correct": true
+            },
+            {
+              "answer": 1316,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2
+                ]
+              },
+              "expected": 1316,
+              "correct": true
+            },
+            {
+              "answer": 38,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -2,
+                  2
+                ]
+              },
+              "expected": 38,
+              "correct": true
+            },
+            {
+              "answer": 360,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -4,
+                  0,
+                  0
+                ]
+              },
+              "expected": 360,
+              "correct": true
+            },
+            {
+              "answer": 310,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  3,
+                  0,
+                  0,
+                  -2
+                ]
+              },
+              "expected": 310,
+              "correct": true
+            },
+            {
+              "answer": 139,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  1,
+                  -1,
+                  3,
+                  -2
+                ]
+              },
+              "expected": 139,
+              "correct": true
+            },
+            {
+              "answer": 420,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  -3,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "expected": 420,
+              "correct": true
+            },
+            {
+              "answer": 38,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  2
+                ]
+              },
+              "expected": 38,
+              "correct": true
+            },
+            {
+              "answer": 94,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -2,
+                  2,
+                  -2
+                ]
+              },
+              "expected": 94,
+              "correct": true
+            },
+            {
+              "answer": 426,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -3,
+                  0,
+                  0,
+                  2
+                ]
+              },
+              "expected": 426,
+              "correct": true
+            },
+            {
+              "answer": 540,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  3,
+                  0,
+                  0,
+                  0,
+                  3
+                ]
+              },
+              "expected": 540,
+              "correct": true
+            },
+            {
+              "answer": 1835,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -3,
+                  -1,
+                  -2,
+                  3,
+                  -3,
+                  -2
+                ]
+              },
+              "expected": 1835,
+              "correct": true
+            }
+          ]
+        },
+        "prompt_sha256": "535cd3ca8f38e9cd3c3a5848823bcb8b067a82c4ade18abda103a302f915efd3",
+        "raw_sha256": "2dcce0798b061a5d1a1a9245042ab4f1e4fb6328d6af0188baf09efccb89d93e",
+        "elapsed_seconds": 132.66502020900953,
+        "structure": [
+          {
+            "name": "investigate",
+            "arguments": [
+              "context",
+              "acquire"
+            ],
+            "calls": [],
+            "called_by": []
+          }
+        ]
+      }
+    ],
+    "required_return": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scope",
+        "change"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nThe single local name _ is allowed; other leading-underscore names are not.\nUse x*x and x*x*x rather than exponentiation (**); do not use function defaults.\nFor loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

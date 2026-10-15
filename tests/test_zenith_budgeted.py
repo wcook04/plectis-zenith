@@ -40,8 +40,18 @@ def reply(cost="0.0001", **extra):
 
 class BudgetedTests(unittest.TestCase):
     def setUp(self):
+        # These legacy tests deliberately stress arbitrary synthetic rates and
+        # aliases. Real model/price admission is exercised without these mocks
+        # in test_provider_policy.py; here the independent budget is the unit.
+        for name in ("require_model", "require_prices"):
+            admission = patch("zenith.budgeted." + name)
+            admission.start()
+            self.addCleanup(admission.stop)
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
+        gates = patch('zenith.provider_policy._inference_root', return_value=self.root/'inference')
+        gates.start()
+        self.addCleanup(gates.stop)
         self.env = patch.dict(os.environ, {"OPENROUTER_API_KEY": SECRET}, clear=True)
         self.env.start()
         self.addCleanup(self.env.stop)
@@ -67,7 +77,7 @@ class BudgetedTests(unittest.TestCase):
     def ledger(self):
         return json.loads((self.root / "shared" / "budget.json").read_text())
 
-    def pinned_provider(self, run="PIN", *, endpoint=None, row=None, caller=None, slug=SLUG):
+    def pinned_provider(self, run="PIN", *, endpoint=None, row=None, caller=None, slug=SLUG, inference_mode='serial'):
         seen = []
         def catalogue(url, headers, timeout):
             self.assertNotIn("Authorization", headers)
@@ -78,7 +88,7 @@ class BudgetedTests(unittest.TestCase):
             return {"data": {"id": MODEL, "endpoints": [endpoint or PINNED]}}
         provider = OpenRouterBudgetedProvider(self.root / run, MODEL, ".25", 40, 1024,
             self.root / "shared", caller=caller or Mock(return_value=reply(provider="Synthetic Host")),
-            catalogue_get=catalogue, provider_slug=slug)
+            catalogue_get=catalogue, provider_slug=slug, inference_mode=inference_mode)
         provider.catalogue_seen = seen
         return provider
 
@@ -91,11 +101,205 @@ class BudgetedTests(unittest.TestCase):
                 "authorization_ref": "synthetic-human-instruction-1", "reason": "explicitly retain unknown 429 reservation",
                 "accept_unknown_cost": True}
 
+    def test_bounded_mode_requires_pinned_route_and_rejects_unknown_mode(self):
+        for mode in ('bounded', 'unlimited'):
+            with self.assertRaises(ValueError):
+                OpenRouterBudgetedProvider(self.root/'invalid', MODEL, '.25', 40, 1024,
+                    self.root/'shared', inference_mode=mode)
+        self.assertFalse((self.root/'shared/budget.json').exists())
+
+    def test_bounded_requests_overlap_and_budget_remains_atomic_outside_http(self):
+        active = peak = 0
+        mutex = threading.Lock()
+        entered = threading.Event()
+        release = threading.Event()
+        def post(*args):
+            nonlocal active, peak
+            with mutex:
+                active += 1
+                peak = max(peak, active)
+                if active == 3:
+                    entered.set()
+            try:
+                self.assertTrue(release.wait(3))
+                return reply(provider='Synthetic Host')
+            finally:
+                with mutex:
+                    active -= 1
+        providers = [self.pinned_provider(f'bounded-{i}', slug=f'host-{i}/fp8',
+            endpoint={**PINNED, 'tag': f'host-{i}/fp8'}, caller=post, inference_mode='bounded') for i in range(3)]
+        with ThreadPoolExecutor(3) as pool:
+            futures = [pool.submit(self.ask, provider) for provider in providers]
+            try:
+                self.assertTrue(entered.wait(3))
+                # An in-flight HTTP request must not retain the budget lock.
+                status = providers[0].budget_status()
+                self.assertEqual(status['attempt_count'], 3)
+                ledger = self.ledger()
+                self.assertTrue(all(e['status'] == 'attempt_started' for e in ledger['entries'].values()))
+                self.assertEqual(Decimal(ledger['total_reserved_usd']),
+                    sum(Decimal(e['reserved_cost_usd']) for e in ledger['entries'].values()))
+            finally:
+                release.set()
+            for future in futures:
+                self.assertEqual(future.result(timeout=3), 'valid synthetic output')
+        ledger = self.ledger()
+        self.assertEqual(peak, 3)
+        self.assertEqual(Decimal(ledger['total_reported_cost_usd']), Decimal('.0003'))
+        self.assertTrue(all(e['status'] == 'response_supplied' and e['inference_mode'] == 'bounded'
+                            and e['queue_elapsed_seconds'] >= 0 and e['network_elapsed_seconds'] > 0
+                            for e in ledger['entries'].values()))
+
+    def test_bounded_wait_cancel_has_no_false_attempt_and_active_call_settles(self):
+        entered, release, cancelled = threading.Event(), threading.Event(), threading.Event()
+        def post(*args):
+            entered.set()
+            self.assertTrue(release.wait(3))
+            return reply(provider='Synthetic Host')
+        active = self.pinned_provider('active', caller=post, inference_mode='bounded')
+        waiting_caller = Mock(return_value=reply(provider='Synthetic Host'))
+        waiting = self.pinned_provider('waiting', caller=waiting_caller, inference_mode='bounded')
+        with ThreadPoolExecutor(2) as pool:
+            a = pool.submit(self.ask, active)
+            self.assertTrue(entered.wait(3))
+            b = pool.submit(waiting.ask_ai, 'hello', {'meta': {'session_id': 'waiting', 'node_id': 'case1'}}, cancelled)
+            cancelled.set()
+            try:
+                with self.assertRaisesRegex(RuntimeError, 'cancelled'):
+                    b.result(timeout=1)
+                waiting_caller.assert_not_called()
+                self.assertEqual(len(self.ledger()['entries']), 1)
+                self.assertFalse((waiting.run_dir/'handoff/budgeted_binding.json').exists())
+            finally:
+                release.set()
+            self.assertEqual(a.result(timeout=3), 'valid synthetic output')
+        self.assertEqual(len(self.ledger()['entries']), 1)
+        self.assertFalse(self.ledger()['halted'])
+
+    def test_bounded_same_pinned_route_serializes_and_records_queue_time(self):
+        active = peak = 0
+        mutex = threading.Lock()
+        def post(*args):
+            nonlocal active, peak
+            with mutex:
+                active += 1
+                peak = max(peak, active)
+            time.sleep(.03)
+            with mutex:
+                active -= 1
+            return reply(provider='Synthetic Host')
+        providers = [self.pinned_provider(f'same-route-{i}', caller=post, inference_mode='bounded') for i in range(3)]
+        with ThreadPoolExecutor(3) as pool:
+            self.assertTrue(all(pool.map(self.ask, providers)))
+        self.assertEqual(peak, 1)
+        self.assertTrue(any(e['queue_elapsed_seconds'] >= .02 for e in self.ledger()['entries'].values()))
+
+    def test_bounded_mode_is_bound_and_none_reasoning_explicitly_disabled(self):
+        row = {**ROW, 'supported_parameters': ROW['supported_parameters'] + ['reasoning']}
+        endpoint = {**PINNED, 'supported_parameters': PINNED['supported_parameters'] + ['reasoning']}
+        post = Mock(return_value=reply(provider='Synthetic Host'))
+        provider = self.pinned_provider('reasoning-off-bounded', row=row, endpoint=endpoint,
+            caller=post, inference_mode='bounded')
+        self.ask(provider)
+        self.assertEqual(post.call_args.args[2]['reasoning'], {'enabled': False})
+        binding = json.loads((provider.run_dir/'handoff/budgeted_binding.json').read_text())
+        self.assertEqual(binding['inference_mode'], 'bounded')
+
+    def test_bounded_shared_max_calls_cannot_be_overreserved(self):
+        posted = []
+        mutex = threading.Lock()
+        def post(*args):
+            with mutex:
+                posted.append(1)
+            time.sleep(.01)
+            return reply(provider='Synthetic Host')
+        def ask(index):
+            slug = f'cap-{index}/fp8'
+            provider = self.pinned_provider(f'cap-{index}', slug=slug,
+                endpoint={**PINNED, 'tag': slug}, caller=post, inference_mode='bounded')
+            provider.options['max_calls'] = 4
+            try:
+                self.ask(provider)
+                return True
+            except RuntimeError as error:
+                self.assertIn('max_calls', str(error))
+                return False
+        with ThreadPoolExecutor(8) as pool:
+            results = list(pool.map(ask, range(12)))
+        ledger = self.ledger()
+        self.assertEqual(sum(results), 4)
+        self.assertEqual(len(posted), 4)
+        self.assertEqual(len(ledger['entries']), 4)
+        self.assertEqual(Decimal(ledger['total_reserved_usd']),
+            sum(Decimal(entry['reserved_cost_usd']) for entry in ledger['entries'].values()))
+        self.assertFalse(ledger['halted'])
+
+    def test_bounded_mode_cannot_rebind_a_legacy_paid_run(self):
+        legacy = self.pinned_provider('mode-binding')
+        self.ask(legacy)
+        post = Mock(return_value=reply(provider='Synthetic Host'))
+        bounded = self.pinned_provider('mode-binding', caller=post, inference_mode='bounded')
+        with self.assertRaisesRegex(RuntimeError, 'binding is immutable'):
+            self.ask(bounded)
+        post.assert_not_called()
+
+    def test_failed_transport_retains_network_timing_and_never_retries(self):
+        def failed(*args):
+            time.sleep(.01)
+            raise RuntimeError('synthetic transport failure')
+        post = Mock(side_effect=failed)
+        provider = self.pinned_provider('timed-failure', caller=post, inference_mode='bounded')
+        with self.assertRaisesRegex(RuntimeError, 'synthetic transport failure'):
+            self.ask(provider)
+        entry = next(iter(self.ledger()['entries'].values()))
+        self.assertEqual(entry['status'], 'failed')
+        self.assertGreater(entry['network_elapsed_seconds'], 0)
+        self.assertGreaterEqual(entry['queue_elapsed_seconds'], 0)
+        with self.assertRaises(RuntimeError):
+            self.ask(provider)
+        self.assertEqual(post.call_count, 1)
+
     def unknown_429(self, run="rate-limited"):
         provider = self.provider(run, caller=Mock(side_effect=RuntimeError("OpenRouter HTTP 429: capacity unavailable")))
         with self.assertRaisesRegex(RuntimeError, "HTTP 429"):
             self.ask(provider)
         return provider
+
+    def test_structured_output_is_bound_transmitted_and_accounted_without_search(self):
+        row=copy.deepcopy(ROW)
+        row['supported_parameters'] += ['response_format','structured_outputs']
+        row['pricing']['web_search']='.01'
+        caller=Mock(return_value=reply())
+        provider=self.provider(row=row,caller=caller)
+        shape={'type':'json_schema','json_schema':{'name':'test','strict':True,'schema':{'type':'object','properties':{},'required':[],'additionalProperties':False}}}
+        provider.ask_ai('hello',{'meta':{'session_id':'RUN','node_id':'structured'},'response_format':shape,'system_prompt':'Execute only your current task.'})
+        payload=caller.call_args.args[2]
+        self.assertEqual(payload['response_format'],shape)
+        self.assertEqual(payload['messages'][0],{'role':'system','content':'Execute only your current task.'})
+        self.assertIn('system_prompt_sha256',next(iter(self.ledger()['entries'].values())))
+        self.assertNotIn('plugins',payload)
+        record=next(iter(self.ledger()['entries'].values()))
+        self.assertEqual(record['response_format_sha256'],digest(shape))
+        self.assertGreater(record['input_token_bound'],4096+len('hello'))
+        unsupported=self.provider(run='UNSUPPORTED',caller=Mock())
+        with self.assertRaisesRegex(RuntimeError,'structured output'):
+            unsupported.ask_ai('hi',{'meta':{'session_id':'UNSUPPORTED','node_id':'s'},'response_format':shape})
+        unsupported.caller.assert_not_called()
+
+    def test_reasoning_is_explicit_bound_and_within_existing_output_budget(self):
+        row=copy.deepcopy(ROW)
+        row['supported_parameters'].append('reasoning')
+        caller=Mock(return_value=reply())
+        provider=self.provider(row=row,caller=caller)
+        provider.ask_ai('hello',{'meta':{'session_id':'RUN','node_id':'reason'},'reasoning_effort':'medium'})
+        payload=caller.call_args.args[2]
+        self.assertEqual(payload['reasoning'],{'effort':'medium','exclude':True})
+        self.assertEqual(payload['max_tokens'],1024)
+        self.assertEqual(next(iter(self.ledger()['entries'].values()))['reasoning_effort'],'medium')
+        unsupported=self.provider(run='UNSUPPORTED',caller=Mock())
+        with self.assertRaisesRegex(RuntimeError,'reasoning support'):
+            unsupported.ask_ai('hello',{'meta':{'session_id':'UNSUPPORTED','node_id':'reason'},'reasoning_effort':'medium'})
+        unsupported.caller.assert_not_called()
 
     def test_provider_slug_is_explicit_and_run_binding_is_immutable(self):
         self.assertIsNone(normalize_provider_slug(None))
@@ -146,7 +350,6 @@ class BudgetedTests(unittest.TestCase):
                    {"provider_name": ""}, {"supported_parameters": ["max_tokens"]},
                    {"context_length": 4500}, {"max_prompt_tokens": 4096}, {"max_completion_tokens": 1000}]
         changes += [{"pricing": {**PINNED["pricing"], key: value}} for key, value in (
-            ("prompt", ".0000011"), ("completion", ".0000021"), ("request", ".01"),
             ("input_cache_read", ".0000006"), ("input_cache_write", ".0000001"),
             ("discount", 1.1), ("prompt", "NaN"))]
         for index, change in enumerate(changes):
@@ -363,7 +566,7 @@ class BudgetedTests(unittest.TestCase):
         rows = []
         for pricing in [None, {}, {"prompt": "1"}, {"prompt": "NaN", "completion": "0"},
                         {"prompt": True, "completion": "0"}, {"prompt": "-1", "completion": "0"},
-                        {"prompt": "0", "completion": "Infinity"}, {"prompt": "0", "completion": "0", "web_search": ".01"}]:
+                        {"prompt": "0", "completion": "Infinity"}, {"prompt": "0", "completion": "0", "image": ".01"}]:
             rows.append({**ROW, "pricing": pricing})
         rows += [{**ROW, "context_length": 100}, {**ROW, "supported_parameters": []},
                  {**ROW, "architecture": {"input_modalities": ["text"], "output_modalities": ["audio"]}}]

@@ -1,0 +1,77 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 5
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 7
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 9
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 5
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "a",
+        "value": 7
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 9
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 5
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 7
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 9
+      }
+    ]
+  ],
+  "purpose": "Separate the three put conflict modes and the trigger presence by counting direct row changes on repeated same-key puts. Experiment 1 (all main) distinguishes INSERT OR IGNORE (channel 1: only first insert counts) from INSERT OR REPLACE / DO UPDATE (channel 3: every put changes a row). Experiment 2 (alternating connections) tests whether the channel is main-only or main+other total_changes: with REPLACE/DO UPDATE the main-only channel is 2 while main+other is 3, and with IGNORE the main-only channel is 1 while main+other is 2. Experiment 3 (rollback then re-put) tests whether the channel counts uncommitted direct changes: REPLACE/DO UPDATE yields channel 3 (2 committed + 1 rolled-back) versus IGNORE yielding 1, and combined with the committed_sum=9 it also reveals whether the trigger fires on ignored inserts (trigger would add 1 to the channel for every put attempt, including the ignored one)."
+}

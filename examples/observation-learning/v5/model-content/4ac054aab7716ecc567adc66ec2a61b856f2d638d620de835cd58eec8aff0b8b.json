@@ -1,0 +1,7 @@
+{
+  "call_id": "4ac054aab7716ecc567adc66ec2a61b856f2d638d620de835cd58eec8aff0b8b",
+  "content": "{\n  \"experiments\": [\n    [\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"x\", \"value\": 10},\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"x\", \"value\": 20},\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"x\", \"value\": 30}\n    ],\n    [\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"x\", \"value\": 10},\n      {\"op\": \"put\", \"connection\": \"other\", \"key\": \"x\", \"value\": 20},\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"x\", \"value\": 30}\n    ],\n    [\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"x\", \"value\": 10},\n      {\"op\": \"begin\", \"connection\": \"main\", \"key\": null, \"value\": null},\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"x\", \"value\": 20},\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"x\", \"value\": 30},\n      {\"op\": \"rollback\", \"connection\": \"main\", \"key\": null, \"value\": null}\n    ]\n  ]\n,\n  \"purpose\": \"Distinguish INSERT OR IGNORE vs REPLACE vs ON CONFLICT DO UPDATE, and main-only vs main+other total_changes, using repeated puts to the same key where committed state may remain 10 but channel counts differ.\"\n}",
+  "original_content_sha256": "21104b9e69af737d02e0709ce48c1e73972f7d6e8eb25e8b537e85b53204302b",
+  "projection": "assistant content only; transport, headers, routing and credentials omitted",
+  "redacted": false
+}

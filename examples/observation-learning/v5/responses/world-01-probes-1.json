@@ -1,0 +1,107 @@
+{
+  "experiments": [
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 5
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 7
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 5
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 7
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 8
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 9
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      }
+    ]
+  ],
+  "purpose": "Separate the three put conflict policies (INSERT OR IGNORE, INSERT OR REPLACE, ON CONFLICT DO UPDATE) and the three channel definitions (main changes(), main total_changes, main+other total_changes) by using repeated puts on the same key, which produce different direct-change counts and different committed values under each policy, and by using a sequence whose committed state is empty but whose channel differs between changes() and total_changes."
+}

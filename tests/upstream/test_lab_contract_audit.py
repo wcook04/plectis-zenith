@@ -72,7 +72,7 @@ def test_contract_audit_flags_contradiction_amnesia(tmp_path: Path) -> None:
                 {
                     "id": "bf_1",
                     "name": "credit split",
-                    "lanes": ["MACRO", "STOCK"],
+                    "lanes": ["ENVIRONMENT", "MEASUREMENTS"],
                     "summary": "Conflict exists.",
                 }
             ],
@@ -88,14 +88,14 @@ def test_contract_audit_flags_contradiction_amnesia(tmp_path: Path) -> None:
             "directional_conflicts": [],
             "solo_targets": [],
             "thesis_stress": [],
-            "valid_prediction_targets": ["XOM"],
+            "valid_prediction_targets": ["SIGNAL_A"],
         },
     )
     _write_artifact(artifacts, "lab_decide", {"epicentre_thesis": "locked thesis"})
     _write_artifact(
         artifacts,
         "lab_director",
-        {"epicentre_thesis": "locked thesis", "predictions_t": [{"target_id": "XOM"}]},
+        {"epicentre_thesis": "locked thesis", "predictions_t": [{"target_id": "SIGNAL_A"}]},
     )
 
     audit = compute_lab_contract_audit(artifacts)
@@ -107,8 +107,8 @@ def test_contract_audit_flags_phase2_annotation_collapse(tmp_path: Path) -> None
     artifacts = tmp_path / "artifacts"
     _write_artifact(
         artifacts,
-        "lab_miner_v2_stock",
-        "{XOM, +2.1%, Momentum is strong. Momentum is strong., C:HIGH}",
+        "lab_miner_v2_measurements",
+        "{SIGNAL_A, +2.1%, Momentum is strong. Momentum is strong., C:HIGH}",
     )
     _write_artifact(
         artifacts,
@@ -149,7 +149,7 @@ def test_contract_audit_question_mark_scan_excludes_director_output(tmp_path: Pa
             "directional_conflicts": [],
             "solo_targets": [],
             "thesis_stress": [],
-            "valid_prediction_targets": ["XOM"],
+            "valid_prediction_targets": ["SIGNAL_A"],
         },
     )
     _write_artifact(artifacts, "lab_decide", {"epicentre_thesis": "locked thesis"})
@@ -158,8 +158,8 @@ def test_contract_audit_question_mark_scan_excludes_director_output(tmp_path: Pa
         "lab_director",
         {
             "epicentre_thesis": "locked thesis",
-            "predictions_t": [{"target_id": "XOM"}],
-            "trade_rationale": "Question in semantic prose is allowed here?",
+            "predictions_t": [{"target_id": "SIGNAL_A"}],
+            "forecast_rationale": "Question in semantic prose is allowed here?",
         },
     )
 
@@ -167,7 +167,7 @@ def test_contract_audit_question_mark_scan_excludes_director_output(tmp_path: Pa
     assert "QUESTION_MARK_OUTPUT" not in audit["hard_fails"]
 
 
-def test_contract_audit_refuses_market_fusion_candidate_claims(tmp_path: Path) -> None:
+def test_contract_audit_refuses_system_fusion_candidate_claims(tmp_path: Path) -> None:
     artifacts = tmp_path / "artifacts"
     _write_artifact(
         artifacts,
@@ -178,21 +178,21 @@ def test_contract_audit_refuses_market_fusion_candidate_claims(tmp_path: Path) -
             "candidate_situation_claims": [
                 {
                     "claim_id": "c1",
-                    "situation_id": "macro_event_x_equity_response",
-                    "lanes": ["MACRO", "STOCK"],
-                    "attempted_claim": "Macro event validates equity response.",
+                    "situation_id": "environment_event_x_observation_response",
+                    "lanes": ["ENVIRONMENT", "MEASUREMENTS"],
+                    "attempted_claim": "Environment event validates observation response.",
                 },
                 {
                     "claim_id": "c2",
-                    "situation_id": "etf_price_move_x_nav_basket_claim",
-                    "lanes": ["ETF"],
-                    "attempted_claim": "ETF price move implies NAV basket pressure.",
+                    "situation_id": "subsystems_value_move_x_nav_basket_claim",
+                    "lanes": ["SUBSYSTEMS"],
+                    "attempted_claim": "SUBSYSTEMS value move implies NAV basket pressure.",
                 },
                 {
                     "claim_id": "c3",
-                    "situation_id": "polymarket_expectation_x_macro_equity_situation",
-                    "lanes": ["POLYMARKET", "MACRO", "STOCK"],
-                    "attempted_claim": "Prediction market expectation validates macro equity situation.",
+                    "situation_id": "interventions_expectation_x_environment_observation_situation",
+                    "lanes": ["INTERVENTIONS", "ENVIRONMENT", "MEASUREMENTS"],
+                    "attempted_claim": "Prediction system expectation validates environment observation situation.",
                 },
             ],
         },
@@ -201,14 +201,14 @@ def test_contract_audit_refuses_market_fusion_candidate_claims(tmp_path: Path) -
     audit = compute_lab_contract_audit(artifacts)
 
     assert audit["status"] == "red"
-    assert "MARKET_FUSION_READINESS_REFUSAL" in audit["hard_fails"]
-    refusals = audit["details"]["market_fusion_readiness_refusals"]
+    assert "SYSTEM_FUSION_READINESS_REFUSAL" in audit["hard_fails"]
+    refusals = audit["details"]["system_fusion_readiness_refusals"]
     assert [row["claim_id"] for row in refusals] == ["c1", "c2", "c3"]
     assert all(row["consumer_name"] == "lab_director" for row in refusals)
-    assert "equity_expected_return_event_window_missing" in refusals[0][
+    assert "observation_expected_return_event_window_missing" in refusals[0][
         "refusal_reasons"
     ]
-    assert "etf_nav_provider_gap" in refusals[1]["refusal_reasons"]
-    assert "polymarket_resolved_archive_target_pairing_missing" in refusals[2][
+    assert "subsystems_nav_provider_gap" in refusals[1]["refusal_reasons"]
+    assert "interventions_resolved_archive_target_pairing_missing" in refusals[2][
         "refusal_reasons"
     ]

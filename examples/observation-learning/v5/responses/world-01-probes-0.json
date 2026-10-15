@@ -1,0 +1,155 @@
+{
+  "experiments": [
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": null,
+        "op": "begin",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": "b",
+        "op": "put",
+        "value": 5
+      },
+      {
+        "connection": "main",
+        "key": "b",
+        "op": "put",
+        "value": 6
+      },
+      {
+        "connection": "main",
+        "key": null,
+        "op": "rollback",
+        "value": null
+      }
+    ],
+    [
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 1
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "put",
+        "value": 2
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "update",
+        "value": 3
+      },
+      {
+        "connection": "main",
+        "key": "a",
+        "op": "delete",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": null,
+        "op": "begin",
+        "value": null
+      },
+      {
+        "connection": "main",
+        "key": "b",
+        "op": "put",
+        "value": 5
+      },
+      {
+        "connection": "main",
+        "key": "b",
+        "op": "put",
+        "value": 6
+      },
+      {
+        "connection": "main",
+        "key": null,
+        "op": "rollback",
+        "value": null
+      },
+      {
+        "connection": "other",
+        "key": "c",
+        "op": "put",
+        "value": 7
+      },
+      {
+        "connection": "other",
+        "key": "c",
+        "op": "put",
+        "value": 8
+      },
+      {
+        "connection": "other",
+        "key": "c",
+        "op": "update",
+        "value": 9
+      },
+      {
+        "connection": "other",
+        "key": "c",
+        "op": "delete",
+        "value": null
+      }
+    ]
+  ],
+  "purpose": "Distinguish conflict handling (IGNORE vs REPLACE vs DO UPDATE), trigger presence, and channel scope (main changes vs main total_changes vs main+other total_changes) by using repeated puts, updates, deletes, a rolled-back transaction, and writes on the other connection. The sequences create cases where committed state cancels but channel counts differ, and where main-only versus combined counters diverge."
+}

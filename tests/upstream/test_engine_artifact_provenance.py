@@ -89,9 +89,9 @@ def test_write_artifact_injects_canonical_metadata_and_provenance(tmp_path: Path
 
     harness = _EngineHarness(artifacts_dir)
     node = CodexNode(
-        id="global_stock_feed",
+        id="global_measurements_feed",
         type=NodeType.TOOL,
-        config_ref="codex/configs/stock_default.json",
+        config_ref="codex/configs/measurements_default.json",
         merged_hash="abc123",
         inline_overrides={"period": "2y", "precision": 4},
     )
@@ -100,21 +100,21 @@ def test_write_artifact_injects_canonical_metadata_and_provenance(tmp_path: Path
         harness,
         node,
         StepStatus.SUCCESS,
-        {"tool": "stock"},
-        {"columns": ["Ticker"], "rows": [["SPY"]]},
+        {"tool": "measurements"},
+        {"columns": ["target_id"], "rows": [["SUBSYSTEM_A"]]},
     )
 
-    artifact_path = artifacts_dir / "global_stock_feed.json"
+    artifact_path = artifacts_dir / "global_measurements_feed.json"
     assert artifact_path.exists()
 
     artifact = json.loads(artifact_path.read_text(encoding="utf-8"))
     metadata = artifact["metadata"]
 
     assert metadata["schema_version"] == TOOL_METADATA_SCHEMA_VERSION
-    assert metadata["data_schema_version"] == "stock.1"
+    assert metadata["data_schema_version"] == "measurements.1"
     assert isinstance(metadata["timestamp_iso"], str) and metadata["timestamp_iso"]
     assert isinstance(metadata["timestamp_epoch_s"], (int, float))
-    assert metadata["config_ref"] == "codex/configs/stock_default.json"
+    assert metadata["config_ref"] == "codex/configs/measurements_default.json"
     assert metadata["merged_hash"] == "abc123"
     assert metadata["override_keys"] == ["period", "precision"]
 
@@ -131,7 +131,7 @@ def test_write_artifact_preserves_explicit_override_keys(tmp_path: Path) -> None
 
     harness = _EngineHarness(artifacts_dir)
     node = CodexNode(
-        id="global_macro_feed",
+        id="global_environment_feed",
         type=NodeType.TOOL,
         inline_overrides={"ignored": True},
     )
@@ -141,14 +141,14 @@ def test_write_artifact_preserves_explicit_override_keys(tmp_path: Path) -> None
         node,
         StepStatus.SUCCESS,
         {
-            "tool": "macro",
+            "tool": "environment",
             "override_keys": ["already_set"],
             "diagnostics": {"warnings": "note"},
         },
         {},
     )
 
-    metadata = json.loads((artifacts_dir / "global_macro_feed.json").read_text(encoding="utf-8"))["metadata"]
+    metadata = json.loads((artifacts_dir / "global_environment_feed.json").read_text(encoding="utf-8"))["metadata"]
     assert metadata["override_keys"] == ["already_set"]
     assert metadata["diagnostics"]["warnings"] == ["note"]
 
@@ -159,9 +159,9 @@ def test_write_artifact_writes_canonical_alias_with_shared_provenance(tmp_path: 
 
     harness = _EngineHarness(artifacts_dir)
     harness._target_time_iso = "2026-03-03T21:00:00+00:00"
-    harness._horizon_label = "Next US Market Close"
+    harness._horizon_label = "Next US System Close"
     node = CodexNode(
-        id="oracle_truth_diff_equity",
+        id="oracle_truth_diff_observations",
         type=NodeType.TOOL,
         is_artifact=True,
         teleology="deterministic reconciliation",
@@ -175,12 +175,12 @@ def test_write_artifact_writes_canonical_alias_with_shared_provenance(tmp_path: 
         "truth_run_id": "RUN_TRUTH",
         "rows": [
             {
-                "target_id": "XOM",
-                "asset_class": "STOCK",
+                "target_id": "SIGNAL_A",
+                "target_kind": "MEASUREMENTS",
                 "prediction_direction": "UP",
-                "subject_snapshot_price": 100.0,
-                "predicted_target_price": 105.0,
-                "realized_truth_price": 104.0,
+                "subject_snapshot_value": 100.0,
+                "predicted_target_value": 105.0,
+                "realized_truth_value": 104.0,
                 "absolute_delta": 1.0,
                 "percent_delta": 0.9523809524,
                 "directional_correct": True,
@@ -191,8 +191,8 @@ def test_write_artifact_writes_canonical_alias_with_shared_provenance(tmp_path: 
             "row_count": 1,
             "directionally_correct_count": 1,
             "directionally_incorrect_count": 0,
-            "largest_absolute_miss_target": "XOM",
-            "largest_percent_miss_target": "XOM",
+            "largest_absolute_miss_target": "SIGNAL_A",
+            "largest_percent_miss_target": "SIGNAL_A",
         },
     }
 
@@ -200,18 +200,18 @@ def test_write_artifact_writes_canonical_alias_with_shared_provenance(tmp_path: 
         harness,
         node,
         StepStatus.SUCCESS,
-        {"tool": "oracle_truth_diff_equity"},
+        {"tool": "oracle_truth_diff_observations"},
         data,
     )
 
-    primary = json.loads((artifacts_dir / "oracle_truth_diff_equity.json").read_text(encoding="utf-8"))
+    primary = json.loads((artifacts_dir / "oracle_truth_diff_observations.json").read_text(encoding="utf-8"))
     alias = json.loads((artifacts_dir / "prediction_reconciliation.json").read_text(encoding="utf-8"))
 
-    assert primary["id"] == "oracle_truth_diff_equity"
+    assert primary["id"] == "oracle_truth_diff_observations"
     assert alias["id"] == "prediction_reconciliation"
     assert alias["data"] == primary["data"]
     assert alias["node_hash"] == primary["node_hash"]
-    assert alias["metadata"]["artifact_alias_of"] == "oracle_truth_diff_equity"
+    assert alias["metadata"]["artifact_alias_of"] == "oracle_truth_diff_observations"
     assert alias["metadata"]["canonical_artifact_id"] == "prediction_reconciliation"
     assert alias["metadata"]["target_time_iso"] == primary["metadata"]["target_time_iso"]
     assert alias["metadata"]["horizon_label"] == primary["metadata"]["horizon_label"]
@@ -222,11 +222,11 @@ def test_is_completed_bypasses_cache_when_policy_is_none(tmp_path: Path) -> None
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     harness = _EngineHarness(artifacts_dir)
     node = CodexNode(
-        id="global_stock_feed",
+        id="global_measurements_feed",
         type=NodeType.TOOL,
         execution={"cache_policy": "none"},
     )
-    artifact_path = artifacts_dir / "global_stock_feed.json"
+    artifact_path = artifacts_dir / "global_measurements_feed.json"
     artifact_path.write_text(
         json.dumps(
             {
@@ -245,11 +245,11 @@ def test_is_completed_uses_cache_when_policy_is_standard(tmp_path: Path) -> None
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     harness = _EngineHarness(artifacts_dir)
     node = CodexNode(
-        id="global_stock_feed",
+        id="global_measurements_feed",
         type=NodeType.TOOL,
         execution={"cache_policy": "standard"},
     )
-    artifact_path = artifacts_dir / "global_stock_feed.json"
+    artifact_path = artifacts_dir / "global_measurements_feed.json"
     artifact_path.write_text(
         json.dumps(
             {
@@ -270,12 +270,12 @@ def test_is_completed_can_force_load_stale_feed_when_override_enabled(tmp_path: 
     harness._force_load_stale_feeds = True
 
     node = CodexNode(
-        id="global_stock_feed",
+        id="global_measurements_feed",
         type=NodeType.TOOL,
         execution={"cache_policy": "standard"},
         meta={"is_feed": True},
     )
-    artifact_path = artifacts_dir / "global_stock_feed.json"
+    artifact_path = artifacts_dir / "global_measurements_feed.json"
     artifact_path.write_text(
         json.dumps(
             {
@@ -371,14 +371,14 @@ def test_recover_horizon_from_artifacts_reads_envelope_metadata(tmp_path: Path) 
         json.dumps({"nodes": [], "edges": []}),
         encoding="utf-8",
     )
-    (artifacts_dir / "global_stock_feed.json").write_text(
+    (artifacts_dir / "global_measurements_feed.json").write_text(
         json.dumps(
             {
-                "id": "global_stock_feed",
+                "id": "global_measurements_feed",
                 "status": "success",
                 "metadata": {
                     "target_time_iso": "2026-03-03T21:00:00+00:00",
-                    "horizon_label": "Next US Market Close (Tue Mar 03, 4:00 PM ET)",
+                    "horizon_label": "Next US System Close (Tue Mar 03, 4:00 PM ET)",
                 },
             }
         ),
@@ -388,7 +388,7 @@ def test_recover_horizon_from_artifacts_reads_envelope_metadata(tmp_path: Path) 
     recovered = GodModeEngine._recover_horizon_from_artifacts(harness)
     assert recovered is not None
     assert recovered["target_time"] == "2026-03-03T21:00:00+00:00"
-    assert recovered["horizon_label"] == "Next US Market Close (Tue Mar 03, 4:00 PM ET)"
+    assert recovered["horizon_label"] == "Next US System Close (Tue Mar 03, 4:00 PM ET)"
 
 
 def test_recover_horizon_from_artifacts_returns_none_without_metadata(tmp_path: Path) -> None:
@@ -423,19 +423,19 @@ def test_write_compact_run_snapshot_excludes_global_feeds_and_embeds_responses(t
 
     harness = _EngineHarness(artifacts_dir)
     harness.run_id = "RUN_SAMPLE"
-    harness._execution_scope = {"global_stock_feed", "lab_decide", "oracle_score_stock"}
+    harness._execution_scope = {"global_measurements_feed", "lab_decide", "oracle_score_measurements"}
     harness._node_outcomes = {
-        "global_stock_feed": "success",
+        "global_measurements_feed": "success",
         "lab_decide": "success",
-        "oracle_score_stock": "success",
+        "oracle_score_measurements": "success",
     }
 
     harness._universe = {
-        "global_stock_feed": CodexNode(
-            id="global_stock_feed",
+        "global_measurements_feed": CodexNode(
+            id="global_measurements_feed",
             type=NodeType.TOOL,
             group="feeds",
-            lane="STOCK",
+            lane="MEASUREMENTS",
             meta={"is_feed": True},
         ),
         "lab_decide": CodexNode(
@@ -443,15 +443,15 @@ def test_write_compact_run_snapshot_excludes_global_feeds_and_embeds_responses(t
             type=NodeType.REASONING,
             group="lab",
             lane="SPINE",
-            dependencies=("global_stock_feed",),
+            dependencies=("global_measurements_feed",),
             instruction="[CONTRACT: schema_cp1.json]",
             output_schema="isomorphic_cp1",
         ),
-        "oracle_score_stock": CodexNode(
-            id="oracle_score_stock",
+        "oracle_score_measurements": CodexNode(
+            id="oracle_score_measurements",
             type=NodeType.REASONING,
             group="oracle",
-            lane="STOCK",
+            lane="MEASUREMENTS",
             dependencies=("lab_decide",),
             instruction="[CONTRACT: evaluate_output.md]",
             output_schema="text",
@@ -473,21 +473,21 @@ def test_write_compact_run_snapshot_excludes_global_feeds_and_embeds_responses(t
                     "horizon_policy": "next_us_close",
                     "target_time_iso": "2026-03-03T21:00:00+00:00",
                     "target_time_et": "2026-03-03T16:00:00-05:00",
-                    "horizon_label": "Next US Market Close",
+                    "horizon_label": "Next US System Close",
                 },
             }
         ),
         encoding="utf-8",
     )
 
-    (artifacts_dir / "global_stock_feed.json").write_text(
+    (artifacts_dir / "global_measurements_feed.json").write_text(
         json.dumps(
             {
-                "id": "global_stock_feed",
+                "id": "global_measurements_feed",
                 "status": "success",
                 "node_hash": "feedhash",
                 "metadata": {"status": "success"},
-                "data": {"rows": [["AAPL"]]},
+                "data": {"rows": [["SIGNAL_B"]]},
             }
         ),
         encoding="utf-8",
@@ -502,17 +502,17 @@ def test_write_compact_run_snapshot_excludes_global_feeds_and_embeds_responses(t
                     "status": "success",
                     "model": "gemini",
                     "target_time_iso": "2026-03-03T21:00:00+00:00",
-                    "horizon_label": "Next US Market Close",
+                    "horizon_label": "Next US System Close",
                 },
                 "data": {"epicentre_thesis": "risk-off concentration"},
             }
         ),
         encoding="utf-8",
     )
-    (artifacts_dir / "oracle_score_stock.json").write_text(
+    (artifacts_dir / "oracle_score_measurements.json").write_text(
         json.dumps(
             {
-                "id": "oracle_score_stock",
+                "id": "oracle_score_measurements",
                 "status": "success",
                 "node_hash": "oraclehash",
                 "metadata": {"status": "success", "model": "chatgpt"},
@@ -538,13 +538,13 @@ def test_write_compact_run_snapshot_excludes_global_feeds_and_embeds_responses(t
     }
 
     node_ids = [entry["id"] for entry in payload["nodes"]]
-    assert "global_stock_feed" not in node_ids
-    assert node_ids == ["lab_decide", "oracle_score_stock"]
+    assert "global_measurements_feed" not in node_ids
+    assert node_ids == ["lab_decide", "oracle_score_measurements"]
 
     lab_entry = payload["nodes"][0]
-    assert lab_entry["dependencies"] == ["global_stock_feed"]
+    assert lab_entry["dependencies"] == ["global_measurements_feed"]
     assert lab_entry["response"] == {"epicentre_thesis": "risk-off concentration"}
-    assert lab_entry["injected"]["dependencies"][0]["id"] == "global_stock_feed"
+    assert lab_entry["injected"]["dependencies"][0]["id"] == "global_measurements_feed"
     assert lab_entry["injected"]["dependencies"][0]["status"] == "success"
 
     oracle_entry = payload["nodes"][1]

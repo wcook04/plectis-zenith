@@ -1,0 +1,59 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "a",
+        "value": 2
+      }
+    ]
+  ],
+  "purpose": "Separate the three put conflict policies and the three channel definitions. Experiment 1: a duplicate put on the same connection distinguishes INSERT OR IGNORE (no change, channel 0) from INSERT OR REPLACE and ON CONFLICT DO UPDATE (one change, channel 1), and the committed value distinguishes REPLACE (2) from DO UPDATE (2) vs IGNORE (1). Experiment 2: a rolled-back duplicate put tests whether the channel counts attempted/triggered changes (AFTER INSERT trigger fires even on rollback) versus committed changes, and whether changes()/total_changes are affected by rollback. Experiment 3: a duplicate put from the other connection distinguishes main-only total_changes from main+other total_changes, and also reveals whether the trigger logs on the other connection."
+}

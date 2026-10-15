@@ -69,12 +69,13 @@ export function Results({
   const ranOutCount = episodes.filter((e) => e.baseline.calls.some((c) => c.finish_reasons?.includes('length'))).length;
   const allRanOut = ranOutCount === episodes.length;
   const developmentCount = episodes.filter((e) => e.split === 'development').length;
+  const stoppedAt = Object.entries((cond.states as Record<string, string>) ?? {}).find(([, state]) => state === 'failure')?.[0];
 
   return (
     <div className="results">
       <section className="results__block" aria-labelledby="tokens-head">
         <h3 id="tokens-head" className="block-head">
-          {capital(numberWord(episodes.length))} snapshots, {modes.length === 1 ? 'one failure' : `${numberWord(modes.length)} kinds of failure`}
+          {modes.length === 1 ? 'One failure mode' : `${capital(numberWord(modes.length))} failure modes`} across {numberWord(episodes.length)} snapshots
         </h3>
         <p className="block-lede">
           {nodeName(change.node_id)} is asked to return one JSON map of where the miners agree and disagree. With the
@@ -99,17 +100,17 @@ export function Results({
 
       <section className="results__block results__block--wide" aria-labelledby="cont-head">
         <h3 id="cont-head" className="block-head">
-          Then the next step failed
+          {stoppedAt ? `The continuation stopped at ${nodeName(stoppedAt)}` : 'Then the next step failed'}
         </h3>
         <p className="block-lede">
-          A separate continuation reused the {numberWord(Object.keys((cond.reused_ancestor_sha256 as object) ?? {}).length)} unchanged
+          A separate continuation loaded the {numberWord(Object.keys((cond.reused_ancestor_sha256 as object) ?? {}).length)} unchanged
           ancestor outputs from the {fmtDate(String(cond.time_anchor))} run and all{' '}
           {numberWord(Object.keys((cond.frozen_feed_sha256 as object) ?? {}).length)} saved feeds, then ran forward with the
           changed instruction. {String(cond.next_failure ?? '')}
         </p>
         <p className="block-lede">
           The graph below shows each node’s recorded state. Select {nodeName('lab_decide')} to read the failure, or any
-          node to compare what ran with what was reused.
+          node to compare what ran in this run with what was loaded from the earlier run.
         </p>
         <Continuation conditional={conditional} labGraph={labGraph} localRuns={localRuns} />
       </section>
@@ -128,11 +129,11 @@ export function Results({
           {num(Number(data.calls ?? 0))} model calls in the window study, about US$
           {Number(data.actual_cost_usd ?? 0).toFixed(2)} in total.{' '}
           <a href={apiUrl('/api/v1/evidence/window-result')} target="_blank" rel="noreferrer">
-            Window receipt
+            Window experiment record
           </a>
           ,{' '}
           <a href={apiUrl('/api/v1/evidence/conditional-result')} target="_blank" rel="noreferrer">
-            continuation receipt
+            continuation record
           </a>
           .
         </p>
@@ -142,65 +143,79 @@ export function Results({
 }
 
 function TokenChart({ episodes, limit }: { episodes: Episode[]; limit: number }) {
-  const rows = episodes.flatMap((episode) => {
-    const arms: Array<{ arm: 'Original' | 'Changed'; data: Arm }> = [{ arm: 'Original', data: episode.baseline }];
-    if (episode.candidate) arms.push({ arm: 'Changed', data: episode.candidate });
-    return arms.map(({ arm, data }) => ({ episode, arm, data }));
-  });
+  const splits = Array.from(new Set(episodes.map((e) => e.split)));
+  const splitLabel = (split: string) =>
+    split === 'development' ? 'Earlier snapshots, used to choose the change' : 'Later snapshots, change frozen';
   return (
     <figure className="token-chart">
-      <div className="token-chart__scale" aria-hidden="true">
-        <span>0</span>
-        <span>{num(limit)} token limit</span>
-      </div>
       <table>
-        <caption className="visually-hidden">Response tokens used by each attempt against the {num(limit)}-token limit</caption>
-        <thead className="visually-hidden">
+        <caption className="visually-hidden">
+          Response tokens used by each attempt against the {num(limit)}-token limit
+        </caption>
+        <colgroup>
+          <col className="tc-date" />
+          <col className="tc-arm" />
+          <col className="tc-plot" />
+          <col className="tc-count" />
+          <col className="tc-result" />
+        </colgroup>
+        <thead>
           <tr>
-            <th>Snapshot</th>
-            <th>Instruction</th>
-            <th>Tokens</th>
-            <th>Result</th>
+            <th scope="col">Snapshot</th>
+            <th scope="col">Instruction</th>
+            <th scope="col" className="tc-axis">
+              <span>0</span>
+              <span>{num(limit)}-token limit</span>
+            </th>
+            <th scope="col" className="tc-num">Tokens</th>
+            <th scope="col">Result</th>
           </tr>
         </thead>
-        <tbody>
-          {rows.map(({ episode, arm, data }, index) => {
-            const call = data.calls[0] ?? {};
-            const tokens = call.completion_tokens ?? 0;
-            const ranOut = call.finish_reasons?.includes('length');
-            const firstOfEpisode = index === 0 || rows[index - 1].episode.id !== episode.id;
-            const firstOfSplit = index === 0 || rows[index - 1].episode.split !== episode.split;
-            return (
-              <tr key={`${episode.id}-${arm}`} className={`${firstOfEpisode ? 'is-first' : ''}${firstOfSplit ? ' is-split' : ''}`}>
-                <th scope="row" className="token-chart__episode">
-                  {firstOfSplit && (
-                    <span className="token-chart__split">
-                      {episode.split === 'development' ? 'Earlier snapshots, used to choose the change' : 'Later snapshots, change frozen'}
-                    </span>
-                  )}
-                  {firstOfEpisode && <span className="token-chart__date">{fmtDate(episode.time_anchor)}</span>}
-                </th>
-                <td className="token-chart__arm">{arm} instruction</td>
-                <td className="token-chart__bar">
-                  <span className="bar-track">
-                    <span
-                      className={`bar-fill ${arm === 'Changed' ? 'bar-fill--changed' : ''} ${ranOut ? 'bar-fill--capped' : ''}`}
-                      style={{ width: `${Math.min(100, (tokens / limit) * 100)}%` }}
-                    />
-                  </span>
-                  <span className="bar-value">{num(tokens)}</span>
-                </td>
-                <td className={`token-chart__result ${data.native_contract_pass ? 'is-pass' : 'is-fail'}`}>
-                  {data.native_contract_pass ? 'Valid JSON' : ranOut ? 'Ran out of tokens' : data.failure_mode}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
+        {splits.map((split) => (
+          <tbody key={split} className="tc-group">
+            <tr className="tc-group-head">
+              <th colSpan={5} scope="colgroup">
+                {splitLabel(split)}
+              </th>
+            </tr>
+            {episodes
+              .filter((e) => e.split === split)
+              .flatMap((episode) => {
+                const arms: Array<{ arm: 'Original' | 'Changed'; data: Arm }> = [{ arm: 'Original', data: episode.baseline }];
+                if (episode.candidate) arms.push({ arm: 'Changed', data: episode.candidate });
+                return arms.map(({ arm, data }, i) => {
+                  const call = data.calls[0] ?? {};
+                  const tokens = call.completion_tokens ?? 0;
+                  const ranOut = call.finish_reasons?.includes('length');
+                  return (
+                    <tr key={`${episode.id}-${arm}`} className={i === 0 ? 'tc-first' : 'tc-pair'}>
+                      <th scope="row" className="tc-date-cell">
+                        {i === 0 ? fmtDate(episode.time_anchor) : <span className="visually-hidden">{fmtDate(episode.time_anchor)}</span>}
+                      </th>
+                      <td>{arm}</td>
+                      <td className="tc-plot-cell">
+                        <span className="bar-track">
+                          <span
+                            className={`bar-fill${arm === 'Changed' ? ' bar-fill--changed' : ''}${ranOut ? ' bar-fill--capped' : ''}`}
+                            style={{ width: `${Math.min(100, (tokens / limit) * 100)}%` }}
+                          />
+                        </span>
+                      </td>
+                      <td className="tc-num">{num(tokens)}</td>
+                      <td className={data.native_contract_pass ? 'is-pass' : 'is-fail'}>
+                        {data.native_contract_pass ? 'Valid JSON' : ranOut ? 'Ran out of tokens' : data.failure_mode}
+                      </td>
+                    </tr>
+                  );
+                });
+              })}
+          </tbody>
+        ))}
       </table>
       <figcaption>
-        Response length of the {nodeName(episodes[0]?.baseline.node_id ?? '')} call. The earlier snapshots were not
-        rerun with the change; only the two later ones were.
+        Response length of the {nodeName(episodes[0]?.baseline.node_id ?? '')} call on one shared scale. Valid JSON is
+        not the same as meeting the requested bounds, shown below, or as completing the forecast. The earlier snapshots
+        were not rerun with the change.
       </figcaption>
     </figure>
   );
@@ -303,11 +318,11 @@ function Continuation({ conditional, labGraph, localRuns }: { conditional: Evide
     });
     return {
       kind: 'receipt',
-      label: 'Public receipt: conditional continuation',
+      label: 'Published continuation record',
       sourceUrl: apiUrl('/api/v1/evidence/conditional-result'),
       states,
       calls,
-      note: `Reused ancestors were loaded from ${String(cond.source_run_id)}; their outputs were not regenerated.`,
+      note: `Earlier outputs were loaded from run ${String(cond.source_run_id)} and not computed again.`,
     };
   }, [cond]);
 
@@ -325,6 +340,7 @@ function Continuation({ conditional, labGraph, localRuns }: { conditional: Evide
       key={choice.value}
       graph={labGraph}
       title="Lab graph with the continuation's recorded states"
+      context={choice.run?.kind === 'receipt' ? 'Lab graph: conditional continuation record' : choice.run?.kind === 'local' ? `Lab graph: saved run ${choice.run.runId}` : 'Lab graph: definitions'}
       run={choice.run}
       initialSelected={selected}
       onSelectionChange={setSelected}
@@ -334,7 +350,7 @@ function Continuation({ conditional, labGraph, localRuns }: { conditional: Evide
           mission="lab"
           value={choice.value}
           onChange={onChange}
-          receiptLabel="Public receipt: conditional continuation"
+          receiptLabel="Published continuation record"
           localEnabled={localRuns}
         />
       }

@@ -1,0 +1,414 @@
+{
+  "prompt": {
+    "task": {
+      "id": "native-utf8-0",
+      "source_id": "utf8-0",
+      "contract": "Native strict codecs UTF8 incremental-decoder diagnostic.\nA fresh query is exactly {\"events\":[event,...]}, with at most 32 events.\nAn event is exactly {\"op\":\"feed\",\"bytes\":[integer,...]}, {\"op\":\"finish\"},\nor {\"op\":\"reset\"}. Each byte is an integer 0..255, excluding booleans; each\nchunk has at most 64 bytes and the entire query at most 256 bytes. Empty chunks\nare legal. Feed invokes decode(bytes, final=False); finish invokes decode with\nempty bytes and final=True. Count Unicode code points in strings successfully\nreturned by these calls, not bytes or graphemes. A UnicodeDecodeError is a\nmeasured result: status becomes \"error\", and the failing call contributes ZERO\ncharacters, including any valid prefix in that same chunk. Successful finish\nsets status \"finished\". Otherwise status is \"open\", including incomplete byte\nprefixes. After either terminal status, only reset is legal. Reset creates a\nfresh strict decoder and sets count=0,status=\"open\". Reset may also occur while\nopen. Return {\"count\":integer,\"status\":\"open\"|\"finished\"|\"error\"}. Each query\nstarts fresh. Invalid/incomplete UTF8 bytes are allowed inputs; malformed query\nshapes and events after a terminal result without reset are illegal queries.\nImplement investigate(context, acquire). No initial program is supplied.\n",
+      "examples": [
+        {
+          "input": {
+            "events": []
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  163
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  66,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  97
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        }
+      ]
+    },
+    "parent_source": "def investigate(context, acquire):\n    def is_cont(b):\n        return 128 <= b <= 191\n\n    def decode_chunk(state, data, final):\n        out = []\n        i = 0\n        n = len(data)\n        while i < n:\n            b = data[i]\n            if state['pending']:\n                if is_cont(b):\n                    state['pending'].append(b)\n                    i += 1\n                    if len(state['pending']) == state['need']:\n                        out.append(chr(int.from_bytes(state['pending'], 'big')))\n                        state['pending'] = None\n                        state['need'] = 0\n                    continue\n                state['pending'] = None\n                state['need'] = 0\n                raise ValueError\n            if b < 128:\n                out.append(chr(b))\n                i += 1\n            elif 192 <= b <= 223:\n                state['pending'] = [b]\n                state['need'] = 2\n                i += 1\n            elif 224 <= b <= 239:\n                state['pending'] = [b]\n                state['need'] = 3\n                i += 1\n            elif 240 <= b <= 247:\n                state['pending'] = [b]\n                state['need'] = 4\n                i += 1\n            else:\n                raise ValueError\n        if final:\n            if state['pending']:\n                state['pending'] = None\n                state['need'] = 0\n                raise ValueError\n        return ''.join(out)\n\n    events = context['events']\n    state = {'pending': None, 'need': 0}\n    count = 0\n    status = 'open'\n    for ev in events:\n        op = ev['op']\n        if op == 'feed':\n            try:\n                count += len(decode_chunk(state, ev['bytes'], False))\n            except ValueError:\n                status = 'error'\n        elif op == 'finish':\n            try:\n                count += len(decode_chunk(state, [], True))\n                status = 'finished'\n            except ValueError:\n                status = 'error'\n        elif op == 'reset':\n            state = {'pending': None, 'need': 0}\n            count = 0\n            status = 'open'\n    return {'count': count, 'status': status}\n",
+    "parent_examples": {
+      "correct": 0,
+      "total": 8,
+      "errors": 8,
+      "rows": [
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported syntax: Try",
+          "input": {
+            "events": []
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported syntax: Try",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported syntax: Try",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported syntax: Try",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  163
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported syntax: Try",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported syntax: Try",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported syntax: Try",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  66,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported syntax: Try",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  97
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        }
+      ]
+    },
+    "investigation": {
+      "receipts": [
+        {
+          "slot": 1,
+          "policy_error": "ValueError: only function definitions are permitted at top level"
+        }
+      ],
+      "native_probes": 0,
+      "query_attempts": 0,
+      "query_units": 0,
+      "policy_executions": 1,
+      "slots_used": 1,
+      "detected": false,
+      "semantic_defect": false,
+      "technical_defect": false,
+      "witness_sha256": null
+    },
+    "instruction": "Repair the complete ordinary program using all measured outcomes. Investigator notes are hypotheses: inspect the code and receipts yourself. You may change any function, interface or state, remove the decomposition or preserve correct code. Retain all previously correct obligations, not only the latest witness. Return source, scope and change."
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, I/O or global state.\nThe single local name _ is allowed; other leading-underscore names are not.\nUse x*x and x*x*x rather than exponentiation (**); do not use function defaults.\nFor and while loops, comprehensions, lambda, nonlocal closure variables,\narithmetic except power, and bit shifts are permitted. No classes,\ntry/except, yield or recursion tricks.\nAll execution remains bounded by the worker CPU, memory and wall-time limits.\nBuiltins: abs all any bool chr dict enumerate float int isinstance len list max min\nrange repr reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split join\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

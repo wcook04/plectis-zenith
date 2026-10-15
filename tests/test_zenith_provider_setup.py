@@ -111,7 +111,7 @@ class ProviderSetupTests(unittest.TestCase):
             raise RuntimeError("Authorization: Bearer " + SENTINEL + " NVIDIA " + NVIDIA_SENTINEL)
         with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"OPENROUTER_API_KEY": SENTINEL, "NVIDIA_API_KEY": NVIDIA_SENTINEL}, clear=True):
             run = Path(directory) / "RUN"
-            provider = OpenRouterFreeProvider(run, caller=fail)
+            provider = OpenRouterFreeProvider(run, model="qwen/fixture:free", caller=fail)
             try:
                 provider.ask_ai("hello", CONFIG)
             except RuntimeError:
@@ -170,54 +170,19 @@ class ProviderSetupTests(unittest.TestCase):
 
 
 class NvidiaProviderTests(unittest.TestCase):
-    def test_explicit_model_official_endpoint_own_key_receipt_and_no_resend(self):
-        seen = []
-        def post(url, headers, payload, timeout):
-            seen.append((url, headers, payload))
-            return {"model": "actual/nim-model", "choices": [{"message": {"content": "synthetic " + NVIDIA_SENTINEL}}], "usage": {"total_tokens": 9}}
-        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"NVIDIA_API_KEY": NVIDIA_SENTINEL}, clear=True):
-            run = Path(directory) / "RUN"
-            with self.assertRaisesRegex(ValueError, "explicit --model"):
-                NvidiaNimProvider(run, None)
-            provider = NvidiaNimProvider(run, "chosen/nim-model", caller=post)
-            text = provider.ask_ai("hello", CONFIG)
-            self.assertNotIn(NVIDIA_SENTINEL, text)
-            provider.ask_ai("hello", CONFIG)
-            self.assertEqual(len(seen), 1)
-            self.assertEqual(seen[0][0], NVIDIA_ENDPOINT)
-            self.assertEqual(seen[0][1]["Authorization"], "Bearer " + NVIDIA_SENTINEL)
-            self.assertEqual(seen[0][2]["model"], "chosen/nim-model")
-            receipts = [json.loads(path.read_text()) for path in (run / "handoff/receipts").glob("*.json")]
-            response = next(row for row in receipts if row["status"] == "response_supplied")
-            self.assertEqual(response["requested_model"], "chosen/nim-model")
-            self.assertEqual(response["actual_model"], "actual/nim-model")
-            self.assertEqual(response["usage"]["total_tokens"], 9)
-            self.assertIsNone(response["cost"])
-            for path in run.rglob("*.json"):
-                self.assertNotIn(NVIDIA_SENTINEL, path.read_text())
+    def test_unpriced_nvidia_inference_is_disabled_before_transport(self):
+        post = Mock()
+        with tempfile.TemporaryDirectory() as directory:
+            with self.assertRaisesRegex(ValueError, "unverified pricing"):
+                NvidiaNimProvider(Path(directory) / "RUN", "deepseek/current", caller=post)
+        post.assert_not_called()
 
-    def test_nvidia_failure_and_missing_key_do_not_leak_or_retry(self):
-        def fail(*args):
-            raise RuntimeError("echo " + NVIDIA_SENTINEL)
-        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {"NVIDIA_API_KEY": NVIDIA_SENTINEL}, clear=True):
-            run = Path(directory) / "RUN"
-            provider = NvidiaNimProvider(run, "chosen/nim-model", caller=fail)
-            with self.assertRaises(RuntimeError) as caught:
-                provider.ask_ai("hello", CONFIG)
-            self.assertNotIn(NVIDIA_SENTINEL, str(caught.exception))
-            with self.assertRaisesRegex(RuntimeError, "not be silently resent"):
-                provider.ask_ai("hello", CONFIG)
-            for path in run.rglob("*.json"):
-                self.assertNotIn(NVIDIA_SENTINEL, path.read_text())
-        with tempfile.TemporaryDirectory() as directory, patch.dict(os.environ, {}, clear=True):
-            post = Mock()
-            with self.assertRaisesRegex(RuntimeError, "NVIDIA_API_KEY is not configured"):
-                NvidiaNimProvider(Path(directory) / "RUN", "chosen/nim-model", caller=post).ask_ai("hello", CONFIG)
-            post.assert_not_called()
+    def test_metadata_check_remains_available_without_inference(self):
+        with patch.dict(os.environ, {}, clear=True):
             result = check(provider="nvidia_nim")
-            self.assertFalse(result["key_configured"])
-            self.assertFalse(result["inference_performed"])
-            self.assertIn("unknown", result["pricing"])
+        self.assertFalse(result["key_configured"])
+        self.assertFalse(result["inference_performed"])
+        self.assertIn("unknown", result["pricing"])
 
 
 if __name__ == "__main__":

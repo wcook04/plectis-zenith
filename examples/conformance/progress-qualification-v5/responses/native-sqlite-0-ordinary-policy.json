@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    actions = [{'op': 'put', 'id': 1}, {'op': 'delete', 'id': 1}, {'op': 'put', 'id': 2}]\\n    return {'query': {'actions': actions}, 'note': {'hypothesis': 'SQLite AUTOINCREMENT tracks sqlite_sequence, so deleting the max row does not lower the next id; parent tracks only current max and predicts 2.'}}\\n\",\"scope\":\"Compare AUTOINCREMENT persistence after deleting the highest allocated row, then reinserting a lower explicit ID.\",\"change\":\"Use put 1, delete 1, put 2: native should allocate 3 from sqlite_sequence, while parent predicts 2 from current maximum.\"}",
+  "prompt_sha256": "27bf594d099c9a60d2135946a91790cc4fe1d6da6ca91ceedd2a27c14528e35e"
+}

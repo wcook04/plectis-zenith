@@ -1,56 +1,15 @@
-# Run the demonstration
+# Prepare one synthetic observation pair
 
-**This is not financial advice.** [Research notice](../RESEARCH_NOTICE.md).
+**Experimental research prototype.** The public example uses synthetic observations of a disclosed toy generator. No predictive improvement has been demonstrated.
 
-## Offline teaching example (start here)
+The preparation creates earlier and later packets for an invented abstract System A. Measurements, subsystems, environment, events and interventions are five synthetic perspectives of the same generated state; derived values are computed from them. No source archive or network is needed. Use the native CLI's `prepare-demo --help` for current command options.
 
-`python -m zenith demo --output state/demo/offline-example` is a fully synthetic,
-offline first run. It needs no inputs, credentials or network. It authors its own
-feed snapshots, executes the real native Lab graph through the original engine,
-`runtime.start`/`import-response` and contract validation, deliberately imports one
-invalid response (rejected and retained), corrects it, and reports the completion
-counts it actually observed in `summary.json`. Everything it generates stays under
-`--output`, and an existing nonempty output directory is refused.
+Pass the earlier packet to `python -m zenith prepare lab`, declaring its cutoff and a later horizon. Preparation loads the six feed artifacts and prepares the first agent request. It makes no model call and produces no completed forecast. See [the current receipt](../examples/demo/result.json). Agent responses are imported with `python -m zenith import-response`; authored teaching answers must not be presented as model execution.
 
-It is a **synthetic contract demonstration**: completing the graph shows the
-contracts execute, not that forecasting improved. The generated README and
-summary retain the research notice and identify the synthetic inputs.
+After Lab completes, Oracle receives that frozen subject and the later packet. Freeze numeric `snapshot_value` and `target_value` forecasts for named observables at the exact horizon. Keep unavailable or unmatched outcomes unresolved. Evolve may propose one reviewed change; compare original and revised graphs on further held-out cases under the same information and budget.
 
-## Prepare one mixed snapshot pair (real inputs, optional)
+This teaches the protocol. It does not validate physical dynamics, predictive accuracy or an improvement from revision.
 
-`prepare-demo` uses real saved stocks, ETFs and prediction markets. It replaces
-only macro and news, then reruns CALC. It never reads the original macro/news
-payloads and makes no network or model calls. The source directories must contain
-`runtime_context.json` and the three retained `artifacts/global_*_feed.json` files.
+## Synthetic offline first run
 
-```sh
-python -m zenith prepare-demo --earlier-source /path/to/earlier \
-  --later-source /path/to/later --output state/demo/my-pair
-python -m zenith prepare lab --run-id DEMO_LAB \
-  --feed-source state/demo/my-pair/earlier \
-  --time-anchor <latest-permitted-earlier-collection-time> \
-  --horizon <declared-later-time> --context-profile compact_feeds
-```
-
-The second command loads the actual graph and writes the first agent request.
-Those private prompts contain real inputs. Agent responses are imported through
-`python -m zenith import-response --packet <request.json> --response <answer.json> --model <author>`.
-Model execution and permission to send source data to that provider need explicit
-configuration. Do not call an authored teaching response an LLM result.
-
-Once the Lab completes, pair it with the later mixed packet:
-
-```sh
-python -m zenith run oracle --run-id DEMO_ORACLE --subject-run DEMO_LAB \
-  --truth-run state/demo/my-pair/later --context-profile compact_feeds
-```
-
-The current prepared example loaded six feeds and stopped at `lab_seed_state`
-awaiting its first response. No CP1, CP2, forecast or Oracle result exists for
-this edition. See [the receipt](../examples/demo/result.json).
-
-Only the two files under the prepared directory's `public/` subdirectory are
-intended for public input presentation: per-feed provenance and synthetic
-replacements. Real inputs and recomputed CALC stay beside them in private
-`earlier/` and `later/` directories. Copying a file into `public/` is not a licence
-check; the exporter itself deliberately withholds the real payloads.
+Run `python -m zenith demo --output work/first-run` to execute authored Lab responses without an API key or network. It demonstrates contracts and retains an intentionally rejected response. It is not model inference or a forecasting result. See the generated `summary.json` and README.

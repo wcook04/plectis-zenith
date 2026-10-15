@@ -17,8 +17,8 @@ export function normalizeState(raw: unknown): NodeState {
 
 export const STATE_LABEL: Record<NodeState, string> = {
   success: 'Ran',
-  loaded: 'Reused',
-  pending: 'Awaiting response',
+  loaded: 'Loaded',
+  pending: 'Request prepared',
   failure: 'Failed',
   not_started: 'Not started',
   not_reached: 'Not reached',
@@ -27,8 +27,8 @@ export const STATE_LABEL: Record<NodeState, string> = {
 
 export const STATE_DESCRIPTION: Record<NodeState, string> = {
   success: 'Executed in this run and produced an output that passed validation.',
-  loaded: 'Loaded from an earlier run. Reused evidence, not a fresh execution.',
-  pending: 'The request is prepared and waiting for a model response. No output exists yet.',
+  loaded: 'Loaded from saved data. Not computed in this run.',
+  pending: 'The request is prepared. No model call is recorded, so no output exists.',
   failure: 'Executed in this run and failed.',
   not_started: 'Never started in this run.',
   not_reached: 'Execution stopped before this node.',

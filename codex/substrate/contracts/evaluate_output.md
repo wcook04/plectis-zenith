@@ -8,7 +8,7 @@ enough for the survival classifier to extract realized drivers.
 For each prediction vector evaluated, output one block:
 
 LANE: <lane_name>
-VECTOR: <the original prediction, quoted>
+VECTOR: <the original prediction, observationd>
 OPERATOR: >> | --> | >| | x--x | << >> | === | ... (which operator the prediction used)
 PREDICTION: <what was predicted, one line>
 PREDICTION_CONF: HIGH | MEDIUM | LOW (from the prediction's confidence tag)
@@ -25,11 +25,11 @@ DRIVER: <the key realized driver that determined the outcome, one line>
 - Special: If BAND_TYPE=WIDENED and reality falls in the widened portion only (not the standard band), verdict is PARTIAL not HIT. Widened bands earn partial credit, not full credit.
 
 ## Operator-Aware Verdict Adjustments
-- **`...` (Latency) predictions**: If the predictor stated "setup building / no expression yet," a 24h MISS on price is EXPECTED. Grade the SETUP VALIDITY instead: did the conditions the predictor identified actually exist? If yes and direction was eventually correct, verdict is PARTIAL (not MISS). If the setup itself was wrong, verdict is MISS.
+- **`...` (Latency) predictions**: If the predictor stated "setup building / no expression yet," a 24h MISS on value is EXPECTED. Grade the SETUP VALIDITY instead: did the conditions the predictor identified actually exist? If yes and direction was eventually correct, verdict is PARTIAL (not MISS). If the setup itself was wrong, verdict is MISS.
 - **`<< >>` (Bifurcation) predictions**: Two sub-predictions in one vector. Evaluate BOTH legs. If one leg hits and the other misses, verdict is PARTIAL regardless of individual magnitudes.
 - **`===` (Short-Circuit) predictions**: These are conditional (IF trigger fires THEN violent move). If the trigger did NOT fire: verdict is N/A (not MISS). If the trigger fired: grade normally against the predicted magnitude.
 - **`>|` (Dampening) predictions**: The predictor claimed a force was being absorbed. If reality shows a BREAKOUT (the absorption failed), verdict is MISS with DRIVER noting "dampening mechanism failed."
-- **Dynamic-universe lane (Polymarket)**:
+- **Dynamic-universe lane (Interventions)**:
   - `EXPIRED`: Entity naturally resolved/aged out before comparable T+1 measurement.
   - `DROPPED`: Entity dropped out of the measurable leaderboard/universe at T+1.
   - `EXPIRED`/`DROPPED` are state outcomes, not directional misses.

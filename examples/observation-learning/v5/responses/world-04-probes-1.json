@@ -1,0 +1,77 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 3
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 3
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      }
+    ]
+  ],
+  "purpose": "These sequences create repeated conflicting puts whose committed net effect is identical under all three conflict policies, but whose channel counts differ depending on whether the source counts attempted inserts, actual row changes, or trigger firings. The second experiment also separates main-only counters from main+other counters. The third experiment separates direct change counts from trigger-based counts and from total_changes, because rollback removes committed effects while leaving counter increments."
+}

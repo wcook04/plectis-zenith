@@ -2,61 +2,52 @@
 // its citations and the receipts bound to the chapter by /api/v1/site.
 import type { Chapter, Paper } from '../api';
 import { apiUrl } from '../api';
-import { EVIDENCE_KIND_LABEL, SECTION_LABEL } from '../content/copy';
-import { latexToText } from '../lib/latex';
+import { SECTION_LABEL } from '../content/copy';
+import { sectionTitle, shortCitation } from '../lib/latex';
 
 const EVIDENCE_LABEL: Record<string, string> = {
-  sources: 'Source hashes for the saved feeds',
-  observations: 'Example stored prices, earlier and later',
-  'window-result': 'Window experiment receipt',
-  'conditional-result': 'Conditional continuation receipt',
-  replacements: 'Synthetic macro and news examples',
-  'demo-result': 'Preparation receipt',
+  sources: 'Where each input comes from, with file hashes',
+  observations: 'Synthetic observations, earlier and later',
+  'window-result': 'Window experiment record',
+  'conditional-result': 'Conditional continuation record',
+  replacements: 'Synthetic multi-feed observations',
+  'demo-result': 'Preparation record',
 };
 
-export function PaperAside({ chapter, paper }: { chapter: Chapter; paper: Paper | null }) {
+export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper: Paper | null; latex: string | null }) {
   const section = chapter.paper_section;
-  const kind = EVIDENCE_KIND_LABEL[chapter.evidence_kind];
+  const currentPdf = paper !== null && 'pdf_current' in paper && paper.pdf_current === true;
   const citations = section && paper ? paper.citations.filter((c) => section.citation_ids.includes(c.id)) : [];
   return (
     <aside className="paper-aside" aria-label={`Sources for ${chapter.title}`}>
-      {kind && (
-        <p className={`kind kind--${chapter.evidence_kind}`}>
-          <span className="kind__label">{kind.label}.</span> {kind.note}
-        </p>
-      )}
       {section && (
         <div className="paper-aside__block">
           <h3 className="paper-aside__head">In the paper</h3>
           <p>
-            <a href={apiUrl(section.pdf_url)} target="_blank" rel="noreferrer">
-              {SECTION_LABEL[section.id] ?? 'Paper section'}
+            <a href={section.source_url} target="_blank" rel="noreferrer">
+              {(latex && sectionTitle(latex, section.start_line, section.end_line)) ?? SECTION_LABEL[section.id] ?? 'Paper section'}
             </a>
             <span className="paper-aside__quiet">
               {' '}
-              (PDF), or the{' '}
-              <a href={section.source_url} target="_blank" rel="noreferrer">
-                LaTeX source, lines {section.start_line}&ndash;{section.end_line}
-              </a>
+              (current LaTeX source, lines {section.start_line}&ndash;{section.end_line})
             </span>
+            <br />
+            <a href={apiUrl(section.pdf_url)} target="_blank" rel="noreferrer">
+              {currentPdf ? 'Section PDF' : 'Previous edition PDF'}
+            </a>
           </p>
         </div>
       )}
       {citations.length > 0 && (
         <div className="paper-aside__block">
           <h3 className="paper-aside__head">Cited here</h3>
-          <ol className="refs">
+          <ul className="refs refs--short">
             {citations.map((citation) => (
-              <li key={citation.id} id={`ref-${chapter.id}-${citation.id}`}>
-                {latexToText(citation.latex)}
-                {citation.urls.map((url) => (
-                  <a key={url} className="refs__link" href={url} target="_blank" rel="noreferrer">
-                    {linkLabel(url)}
-                  </a>
-                ))}
+              <li key={citation.id}>
+                <a href={`#ref-${citation.id}`}>{shortCitation(citation.latex)}</a>
               </li>
             ))}
-          </ol>
+          </ul>
         </div>
       )}
       {chapter.evidence_urls.length > 0 && (
@@ -84,7 +75,10 @@ export function PaperAside({ chapter, paper }: { chapter: Chapter; paper: Paper 
 export function linkLabel(url: string): string {
   if (url.includes('arxiv.org')) return 'arXiv';
   if (url.includes('doi.org')) return 'DOI';
-  if (url.includes('github.com/wcook04/plectis-zenith')) return 'Repository';
+  if (url.includes('github.com/wcook04/plectis-zenith')) {
+    const file = url.split('/').pop()?.split('#')[0] ?? '';
+    return file ? file : 'Repository';
+  }
   if (url.includes('github.com')) return 'GitHub';
   return 'Link';
 }

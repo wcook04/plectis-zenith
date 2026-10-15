@@ -1,0 +1,1486 @@
+{
+  "prompt": {
+    "task": {
+      "id": "state-2",
+      "family": "synthetic_integer_sequence",
+      "description": "Synthetic resettable integer source. Input is exactly\n{\"values\":[integer,...]}, length 0..32, values -8..8. Return one JSON integer;\nthe empty sequence returns zero. Allowed probes use this same schema. There\nare no tables, clocks, external data or persistent state across queries.\n\nThe following finite family is supplied research bias. Choose a nonzero\npolynomial p(x)=a*x+b*x*x+c*x*x*x, with a,b,c each in {-2,-1,0,1,2}. For each\nlist position its contribution is p(x), optionally plus g*x times either the\nimmediately preceding value or the sum of all preceding values; g is in\n{-2,-1,1,2}, and missing preceding values contribute zero. Apply between one\nand four inclusive cumulative-sum passes to the contribution list, preserving\nlist order. Return the last entry after those passes. The source's choices\nare fixed and private; none is specified by the seed program. Use the measured\nexamples to infer a predictor. Implement investigate(context, acquire).\n",
+      "focus_function": "readout",
+      "calibration": [
+        {
+          "input": {
+            "values": []
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              0
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              1
+            ]
+          },
+          "expected": 3
+        },
+        {
+          "input": {
+            "values": [
+              2
+            ]
+          },
+          "expected": 16
+        },
+        {
+          "input": {
+            "values": [
+              -1
+            ]
+          },
+          "expected": -5
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              0
+            ]
+          },
+          "expected": 9
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              1
+            ]
+          },
+          "expected": 3
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1
+            ]
+          },
+          "expected": 13
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": 18
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 34
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              2,
+              1
+            ]
+          },
+          "expected": 77
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              1,
+              0
+            ]
+          },
+          "expected": 111
+        }
+      ],
+      "development": [
+        {
+          "input": {
+            "values": [
+              2,
+              2
+            ]
+          },
+          "expected": 68
+        },
+        {
+          "input": {
+            "values": [
+              -4,
+              0,
+              0
+            ]
+          },
+          "expected": -912
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 70
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              3,
+              -3,
+              3,
+              -3
+            ]
+          },
+          "expected": -1035
+        },
+        {
+          "input": {
+            "values": [
+              -1,
+              0,
+              0,
+              2,
+              0,
+              0
+            ]
+          },
+          "expected": -9
+        },
+        {
+          "input": {
+            "values": [
+              4,
+              3
+            ]
+          },
+          "expected": 423
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              -2,
+              -2
+            ]
+          },
+          "expected": -8
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              2,
+              0
+            ]
+          },
+          "expected": 48
+        },
+        {
+          "input": {
+            "values": [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          },
+          "expected": -155
+        },
+        {
+          "input": {
+            "values": [
+              -1,
+              1,
+              -1,
+              1,
+              -1,
+              1
+            ]
+          },
+          "expected": -139
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              0,
+              -3
+            ]
+          },
+          "expected": -483
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              3,
+              -3,
+              -3
+            ]
+          },
+          "expected": 576
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": 240
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              -3,
+              -3,
+              -3,
+              -3,
+              -3
+            ]
+          },
+          "expected": -3549
+        },
+        {
+          "input": {
+            "values": [
+              -4,
+              4
+            ]
+          },
+          "expected": -352
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              0,
+              0
+            ]
+          },
+          "expected": -414
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              0,
+              0,
+              3
+            ]
+          },
+          "expected": 561
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              -2,
+              -2,
+              0,
+              -1
+            ]
+          },
+          "expected": 340
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              3,
+              0
+            ]
+          },
+          "expected": 153
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": -136
+        },
+        {
+          "input": {
+            "values": [
+              -1,
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": -50
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "expected": -1019
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              -3,
+              3,
+              -3,
+              1,
+              0
+            ]
+          },
+          "expected": -1497
+        }
+      ]
+    },
+    "instruction": "Improve the whole ordinary program using the task specification and measured examples. You may freely refactor any function, change interfaces or retained state, add/remove helpers, or replace the whole implementation. Diagnose the actual cause; a local edit is not required. Preserve a correct program when no useful change is needed.",
+    "current_program": "def summarize_values(values):\n    return values[-1] if values else 0\n\ndef readout(summary):\n    return summary\n\ndef investigate(context, acquire):\n    return readout(summarize_values(context[\"values\"]))\n",
+    "current_development": {
+      "correct": 3,
+      "total": 36,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": []
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1
+            ]
+          },
+          "expected": 3,
+          "correct": false
+        },
+        {
+          "answer": 2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2
+            ]
+          },
+          "expected": 16,
+          "correct": false
+        },
+        {
+          "answer": -1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1
+            ]
+          },
+          "expected": -5,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              0
+            ]
+          },
+          "expected": 9,
+          "correct": false
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              1
+            ]
+          },
+          "expected": 3,
+          "correct": false
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1
+            ]
+          },
+          "expected": 13,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": 18,
+          "correct": false
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 34,
+          "correct": false
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              2,
+              1
+            ]
+          },
+          "expected": 77,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              1,
+              0
+            ]
+          },
+          "expected": 111,
+          "correct": false
+        },
+        {
+          "answer": 2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              2
+            ]
+          },
+          "expected": 68,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -4,
+              0,
+              0
+            ]
+          },
+          "expected": -912,
+          "correct": false
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 70,
+          "correct": false
+        },
+        {
+          "answer": -3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              3,
+              -3,
+              3,
+              -3
+            ]
+          },
+          "expected": -1035,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1,
+              0,
+              0,
+              2,
+              0,
+              0
+            ]
+          },
+          "expected": -9,
+          "correct": false
+        },
+        {
+          "answer": 3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              4,
+              3
+            ]
+          },
+          "expected": 423,
+          "correct": false
+        },
+        {
+          "answer": -2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              -2,
+              -2
+            ]
+          },
+          "expected": -8,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              2,
+              0
+            ]
+          },
+          "expected": 48,
+          "correct": false
+        },
+        {
+          "answer": -1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1,
+              -1,
+              -1,
+              -1,
+              -1
+            ]
+          },
+          "expected": -155,
+          "correct": false
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1,
+              1,
+              -1,
+              1,
+              -1,
+              1
+            ]
+          },
+          "expected": -139,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": -3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              0,
+              -3
+            ]
+          },
+          "expected": -483,
+          "correct": false
+        },
+        {
+          "answer": -3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              3,
+              -3,
+              -3
+            ]
+          },
+          "expected": 576,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              0,
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": 240,
+          "correct": false
+        },
+        {
+          "answer": -3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              -3,
+              -3,
+              -3,
+              -3,
+              -3
+            ]
+          },
+          "expected": -3549,
+          "correct": false
+        },
+        {
+          "answer": 4,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -4,
+              4
+            ]
+          },
+          "expected": -352,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              0,
+              0
+            ]
+          },
+          "expected": -414,
+          "correct": false
+        },
+        {
+          "answer": 3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              0,
+              0,
+              3
+            ]
+          },
+          "expected": 561,
+          "correct": false
+        },
+        {
+          "answer": -1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              -2,
+              -2,
+              0,
+              -1
+            ]
+          },
+          "expected": 340,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              3,
+              0
+            ]
+          },
+          "expected": 153,
+          "correct": false
+        },
+        {
+          "answer": -2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": -136,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1,
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": -50,
+          "correct": false
+        },
+        {
+          "answer": 2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "expected": -1019,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              -3,
+              3,
+              -3,
+              1,
+              0
+            ]
+          },
+          "expected": -1497,
+          "correct": false
+        }
+      ]
+    },
+    "prior_attempts": [
+      {
+        "source": "def investigate(context, acquire):\n    values = context.get(\"values\", [])\n    if not values:\n        return 0\n    \n    # Infer parameters from calibration examples\n    # From single-element cases: p(1)=3, p(2)=16, p(-1)=-5\n    # Solving a + b + c = 3\n    #          2a + 4b + 8c = 16\n    #         -a + b - c = -5\n    # Gives a=1, b=2, c=0 -> p(x) = x + 2x^2\n    \n    # Determine g and pass count using multi-element examples\n    # Example [1, 0] expected 9\n    # Contributions without interaction: p(1)=3, p(0)=0\n    # With one cumsum pass: [3, 3]\n    # Need final value 9. If we apply another pass? No, that would be 6.\n    # Let's look at the structure again.\n    # Maybe the \"interaction\" term is added BEFORE cumulative sums?\n    # Or maybe there are multiple passes.\n    \n    # Let's test hypothesis: p(x) = x + 2x^2. Interaction coefficient g.\n    # Number of passes k.\n    \n    # Case [1]: val=1. contrib=p(1)=3. After k passes, last elem is 3 (since prefix sum of constant/single element doesn't change it if k>=1? No.)\n    # Cumulative sum of [3] is [3]. So result 3 matches.\n    \n    # Case [1, 0]: vals=[1, 0].\n    # pos 0: x=1. prev_sum=0. contrib = p(1) + g*1*0 = 3.\n    # pos 1: x=0. prev_sum=1. contrib = p(0) + g*0*1 = 0.\n    # List C = [3, 0].\n    # Pass 1: S1 = [3, 3]. Last=3.\n    # Pass 2: S2 = [3, 6]. Last=6.\n    # Pass 3: S3 = [3, 9]. Last=9.\n    # Expected 9. This implies 3 passes with g irrelevant here because x=0 kills interaction.\n    \n    # Check [0, 1]: vals=[0, 1].\n    # pos 0: x=0. contrib=0.\n    # pos 1: x=1. prev_sum=0. contrib=p(1)+g*1*0=3.\n    # C=[0, 3].\n    # P1: [0, 3]. Last=3.\n    # P2: [0, 3]. Last=3.\n    # P3: [0, 3]. Last=3.\n    # Expected 3. Matches any number of passes >=1.\n    \n    # Check [1, 1]: vals=[1, 1].\n    # pos 0: x=1. contrib=3.\n    # pos 1: x=1. prev_sum=1. contrib=p(1)+g*1*1 = 3+g.\n    # C=[3, 3+g].\n    # We suspect 3 passes based on [1,0].\n    # P1: [3, 6+g].\n    # P2: [3, 9+2g].\n    # P3: [3, 12+3g].\n    # Expected 13. 12+3g=13 => 3g=1 => g=1/3. Not integer.\n    \n    # Re-evaluate passes. Maybe 2 passes?\n    # [1,0] with 2 passes gave 6. Expected 9. Fail.\n    # Maybe 4 passes?\n    # [1,0] C=[3,0].\n    # P1:[3,3], P2:[3,6], P3:[3,9], P4:[3,12]. Last 12 != 9.\n    \n    # Is my polynomial wrong?\n    # p(1)=3, p(2)=16, p(-1)=-5.\n    # a+b+c=3\n    # 2a+4b+8c=16\n    # -a+b-c=-5\n    # Sum eq1 and eq3: 2b = -2 => b=-1.\n    # Then a+c=4.\n    # Eq2: 2a-4+8c=16 => 2a+8c=20 => a+4c=10.\n    # Subtract a+c=4 from a+4c=10: 3c=6 => c=2.\n    # a=2.\n    # p(x) = 2x - x^2 + 2x^3.\n    # Check p(1) = 2-1+2=3. OK.\n    # Check p(2) = 4-4+16=16. OK.\n    # Check p(-1) = -2-1-2=-5. OK.\n    \n    # Now re-test [1, 1] with p(x)=2x-x^2+2x^3.\n    # pos 0: x=1. contrib=3.\n    # pos 1: x=1. prev_sum=1. contrib=3 + g*1*1 = 3+g.\n    # C=[3, 3+g].\n    # Try 3 passes again.\n    # P1: [3, 6+g].\n    # P2: [3, 9+2g].\n    # P3: [3, 12+3g].\n    # Expected 13. 12+3g=13 => g=1/3. Still fail.\n    \n    # Try 2 passes.\n    # P1: [3, 6+g].\n    # P2: [3, 9+2g].\n    # Expected 13. 9+2g=13 => 2g=4 => g=2.\n    \n    # Let's verify g=2 and 2 passes with other examples.\n    # [1, 0] expected 9.\n    # C=[3, 0]. (pos 1 x=0 so interaction 0).\n    # P1: [3, 3].\n    # P2: [3, 6].\n    # Result 6. Expected 9. Mismatch.\n    \n    # Did I calculate C correctly for [1,0]? \n    # pos 0: x=1. prev_sum=0. contrib=p(1)+g*1*0=3.\n    # pos 1: x=0. prev_sum=1. contrib=p(0)+g*0*1=0.\n    # Yes C=[3,0].\n    \n    # What if interaction uses IMMEDIATELY PRECEDING VALUE instead of SUM?\n    # Spec says: \"optionally plus g*x times either the immediately preceding value or the sum of all preceding values\"\n    \n    # Hypothesis B: Immediate Preceding Value.\n    # [1, 0]:\n    # pos 0: x=1. prev_val=0 (missing). contrib=3.\n    # pos 1: x=0. prev_val=1. contrib=0 + g*0*1 = 0.\n    # Same C=[3,0]. Fails same way.\n    \n    # Let's check [2, 1, 0] expected 111.\n    # p(2)=16, p(1)=3, p(0)=0.\n    # Using Sum Preceding, g=2, 2 passes?\n    # pos 0: x=2. ps=0. c=16.\n    # pos 1: x=1. ps=2. c=3 + 2*1*2 = 7.\n    # pos 2: x=0. ps=3. c=0 + 2*0*3 = 0.\n    # C=[16, 7, 0].\n    # P1: [16, 23, 23].\n    # P2: [16, 39, 62].\n    # Result 62. Expected 111.\n    \n    # Using Sum Preceding, g=?, 3 passes?\n    # C=[16, 3+2g, 0].\n    # P1: [16, 19+2g, 19+2g].\n    # P2: [16, 35+4g, 54+6g].\n    # P3: [16, 51+8g, 105+12g].\n    # 105+12g=111 => 12g=6 => g=0.5. No.\n    \n    # Let's look at [1, 2, 1] expected 77.\n    # p(1)=3, p(2)=16, p(1)=3.\n    # Pos 0: 3.\n    # Pos 1: x=2. ps=1. c=16 + g*2*1 = 16+2g.\n    # Pos 2: x=1. ps=3. c=3 + g*1*3 = 3+3g.\n    # C=[3, 16+2g, 3+3g].\n    \n    # If 3 passes:\n    # P1: [3, 19+2g, 22+5g].\n    # P2: [3, 22+2g, 44+7g].\n    # P3: [3, 25+2g, 69+9g].\n    # 69+9g=77 => 9g=8. No.\n    \n    # If 4 passes:\n    # P3 was [3, 25+2g, 69+9g].\n    # P4: [3, 28+2g, 97+11g].\n    # 97+11g=77 => negative g.\n    \n    # Let's reconsider the polynomial derivation.\n    # Single elements define p(x) directly IF no interaction affects them (prev=0).\n    # And if passes don't change single element list (they don't).\n    # So p(1)=3, p(2)=16, p(-1)=-5 is robust.\n    # Roots: 2x^3 - x^2 + 2x - 3 = 0? No, p(x)-y=0.\n    # p(x) = 2x^3 - x^2 + 2x.\n    \n    # Let's try fitting [1, 1] -> 13 again.\n    # C=[3, 3+g] (using sum prev).\n    # If 1 pass: [3, 6+g]. 6+g=13 => g=7. Out of range {-2..2}.\n    # If 2 passes: [3, 9+2g]. 9+2g=13 => g=2.\n    # If 3 passes: [3, 12+3g]. 12+3g=13 => g=1/3.\n    # If 4 passes: [3, 15+4g]. 15+4g=13 => g=-0.5.\n    \n    # So g=2, 2 passes fits [1,1]. But failed [1,0] (got 6, want 9).\n    # Why did [1,0] fail? C=[3,0].\n    # P1: [3,3]. P2: [3,6].\n    # Is it possible interaction applies differently?\n    # \"plus g*x times ... sum of all preceding values\"\n    # For [1,0], pos 1 is x=0. Term is g*0*1 = 0. Correct.\n    \n    # Maybe the number of passes varies? \"Apply between one and four inclusive... The source's choices are fixed\".\n    # Fixed means same N for all inputs.\n    \n    # Could the polynomial be different? \n    # What if `acquire` provides hints? No, standard signature.\n    \n    # Let's check [2, 2] expected 68.\n    # p(2)=16.\n    # Pos 0: 16.\n    # Pos 1: x=2. ps=2. c=16 + g*2*2 = 16+4g.\n    # C=[16, 16+4g].\n    # 2 passes, g=2:\n    # C=[16, 24].\n    # P1: [16, 40].\n    # P2: [16, 56].\n    # Expected 68. Diff 12.\n    \n    # 3 passes, g=2:\n    # P1: [16, 40].\n    # P2: [16, 56].\n    # P3: [16, 72].\n    # Expected 68. Close but no.\n    \n    # 3 passes, g=?\n    # C=[16, 16+4g].\n    # P1: [16, 32+4g].\n    # P2: [16, 48+8g].\n    # P3: [16, 64+12g].\n    # 64+12g=68 => 12g=4 => g=1/3.\n    \n    # There is a contradiction between [1,1] suggesting g=2/N=2 and others failing.\n    \n    # Let's look at [0, 0, 2, 0] expected 48.\n    # p(0)=0, p(2)=16.\n    # Pos 0: 0.\n    # Pos 1: 0.\n    # Pos 2: x=2. ps=0. c=16.\n    # Pos 3: x=0. ps=2. c=0.\n    # C=[0, 0, 16, 0].\n    # 2 passes:\n    # P1: [0, 0, 16, 16].\n    # P2: [0, 0, 16, 32].\n    # Exp 48.\n    # 3 passes:\n    # P2: [0, 0, 16, 32].\n    # P3: [0, 0, 16, 48].\n    # Match! So N=3 seems likely for this case.\n    \n    # If N=3, let's re-evaluate [1,1] exp 13.\n    # C=[3, 3+g].\n    # P1: [3, 6+g].\n    # P2: [3, 9+2g].\n    # P3: [3, 12+3g].\n    # 12+3g=13 => g=1/3. Impossible.\n    \n    # Wait, did I get p(x) right?\n    # Calibration: [1]->3, [2]->16, [-1]->-5.\n    # My poly: 2x^3 - x^2 + 2x.\n    # p(1) = 2-1+2=3.\n    # p(2) = 16-4+4=16.\n    # p(-1) = -2-1-2=-5.\n    # It is correct.\n    \n    # Is it possible interaction is with IMMEDIATE PREVIOUS VALUE?\n    # Let's retry [1,1] with Immediate Prev, N=3.\n    # Pos 0: x=1. prev=0. c=3.\n    # Pos 1: x=1. prev=1. c=3 + g*1*1 = 3+g.\n    # Same C.\n    \n    # Retry [0,0,2,0] with Immediate Prev, N=3.\n    # Pos 0: 0.\n    # Pos 1: 0.\n    # Pos 2: x=2. prev=0. c=16.\n    # Pos 3: x=0. prev=2. c=0.\n    # Same C.\n    \n    # Contradiction remains. One case needs g=2 (from [1,1] if N=2) or fractional.\n    # Other case needs N=3.\n    \n    # Let's check [1, 0] exp 9 with N=3.\n    # C=[3, 0].\n    # P1: [3, 3].\n    # P2: [3, 6].\n    # P3: [3, 9].\n    # Match!\n    \n    # So N=3 works for [1,0] and [0,0,2,0].\n    # Does N=3 work for [1,1] exp 13?\n    # Requires 12+3g=13. No integer g.\n    \n    # Is it possible p(x) is different? \n    # What if the sequence isn't just p(x)?\n    # \"contribution is p(x), optionally plus...\"\n    \n    # Let's check [2, 1, 0] exp 111 with N=3.\n    # C=[16, 3+2g, 0] (Sum Prev).\n    # P1: [16, 19+2g, 19+2g].\n    # P2: [16, 35+4g, 54+6g].\n    # P3: [16, 51+8g, 105+12g].\n    # 105+12g=111 => 12g=6 => g=0.5.\n    \n    # All signs point to g being non-integer or model wrong.\n    # However, constraints say g in {-2,-1,1,2}.\n    \n    # Let's look at [1, 2, 1] exp 77 with N=3.\n    # C=[3, 16+2g, 3+3g].\n    # P1: [3, 19+2g, 22+5g].\n    # P2: [3, 22+2g, 44+7g].\n    # P3: [3, 25+2g, 69+9g].\n    # 69+9g=77 => 9g=8.\n    \n    # Maybe N=4?\n    # [1,0] exp 9.\n    # C=[3,0].\n    # P3: [3,9].\n    # P4: [3,12]. Fail.\n    \n    # Maybe N=1?\n    # [1,0] exp 9. C=[3,0]. Last 0. Fail.\n    \n    # Is it possible the \"sum of all preceding values\" includes current?\n    # No, \"preceding\".\n    \n    # Let's step back. Look at [2, 2] exp 68.\n    # If N=3, g=2 (integers only).\n    # C=[16, 16+4(2)=24].\n    # P1: [16, 40].\n    # P2: [16, 56].\n    # P3: [16, 72].\n    # Exp 68. Off by 4.\n    \n    # If N=3, g=1.\n    # C=[16, 20].\n    # P1: [16, 36].\n    # P2: [16, 52].\n    # P3: [16, 68].\n    # MATCH!\n    \n    # So g=1, N=3 fits [2,2].\n    # Let's check [1,1] exp 13 with g=1, N=3.\n    # C=[3, 3+1=4].\n    # P1: [3, 7].\n    # P2: [3, 10].\n    # P3: [3, 13].\n    # MATCH!\n    \n    # Let's check [1,0] exp 9 with g=1, N=3.\n    # C=[3, 0].\n    # P1: [3, 3].\n    # P2: [3, 6].\n    # P3: [3, 9].\n    # MATCH!\n    \n    # Let's check [0,0,2,0] exp 48 with g=1, N=3.\n    # C=[0, 0, 16, 0].\n    # P1: [0, 0, 16, 16].\n    # P2: [0, 0, 16, 32].\n    # P3: [0, 0, 16, 48].\n    # MATCH!\n    \n    # Let's check [2, 1, 0] exp 111 with g=1, N=3.\n    # C=[16, 3+2(1)(1)=5, 0]. Note: pos 1 x=1, ps=2. c=3+1*1*2=5.\n    # C=[16, 5, 0].\n    # P1: [16, 21, 21].\n    # P2: [16, 37, 58].\n    # P3: [16, 53, 111].\n    # MATCH!\n    \n    # Conclusion: p(x) = 2x^3 - x^2 + 2x, g=1, interaction with Sum of Preceding Values, N=3 passes.\n\n    def calc_p(x):\n        return 2 * x * x * x - x * x + 2 * x\n\n    contributions = []\n    running_sum = 0\n    for x in values:\n        # Contribution is p(x) + g * x * running_sum\n        # g = 1\n        c = calc_p(x) + 1 * x * running_sum\n        contributions.append(c)\n        running_sum += x\n        \n    # Apply 3 cumulative sum passes\n    res_list = contributions\n    for _ in range(3):\n        new_res = []\n        s = 0\n        for v in res_list:\n            s += v\n            new_res.append(s)\n        res_list = new_res\n        \n    return res_list[-1]",
+        "scope": "Inferred cubic polynomial coefficients, interaction type/coefficient, and number of cumulative passes from calibration data.",
+        "change": "Replaced trivial identity function with full logic implementing p(x)=2x^3-x^2+2x, additive interaction g=1 with prefix sum, and 3 cumulative sum passes.",
+        "node_id": "state-2-global-0",
+        "response_error": null,
+        "constraint_error": "ValueError: private names are not permitted",
+        "development": {
+          "correct": 0,
+          "total": 36,
+          "errors": 36,
+          "rows": [
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": []
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1
+                ]
+              },
+              "expected": 3,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2
+                ]
+              },
+              "expected": 16,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -1
+                ]
+              },
+              "expected": -5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  0
+                ]
+              },
+              "expected": 9,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0,
+                  1
+                ]
+              },
+              "expected": 3,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  1
+                ]
+              },
+              "expected": 13,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  0,
+                  0
+                ]
+              },
+              "expected": 18,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "expected": 34,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  2,
+                  1
+                ]
+              },
+              "expected": 77,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2,
+                  1,
+                  0
+                ]
+              },
+              "expected": 111,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2,
+                  2
+                ]
+              },
+              "expected": 68,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -4,
+                  0,
+                  0
+                ]
+              },
+              "expected": -912,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "expected": 70,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -3,
+                  3,
+                  -3,
+                  3,
+                  -3
+                ]
+              },
+              "expected": -1035,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -1,
+                  0,
+                  0,
+                  2,
+                  0,
+                  0
+                ]
+              },
+              "expected": -9,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  4,
+                  3
+                ]
+              },
+              "expected": 423,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2,
+                  -2,
+                  -2
+                ]
+              },
+              "expected": -8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  2,
+                  0
+                ]
+              },
+              "expected": 48,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -1,
+                  -1,
+                  -1,
+                  -1,
+                  -1
+                ]
+              },
+              "expected": -155,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -1,
+                  1,
+                  -1,
+                  1,
+                  -1,
+                  1
+                ]
+              },
+              "expected": -139,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0,
+                  0
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -3,
+                  0,
+                  -3
+                ]
+              },
+              "expected": -483,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  3,
+                  3,
+                  -3,
+                  -3
+                ]
+              },
+              "expected": 576,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "expected": 240,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -3,
+                  -3,
+                  -3,
+                  -3,
+                  -3,
+                  -3
+                ]
+              },
+              "expected": -3549,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -4,
+                  4
+                ]
+              },
+              "expected": -352,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -3,
+                  0,
+                  0
+                ]
+              },
+              "expected": -414,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  3,
+                  0,
+                  0,
+                  3
+                ]
+              },
+              "expected": 561,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  3,
+                  -2,
+                  -2,
+                  0,
+                  -1
+                ]
+              },
+              "expected": 340,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  3,
+                  0
+                ]
+              },
+              "expected": 153,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -2,
+                  2,
+                  -2
+                ]
+              },
+              "expected": -136,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -1,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "expected": -50,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -3,
+                  0,
+                  0,
+                  0,
+                  2
+                ]
+              },
+              "expected": -1019,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -2,
+                  -3,
+                  3,
+                  -3,
+                  1,
+                  0
+                ]
+              },
+              "expected": -1497,
+              "correct": false
+            }
+          ]
+        },
+        "prompt_sha256": "e0789858aea6d33ec0b8b79774db323d3e317276f50bb55a4a1c9fa35bce6a5b",
+        "raw_sha256": "38485b022d2f65d3e0782fa1f0b5f09a47bc46fbca6f7ad592088b286bdb3043",
+        "elapsed_seconds": 64.22289495897712,
+        "structure": null
+      }
+    ],
+    "required_return": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scope",
+        "change"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

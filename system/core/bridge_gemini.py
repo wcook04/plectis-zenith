@@ -303,7 +303,7 @@ class GeminiBridgeMixin:
         """
         [ACTION]
         - Teleology: Recognize Gemini placeholder or shell-like text that should not count as a meaningful model answer.
-        - Mechanism: Normalizes whitespace, strips stock shell phrases, then checks short-title and shell-token heuristics against the remaining text.
+        - Mechanism: Normalizes whitespace, strips measurements shell phrases, then checks short-title and shell-token heuristics against the remaining text.
         - Reads: Raw Gemini model text.
         - Guarantee: Returns `True` only for text patterns that look like Gemini shell or placeholder output.
         - Fails: None.

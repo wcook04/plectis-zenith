@@ -1,0 +1,1972 @@
+{
+  "batch-a7": {
+    "public": {
+      "id": "batch-a7",
+      "family": "batch",
+      "contract": "An ordered batch insert is all-or-nothing on a real SQLite table with unique keys 1..9. A duplicate or key 10 makes that batch fail; later batches and the caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each batch's success, rows and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 0..4 DISTINCT integer keys in 1..9.",
+        "steps_item": "List of 1..4 integer keys in 1..10; duplicates and key 10 are legal inputs and can fail natively.",
+        "continuation": "One integer key in 1..10, inserted by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "batch-a7",
+        "source_sha256": "ec50bf5a23a95004d4d367d7deef4eaeb0801f09af111c9653af4310bc3e2497",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "query_sha256": "90d9457aad8cd2e69d13e65cab4d59f6ec2c658fbccf093be9a9ef934a9e548d",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 9,
+          "client_sql": 7
+        }
+      }
+    }
+  },
+  "batch-k4": {
+    "public": {
+      "id": "batch-k4",
+      "family": "batch",
+      "contract": "An ordered batch insert is all-or-nothing on a real SQLite table with unique keys 1..9. A duplicate or key 10 makes that batch fail; later batches and the caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each batch's success, rows and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 0..4 DISTINCT integer keys in 1..9.",
+        "steps_item": "List of 1..4 integer keys in 1..10; duplicates and key 10 are legal inputs and can fail natively.",
+        "continuation": "One integer key in 1..10, inserted by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "batch-k4",
+        "source_sha256": "0e94f1bbb84091bfc929a3444bf0b1695bb0f8062b973d7195af7b62f085c8ee",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "query_sha256": "90d9457aad8cd2e69d13e65cab4d59f6ec2c658fbccf093be9a9ef934a9e548d",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 9,
+          "client_sql": 9
+        }
+      }
+    }
+  },
+  "batch-r9": {
+    "public": {
+      "id": "batch-r9",
+      "family": "batch",
+      "contract": "An ordered batch insert is all-or-nothing on a real SQLite table with unique keys 1..9. A duplicate or key 10 makes that batch fail; later batches and the caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each batch's success, rows and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 0..4 DISTINCT integer keys in 1..9.",
+        "steps_item": "List of 1..4 integer keys in 1..10; duplicates and key 10 are legal inputs and can fail natively.",
+        "continuation": "One integer key in 1..10, inserted by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "batch-r9",
+        "source_sha256": "cb47775ed3829e7c97c1defedf6ed526df681304f3039a6f3553e76aa3a12f3f",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "query_sha256": "90d9457aad8cd2e69d13e65cab4d59f6ec2c658fbccf093be9a9ef934a9e548d",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 9,
+          "client_sql": 9
+        }
+      }
+    }
+  },
+  "batch-u2": {
+    "public": {
+      "id": "batch-u2",
+      "family": "batch",
+      "contract": "An ordered batch insert is all-or-nothing on a real SQLite table with unique keys 1..9. A duplicate or key 10 makes that batch fail; later batches and the caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each batch's success, rows and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 0..4 DISTINCT integer keys in 1..9.",
+        "steps_item": "List of 1..4 integer keys in 1..10; duplicates and key 10 are legal inputs and can fail natively.",
+        "continuation": "One integer key in 1..10, inserted by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "batch-u2",
+        "source_sha256": "4555d6cb9ae335e22d1834abf8d914f0d69d709e0d067c974941c239f23833a5",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "query_sha256": "90d9457aad8cd2e69d13e65cab4d59f6ec2c658fbccf093be9a9ef934a9e548d",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 9,
+          "client_sql": 9
+        }
+      }
+    }
+  },
+  "batch-z5": {
+    "public": {
+      "id": "batch-z5",
+      "family": "batch",
+      "contract": "An ordered batch insert is all-or-nothing on a real SQLite table with unique keys 1..9. A duplicate or key 10 makes that batch fail; later batches and the caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each batch's success, rows and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 0..4 DISTINCT integer keys in 1..9.",
+        "steps_item": "List of 1..4 integer keys in 1..10; duplicates and key 10 are legal inputs and can fail natively.",
+        "continuation": "One integer key in 1..10, inserted by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "batch-z5",
+        "source_sha256": "404c892f4c1cb33c39a090aa7a86a9a76b724de26b4424bf113d3bba28c91e31",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "query_sha256": "90d9457aad8cd2e69d13e65cab4d59f6ec2c658fbccf093be9a9ef934a9e548d",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 9,
+          "client_sql": 7
+        }
+      }
+    }
+  },
+  "transfer-b8": {
+    "public": {
+      "id": "transfer-b8",
+      "family": "transfer",
+      "contract": "Each account transfer is all-or-nothing on real SQLite balances: debit then credit, with no negative balance. Missing source, missing destination or insufficient funds makes only that transfer fail. Later transfers and a caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each transfer's success, balances and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 2..4 [id,balance] pairs: DISTINCT integer ids 1..9 and integer balances 0..9.",
+        "steps_item": "[source_id,destination_id,amount]: integer ids 1..10 and integer amount 1..9. Missing ids and insufficient funds are legal cases.",
+        "continuation": "[account_id,positive_credit]: integer id 1..10 and integer credit 1..3, applied by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "transfer-b8",
+        "source_sha256": "cb47775ed3829e7c97c1defedf6ed526df681304f3039a6f3553e76aa3a12f3f",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "query_sha256": "b53b01381c667f49d8745309cea17a910c48ee95059691949357779d05e1e44e",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 11,
+          "client_sql": 11
+        }
+      }
+    }
+  },
+  "transfer-f3": {
+    "public": {
+      "id": "transfer-f3",
+      "family": "transfer",
+      "contract": "Each account transfer is all-or-nothing on real SQLite balances: debit then credit, with no negative balance. Missing source, missing destination or insufficient funds makes only that transfer fail. Later transfers and a caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each transfer's success, balances and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 2..4 [id,balance] pairs: DISTINCT integer ids 1..9 and integer balances 0..9.",
+        "steps_item": "[source_id,destination_id,amount]: integer ids 1..10 and integer amount 1..9. Missing ids and insufficient funds are legal cases.",
+        "continuation": "[account_id,positive_credit]: integer id 1..10 and integer credit 1..3, applied by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "transfer-f3",
+        "source_sha256": "ec50bf5a23a95004d4d367d7deef4eaeb0801f09af111c9653af4310bc3e2497",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "query_sha256": "b53b01381c667f49d8745309cea17a910c48ee95059691949357779d05e1e44e",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 11,
+          "client_sql": 9
+        }
+      }
+    }
+  },
+  "transfer-m6": {
+    "public": {
+      "id": "transfer-m6",
+      "family": "transfer",
+      "contract": "Each account transfer is all-or-nothing on real SQLite balances: debit then credit, with no negative balance. Missing source, missing destination or insufficient funds makes only that transfer fail. Later transfers and a caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each transfer's success, balances and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 2..4 [id,balance] pairs: DISTINCT integer ids 1..9 and integer balances 0..9.",
+        "steps_item": "[source_id,destination_id,amount]: integer ids 1..10 and integer amount 1..9. Missing ids and insufficient funds are legal cases.",
+        "continuation": "[account_id,positive_credit]: integer id 1..10 and integer credit 1..3, applied by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "transfer-m6",
+        "source_sha256": "0e94f1bbb84091bfc929a3444bf0b1695bb0f8062b973d7195af7b62f085c8ee",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "query_sha256": "b53b01381c667f49d8745309cea17a910c48ee95059691949357779d05e1e44e",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 11,
+          "client_sql": 11
+        }
+      }
+    }
+  },
+  "transfer-q1": {
+    "public": {
+      "id": "transfer-q1",
+      "family": "transfer",
+      "contract": "Each account transfer is all-or-nothing on real SQLite balances: debit then credit, with no negative balance. Missing source, missing destination or insufficient funds makes only that transfer fail. Later transfers and a caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each transfer's success, balances and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 2..4 [id,balance] pairs: DISTINCT integer ids 1..9 and integer balances 0..9.",
+        "steps_item": "[source_id,destination_id,amount]: integer ids 1..10 and integer amount 1..9. Missing ids and insufficient funds are legal cases.",
+        "continuation": "[account_id,positive_credit]: integer id 1..10 and integer credit 1..3, applied by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "transfer-q1",
+        "source_sha256": "404c892f4c1cb33c39a090aa7a86a9a76b724de26b4424bf113d3bba28c91e31",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "query_sha256": "b53b01381c667f49d8745309cea17a910c48ee95059691949357779d05e1e44e",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 11,
+          "client_sql": 9
+        }
+      }
+    }
+  },
+  "transfer-v4": {
+    "public": {
+      "id": "transfer-v4",
+      "family": "transfer",
+      "contract": "Each account transfer is all-or-nothing on real SQLite balances: debit then credit, with no negative balance. Missing source, missing destination or insufficient funds makes only that transfer fail. Later transfers and a caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each transfer's success, balances and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 2..4 [id,balance] pairs: DISTINCT integer ids 1..9 and integer balances 0..9.",
+        "steps_item": "[source_id,destination_id,amount]: integer ids 1..10 and integer amount 1..9. Missing ids and insufficient funds are legal cases.",
+        "continuation": "[account_id,positive_credit]: integer id 1..10 and integer credit 1..3, applied by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "audit": {
+      "example_receipt": {
+        "task_id": "transfer-v4",
+        "source_sha256": "4555d6cb9ae335e22d1834abf8d914f0d69d709e0d067c974941c239f23833a5",
+        "sqlite_version": "3.53.4",
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "query_sha256": "b53b01381c667f49d8745309cea17a910c48ee95059691949357779d05e1e44e",
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false,
+        "cost": {
+          "reference_calls": 1,
+          "client_calls": 1,
+          "reference_sql": 11,
+          "client_sql": 11
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\": \"def calibrate(x):\\n    return 5 * x + 11\\n\\ndef investigate(context, acquire):\\n    rows = context.get(\\\"rows\\\", [])\\n    total = 0\\n    for r in rows:\\n        total += calibrate(r)\\n    return total\", \"scope\": \"The `calibrate` function applies an affine transformation (s*x + b) to individual sensor readings. The `investigate` function iterates over the input rows, applies calibration to each reading, and sums the results.\", \"change\": \"Replaced the previous linear scaling logic with a per-element affine calibration using inferred parameters s=5 and b=11. Updated `investigate` to apply this calibration individually to each row before summation.\"}",
+  "prompt_sha256": "1e9a1b6731e98deb367594acb4ed733288d5fd0fbdc481a58ae5fca8e25e34cb"
+}

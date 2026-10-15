@@ -1,0 +1,7 @@
+{
+  "call_id": "e59676fc9604a3d8ad07a4333e92b7ab702dbe17024265cdce02383d49cd36ee",
+  "content": "{\n  \"experiments\": [\n    [\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"k\", \"value\": 1},\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"k\", \"value\": 2},\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"k\", \"value\": 3}\n    ],\n    [\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"k\", \"value\": 1},\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"k\", \"value\": 2},\n      {\"op\": \"delete\", \"connection\": \"main\", \"key\": \"k\", \"value\": null}\n    ],\n    [\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"k\", \"value\": 1},\n      {\"op\": \"put\", \"connection\": \"other\", \"key\": \"k\", \"value\": 2},\n      {\"op\": \"put\", \"connection\": \"main\", \"key\": \"k\", \"value\": 3}\n    ]\n  ]\n  ,\n  \"purpose\": \"These three sequences separate the remaining plausible source behaviors: repeated same-key puts distinguish INSERT OR IGNORE from REPLACE/DO UPDATE and expose trigger effects; put-then-delete distinguishes direct change counts from trigger-inflated counts and from total_changes; cross-connection same-key puts distinguish main-only counters from main+other total_changes and expose conflict handling across connections.\"\n}",
+  "original_content_sha256": "783e3ada02d60bf8be4893834b5108c4eea6742212683c758d1e17086d4cea17",
+  "projection": "assistant content only; transport, headers, routing and credentials omitted",
+  "redacted": false
+}

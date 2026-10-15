@@ -1,0 +1,71 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 1
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 2
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 1
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 2
+      },
+      {
+        "op": "rollback",
+        "connection": "main",
+        "key": null,
+        "value": null
+      }
+    ],
+    [
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 1
+      },
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "k",
+        "value": 2
+      },
+      {
+        "op": "commit",
+        "connection": "main",
+        "key": null,
+        "value": null
+      }
+    ]
+  ],
+  "purpose": "These three sequences separate the three put conflict modes and the three channel definitions. Experiment 1 distinguishes INSERT OR IGNORE (second put changes nothing) from INSERT OR REPLACE and ON CONFLICT DO UPDATE (second put changes the row). Experiment 2 distinguishes INSERT OR REPLACE from ON CONFLICT DO UPDATE under rollback: REPLACE deletes the old row and inserts a new one, so rollback restores the original row; DO UPDATE modifies the existing row, so rollback also restores the original row, but the channel counts differ. Experiment 3 distinguishes the same two modes under commit: REPLACE deletes and inserts, DO UPDATE updates in place, and the channel counts differ. Together with the trigger and total_changes variants, these experiments separate all 18 family members."
+}

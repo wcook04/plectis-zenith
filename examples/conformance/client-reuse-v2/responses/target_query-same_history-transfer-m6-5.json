@@ -1,0 +1,4 @@
+{
+  "raw": "{\"queries\": [{\"outer\": true, \"initial\": [[1, 4], [2, 1], [3, 0]], \"steps\": [[1, 2, 2], [2, 3, 1], [3, 1, 1]], \"continuation\": [2, 1]}], \"note\": \"Proposed experiment: under an open caller transaction, first transfer succeeds (1->2 amount 2), second succeeds (2->3 amount 1), third fails on insufficient funds (3 has 1, amount 1 is fine, so likely succeeds; instead use source 3 with amount 1 after it received 1, so it succeeds). This tests a chain where all steps succeed under an open caller transaction, checking per-step atomicity, transaction state, continuation, and caller rollback discarding all writes. No target receipt exists yet.\"}",
+  "envelope_sha256": "53dbbbbaf0df55eb603e0d2e806650dd6b86e2280dc35ed7ff6ecf93a0009bc4"
+}

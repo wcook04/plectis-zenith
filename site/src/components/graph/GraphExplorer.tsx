@@ -32,6 +32,11 @@ export type ExplorerProps = {
   runControl?: React.ReactNode;
   onSelectionChange?: (id: string | null) => void;
   maxHeight?: number;
+  // Short label naming the graph and what its states show, e.g.
+  // "Lab graph: preparation record". Shown above the drawing.
+  context?: string;
+  // Open a node from outside the graph (a table row, a link); bump nonce to repeat.
+  focusRequest?: { id: string; nonce: number } | null;
 };
 
 export function GraphExplorer(props: ExplorerProps) {
@@ -112,7 +117,7 @@ const PAD = 28;
 const LEGEND_SPACE = 8;
 
 function CanvasExplorer(props: ExplorerProps) {
-  const { graph, title, run, runControl, maxHeight = 720 } = props;
+  const { graph, title, run, runControl, maxHeight = 720, context, focusRequest } = props;
   const families = useMemo(() => layoutGraph(graph, new Set()).families, [graph]);
   const { selected, select, expanded, setExpanded } = useSelection(props, families);
   const [lineageOnly, setLineageOnly] = useState(false);
@@ -149,7 +154,8 @@ function CanvasExplorer(props: ExplorerProps) {
   }, [layout]);
   const height = useMemo(() => {
     const zoom = Math.min(1, (stageWidth - PAD * 2) / bounds.w);
-    return Math.round(Math.max(300, Math.min(maxHeight, bounds.h * zoom + PAD * 2 + LEGEND_SPACE)));
+    const floor = graph.nodes.length <= 6 ? 160 : 300;
+    return Math.round(Math.max(floor, Math.min(maxHeight, bounds.h * zoom + PAD * 2 + LEGEND_SPACE)));
   }, [stageWidth, bounds, maxHeight]);
 
   const toggleFamily = useCallback(
@@ -255,16 +261,38 @@ function CanvasExplorer(props: ExplorerProps) {
 
     const selfId = selected ? layout.renderIdOf.get(selected) : undefined;
     const rfEdges: Edge[] = [];
-    const itemById = new Map(layout.items.map((item) => [item.id, item]));
+    const itemById = new Map<string, { column: number; w: number; h: number }>(layout.items.map((item) => [item.id, item]));
+    // An expanded group talks to the rest of the graph through its frame: one
+    // line per outside node, not one per member. A selected member's own
+    // links are drawn individually on top.
+    const frameOf = new Map<string, string>();
+    layout.frames.forEach((frame) => {
+      frame.members.forEach((id) => frameOf.set(id, frame.id));
+      const first = itemById.get(frame.members[0]);
+      if (first) itemById.set(frame.id, { column: first.column, w: frame.w, h: frame.h });
+    });
+    const seenEdge = new Set<string>();
     let stackSlot = 0;
-    layout.edges.forEach((edge) => {
+    layout.edges.forEach((original) => {
+      const touchesSelection = selfId !== undefined && (original.source === selfId || original.target === selfId);
+      const sourceFrame = frameOf.get(original.source);
+      const targetFrame = frameOf.get(original.target);
+      const sameGroup = sourceFrame !== undefined && sourceFrame === targetFrame;
+      const edge =
+        touchesSelection || sameGroup
+          ? original
+          : { ...original, source: sourceFrame ?? original.source, target: targetFrame ?? original.target };
+      const key = `${edge.source}->${edge.target}`;
+      if (seenEdge.has(key)) return;
+      seenEdge.add(key);
+      if (edge !== original) edge.id = key;
       const from = itemById.get(edge.source);
       const to = itemById.get(edge.target);
       const stacked = from !== undefined && to !== undefined && from.column === to.column;
       const direct = selfId !== undefined && (edge.source === selfId || edge.target === selfId);
       if (edge.redundant && !allDeps && !direct) return;
-      const sourceRole = role.get(edge.source);
-      const targetRole = role.get(edge.target);
+      const sourceRole = role.get(edge.source) ?? (edge.source.startsWith('frame:') ? 'ancestor' : undefined);
+      const targetRole = role.get(edge.target) ?? (edge.target.startsWith('frame:') ? 'descendant' : undefined);
       const inLineage =
         selfId !== undefined &&
         sourceRole !== undefined &&
@@ -275,7 +303,7 @@ function CanvasExplorer(props: ExplorerProps) {
         !((sourceRole === 'descendant' || sourceRole === 'consumer') && (targetRole === 'ancestor' || targetRole === 'input'));
       if (filtering && !inLineage && !direct) return;
       const tone = !selfId ? 'rest' : direct ? 'direct' : inLineage ? 'lineage' : 'dim';
-      const stroke = direct ? (edge.target === selfId ? colours.lanes[edge.lane] ?? colours.ink : colours.ink) : colours.edge;
+      const stroke = direct ? colours.ink : colours.edge;
       rfEdges.push({
         id: edge.id,
         source: edge.source,
@@ -285,7 +313,7 @@ function CanvasExplorer(props: ExplorerProps) {
         data: stacked
           ? { width: from!.w, slot: stackSlot++ }
           : edge.routed
-            ? { channelY: edge.channelY, slot: edge.slot }
+            ? { channelY: edge.channelY, slot: edge.slot, outLane: edge.outLane }
             : undefined,
         className: `z-edge z-edge--${tone}${edge.skip ? ' z-edge--skip' : ''}`,
         style: { stroke },
@@ -353,9 +381,10 @@ function CanvasExplorer(props: ExplorerProps) {
     return () => window.cancelAnimationFrame(frame);
   }, [selected, layout, flow, reduced]);
 
+  // Centre after the inspector has opened and the canvas has its final width.
   const centerOn = useCallback(
     (id: string) => {
-      window.requestAnimationFrame(() =>
+      window.setTimeout(() =>
         window.requestAnimationFrame(() => {
           const renderId = layout.renderIdOf.get(id);
           const item = layout.items.find((i) => i.id === renderId);
@@ -363,7 +392,7 @@ function CanvasExplorer(props: ExplorerProps) {
           const zoom = Math.max(flow.getZoom(), 0.8);
           flow.setCenter(item.x + NODE_W / 2, item.y + NODE_H / 2, { zoom, duration: reduced ? 0 : 280 });
         }),
-      );
+      180);
     },
     [flow, layout, reduced],
   );
@@ -376,55 +405,99 @@ function CanvasExplorer(props: ExplorerProps) {
     [select, centerOn],
   );
 
+  useEffect(() => {
+    if (!focusRequest) return;
+    navigate(focusRequest.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusRequest?.nonce]);
+
   const allExpanded = layout.families.size > 0 && Array.from(layout.families.keys()).every((k) => expanded.has(k));
+  // Small graphs (Evolve) need no search, grouping or lineage controls.
+  const compact = graph.nodes.length <= 6 && layout.families.size === 0;
+  // Beside a narrow canvas the inspector would shrink the graph; put it below.
+  const inspectorBelow = compact || stageWidth - 420 < 760;
+  const hiddenLinks = allDeps ? 0 : layout.edges.filter((e) => e.redundant).length;
+  const inspector = selected ? (
+    <Inspector
+      graph={graph}
+      nodeId={selected}
+      run={run ?? null}
+      onNavigate={navigate}
+      onClose={() => {
+        const was = selected;
+        select(null);
+        setLineageOnly(false);
+        window.requestAnimationFrame(() =>
+          canvasRef.current?.querySelector<HTMLButtonElement>(`[data-node-id="${was}"]`)?.focus(),
+        );
+      }}
+    />
+  ) : null;
+
+  // Visible provenance key only where provenance is drawn: expanded feed cards.
+  const originVisible = layout.items.some((item) => item.kind === 'node' && item.node.demo_provenance);
 
   return (
-    <div className={`explorer${selected ? ' has-inspector' : ''}`}>
-      <div className="explorer__bar">
-        <NodeSearch graph={graph} onPick={navigate} />
-        <div className="explorer__actions">
-          <button
-            type="button"
-            className="z-chip-button"
-            onClick={() => {
-              lastAction.current = { kind: 'fit' };
-              setExpanded(allExpanded ? new Set() : new Set(layout.families.keys()));
-            }}
-          >
-            {allExpanded ? 'Collapse groups' : 'Show every node'}
-          </button>
-          <button type="button" className="z-chip-button" aria-pressed={allDeps} onClick={() => setAllDeps(!allDeps)}>
-            Every dependency
-          </button>
-          <button
-            type="button"
-            className="z-chip-button"
-            aria-pressed={lineageOnly}
-            disabled={!selected}
-            onClick={() => setLineageOnly(!lineageOnly)}
-          >
-            Lineage only
-          </button>
-          <span className="explorer__zoom">
-            <button type="button" className="z-chip-button" onClick={() => flow.fitView({ padding: 0.06, maxZoom: 1, duration: reduced ? 0 : 260 })}>
-              Fit
-            </button>
-            <button type="button" className="z-chip-button" aria-label="Zoom in" onClick={() => flow.zoomIn({ duration: reduced ? 0 : 160 })}>
-              +
-            </button>
-            <button type="button" className="z-chip-button" aria-label="Zoom out" onClick={() => flow.zoomOut({ duration: reduced ? 0 : 160 })}>
-              −
-            </button>
-          </span>
+    <figure className="explorer-figure" aria-label={title}>
+    <figcaption className="explorer__context">
+      <span className="explorer__context-label">{context ?? title}</span>
+      <span className="explorer__context-help">Select a node to see its instruction, the inputs it reads and the output it must produce.</span>
+    </figcaption>
+    <div className={`explorer${compact ? ' explorer--compact' : ''}${selected ? ' has-inspector' : ''}${inspectorBelow ? ' inspector-below' : ''}`}>
+      {(!compact || runControl) && (
+        <div className="explorer__bar">
+          {!compact && (
+            <div className="explorer__find">
+              <NodeSearch graph={graph} onPick={navigate} />
+              {layout.families.size > 0 && (
+                <button
+                  type="button"
+                  className="z-chip-button"
+                  onClick={() => {
+                    lastAction.current = { kind: 'fit' };
+                    setExpanded(allExpanded ? new Set() : new Set(layout.families.keys()));
+                  }}
+                >
+                  {allExpanded ? 'Collapse groups' : 'Show every node'}
+                </button>
+              )}
+              <span className="explorer__mode">
+                <button type="button" className="z-chip-button" aria-pressed={allDeps} onClick={() => setAllDeps(!allDeps)}>
+                  {allDeps ? 'Drawing every input' : 'Draw every input'}
+                </button>
+                {!allDeps && hiddenLinks > 0 && (
+                  <span className="explorer__mode-note">Simplified view: some inputs are not drawn. Selecting a node draws all of its inputs.</span>
+                )}
+              </span>
+              {selected && (
+                <button type="button" className="z-chip-button" aria-pressed={lineageOnly} onClick={() => setLineageOnly(!lineageOnly)}>
+                  Hide unrelated nodes
+                </button>
+              )}
+            </div>
+          )}
+          {runControl}
+          {!compact && (
+            <span className="explorer__zoom" aria-label="Framing">
+              <button type="button" className="z-quiet-button" onClick={() => flow.fitView({ padding: 0.06, maxZoom: 1, duration: reduced ? 0 : 260 })}>
+                Fit
+              </button>
+              <button type="button" className="z-quiet-button" aria-label="Zoom out" onClick={() => flow.zoomOut({ duration: reduced ? 0 : 160 })}>
+                −
+              </button>
+              <button type="button" className="z-quiet-button" aria-label="Zoom in" onClick={() => flow.zoomIn({ duration: reduced ? 0 : 160 })}>
+                +
+              </button>
+            </span>
+          )}
         </div>
-        {runControl}
-      </div>
-      <div className="explorer__stage" ref={stageRef} style={{ height: stageHeight }}>
+      )}
+      <div className="explorer__stage" ref={stageRef} style={{ height: inspectorBelow ? height : stageHeight }}>
         <div
           className="explorer__canvas"
           ref={canvasRef}
           role="group"
-          aria-label={`${title}. Select a node to read its instruction, inputs and output. Drag to pan; pinch or use the buttons to zoom.`}
+          aria-label={`${title}. Select a node to read its instruction, inputs and output.${compact ? '' : ' Drag to pan; pinch or use the buttons to zoom.'}`}
         >
           <ReactFlow
             nodes={nodes}
@@ -439,39 +512,26 @@ function CanvasExplorer(props: ExplorerProps) {
             minZoom={0.2}
             maxZoom={1.8}
             zoomOnDoubleClick={false}
+            zoomOnPinch={!compact}
+            panOnDrag={!compact}
             preventScrolling={false}
             zoomOnScroll={false}
             panOnScroll={false}
             proOptions={{ hideAttribution: true }}
             onPaneClick={() => selected && select(null)}
           />
-          {!selected && <p className="explorer__hint">Select any node to read its instruction, inputs and output.</p>}
         </div>
-        {selected && (
-          <Inspector
-            graph={graph}
-            nodeId={selected}
-            run={run ?? null}
-            onNavigate={navigate}
-            onClose={() => {
-              const was = selected;
-              select(null);
-              setLineageOnly(false);
-              window.requestAnimationFrame(() =>
-                canvasRef.current?.querySelector<HTMLButtonElement>(`[data-node-id="${was}"]`)?.focus(),
-              );
-            }}
-          />
-        )}
+        {!inspectorBelow && inspector}
       </div>
       <Legend
         states={states}
         hasTool={graph.nodes.some((n) => n.type === 'tool')}
         hasCheckpoint={graph.nodes.some((n) => CHECKPOINTS.has(n.id))}
-        hasSkip={edges.some((e) => String(e.className).includes('z-edge--skip'))}
-        hasOrigin={graph.nodes.some((n) => n.demo_provenance)}
+        hasOrigin={originVisible}
       />
+      {inspectorBelow && inspector && <div className="explorer__below">{inspector}</div>}
     </div>
+    </figure>
   );
 }
 
@@ -479,54 +539,57 @@ function Legend({
   states,
   hasTool,
   hasCheckpoint,
-  hasSkip,
   hasOrigin,
 }: {
   states: Record<string, NodeState> | null;
   hasTool: boolean;
   hasCheckpoint: boolean;
-  hasSkip: boolean;
   hasOrigin: boolean;
 }) {
   const present = states ? Array.from(new Set(Object.values(states))) : [];
   const order: NodeState[] = ['success', 'loaded', 'pending', 'failure', 'not_started', 'not_reached', 'unknown'];
   return (
     <div className="legend" aria-label="Key">
-      <span className="legend__item">
-        <span className="legend__swatch legend__swatch--reasoning" aria-hidden="true" /> Model call
+      <span className="legend__group">
+        <span className="legend__item">
+          <span className="legend__swatch legend__swatch--reasoning" aria-hidden="true" /> Model call
+        </span>
+        {hasTool && (
+          <span className="legend__item">
+            <span className="legend__swatch legend__swatch--tool" aria-hidden="true" /> Tool
+          </span>
+        )}
+        {hasCheckpoint && (
+          <span className="legend__item">
+            <span className="legend__swatch legend__swatch--checkpoint" aria-hidden="true" /> Checkpoint node
+          </span>
+        )}
+        <span className="legend__item">
+          <svg width="30" height="10" aria-hidden="true"><path d="M1 5h22" stroke="currentColor" strokeWidth="1.4" /><path d="M22 1.5l6 3.5-6 3.5z" fill="currentColor" /></svg>
+          Input
+        </span>
       </span>
-      {hasTool && (
-        <span className="legend__item">
-          <span className="legend__swatch legend__swatch--tool" aria-hidden="true" /> Tool
-        </span>
-      )}
-      {hasCheckpoint && (
-        <span className="legend__item">
-          <span className="legend__swatch legend__swatch--checkpoint" aria-hidden="true" /> Frozen checkpoint
-        </span>
-      )}
-      {hasSkip && (
-        <span className="legend__item">
-          <svg width="26" height="8" aria-hidden="true"><path d="M1 4h24" stroke="currentColor" strokeWidth="1.5" strokeDasharray="4 3" /></svg>
-          Skips a step
+      {present.length > 0 && (
+        <span className="legend__group">
+          <span className="legend__group-label">State in this record</span>
+          {order
+            .filter((s) => present.includes(s))
+            .map((s) => (
+              <span key={s} className={`legend__item z-state z-state--${s}`}>
+                <span className="z-state__glyph" aria-hidden="true" />
+                {STATE_LABEL[s]}
+              </span>
+            ))}
         </span>
       )}
       {hasOrigin && (
-        <span className="legend__item">
-          <span className="z-origin z-origin--real_saved_input">Real input</span>
-          <span className="z-origin z-origin--authored_synthetic">Synthetic</span>
-          <span className="z-origin z-origin--derived_mixed_inputs">Derived</span>
-          feed data
+        <span className="legend__group">
+          <span className="legend__group-label">Feed data</span>
+
+          <span className="z-origin z-origin--authored_synthetic">Synthetic data</span>
+          <span className="z-origin z-origin--derived_synthetic_inputs">Computed</span>
         </span>
       )}
-      {order
-        .filter((s) => present.includes(s))
-        .map((s) => (
-          <span key={s} className={`legend__item z-state z-state--${s}`}>
-            <span className="z-state__glyph" aria-hidden="true" />
-            {STATE_LABEL[s]}
-          </span>
-        ))}
     </div>
   );
 }
@@ -620,6 +683,10 @@ function StagedExplorer(props: ExplorerProps) {
   }, [graph]);
   const { selected, select } = useSelection(props, everything.families);
   const states = useRunStates(graph, run);
+  useEffect(() => {
+    if (props.focusRequest) select(props.focusRequest.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.focusRequest?.nonce]);
   const columns = useMemo(() => {
     const byColumn = new Map<number, typeof everything.items>();
     everything.items.forEach((item) => {

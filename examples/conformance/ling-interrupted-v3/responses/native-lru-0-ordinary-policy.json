@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    events = [{'op':'call','key':1},{'op':'call','key':2},{'op':'call','key':3},{'op':'call','key':1},{'op':'call','key':4},{'op':'call','key':1}]\\n    return {'query': {'capacity': 2, 'events': events}, 'note': {'hypothesis':'parent tracks recency correctly; native lru_cache may evict least-recently-used key 2 before key 3, making final call 1 a miss'}}\\n\",\"scope\":\"Compare native functools.lru_cache against parent's explicit LRU on capacity 2 with interleaved recency updates and eviction.\",\"change\":\"Use sequence 1,2,3,1,4,1: parent predicts hits=2, misses=4, size=2; a native LRU that evicts key 2 at insertion of 3 predicts final call 1 is a miss (hits=1, misses=5).\"}",
+  "prompt_sha256": "6c6123b5fd5adcace4cc8ac1d68f5d1e1762f9d06b4f7423e34d5ae92a3ac9fc"
+}

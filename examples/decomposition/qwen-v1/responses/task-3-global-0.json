@@ -1,0 +1,4 @@
+{
+  "raw": "{\n  \"source\": \"def calibrate(x):\\n    return 3 * x\\n\\ndef investigate(context, acquire):\\n    rows = context.get(\\\"rows\\\", [])\\n    if not rows:\\n        return 0\\n    total = sum(calibrate(r) for r in rows)\\n    return int(total)\",\n  \"scope\": \"The `investigate` function processes a list of sensor readings (`context['rows']`) by applying an affine calibration (s=3, b=0 inferred from examples) to each reading individually and summing the results. Empty inputs yield zero.\",\n  \"change\": \"Implemented per-element calibration using `calibrate`, ensuring correct summation logic aligned with observed behavior where individual readings are transformed before aggregation.\"\n}",
+  "prompt_sha256": "89ba8f9bd115173ebd7e39bd9f8c304724c90e2c395c673f693a788f0ea4d4bb"
+}

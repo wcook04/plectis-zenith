@@ -1,7 +1,7 @@
 """Descriptive scores for a frozen universe, selection and fallback forecast.
 
 Callers own source/time binding. This does not admit a native cohort, infer
-predictability, or turn forecast error into trading profit.
+predictability, or turn forecast error into a demonstrated practical advantage.
 """
 from __future__ import annotations
 
@@ -68,7 +68,7 @@ def score_selection(*, universe, selected, forecasts, fallback, truth, budget, l
               'truth_coverage': (len(members) - len(missing)) / len(members),
               'missing_truth': missing, 'state': 'pending' if missing else 'scored',
               'metrics': None, 'shadow_selection': None,
-              'boundary': 'Descriptive forecast loss; no causal, predictability or trading claim.'}
+              'boundary': 'Descriptive forecast loss; no causal, predictability or observing claim.'}
     if missing:
         return result
 

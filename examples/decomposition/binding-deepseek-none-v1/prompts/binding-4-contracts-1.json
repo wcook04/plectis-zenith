@@ -1,0 +1,1514 @@
+{
+  "prompt": {
+    "task": {
+      "id": "binding-4",
+      "family": "synthetic_integer_sequence",
+      "description": "Synthetic resettable integer source. Input is exactly\n{\"values\":[integer,...]}, length 0..32, values -8..8. Return one JSON integer;\nthe empty sequence returns zero. Allowed probes use this same schema. There\nare no tables, clocks, external data or persistent state across queries.\n\nThe following finite family is supplied research bias. Choose a nonzero\npolynomial p(x)=a*x+b*x*x+c*x*x*x, with a,b,c each in {-2,-1,0,1,2}. For each\nlist position its contribution is p(x), optionally plus g*x times either the\nimmediately preceding value or the sum of all preceding values; g is in\n{-2,-1,1,2}, and missing preceding values contribute zero. Apply between one\nand four inclusive cumulative-sum passes to the contribution list, preserving\nlist order. Return the last entry after those passes. The source's choices\nare fixed and private; none is specified by the seed program. Use the measured\nexamples to infer a predictor. Implement investigate(context, acquire).\n\nExecution interface clarification: Use named or single-underscore loop\nvariables; other leading-underscore names remain forbidden. Use multiplication\nrather than **; no defaults.\n",
+      "focus_function": "readout",
+      "calibration": [
+        {
+          "input": {
+            "values": []
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              0
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              1
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "values": [
+              2
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              -1
+            ]
+          },
+          "expected": 3
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              0
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              1
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1
+            ]
+          },
+          "expected": 4
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 9
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              2,
+              1
+            ]
+          },
+          "expected": 12
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              1,
+              0
+            ]
+          },
+          "expected": 5
+        }
+      ],
+      "development": [
+        {
+          "input": {
+            "values": [
+              -3,
+              3
+            ]
+          },
+          "expected": 18
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              2
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 16
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": 32
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              3,
+              0,
+              0
+            ]
+          },
+          "expected": -9
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              2
+            ]
+          },
+          "expected": 8
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              2,
+              -1
+            ]
+          },
+          "expected": 11
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              -4,
+              0,
+              0
+            ]
+          },
+          "expected": 96
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              3,
+              3,
+              3,
+              3
+            ]
+          },
+          "expected": 135
+        },
+        {
+          "input": {
+            "values": [
+              -4,
+              4,
+              -4,
+              4,
+              -4,
+              4
+            ]
+          },
+          "expected": 96
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              0
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              3,
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": 3
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              3,
+              0,
+              0
+            ]
+          },
+          "expected": -9
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ]
+          },
+          "expected": 120
+        },
+        {
+          "input": {
+            "values": [
+              4,
+              0,
+              0
+            ]
+          },
+          "expected": -32
+        },
+        {
+          "input": {
+            "values": [
+              4,
+              0,
+              0,
+              -2
+            ]
+          },
+          "expected": -32
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              2,
+              -3,
+              -3,
+              -2
+            ]
+          },
+          "expected": 116
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              4,
+              0,
+              0
+            ]
+          },
+          "expected": -32
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              2
+            ]
+          },
+          "expected": 8
+        },
+        {
+          "input": {
+            "values": [
+              -4,
+              4,
+              -4
+            ]
+          },
+          "expected": 128
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              0,
+              0,
+              4
+            ]
+          },
+          "expected": -32
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              3
+            ]
+          },
+          "expected": -9
+        },
+        {
+          "input": {
+            "values": [
+              -1,
+              -1,
+              0,
+              -1,
+              -2,
+              3
+            ]
+          },
+          "expected": 4
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              -4
+            ]
+          },
+          "expected": 96
+        }
+      ]
+    },
+    "instruction": "Improve the whole ordinary program using the function contracts and measured examples. Check whether the information passed across interfaces suffices for the requested result. You may change ANY function/interface/state, add/remove helpers or replace the whole program. Choose the simplest useful refactoring; preserving correct code is allowed.",
+    "current_program": "def summarize_values(values):\n    return sum(values)\n\ndef readout(summary):\n    return summary\n\ndef investigate(context, acquire):\n    values = context[\"values\"]\n    if len(values) == 0:\n        return 0\n    examples = [\n        ([], 0),\n        ([0], 0),\n        ([1], 1),\n        ([2], 0),\n        ([-1], 3),\n        ([1, 0], 1),\n        ([0, 1], 1),\n        ([1, 1], 4),\n        ([1, 0, 0], 1),\n        ([1, 1, 1], 9),\n        ([1, 2, 1], 12),\n        ([2, 1, 0], 5),\n        ([-3, 3], 18),\n        ([0, 0, 2], 0),\n        ([1, 1, 1, 1], 16),\n        ([-2, 2, -2, 2, -2], 32),\n        ([0, 0, 0, 3, 0, 0], -9),\n        ([-2, 2], 8),\n        ([-2, 2, -1], 11),\n        ([0, -4, 0, 0], 96),\n        ([3, 3, 3, 3, 3], 135),\n        ([-4, 4, -4, 4, -4, 4], 96),\n        ([2, 0], 0),\n        ([3, -2, 2, -2], 3),\n        ([0, 0, 3, 0, 0], -9),\n        ([2, 2, 2, 2, 2, 2], 120),\n        ([4, 0, 0], -32),\n        ([4, 0, 0, -2], -32),\n        ([0, 2, -3, -3, -2], 116),\n        ([0, 0, 0, 4, 0, 0], -32),\n        ([2, 2], 8),\n        ([-4, 4, -4], 128),\n        ([-2, 0, 0, 4], -32),\n        ([0, 0, 0, 0, 3], -9),\n        ([-1, -1, 0, -1, -2, 3], 4),\n        ([0, -4], 96),\n    ]\n    coeffs = [-2, -1, 0, 1, 2]\n    gs = [-2, -1, 1, 2]\n    modes = [0, 1]\n    passes = [1, 2, 3, 4]\n    best = None\n    for a in coeffs:\n        for b in coeffs:\n            for c in coeffs:\n                for g in gs:\n                    for mode in modes:\n                        for np in passes:\n                            ok = True\n                            for ex in examples:\n                                vals = ex[0]\n                                want = ex[1]\n                                got = 0\n                                if len(vals) > 0:\n                                    contrib = []\n                                    for i in range(len(vals)):\n                                        x = vals[i]\n                                        p = a * x + b * x * x + c * x * x * x\n                                        extra = 0\n                                        if mode == 0:\n                                            if i > 0:\n                                                extra = g * x * vals[i - 1]\n                                        else:\n                                            if i > 0:\n                                                extra = g * x * sum(vals[0:i])\n                                        contrib.append(p + extra)\n                                    cur = contrib\n                                    for k in range(np):\n                                        nxt = []\n                                        run = 0\n                                        for v in cur:\n                                            run = run + v\n                                            nxt.append(run)\n                                        cur = nxt\n                                    got = cur[-1]\n                                if got != want:\n                                    ok = False\n                                    break\n                            if ok:\n                                best = (a, b, c, g, mode, np)\n                                break\n                        if best is not None:\n                            break\n                    if best is not None:\n                        break\n                if best is not None:\n                    break\n            if best is not None:\n                break\n        if best is not None:\n            break\n    if best is None:\n        best = (0, 0, 0, 1, 0, 1)\n    a, b, c, g, mode, np = best\n    contrib = []\n    for i in range(len(values)):\n        x = values[i]\n        p = a * x + b * x * x + c * x * x * x\n        extra = 0\n        if mode == 0:\n            if i > 0:\n                extra = g * x * values[i - 1]\n        else:\n            if i > 0:\n                extra = g * x * sum(values[0:i])\n        contrib.append(p + extra)\n    cur = contrib\n    for k in range(np):\n        nxt = []\n        run = 0\n        for v in cur:\n            run = run + v\n            nxt.append(run)\n        cur = nxt\n    return cur[-1]\n",
+    "current_development": {
+      "correct": 36,
+      "total": 36,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": []
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1
+            ]
+          },
+          "expected": 3,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              0
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              1
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 4,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1
+            ]
+          },
+          "expected": 4,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": 1,
+          "correct": true
+        },
+        {
+          "answer": 9,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 9,
+          "correct": true
+        },
+        {
+          "answer": 12,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              2,
+              1
+            ]
+          },
+          "expected": 12,
+          "correct": true
+        },
+        {
+          "answer": 5,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              1,
+              0
+            ]
+          },
+          "expected": 5,
+          "correct": true
+        },
+        {
+          "answer": 18,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              3
+            ]
+          },
+          "expected": 18,
+          "correct": true
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              2
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 16,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 16,
+          "correct": true
+        },
+        {
+          "answer": 32,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": 32,
+          "correct": true
+        },
+        {
+          "answer": -9,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              3,
+              0,
+              0
+            ]
+          },
+          "expected": -9,
+          "correct": true
+        },
+        {
+          "answer": 8,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              2
+            ]
+          },
+          "expected": 8,
+          "correct": true
+        },
+        {
+          "answer": 11,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              2,
+              -1
+            ]
+          },
+          "expected": 11,
+          "correct": true
+        },
+        {
+          "answer": 96,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              -4,
+              0,
+              0
+            ]
+          },
+          "expected": 96,
+          "correct": true
+        },
+        {
+          "answer": 135,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              3,
+              3,
+              3,
+              3
+            ]
+          },
+          "expected": 135,
+          "correct": true
+        },
+        {
+          "answer": 96,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -4,
+              4,
+              -4,
+              4,
+              -4,
+              4
+            ]
+          },
+          "expected": 96,
+          "correct": true
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              0
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": 3,
+          "correct": true
+        },
+        {
+          "answer": -9,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              3,
+              0,
+              0
+            ]
+          },
+          "expected": -9,
+          "correct": true
+        },
+        {
+          "answer": 120,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              2,
+              2,
+              2,
+              2,
+              2
+            ]
+          },
+          "expected": 120,
+          "correct": true
+        },
+        {
+          "answer": -32,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              4,
+              0,
+              0
+            ]
+          },
+          "expected": -32,
+          "correct": true
+        },
+        {
+          "answer": -32,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              4,
+              0,
+              0,
+              -2
+            ]
+          },
+          "expected": -32,
+          "correct": true
+        },
+        {
+          "answer": 116,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              2,
+              -3,
+              -3,
+              -2
+            ]
+          },
+          "expected": 116,
+          "correct": true
+        },
+        {
+          "answer": -32,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              4,
+              0,
+              0
+            ]
+          },
+          "expected": -32,
+          "correct": true
+        },
+        {
+          "answer": 8,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              2
+            ]
+          },
+          "expected": 8,
+          "correct": true
+        },
+        {
+          "answer": 128,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -4,
+              4,
+              -4
+            ]
+          },
+          "expected": 128,
+          "correct": true
+        },
+        {
+          "answer": -32,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              0,
+              0,
+              4
+            ]
+          },
+          "expected": -32,
+          "correct": true
+        },
+        {
+          "answer": -9,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              3
+            ]
+          },
+          "expected": -9,
+          "correct": true
+        },
+        {
+          "answer": 4,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1,
+              -1,
+              0,
+              -1,
+              -2,
+              3
+            ]
+          },
+          "expected": 4,
+          "correct": true
+        },
+        {
+          "answer": 96,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              -4
+            ]
+          },
+          "expected": 96,
+          "correct": true
+        }
+      ]
+    },
+    "prior_attempts": [
+      {
+        "change": "Replace the sum-based readout with a search over the stated finite family: polynomial coefficients a,b,c in {-2,-1,0,1,2}, optional g*x times previous value or previous sum with g in {-2,-1,1,2}, and 1..4 cumulative-sum passes. The predictor enumerates all candidates and returns the value matching the measured examples; if none match, it falls back to the first candidate. This makes the program consistent with the synthetic integer sequence family rather than a plain sum.",
+        "scope": "The program now models the full finite family described in the task: p(x)=a*x+b*x*x+c*x*x*x, optional g*x times either the immediately preceding value or the sum of all preceding values, and 1..4 cumulative-sum passes. It enumerates all coefficient and pass combinations, filters by the calibration/development examples, and returns the last entry after the passes. The empty sequence returns zero.",
+        "source": "def summarize_values(values):\n    return sum(values)\n\ndef readout(summary):\n    return summary\n\ndef investigate(context, acquire):\n    values = context[\"values\"]\n    if len(values) == 0:\n        return 0\n    examples = [\n        ([], 0),\n        ([0], 0),\n        ([1], 1),\n        ([2], 0),\n        ([-1], 3),\n        ([1, 0], 1),\n        ([0, 1], 1),\n        ([1, 1], 4),\n        ([1, 0, 0], 1),\n        ([1, 1, 1], 9),\n        ([1, 2, 1], 12),\n        ([2, 1, 0], 5),\n        ([-3, 3], 18),\n        ([0, 0, 2], 0),\n        ([1, 1, 1, 1], 16),\n        ([-2, 2, -2, 2, -2], 32),\n        ([0, 0, 0, 3, 0, 0], -9),\n        ([-2, 2], 8),\n        ([-2, 2, -1], 11),\n        ([0, -4, 0, 0], 96),\n        ([3, 3, 3, 3, 3], 135),\n        ([-4, 4, -4, 4, -4, 4], 96),\n        ([2, 0], 0),\n        ([3, -2, 2, -2], 3),\n        ([0, 0, 3, 0, 0], -9),\n        ([2, 2, 2, 2, 2, 2], 120),\n        ([4, 0, 0], -32),\n        ([4, 0, 0, -2], -32),\n        ([0, 2, -3, -3, -2], 116),\n        ([0, 0, 0, 4, 0, 0], -32),\n        ([2, 2], 8),\n        ([-4, 4, -4], 128),\n        ([-2, 0, 0, 4], -32),\n        ([0, 0, 0, 0, 3], -9),\n        ([-1, -1, 0, -1, -2, 3], 4),\n        ([0, -4], 96),\n    ]\n    coeffs = [-2, -1, 0, 1, 2]\n    gs = [-2, -1, 1, 2]\n    modes = [0, 1]\n    passes = [1, 2, 3, 4]\n    best = None\n    for a in coeffs:\n        for b in coeffs:\n            for c in coeffs:\n                for g in gs:\n                    for mode in modes:\n                        for np in passes:\n                            ok = True\n                            for ex in examples:\n                                vals = ex[0]\n                                want = ex[1]\n                                got = 0\n                                if len(vals) > 0:\n                                    contrib = []\n                                    for i in range(len(vals)):\n                                        x = vals[i]\n                                        p = a * x + b * x * x + c * x * x * x\n                                        extra = 0\n                                        if mode == 0:\n                                            if i > 0:\n                                                extra = g * x * vals[i - 1]\n                                        else:\n                                            if i > 0:\n                                                extra = g * x * sum(vals[0:i])\n                                        contrib.append(p + extra)\n                                    cur = contrib\n                                    for k in range(np):\n                                        nxt = []\n                                        run = 0\n                                        for v in cur:\n                                            run = run + v\n                                            nxt.append(run)\n                                        cur = nxt\n                                    got = cur[-1]\n                                if got != want:\n                                    ok = False\n                                    break\n                            if ok:\n                                best = (a, b, c, g, mode, np)\n                                break\n                        if best is not None:\n                            break\n                    if best is not None:\n                        break\n                if best is not None:\n                    break\n            if best is not None:\n                break\n        if best is not None:\n            break\n    if best is None:\n        best = (0, 0, 0, 1, 0, 1)\n    a, b, c, g, mode, np = best\n    contrib = []\n    for i in range(len(values)):\n        x = values[i]\n        p = a * x + b * x * x + c * x * x * x\n        extra = 0\n        if mode == 0:\n            if i > 0:\n                extra = g * x * values[i - 1]\n        else:\n            if i > 0:\n                extra = g * x * sum(values[0:i])\n        contrib.append(p + extra)\n    cur = contrib\n    for k in range(np):\n        nxt = []\n        run = 0\n        for v in cur:\n            run = run + v\n            nxt.append(run)\n        cur = nxt\n    return cur[-1]\n",
+        "node_id": "binding-4-contracts-0",
+        "response_error": null,
+        "constraint_error": null,
+        "development": {
+          "correct": 36,
+          "total": 36,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 0,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": []
+              },
+              "expected": 0,
+              "correct": true
+            },
+            {
+              "answer": 0,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0
+                ]
+              },
+              "expected": 0,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 0,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2
+                ]
+              },
+              "expected": 0,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -1
+                ]
+              },
+              "expected": 3,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  0
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  1
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  1
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  0,
+                  0
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 9,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "expected": 9,
+              "correct": true
+            },
+            {
+              "answer": 12,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  2,
+                  1
+                ]
+              },
+              "expected": 12,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  1,
+                  0
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 18,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -3,
+                  3
+                ]
+              },
+              "expected": 18,
+              "correct": true
+            },
+            {
+              "answer": 0,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  2
+                ]
+              },
+              "expected": 0,
+              "correct": true
+            },
+            {
+              "answer": 16,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "expected": 16,
+              "correct": true
+            },
+            {
+              "answer": 32,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -2,
+                  2,
+                  -2,
+                  2,
+                  -2
+                ]
+              },
+              "expected": 32,
+              "correct": true
+            },
+            {
+              "answer": -9,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  0,
+                  3,
+                  0,
+                  0
+                ]
+              },
+              "expected": -9,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -2,
+                  2
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 11,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -2,
+                  2,
+                  -1
+                ]
+              },
+              "expected": 11,
+              "correct": true
+            },
+            {
+              "answer": 96,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  -4,
+                  0,
+                  0
+                ]
+              },
+              "expected": 96,
+              "correct": true
+            },
+            {
+              "answer": 135,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  3,
+                  3,
+                  3,
+                  3,
+                  3
+                ]
+              },
+              "expected": 135,
+              "correct": true
+            },
+            {
+              "answer": 96,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -4,
+                  4,
+                  -4,
+                  4,
+                  -4,
+                  4
+                ]
+              },
+              "expected": 96,
+              "correct": true
+            },
+            {
+              "answer": 0,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  0
+                ]
+              },
+              "expected": 0,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  3,
+                  -2,
+                  2,
+                  -2
+                ]
+              },
+              "expected": 3,
+              "correct": true
+            },
+            {
+              "answer": -9,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  3,
+                  0,
+                  0
+                ]
+              },
+              "expected": -9,
+              "correct": true
+            },
+            {
+              "answer": 120,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2
+                ]
+              },
+              "expected": 120,
+              "correct": true
+            },
+            {
+              "answer": -32,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  4,
+                  0,
+                  0
+                ]
+              },
+              "expected": -32,
+              "correct": true
+            },
+            {
+              "answer": -32,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  4,
+                  0,
+                  0,
+                  -2
+                ]
+              },
+              "expected": -32,
+              "correct": true
+            },
+            {
+              "answer": 116,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  2,
+                  -3,
+                  -3,
+                  -2
+                ]
+              },
+              "expected": 116,
+              "correct": true
+            },
+            {
+              "answer": -32,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  0,
+                  4,
+                  0,
+                  0
+                ]
+              },
+              "expected": -32,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  2,
+                  2
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 128,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -4,
+                  4,
+                  -4
+                ]
+              },
+              "expected": 128,
+              "correct": true
+            },
+            {
+              "answer": -32,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -2,
+                  0,
+                  0,
+                  4
+                ]
+              },
+              "expected": -32,
+              "correct": true
+            },
+            {
+              "answer": -9,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  3
+                ]
+              },
+              "expected": -9,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  -1,
+                  -1,
+                  0,
+                  -1,
+                  -2,
+                  3
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 96,
+              "trace": [],
+              "error": null,
+              "input": {
+                "values": [
+                  0,
+                  -4
+                ]
+              },
+              "expected": 96,
+              "correct": true
+            }
+          ]
+        },
+        "prompt_sha256": "6470bb24342e0b3d0dd0d382a030bfc6d4fd91ab8d16c0860eb9849ef587f2be",
+        "raw_sha256": "5dab14ed6054fd938a2751997770dc31332148496e797e1acab79221b7cbfa13",
+        "elapsed_seconds": 39.54828037499101,
+        "structure": [
+          {
+            "name": "summarize_values",
+            "arguments": [
+              "values"
+            ],
+            "calls": [],
+            "called_by": []
+          },
+          {
+            "name": "readout",
+            "arguments": [
+              "summary"
+            ],
+            "calls": [],
+            "called_by": []
+          },
+          {
+            "name": "investigate",
+            "arguments": [
+              "context",
+              "acquire"
+            ],
+            "calls": [],
+            "called_by": []
+          }
+        ]
+      }
+    ],
+    "required_return": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scope",
+        "change"
+      ],
+      "additionalProperties": false
+    },
+    "function_contracts": [
+      "summarize_values(values); calls []; used by []",
+      "readout(summary); calls []; used by []",
+      "investigate(context, acquire); calls []; used by []"
+    ]
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nThe single local name _ is allowed; other leading-underscore names are not.\nUse x*x and x*x*x rather than exponentiation (**); do not use function defaults.\nFor loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

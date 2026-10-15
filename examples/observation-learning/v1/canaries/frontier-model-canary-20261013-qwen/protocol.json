@@ -1,0 +1,31 @@
+{
+  "model": "qwen/qwen3.8-omni-flash",
+  "provider_slug": "alibaba",
+  "reasoning_effort": "low",
+  "max_calls": 1,
+  "max_cost_usd": "0.05",
+  "max_output_tokens": 8192,
+  "prompt": {
+    "request": "Return exactly one JSON object matching the schema, never an array. Write investigate(context, acquire) in Python. acquire(\"events\") returns records with event_id and work. Return {\"findings\": [], \"unresolved\": [], \"ratio\": sum of work once per unique event_id}. Duplicate deliveries repeat exactly. Distinct IDs with equal work must both count. No imports, top-level assignments, annotations or default function arguments. This is an interface canary, not a research evaluation."
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "lesson": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson"
+    ],
+    "additionalProperties": false
+  }
+}

@@ -15,33 +15,75 @@ DOCUMENTS = {
     "architecture": "docs/architecture.md",
     "graphs": "docs/graphs.md",
     "results": "docs/status.md",
-    "experiment": "docs/demo.md",
+    "experiment": "docs/baskets.md",
+    "synthetic-fixture": "docs/demo.md",
     "data": "docs/data.md",
     "diagnosis": "docs/failure-diagnosis.md",
+    "reasoning-ontology": "docs/reasoning-ontology.md",
+    "investigator": "docs/investigator.md",
+    "executable-investigations": "docs/executable-investigations.md",
+    "observation-learning": "docs/executable-investigations.md",
+    "decomposition-study": "docs/decomposition-study.md",
+    "decomposition-results": "docs/decomposition-20261014.md",
+    "conformance-study": "docs/conformance-study.md",
+    "continuation-memory": "docs/continuation-memory.md",
+    "advance-synthesis": "docs/advance-returns-20261014.md",
+    "progress-synthesis": "docs/progress-returns-20261014.md",
+    "client-investigation-protocol": "docs/client-investigation-protocol-20261014.md",
+    "client-investigation": "docs/client-investigation-20261014.md",
+    "client-investigation-protocol-v2": "docs/client-investigation-protocol-v2-20261015.md",
+    "client-investigation-v2": "docs/client-investigation-v2-20261015.md",
+    "client-investigation-v2-low": "docs/client-investigation-v2-low-20261015.md",
+    "research-programme": "program.md",
+    "model-repair": "docs/model-repair-20261013.md",
+    "worked-case": "docs/full-graph-case.md",
     "research-direction": "docs/research-direction.md",
     "walkthrough": "docs/zenith-walkthrough-script.md",
     "notice": "RESEARCH_NOTICE.md",
 }
 EVIDENCE = {
+    "progress-campaign": "docs/progress-campaign-20261014.json",
+    "client-investigation": "docs/client-investigation-20261014.json",
+    "client-investigation-v2": "docs/client-investigation-v2-20261015.json",
+    "client-investigation-v2-low": "docs/client-investigation-v2-low-20261015.json",
+    "advance-campaign": "docs/advance-campaign-20261014.json",
+    "decomposition-result": "docs/decomposition-20261014.json",
+    "observation-learning-result": "docs/observation-learning-20261013.json",
+    "observation-screens": "docs/observation-screens-20261013.json",
+    "investigation-learning-result": "docs/investigation-learning-20261013.json",
+    "investigator-result": "docs/investigator-evidence.json",
+    "model-repair-result": "docs/model-repair-20261013.json",
     "sources": "examples/demo/provenance.json",
     "replacements": "examples/demo/replacements.json",
     "demo-result": "examples/demo/result.json",
+    "basket-result": "examples/baskets/result.json",
+    "basket-trace": "examples/baskets/trace.json",
+    "basket-repair": "examples/baskets/repair.json",
+    "basket-protocol": "examples/baskets/protocol.json",
+    "full-graph-result": "examples/full-graph/result.json",
+    "full-graph-trace": "examples/full-graph/trace.json",
+    "reasoning-schemas": "examples/full-graph/reasoning-schemas.json",
+    "experiment-reasoning-schemas": "examples/full-graph/experiment-reasoning-schemas.json",
+    "full-graph-protocol": "examples/full-graph/protocol.json",
+    "full-graph-history": "examples/full-graph/development-history.json",
+    "full-graph-followups": "examples/full-graph/followups.json",
+    "full-graph-manifest": "examples/full-graph/manifest.json",
 }
-FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail")
+FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail", "basket-detail", "basket-serial-detail", "investigator-detail")
 CHAPTERS = (
-    ("idea", "The idea", "introduction", "replay", None, "proposed_process"),
-    ("lab", "Read earlier evidence and freeze a prediction", "graphs", "lab", "lab", "authored_mechanism"),
-    ("oracle", "Compare with later evidence", "graphs", "oracle", "oracle", "authored_mechanism"),
-    ("evolve", "Propose one change and test it", "architecture", "evolve", "refinement", "authored_mechanism"),
-    ("results", "What has been prepared", "results", None, "lab", "verified_preparation"),
-    ("next", "What still needs testing", "research-direction", None, None, "research_proposal"),
+    ("idea", "The idea", "introduction", None, None, "authored_mechanism"),
+    ("lab", "Investigate native behavior", "conformance-study", None, None, "authored_mechanism"),
+    ("oracle", "Check experiments and repairs", "conformance-study", None, None, "authored_mechanism"),
+    ("evolve", "Retain useful continuation state", "continuation-memory", None, None, "authored_mechanism"),
+    ("results", "Current campaign and limits", "progress-synthesis", None, None, "measured_execution"),
+    ("next", "What still needs testing", "research-programme", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
-    "idea": ("sources",), "lab": ("replacements",), "oracle": (), "evolve": (),
-    "results": ("demo-result",), "next": (),
+    "idea": (), "lab": (), "oracle": ("progress-campaign",), "evolve": ("progress-campaign",),
+    "results": ("progress-campaign",), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
-                  "evolve": "trace", "results": "results", "next": "research"}
+                  "evolve": "evolve", "results": "results", "next": "research"}
 
 
 def digest(data: bytes) -> str:
@@ -79,7 +121,7 @@ class PublicContent:
                 self.sources[source["id"]] = (path.relative_to(self.root).as_posix(), raw, source)
         if set(self.sources) != set(self.nodes):
             raise ValueError("Native nodes lack source bindings")
-        self.plans = {name: runtime.plan(self.root, name) for name in ("lab", "oracle", "refinement")}
+        self.plans = {name: runtime.plan(self.root, name) for name in ("lab", "oracle", "refinement", "basket", "basket_serial", "basket_evolve")}
 
     def source(self, path: str, data: bytes) -> dict:
         return {"path": path, "sha256": digest(data),
@@ -126,27 +168,85 @@ class PublicContent:
         return {"title": title[1] if title else "Zenith", "source": source["source"],
                 "source_url": f"{API}/documents/paper", "pdf_url": "/assets/paper.pdf",
                 "pdf_sha256": digest(pdf), "citations": citations, "sections": sections,
+                # The current source has changed without an exported PDF and
+                # there is no verified source-to-PDF binding receipt.
+                "pdf_current": False, "pdf_edition": "retained_previous_edition",
+                "pdf_note": "The LaTeX source is current. The retained PDF is a previous edition without a verified current-source binding.",
                 "notice_url": f"{API}/documents/notice"}
 
-    def node(self, identifier: str) -> dict:
+    def node(self, identifier: str, task_profile: str = "generic") -> dict:
         if identifier not in self.nodes:
             raise FileNotFoundError("Unknown node")
+        if task_profile=="financial":
+            group=self.nodes[identifier].group
+            if group not in {"lab","oracle","refinement","feeds"}:raise ValueError("Node has no financial profile")
+            mission="lab" if group=="feeds" else group
+            return next(n for n in self.graph("financial_"+mission)["nodes"] if n["id"]==identifier)
+        if task_profile!="generic":raise ValueError("Unknown task profile")
         node = self.nodes[identifier]
         path, raw, authored = self.sources[identifier]
         consumers = sorted(n.id for n in self.nodes.values() if identifier in n.dependencies)
         demo = self.evidence("sources")["data"]
         provenance = next((lane for snapshot in demo["snapshots"] if snapshot["id"] == "earlier"
                            for lane in snapshot["lanes"] if lane["node_id"] == identifier), None)
+        dossier = None
+        perspective = node.lane.lower()
+        if not node.group.startswith("basket") and perspective in {"measurements", "subsystems", "environment", "events", "interventions", "derived"}:
+            dossier_path = f"codex/substrate/dossiers/{perspective}.json"
+            dossier_raw = safe_read(self.root, dossier_path)
+            dossier = {"data": json.loads(dossier_raw), "source": self.source(dossier_path, dossier_raw)}
         return {"id": node.id, "type": node.type.value, "group": node.group, "lane": node.lane,
                 "purpose": node.teleology, "mechanism": node.mechanism, "expectation": node.expectation,
                 "boundary": authored.get("boundary", ""), "instruction": node.instruction,
                 "instruction_kind": "current_authored_definition_not_run_override",
                 "dependencies": list(node.dependencies), "consumers": consumers,
-                "demo_provenance": provenance,
+                "demo_provenance": provenance, "dossier": dossier,
                 "output_schema": node.output_schema, "source": self.source(path, raw),
-                "explanation_url": f"{API}/documents/graphs"}
+                "explanation_url": f"{API}/documents/experiment" if node.group.startswith("basket") else f"{API}/documents/graphs"}
 
     def graph(self, mission: str = "all", focus: str | None = None) -> dict:
+        if mission.startswith("financial_"):
+            underlying=mission.removeprefix("financial_")
+            if underlying not in {"lab","oracle","refinement"}: raise ValueError("unknown financial mission")
+            answer=self.graph(underlying,focus)
+            financial=runtime.load_graph(self.root,task_profile="financial")
+            from .financial_reasoning import schema_for
+            for row in answer["nodes"]:
+                node=financial[row["id"]]
+                from system.lib.hashing import hash_node
+                row["effective_node_hash"]=hash_node(node)
+                row["task_profile"]="financial"
+                row["instruction"]=node.instruction
+                row["output_schema"]=node.output_schema
+                row["dossier"]=None;row["demo_provenance"]=None
+                row["explanation_url"]=f"{API}/documents/reasoning-ontology"
+                row["detail_url"]=f"{API}/nodes/{node.id}?task_profile=financial"
+                row["profile_source"]=self.source("zenith/market_graph.py",safe_read(self.root,"zenith/market_graph.py"))
+                row["instruction_kind"]="effective_financial_definition_not_run_override"
+                if node.type.value=="reasoning":
+                    from .financial_reasoning import stage_for
+                    row["purpose"]="Financial reasoning stage: "+stage_for(node.id)
+                    row["expectation"]="Validated reasoning record with the attached stage-specific JSON Schema."
+                if node.type.value=="reasoning": row["reasoning_schema"]=schema_for(node.id,persisted=True)
+            selected={n["id"] for n in answer["nodes"]}
+            edges=[{"id":f"{dep}->{nid}","source":dep,"target":nid,"kind":"declared_dependency"}
+                   for nid in sorted(selected) for dep in financial[nid].dependencies if dep in selected]
+            for row in answer["nodes"]:
+                row["dependencies"]=list(financial[row["id"]].dependencies)
+                row["consumers"]=sorted(n for n in selected if row["id"] in financial[n].dependencies)
+            def reachable(reverse):
+                seen=set();todo=[focus] if focus else []
+                while todo:
+                    current=todo.pop()
+                    for edge in edges:
+                        before,after=(edge["target"],edge["source"]) if reverse else (edge["source"],edge["target"])
+                        if before==current and after not in seen:seen.add(after);todo.append(after)
+                return sorted(seen)
+            from system.core.governance import compute_waves
+            answer.update(edges=edges,edge_count=len(edges),waves=compute_waves({n:financial[n] for n in selected}),
+                          focus={"id":focus,"ancestors":reachable(True),"descendants":reachable(False)})
+            answer.update(mission=mission,task_profile="financial",profile_source="zenith/market_graph.py")
+            return answer
         if mission == "evolve":
             mission = "refinement"
         if mission == "all":
@@ -188,24 +288,30 @@ class PublicContent:
 
     def site(self, local_runs: bool) -> dict:
         chapters = []
+        current_available = (self.root / EVIDENCE["progress-campaign"]).is_file()
         paper = self.paper()
         sections = {section["id"]: section for section in paper["sections"]}
         for identifier, title, document, figure, mission, kind in CHAPTERS:
+            if identifier == "results":
+                # Analysis completion does not certify construction, protected
+                # outcomes or learning success for every constituent study.
+                kind = "measured_execution" if current_available else "research_proposal"
             available = (self.root / DOCUMENTS[document]).is_file()
             chapters.append({"id": identifier, "title": title, "evidence_kind": kind,
                              "document_url": f"{API}/documents/{document}" if available else None,
                              "available": available, "figure_url": f"/assets/graphs/{figure}.svg" if figure else None,
                              "graph_url": f"{API}/graph?mission={mission}" if mission else None,
                              "paper_section": sections.get(PAPER_SECTIONS[identifier]),
-                             "evidence_urls": [f"{API}/evidence/{name}" for name in CHAPTER_EVIDENCE[identifier]]})
+                             "evidence_urls": [f"{API}/evidence/{name}" for name in CHAPTER_EVIDENCE[identifier] if (self.root/EVIDENCE[name]).is_file()]})
         return {"schema": "zenith_teaching_site_v1", "api_version": "1",
                 "title": paper["title"], "paper_url": f"{API}/paper", "chapters": chapters,
-                "notice": "This is not financial advice.", "notice_url": f"{API}/documents/notice",
+                "notice": "Experimental research prototype.", "notice_url": f"{API}/documents/notice",
                 "documents": {k: f"{API}/documents/{k}" for k, v in DOCUMENTS.items() if (self.root / v).is_file()},
                 "figures": {k: f"/assets/graphs/{k}.svg" for k in FIGURES},
-                "evidence": {k: f"{API}/evidence/{k}" for k in EVIDENCE},
-                "data_mode": "mixed",
-                "data_note": "Real saved stocks, ETFs and prediction markets; synthetic macro/news; recomputed CALC. Real payloads withheld from public responses. No forecast result for this configuration.",
+                "evidence": {k: f"{API}/evidence/{k}" for k,v in EVIDENCE.items() if (self.root / v).is_file()},
+                "active_evidence_id": "progress-campaign",
+                "data_mode": "source_bound_acquisition_research",
+                "data_note": "The native investigation comparison, SQLite client pilot and exact-class learner retain separate evidence boundaries. Earlier Advance, observation learning, decomposition, financial studies and System A remain available as historical profiles.",
                 "local_runs_enabled": local_runs,
                 "run_index_url": f"{API}/runs" if local_runs else None,
                 "capabilities": {"read_graph": True, "read_paper": True, "read_local_runs": local_runs,

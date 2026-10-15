@@ -6,26 +6,26 @@
 
 [INTERFACE]
 - Inputs: `config.runtime.oracle_subject_run_dir` pointing at the subject run.
-- Outputs: Success envelope carrying subject evidence maps, predictions, price tables, and lane summaries.
+- Outputs: Success envelope carrying subject evidence maps, predictions, value tables, and lane summaries.
 - Exports: `run`.
 
 [FLOW]
 - Resolve the subject run directory and optional runtime context.
 - Load Lab CP1/CP2 artifacts plus cross-correlation targets.
 - Partition evidence into admissible versus contextual subject buckets.
-- Attach subject price maps, predictions, and compact Phase-2 lane summaries.
+- Attach subject value maps, predictions, and compact Phase-2 lane summaries.
 - Return a success envelope for downstream Oracle tools.
 
 [DEPENDENCIES]
 - system.lib.artifacts: Load subject-run artifacts and compact lane outputs.
-- system.lib.run_compare: Reuse shared prediction and price-table loaders.
+- system.lib.run_compare: Reuse shared prediction and value-table loaders.
 
 [CONSTRAINTS]
 - Read-only over subject-run artifacts; this module does not mutate subject state.
 - Missing or malformed optional artifacts degrade to empty structures via helper defaults.
-- When-needed: Open when Oracle needs the subject-side grounding map built from a paired Lab run, including admissible evidence, target prices, and lane summaries.
-- Escalates-to: tools/oracle/subject_index.py::run; tools/oracle/truth_diff_equity.py::run; tools/calculator/calculator.py::run
-- Navigation-group: market_intelligence
+- When-needed: Open when Oracle needs the subject-side grounding map built from a paired Lab run, including admissible evidence, target values, and lane summaries.
+- Escalates-to: tools/oracle/subject_index.py::run; tools/oracle/truth_diff_observations.py::run; tools/derived/derived.py::run
+- Navigation-group: system_intelligence
 """
 from __future__ import annotations
 
@@ -34,16 +34,16 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 from system.lib.artifacts import load_artifact, load_artifact_data
-from system.lib.run_compare import combined_prices, load_predictions
+from system.lib.run_compare import combined_values, load_predictions
 
 
 _PHASE2_IDS = {
-    "stock": "lab_miner_v2_stock",
-    "etf": "lab_miner_v2_etf",
-    "macro": "lab_miner_v2_macro",
-    "news": "lab_miner_v2_news",
-    "poly": "lab_miner_v2_poly",
-    "calc": "lab_miner_v2_calc",
+    "measurements": "lab_miner_v2_measurements",
+    "subsystems": "lab_miner_v2_subsystems",
+    "environment": "lab_miner_v2_environment",
+    "events": "lab_miner_v2_events",
+    "poly": "lab_miner_v2_interventions",
+    "calc": "lab_miner_v2_derived",
 }
 
 
@@ -112,13 +112,13 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
     """
     [ACTION]
     - Teleology: Build the subject-side Oracle index payload from subject-run artifacts and paired Lab outputs.
-    - Mechanism: Resolve the subject run directory, hydrate runtime context plus Lab artifacts, partition evidence into admissible and contextual buckets, merge prices and predictions, and emit a success envelope.
+    - Mechanism: Resolve the subject run directory, hydrate runtime context plus Lab artifacts, partition evidence into admissible and contextual buckets, merge values and predictions, and emit a success envelope.
     - Reads: `config.runtime.oracle_subject_run_dir`, subject artifacts, and shared run-compare helpers.
     - Writes: None.
-    - Guarantee: Returns a success payload with evidence maps, target lists, price maps, and compact Phase-2 lane summaries derived from the subject run.
+    - Guarantee: Returns a success payload with evidence maps, target lists, value maps, and compact Phase-2 lane summaries derived from the subject run.
     - Fails: Raises ValueError when `oracle_subject_run_dir` is missing or invalid; optional artifact read failures degrade to empty structures via helper defaults.
     - When-needed: Open when a caller needs the exact subject-index payload shape, admissible-support rules, or lane-summary hydration behavior.
-    - Escalates-to: tools/oracle/subject_snapshot.py::run; tools/oracle/truth_diff_equity.py::run; tools/calculator/calculator.py::run
+    - Escalates-to: tools/oracle/subject_snapshot.py::run; tools/oracle/truth_diff_observations.py::run; tools/derived/derived.py::run
     """
     subject_run_dir = _require_subject_run_dir(config)
     ctx = _load_runtime_context(subject_run_dir)
@@ -154,7 +154,7 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
             if str(token).strip() and str(token).upper().strip() != "NONE"
         ]
 
-    price_rows = combined_prices(subject_run_dir)
+    value_rows = combined_values(subject_run_dir)
     target_subset = set(valid_prediction_targets)
     for pred in load_predictions(subject_run_dir):
         target_id = str(pred.get("target_id") or "").upper().strip()
@@ -175,15 +175,15 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
         for target in target_subset
         if target and target not in admissible_evidence_by_subject
     )
-    subject_equity_rows_by_ticker = {
-        ticker: row
-        for ticker, row in price_rows.items()
-        if ticker in target_subset
+    subject_observation_rows_by_target_id = {
+        target_id: row
+        for target_id, row in value_rows.items()
+        if target_id in target_subset
     }
-    subject_equity_price_map = {
-        ticker: row.get("Price")
-        for ticker, row in price_rows.items()
-        if isinstance(row, dict) and isinstance(row.get("Price"), (int, float))
+    subject_observation_value_map = {
+        target_id: row.get("Value")
+        for target_id, row in value_rows.items()
+        if isinstance(row, dict) and isinstance(row.get("Value"), (int, float))
     }
 
     phase2_lane_summaries: Dict[str, str] = {}
@@ -213,13 +213,13 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
             "abstention": lab_decide_data.get("abstention"),
             "epicentre_thesis": lab_decide_data.get("epicentre_thesis"),
             "dominant_evidence_track": lab_decide_data.get("dominant_evidence_track"),
-            "pre_pricing_assessment": lab_decide_data.get("pre_pricing_assessment"),
+            "prior_availability_assessment": lab_decide_data.get("prior_availability_assessment"),
         },
         "lab_cp2": {
             "decision_status": lab_director_data.get("decision_status", "FORECAST"),
             "abstention": lab_director_data.get("abstention"),
             "epicentre_thesis": lab_director_data.get("epicentre_thesis"),
-            "trade_rationale": lab_director_data.get("trade_rationale"),
+            "forecast_rationale": lab_director_data.get("forecast_rationale"),
             "predictions_t": lab_director_data.get("predictions_t"),
         },
         "evidence_dictionary": evidence_dictionary,
@@ -227,8 +227,8 @@ def run(config: Dict[str, Any], run_dir: str | None = None) -> Dict[str, Any]:
         "admissible_evidence_by_subject": dict(sorted(admissible_evidence_by_subject.items())),
         "contextual_evidence_by_subject": dict(sorted(contextual_evidence_by_subject.items())),
         "missing_admissible_support_targets": missing_admissible_support_targets,
-        "subject_equity_price_map": dict(sorted(subject_equity_price_map.items())),
-        "subject_equity_rows_by_ticker": dict(sorted(subject_equity_rows_by_ticker.items())),
+        "subject_observation_value_map": dict(sorted(subject_observation_value_map.items())),
+        "subject_observation_rows_by_target_id": dict(sorted(subject_observation_rows_by_target_id.items())),
         "phase2_lane_summaries": phase2_lane_summaries,
     }
     return {

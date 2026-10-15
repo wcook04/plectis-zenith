@@ -1,0 +1,7 @@
+{
+  "call_id": "61a8e6eb9e8b875016e408024bdbe3bbfc578d716c9d956e95a5a5a21d3bd440",
+  "content": "{\n  \"source\": \"def investigate(context, acquire):\\n    events = acquire(\\\"events\\\")\\n    seen = set()\\n    total = 0\\n    for event in events:\\n        eid = event[\\\"event_id\\\"]\\n        if eid not in seen:\\n            seen.add(eid)\\n            total += event[\\\"work\\\"]\\n    return {\\\"findings\\\": [], \\\"unresolved\\\": [], \\\"ratio\\\": total}\"\n  ,\n  \"scope\": \"investigate\"\n  ,\n  \"lesson\": \"The function deduplicates events by event_id, summing work only for the first occurrence of each unique ID, and returns the required JSON object with empty findings and unresolved lists.\"\n}",
+  "original_content_sha256": "cca1ebb354c25bf02c183c296c6dc17dc082baeeb803c7c2e89741441718caa5",
+  "projection": "assistant content only; transport, headers, routing and credentials omitted",
+  "redacted": false
+}

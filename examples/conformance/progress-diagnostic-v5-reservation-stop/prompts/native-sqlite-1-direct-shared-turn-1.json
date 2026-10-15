@@ -1,0 +1,346 @@
+{
+  "prompt": {
+    "observed_task": {
+      "id": "native-sqlite-1",
+      "source_id": "sqlite-1",
+      "examples": [
+        {
+          "input": {
+            "actions": []
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "delete",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 9
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 3
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 4
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 6
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 6
+              }
+            ]
+          },
+          "expected": 7
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 2
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 7
+              }
+            ]
+          },
+          "expected": 8
+        },
+        {
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 7
+              },
+              {
+                "op": "delete",
+                "id": 7
+              },
+              {
+                "op": "put",
+                "id": 1
+              }
+            ]
+          },
+          "expected": 8
+        }
+      ],
+      "native_contract_not_response_instructions": "Native SQLite diagnostic source. Each query starts an empty\nin-memory database with one table whose id column is INTEGER PRIMARY KEY\nAUTOINCREMENT. Input is exactly {\"actions\": [action, ...]}, at most 32 actions.\nAn action is exactly {\"op\":\"put\", \"id\":n}, {\"op\":\"delete\", \"id\":n}, or\n{\"op\":\"begin\"}, {\"op\":\"commit\"}, {\"op\":\"rollback\"}. IDs are integers\n1..1000. Put inserts the explicit ID; it must be absent in the current\ntransactional view. Delete may name an absent ID. Transactions cannot nest;\ncommit/rollback require an open transaction. The sequence may end with an\nopen transaction. Operations and the final measurement use the same connection.\nAfter the actions, insert one row without specifying an ID and return its\nautomatically allocated ID as an integer. The source has no other tables,\ntriggers, conflicts, connections or hidden modes. An allowed source probe uses\nexactly this schema and returns this native measurement. There are no\nacquisition tables. \n"
+    },
+    "candidate_source": "",
+    "candidate_on_examples": {
+      "correct": 0,
+      "total": 8,
+      "errors": 8,
+      "rows": [
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": []
+          },
+          "expected": 1,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "delete",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 9
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 3
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 4,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 6
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 6
+              }
+            ]
+          },
+          "expected": 7,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 2
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 7
+              }
+            ]
+          },
+          "expected": 8,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 7
+              },
+              {
+                "op": "delete",
+                "id": 7
+              },
+              {
+                "op": "put",
+                "id": 1
+              }
+            ]
+          },
+          "expected": 8,
+          "correct": false
+        }
+      ]
+    },
+    "turn": 1,
+    "remaining_slots": 8,
+    "max_queries_this_turn": 4,
+    "receipts": [],
+    "outcomes_available": false,
+    "earlier_delivery_errors": [],
+    "response_example": {
+      "queries": [],
+      "note": null
+    }
+  },
+  "system": "You are investigating a candidate program, not implementing it.\nReturn JSON with exactly \"queries\" (a list of native input objects) and \"note\"\n(a short string or null). Do not return Python, predicted answers, or source/scope/\nchange fields. The host executes queries and measures both native and candidate\noutputs. The native contract below defines the object under test, NOT your reply.\nChoose revealing legal inputs from code inspection and evidence. Do not repeat\nexamples or earlier queries. An empty queries list stops. Notes are unverified\nhypotheses: observed evidence takes precedence. The request states your remaining\nquery allowance. Your note may be null; a long explanation is not required.",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "queries": {
+        "type": "array",
+        "maxItems": 4,
+        "items": {
+          "type": "object"
+        }
+      },
+      "note": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "queries",
+      "note"
+    ],
+    "additionalProperties": false
+  }
+}

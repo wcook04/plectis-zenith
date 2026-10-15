@@ -12,7 +12,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from benchmarks import fnspid
+from . import observations as observation_adapter
 from system.lib.reasoning_policy import policy_sha256, validate_reasoning_policy
 from tools.refinement import run_evolve as evolve
 from . import runtime
@@ -40,9 +40,9 @@ def substrate_hashes(root):
 
 def dataset_adapter(dataset):
     schema = read(Path(dataset)/'source-manifest.json').get('schema')
-    if schema == 'fnspid_raw_source_v1':
-        return fnspid
-    raise ValueError('No native daily adapter for this source manifest')
+    if schema == 'zenith_synthetic_source_v1':
+        return observation_adapter
+    raise ValueError('Explicit authored synthetic source manifest required')
 
 
 def immutable(path, value):

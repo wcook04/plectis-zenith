@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    return {'query': {'events': [{'op': 'feed', 'bytes': [240, 159, 152, 128]}, {'op': 'finish'}]}, 'note': {'hypothesis': 'Parent mishandles 4-byte UTF-8: need=3 instead of 4, so a complete U+1F600 sequence is treated as incomplete and finish errors. Native should count 1 and finish.'}}\\n\",\"scope\":\"Compare native strict UTF-8 incremental decoder against parent on a complete 4-byte sequence (F0 9F 98 80) followed by finish; parent_examples already show this row failing with count=0/error instead of count=1/finished.\",\"change\":\"Feed one complete 4-byte UTF-8 code point then finish to expose the parent's incorrect need value for lead byte 0xF0 and its resulting terminal-status mismatch.\"}",
+  "prompt_sha256": "f0605306998d273e3e4fb553b14a933cfd7ca1fed70163e5377721365a893f05"
+}

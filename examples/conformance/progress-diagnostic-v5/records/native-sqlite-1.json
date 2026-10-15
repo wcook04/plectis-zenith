@@ -1,0 +1,5372 @@
+{
+  "task_id": "native-sqlite-1",
+  "source_id": "sqlite-1",
+  "arms": {
+    "direct_adaptive": {
+      "policy": null,
+      "investigation": {
+        "receipts": [
+          {
+            "slot": 1,
+            "turn": 1,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 1
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                },
+                {
+                  "op": "put",
+                  "id": 3
+                }
+              ]
+            },
+            "note": "Probe AUTOINCREMENT behavior: sequential inserts, max ID, commit/rollback effects, and delete/reinsert reuse.",
+            "expected": 4,
+            "parent_answer": null,
+            "parent_error": "ValueError: only function definitions are permitted at top level",
+            "verified_counterexample": true,
+            "query_units": 5
+          }
+        ],
+        "turns": [
+          {
+            "turn": 1,
+            "envelope": {
+              "prompt": {
+                "observed_task": {
+                  "id": "native-sqlite-1",
+                  "source_id": "sqlite-1",
+                  "examples": [
+                    {
+                      "input": {
+                        "actions": []
+                      },
+                      "expected": 1
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          },
+                          {
+                            "op": "delete",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 9
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 1
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 3
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 11
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 4
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 6
+                          },
+                          {
+                            "op": "commit"
+                          },
+                          {
+                            "op": "delete",
+                            "id": 6
+                          }
+                        ]
+                      },
+                      "expected": 7
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 2
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 7
+                          }
+                        ]
+                      },
+                      "expected": 8
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 7
+                          },
+                          {
+                            "op": "delete",
+                            "id": 7
+                          },
+                          {
+                            "op": "put",
+                            "id": 1
+                          }
+                        ]
+                      },
+                      "expected": 8
+                    }
+                  ],
+                  "native_contract_not_response_instructions": "Native SQLite diagnostic source. Each query starts an empty\nin-memory database with one table whose id column is INTEGER PRIMARY KEY\nAUTOINCREMENT. Input is exactly {\"actions\": [action, ...]}, at most 32 actions.\nAn action is exactly {\"op\":\"put\", \"id\":n}, {\"op\":\"delete\", \"id\":n}, or\n{\"op\":\"begin\"}, {\"op\":\"commit\"}, {\"op\":\"rollback\"}. IDs are integers\n1..1000. Put inserts the explicit ID; it must be absent in the current\ntransactional view. Delete may name an absent ID. Transactions cannot nest;\ncommit/rollback require an open transaction. The sequence may end with an\nopen transaction. Operations and the final measurement use the same connection.\nAfter the actions, insert one row without specifying an ID and return its\nautomatically allocated ID as an integer. The source has no other tables,\ntriggers, conflicts, connections or hidden modes. An allowed source probe uses\nexactly this schema and returns this native measurement. There are no\nacquisition tables. \n"
+                },
+                "candidate_source": "",
+                "candidate_on_examples": {
+                  "correct": 0,
+                  "total": 8,
+                  "errors": 8,
+                  "rows": [
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": []
+                      },
+                      "expected": 1,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          },
+                          {
+                            "op": "delete",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 9
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 1,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 3
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 11
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 4,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 6
+                          },
+                          {
+                            "op": "commit"
+                          },
+                          {
+                            "op": "delete",
+                            "id": 6
+                          }
+                        ]
+                      },
+                      "expected": 7,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 2
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 7
+                          }
+                        ]
+                      },
+                      "expected": 8,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 7
+                          },
+                          {
+                            "op": "delete",
+                            "id": 7
+                          },
+                          {
+                            "op": "put",
+                            "id": 1
+                          }
+                        ]
+                      },
+                      "expected": 8,
+                      "correct": false
+                    }
+                  ]
+                },
+                "turn": 1,
+                "remaining_slots": 8,
+                "max_queries_this_turn": 4,
+                "receipts": [],
+                "outcomes_available": false,
+                "earlier_delivery_errors": [],
+                "response_example": {
+                  "queries": [],
+                  "note": null
+                }
+              },
+              "system": "You are investigating a candidate program, not implementing it.\nReturn JSON with exactly \"queries\" (a list of native input objects) and \"note\"\n(a short string or null). Do not return Python, predicted answers, or source/scope/\nchange fields. The host executes queries and measures both native and candidate\noutputs. The native contract below defines the object under test, NOT your reply.\nChoose revealing legal inputs from code inspection and evidence. Do not repeat\nexamples or earlier queries. An empty queries list stops. Notes are unverified\nhypotheses: observed evidence takes precedence. The request states your remaining\nquery allowance. Your note may be null; a long explanation is not required.",
+              "response_schema": {
+                "type": "object",
+                "properties": {
+                  "queries": {
+                    "type": "array",
+                    "maxItems": 4,
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "note": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "queries",
+                  "note"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "envelope_sha256": "ff0340afbe6a12b1346d80eca4375d6664e8046ab6035ea7b34ce4d89e9828db",
+            "raw": "{\"queries\":[{\"actions\":[{\"op\":\"put\",\"id\":1},{\"op\":\"put\",\"id\":2},{\"op\":\"put\",\"id\":3}]},{\"actions\":[{\"op\":\"put\",\"id\":1000}]},{\"actions\":[{\"op\":\"begin\"},{\"op\":\"put\",\"id\":10},{\"op\":\"commit\"},{\"op\":\"begin\"},{\"op\":\"put\",\"id\":20},{\"op\":\"rollback\"}]},{\"actions\":[{\"op\":\"put\",\"id\":5},{\"op\":\"delete\",\"id\":5},{\"op\":\"put\",\"id\":5},{\"op\":\"delete\",\"id\":5}]}],\"note\":\"Probe AUTOINCREMENT behavior: sequential inserts, max ID, commit/rollback effects, and delete/reinsert reuse.\"}",
+            "delivery_error": null,
+            "call_id": "native-sqlite-1-direct-shared-turn-1",
+            "raw_sha256": "07350c19a82808b6791c77f7fcc806f0dd50ddae0b5f426867bcb955f34c206d",
+            "action": {
+              "queries": [
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 1
+                    },
+                    {
+                      "op": "put",
+                      "id": 2
+                    },
+                    {
+                      "op": "put",
+                      "id": 3
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 1000
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "begin"
+                    },
+                    {
+                      "op": "put",
+                      "id": 10
+                    },
+                    {
+                      "op": "commit"
+                    },
+                    {
+                      "op": "begin"
+                    },
+                    {
+                      "op": "put",
+                      "id": 20
+                    },
+                    {
+                      "op": "rollback"
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 5
+                    },
+                    {
+                      "op": "delete",
+                      "id": 5
+                    },
+                    {
+                      "op": "put",
+                      "id": 5
+                    },
+                    {
+                      "op": "delete",
+                      "id": 5
+                    }
+                  ]
+                }
+              ],
+              "note": "Probe AUTOINCREMENT behavior: sequential inserts, max ID, commit/rollback effects, and delete/reinsert reuse."
+            }
+          }
+        ],
+        "model_turn_attempts": 1,
+        "native_probes": 1,
+        "query_attempts": 1,
+        "query_units": 5,
+        "policy_executions": 0,
+        "invalid_query_attempts": 0,
+        "slots_used": 1,
+        "detected": true,
+        "semantic_defect": false,
+        "technical_defect": true,
+        "witness_sha256": "ac9655f7e3006c9f88507e0b2b24280b7f94f3505bed1d6fa3bbaf180105ef96",
+        "halted": null,
+        "feedback": true,
+        "boundary": "Source work excludes partial work of dynamically illegal queries; attempts remain counted."
+      },
+      "investigation_elapsed_seconds": 0.4872069580014795,
+      "candidate": {
+        "source": "def investigate(context, acquire):\n    table = {}\n    high = 0\n    open_transaction = False\n    pending = None\n    for action in context['actions']:\n        op = action['op']\n        if op == 'begin':\n            open_transaction = True\n            pending = dict(table)\n        elif op == 'commit':\n            open_transaction = False\n            pending = None\n        elif op == 'rollback':\n            open_transaction = False\n            table = pending\n            high = max(table) if table else 0\n            pending = None\n        elif op == 'put':\n            ident = action['id']\n            table[ident] = True\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            ident = action['id']\n            if ident in table:\n                del table[ident]\n    return high + 1\n",
+        "scope": "Native SQLite AUTOINCREMENT diagnostic model over one INTEGER PRIMARY KEY AUTOINCREMENT table. Tracks committed rows, the largest ever allocated ID, and an open transaction's pending snapshot for rollback; commit discards the snapshot and rollback restores it.",
+        "change": "Replaced the defective top-level program with a single module-level investigate function. Model the monotonic AUTOINCREMENT counter as the maximum ID ever inserted in the current committed view, so deletes do not lower it, rollback restores both rows and the prior high-water mark, and the final implicit insert receives high + 1.",
+        "error": null,
+        "call_id": "native-sqlite-1-direct_adaptive-repair",
+        "prompt_sha256": "ae903e67527ebd5413a7f5af74863441fb699dd9e29260f5dbc8292738129928",
+        "raw_sha256": "3e98f68254cda17ef070019f657f629cdb63e45df486d4bed318bca9d41ba012",
+        "elapsed_seconds": 0.25130225002067164
+      },
+      "selected": {
+        "source": "def investigate(context, acquire):\n    table = {}\n    high = 0\n    open_transaction = False\n    pending = None\n    for action in context['actions']:\n        op = action['op']\n        if op == 'begin':\n            open_transaction = True\n            pending = dict(table)\n        elif op == 'commit':\n            open_transaction = False\n            pending = None\n        elif op == 'rollback':\n            open_transaction = False\n            table = pending\n            high = max(table) if table else 0\n            pending = None\n        elif op == 'put':\n            ident = action['id']\n            table[ident] = True\n            if ident > high:\n                high = ident\n        elif op == 'delete':\n            ident = action['id']\n            if ident in table:\n                del table[ident]\n    return high + 1\n",
+        "call_id": "native-sqlite-1-direct_adaptive-repair",
+        "error": null,
+        "development": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 3
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_selected": true,
+        "preserves_measured_parent_successes": true,
+        "parent_on_final_evidence": {
+          "correct": 0,
+          "total": 9,
+          "errors": 9,
+          "rows": [
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 3
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            }
+          ]
+        },
+        "candidate_on_final_evidence": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 3
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            }
+          ]
+        }
+      },
+      "repair_account": {
+        "candidate_byte_identical": false,
+        "candidate_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "7cfa06e67de9c9a015c9f1a367389f1414c1e1211a7505a550025c071f18b9de"
+        ],
+        "candidate_remaining_obligations": [],
+        "candidate_regressed_obligations": [],
+        "selected_byte_identical": false,
+        "selected_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "7cfa06e67de9c9a015c9f1a367389f1414c1e1211a7505a550025c071f18b9de"
+        ],
+        "selected_remaining_obligations": [],
+        "selected_regressed_obligations": [],
+        "candidate_selected": true,
+        "status": "observed_set_satisfied",
+        "boundary": "Status concerns the retained programme on measured obligations only."
+      }
+    },
+    "direct_masked": {
+      "policy": null,
+      "investigation": {
+        "receipts": [
+          {
+            "slot": 1,
+            "turn": 1,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 1
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                },
+                {
+                  "op": "put",
+                  "id": 3
+                }
+              ]
+            },
+            "note": "Probe AUTOINCREMENT behavior: sequential inserts, max ID, commit/rollback effects, and delete/reinsert reuse.",
+            "expected": 4,
+            "parent_answer": null,
+            "parent_error": "ValueError: only function definitions are permitted at top level",
+            "verified_counterexample": true,
+            "query_units": 5
+          }
+        ],
+        "turns": [
+          {
+            "turn": 1,
+            "envelope": {
+              "prompt": {
+                "observed_task": {
+                  "id": "native-sqlite-1",
+                  "source_id": "sqlite-1",
+                  "examples": [
+                    {
+                      "input": {
+                        "actions": []
+                      },
+                      "expected": 1
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          },
+                          {
+                            "op": "delete",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 9
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 1
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 3
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 11
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 4
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 6
+                          },
+                          {
+                            "op": "commit"
+                          },
+                          {
+                            "op": "delete",
+                            "id": 6
+                          }
+                        ]
+                      },
+                      "expected": 7
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 2
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 7
+                          }
+                        ]
+                      },
+                      "expected": 8
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 7
+                          },
+                          {
+                            "op": "delete",
+                            "id": 7
+                          },
+                          {
+                            "op": "put",
+                            "id": 1
+                          }
+                        ]
+                      },
+                      "expected": 8
+                    }
+                  ],
+                  "native_contract_not_response_instructions": "Native SQLite diagnostic source. Each query starts an empty\nin-memory database with one table whose id column is INTEGER PRIMARY KEY\nAUTOINCREMENT. Input is exactly {\"actions\": [action, ...]}, at most 32 actions.\nAn action is exactly {\"op\":\"put\", \"id\":n}, {\"op\":\"delete\", \"id\":n}, or\n{\"op\":\"begin\"}, {\"op\":\"commit\"}, {\"op\":\"rollback\"}. IDs are integers\n1..1000. Put inserts the explicit ID; it must be absent in the current\ntransactional view. Delete may name an absent ID. Transactions cannot nest;\ncommit/rollback require an open transaction. The sequence may end with an\nopen transaction. Operations and the final measurement use the same connection.\nAfter the actions, insert one row without specifying an ID and return its\nautomatically allocated ID as an integer. The source has no other tables,\ntriggers, conflicts, connections or hidden modes. An allowed source probe uses\nexactly this schema and returns this native measurement. There are no\nacquisition tables. \n"
+                },
+                "candidate_source": "",
+                "candidate_on_examples": {
+                  "correct": 0,
+                  "total": 8,
+                  "errors": 8,
+                  "rows": [
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": []
+                      },
+                      "expected": 1,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          },
+                          {
+                            "op": "delete",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 9
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 1,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 3
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 11
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 4,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 6
+                          },
+                          {
+                            "op": "commit"
+                          },
+                          {
+                            "op": "delete",
+                            "id": 6
+                          }
+                        ]
+                      },
+                      "expected": 7,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 2
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 7
+                          }
+                        ]
+                      },
+                      "expected": 8,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 7
+                          },
+                          {
+                            "op": "delete",
+                            "id": 7
+                          },
+                          {
+                            "op": "put",
+                            "id": 1
+                          }
+                        ]
+                      },
+                      "expected": 8,
+                      "correct": false
+                    }
+                  ]
+                },
+                "turn": 1,
+                "remaining_slots": 8,
+                "max_queries_this_turn": 4,
+                "receipts": [],
+                "outcomes_available": false,
+                "earlier_delivery_errors": [],
+                "response_example": {
+                  "queries": [],
+                  "note": null
+                }
+              },
+              "system": "You are investigating a candidate program, not implementing it.\nReturn JSON with exactly \"queries\" (a list of native input objects) and \"note\"\n(a short string or null). Do not return Python, predicted answers, or source/scope/\nchange fields. The host executes queries and measures both native and candidate\noutputs. The native contract below defines the object under test, NOT your reply.\nChoose revealing legal inputs from code inspection and evidence. Do not repeat\nexamples or earlier queries. An empty queries list stops. Notes are unverified\nhypotheses: observed evidence takes precedence. The request states your remaining\nquery allowance. Your note may be null; a long explanation is not required.",
+              "response_schema": {
+                "type": "object",
+                "properties": {
+                  "queries": {
+                    "type": "array",
+                    "maxItems": 4,
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "note": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "queries",
+                  "note"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "envelope_sha256": "ff0340afbe6a12b1346d80eca4375d6664e8046ab6035ea7b34ce4d89e9828db",
+            "raw": "{\"queries\":[{\"actions\":[{\"op\":\"put\",\"id\":1},{\"op\":\"put\",\"id\":2},{\"op\":\"put\",\"id\":3}]},{\"actions\":[{\"op\":\"put\",\"id\":1000}]},{\"actions\":[{\"op\":\"begin\"},{\"op\":\"put\",\"id\":10},{\"op\":\"commit\"},{\"op\":\"begin\"},{\"op\":\"put\",\"id\":20},{\"op\":\"rollback\"}]},{\"actions\":[{\"op\":\"put\",\"id\":5},{\"op\":\"delete\",\"id\":5},{\"op\":\"put\",\"id\":5},{\"op\":\"delete\",\"id\":5}]}],\"note\":\"Probe AUTOINCREMENT behavior: sequential inserts, max ID, commit/rollback effects, and delete/reinsert reuse.\"}",
+            "delivery_error": null,
+            "call_id": "native-sqlite-1-direct-shared-turn-1",
+            "raw_sha256": "07350c19a82808b6791c77f7fcc806f0dd50ddae0b5f426867bcb955f34c206d",
+            "action": {
+              "queries": [
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 1
+                    },
+                    {
+                      "op": "put",
+                      "id": 2
+                    },
+                    {
+                      "op": "put",
+                      "id": 3
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 1000
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "begin"
+                    },
+                    {
+                      "op": "put",
+                      "id": 10
+                    },
+                    {
+                      "op": "commit"
+                    },
+                    {
+                      "op": "begin"
+                    },
+                    {
+                      "op": "put",
+                      "id": 20
+                    },
+                    {
+                      "op": "rollback"
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 5
+                    },
+                    {
+                      "op": "delete",
+                      "id": 5
+                    },
+                    {
+                      "op": "put",
+                      "id": 5
+                    },
+                    {
+                      "op": "delete",
+                      "id": 5
+                    }
+                  ]
+                }
+              ],
+              "note": "Probe AUTOINCREMENT behavior: sequential inserts, max ID, commit/rollback effects, and delete/reinsert reuse."
+            }
+          }
+        ],
+        "model_turn_attempts": 1,
+        "native_probes": 1,
+        "query_attempts": 1,
+        "query_units": 5,
+        "policy_executions": 0,
+        "invalid_query_attempts": 0,
+        "slots_used": 1,
+        "detected": true,
+        "semantic_defect": false,
+        "technical_defect": true,
+        "witness_sha256": "ac9655f7e3006c9f88507e0b2b24280b7f94f3505bed1d6fa3bbaf180105ef96",
+        "halted": null,
+        "feedback": false,
+        "boundary": "Source work excludes partial work of dynamically illegal queries; attempts remain counted."
+      },
+      "investigation_elapsed_seconds": 0.2421498340263497,
+      "candidate": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions')\n    if actions is None:\n        actions = []\n    rows = []\n    seq = 0\n    open_tx = False\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            ident = action.get('id')\n            rows.append(ident)\n            if ident > seq:\n                seq = ident\n        elif op == 'delete':\n            ident = action.get('id')\n            if ident in rows:\n                rows.remove(ident)\n        elif op == 'begin':\n            open_tx = True\n        elif op == 'commit':\n            open_tx = False\n        elif op == 'rollback':\n            open_tx = False\n            rows = []\n            seq = 0\n    return seq + 1\n",
+        "scope": "Model SQLite AUTOINCREMENT semantics over the action list: track committed row IDs and the monotonic sequence counter; rollback restores the pre-transaction state, while delete does not lower the counter.",
+        "change": "Replaced the malformed top-level program with a single module-level investigate function that simulates put/delete/begin/commit/rollback and returns the next AUTOINCREMENT ID as a JSON integer.",
+        "error": null,
+        "call_id": "native-sqlite-1-direct_masked-repair",
+        "prompt_sha256": "ae903e67527ebd5413a7f5af74863441fb699dd9e29260f5dbc8292738129928",
+        "raw_sha256": "b19ee13d9e3f128c6712606eac23c16cbea96598a5df6b83406739873f67960a",
+        "elapsed_seconds": 0.13546091699390672
+      },
+      "selected": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions')\n    if actions is None:\n        actions = []\n    rows = []\n    seq = 0\n    open_tx = False\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            ident = action.get('id')\n            rows.append(ident)\n            if ident > seq:\n                seq = ident\n        elif op == 'delete':\n            ident = action.get('id')\n            if ident in rows:\n                rows.remove(ident)\n        elif op == 'begin':\n            open_tx = True\n        elif op == 'commit':\n            open_tx = False\n        elif op == 'rollback':\n            open_tx = False\n            rows = []\n            seq = 0\n    return seq + 1\n",
+        "call_id": "native-sqlite-1-direct_masked-repair",
+        "error": null,
+        "development": {
+          "correct": 8,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 3
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_selected": true,
+        "preserves_measured_parent_successes": true,
+        "parent_on_final_evidence": {
+          "correct": 0,
+          "total": 9,
+          "errors": 9,
+          "rows": [
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 3
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            }
+          ]
+        },
+        "candidate_on_final_evidence": {
+          "correct": 8,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "put",
+                    "id": 3
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            }
+          ]
+        }
+      },
+      "repair_account": {
+        "candidate_byte_identical": false,
+        "candidate_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "7cfa06e67de9c9a015c9f1a367389f1414c1e1211a7505a550025c071f18b9de"
+        ],
+        "candidate_remaining_obligations": [
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f"
+        ],
+        "candidate_regressed_obligations": [],
+        "selected_byte_identical": false,
+        "selected_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "7cfa06e67de9c9a015c9f1a367389f1414c1e1211a7505a550025c071f18b9de"
+        ],
+        "selected_remaining_obligations": [
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f"
+        ],
+        "selected_regressed_obligations": [],
+        "candidate_selected": true,
+        "status": "observed_failures_remain",
+        "boundary": "Status concerns the retained programme on measured obligations only."
+      }
+    },
+    "repair_only": {
+      "policy": null,
+      "investigation": {
+        "receipts": [],
+        "native_probes": 0,
+        "query_attempts": 0,
+        "query_units": 0,
+        "policy_executions": 0,
+        "slots_used": 0,
+        "detected": false,
+        "semantic_defect": false,
+        "technical_defect": false,
+        "witness_sha256": null
+      },
+      "investigation_elapsed_seconds": 4.417001036927104e-06,
+      "candidate": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions', [])\n    present = set()\n    high = 0\n    open_transaction = False\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            identifier = action.get('id')\n            present.add(identifier)\n            if identifier > high:\n                high = identifier\n        elif op == 'delete':\n            identifier = action.get('id')\n            if identifier in present:\n                present.remove(identifier)\n        elif op == 'begin':\n            open_transaction = True\n        elif op == 'commit':\n            open_transaction = False\n        elif op == 'rollback':\n            open_transaction = False\n            present = set()\n            high = 0\n    return high + 1\n",
+        "scope": "Model SQLite AUTOINCREMENT behavior: the next implicit ID is one greater than the largest ID ever inserted in the current committed state; rollback discards all inserts made inside the transaction, while commit and delete preserve the high-water mark.",
+        "change": "Replaced the incomplete source with a fresh state machine tracking the present ID set, the maximum inserted ID, and transaction boundaries; commit keeps state, rollback restores the pre-transaction empty state, and the final implicit insert returns max ID plus one.",
+        "error": null,
+        "call_id": "native-sqlite-1-repair_only-repair",
+        "prompt_sha256": "3f78acfdc9611bac0be197b9619c013b52cd3fff7e5b7b8096eba238de9a8e62",
+        "raw_sha256": "0f5de4817eb5417b03d5d96ffdbc52d4116f1e3c5aaa5d71211315d416304d25",
+        "elapsed_seconds": 0.13426395898568444
+      },
+      "selected": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions', [])\n    present = set()\n    high = 0\n    open_transaction = False\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            identifier = action.get('id')\n            present.add(identifier)\n            if identifier > high:\n                high = identifier\n        elif op == 'delete':\n            identifier = action.get('id')\n            if identifier in present:\n                present.remove(identifier)\n        elif op == 'begin':\n            open_transaction = True\n        elif op == 'commit':\n            open_transaction = False\n        elif op == 'rollback':\n            open_transaction = False\n            present = set()\n            high = 0\n    return high + 1\n",
+        "call_id": "native-sqlite-1-repair_only-repair",
+        "error": null,
+        "development": {
+          "correct": 7,
+          "total": 8,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_selected": true,
+        "preserves_measured_parent_successes": true,
+        "parent_on_final_evidence": {
+          "correct": 0,
+          "total": 8,
+          "errors": 8,
+          "rows": [
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            }
+          ]
+        },
+        "candidate_on_final_evidence": {
+          "correct": 7,
+          "total": 8,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            }
+          ]
+        }
+      },
+      "repair_account": {
+        "candidate_byte_identical": false,
+        "candidate_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b"
+        ],
+        "candidate_remaining_obligations": [
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f"
+        ],
+        "candidate_regressed_obligations": [],
+        "selected_byte_identical": false,
+        "selected_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b"
+        ],
+        "selected_remaining_obligations": [
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f"
+        ],
+        "selected_regressed_obligations": [],
+        "candidate_selected": true,
+        "status": "observed_failures_remain",
+        "boundary": "Status concerns the retained programme on measured obligations only."
+      }
+    },
+    "ordinary": {
+      "policy": {
+        "source": "def investigate(context, acquire):\n    seen = set()\n    for row in context.get('examples', []):\n        item = row.get('input') if isinstance(row, dict) else None\n        if isinstance(item, dict):\n            seen.add(repr(item))\n    for row in context.get('receipts', []):\n        item = row.get('query') if isinstance(row, dict) else None\n        if isinstance(item, dict):\n            seen.add(repr(item))\n    candidates = [\n        {'actions': [{'op': 'put', 'id': 1000}]},\n        {'actions': [{'op': 'begin'}, {'op': 'put', 'id': 1000}, {'op': 'commit'}]},\n        {'actions': [{'op': 'put', 'id': 1}, {'op': 'begin'}, {'op': 'delete', 'id': 1}, {'op': 'rollback'}]},\n        {'actions': [{'op': 'put', 'id': 1}, {'op': 'begin'}, {'op': 'delete', 'id': 1}, {'op': 'commit'}]},\n        {'actions': [{'op': 'begin'}, {'op': 'put', 'id': 5}, {'op': 'delete', 'id': 5}, {'op': 'commit'}]},\n        {'actions': [{'op': 'put', 'id': 999}, {'op': 'put', 'id': 1000}]},\n        {'actions': [{'op': 'put', 'id': 1}, {'op': 'delete', 'id': 1}, {'op': 'begin'}, {'op': 'put', 'id': 2}, {'op': 'rollback'}]},\n        {'actions': [{'op': 'begin'}, {'op': 'put', 'id': 1}, {'op': 'begin'}]}\n    ]\n    for candidate in candidates:\n        if repr(candidate) not in seen:\n            return {'query': candidate, 'note': {'focus': 'AUTOINCREMENT sqlite_sequence persistence across commit/rollback and upper ID boundary'}}\n    return {'query': None, 'note': {'focus': 'all candidate queries already exercised'}}\n",
+        "scope": "The parent failed all eight examples with a JSONDecodeError, so no behavioral model is available. Probe SQLite AUTOINCREMENT semantics: sqlite_sequence persistence after commit, non-persistence after rollback, delete-then-insert behavior, and the maximum ID boundary 1000.",
+        "change": "First unused candidate is put id=1000, expected native allocation 1001 if sqlite_sequence tracks the largest ever committed row. Subsequent candidates isolate rollback of delete, commit of delete, and illegal nested begin, which distinguish sequence-table models from max(id)+1 models.",
+        "error": null,
+        "call_id": "native-sqlite-1-ordinary-policy",
+        "prompt_sha256": "d739c826ebc7581d027a3fa67395797592a6329918d5c13051e8d09b9d9e896d",
+        "raw_sha256": "243739c2de1b8457514e7036bd4d78ea02a8e3a807348f951513944ef5c34051",
+        "elapsed_seconds": 18.997366542025702
+      },
+      "investigation": {
+        "receipts": [
+          {
+            "slot": 1,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 1000
+                }
+              ]
+            },
+            "expected": 1001,
+            "parent_answer": null,
+            "parent_error": "ValueError: only function definitions are permitted at top level",
+            "verified_counterexample": true,
+            "query_units": 3,
+            "note": {
+              "focus": "AUTOINCREMENT sqlite_sequence persistence across commit/rollback and upper ID boundary"
+            }
+          }
+        ],
+        "native_probes": 1,
+        "query_attempts": 1,
+        "query_units": 3,
+        "policy_executions": 1,
+        "slots_used": 1,
+        "detected": true,
+        "semantic_defect": false,
+        "technical_defect": true,
+        "witness_sha256": "29ac263737bfd613acea6188f985923554c01815a6e1417b531b6c1c653db64b"
+      },
+      "investigation_elapsed_seconds": 19.110038749990053,
+      "candidate": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions')\n    if actions is None:\n        actions = []\n    seq = 0\n    present = set()\n    open_tx = False\n    saved_seq = 0\n    saved_present = set()\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            ident = action.get('id')\n            present.add(ident)\n            if seq < ident:\n                seq = ident\n        elif op == 'delete':\n            ident = action.get('id')\n            if ident in present:\n                present.remove(ident)\n        elif op == 'begin':\n            open_tx = True\n            saved_seq = seq\n            saved_present = present.copy()\n        elif op == 'commit':\n            open_tx = False\n            saved_seq = 0\n            saved_present = set()\n        elif op == 'rollback':\n            open_tx = False\n            seq = saved_seq\n            present = saved_present.copy()\n            saved_seq = 0\n            saved_present = set()\n    return seq + 1\n",
+        "scope": "Models SQLite INTEGER PRIMARY KEY AUTOINCREMENT: sqlite_sequence tracks the largest ever inserted ID, deletion does not lower it, rollback restores both the sequence high-water mark and row set, and commit makes transaction changes durable; the next implicit ID is that high-water mark plus one.",
+        "change": "Replaced the defective top-level program with a fresh single-function model that replays put/delete/begin/commit/rollback, snapshots and restores sequence and row-set state on rollback, and returns max inserted ID plus one.",
+        "error": null,
+        "call_id": "native-sqlite-1-ordinary-repair",
+        "prompt_sha256": "af223b68d29ccf88684796b4486e2b1ef4e180b3ef06ecfb196a73b893223d66",
+        "raw_sha256": "3f1bfa35fdb746329a50285068eefe3ed0c0e33354396584210ea5b5fad5d7d6",
+        "elapsed_seconds": 8.63728391600307
+      },
+      "selected": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions')\n    if actions is None:\n        actions = []\n    seq = 0\n    present = set()\n    open_tx = False\n    saved_seq = 0\n    saved_present = set()\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            ident = action.get('id')\n            present.add(ident)\n            if seq < ident:\n                seq = ident\n        elif op == 'delete':\n            ident = action.get('id')\n            if ident in present:\n                present.remove(ident)\n        elif op == 'begin':\n            open_tx = True\n            saved_seq = seq\n            saved_present = present.copy()\n        elif op == 'commit':\n            open_tx = False\n            saved_seq = 0\n            saved_present = set()\n        elif op == 'rollback':\n            open_tx = False\n            seq = saved_seq\n            present = saved_present.copy()\n            saved_seq = 0\n            saved_present = set()\n    return seq + 1\n",
+        "call_id": "native-sqlite-1-ordinary-repair",
+        "error": null,
+        "development": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 1001,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1000
+                  }
+                ]
+              },
+              "expected": 1001,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_selected": true,
+        "preserves_measured_parent_successes": true,
+        "parent_on_final_evidence": {
+          "correct": 0,
+          "total": 9,
+          "errors": 9,
+          "rows": [
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1000
+                  }
+                ]
+              },
+              "expected": 1001,
+              "correct": false
+            }
+          ]
+        },
+        "candidate_on_final_evidence": {
+          "correct": 9,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 1001,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1000
+                  }
+                ]
+              },
+              "expected": 1001,
+              "correct": true
+            }
+          ]
+        }
+      },
+      "repair_account": {
+        "candidate_byte_identical": false,
+        "candidate_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "eae6b27dfa46790b157bd73fa318910205dd518f75836308545f8ebffbf02683"
+        ],
+        "candidate_remaining_obligations": [],
+        "candidate_regressed_obligations": [],
+        "selected_byte_identical": false,
+        "selected_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "eae6b27dfa46790b157bd73fa318910205dd518f75836308545f8ebffbf02683"
+        ],
+        "selected_remaining_obligations": [],
+        "selected_regressed_obligations": [],
+        "candidate_selected": true,
+        "status": "observed_set_satisfied",
+        "boundary": "Status concerns the retained programme on measured obligations only."
+      }
+    },
+    "fixed": {
+      "policy": null,
+      "investigation": {
+        "receipts": [
+          {
+            "slot": 1,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 1
+                },
+                {
+                  "op": "delete",
+                  "id": 1
+                }
+              ]
+            },
+            "expected": 2,
+            "parent_answer": null,
+            "parent_error": "ValueError: only function definitions are permitted at top level",
+            "verified_counterexample": true,
+            "query_units": 4,
+            "note": null
+          }
+        ],
+        "native_probes": 1,
+        "query_attempts": 1,
+        "query_units": 4,
+        "policy_executions": 0,
+        "slots_used": 1,
+        "detected": true,
+        "semantic_defect": false,
+        "technical_defect": true,
+        "witness_sha256": "5f089f8735aeaf6bc8e31f497bfd9cf31b48b8ae18f88d0db06a88870009e3b9"
+      },
+      "investigation_elapsed_seconds": 0.006279915978666395,
+      "candidate": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions')\n    if actions is None:\n        actions = []\n    high = 0\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            ident = action.get('id')\n            if ident > high:\n                high = ident\n    return high + 1\n",
+        "scope": "Model the native SQLite AUTOINCREMENT allocation as the maximum explicitly inserted ID plus one. Deletes, absent IDs, and rolled-back transactions do not advance the persistent sequence; committed or uncommitted puts do.",
+        "change": "Replaced the defective top-level program with a single module-level investigate function. It scans the action list, tracks the largest put ID, and returns that maximum plus one, matching all measured examples and the new receipt.",
+        "error": null,
+        "call_id": "native-sqlite-1-fixed-repair",
+        "prompt_sha256": "22eeb3d252da5500eb46a13db9fc93aae87fc544e2f99c108bde188bf5cfaa08",
+        "raw_sha256": "51d4a400f6ea44271549e8cc99cd28da9cbf58093a89d99c7241a296365ed4b8",
+        "elapsed_seconds": 5.393289334024303
+      },
+      "selected": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions')\n    if actions is None:\n        actions = []\n    high = 0\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            ident = action.get('id')\n            if ident > high:\n                high = ident\n    return high + 1\n",
+        "call_id": "native-sqlite-1-fixed-repair",
+        "error": null,
+        "development": {
+          "correct": 7,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 10,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": 12,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 2,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 2,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_selected": true,
+        "preserves_measured_parent_successes": true,
+        "parent_on_final_evidence": {
+          "correct": 0,
+          "total": 9,
+          "errors": 9,
+          "rows": [
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 2,
+              "correct": false
+            }
+          ]
+        },
+        "candidate_on_final_evidence": {
+          "correct": 7,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 10,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": 12,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 2,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 2,
+              "correct": true
+            }
+          ]
+        }
+      },
+      "repair_account": {
+        "candidate_byte_identical": false,
+        "candidate_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "03299e94e6e33d824bce0a904096441e7cf98bf3aa778cbfccdde52f25c9a345"
+        ],
+        "candidate_remaining_obligations": [
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f"
+        ],
+        "candidate_regressed_obligations": [],
+        "selected_byte_identical": false,
+        "selected_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "03299e94e6e33d824bce0a904096441e7cf98bf3aa778cbfccdde52f25c9a345"
+        ],
+        "selected_remaining_obligations": [
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f"
+        ],
+        "selected_regressed_obligations": [],
+        "candidate_selected": true,
+        "status": "observed_failures_remain",
+        "boundary": "Status concerns the retained programme on measured obligations only."
+      }
+    },
+    "direct_batch": {
+      "policy": null,
+      "investigation": {
+        "receipts": [
+          {
+            "slot": 1,
+            "turn": 1,
+            "query": {
+              "actions": [
+                {
+                  "op": "put",
+                  "id": 1
+                },
+                {
+                  "op": "delete",
+                  "id": 1
+                },
+                {
+                  "op": "put",
+                  "id": 2
+                }
+              ]
+            },
+            "note": "Probe AUTOINCREMENT behavior after delete/reuse, boundary ID 1000, invalid nested begin, commit/rollback without transaction, duplicate put, and transaction visibility.",
+            "expected": 3,
+            "parent_answer": null,
+            "parent_error": "ValueError: only function definitions are permitted at top level",
+            "verified_counterexample": true,
+            "query_units": 5
+          }
+        ],
+        "turns": [
+          {
+            "turn": 1,
+            "envelope": {
+              "prompt": {
+                "observed_task": {
+                  "id": "native-sqlite-1",
+                  "source_id": "sqlite-1",
+                  "examples": [
+                    {
+                      "input": {
+                        "actions": []
+                      },
+                      "expected": 1
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          },
+                          {
+                            "op": "delete",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 9
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 1
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 3
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 11
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 4
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 6
+                          },
+                          {
+                            "op": "commit"
+                          },
+                          {
+                            "op": "delete",
+                            "id": 6
+                          }
+                        ]
+                      },
+                      "expected": 7
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 2
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 7
+                          }
+                        ]
+                      },
+                      "expected": 8
+                    },
+                    {
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 7
+                          },
+                          {
+                            "op": "delete",
+                            "id": 7
+                          },
+                          {
+                            "op": "put",
+                            "id": 1
+                          }
+                        ]
+                      },
+                      "expected": 8
+                    }
+                  ],
+                  "native_contract_not_response_instructions": "Native SQLite diagnostic source. Each query starts an empty\nin-memory database with one table whose id column is INTEGER PRIMARY KEY\nAUTOINCREMENT. Input is exactly {\"actions\": [action, ...]}, at most 32 actions.\nAn action is exactly {\"op\":\"put\", \"id\":n}, {\"op\":\"delete\", \"id\":n}, or\n{\"op\":\"begin\"}, {\"op\":\"commit\"}, {\"op\":\"rollback\"}. IDs are integers\n1..1000. Put inserts the explicit ID; it must be absent in the current\ntransactional view. Delete may name an absent ID. Transactions cannot nest;\ncommit/rollback require an open transaction. The sequence may end with an\nopen transaction. Operations and the final measurement use the same connection.\nAfter the actions, insert one row without specifying an ID and return its\nautomatically allocated ID as an integer. The source has no other tables,\ntriggers, conflicts, connections or hidden modes. An allowed source probe uses\nexactly this schema and returns this native measurement. There are no\nacquisition tables. \n"
+                },
+                "candidate_source": "",
+                "candidate_on_examples": {
+                  "correct": 0,
+                  "total": 8,
+                  "errors": 8,
+                  "rows": [
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": []
+                      },
+                      "expected": 1,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 4
+                          },
+                          {
+                            "op": "delete",
+                            "id": 4
+                          }
+                        ]
+                      },
+                      "expected": 5,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 9
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 1,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 3
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 11
+                          },
+                          {
+                            "op": "rollback"
+                          }
+                        ]
+                      },
+                      "expected": 4,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 6
+                          },
+                          {
+                            "op": "commit"
+                          },
+                          {
+                            "op": "delete",
+                            "id": 6
+                          }
+                        ]
+                      },
+                      "expected": 7,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 2
+                          },
+                          {
+                            "op": "begin"
+                          },
+                          {
+                            "op": "put",
+                            "id": 7
+                          }
+                        ]
+                      },
+                      "expected": 8,
+                      "correct": false
+                    },
+                    {
+                      "answer": null,
+                      "trace": [],
+                      "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+                      "input": {
+                        "actions": [
+                          {
+                            "op": "put",
+                            "id": 7
+                          },
+                          {
+                            "op": "delete",
+                            "id": 7
+                          },
+                          {
+                            "op": "put",
+                            "id": 1
+                          }
+                        ]
+                      },
+                      "expected": 8,
+                      "correct": false
+                    }
+                  ]
+                },
+                "turn": 1,
+                "remaining_slots": 8,
+                "max_queries_this_turn": 8,
+                "receipts": [],
+                "outcomes_available": false,
+                "earlier_delivery_errors": [],
+                "response_example": {
+                  "queries": [],
+                  "note": null
+                }
+              },
+              "system": "You are investigating a candidate program, not implementing it.\nReturn JSON with exactly \"queries\" (a list of native input objects) and \"note\"\n(a short string or null). Do not return Python, predicted answers, or source/scope/\nchange fields. The host executes queries and measures both native and candidate\noutputs. The native contract below defines the object under test, NOT your reply.\nChoose revealing legal inputs from code inspection and evidence. Do not repeat\nexamples or earlier queries. An empty queries list stops. Notes are unverified\nhypotheses: observed evidence takes precedence. The request states your remaining\nquery allowance. Your note may be null; a long explanation is not required.",
+              "response_schema": {
+                "type": "object",
+                "properties": {
+                  "queries": {
+                    "type": "array",
+                    "maxItems": 8,
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "note": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "queries",
+                  "note"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "envelope_sha256": "21f8c7a9eb71dde04cba3e6570391a6800d29e4eb71a7939d03ff5a756f9e6c7",
+            "raw": "{\"queries\":[{\"actions\":[{\"op\":\"put\",\"id\":1},{\"op\":\"delete\",\"id\":1},{\"op\":\"put\",\"id\":2}]},{\"actions\":[{\"op\":\"put\",\"id\":1000}]},{\"actions\":[{\"op\":\"begin\"},{\"op\":\"put\",\"id\":5},{\"op\":\"begin\"}]},{\"actions\":[{\"op\":\"commit\"}]},{\"actions\":[{\"op\":\"rollback\"}]},{\"actions\":[{\"op\":\"put\",\"id\":1},{\"op\":\"put\",\"id\":1}]},{\"actions\":[{\"op\":\"begin\"},{\"op\":\"put\",\"id\":8},{\"op\":\"commit\"},{\"op\":\"begin\"},{\"op\":\"put\",\"id\":9},{\"op\":\"rollback\"}]},{\"actions\":[{\"op\":\"put\",\"id\":1},{\"op\":\"begin\"},{\"op\":\"delete\",\"id\":1},{\"op\":\"commit\"}]}],\"note\":\"Probe AUTOINCREMENT behavior after delete/reuse, boundary ID 1000, invalid nested begin, commit/rollback without transaction, duplicate put, and transaction visibility.\"}",
+            "delivery_error": null,
+            "call_id": "native-sqlite-1-direct_batch-turn-1",
+            "raw_sha256": "6881a6ddb85ea7008c2e2e0694e583a0ac37c6b6b2e7777d7ceb627835809fc3",
+            "action": {
+              "queries": [
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 1
+                    },
+                    {
+                      "op": "delete",
+                      "id": 1
+                    },
+                    {
+                      "op": "put",
+                      "id": 2
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 1000
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "begin"
+                    },
+                    {
+                      "op": "put",
+                      "id": 5
+                    },
+                    {
+                      "op": "begin"
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "commit"
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "rollback"
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 1
+                    },
+                    {
+                      "op": "put",
+                      "id": 1
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "begin"
+                    },
+                    {
+                      "op": "put",
+                      "id": 8
+                    },
+                    {
+                      "op": "commit"
+                    },
+                    {
+                      "op": "begin"
+                    },
+                    {
+                      "op": "put",
+                      "id": 9
+                    },
+                    {
+                      "op": "rollback"
+                    }
+                  ]
+                },
+                {
+                  "actions": [
+                    {
+                      "op": "put",
+                      "id": 1
+                    },
+                    {
+                      "op": "begin"
+                    },
+                    {
+                      "op": "delete",
+                      "id": 1
+                    },
+                    {
+                      "op": "commit"
+                    }
+                  ]
+                }
+              ],
+              "note": "Probe AUTOINCREMENT behavior after delete/reuse, boundary ID 1000, invalid nested begin, commit/rollback without transaction, duplicate put, and transaction visibility."
+            }
+          }
+        ],
+        "model_turn_attempts": 1,
+        "native_probes": 1,
+        "query_attempts": 1,
+        "query_units": 5,
+        "policy_executions": 0,
+        "invalid_query_attempts": 0,
+        "slots_used": 1,
+        "detected": true,
+        "semantic_defect": false,
+        "technical_defect": true,
+        "witness_sha256": "4d9e37d8170db781f8697ebab7c356a84441a22c109c0f40f8a1a1e37fe719dc",
+        "halted": null,
+        "feedback": true,
+        "boundary": "Source work excludes partial work of dynamically illegal queries; attempts remain counted."
+      },
+      "investigation_elapsed_seconds": 7.0703956249926705,
+      "candidate": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions')\n    if actions is None:\n        actions = []\n    high = 0\n    live = set()\n    tx_high = 0\n    tx_live = set()\n    tx_deleted = set()\n    open_tx = False\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            ident = action.get('id')\n            if open_tx:\n                if ident in tx_live or ident in tx_deleted:\n                    return None\n                tx_live.add(ident)\n                tx_deleted.discard(ident)\n                if ident > tx_high:\n                    tx_high = ident\n            else:\n                if ident in live:\n                    return None\n                live.add(ident)\n                if ident > high:\n                    high = ident\n        elif op == 'delete':\n            ident = action.get('id')\n            if open_tx:\n                if ident in tx_live:\n                    tx_live.remove(ident)\n                    tx_deleted.add(ident)\n                elif ident in live:\n                    tx_deleted.add(ident)\n            else:\n                live.discard(ident)\n        elif op == 'begin':\n            if open_tx:\n                return None\n            open_tx = True\n            tx_high = high\n            tx_live = set(live)\n            tx_deleted = set()\n        elif op == 'commit':\n            if not open_tx:\n                return None\n            high = tx_high\n            live = set(tx_live)\n            open_tx = False\n            tx_high = 0\n            tx_live = set()\n            tx_deleted = set()\n        elif op == 'rollback':\n            if not open_tx:\n                return None\n            open_tx = False\n            tx_high = 0\n            tx_live = set()\n            tx_deleted = set()\n    return high + 1\n",
+        "scope": "Native SQLite INTEGER PRIMARY KEY AUTOINCREMENT diagnostic model over one table and one connection. Tracks the persistent maximum ID and live IDs, plus transaction-scoped maximum, live set, and deleted set; rollback discards transaction state, commit promotes it, and the final implicit insert receives max-ever-ID + 1.",
+        "change": "Replaced the incomplete top-level program with a single module-level investigate(context, acquire) function. Added validation for duplicate puts in the current transactional view, non-nesting transactions, and commit/rollback without an open transaction; invalid sequences return None. Deletion no longer lowers the AUTOINCREMENT high-water mark, and rollback restores the prior maximum and membership.",
+        "error": null,
+        "call_id": "native-sqlite-1-direct_batch-repair",
+        "prompt_sha256": "16d521ca96a16260b8ed8e3cea6568a9240f66d64a8c73b204891231b5a316d1",
+        "raw_sha256": "f543af24de5c2ed9cfcdd7a90a0efc9f4aee7fcb650fa20300e0ec325ede1084",
+        "elapsed_seconds": 14.245468333014287
+      },
+      "selected": {
+        "source": "def investigate(context, acquire):\n    actions = context.get('actions')\n    if actions is None:\n        actions = []\n    high = 0\n    live = set()\n    tx_high = 0\n    tx_live = set()\n    tx_deleted = set()\n    open_tx = False\n    for action in actions:\n        op = action.get('op')\n        if op == 'put':\n            ident = action.get('id')\n            if open_tx:\n                if ident in tx_live or ident in tx_deleted:\n                    return None\n                tx_live.add(ident)\n                tx_deleted.discard(ident)\n                if ident > tx_high:\n                    tx_high = ident\n            else:\n                if ident in live:\n                    return None\n                live.add(ident)\n                if ident > high:\n                    high = ident\n        elif op == 'delete':\n            ident = action.get('id')\n            if open_tx:\n                if ident in tx_live:\n                    tx_live.remove(ident)\n                    tx_deleted.add(ident)\n                elif ident in live:\n                    tx_deleted.add(ident)\n            else:\n                live.discard(ident)\n        elif op == 'begin':\n            if open_tx:\n                return None\n            open_tx = True\n            tx_high = high\n            tx_live = set(live)\n            tx_deleted = set()\n        elif op == 'commit':\n            if not open_tx:\n                return None\n            high = tx_high\n            live = set(tx_live)\n            open_tx = False\n            tx_high = 0\n            tx_live = set()\n            tx_deleted = set()\n        elif op == 'rollback':\n            if not open_tx:\n                return None\n            open_tx = False\n            tx_high = 0\n            tx_live = set()\n            tx_deleted = set()\n    return high + 1\n",
+        "call_id": "native-sqlite-1-direct_batch-repair",
+        "error": null,
+        "development": {
+          "correct": 8,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 3,
+              "correct": true
+            }
+          ]
+        },
+        "candidate_selected": true,
+        "preserves_measured_parent_successes": true,
+        "parent_on_final_evidence": {
+          "correct": 0,
+          "total": 9,
+          "errors": 9,
+          "rows": [
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 3,
+              "correct": false
+            }
+          ]
+        },
+        "candidate_on_final_evidence": {
+          "correct": 8,
+          "total": 9,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": []
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 5,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 4
+                  },
+                  {
+                    "op": "delete",
+                    "id": 4
+                  }
+                ]
+              },
+              "expected": 5,
+              "correct": true
+            },
+            {
+              "answer": 1,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 9
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 1,
+              "correct": true
+            },
+            {
+              "answer": 4,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 3
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 11
+                  },
+                  {
+                    "op": "rollback"
+                  }
+                ]
+              },
+              "expected": 4,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 6
+                  },
+                  {
+                    "op": "commit"
+                  },
+                  {
+                    "op": "delete",
+                    "id": 6
+                  }
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 2
+                  },
+                  {
+                    "op": "begin"
+                  },
+                  {
+                    "op": "put",
+                    "id": 7
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 7
+                  },
+                  {
+                    "op": "delete",
+                    "id": 7
+                  },
+                  {
+                    "op": "put",
+                    "id": 1
+                  }
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": 3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "actions": [
+                  {
+                    "op": "put",
+                    "id": 1
+                  },
+                  {
+                    "op": "delete",
+                    "id": 1
+                  },
+                  {
+                    "op": "put",
+                    "id": 2
+                  }
+                ]
+              },
+              "expected": 3,
+              "correct": true
+            }
+          ]
+        }
+      },
+      "repair_account": {
+        "candidate_byte_identical": false,
+        "candidate_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "cb8fb1c8d617b6947a9aaa316ac85e33f751ec7f91eb0b60fd6e819e941c2123"
+        ],
+        "candidate_remaining_obligations": [
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a"
+        ],
+        "candidate_regressed_obligations": [],
+        "selected_byte_identical": false,
+        "selected_corrected_obligations": [
+          "b28c721384ee38716c5548073c85a16a2efdbe86d54ad38c194b8a2b8a26cf15",
+          "e40b150d3cb344d1b35022829d2d3947c95344d81a94087d8780fb89656518e9",
+          "d2c4a268dbed45fb67827f7116e70b93338f74534c85e256a2896db995a8403a",
+          "e7d1ddcf26a9dfaf83dd3d4b6f9e71f49f3558707011ca0c6d16ca61d56815f9",
+          "abee0585d1fb54d745113295c54b03c8381952fe63766049e8a845ce6220203f",
+          "296db8dd8bf3942dea015b75287d1ebcf217077fc52a5aa3dc91815472913c60",
+          "abe35232316b6ad257e3d058feaaa51820aafaae15e7bd6f7cc2e3e19b6ff66b",
+          "cb8fb1c8d617b6947a9aaa316ac85e33f751ec7f91eb0b60fd6e819e941c2123"
+        ],
+        "selected_remaining_obligations": [
+          "f2a7b4c2f5f55efae032248561253b2d52e5b43be93ed677c3b660bfe8f3dc4a"
+        ],
+        "selected_regressed_obligations": [],
+        "candidate_selected": true,
+        "status": "observed_failures_remain",
+        "boundary": "Status concerns the retained programme on measured obligations only."
+      }
+    }
+  },
+  "parent": {
+    "source": "",
+    "scope": "",
+    "change": "",
+    "error": "JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+    "call_id": "native-sqlite-1-parent",
+    "prompt_sha256": "6ffbe611851e33c086c28ee2f4ae79d125a571a8cec42e47f9022daf21c31615",
+    "raw_sha256": "9140cd420343f2318271cc7be3e6b3f025f73a29fd67586a96b8740502441a6d",
+    "elapsed_seconds": 0.27219087499543093,
+    "development": {
+      "correct": 0,
+      "total": 8,
+      "errors": 8,
+      "rows": [
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": []
+          },
+          "expected": 1,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 4
+              },
+              {
+                "op": "delete",
+                "id": 4
+              }
+            ]
+          },
+          "expected": 5,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 9
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 1,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 3
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 11
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          },
+          "expected": 4,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 6
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "delete",
+                "id": 6
+              }
+            ]
+          },
+          "expected": 7,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 2
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "id": 7
+              }
+            ]
+          },
+          "expected": 8,
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: JSONDecodeError: Unterminated string starting at: line 1 column 282 (char 281)",
+          "input": {
+            "actions": [
+              {
+                "op": "put",
+                "id": 7
+              },
+              {
+                "op": "delete",
+                "id": 7
+              },
+              {
+                "op": "put",
+                "id": 1
+              }
+            ]
+          },
+          "expected": 8,
+          "correct": false
+        }
+      ]
+    }
+  }
+}

@@ -14,15 +14,15 @@ r"""
 [FLOW]
 - ValidationResult: dataclass aggregate result with an ok flag and sorted, deduplicated failure errors.
 - validate_cp1: structural + uniqueness + ref_id/ledger_id format + citation + word-count checks.
-- validate_cp2: runs validate_cp1 then adds predictions_t, trade_rationale, equity grounding, and universe checks.
+- validate_cp2: runs validate_cp1 then adds predictions_t, forecast_rationale, observation grounding, and universe checks.
 - validate_golden_ids: Oracle-only guard; validates CP2 evidence ledger_ids against snapshot ledger set.
-- _load_ticker_set: discovers stock+ETF ticker universe from subject_run_dir for OUT_OF_UNIVERSE guard.
+- _load_target_id_set: discovers measurements+SUBSYSTEMS target_id universe from subject_run_dir for OUT_OF_UNIVERSE guard.
 - When-needed: Open when CP1, CP2, or Oracle artifact payloads need deterministic schema validation and stable error-code semantics before engine, server, or grading logic proceeds.
 - Escalates-to: system/lib/citations.py; system/lib/artifacts.py; codex/contracts/contract_config.json
 - Navigation-group: kernel_lib
 
 [DEPENDENCIES]
-- Couples: system.lib.artifacts supplies subject-run ticker universes and snapshot ledger IDs; contract_config.json overrides validation thresholds.
+- Couples: system.lib.artifacts supplies subject-run target_id universes and snapshot ledger IDs; contract_config.json overrides validation thresholds.
 - Internal: system.lib.citations (detect_malformed_citations, extract_citations, validate_citations).
 
 [CONSTRAINTS]
@@ -30,7 +30,7 @@ r"""
 - ValidationResult.errors is always sorted(set(errors)) — deterministic, deduplicated.
 - detect_malformed_citations runs before validate_citations (per Locked Decision 9).
 - Word count: len(re.findall(r"\S+", text)) on raw text.
-- Lane/ticker comparison: .upper().strip() normalization.
+- Lane/target_id comparison: .upper().strip() normalization.
 - This module must remain free of engine, server, and bridge imports.
 
 """
@@ -45,7 +45,7 @@ from pathlib import Path
 from typing import Any, List, Optional, Set
 
 from system.lib.citations import detect_malformed_citations, extract_citations, validate_citations
-from system.lib.artifacts import load_equity_universe, load_snapshot_ledger_ids
+from system.lib.artifacts import load_observation_universe, load_snapshot_ledger_ids
 from system.lib.empirical_forecast import rule_errors, target_errors
 from system.lib.judgmental_forecast import rule_errors as quantile_rule_errors, target_errors as quantile_target_errors
 
@@ -58,15 +58,15 @@ _VALID_DIRECTIONS = frozenset({"UP", "DOWN"})
 
 _DEFAULT_CONFIG = {
     "epicentre_thesis_min_words": 150,
-    "trade_rationale_base_words": 75,
-    "trade_rationale_per_prediction_words": 30,
+    "forecast_rationale_base_words": 75,
+    "forecast_rationale_per_prediction_words": 30,
     "lane_prefix_map": {
-        "S": "STOCK",
-        "M": "MACRO",
-        "P": "POLYMARKET",
-        "N": "NEWS",
-        "E": "ETF",
-        "C": "CALCULATOR",
+        "S": "MEASUREMENTS",
+        "M": "ENVIRONMENT",
+        "P": "INTERVENTIONS",
+        "N": "EVENTS",
+        "E": "SUBSYSTEMS",
+        "C": "DERIVED",
         "X": "UNKNOWN",
     },
 }
@@ -224,20 +224,20 @@ def _validate_evidence_dictionary(evidence: List[Any], ledger_id_re: re.Pattern)
 
 
 # ---------------------------------------------------------------------------
-# Ticker universe loader for CP2 OUT_OF_UNIVERSE guard
+# target_id universe loader for CP2 OUT_OF_UNIVERSE guard
 # ---------------------------------------------------------------------------
 
-def _load_ticker_set(subject_run_dir: Path) -> Optional[Set[str]]:
+def _load_target_id_set(subject_run_dir: Path) -> Optional[Set[str]]:
     """
     [ACTION]
-    - Load the equity ticker universe from subject_run_dir/artifacts/ by unioning
-      global_stock_feed and global_etf_feed artifacts.
-    - Delegates to system.lib.artifacts.load_equity_universe which handles both flat and
+    - Load the observation target_id universe from subject_run_dir/artifacts/ by unioning
+      global_measurements_feed and global_subsystems_feed artifacts.
+    - Delegates to system.lib.artifacts.load_observation_universe which handles both flat and
       nested artifact shapes and falls back to glob patterns if named feeds are absent.
-    - Returns set of uppercase ticker strings, or None if no ticker set could be extracted.
+    - Returns set of uppercase target_id strings, or None if no target_id set could be extracted.
     - Never raises; returns None on any IO or shape failure.
     """
-    return load_equity_universe(Path(subject_run_dir))
+    return load_observation_universe(Path(subject_run_dir))
 
 
 def _load_snapshot_ledger_set(subject_run_dir: Path) -> Optional[Set[str]]:
@@ -304,7 +304,7 @@ def _validate_cross_corr_block_list(
     *,
     require_direction: bool = False,
     require_subjects: bool = False,
-    require_tickers: bool = False,
+    require_target_ids: bool = False,
 ) -> List[str]:
     errors: List[str] = []
     items = payload.get(field) if isinstance(payload, dict) else None
@@ -318,8 +318,8 @@ def _validate_cross_corr_block_list(
         required_fields: List[str] = ["id", "name", "lanes", "summary"]
         if require_subjects:
             required_fields.append("subjects")
-        if require_tickers:
-            required_fields.append("tickers")
+        if require_target_ids:
+            required_fields.append("target_ids")
         for req in required_fields:
             if req not in entry:
                 errors.append(f"MISSING_FIELD: {field}[{i}].{req}")
@@ -330,20 +330,20 @@ def _validate_cross_corr_block_list(
             subjects = entry.get("subjects")
             if not isinstance(subjects, list) or not all(isinstance(x, str) and x.strip() for x in subjects):
                 errors.append(f"INVALID_FIELD: {field}[{i}].subjects must be list[str]")
-        if "tickers" in entry:
-            tickers = entry.get("tickers")
-            if not isinstance(tickers, list):
-                errors.append(f"INVALID_FIELD: {field}[{i}].tickers must be list[str]")
+        if "target_ids" in entry:
+            target_ids = entry.get("target_ids")
+            if not isinstance(target_ids, list):
+                errors.append(f"INVALID_FIELD: {field}[{i}].target_ids must be list[str]")
             else:
-                for t in tickers:
+                for t in target_ids:
                     if not isinstance(t, str) or not t.strip():
-                        errors.append(f"INVALID_FIELD: {field}[{i}].tickers contains empty token")
+                        errors.append(f"INVALID_FIELD: {field}[{i}].target_ids contains empty token")
         if require_direction:
             consensus = entry.get("direction_consensus")
-            if consensus not in {"BULLISH", "BEARISH", "CONTESTED", "N/A"}:
+            if consensus not in {"INCREASE", "DECREASE", "CONTESTED", "N/A"}:
                 errors.append(
                     f"INVALID_FIELD: {field}[{i}].direction_consensus={consensus!r} "
-                    "(must be BULLISH|BEARISH|CONTESTED|N/A)"
+                    "(must be INCREASE|DECREASE|CONTESTED|N/A)"
                 )
     return errors
 
@@ -383,22 +383,22 @@ def validate_cross_corr_v2(payload: Any) -> ValidationResult:
     errors: List[str] = []
     errors.extend(
         _validate_cross_corr_block_list(
-            payload, "target_swarms", require_direction=True, require_tickers=True
+            payload, "target_swarms", require_direction=True, require_target_ids=True
         )
     )
     errors.extend(
         _validate_cross_corr_block_list(
-            payload, "directional_conflicts", require_direction=True, require_tickers=True
+            payload, "directional_conflicts", require_direction=True, require_target_ids=True
         )
     )
     errors.extend(
         _validate_cross_corr_block_list(
-            payload, "solo_targets", require_direction=True, require_tickers=True
+            payload, "solo_targets", require_direction=True, require_target_ids=True
         )
     )
     errors.extend(
         _validate_cross_corr_block_list(
-            payload, "thesis_stress", require_direction=True, require_tickers=True
+            payload, "thesis_stress", require_direction=True, require_target_ids=True
         )
     )
 
@@ -412,7 +412,7 @@ def validate_cross_corr_v2(payload: Any) -> ValidationResult:
             if isinstance(t, str) and str(t).strip()
         }
         if len(normalized_targets) != len(valid_targets):
-            errors.append("INVALID_FIELD: valid_prediction_targets must be unique non-empty ticker strings")
+            errors.append("INVALID_FIELD: valid_prediction_targets must be unique non-empty target_id strings")
 
         expected_targets: Set[str] = set()
         for field in ("target_swarms", "solo_targets"):
@@ -422,16 +422,16 @@ def validate_cross_corr_v2(payload: Any) -> ValidationResult:
             for entry in items:
                 if not isinstance(entry, dict):
                     continue
-                tickers = entry.get("tickers")
-                if not isinstance(tickers, list):
+                target_ids = entry.get("target_ids")
+                if not isinstance(target_ids, list):
                     continue
-                for token in tickers:
+                for token in target_ids:
                     t = str(token).upper().strip()
                     if t and t != "NONE":
                         expected_targets.add(t)
         if expected_targets and normalized_targets != expected_targets:
             errors.append(
-                "INVALID_FIELD: valid_prediction_targets must equal union of target_swarms/solo_targets tickers"
+                "INVALID_FIELD: valid_prediction_targets must equal union of target_swarms/solo_targets target_ids"
             )
 
     if errors:
@@ -478,7 +478,7 @@ def _validate_artifact_handle_list(
 def validate_prediction_reconciliation(payload: Any) -> ValidationResult:
     """[ACTION]
     - Teleology: Validate the deterministic Oracle `prediction_reconciliation` artifact before storage or downstream grading use.
-    - Mechanism: Check required top-level fields, row uniqueness and numeric invariants, optional macro rows, and summary/count coherence.
+    - Mechanism: Check required top-level fields, row uniqueness and numeric invariants, optional environment rows, and summary/count coherence.
     - Guarantee: Returns a ValidationResult with sorted, deduplicated errors and never mutates the payload.
     - Fails: None.
     - When-needed: Open when Oracle comparison output must be accepted or rejected as a valid `prediction_reconciliation` artifact.
@@ -525,9 +525,9 @@ def validate_prediction_reconciliation(payload: Any) -> ValidationResult:
                 errors.append(f"DUPLICATE_TARGET_ID: rows[{idx}].target_id={normalized_target!r}")
             seen_targets.add(normalized_target)
 
-        asset_class = row.get("asset_class")
-        if asset_class not in {"STOCK", "ETF"}:
-            errors.append(f"INVALID_FIELD: rows[{idx}].asset_class={asset_class!r}")
+        target_kind = row.get("target_kind")
+        if target_kind not in {"MEASUREMENTS", "SUBSYSTEMS"}:
+            errors.append(f"INVALID_FIELD: rows[{idx}].target_kind={target_kind!r}")
 
         direction = row.get("prediction_direction")
         if direction not in _VALID_DIRECTIONS | ({'FLAT'} if payload.get('subject_forecast_basis') == 'JUDGMENTAL' else set()):
@@ -537,9 +537,9 @@ def validate_prediction_reconciliation(payload: Any) -> ValidationResult:
             )
 
         for field in (
-            "subject_snapshot_price",
-            "predicted_target_price",
-            "realized_truth_price",
+            "subject_snapshot_value",
+            "predicted_target_value",
+            "realized_truth_value",
             "absolute_delta",
             "percent_delta",
         ):
@@ -555,23 +555,23 @@ def validate_prediction_reconciliation(payload: Any) -> ValidationResult:
         ):
             errors.append(f"INVALID_FIELD: rows[{idx}].rank must be positive integer when present")
 
-    macro_rows = payload.get("macro_rows")
-    if macro_rows is not None:
-        if not isinstance(macro_rows, list):
-            errors.append("INVALID_FIELD: macro_rows must be a list when present")
+    environment_rows = payload.get("environment_rows")
+    if environment_rows is not None:
+        if not isinstance(environment_rows, list):
+            errors.append("INVALID_FIELD: environment_rows must be a list when present")
         else:
-            for idx, row in enumerate(macro_rows):
+            for idx, row in enumerate(environment_rows):
                 if not isinstance(row, dict):
-                    errors.append(f"MISSING_FIELD: macro_rows[{idx}] is not an object")
+                    errors.append(f"MISSING_FIELD: environment_rows[{idx}] is not an object")
                     continue
                 for field in ("series_id", "subject_value", "realized_value", "comparison_basis"):
                     if field not in row:
-                        errors.append(f"MISSING_FIELD: macro_rows[{idx}].{field}")
+                        errors.append(f"MISSING_FIELD: environment_rows[{idx}].{field}")
                 if not isinstance(row.get("series_id"), str) or not str(row.get("series_id")).strip():
-                    errors.append(f"INVALID_FIELD: macro_rows[{idx}].series_id must be non-empty string")
+                    errors.append(f"INVALID_FIELD: environment_rows[{idx}].series_id must be non-empty string")
                 if not isinstance(row.get("comparison_basis"), str) or not str(row.get("comparison_basis")).strip():
                     errors.append(
-                        f"INVALID_FIELD: macro_rows[{idx}].comparison_basis must be non-empty string"
+                        f"INVALID_FIELD: environment_rows[{idx}].comparison_basis must be non-empty string"
                     )
 
     summary = payload.get("summary")
@@ -731,7 +731,7 @@ def validate_realized_hindsight_brief(payload: Any) -> ValidationResult:
                 seen_drivers.add(normalized_driver)
 
             classification = item.get("classification")
-            if classification not in {"SURPRISE", "ALREADY_PRICED", "PARTIAL_REPRICING", "UNRESOLVED"}:
+            if classification not in {"SURPRISE", "ALREADY_OBSERVED", "PARTIAL_CHANGE", "UNRESOLVED"}:
                 errors.append(
                     f"INVALID_FIELD: driver_classification[{idx}].classification={classification!r}"
                 )
@@ -754,9 +754,9 @@ def validate_realized_hindsight_brief(payload: Any) -> ValidationResult:
                 )
 
     package_fields = (
-        "already_priced_packages",
+        "already_observed_packages",
         "surprise_packages",
-        "partial_repricing_packages",
+        "partial_change_packages",
         "unresolved_packages",
     )
     package_sets: Dict[str, Set[str]] = {}
@@ -795,10 +795,10 @@ def validate_realized_hindsight_brief(payload: Any) -> ValidationResult:
             what_happened = item.get("what_happened")
             if not isinstance(what_happened, str) or not what_happened.strip():
                 errors.append(f"MISSING_FIELD: prediction_target_outcomes[{idx}].what_happened")
-            pricing_judgement = item.get("pricing_judgement")
-            if pricing_judgement not in {"SURPRISE", "ALREADY_PRICED", "PARTIAL_REPRICING", "UNRESOLVED"}:
+            availability_judgement = item.get("availability_judgement")
+            if availability_judgement not in {"SURPRISE", "ALREADY_OBSERVED", "PARTIAL_CHANGE", "UNRESOLVED"}:
                 errors.append(
-                    f"INVALID_FIELD: prediction_target_outcomes[{idx}].pricing_judgement={pricing_judgement!r}"
+                    f"INVALID_FIELD: prediction_target_outcomes[{idx}].availability_judgement={availability_judgement!r}"
                 )
 
     if errors:
@@ -1044,9 +1044,9 @@ def validate_cp2(
 ) -> ValidationResult:
     """
     [ACTION]
-    - Validate a CP2 payload: runs validate_cp1 then adds predictions_t, trade_rationale,
+    - Validate a CP2 payload: runs validate_cp1 then adds predictions_t, forecast_rationale,
       grounding checks, and (if subject_run_dir provided) out-of-universe checks.
-    - subject_run_dir: path to the Lab run directory whose T-n artifacts define the ticker universe.
+    - subject_run_dir: path to the Lab run directory whose T-n artifacts define the target_id universe.
       Pass None to skip out-of-universe checks (structure is still fully validated).
     - expected_snapshot_time / expected_target_time_iso: optional canonical runtime timestamps
       used to enforce deterministic temporal stamping.
@@ -1085,10 +1085,12 @@ def validate_cp2(
                 if not isinstance(pred, dict):
                     errors.append(f"MISSING_FIELD: predictions_t[{i}] is not an object")
                     continue
-                snapshot_price: Optional[float] = None
-                target_price: Optional[float] = None
-                has_valid_snapshot_price = False
-                has_valid_target_price = False
+                snapshot_value: Optional[float] = None
+                target_value: Optional[float] = None
+                has_valid_snapshot_value = False
+                has_valid_target_value = False
+                if not isinstance(pred.get("unit"), str) or not pred["unit"].strip():
+                    errors.append(f"MISSING_FIELD: predictions_t[{i}].unit")
                 if not pred.get("target_id"):
                     errors.append(f"MISSING_FIELD: predictions_t[{i}].target_id")
                 if "direction" not in pred:
@@ -1099,30 +1101,34 @@ def validate_cp2(
                         f"(must be UP or DOWN)"
                     )
                 # --- Deterministic baseline fields ---
-                if "snapshot_price" not in pred:
-                    errors.append(f"MISSING_SNAPSHOT_PRICE: predictions_t[{i}].snapshot_price")
+                if "snapshot_value" not in pred:
+                    errors.append(f"MISSING_SNAPSHOT_VALUE: predictions_t[{i}].snapshot_value")
                 else:
                     try:
-                        snapshot_price = float(pred.get("snapshot_price"))
-                        if not math.isfinite(snapshot_price):
+                        if isinstance(pred.get("snapshot_value"), bool):
+                            raise ValueError("boolean observation")
+                        snapshot_value = float(pred.get("snapshot_value"))
+                        if not math.isfinite(snapshot_value):
                             raise ValueError("non-finite")
-                        has_valid_snapshot_price = True
+                        has_valid_snapshot_value = True
                     except Exception:
                         errors.append(
-                            f"INVALID_FIELD: predictions_t[{i}].snapshot_price={pred.get('snapshot_price')!r} "
+                            f"INVALID_FIELD: predictions_t[{i}].snapshot_value={pred.get('snapshot_value')!r} "
                             "(must be numeric)"
                         )
-                if "target_price" not in pred:
-                    errors.append(f"MISSING_TARGET_PRICE: predictions_t[{i}].target_price")
+                if "target_value" not in pred:
+                    errors.append(f"MISSING_TARGET_VALUE: predictions_t[{i}].target_value")
                 else:
                     try:
-                        target_price = float(pred.get("target_price"))
-                        if not math.isfinite(target_price):
+                        if isinstance(pred.get("target_value"), bool):
+                            raise ValueError("boolean observation")
+                        target_value = float(pred.get("target_value"))
+                        if not math.isfinite(target_value):
                             raise ValueError("non-finite")
-                        has_valid_target_price = True
+                        has_valid_target_value = True
                     except Exception:
                         errors.append(
-                            f"INVALID_FIELD: predictions_t[{i}].target_price={pred.get('target_price')!r} "
+                            f"INVALID_FIELD: predictions_t[{i}].target_value={pred.get('target_value')!r} "
                             "(must be numeric)"
                         )
                 if not pred.get("snapshot_time"):
@@ -1133,19 +1139,19 @@ def validate_cp2(
                     errors.append(f"MISSING_FIELD: predictions_t[{i}].invalidation")
 
                 direction = pred.get("direction")
-                if has_valid_snapshot_price and has_valid_target_price:
-                    if direction == "UP" and target_price <= snapshot_price:
+                if has_valid_snapshot_value and has_valid_target_value:
+                    if direction == "UP" and target_value <= snapshot_value:
                         errors.append(
                             f"INVALID_TARGET_DIRECTION: predictions_t[{i}] "
-                            "UP prediction requires target_price > snapshot_price"
+                            "UP prediction requires target_value > snapshot_value"
                         )
-                    elif direction == "DOWN" and target_price >= snapshot_price:
+                    elif direction == "DOWN" and target_value >= snapshot_value:
                         errors.append(
                             f"INVALID_TARGET_DIRECTION: predictions_t[{i}] "
-                            "DOWN prediction requires target_price < snapshot_price"
+                            "DOWN prediction requires target_value < snapshot_value"
                         )
-                    elif direction == "FLAT" and target_price != snapshot_price:
-                        errors.append(f"INVALID_TARGET_DIRECTION: predictions_t[{i}] FLAT median must equal snapshot_price")
+                    elif direction == "FLAT" and target_value != snapshot_value:
+                        errors.append(f"INVALID_TARGET_DIRECTION: predictions_t[{i}] FLAT median must equal snapshot_value")
 
                 snapshot_dt = _parse_iso_datetime(pred.get("snapshot_time"))
                 target_dt = _parse_iso_datetime(pred.get("target_time_iso"))
@@ -1175,31 +1181,31 @@ def validate_cp2(
                                 f"{pred.get('target_time_iso')!r} expected={expected_target_time_iso!r}"
                             )
 
-    # --- trade_rationale ---
-    if not payload.get("trade_rationale"):
-        errors.append("MISSING_FIELD: trade_rationale")
+    # --- forecast_rationale ---
+    if not payload.get("forecast_rationale"):
+        errors.append("MISSING_FIELD: forecast_rationale")
     else:
-        rationale = payload["trade_rationale"]
+        rationale = payload["forecast_rationale"]
         if not isinstance(rationale, str):
-            errors.append("MISSING_FIELD: trade_rationale must be a string")
+            errors.append("MISSING_FIELD: forecast_rationale must be a string")
         else:
             malformed = detect_malformed_citations(rationale)
             if malformed:
                 for tok in malformed:
-                    errors.append(f"MALFORMED_CITATION: {tok} in trade_rationale")
+                    errors.append(f"MALFORMED_CITATION: {tok} in forecast_rationale")
             else:
-                base = cfg.get("trade_rationale_base_words", 75)
-                per_pred = cfg.get("trade_rationale_per_prediction_words", 30)
+                base = cfg.get("forecast_rationale_base_words", 75)
+                per_pred = cfg.get("forecast_rationale_per_prediction_words", 30)
                 min_words = base + per_pred * len(predictions)
                 word_count = _count_words(rationale)
                 if word_count < min_words:
                     errors.append(
-                        f"BELOW_MIN_WORD_COUNT: trade_rationale has {word_count} words (min {min_words})"
+                        f"BELOW_MIN_WORD_COUNT: forecast_rationale has {word_count} words (min {min_words})"
                     )
                 cite_errors = validate_citations(rationale, evidence)
                 errors.extend(cite_errors)
 
-    # --- Grounding: every valid target_id needs an equity (S_/E_) evidence entry ---
+    # --- Grounding: every valid target_id needs an observation (S_/E_) evidence entry ---
     valid_predictions = [
         p for p in predictions if isinstance(p, dict) and p.get("target_id")
     ]
@@ -1213,7 +1219,7 @@ def validate_cp2(
         ]
         if not grounding:
             errors.append(
-                f"GROUNDING_FAILED_WRONG_LANE: no equity ledger grounding for target_id={target}"
+                f"GROUNDING_FAILED_WRONG_LANE: no observation ledger grounding for target_id={target}"
             )
 
     # --- Cross-corr structural grounding (orphan prevention) ---
@@ -1228,16 +1234,23 @@ def validate_cp2(
 
     # --- Out-of-universe check (requires subject_run_dir) ---
     if valid_predictions and subject_run_dir is not None:
-        ticker_set = _load_ticker_set(Path(subject_run_dir))
-        if ticker_set is None:
-            errors.append("MISSING_CONTEXT: could not load ticker universe from subject_run_dir")
+        target_id_set = _load_target_id_set(Path(subject_run_dir))
+        if target_id_set is None:
+            errors.append("MISSING_CONTEXT: could not load target_id universe from subject_run_dir")
         else:
             for pred in valid_predictions:
                 target = str(pred["target_id"]).upper().strip()
-                if target not in ticker_set:
-                    errors.append(f"OUT_OF_UNIVERSE: target_id={target} not in T-n ticker set")
+                if target not in target_id_set:
+                    errors.append(f"OUT_OF_UNIVERSE: target_id={target} not in T-n target_id set")
 
-    # --- Engine price-audit mismatches ---
+    if valid_predictions and subject_run_dir is not None:
+        from system.lib.run_compare import combined_values
+        source_values=combined_values(subject_run_dir)
+        for pred in valid_predictions:
+            row=source_values.get(str(pred["target_id"]).upper().strip(),{})
+            if row.get("unit") and row["unit"] != pred.get("unit"):
+                errors.append(f"UNIT_MISMATCH: target_id={pred['target_id']}")
+    # --- Engine value-audit mismatches ---
     errors.extend(target_errors(payload, subject_run_dir, expected_snapshot_time,
                                 expected_target_time_iso))
     errors.extend(quantile_target_errors(payload, subject_run_dir, expected_snapshot_time,
@@ -1245,7 +1258,7 @@ def validate_cp2(
     audit_errors = payload.get("_engine_audit_errors")
     if isinstance(audit_errors, list):
         for raw in audit_errors:
-            if isinstance(raw, str) and raw.startswith("SNAPSHOT_PRICE_MISMATCH"):
+            if isinstance(raw, str) and raw.startswith("SNAPSHOT_VALUE_MISMATCH"):
                 errors.append(raw)
 
     if errors:

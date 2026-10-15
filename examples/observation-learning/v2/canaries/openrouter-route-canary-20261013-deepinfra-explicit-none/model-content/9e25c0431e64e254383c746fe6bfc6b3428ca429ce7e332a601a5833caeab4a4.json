@@ -1,0 +1,7 @@
+{
+  "call_id": "9e25c0431e64e254383c746fe6bfc6b3428ca429ce7e332a601a5833caeab4a4",
+  "content": "{\"source\": \"def investigate(context, acquire):\\n    events = acquire(\\\"events\\\")\\n    seen = set()\\n    total = 0\\n    for event in events:\\n        event_id = event[\\\"event_id\\\"]\\n        if event_id not in seen:\\n            seen.add(event_id)\\n            total = total + event[\\\"work\\\"]\\n    return {\\\"findings\\\": [], \\\"unresolved\\\": [], \\\"ratio\\\": total}\" , \"scope\": \"Sums work once per unique event_id across acquired event records.\", \"lesson\": \"Deduplicate by event_id before summing work to avoid double counting repeated deliveries.\"}",
+  "original_content_sha256": "e63bf92291cadf7eb202e650c5027773cb049fb9f2193d852ca1eebc5e25f7f3",
+  "projection": "assistant content only; transport, headers, routing and credentials omitted",
+  "redacted": false
+}

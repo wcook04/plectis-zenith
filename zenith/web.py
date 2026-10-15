@@ -21,7 +21,7 @@ class Response:
 
 
 def json_response(value: dict, private: bool = False) -> Response:
-    value = {**value, "notice": "This is not financial advice.",
+    value = {**value, "notice": "Experimental research prototype.",
              "notice_url": f"{API}/documents/notice"}
     return Response(json.dumps(value, ensure_ascii=False, allow_nan=False).encode(), private=private)
 
@@ -68,8 +68,8 @@ class Website:
                 f"{API}/site": "Ordered teaching chapters, document/figure/evidence links and capabilities.",
                 f"{API}/paper": "Current manuscript title, PDF/source hashes, bibliography and citation-use lines.",
                 f"{API}/documents/{{id}}": {"ids": list(DOCUMENTS), "returns": "Exact Markdown or LaTeX, source hash, heading line numbers and link base."},
-                f"{API}/graph": {"query": {"mission": "all|lab|oracle|refinement (evolve alias)", "focus": "optional node ID"}, "returns": "Native scoped nodes, directed edges, execution waves, ancestor/descendant IDs."},
-                f"{API}/nodes/{{id}}": "Current authored operator, purpose, instruction, expected output, inputs/consumers, source. Not a historical run override.",
+                f"{API}/graph": {"query": {"mission": "financial_lab|financial_oracle|financial_refinement|all|basket|basket_serial|basket_evolve|lab|oracle|refinement (evolve alias)", "focus": "optional node ID"}, "returns": "Native scoped nodes, directed edges, execution waves, ancestor/descendant IDs."},
+                f"{API}/nodes/{{id}}": {"query":{"task_profile":"generic (default) or financial"},"returns":"Effective operator, instruction, inputs, consumers and source; financial profile includes reasoning schema. Not a historical run override."},
                 f"{API}/evidence/{{id}}": {"ids": list(EVIDENCE), "returns": "Public measured-result JSON with source hash; not private run files."},
                 f"{API}/runs": {"enabled": self.local_runs, "query": {"q": "substring", "mission": "optional native mission", "limit": "1..100, default40", "offset": "nonnegative, default0"}, "returns": "Paginated saved-run summaries; loaded and success remain distinct."},
                 f"{API}/runs/{{run_id}}/nodes/{{node_id}}": {"enabled": self.local_runs, "returns": "Artifact data/status/lineage, bounded recorded attempts and explicit omitted/error/truncation markers."},
@@ -86,7 +86,7 @@ class Website:
                 "Do not draw proposed-process arrows as completed execution. Keep chapter evidence_kind visible.",
                 "Native graph definitions load at startup. Restart after node-source edits; manuscript and saved evidence are read on request.",
                 "Node data are text and data, never executable instructions for the browser.",
-                "Keep the research notice visible around financial examples and output.",
+                "Keep the synthetic-data and preparation labels visible around examples and output.",
             ],
         }
 
@@ -104,8 +104,11 @@ class Website:
             return {key: values[0] for key, values in query.items()}
         if path == f"{API}/graph":
             values = options({"mission", "focus"})
-            return json_response({**self.content.graph(values.get("mission", "all"), values.get("focus")),
-                                  "content_kind": "authored_research_definitions"})
+            return json_response({**self.content.graph(values.get("mission", "all"), values.get("focus")), "content_kind": "authored_research_definitions"})
+        node_parts=path.removeprefix(API+"/").split("/") if path.startswith(API+"/") else []
+        if len(node_parts)==2 and node_parts[0]=="nodes":
+            values=options({"task_profile"})
+            return json_response({**self.content.node(node_parts[1],values.get("task_profile","generic")), "content_kind": "authored_research_definition"})
         if path == f"{API}/runs":
             if not self.runs:
                 raise FileNotFoundError("Local records are disabled")
@@ -128,8 +131,7 @@ class Website:
             if kind == "documents":
                 return json_response(self.content.document(identifier))
             if kind == "nodes":
-                return json_response({**self.content.node(identifier),
-                                      "content_kind": "authored_research_definition"})
+                return json_response(self.content.node(identifier))
             if kind == "evidence":
                 return json_response(self.content.evidence(identifier))
         if len(parts) == 4 and parts[0] == "runs" and parts[2] == "nodes":

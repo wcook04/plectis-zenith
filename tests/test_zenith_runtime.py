@@ -1,4 +1,4 @@
-"""Original graph/engine regression tests; all market observations are synthetic."""
+"""Original graph/engine regression tests; all system observations are synthetic."""
 from __future__ import annotations
 
 import copy
@@ -27,12 +27,12 @@ def fixture_root(root: Path) -> Path:
     for node in graph.values():
         if not node.meta.get("is_feed"):
             continue
-        if node.id in ("global_stock_feed", "global_etf_feed"):
-            ticker = "XOM" if node.id == "global_stock_feed" else "SPY"
-            data = {"columns": ["Ticker", "Price"], "rows": [[ticker, 100.0]],
-                    "evidence_dictionary": [{"ledger_id": "S_ABCD0001", "subject": "XOM"}]}
-        elif node.id == "global_macro_feed":
-            data = {"columns": ["ticker", "Proxy", "pct_change", "z_score"], "rows": [["DGS10", 4.0, 0.1, 0.2]]}
+        if node.id in ("global_measurements_feed", "global_subsystems_feed"):
+            target_id = "SIGNAL_A" if node.id == "global_measurements_feed" else "SUBSYSTEM_A"
+            data = {"columns": ["target_id", "Value"], "rows": [[target_id, 100.0]],
+                    "evidence_dictionary": [{"ledger_id": "S_ABCD0001", "subject": "SIGNAL_A"}]}
+        elif node.id == "global_environment_feed":
+            data = {"columns": ["target_id", "Proxy", "pct_change", "z_score"], "rows": [["DGS10", 4.0, 0.1, 0.2]]}
         else:
             data = {"items": [], "synthetic_fixture": True}
         write_json(source / "artifacts" / (node.id + ".json"), {
@@ -43,9 +43,9 @@ def fixture_root(root: Path) -> Path:
 
 def cp1() -> dict:
     # Test grammar only: this repeated prose is explicitly not a research example.
-    return {"evidence_dictionary": [{"ref_id": "[1]", "ledger_id": "S_ABCD0001", "subject": "XOM",
-                                      "signal_summary": "Synthetic fixture price anchor."}],
-            "epicentre_thesis": "[1] " + "Synthetic fixture transmission persists unless price drops below the declared baseline. " * 20}
+    return {"evidence_dictionary": [{"ref_id": "[1]", "ledger_id": "S_ABCD0001", "subject": "SIGNAL_A",
+                                      "signal_summary": "Synthetic fixture value anchor."}],
+            "epicentre_thesis": "[1] " + "Synthetic fixture transmission persists unless value drops below the declared baseline. " * 20}
 
 
 def response_for(node_id: str) -> str:
@@ -53,22 +53,22 @@ def response_for(node_id: str) -> str:
         return json.dumps(cp1())
     if node_id == "lab_director":
         payload = cp1()
-        payload["predictions_t"] = [{"target_id": "XOM", "direction": "UP", "snapshot_price": 100.0,
-                                     "target_price": 105.0, "invalidation": "XOM below 98 at horizon"}]
-        payload["trade_rationale"] = "[1] " + "Synthetic fixture consequence uses the same baseline and explicit horizon invalidation. " * 15
+        payload["predictions_t"] = [{"target_id": "SIGNAL_A", "direction": "UP", "unit": "dimensionless", "snapshot_value": 100.0,
+                                     "target_value": 105.0, "invalidation": "SIGNAL_A below 98 at horizon"}]
+        payload["forecast_rationale"] = "[1] " + "Synthetic fixture consequence uses the same baseline and explicit horizon invalidation. " * 15
         return json.dumps(payload)
     if node_id == "lab_cross_corr_v1":
         return json.dumps({"swarms": [], "bifurcations": [], "orphans": [], "confidence_asymmetries": []})
     if node_id == "lab_cross_corr_v2":
         return json.dumps({"target_swarms": [], "directional_conflicts": [], "solo_targets": [
-            {"id": "fixture_solo", "name": "Synthetic XOM", "summary": "Fixture grounding only", "tickers": ["XOM"], "lanes": ["STOCK"], "direction_consensus": "BULLISH"}],
-            "thesis_stress": [], "valid_prediction_targets": ["XOM"]})
+            {"id": "fixture_solo", "name": "Synthetic SIGNAL_A", "summary": "Fixture grounding only", "target_ids": ["SIGNAL_A"], "lanes": ["MEASUREMENTS"], "direction_consensus": "INCREASE"}],
+            "thesis_stress": [], "valid_prediction_targets": ["SIGNAL_A"]})
     return "Synthetic recorded response; contract plumbing only."
 
 
 class ZenithGraphTests(unittest.TestCase):
     def test_exact_authored_graph_and_offline_scope(self):
-        self.assertEqual(runtime.validate(ROOT)["node_count"], 50)
+        self.assertEqual(runtime.validate(ROOT)["node_count"], 75)
         self.assertTrue(runtime.validate(ROOT)["ok"])
         lab = runtime.plan(ROOT, "lab", "lab_decide")
         oracle = runtime.plan(ROOT, "oracle")
@@ -76,8 +76,8 @@ class ZenithGraphTests(unittest.TestCase):
         self.assertEqual((oracle["node_count"], oracle["wave_count"]), (28, 7))
         # Even an early target includes its mission siblings, as the real engine does.
         self.assertIn("lab_integrity", {node["id"] for node in lab["nodes"]})
-        self.assertEqual(lab["waves"][3], ["lab_miner_calc", "lab_miner_etf", "lab_miner_macro", "lab_miner_news",
-                                            "lab_miner_poly", "lab_miner_stock"])
+        self.assertEqual(lab["waves"][3], ["lab_miner_derived", "lab_miner_environment", "lab_miner_events",
+                                            "lab_miner_interventions", "lab_miner_measurements", "lab_miner_subsystems"])
 
     def test_offline_inspection_does_not_construct_engine_or_create_state(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -114,7 +114,7 @@ class ZenithHandoffTests(unittest.TestCase):
         self.assertEqual([item["node_id"] for item in result["pending"]], ["lab_seed_state"])
         packet = json.loads(Path(result["pending"][0]["packet_path"]).read_text())
         self.assertIn("[CONTEXT_INJECTION]", packet["prompt"])
-        self.assertIn("<global_stock_feed>", packet["prompt"])
+        self.assertIn("<global_measurements_feed>", packet["prompt"])
         self.assertEqual(text_digest(packet["prompt"]), packet["prompt_sha256"])
         completed_responses = 0
         saw_sibling_wave = False
@@ -169,10 +169,10 @@ class ZenithHandoffTests(unittest.TestCase):
         # Synthetic pair exercises the original subject proxy/diff tools, not a fake oracle verdict.
         subject = self.source
         payload = cp1()
-        payload.update(predictions_t=[{"target_id": "XOM", "direction": "UP", "snapshot_price": 100.0,
-                                      "target_price": 105.0, "snapshot_time": ANCHOR, "target_time_iso": HORIZON,
-                                      "invalidation": "XOM below 98"}],
-                       trade_rationale="[1] " + "Synthetic fixture consequence remains bound to its baseline and horizon. " * 15)
+        payload.update(predictions_t=[{"target_id": "SIGNAL_A", "direction": "UP", "unit": "dimensionless", "snapshot_value": 100.0,
+                                      "target_value": 105.0, "snapshot_time": ANCHOR, "target_time_iso": HORIZON,
+                                      "invalidation": "SIGNAL_A below 98"}],
+                       forecast_rationale="[1] " + "Synthetic fixture consequence remains bound to its baseline and horizon. " * 15)
         for node_id, data in (("lab_decide", cp1()), ("lab_director", payload),
                               ("lab_cross_corr_v2", json.loads(response_for("lab_cross_corr_v2")))):
             write_json(subject / "artifacts" / (node_id + ".json"), {"id": node_id, "status": "success", "data": data})
@@ -185,7 +185,7 @@ class ZenithHandoffTests(unittest.TestCase):
         for path in (truth / "artifacts").glob("global_*.json"):
             envelope = json.loads(path.read_text())
             envelope["metadata"].update(as_of=HORIZON, timestamp_iso=HORIZON)
-            if path.stem == "global_stock_feed":
+            if path.stem == "global_measurements_feed":
                 envelope["data"]["rows"][0][1] = 110.0
             write_json(path, envelope)
         result = runtime.start(self.root, mission="oracle", run_id="SYNTHETIC_ORACLE",
@@ -197,9 +197,9 @@ class ZenithHandoffTests(unittest.TestCase):
         self.assertEqual(reconciliation["subject_run_id"], "SYNTHETIC_FEEDS")
         self.assertEqual(reconciliation["truth_run_id"], "SYNTHETIC_TRUTH")
         self.assertEqual(reconciliation["feed_health"]["status"], "READY")
-        self.assertEqual(reconciliation["rows"][0]["target_id"], "XOM")
-        subject_proxy = json.loads((oracle_dir / "artifacts/oracle_subject_stock_feed.json").read_text())
-        truth_feed = json.loads((oracle_dir / "artifacts/global_stock_feed.json").read_text())
+        self.assertEqual(reconciliation["rows"][0]["target_id"], "SIGNAL_A")
+        subject_proxy = json.loads((oracle_dir / "artifacts/oracle_subject_measurements_feed.json").read_text())
+        truth_feed = json.loads((oracle_dir / "artifacts/global_measurements_feed.json").read_text())
         self.assertEqual(subject_proxy["data"]["rows"][0][1], 100.0)
         self.assertEqual(truth_feed["data"]["rows"][0][1], 110.0)
         with self.assertRaisesRegex(ValueError, "both"):
@@ -208,7 +208,7 @@ class ZenithHandoffTests(unittest.TestCase):
     def test_frozen_policy_and_feed_bytes_are_checked_on_resume(self):
         from system.lib.reasoning_policy import policy_sha256
         policy = {"variant_id": "synthetic_skill_variant", "nodes": {"lab_seed_state": {
-            "skill_addon": "SYNTHETIC_VARIANT_ADDON", "incoming_weights": {"global_news_feed": 0}, "max_context_chars": 512}}}
+            "skill_addon": "SYNTHETIC_VARIANT_ADDON", "incoming_weights": {"global_events_feed": 0}, "max_context_chars": 512}}}
         policy["policy_sha256"] = policy_sha256(policy)
         path = self.root / "policy.json"
         write_json(path, policy)
@@ -222,7 +222,7 @@ class ZenithHandoffTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "policy source changed"):
             runtime.resume(self.root, "POLICY")
         self.prepare()
-        feed = self.source / "artifacts/global_stock_feed.json"
+        feed = self.source / "artifacts/global_measurements_feed.json"
         envelope = json.loads(feed.read_text())
         envelope["data"]["rows"][0][1] = 999.0
         write_json(feed, envelope)
@@ -280,7 +280,7 @@ class ZenithHandoffTests(unittest.TestCase):
         self.assertTrue(recovered["import"]["engine_accepted"])
 
     def test_lab_refuses_future_truth_and_oracle_pair_args_before_creating_run(self):
-        path = self.source / "artifacts/global_stock_feed.json"
+        path = self.source / "artifacts/global_measurements_feed.json"
         envelope = json.loads(path.read_text())
         envelope["metadata"]["as_of"] = HORIZON
         write_json(path, envelope)
@@ -290,13 +290,12 @@ class ZenithHandoffTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "forward-only"):
             runtime.start(self.root, mission="lab", run_id="BAD", feed_source=str(self.source), truth_run=str(self.source))
 
-    def test_lab_refuses_future_provider_bar_even_with_past_acquisition(self):
-        path = self.source / "artifacts/global_stock_feed.json"
+    def test_lab_refuses_future_observation_availability_with_past_acquisition(self):
+        path = self.source / "artifacts/global_measurements_feed.json"
         envelope = json.loads(path.read_text())
-        envelope["metadata"]["diagnostics"] = {"price_observations": {"XOM": {
-            "bar_date": "2026-03-05", "interval": "1d", "auto_adjust": False, "price_basis": "unadjusted daily close"}}}
+        envelope["data"]["observations"] = [{"target_id":"SIGNAL_A", "value":1, "unit":"dimensionless", "observed_at":ANCHOR, "available_at":HORIZON}]
         write_json(path, envelope)
-        with self.assertRaisesRegex(ValueError, "future provider bar_date"):
+        with self.assertRaisesRegex(ValueError, "later than cutoff"):
             self.prepare()
         self.assertFalse((self.root / "state/runs/SYNTHETIC_LAB").exists())
 
@@ -336,15 +335,15 @@ class FreeProviderTests(unittest.TestCase):
             seen = []
             def call(prompt, config):
                 seen.append(config)
-                return {"response_text": "synthetic", "model": "actual/model:free", "usage": {"total_tokens": 7}, "cost": 0}
-            provider = OpenRouterFreeProvider(run, caller=call)
+                return {"response_text": "synthetic", "model": "qwen/actual-model:free", "usage": {"total_tokens": 7}, "cost": 0}
+            provider = OpenRouterFreeProvider(run, model="qwen/fixture:free", caller=call)
             self.assertEqual(provider.ask_ai("hello", {"meta": {"node_id": "lab_seed_state", "session_id": "RUN"}}), "synthetic")
             self.assertTrue(seen[0]["free_only"])
             self.assertFalse(seen[0]["allow_paid"])
             receipts = [json.loads(path.read_text()) for path in (run / "handoff/receipts").glob("*.json")]
             returned = next(row for row in receipts if row["status"] == "response_supplied")
-            self.assertEqual(returned["actual_model"], "actual/model:free")
-            self.assertEqual(returned["requested_model"], "openrouter/free")
+            self.assertEqual(returned["actual_model"], "qwen/actual-model:free")
+            self.assertEqual(returned["requested_model"], "qwen/fixture:free")
             self.assertEqual(returned["usage"]["total_tokens"], 7)
             provider.ask_ai("hello", {"meta": {"node_id": "lab_seed_state", "session_id": "RUN"}})
             self.assertEqual(len(seen), 1, "resume must reuse the durable response without another API attempt")
@@ -356,12 +355,12 @@ class FreeProviderTests(unittest.TestCase):
                 count.append(1)
                 raise RuntimeError("synthetic network failure")
             run = Path(directory) / "RUN"
-            provider = OpenRouterFreeProvider(run, caller=fail)
+            provider = OpenRouterFreeProvider(run, model="qwen/fixture:free", caller=fail)
             config = {"meta": {"node_id": "lab_seed_state", "session_id": "RUN"}}
             with self.assertRaisesRegex(RuntimeError, "synthetic network failure"):
                 provider.ask_ai("prompt", config)
             with self.assertRaisesRegex(RuntimeError, "not be silently resent"):
-                OpenRouterFreeProvider(run, caller=fail).ask_ai("prompt", config)
+                OpenRouterFreeProvider(run, model="qwen/fixture:free", caller=fail).ask_ai("prompt", config)
             self.assertEqual(len(count), 1)
 
 

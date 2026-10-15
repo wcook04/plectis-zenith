@@ -1,0 +1,173 @@
+{
+  "schema": "zenith_conformance_study_v5_direct_actions_executor_compatibility",
+  "created_at": "2026-10-14T22:37:12.515735+00:00",
+  "model": "inclusionai/ling-3.1-flash",
+  "providers": [
+    "deepinfra/fp4"
+  ],
+  "arms": [
+    "ordinary",
+    "fixed",
+    "direct_batch",
+    "direct_adaptive",
+    "direct_masked",
+    "repair_only"
+  ],
+  "max_calls": 36,
+  "max_calls_is_ceiling": true,
+  "parents_per_contract": 1,
+  "direct_config": {
+    "direct_batch": {
+      "turns": 1,
+      "queries_per_turn": 8,
+      "feedback": true
+    },
+    "direct_adaptive": {
+      "turns": 2,
+      "queries_per_turn": 4,
+      "feedback": true
+    },
+    "direct_masked": {
+      "turns": 2,
+      "queries_per_turn": 4,
+      "feedback": false
+    }
+  },
+  "shared_direct_first_turn": true,
+  "max_cost_usd": "0.60",
+  "max_output_tokens": 12288,
+  "reasoning_effort": "none",
+  "workers": 3,
+  "probe_cap": 8,
+  "task_routes": {
+    "native-sqlite-0": "deepinfra/fp4",
+    "native-lru-0": "deepinfra/fp4",
+    "native-utf8-0": "deepinfra/fp4"
+  },
+  "task_arm_order": {
+    "native-sqlite-0": [
+      "ordinary",
+      "fixed",
+      "direct_batch",
+      "direct_adaptive",
+      "direct_masked",
+      "repair_only"
+    ],
+    "native-lru-0": [
+      "fixed",
+      "direct_batch",
+      "direct_adaptive",
+      "direct_masked",
+      "repair_only",
+      "ordinary"
+    ],
+    "native-utf8-0": [
+      "direct_batch",
+      "direct_adaptive",
+      "direct_masked",
+      "repair_only",
+      "ordinary",
+      "fixed"
+    ]
+  },
+  "dataset_sha256": "99aa5bf53ed36688fda6413b5c0784f1e59178cdb66681589d24106494aeee9c",
+  "dependencies": {
+    "research/conformance_study.py": "a3e31f65f7110fff5402e48ab45d5996e37f047aad64c1f69f0137fc34cae71f",
+    "research/native_conformance_tasks.py": "2a570ab7b6c09c8c4d45337be449a6c4f977ab0c78ba1c16fda253b449cbadec",
+    "research/direct_investigation.py": "a465a0a3fdf8e838980e22c9f3cd28fbe83d719723360e8f2ca1ed617de42073",
+    "research/decomposition_study.py": "57af9c8bf0f82c54424ab44bb0b8c51fe6d2583f3736bbe0c251ef29e9303d8d",
+    "research/decomposition_tasks.py": "5a3b2853402c390d297d73058d5d913ac9600e2546ac84cd6217fc133017d42c",
+    "zenith/source_snapshot.py": "34bbbbfc59d79d6a3caaa4a1227b5ec204d82544832ac5267d2d943632b2619f",
+    "zenith/investigation_program.py": "7ea08df9578ca1f3a3b80b2612526f1c8fbca40ba25fda8fe5c421169f4e84d5",
+    "zenith/budgeted.py": "1a4640b57af3ae7d5cf1ce029c596b77f03ede16ce77d24c65d8b63682de7bd1",
+    "zenith/provider_policy.py": "5e1ce647a4f4481cb4bdce545a08df36dc406dab141e2989c5ae800b9d251b1d",
+    "zenith/providers.py": "45d131dd915c65ece8211abd9459008c66eca0411f777f904df196d70db8f4d1",
+    "system/lib/openrouter_free_runtime.py": "3b45810bf5105d3d7ed4ef4053ee2f4f800bdd04d548f748d520eb4b0cecb3eb"
+  },
+  "source": {
+    "path": "runtime-source.zip",
+    "sha256": "b86ede011eb25f22e3e438167f7670ce191261690cfac27c2cb44571d3bb8723",
+    "scope": "Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads"
+  },
+  "model_evidence": {
+    "observed_at": "2026-10-14T22:17:55.055581+00:00",
+    "authority": "Current official OpenRouter model and endpoint APIs",
+    "catalogue_url": "https://openrouter.ai/api/v1/models",
+    "endpoint_url": "https://openrouter.ai/api/v1/models/inclusionai/ling-3.1-flash/endpoints",
+    "selection": "Newest eligible Chinese-developed text model with compatible pinned structured-output endpoint; the cheaper Novita endpoint lacks advertised structured_outputs and response_format. No fallback.",
+    "model": {
+      "id": "inclusionai/ling-3.1-flash",
+      "name": "inclusionAI: Ling 3.1 Flash",
+      "created": 1790950024,
+      "context_length": 262144,
+      "pricing": {
+        "prompt": "0.000000075",
+        "completion": "0.000000225",
+        "input_cache_read": "0.000000015"
+      },
+      "supported_parameters": [
+        "frequency_penalty",
+        "include_reasoning",
+        "logit_bias",
+        "logprobs",
+        "max_tokens",
+        "min_p",
+        "presence_penalty",
+        "reasoning",
+        "repetition_penalty",
+        "response_format",
+        "seed",
+        "stop",
+        "structured_outputs",
+        "temperature",
+        "tool_choice",
+        "tools",
+        "top_k",
+        "top_logprobs",
+        "top_p"
+      ],
+      "reasoning": {
+        "mandatory": false,
+        "default_enabled": true
+      }
+    },
+    "endpoint": {
+      "tag": "deepinfra/fp4",
+      "provider_name": "DeepInfra",
+      "status": 0,
+      "pricing": {
+        "prompt": "0.0000003",
+        "completion": "0.0000009",
+        "input_cache_read": "0.00000006",
+        "discount": 0
+      },
+      "context_length": 262144,
+      "max_completion_tokens": 235929,
+      "supported_parameters": [
+        "reasoning",
+        "include_reasoning",
+        "max_tokens",
+        "temperature",
+        "top_p",
+        "stop",
+        "frequency_penalty",
+        "presence_penalty",
+        "repetition_penalty",
+        "top_k",
+        "seed",
+        "min_p",
+        "logit_bias",
+        "structured_outputs",
+        "tools",
+        "tool_choice",
+        "response_format"
+      ]
+    },
+    "reasoning_effort": "none",
+    "cap_per_stage_usd": "0.60",
+    "expected_charge_boundary": "Ceiling only; actual settled usage is reported separately."
+  },
+  "selection": "Fresh unfiltered first parents; native counterexamples; repair selected on supplied examples plus its own measured probes only, preserving every measured parent success. Every arm receives repair even without a counterexample; repair gains alone do not identify probe value.",
+  "comparison": "Ordinary/witness compile one selector; fixed uses authored probes; repair_only sees original examples without new probes; direct_batch makes at most one action call and direct_adaptive/direct_masked at most two. Paired adaptive/masked arms share one exact first provider response; each independently reexecutes its native and parent measurements, counted in each arm. Second prompts receive observed versus outcome-masked evidence. Every arm gets one repair call. All investigation arms have eight query slots and stop on the first verified defect; maximum calls are a ceiling, not required spending.",
+  "boundary": "Exploratory comparison on authored wrappers for native software semantics. Repeated parents within three native contracts are not independent source mechanisms. No acquired update rule, protected novelty or production-value claim."
+}

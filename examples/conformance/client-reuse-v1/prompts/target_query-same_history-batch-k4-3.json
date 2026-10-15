@@ -1,0 +1,349 @@
+{
+  "phase": "target_query",
+  "arm": "same_history",
+  "turn": 3,
+  "system": "Investigate the opaque client under its public contract.\nReturn exactly JSON {\"queries\": [legal query objects], \"note\": string or null}.\nYou may use measured reference/client results from earlier turns. Do not assert\nunmeasured expected outputs. Do not repeat the public example or earlier queries.\nQueries are actions, not a repaired implementation. Empty queries stops.",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "queries": {
+        "type": "array",
+        "maxItems": 1,
+        "items": {
+          "type": "object"
+        }
+      },
+      "note": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "queries",
+      "note"
+    ],
+    "additionalProperties": false
+  },
+  "prompt": {
+    "public_task": {
+      "id": "batch-k4",
+      "family": "batch",
+      "contract": "An ordered batch insert is all-or-nothing on a real SQLite table with unique keys 1..9. A duplicate or key 10 makes that batch fail; later batches and the caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each batch's success, rows and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 0..4 DISTINCT integer keys in 1..9.",
+        "steps_item": "List of 1..4 integer keys in 1..10; duplicates and key 10 are legal inputs and can fail natively.",
+        "continuation": "One integer key in 1..10, inserted by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            1
+          ],
+          "steps": [
+            [
+              2
+            ]
+          ],
+          "continuation": 3
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "development_history": [],
+    "target_receipts": [
+      {
+        "query": {
+          "outer": true,
+          "initial": [
+            1,
+            2
+          ],
+          "steps": [
+            [
+              3,
+              3
+            ],
+            [
+              4,
+              10
+            ],
+            [
+              5
+            ]
+          ],
+          "continuation": 6
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": false,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": true
+            },
+            {
+              "ok": false,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": true
+            },
+            {
+              "ok": true,
+              "state": [
+                1,
+                2,
+                5
+              ],
+              "transaction_open": true
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            5,
+            6
+          ],
+          "transaction_open_before_caller_rollback": true,
+          "state_after_caller_rollback": []
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": false,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": true
+            },
+            {
+              "ok": false,
+              "state": [
+                1,
+                2
+              ],
+              "transaction_open": true
+            },
+            {
+              "ok": true,
+              "state": [
+                1,
+                2,
+                5
+              ],
+              "transaction_open": true
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            5,
+            6
+          ],
+          "transaction_open_before_caller_rollback": true,
+          "state_after_caller_rollback": []
+        },
+        "discrepancy": false,
+        "slot": 1,
+        "note": "Probe caller-owned transaction with a duplicate within a batch, key 10, and a valid later batch; observe per-step ok/state/transaction_open, continuation, and rollback restoring pre-transaction state."
+      },
+      {
+        "query": {
+          "outer": false,
+          "initial": [
+            1,
+            2,
+            3
+          ],
+          "steps": [
+            [
+              4,
+              4
+            ],
+            [
+              5,
+              10
+            ],
+            [
+              6,
+              7
+            ]
+          ],
+          "continuation": 8
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": false,
+              "state": [
+                1,
+                2,
+                3
+              ],
+              "transaction_open": false
+            },
+            {
+              "ok": false,
+              "state": [
+                1,
+                2,
+                3
+              ],
+              "transaction_open": false
+            },
+            {
+              "ok": true,
+              "state": [
+                1,
+                2,
+                3,
+                6,
+                7
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3,
+            6,
+            7,
+            8
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3,
+            6,
+            7,
+            8
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": false,
+              "state": [
+                1,
+                2,
+                3
+              ],
+              "transaction_open": false
+            },
+            {
+              "ok": false,
+              "state": [
+                1,
+                2,
+                3
+              ],
+              "transaction_open": false
+            },
+            {
+              "ok": true,
+              "state": [
+                1,
+                2,
+                3,
+                6,
+                7
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            1,
+            2,
+            3,
+            6,
+            7,
+            8
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            1,
+            2,
+            3,
+            6,
+            7,
+            8
+          ]
+        },
+        "discrepancy": false,
+        "slot": 2,
+        "note": "Probe non-outer mode with duplicate within a batch, key 10, and a valid multi-key later batch; observe per-step ok/state/transaction_open, continuation, and that no caller rollback occurs (state persists)."
+      }
+    ],
+    "remaining_slots": 4,
+    "max_queries_this_turn": 1
+  }
+}

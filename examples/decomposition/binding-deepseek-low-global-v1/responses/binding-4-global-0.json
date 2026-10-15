@@ -1,0 +1,4 @@
+{
+  "raw": "{\"change\": \"Replaced the sum-only readout with the inferred hidden sequence model: per-position contribution is p(x) plus 2*x times the preceding-value prefix sum, followed by one cumulative-sum pass.\",\"scope\": \"Computes the last entry after one cumulative-sum pass by summing per-position contributions derived from p(x)=2*x*x - x*x*x and a prefix-sum interaction term 2*x*prefix.\",\"source\": \"def investigate(context, acquire):\\n    values = context[\\\"values\\\"]\\n    total = 0\\n    prefix = 0\\n    for x in values:\\n        total = total + (2 * x * x - x * x * x) + 2 * x * prefix\\n        prefix = prefix + x\\n    return total\\n\"}",
+  "prompt_sha256": "fb3de071d6c927f36387c75f39c6bfdbd2f4572cfcaf727f5be952fada4c47bc"
+}

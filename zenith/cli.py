@@ -12,9 +12,18 @@ def parser() -> argparse.ArgumentParser:
                                   "Experimental research software; see RESEARCH_NOTICE.md.")
     cli.add_argument("--root", type=Path, default=runtime.DEFAULT_ROOT, help="standalone substrate root")
     commands = cli.add_subparsers(dest="command", required=True)
-    demo = commands.add_parser("prepare-demo", help="assemble local real inputs with explicit macro/news replacements; no network or model calls")
-    demo.add_argument("--earlier-source", type=Path, required=True)
-    demo.add_argument("--later-source", type=Path, required=True)
+    basket = commands.add_parser("basket", help="licensed shared-universe data and native basket experiment")
+    basket.add_argument("action", choices=("fetch", "ingest", "prepare", "run", "report"))
+    basket.add_argument("--source", type=Path)
+    basket.add_argument("--output", type=Path)
+    basket.add_argument("--through", default="2025-12-31")
+    basket.add_argument("--data", type=Path)
+    basket.add_argument("--study", type=Path)
+    basket.add_argument("--env-file", type=Path)
+    basket.add_argument("--model", default="inclusionai/ling-3.0-flash")
+    demo = commands.add_parser("prepare-demo", help="construct independently authored synthetic system observations; no network or model calls")
+    demo.add_argument("--earlier-source", type=Path)
+    demo.add_argument("--later-source", type=Path)
     demo.add_argument("--output", type=Path, required=True)
     offline = commands.add_parser("demo", help="run a fully synthetic offline teaching example over the native Lab graph; no network or model calls")
     offline.add_argument("--output", type=Path, required=True, help="new or empty directory; all generated files stay here")
@@ -28,9 +37,9 @@ def parser() -> argparse.ArgumentParser:
     daily_commands = daily.add_subparsers(dest="daily_command", required=True)
     init = daily_commands.add_parser("init", help="freeze daily snapshots and a baseline; no inference")
     init.add_argument("--work-dir", type=Path, required=True)
-    init.add_argument("--dataset", type=Path, default=runtime.DEFAULT_ROOT / "work/datasets/fnspid-aa")
-    init.add_argument("--start", required=True, help="first forecast session, YYYY-MM-DD")
-    init.add_argument("--end", required=True, help="last forecast session; the next session supplies its truth")
+    init.add_argument("--dataset", type=Path, default=runtime.DEFAULT_ROOT / "examples/demo")
+    init.add_argument("--start", required=True, help="first forecast day, YYYY-MM-DD")
+    init.add_argument("--end", required=True, help="last forecast day; the next day supplies its truth")
     init.add_argument("--policy", type=Path, help="initial frozen native reasoning policy")
     init.add_argument("--retention", type=Path, help="verified matchoff retention receipt; enforces its evidence cutoff")
     for name in ("next", "review"):
@@ -47,7 +56,7 @@ def parser() -> argparse.ArgumentParser:
     matchoff.add_argument("--end", required=True)
     matchoff.add_argument("--output", type=Path, required=True)
     matchoff.add_argument("--model", required=True)
-    matchoff.add_argument("--minimum-improvement", type=float, required=True, help="predeclared absolute reduction in mean relative target-price error")
+    matchoff.add_argument("--minimum-improvement", type=float, required=True, help="predeclared absolute reduction in mean relative target-value error")
     matchoff.add_argument("--max-calls-per-run", type=int, default=21,
                          help="pre-freeze per-arm response allowance including rejected corrections; default 21, minimum follows the graph")
     retain = daily_commands.add_parser("retain", help="record reviewed winner from a complete native development matchoff")
@@ -69,16 +78,20 @@ def parser() -> argparse.ArgumentParser:
     plan = commands.add_parser("plan", help="show actual engine mission scope and waves offline")
     plan.add_argument("mission", choices=runtime.MISSION_TARGETS)
     plan.add_argument("--target")
+    plan.add_argument("--task-profile", choices=("generic", "financial", "financial_investigator_v1"), default="generic")
     plan.add_argument("--graph-variant", type=Path, help="frozen topology variant JSON")
     for name in ("run", "prepare"):
         run = commands.add_parser(name, help="execute the real graph" if name == "run" else "prepare durable agent packets through the real engine")
-        run.add_argument("mission", choices=("lab", "oracle", "feeds"))
+        run.add_argument("mission", choices=("lab", "oracle", "feeds", "basket", "basket_serial", "basket_evolve", "refinement"))
+        run.add_argument("--task-profile", choices=("generic", "financial", "financial_investigator_v1"), default="generic")
+        run.add_argument("--replay-from", help="completed source Lab run for a financial local replay")
+        run.add_argument("--replay-node", help="single changed reasoning node; only its descendants rerun")
         run.add_argument("--run-id", required=True)
         run.add_argument("--target")
         run.add_argument("--feed-source", help="recorded feed run id or directory; required for Lab")
         run.add_argument("--subject-run", help="Oracle subject Lab run")
         run.add_argument("--truth-run", help="Oracle later truth run")
-        run.add_argument("--horizon", help="next_us_close, 24h, 48h, or timezone-aware ISO target")
+        run.add_argument("--horizon", help="24h, 48h, or timezone-aware ISO target")
         run.add_argument("--time-anchor", help="timezone-aware prediction anchor")
         run.add_argument("--policy", help="frozen reasoning policy JSON for this variant run")
         run.add_argument("--graph-variant", help="frozen topology variant JSON")
@@ -106,6 +119,17 @@ def parser() -> argparse.ArgumentParser:
 
 def dispatch(args) -> dict:
     root = args.root.resolve()
+    if args.command == "basket":
+        required = {"fetch": ("output",), "ingest": ("source", "output"), "prepare": ("data", "study"), "run": ("study", "env_file"), "report": ("study",)}
+        for field in required[args.action]:
+            if getattr(args, field) is None: raise ValueError(f"basket {args.action} requires --{field.replace(chr(95), chr(45))}")
+        from . import market_data
+        from research import basket_study
+        if args.action == "fetch": return market_data.fetch(args.output)
+        if args.action == "ingest": return market_data.ingest(args.source, args.output, args.through)
+        if args.action == "prepare": return basket_study.prepare(args.data, args.study, args.model)
+        if args.action == "run": return basket_study.run_study(args.study, args.env_file)
+        return basket_study.report(args.study)
     if args.command == "prepare-demo":
         from .demo import prepare
         return prepare(root, args.earlier_source, args.later_source, args.output)
@@ -153,7 +177,7 @@ def dispatch(args) -> dict:
         return runtime.validate(root)
     if args.command == "plan":
         return runtime.plan(root, args.mission, args.target,
-                            json.loads(args.graph_variant.read_text()) if args.graph_variant else None)
+                            json.loads(args.graph_variant.read_text()) if args.graph_variant else None, args.task_profile)
     if args.command in ("run", "prepare"):
         if getattr(args, "env_file", None):
             from system.lib.openrouter_free_runtime import load_env_file
@@ -165,7 +189,8 @@ def dispatch(args) -> dict:
                              horizon=args.horizon, time_anchor=args.time_anchor, policy=args.policy, graph_variant=args.graph_variant, context_profile=args.context_profile,
                              max_cost_usd=getattr(args, "max_cost_usd", None), max_calls=getattr(args, "max_calls", None),
                              max_output_tokens=getattr(args, "max_output_tokens", 4096), budget_dir=getattr(args, "budget_dir", None),
-                             provider_slug=getattr(args, "provider_slug", None))
+                             provider_slug=getattr(args, "provider_slug", None), task_profile=args.task_profile,
+                             replay_from=args.replay_from, replay_node=args.replay_node)
     if args.command == "resume":
         return runtime.resume(root, args.run_id)
     if args.command == "status":

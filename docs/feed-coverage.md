@@ -1,13 +1,7 @@
 # Feed coverage
 
-The current graph has five source lanes and a derived calculator. The
-[mixed demonstration](demo.md) retains real stocks, ETFs and prediction markets,
-uses labelled synthetic macro/news replacements, and recomputes CALC.
-[Per-feed provenance](../examples/demo/provenance.json) states which inputs are
-real, invented or derived. Real input retention is separate from public display.
+**Experimental research prototype.** The public example uses synthetic observations of a disclosed toy generator. No predictive improvement has been demonstrated.
 
-The FNSPID adapter is a separate prices/news input option, not a replacement
-for the mixed demonstration or a claim of full feed equivalence. Any new data
-source needs its own coverage, clock and permission review.
+The public packet has five synthetic source perspectives and one derived feed: measurements, subsystems, environment, events, interventions and derived summaries. Each feed describes the same invented abstract System A from a different perspective.
 
-This is not financial advice.
+Coverage means which declared observables have admissible records at the cutoff and matched later outcomes. Missingness is explicit; events and interventions do not automatically provide numeric outcome measurements. Record selection coverage beside conditional forecast error and declare an abstention rule. The synthetic example does not establish coverage or accuracy for another system.

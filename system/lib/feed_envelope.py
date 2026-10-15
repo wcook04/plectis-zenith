@@ -1,7 +1,7 @@
 """
 [PURPOSE]
 - Teleology: Shared, compatibility-focused helpers that every deterministic feed lane
-  (stock / etf / macro / news / polymarket / calculator) uses to build
+  (measurements / subsystems / environment / events / interventions / derived) uses to build
   status, diagnostics, and envelope metadata consistently without breaking per-lane ABI.
 - Mechanism: Narrow utility functions (no framework, no class hierarchy) for UTC timestamp
   derivation, `as_of` / `run_id` resolution, diagnostics normalisation, bounded warning
@@ -70,13 +70,9 @@ __all__ = [
 # Secret names commonly surfaced by feed tools; kept in sync with run_tools6.SECRET_ENV_KEYS
 # but widened here because individual lane modules may use a different subset.
 DEFAULT_SECRET_ENV_KEYS: Sequence[str] = (
-    "FRED_API_KEY",
-    "TELEGRAM_API_ID",
-    "TELEGRAM_API_HASH",
-    "TELEGRAM_PHONE",
-    "POLYGON_API_KEY",
-    "ALPHAVANTAGE_API_KEY",
-    "POLYMARKET_API_KEY",
+    "ZENITH_OBSERVATION_TOKEN",
+    "OPENROUTER_API_KEY",
+    "NVIDIA_API_KEY",
 )
 
 DEFAULT_MAX_WARNINGS: int = 500
@@ -237,7 +233,7 @@ def warning_event(
     lane: str,
     exc: Optional[BaseException] = None,
     message: Optional[str] = None,
-    ticker: Optional[str] = None,
+    target_id: Optional[str] = None,
     series_id: Optional[str] = None,
     channel: Optional[str] = None,
     endpoint: Optional[str] = None,
@@ -262,8 +258,8 @@ def warning_event(
     }
     if exc is not None:
         event["exception"] = type(exc).__name__
-    if ticker:
-        event["ticker"] = str(ticker)
+    if target_id:
+        event["target_id"] = str(target_id)
     if series_id:
         event["series_id"] = str(series_id)
     if channel:
@@ -383,16 +379,16 @@ def build_metadata(
     """Build a canonical metadata block for a feed envelope.
 
     Preserves per-lane polymorphism on `timestamp`:
-      - Default (timestamp=None) writes `now.iso` — matches stock / macro / calculator.
-      - Pass `timestamp=now.epoch` for news / polymarket legacy-epoch shape.
+      - Default (timestamp=None) writes `now.iso` — matches measurements / environment / derived.
+      - Pass `timestamp=now.epoch` for events / interventions legacy-epoch shape.
       - Pass any other value to preserve existing literal (e.g. the anchor string).
 
     `timestamp_iso` / `timestamp_epoch_s` default to `now.iso` / `now.epoch`, but can
-    be overridden independently. news overrides `timestamp_iso` with `as_of` because
+    be overridden independently. events overrides `timestamp_iso` with `as_of` because
     its original shape coupled `timestamp_iso` to logical time rather than wall-clock.
 
     `always_include_error=True` emits `"error": None` even on success — required by
-    lanes that historically emit the key unconditionally (stock, news). Other lanes
+    lanes that historically emit the key unconditionally (measurements, events). Other lanes
     omit the key on success.
     """
     md: Dict[str, Any] = {

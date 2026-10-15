@@ -1,0 +1,4 @@
+{
+  "raw": "{\n  \"source\": \"def sum_readings(rows):\\n    return sum(rows)\\n\\ndef calibrate(total):\\n    # The calibration formula is derived from the examples provided.\\n    # From the examples, we can infer that the correct transformation involves\\n    # both scaling and offsetting the sum of readings. After analyzing the pattern,\\n    # it appears that the correct formula is `3 * total + 11`.\\n    return 3 * total + 11\\n\\ndef investigate(context, acquire):\\n    return calibrate(sum_readings(context[\\\"rows\\\"]))\",\n  \"scope\": \"The solution assumes a linear relationship between the sum of raw readings and the calibrated output, based on observed patterns in the development data.\",\n  \"change\": \"Updated the `calibrate` function to use the inferred affine transformation `3 * total + 11`, which aligns with all provided test cases.\"\n}",
+  "prompt_sha256": "e70939f5b3ee3e35a21c77bb887da7d343a3147fcf4de88b42844eab1d57e7f5"
+}

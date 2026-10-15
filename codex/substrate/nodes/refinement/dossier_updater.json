@@ -1,15 +1,16 @@
 {
-    "id": "dossier_updater",
-    "type": "reasoning",
-    "lane": "SPINE",
-    "group": "refinement",
-    "platform": "chatgpt",
-    "is_artifact": true,
-    "teleology": "Consume delta_analyzer output and produce a strict patch payload ready for version_committer to apply to the target dossier file.",
-    "mechanism": "LLM constrained to output only the unified patch operation contract. Depends on delta_analyzer delta summary.",
-    "expectation": "A JSON array of patch operations using slash-selector vocabulary: [{\"op\": \"set\"|\"merge\"|\"append\", \"selector\": \"SECTION/key\", \"payload\": <value>}]. \"set\" with payload=null deletes the key. No dot-paths, no \"delete\" op, no reasoning, no commentary.",
-    "instruction": "See Contract: codex/substrate/contracts/evaluate_output.md\n\nYou are the Dossier Updater. Receive the delta summary from delta_analyzer and output a minimal patch payload.\n\nEach operation must use the UNIFIED VOCABULARY:\n- op: \"set\" (create or update a value), \"merge\" (partial-update a dict), or \"append\" (add to a list)\n- selector: slash-delimited path within the dossier JSON (e.g. \"FED_RATE_TRAJECTORY/summary\")\n- payload: (required) the new value to write. For deletion, use op=\"set\" with payload=null.\n\nBANNED vocabulary:\n- Do NOT use op=\"delete\" — use {\"op\": \"set\", \"selector\": \"SECTION/key\", \"payload\": null} instead.\n- Do NOT use dot-notation paths (e.g. \"SECTION.key\") — use slash selectors only.\n\nExamples:\n  Update:  {\"op\": \"set\", \"selector\": \"FED_RATE_TRAJECTORY/summary\", \"payload\": \"Updated summary text\"}\n  Delete:  {\"op\": \"set\", \"selector\": \"FED_RATE_TRAJECTORY/stale_field\", \"payload\": null}\n  Merge:   {\"op\": \"merge\", \"selector\": \"FED_RATE_TRAJECTORY\", \"payload\": {\"confidence\": \"HIGH\"}}\n  Append:  {\"op\": \"append\", \"selector\": \"SIGNALS/items\", \"payload\": \"new signal\"}\n\nOutput ONLY the JSON array. No preamble, no commentary, no trailing text.",
-    "dependencies": [
-        "delta_analyzer"
-    ]
+  "id": "dossier_updater",
+  "type": "reasoning",
+  "lane": "SPINE",
+  "group": "refinement",
+  "platform": "chatgpt",
+  "is_artifact": true,
+  "teleology": "Native dossier_updater role over a system observed at explicit times.",
+  "mechanism": "LLM constrained to output only the unified patch operation contract. Depends on delta_analyzer delta summary.",
+  "expectation": "Output the declared contract with explicit grounding and uncertainty.",
+  "instruction": "[SYSTEM OBSERVATION CONTRACT]\nReason over observations of one system available at cutoff t. Feeds are different perspectives on the same system, not independent votes. Numeric observations preserve target_id, value, unit, observed_at and available_at. Record uncertainty and missingness. No future observations or invented evidence enter Lab. A forecast freezes snapshot_value, target_value, unit, snapshot_time and explicit target_time_iso. Later Oracle observations may resolve that frozen forecast but cannot rewrite it. A diagnosis is a hypothesis; Evolve changes require review and a matched later comparison. The disclosed System A generator demonstrates protocol only, not blind prediction or learned improvement.\n\n[ROLE] dossier_updater\n[TASK] Perform the declared cross-perspective reasoning role with explicit evidence and uncertainty.\n\n[OUTPUT] Match the declared output_schema; JSON only where a JSON schema is declared.",
+  "dependencies": [
+    "delta_analyzer"
+  ],
+  "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments."
 }

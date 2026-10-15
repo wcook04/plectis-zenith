@@ -1,0 +1,4 @@
+{
+  "raw": "{\"change\":\"No change needed; the current implementation already matches all measured calibration and development examples exactly.\",\"scope\":\"Computes the final readout as the sum over positions of p(x)=2*x*x - x*x*x plus 2*x times the sum of all previous values, equivalent to one cumulative-sum pass over per-position contributions.\",\"source\":\"def investigate(context, acquire):\\n    values = context[\\\"values\\\"]\\n    total = 0\\n    prefix = 0\\n    for x in values:\\n        total = total + (2 * x * x - x * x * x) + 2 * x * prefix\\n        prefix = prefix + x\\n    return total\\n\"}",
+  "prompt_sha256": "d26c70c3a71ef9d3d5ac74bda8f87398bcc875cfc10bc165370f2716047e4b90"
+}

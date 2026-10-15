@@ -18,6 +18,7 @@ export type PaperSection = {
 export type EvidenceKind =
   | 'proposed_process'
   | 'authored_mechanism'
+  | 'measured_experiment'
   | 'measured_execution'
   | 'verified_preparation'
   | 'research_proposal';
@@ -44,6 +45,7 @@ export type Site = {
   documents: Record<string, string>;
   figures: Record<string, string>;
   evidence: Record<string, string>;
+  active_evidence_id?: string;
   local_runs_enabled: boolean;
   run_index_url?: string | null;
   data_mode?: string;
@@ -97,11 +99,12 @@ export type GraphNode = {
   source: SourceRef;
   explanation_url: string | null;
   demo_provenance?: Provenance | null;
+  dossier?: { data: Record<string, unknown>; source: SourceRef } | null;
 };
 
 export type Provenance = {
   node_id: string;
-  input_origin: 'real_saved_input' | 'authored_synthetic' | 'derived_mixed_inputs' | string;
+  input_origin: 'real_saved_input' | 'authored_synthetic' | 'derived_synthetic_inputs' | string;
   input_sha256?: string;
   source_sha256?: string;
   public_payload?: string;
@@ -186,18 +189,47 @@ export class ApiError extends Error {
 // Same-origin by default: Vite proxies /api in development and the Python
 // server mounts the build in production. VITE_ZENITH_API overrides it.
 export const API_BASE: string = (import.meta.env.VITE_ZENITH_API as string | undefined) ?? '';
+const SNAPSHOT_MODE = import.meta.env.VITE_ZENITH_SNAPSHOT === '1';
 
 export function apiUrl(path: string): string {
   if (/^https?:\/\//.test(path)) return path;
-  return `${API_BASE}${path}`;
+  // Static publication includes exact JSON files for read-only API links.
+  const publicPath = SNAPSHOT_MODE && /^\/api\/v1\/[^?]+$/.test(path) ? `${path}.json` : path;
+  return `${API_BASE}${publicPath}`;
 }
 
 const cache = new Map<string, Promise<unknown>>();
+type PublicSnapshot = { schema: 'zenith_public_api_snapshot_v1'; routes: Record<string, unknown> };
+let snapshotRequest: Promise<PublicSnapshot> | null = null;
+
+function publicSnapshot(): Promise<PublicSnapshot> {
+  if (!snapshotRequest) {
+    snapshotRequest = (async () => {
+      const response = await fetch(`${API_BASE}/public-api.json`, { headers: { Accept: 'application/json' } });
+      if (!response.ok) throw new ApiError(response.status, 'snapshot_unavailable', 'Public API snapshot unavailable');
+      const value = await response.json() as Partial<PublicSnapshot>;
+      if (value?.schema !== 'zenith_public_api_snapshot_v1' || value.routes === null
+        || typeof value.routes !== 'object' || Array.isArray(value.routes)) {
+        throw new ApiError(502, 'snapshot_schema', 'Public API snapshot has an unsupported schema');
+      }
+      return value as PublicSnapshot;
+    })();
+    snapshotRequest.catch(() => { snapshotRequest = null; });
+  }
+  return snapshotRequest;
+}
 
 async function fetchJson<T>(path: string, { fresh = false }: { fresh?: boolean } = {}): Promise<T> {
   const url = apiUrl(path);
   if (!fresh && cache.has(url)) return cache.get(url) as Promise<T>;
   const request = (async () => {
+    if (SNAPSHOT_MODE) {
+      const snapshot = await publicSnapshot();
+      if (!Object.prototype.hasOwnProperty.call(snapshot.routes, path)) {
+        throw new ApiError(404, 'unknown_snapshot_route', `No public snapshot route: ${path}`);
+      }
+      return snapshot.routes[path] as T;
+    }
     const response = await fetch(url, { headers: { Accept: 'application/json' } });
     if (!response.ok) {
       let code = 'http_error';
@@ -245,4 +277,5 @@ export const api = {
 
 export function clearApiCache() {
   cache.clear();
+  snapshotRequest = null;
 }

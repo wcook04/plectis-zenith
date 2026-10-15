@@ -1,0 +1,2591 @@
+{
+  "schema": "zenith_native_conformance_dataset_v1",
+  "seed": 20261016,
+  "panel_size": 24,
+  "probe_budget": 8,
+  "max_query_units": {
+    "sqlite": 34,
+    "lru": 33,
+    "utf8": 289
+  },
+  "source_versions": {
+    "python": "3.12.7",
+    "sqlite": "3.45.3",
+    "lru": "stdlib functools.lru_cache",
+    "utf8": "stdlib codecs strict utf-8"
+  },
+  "adaptation": {
+    "source": "ZENITH_ADVANCE_RETURN_14-the-next-decisive-campaign/diagnostics.py",
+    "sha256": "dd6a1256438f83593c4078fe207d9e4953dd7668064b229ae6cc97f46648614a",
+    "scope": "Native adapters and public-example proper-prefix tester; bounded local adaptation."
+  },
+  "boundary": "Authored three-wrapper diagnostic population; fresh model parents, no initial buggy program, no production or novelty claim.",
+  "tasks": [
+    {
+      "id": "native-utf8-0",
+      "source_id": "utf8-0",
+      "parent_replicate": 0,
+      "contract": "Native strict codecs UTF8 incremental-decoder diagnostic.\nA fresh query is exactly {\"events\":[event,...]}, with at most 32 events.\nAn event is exactly {\"op\":\"feed\",\"bytes\":[integer,...]}, {\"op\":\"finish\"},\nor {\"op\":\"reset\"}. Each byte is an integer 0..255, excluding booleans; each\nchunk has at most 64 bytes and the entire query at most 256 bytes. Empty chunks\nare legal. Feed invokes decode(bytes, final=False); finish invokes decode with\nempty bytes and final=True. Count Unicode code points in strings successfully\nreturned by these calls, not bytes or graphemes. A UnicodeDecodeError is a\nmeasured result: status becomes \"error\", and the failing call contributes ZERO\ncharacters, including any valid prefix in that same chunk. Successful finish\nsets status \"finished\". Otherwise status is \"open\", including incomplete byte\nprefixes. After either terminal status, only reset is legal. Reset creates a\nfresh strict decoder and sets count=0,status=\"open\". Reset may also occur while\nopen. Return {\"count\":integer,\"status\":\"open\"|\"finished\"|\"error\"}. Each query\nstarts fresh. Invalid/incomplete UTF8 bytes are allowed inputs; malformed query\nshapes and events after a terminal result without reset are illegal queries.\nImplement investigate(context, acquire). No initial program is supplied.\n",
+      "examples": [
+        {
+          "input": {
+            "events": []
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  163
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  66,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  97
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        }
+      ],
+      "fixed_queries": [
+        {
+          "events": [
+            {
+              "op": "feed",
+              "bytes": [
+                0
+              ]
+            },
+            {
+              "op": "finish"
+            }
+          ]
+        },
+        {
+          "events": [
+            {
+              "op": "feed",
+              "bytes": [
+                240,
+                159,
+                152
+              ]
+            },
+            {
+              "op": "finish"
+            }
+          ]
+        },
+        {
+          "events": [
+            {
+              "op": "feed",
+              "bytes": [
+                237,
+                160,
+                128
+              ]
+            }
+          ]
+        },
+        {
+          "events": [
+            {
+              "op": "feed",
+              "bytes": [
+                97
+              ]
+            },
+            {
+              "op": "feed",
+              "bytes": [
+                98,
+                255
+              ]
+            }
+          ]
+        },
+        {
+          "events": [
+            {
+              "op": "feed",
+              "bytes": [
+                65
+              ]
+            }
+          ]
+        },
+        {
+          "events": [
+            {
+              "op": "feed",
+              "bytes": [
+                194
+              ]
+            },
+            {
+              "op": "feed",
+              "bytes": [
+                163
+              ]
+            }
+          ]
+        },
+        {
+          "events": [
+            {
+              "op": "feed",
+              "bytes": [
+                240,
+                159,
+                152,
+                128
+              ]
+            }
+          ]
+        },
+        {
+          "events": [
+            {
+              "op": "feed",
+              "bytes": [
+                226,
+                130
+              ]
+            },
+            {
+              "op": "finish"
+            },
+            {
+              "op": "reset"
+            },
+            {
+              "op": "feed",
+              "bytes": [
+                97
+              ]
+            }
+          ]
+        }
+      ],
+      "screen": [
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65,
+                  238
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  223,
+                  191,
+                  244,
+                  143,
+                  191,
+                  191,
+                  223,
+                  191
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 3,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  162
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  159
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  65,
+                  0,
+                  244
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 3,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128,
+                  224,
+                  160,
+                  128,
+                  0
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  60,
+                  237,
+                  160,
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 3,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194,
+                  162,
+                  223,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  224
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  160
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  125,
+                  244,
+                  144,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  159,
+                  152,
+                  128,
+                  224
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  160,
+                  128,
+                  122,
+                  244
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  143
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191,
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  122,
+                  240,
+                  159,
+                  152
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  224
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  160
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  226
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  130
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  172
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  223
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  223,
+                  191,
+                  223,
+                  191,
+                  238,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  238,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  152,
+                  128,
+                  238,
+                  128,
+                  128,
+                  244,
+                  143,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191,
+                  244,
+                  143,
+                  191,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  237
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  159,
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 5,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  162
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  226
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  130
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  172
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  237
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  159
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191,
+                  122
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130,
+                  172
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  0,
+                  240
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  223,
+                  191,
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  172
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130,
+                  172,
+                  122
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  102,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 5,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  238
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128,
+                  128,
+                  0
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  162
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  50,
+                  244,
+                  144,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130,
+                  172,
+                  223,
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  238,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  122
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  0
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130,
+                  172,
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  162
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128,
+                  238,
+                  128,
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  224
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  160
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  65,
+                  223,
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  237,
+                  159,
+                  191,
+                  237,
+                  159,
+                  191,
+                  238,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  238,
+                  128,
+                  128,
+                  122
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 5,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  159,
+                  152,
+                  128,
+                  238,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  244,
+                  143,
+                  191,
+                  191,
+                  65
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  159
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  152
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194,
+                  162,
+                  244,
+                  143,
+                  191,
+                  191,
+                  223,
+                  191,
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 3,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  223,
+                  191,
+                  224,
+                  160,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  0,
+                  238,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  16,
+                  237,
+                  160,
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  223
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191,
+                  223
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191,
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  12,
+                  255
+                ]
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  194,
+                  162,
+                  0,
+                  224,
+                  160,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 3,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  0
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  238,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128,
+                  122,
+                  122
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  244,
+                  143
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  226
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  122
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  238,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  224,
+                  160
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  162,
+                  226,
+                  130,
+                  172
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  122
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "finished"
+          }
+        }
+      ],
+      "confirmation": [
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  224,
+                  160
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128,
+                  122,
+                  237
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  159,
+                  191,
+                  244,
+                  143,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194,
+                  162,
+                  224,
+                  160,
+                  128,
+                  122,
+                  224,
+                  160,
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  122,
+                  223,
+                  191,
+                  0,
+                  238,
+                  128,
+                  128,
+                  244,
+                  143,
+                  191
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  244,
+                  143,
+                  191,
+                  191,
+                  244,
+                  143,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191,
+                  224,
+                  160,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  224,
+                  160,
+                  128,
+                  244,
+                  143,
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 5,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65,
+                  244
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  143,
+                  191,
+                  191,
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  172,
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130,
+                  172
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  102,
+                  237,
+                  160,
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 5,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128,
+                  226,
+                  130,
+                  172,
+                  224,
+                  160,
+                  128,
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  54,
+                  237,
+                  160,
+                  128
+                ]
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  194,
+                  162,
+                  0
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  244,
+                  143,
+                  191,
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  0,
+                  226
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  130,
+                  172,
+                  238,
+                  128,
+                  128,
+                  0,
+                  240
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  223,
+                  191,
+                  65
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130,
+                  172,
+                  237,
+                  159,
+                  191,
+                  237,
+                  159,
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  244,
+                  143,
+                  191,
+                  191,
+                  194,
+                  162
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  238,
+                  128,
+                  128,
+                  240,
+                  159,
+                  152,
+                  128,
+                  0,
+                  237,
+                  159,
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  122,
+                  122,
+                  223,
+                  191,
+                  194,
+                  162
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  224,
+                  160,
+                  128,
+                  238,
+                  128,
+                  128,
+                  0,
+                  226,
+                  130
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 3,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  122
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  159,
+                  152
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128,
+                  226
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  122
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  78,
+                  244,
+                  144,
+                  128,
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  224
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  160
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128,
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  172
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  79,
+                  224,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  0,
+                  240,
+                  159,
+                  152,
+                  128,
+                  0,
+                  240,
+                  159,
+                  152,
+                  128,
+                  238,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 5,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  152
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  244,
+                  143,
+                  191,
+                  191,
+                  244,
+                  143,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191,
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128,
+                  237,
+                  159,
+                  191,
+                  194
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  238,
+                  128,
+                  128,
+                  65
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  238,
+                  128,
+                  128,
+                  238,
+                  128,
+                  128,
+                  122,
+                  224,
+                  160,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  237,
+                  159,
+                  191,
+                  226,
+                  130,
+                  172,
+                  226,
+                  130,
+                  172,
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  223,
+                  191,
+                  226,
+                  130,
+                  172,
+                  224,
+                  160,
+                  128,
+                  0
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  152,
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  224
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  160
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  0,
+                  194,
+                  162
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 3,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  244,
+                  143,
+                  191,
+                  191,
+                  0,
+                  244,
+                  143,
+                  191,
+                  191,
+                  223,
+                  191,
+                  240
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130,
+                  172,
+                  244,
+                  143,
+                  191,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  105,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 2,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194,
+                  162
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  122
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  29,
+                  244,
+                  144,
+                  128,
+                  128
+                ]
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  223,
+                  191,
+                  223
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191,
+                  224,
+                  160
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 3,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  130
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  172,
+                  0
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  244,
+                  143
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  244
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  143,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  65,
+                  0,
+                  226
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  130,
+                  172
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 4,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  238,
+                  128,
+                  128,
+                  122
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  244,
+                  143,
+                  191,
+                  191
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  128,
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  172,
+                  237,
+                  159,
+                  191
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130,
+                  172
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 5,
+            "status": "finished"
+          }
+        }
+      ],
+      "reference_source": null
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "raw": "{\n  \"source\": \"def investigate(context, acquire):\\n    values = context[\\\"values\\\"]\\n    if len(values) == 0:\\n        return 0\\n    contrib = []\\n    prev = 0\\n    for x in values:\\n        p = -x + 2*x*x\\n        term = 2*x*prev\\n        contrib.append(p + term)\\n        prev = x\\n    for _ in range(4):\\n        total = 0\\n        for i in range(len(contrib)):\\n            total = total + contrib[i]\\n            contrib[i] = total\\n    return contrib[-1]\\n\",\n  \"scope\": \"Synthetic integer sequence readout: contribution p(x)=-x+2*x*x plus 2*x*previous value, then four cumulative-sum passes; return final last entry.\",\n  \"change\": \"Replaced last-value passthrough with inferred polynomial, previous-value interaction, and four cumulative passes.\"\n}",
+  "prompt_sha256": "535cd3ca8f38e9cd3c3a5848823bcb8b067a82c4ade18abda103a302f915efd3"
+}

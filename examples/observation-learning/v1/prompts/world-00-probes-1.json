@@ -1,0 +1,231 @@
+{
+  "system": "Design discriminating experiments for an unknown measurement source. Return one JSON object.",
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source is actual deterministic SQLite software using these operations,\nordinary conflict handling and optional auxiliary insertion instrumentation.\nIts measurement channel uses native change counters, which may concern one or\nboth writing connections. Exact source configuration is not supplied. Do not\nassume a counter measures net committed effects. Calibration history gives the\nactions, emitted channel and independently read committed item count/value sum.\nThose are observations, not rules describing all future behavior.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. Correct identification is assessed conditionally\nwithin the study's frozen native-software family; an unsupported lucky guess is\nnot a supported answer. Infer executable behavior; no solution grammar is given.\n",
+    "history": [
+      {
+        "source_id": "source-59e3627fc97e722eacf4",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "other",
+            "key": "b",
+            "op": "put",
+            "value": 1
+          }
+        ],
+        "observed": {
+          "channel": 4,
+          "committed_count": 1,
+          "committed_sum": 1
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "5e83e5815ccff876d355c3f3a82d2a8c0ae9ab1adaeacdfe78a7d6f9c994b50a"
+      },
+      {
+        "source_id": "source-59e3627fc97e722eacf4",
+        "actions": [
+          {
+            "connection": "main",
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "op": "rollback"
+          },
+          {
+            "connection": "other",
+            "key": "b",
+            "op": "put",
+            "value": 3
+          }
+        ],
+        "observed": {
+          "channel": 4,
+          "committed_count": 1,
+          "committed_sum": 3
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "031c9297472555fa61b791fce44f48fbb10e3b3c9aa14aebe414ce5d620b6ad2"
+      },
+      {
+        "source_id": "source-59e3627fc97e722eacf4",
+        "actions": [
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 1
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 2
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "update",
+            "value": 3
+          },
+          {
+            "connection": "main",
+            "key": "missing",
+            "op": "update",
+            "value": 4
+          },
+          {
+            "connection": "main",
+            "key": "missing",
+            "op": "delete"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "delete"
+          }
+        ],
+        "observed": {
+          "channel": 3,
+          "committed_count": 0,
+          "committed_sum": 0
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "f0c638a6f1a89fa6fd2b773571e84483ae3553449dcca87bf845758c405d76ed"
+      },
+      {
+        "source_id": "source-59e3627fc97e722eacf4",
+        "actions": [
+          {
+            "op": "begin"
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 82
+          },
+          {
+            "connection": "main",
+            "key": "a",
+            "op": "put",
+            "value": 97
+          },
+          {
+            "op": "commit"
+          }
+        ],
+        "observed": {
+          "channel": 1,
+          "committed_count": 1,
+          "committed_sum": 82
+        },
+        "authority": "native SQLite counter; committed state read through a separate connection",
+        "sqlite_version": "3.45.3",
+        "receipt_sha256": "467d85fa73f66f3f83dfa850176d3afd6190c9e9a10c9c7b1db9999a6f3568ab"
+      }
+    ],
+    "request": "Propose exactly three legal experiments that distinguish plausible source behaviors not yet separated by the observations. Use null for key/value on operations where those fields do not apply. Experiments each start fresh. Prefer informative combinations, including effects which may cancel in committed state but remain in the channel. No answers are requested."
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "experiments": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "properties": {
+              "op": {
+                "type": "string",
+                "enum": [
+                  "put",
+                  "update",
+                  "delete",
+                  "begin",
+                  "commit",
+                  "rollback"
+                ]
+              },
+              "connection": {
+                "type": "string",
+                "enum": [
+                  "main",
+                  "other"
+                ]
+              },
+              "key": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "value": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "connection",
+              "key",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "purpose": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "experiments",
+      "purpose"
+    ],
+    "additionalProperties": false
+  }
+}

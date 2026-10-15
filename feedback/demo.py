@@ -18,18 +18,18 @@ def fixture_run(directory, issue, horizon, *, snapshot=100.0, target=101.0, root
         "provider": "captured", "time_anchor": issue.isoformat(), "horizon": horizon.isoformat(),
         "synthetic_fixture": True})
     # Repetition is solely to exercise the existing minimum-word grammar.
-    cp2 = {"evidence_dictionary": [{"ref_id": "[1]", "ledger_id": "S_00000001", "subject": "XOM",
-                                   "signal_summary": "Synthetic fixture, not market evidence."}],
+    cp2 = {"evidence_dictionary": [{"ref_id": "[1]", "ledger_id": "S_00000001", "subject": "SIGNAL_A",
+                                   "signal_summary": "Synthetic fixture, not system evidence."}],
         "epicentre_thesis": "[1] " + "Synthetic fixture mechanism has a declared baseline and falsifiable condition. " * 25,
-        "trade_rationale": "[1] " + "Synthetic fixture consequence follows the baseline at an explicitly declared horizon. " * 20,
-        "predictions_t": [{"target_id": "XOM", "direction": "UP", "snapshot_price": snapshot,
-            "target_price": target, "snapshot_time": issue.isoformat(), "target_time_iso": horizon.isoformat(),
-            "invalidation": "Synthetic XOM at or below the baseline at the declared horizon."}]}
+        "forecast_rationale": "[1] " + "Synthetic fixture consequence follows the baseline at an explicitly declared horizon. " * 20,
+        "predictions_t": [{"target_id": "SIGNAL_A", "direction": "UP", "unit": "dimensionless", "snapshot_value": snapshot,
+            "target_value": target, "snapshot_time": issue.isoformat(), "target_time_iso": horizon.isoformat(),
+            "invalidation": "Synthetic SIGNAL_A at or below the baseline at the declared horizon."}]}
     write_json(directory / "artifacts/lab_director.json", {"status": "success",
         "metadata": {"synthetic_fixture": True}, "data": cp2})
-    write_json(directory / "artifacts/global_stock_feed.json", {"status": "success",
-        "metadata": {"status": "success", "price_basis": "synthetic_point_quote", "currency": "USD", "synthetic_fixture": True},
-        "data": {"columns": ["Ticker", "Price", "timestamp"], "rows": [["XOM", snapshot, issue.isoformat()]]}})
+    write_json(directory / "artifacts/global_measurements_feed.json", {"status": "success",
+        "metadata": {"status": "success", "observation_basis": "explicit_observation", "unit": "dimensionless", "synthetic_fixture": True},
+        "data": {"columns": ["target_id", "Value", "observed_at"], "rows": [["SIGNAL_A", snapshot, issue.isoformat()]], "observations": [{"target_id":"SIGNAL_A", "value":snapshot,"unit":"dimensionless","observed_at":issue.isoformat(),"available_at":issue.isoformat()}]}})
     write_json(directory / "handoff/receipts/fixture.json", {"schema": "zenith_provider_attempt_v1",
         "run_id": directory.name, "node_id": "lab_director", "status": "replayed", "provider": "captured",
         "actual_model": "offline-synthetic-fixture", "requested_model": "offline-synthetic-fixture",
@@ -40,7 +40,7 @@ def fixture_run(directory, issue, horizon, *, snapshot=100.0, target=101.0, root
 
 def fixture_policy(path):
     write_json(path, {"schema": "zenith_forecast_feedback_policy_v1", "policy_id": "synthetic-example-v1",
-        "price_basis": "synthetic_point_quote", "currency": "USD", "observation_precision": "timestamp",
+        "observation_basis": "explicit_observation", "unit": "dimensionless", "observation_precision": "timestamp",
         "relative_error_threshold": 0.05})
     return Path(path)
 
@@ -58,9 +58,9 @@ def run(store):
         horizon = issue + timedelta(days=1)
         source = fixture_run(fixtures / f"SYNTHETIC_LAB_{index:02d}", issue, horizon)
         engine.register(store, source, policy, "24h")
-        truth.append({"target_id": "XOM", "timestamp": horizon.isoformat(), "price": 99.0 if index % 5 == 0 else 101.0})
+        truth.append({"target_id": "SIGNAL_A", "observed_at": horizon.isoformat(), "available_at":horizon.isoformat(), "value": 99.0 if index % 5 == 0 else 101.0})
     truth_path = fixtures / "truth.json"
-    write_json(truth_path, {"metadata": {"status": "success", "price_basis": "synthetic_point_quote", "currency": "USD", "synthetic_fixture": True},
+    write_json(truth_path, {"metadata": {"status": "success", "observation_basis": "explicit_observation", "unit": "dimensionless", "synthetic_fixture": True},
         "data": {"rows": truth}})
     as_of = "2026-03-01T00:00:00+00:00"
     pending = engine.score(store, truth_path, "2026-01-05T20:01:00+00:00")
@@ -68,7 +68,7 @@ def run(store):
     repeated = engine.score(store, truth_path, as_of)
     proposals = engine.propose(store, as_of)
     return {"schema": "zenith_forecast_feedback_demo_v1", "synthetic_fixture": True,
-        "claim_boundary": "Offline contract demonstration, not market observations or model skill evidence.",
+        "claim_boundary": "Offline contract demonstration, not system observations or model skill evidence.",
         "pending_statuses": pending["statuses"], "mature_statuses": measured["statuses"],
         "repeated_scoring_same_attempt": measured["attempt_id"] == repeated["attempt_id"],
         "summary": engine.summary(store, as_of, window_days=90),

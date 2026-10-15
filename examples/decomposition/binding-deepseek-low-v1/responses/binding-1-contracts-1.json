@@ -1,0 +1,4 @@
+{
+  "raw": "{\"change\":\"Preserve verified closed-form predictor; no functional change.\",\"scope\":\"Model: p(x)=2*x*x*x-2*x*x, no g*x term, exactly four cumulative-sum passes; readout equals sum over positions i of C(n-i+2,3)*p(x_i).\",\"source\":\"def investigate(context, acquire):\\n    values = context[\\\"values\\\"]\\n    n = len(values)\\n    total = 0\\n    for i in range(n):\\n        x = values[i]\\n        p = 2 * x * x * x - 2 * x * x\\n        w = (n - i + 2) * (n - i + 1) * (n - i) // 6\\n        total = total + w * p\\n    return total\\n\"}",
+  "prompt_sha256": "ef02647331f547432ca28c1384d0fd42866d468987651c37950d8c5155f13958"
+}

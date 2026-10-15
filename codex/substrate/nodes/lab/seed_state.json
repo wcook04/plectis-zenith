@@ -2,12 +2,12 @@
   "id": "lab_seed_state",
   "type": "reasoning",
   "dependencies": [
-    "global_stock_feed",
-    "global_etf_feed",
-    "global_macro_feed",
-    "global_news_feed",
-    "global_polymarket_feed",
-    "global_calculator_feed"
+    "global_measurements_feed",
+    "global_subsystems_feed",
+    "global_environment_feed",
+    "global_events_feed",
+    "global_interventions_feed",
+    "global_derived_feed"
   ],
   "meta": {},
   "execution": {
@@ -17,12 +17,12 @@
     "timeout": 300
   },
   "is_artifact": false,
-  "teleology": "Describe the data universe topology so downstream miners have spatial awareness — what exists, what is missing, and what fields are available.",
+  "teleology": "Inventory feed structure, clocks, units, coverage and missingness.",
   "mechanism": "LLM Data Cartography",
   "platform": "gemini",
-  "instruction": "@node_path:codex/substrate/nodes/lab/seed_state.json\n[SYSTEM CONSTRAINT] Output ONLY the contracted format. Do NOT greet, ask questions, hedge, self-assess, or offer additional work. No preamble. No sign-off.\n[ROLE]\nYou are the Data Cartographer. You describe the data universe. You do NOT interpret, extract signals, or narrate market conditions.\n\n[TASK]\nFor each of the 6 feeds below, write approximately 5 sentences describing what it IS — its structure, its fields, its coverage at this moment, and where gaps exist.\nThis is a map, not an analysis. Miners will read this map to orient their extraction. Do not do the extraction for them.\n\nFor each feed write:\n1. What type of data this feed contains and roughly how many records are present.\n2. What fields/columns are available (name the key ones).\n3. What the data covers: time window, asset universe, or geographic scope.\n4. Any known coverage gaps — missing tickers, stale fields, wr=0 counts, null values. Be specific about counts where visible.\n5. One sentence on what a miner should be aware of before querying this feed (structural quirk, known limitation, or field to watch for quality flags).\n\n[FEEDS TO MAP]\n- STOCK: global_stock_feed (single-name equities)\n- ETF: global_etf_feed (funds, sectors, themes)\n- MACRO: global_macro_feed (rates, FX, commodities, FRED series)\n- NEWS: global_news_feed (headlines, sources, timestamps)\n- POLYMARKET: global_polymarket_feed (prediction markets, probability contracts)\n- CALCULATOR: global_calculator_feed (pre-computed signal profiles: energy, polarity, directional concentration)\n\n[HARD CONSTRAINTS]\n- NO thesis, narrative, or causal claims of any kind\n- NO statistical anomaly callouts (that is the miner's job)\n- NO interpretation of what signals mean\n- NO regime labels or market characterizations\n- NO questions for downstream nodes\n- Pure structural inventory: what data exists, where it lives, what is present or absent\n\n[OUTPUT]\nData Topology Map — 7 sections, one per feed. Plain text, labeled sections. No JSON.",
+  "instruction": "[SYSTEM OBSERVATION CONTRACT]\nReason over observations of one system available at cutoff t. Feeds are different perspectives on the same system, not independent votes. Numeric observations preserve target_id, value, unit, observed_at and available_at. Record uncertainty and missingness. No future observations or invented evidence enter Lab. A forecast freezes snapshot_value, target_value, unit, snapshot_time and explicit target_time_iso. Later Oracle observations may resolve that frozen forecast but cannot rewrite it. A diagnosis is a hypothesis; Evolve changes require review and a matched later comparison. The disclosed System A generator demonstrates protocol only, not blind prediction or learned improvement.\n\n[TASK] Inventory the six feed perspectives: structure, available fields, target coverage, times, units, missingness and limitations. Do not infer outcomes.\n[OUTPUT] Plain text topology map, one section per feed.",
   "lane": "SPINE",
-  "expectation": "Output Data Topology Map describing structure, fields, coverage, and gaps for each feed. No signal extraction. No interpretation.",
+  "expectation": "A topology map with one section per feed and visible support limits.",
   "routing_class": "CROSS_LANE",
-  "boundary": "Pure topology cartography only. Describe what data exists and its structural properties. No signal extraction, no anomaly detection, no interpretation, no thesis."
+  "boundary": "Use only supplied evidence. Preserve cutoff, units, identities, missingness and frozen commitments."
 }

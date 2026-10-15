@@ -1,0 +1,74 @@
+{
+  "system": "Design discriminating experiments for an unknown measurement source. Return one JSON object.",
+  "prompt": {
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "history": [],
+    "previous_experiments": [],
+    "last_plan_response_error": null,
+    "request": "Propose exactly three legal experiments that distinguish plausible source behaviors not yet separated by the observations. Use null for key/value on operations where those fields do not apply. Experiments each start fresh. Prefer informative combinations, including effects which may cancel in committed state but remain in the channel. No answers are requested."
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "experiments": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": {
+          "type": "array",
+          "maxItems": 32,
+          "items": {
+            "type": "object",
+            "properties": {
+              "op": {
+                "type": "string",
+                "enum": [
+                  "put",
+                  "update",
+                  "delete",
+                  "begin",
+                  "commit",
+                  "rollback"
+                ]
+              },
+              "connection": {
+                "type": "string",
+                "enum": [
+                  "main",
+                  "other"
+                ]
+              },
+              "key": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "value": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "op",
+              "connection",
+              "key",
+              "value"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "purpose": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "experiments",
+      "purpose"
+    ],
+    "additionalProperties": false
+  }
+}

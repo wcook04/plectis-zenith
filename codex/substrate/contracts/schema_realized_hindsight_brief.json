@@ -21,14 +21,14 @@
     "regime_summary": {
       "type": "string",
       "required": true,
-      "constraint": "Readable summary of the realized market regime."
+      "constraint": "Readable summary of the realized system regime."
     },
     "driver_classification": {
       "type": "array[RealizedDriver]",
       "required": true,
       "constraint": "Non-empty. Each major realized package must appear exactly once."
     },
-    "already_priced_packages": {
+    "already_observed_packages": {
       "type": "array[string]",
       "required": true
     },
@@ -36,7 +36,7 @@
       "type": "array[string]",
       "required": true
     },
-    "partial_repricing_packages": {
+    "partial_change_packages": {
       "type": "array[string]",
       "required": true
     },
@@ -56,8 +56,8 @@
       "required": true,
       "enum": [
         "SURPRISE",
-        "ALREADY_PRICED",
-        "PARTIAL_REPRICING"
+        "ALREADY_OBSERVED",
+        "PARTIAL_CHANGE"
       ]
     },
     "why": {
@@ -83,21 +83,21 @@
       "type": "string",
       "required": true
     },
-    "pricing_judgement": {
+    "availability_judgement": {
       "type": "string",
       "required": true,
       "enum": [
         "SURPRISE",
-        "ALREADY_PRICED",
-        "PARTIAL_REPRICING"
+        "ALREADY_OBSERVED",
+        "PARTIAL_CHANGE"
       ]
     }
   },
   "classification_rules": {
     "rules": [
       "Every major realized package must be classified exactly once.",
-      "already_priced_packages, surprise_packages, and partial_repricing_packages must be mutually exclusive.",
-      "Mixed cases belong in PARTIAL_REPRICING, not dual classification."
+      "already_observed_packages, surprise_packages, and partial_change_packages must be mutually exclusive.",
+      "Mixed cases belong in PARTIAL_CHANGE, not dual classification."
     ]
   },
   "boundary": {
@@ -113,6 +113,6 @@
     "classification": "UNRESOLVED",
     "package_list": "unresolved_packages",
     "optional_for_legacy": true,
-    "semantics": "Observed movement with unestablished causal or pricing interpretation; no surprise, repricing or foresight implied. Keep package lists mutually exclusive."
+    "semantics": "Observed movement with unestablished causal or availability interpretation; no surprise, change or foresight implied. Keep package lists mutually exclusive."
   }
 }

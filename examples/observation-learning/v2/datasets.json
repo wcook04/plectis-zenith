@@ -1,0 +1,4844 @@
+{
+  "public": {
+    "protocol_version": "sqlite-observation-v2",
+    "documentation": "Predict a disposable SQLite source from its past measured experiments.\nEach experiment starts with an empty items table (text primary key, nonnegative\ninteger value) and fresh main/other database connections. No state carries between\nexperiments. Actions are JSON dictionaries: put(key,value), update(key,value),\ndelete(key), begin, commit, rollback. Use the field op for the action name; an\noptional connection is main (default) or other. Put submits an insertion with the\nsource's stable conflict handling; update changes an existing item's value;\ndelete removes an item. Values are integers 0..1000000 and keys are nonempty text\nup to 40 characters. At most 32 actions are permitted. Transactions cannot nest.\nWhile a transaction is open, writes and transaction actions use that connection;\nthe other connection can write after commit or rollback. A sequence may end with\nan open transaction. A separate read connection measures committed state.\n\nThe source belongs to this disclosed, fixed 18-member family. Its put operation\nuses exactly one of SQLite INSERT OR IGNORE, INSERT OR REPLACE, or INSERT with\nON CONFLICT(id) DO UPDATE of the value. Instrumentation is either absent or one\nAFTER INSERT trigger that inserts exactly one row into an otherwise unread\nauxiliary log; there are no other triggers. Its channel is exactly one of:\nmain connection changes() (last direct row-change count), main total_changes,\nor main total_changes plus other total_changes. Each combination is possible.\nThe actual combination is private and stable for this source. Infer it from\nmeasurements, using native SQLite semantics; do not assume a counter measures\nnet committed effects. Calibration history gives actions, emitted channel and\nindependently read committed item count/value sum.\n\nA query supplies a fresh action sequence and one goal: channel (the source's\nemitted number), committed_count (items visible to the separate committed-state\nreader), or committed_sum (sum of their values, zero when empty). Query contexts\ncontain no outcome for the requested sequence. Return value as an integer and\nunresolved=false when the calibration evidence supports that answer, otherwise\nvalue=null and unresolved=true. A value is supported exactly when every member\nof the disclosed family consistent with all calibration receipts predicts that\nsame value for this goal and sequence. Otherwise it is unresolved; an unsupported\nlucky guess is not a supported answer. Author your own executable predictor;\nno candidate programs, simulator or solver library are supplied.\n",
+    "checkpoint_prefixes": [
+      3,
+      6,
+      9
+    ],
+    "streams": [
+      {
+        "source_id": "source-b23ea10b80ca887e778e",
+        "receipts": [
+          {
+            "source_id": "source-b23ea10b80ca887e778e",
+            "actions": [],
+            "observed": {
+              "channel": 0,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "134da21e4e84588b041aea028696547790f762ccdab07d4059707a022859898a"
+          },
+          {
+            "source_id": "source-b23ea10b80ca887e778e",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "4ff367f57772f797bbacc904ba320c61fe991ac2f646b69b6707af9d01912b33"
+          },
+          {
+            "source_id": "source-b23ea10b80ca887e778e",
+            "actions": [
+              {
+                "connection": "other",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 0,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "37cd126a11fcf0316281f6adbb0db20277127e9f02b1f3b3f486ca72d42a88eb"
+          },
+          {
+            "source_id": "source-b23ea10b80ca887e778e",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 5
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 5
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "78934a224d245001606ebdc089225fa77e3540f11bab98bd25723d21d26219aa"
+          },
+          {
+            "source_id": "source-b23ea10b80ca887e778e",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 2,
+              "committed_sum": 4
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "d877db06be0fb3657d8372beb3378b4f2942c25eb9000e33bd1ac0d92a307fba"
+          },
+          {
+            "source_id": "source-b23ea10b80ca887e778e",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 3
+              },
+              {
+                "connection": "main",
+                "key": "c",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 3,
+              "committed_count": 3,
+              "committed_sum": 9
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "eca6850e8a99e6346f2e34322b7d9939af289c5549d547741cc1d0667dd6781e"
+          },
+          {
+            "source_id": "source-b23ea10b80ca887e778e",
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "15fc7d312775caac19456a2ea192d3190518f1864b47b40e685d5a2761696e37"
+          },
+          {
+            "source_id": "source-b23ea10b80ca887e778e",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "key": "a",
+                "op": "update",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "3bc7fd23cacddaef502fbe4fa79b2d64a29476db970028cc7c38c7266c67b6d7"
+          },
+          {
+            "source_id": "source-b23ea10b80ca887e778e",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "other",
+                "key": "b",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 2,
+              "committed_sum": 6
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "299f4ea69755b41880ab81f7003a84a381a9344bf6a4b8e09074daf2e145262f"
+          }
+        ],
+        "partitions": {
+          "learn": [
+            [],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 5,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 3,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 4,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 2
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 4,
+                "connection": "other"
+              }
+            ]
+          ],
+          "challenge": [
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 88
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              }
+            ]
+          ],
+          "eval": [
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 41,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "other"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 96
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 41,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 88,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 41,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 88
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 41,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 88
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 41,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 96,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 41,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "other"
+              },
+              {
+                "op": "begin",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "other"
+              },
+              {
+                "op": "rollback",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 41,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "absent",
+                "value": 88
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 41,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 88
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 88,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 41,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 41,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "absent"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 96,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 88,
+                "connection": "other"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 41,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "receipts": [
+          {
+            "source_id": "source-f4c2e333ca707e1387b2",
+            "actions": [],
+            "observed": {
+              "channel": 0,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "bc5f3a99537b39ec62031b2f32ef3af3a4838b1e02f1534425e1d19ef0fa309b"
+          },
+          {
+            "source_id": "source-f4c2e333ca707e1387b2",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "6081cb54a861019db02ece8057a523681d6e0041d638efd50caca0b123472d45"
+          },
+          {
+            "source_id": "source-f4c2e333ca707e1387b2",
+            "actions": [
+              {
+                "connection": "other",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 0,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "f3bca3e86ebf36c2e67ab5f0ede327f11cf298e0d40d8871c1a74b3cdedc2fdb"
+          },
+          {
+            "source_id": "source-f4c2e333ca707e1387b2",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 5
+              }
+            ],
+            "observed": {
+              "channel": 0,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "0926a1e7cbce1f41b798e1300a144caf09e71337062d3fc7f946917b510fec51"
+          },
+          {
+            "source_id": "source-f4c2e333ca707e1387b2",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 2,
+              "committed_sum": 4
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "c73c363aacb0f008dc69b6bcfe807073193afd28de3a6f4892be20ed126fe41c"
+          },
+          {
+            "source_id": "source-f4c2e333ca707e1387b2",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 3
+              },
+              {
+                "connection": "main",
+                "key": "c",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 3,
+              "committed_sum": 9
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "6e9d9b5e0504101d8feac15ff6dacd9952379a0f78719e790341dfa2f03c2a12"
+          },
+          {
+            "source_id": "source-f4c2e333ca707e1387b2",
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "6667299b604a85ae39ec001147f94beba96011f2889ea4393dc6b3be54c6d35c"
+          },
+          {
+            "source_id": "source-f4c2e333ca707e1387b2",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "key": "a",
+                "op": "update",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "5895c9ed812fc2e9a03abb79ba18ebdb4d3e30a7cbac132abe39e15dcb84fa61"
+          },
+          {
+            "source_id": "source-f4c2e333ca707e1387b2",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "other",
+                "key": "b",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 2,
+              "committed_sum": 6
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "07cdc8d453f49c2fc39aa3718f8bee8924851210c1a84830a0212e7d6d66319f"
+          }
+        ],
+        "partitions": {
+          "learn": [
+            [],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 5,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 3,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 4,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 2
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 4,
+                "connection": "other"
+              }
+            ]
+          ],
+          "challenge": [
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 32
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              }
+            ]
+          ],
+          "eval": [
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 12,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "other"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 77
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 12,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 32,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 12,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 32
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 12,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 32
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 12,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 77,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 12,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "other"
+              },
+              {
+                "op": "begin",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "other"
+              },
+              {
+                "op": "rollback",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 12,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "absent",
+                "value": 32
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 12,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 32
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 32,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 32,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 12,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 32,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 12,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "absent"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 32,
+                "connection": "other"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 12,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "source_id": "source-f17213b1497af891bf07",
+        "receipts": [
+          {
+            "source_id": "source-f17213b1497af891bf07",
+            "actions": [],
+            "observed": {
+              "channel": 0,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "f595e3ed184add098feb44351692265b7a974f203fdc0c4cb6e0665940a2a8ab"
+          },
+          {
+            "source_id": "source-f17213b1497af891bf07",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "f80bba00727380dec5f8134e16af81056f5a15dcb7e5dca3c2e251ed1c298308"
+          },
+          {
+            "source_id": "source-f17213b1497af891bf07",
+            "actions": [
+              {
+                "connection": "other",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "4cbe84a7bbe56a935426399224a96d8f1b4794e1f030068a6d6f7f42d6ea4714"
+          },
+          {
+            "source_id": "source-f17213b1497af891bf07",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 5
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 5
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "90daefb2fe43214c8368213910121be8d15dcb73dda7891eb0a57eac4b2d7f69"
+          },
+          {
+            "source_id": "source-f17213b1497af891bf07",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 2,
+              "committed_sum": 4
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "94aed1fb18e45cef75d2cf5bef775dd1188d71beb1166556c2a6be11a1845317"
+          },
+          {
+            "source_id": "source-f17213b1497af891bf07",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 3
+              },
+              {
+                "connection": "main",
+                "key": "c",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 3,
+              "committed_count": 3,
+              "committed_sum": 9
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "20068dec7611150c966fe2b263c9fd6cbad590451a3385194e1f24198063ebca"
+          },
+          {
+            "source_id": "source-f17213b1497af891bf07",
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "cc152f594394afdca8642b8f32f6559fdb52fb271948cf4b14dd29a2df776e95"
+          },
+          {
+            "source_id": "source-f17213b1497af891bf07",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "key": "a",
+                "op": "update",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "d77f79327ad86837beb4cdeb946e388f14eabff5fb6b4be284cb34ffd04b3d4d"
+          },
+          {
+            "source_id": "source-f17213b1497af891bf07",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "other",
+                "key": "b",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 2,
+              "committed_sum": 6
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "0f63a608e8c65d8fa2d27181221b9eda8a4954ed3d3898207e96c74405207cda"
+          }
+        ],
+        "partitions": {
+          "learn": [
+            [],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 5,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 3,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 4,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 2
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 4,
+                "connection": "other"
+              }
+            ]
+          ],
+          "challenge": [
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 47
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              }
+            ]
+          ],
+          "eval": [
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 18,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "other"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 88
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 18,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 47,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 18,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 47
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 18,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 47
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 18,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 88,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 18,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "other"
+              },
+              {
+                "op": "begin",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "other"
+              },
+              {
+                "op": "rollback",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 18,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "absent",
+                "value": 47
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 18,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 47
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 47,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 47,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 18,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 47,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 18,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "absent"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 88,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 47,
+                "connection": "other"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 18,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "source_id": "source-3985ba99677cf25f27bd",
+        "receipts": [
+          {
+            "source_id": "source-3985ba99677cf25f27bd",
+            "actions": [],
+            "observed": {
+              "channel": 0,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "5bc749446b92f448038149f6186db826074d28e2e7d8f78c0601a7440e8a98c2"
+          },
+          {
+            "source_id": "source-3985ba99677cf25f27bd",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "6769b2a7a2e8590a01c324472d2302ce83e80af11ade68e5cda52f659444d917"
+          },
+          {
+            "source_id": "source-3985ba99677cf25f27bd",
+            "actions": [
+              {
+                "connection": "other",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 0,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "22860e3e2300a6263010face93f593127febfe88718b125159cbd0af95300e83"
+          },
+          {
+            "source_id": "source-3985ba99677cf25f27bd",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 5
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 5
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "e2163d998a74e477733954b3ec2cde597e6f0a74e886966999547c1dace5a1bd"
+          },
+          {
+            "source_id": "source-3985ba99677cf25f27bd",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 2,
+              "committed_sum": 4
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "cd13a0e87157f7ddd38463fc57e0860fc8744320b3bdaa66fb38714d090ee844"
+          },
+          {
+            "source_id": "source-3985ba99677cf25f27bd",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 3
+              },
+              {
+                "connection": "main",
+                "key": "c",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 3,
+              "committed_sum": 9
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "6ea0a1a8f803e8d536efc024d18a02b60713657b1c9dad8bcd30d66fbb820369"
+          },
+          {
+            "source_id": "source-3985ba99677cf25f27bd",
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "23082a97dc67cab7c7b83a1e73726f3b81bbc68e6cecd138861bc767cf11908d"
+          },
+          {
+            "source_id": "source-3985ba99677cf25f27bd",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "key": "a",
+                "op": "update",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "5d0f5adc65a3cd2ae2518d5c66ce02a10d12cf50ba5a5cbc0d16500ac2124e1d"
+          },
+          {
+            "source_id": "source-3985ba99677cf25f27bd",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "other",
+                "key": "b",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 1,
+              "committed_count": 2,
+              "committed_sum": 6
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "5c6b76253b0a1b1ce77343f9bd76d9d1783bc654c86e3d5e1f2dbb0e26fb2113"
+          }
+        ],
+        "partitions": {
+          "learn": [
+            [],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 5,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 3,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 4,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 2
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 4,
+                "connection": "other"
+              }
+            ]
+          ],
+          "challenge": [
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 81
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              }
+            ]
+          ],
+          "eval": [
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 54,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "other"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 90
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 54,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 81,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 54,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 81
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 54,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 81
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 54,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 90,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 54,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "other"
+              },
+              {
+                "op": "begin",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "other"
+              },
+              {
+                "op": "rollback",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 54,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "absent",
+                "value": 81
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 54,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 81
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 81,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 81,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 54,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 81,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 54,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "absent"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 90,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 81,
+                "connection": "other"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 54,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "receipts": [
+          {
+            "source_id": "source-cfa9a0c4c697f5e9d949",
+            "actions": [],
+            "observed": {
+              "channel": 0,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "031bba77dc278d0655feb813e2ec5ed5817a26667bb00ddacd34b22437e57fc2"
+          },
+          {
+            "source_id": "source-cfa9a0c4c697f5e9d949",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "a2992fd357750c1ec7a87b8cfe63a7c4b5e2cece889f4574810c04c9e89d8623"
+          },
+          {
+            "source_id": "source-cfa9a0c4c697f5e9d949",
+            "actions": [
+              {
+                "connection": "other",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "8dcca53a431d4e78da2030abb9062182fca39cac35df9b31e89378e1949f3e30"
+          },
+          {
+            "source_id": "source-cfa9a0c4c697f5e9d949",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 5
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "c0c19dfb955acbd13ac5bd37e987ab83b548c6b1caceba2ac567ad6d8c85b9ee"
+          },
+          {
+            "source_id": "source-cfa9a0c4c697f5e9d949",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 4,
+              "committed_count": 2,
+              "committed_sum": 4
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "41922206fa0b2524cf98316095818ffb1a0bd65760908d1edf78634da28202b4"
+          },
+          {
+            "source_id": "source-cfa9a0c4c697f5e9d949",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 3
+              },
+              {
+                "connection": "main",
+                "key": "c",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 6,
+              "committed_count": 3,
+              "committed_sum": 9
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "18ba2feee1c0e18315f0dc5675582ee79cbbed048d3780d045c47baabe16abc9"
+          },
+          {
+            "source_id": "source-cfa9a0c4c697f5e9d949",
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "ec2c5bc28b1f1f7711be16ec3f179a96b6f942df8f55556ab318b108342a8c8f"
+          },
+          {
+            "source_id": "source-cfa9a0c4c697f5e9d949",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "key": "a",
+                "op": "update",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 3,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "963f559d10db048d12e075d8f7feadccdfef7ae967fb5237ff5657b0981611ed"
+          },
+          {
+            "source_id": "source-cfa9a0c4c697f5e9d949",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "other",
+                "key": "b",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 4,
+              "committed_count": 2,
+              "committed_sum": 6
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "fe985aae90f85df34365c42dbe3ca25651e04fec33401522b075ff3ebf49a238"
+          }
+        ],
+        "partitions": {
+          "learn": [
+            [],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 5,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 3,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 4,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 2
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 4,
+                "connection": "other"
+              }
+            ]
+          ],
+          "challenge": [
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 77
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              }
+            ]
+          ],
+          "eval": [
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 50,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "other"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 33
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 50,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 77,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 50,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 77
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 50,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 77
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 50,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 33,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 50,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "other"
+              },
+              {
+                "op": "begin",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "other"
+              },
+              {
+                "op": "rollback",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 50,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "absent",
+                "value": 77
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 50,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 77
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 77,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 50,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 77,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 50,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "absent"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 33,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 77,
+                "connection": "other"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 50,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "source_id": "source-a161f7468549039a9b44",
+        "receipts": [
+          {
+            "source_id": "source-a161f7468549039a9b44",
+            "actions": [],
+            "observed": {
+              "channel": 0,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "eb4805290aafc9c13be71a4defa02b4e065118e00c3507fcd2999462a85657ca"
+          },
+          {
+            "source_id": "source-a161f7468549039a9b44",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "23a4fcd240b518391704fd3857a8ed43864576144aa8c4e36c34212c70c9e289"
+          },
+          {
+            "source_id": "source-a161f7468549039a9b44",
+            "actions": [
+              {
+                "connection": "other",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 0,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "09948aa571c1aee65b4ce7981702de20d63ebe31883cc1891efc3c214189a603"
+          },
+          {
+            "source_id": "source-a161f7468549039a9b44",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 5
+              }
+            ],
+            "observed": {
+              "channel": 3,
+              "committed_count": 1,
+              "committed_sum": 5
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "1f08e1409e047e71173ca695f9d990bc27cc716ac19d910ac699b47e626a05bd"
+          },
+          {
+            "source_id": "source-a161f7468549039a9b44",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 4,
+              "committed_count": 2,
+              "committed_sum": 4
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "95ce96f3892912e170b76f368b8ab67547bf422b2281dbdfc88a250dba35c053"
+          },
+          {
+            "source_id": "source-a161f7468549039a9b44",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "main",
+                "key": "b",
+                "op": "put",
+                "value": 3
+              },
+              {
+                "connection": "main",
+                "key": "c",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 6,
+              "committed_count": 3,
+              "committed_sum": 9
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "03785adddb3de6107aff7f0c74cc29a4eac82ffd14b5c913eda52a1baf7ec98a"
+          },
+          {
+            "source_id": "source-a161f7468549039a9b44",
+            "actions": [
+              {
+                "op": "begin"
+              },
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 0,
+              "committed_sum": 0
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "5f49fb070ce4d8fbfda507de33fa23c9db6dbccdd351d5e1c2541970cd283200"
+          },
+          {
+            "source_id": "source-a161f7468549039a9b44",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "key": "a",
+                "op": "update",
+                "value": 2
+              }
+            ],
+            "observed": {
+              "channel": 3,
+              "committed_count": 1,
+              "committed_sum": 2
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "06b466d674ee8a31c2d6d27d53fd8aac6be2b6c43086a8ead7e34b06c3702b72"
+          },
+          {
+            "source_id": "source-a161f7468549039a9b44",
+            "actions": [
+              {
+                "connection": "main",
+                "key": "a",
+                "op": "put",
+                "value": 2
+              },
+              {
+                "connection": "other",
+                "key": "b",
+                "op": "put",
+                "value": 4
+              }
+            ],
+            "observed": {
+              "channel": 2,
+              "committed_count": 2,
+              "committed_sum": 6
+            },
+            "authority": "native SQLite counter; committed state read through a separate connection",
+            "sqlite_version": "3.45.3",
+            "receipt_sha256": "d1055b824f26b191d787cda1fbf68c9835cdaf17eb01febd88ef023a40d21cd1"
+          }
+        ],
+        "partitions": {
+          "learn": [
+            [],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 5,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 2,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 3,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 4,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 2
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 2,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 4,
+                "connection": "other"
+              }
+            ]
+          ],
+          "challenge": [
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 69
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              }
+            ]
+          ],
+          "eval": [
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 51,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "other"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 63
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 51,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 69,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 51,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 69
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 51,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 69
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 51,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 63,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 51,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "other"
+              },
+              {
+                "op": "begin",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "other"
+              },
+              {
+                "op": "rollback",
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 51,
+                "connection": "main"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "update",
+                "key": "absent",
+                "value": 69
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 51,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "update",
+                "key": "a",
+                "value": 69
+              },
+              {
+                "op": "commit"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "delete",
+                "key": "a"
+              },
+              {
+                "op": "rollback"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 69,
+                "connection": "other"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 69,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 51,
+                "connection": "main"
+              },
+              {
+                "op": "commit"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "a",
+                "value": 69,
+                "connection": "main"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 51,
+                "connection": "main"
+              },
+              {
+                "op": "delete",
+                "key": "absent"
+              }
+            ],
+            [
+              {
+                "op": "put",
+                "key": "a",
+                "value": 63,
+                "connection": "other"
+              },
+              {
+                "op": "put",
+                "key": "b",
+                "value": 69,
+                "connection": "other"
+              },
+              {
+                "op": "begin"
+              },
+              {
+                "op": "put",
+                "key": "c",
+                "value": 51,
+                "connection": "main"
+              },
+              {
+                "op": "rollback"
+              }
+            ]
+          ]
+        }
+      }
+    ]
+  },
+  "private": {
+    "configs": {
+      "source-b23ea10b80ca887e778e": {
+        "source_id": "source-b23ea10b80ca887e778e",
+        "conflict": "replace",
+        "insert_trigger": false,
+        "counter": "main_total"
+      },
+      "source-f4c2e333ca707e1387b2": {
+        "source_id": "source-f4c2e333ca707e1387b2",
+        "conflict": "ignore",
+        "insert_trigger": false,
+        "counter": "main_direct"
+      },
+      "source-f17213b1497af891bf07": {
+        "source_id": "source-f17213b1497af891bf07",
+        "conflict": "upsert",
+        "insert_trigger": false,
+        "counter": "all_total"
+      },
+      "source-3985ba99677cf25f27bd": {
+        "source_id": "source-3985ba99677cf25f27bd",
+        "conflict": "replace",
+        "insert_trigger": true,
+        "counter": "main_direct"
+      },
+      "source-cfa9a0c4c697f5e9d949": {
+        "source_id": "source-cfa9a0c4c697f5e9d949",
+        "conflict": "ignore",
+        "insert_trigger": true,
+        "counter": "all_total"
+      },
+      "source-a161f7468549039a9b44": {
+        "source_id": "source-a161f7468549039a9b44",
+        "conflict": "upsert",
+        "insert_trigger": true,
+        "counter": "main_total"
+      }
+    },
+    "native_family_size": 18,
+    "identification_scope": "exact predictions conditional on the frozen native family",
+    "oracle": "actual SQLite execution; separate committed-state reader"
+  }
+}

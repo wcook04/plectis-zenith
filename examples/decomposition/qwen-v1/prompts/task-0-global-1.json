@@ -1,0 +1,1323 @@
+{
+  "prompt": {
+    "task": {
+      "id": "task-0",
+      "family": "synthetic_sensor",
+      "description": "Synthetic diagnostic sensor source. A fresh query is exactly\n{\"rows\": [integer, ...]}, with 0..32 readings, each -100..100. Each individual\nreading is converted by one stable, source-private affine calibration s*x+b;\ns is an integer 1..5 and b is an integer -15..15. The answer is the integer sum\nof the calibrated individual readings, zero for an empty group. Individual\nand grouped observed receipts are available; infer the calibration from them.\nAn allowed source probe uses exactly this same input schema and returns that\ninteger. There are no acquisition tables, ambient context fields or clocks.\nImplement investigate(context, acquire), returning a JSON integer. The supplied\nprogram is an experimental starting point, not a source specification.\n",
+      "focus_function": "calibrate",
+      "calibration": [
+        {
+          "input": {
+            "rows": []
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "rows": [
+              0
+            ]
+          },
+          "expected": 11
+        },
+        {
+          "input": {
+            "rows": [
+              1
+            ]
+          },
+          "expected": 16
+        },
+        {
+          "input": {
+            "rows": [
+              -1
+            ]
+          },
+          "expected": 6
+        },
+        {
+          "input": {
+            "rows": [
+              3
+            ]
+          },
+          "expected": 26
+        },
+        {
+          "input": {
+            "rows": [
+              1,
+              2
+            ]
+          },
+          "expected": 37
+        },
+        {
+          "input": {
+            "rows": [
+              4,
+              -1
+            ]
+          },
+          "expected": 37
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": 33
+        }
+      ],
+      "development": [
+        {
+          "input": {
+            "rows": [
+              0,
+              10
+            ]
+          },
+          "expected": 72
+        },
+        {
+          "input": {
+            "rows": [
+              17,
+              12,
+              17
+            ]
+          },
+          "expected": 263
+        },
+        {
+          "input": {
+            "rows": [
+              20,
+              -20,
+              0,
+              13
+            ]
+          },
+          "expected": 109
+        },
+        {
+          "input": {
+            "rows": [
+              2,
+              -11,
+              14,
+              7,
+              -1,
+              8
+            ]
+          },
+          "expected": 161
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -3
+            ]
+          },
+          "expected": 7
+        },
+        {
+          "input": {
+            "rows": [
+              -5,
+              -17,
+              -5
+            ]
+          },
+          "expected": -102
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              0,
+              20,
+              17
+            ]
+          },
+          "expected": 229
+        },
+        {
+          "input": {
+            "rows": [
+              20,
+              5,
+              0,
+              -4,
+              7,
+              16
+            ]
+          },
+          "expected": 286
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -16
+            ]
+          },
+          "expected": -58
+        },
+        {
+          "input": {
+            "rows": [
+              1,
+              -7,
+              1
+            ]
+          },
+          "expected": 8
+        },
+        {
+          "input": {
+            "rows": [
+              4,
+              -4,
+              -20,
+              -17
+            ]
+          },
+          "expected": -141
+        },
+        {
+          "input": {
+            "rows": [
+              3,
+              -3,
+              5,
+              -13,
+              7,
+              4
+            ]
+          },
+          "expected": 81
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -12
+            ]
+          },
+          "expected": -38
+        },
+        {
+          "input": {
+            "rows": [
+              -11,
+              -3,
+              -11
+            ]
+          },
+          "expected": -92
+        },
+        {
+          "input": {
+            "rows": [
+              -17,
+              17,
+              -12,
+              -17
+            ]
+          },
+          "expected": -101
+        },
+        {
+          "input": {
+            "rows": [
+              -7,
+              -20,
+              -2,
+              13,
+              15,
+              -20
+            ]
+          },
+          "expected": -39
+        },
+        {
+          "input": {
+            "rows": [
+              -15,
+              3,
+              -15
+            ]
+          },
+          "expected": -102
+        },
+        {
+          "input": {
+            "rows": [
+              11,
+              -11,
+              2,
+              -20
+            ]
+          },
+          "expected": -46
+        },
+        {
+          "input": {
+            "rows": [
+              -4,
+              -20,
+              -13,
+              16,
+              10,
+              -19
+            ]
+          },
+          "expected": -84
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -20
+            ]
+          },
+          "expected": -78
+        },
+        {
+          "input": {
+            "rows": [
+              -10,
+              -7,
+              -10
+            ]
+          },
+          "expected": -102
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              0,
+              3,
+              -2
+            ]
+          },
+          "expected": 49
+        },
+        {
+          "input": {
+            "rows": [
+              -20,
+              -7,
+              -11,
+              -14,
+              17,
+              17
+            ]
+          },
+          "expected": -24
+        },
+        {
+          "input": {
+            "rows": [
+              0,
+              -5
+            ]
+          },
+          "expected": -3
+        }
+      ]
+    },
+    "instruction": "Improve the whole ordinary program using the task specification and measured examples. You may freely refactor any function, change interfaces or retained state, add/remove helpers, or replace the whole implementation. Diagnose the actual cause; a local edit is not required. Preserve a correct program when no useful change is needed.",
+    "current_program": "def investigate(context, acquire):\n    rows = context.get(\"rows\", [])\n    if not rows:\n        return 0\n    # Infer calibration parameters s and b from known examples\n    # From example: {\"rows\": [0]} -> expected 11 => s*0 + b = 11 => b = 11\n    # From example: {\"rows\": [1]} -> expected 16 => s*1 + b = 16 => s = 5\n    s = 5\n    b = 11\n    calibrated_sum = sum(s * x + b for x in rows)\n    return int(calibrated_sum)",
+    "current_development": {
+      "correct": 32,
+      "total": 32,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": []
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 11,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0
+            ]
+          },
+          "expected": 11,
+          "correct": true
+        },
+        {
+          "answer": 16,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              1
+            ]
+          },
+          "expected": 16,
+          "correct": true
+        },
+        {
+          "answer": 6,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -1
+            ]
+          },
+          "expected": 6,
+          "correct": true
+        },
+        {
+          "answer": 26,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              3
+            ]
+          },
+          "expected": 26,
+          "correct": true
+        },
+        {
+          "answer": 37,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              1,
+              2
+            ]
+          },
+          "expected": 37,
+          "correct": true
+        },
+        {
+          "answer": 37,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              4,
+              -1
+            ]
+          },
+          "expected": 37,
+          "correct": true
+        },
+        {
+          "answer": 33,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              0,
+              0
+            ]
+          },
+          "expected": 33,
+          "correct": true
+        },
+        {
+          "answer": 72,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              10
+            ]
+          },
+          "expected": 72,
+          "correct": true
+        },
+        {
+          "answer": 263,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              17,
+              12,
+              17
+            ]
+          },
+          "expected": 263,
+          "correct": true
+        },
+        {
+          "answer": 109,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              20,
+              -20,
+              0,
+              13
+            ]
+          },
+          "expected": 109,
+          "correct": true
+        },
+        {
+          "answer": 161,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              2,
+              -11,
+              14,
+              7,
+              -1,
+              8
+            ]
+          },
+          "expected": 161,
+          "correct": true
+        },
+        {
+          "answer": 7,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -3
+            ]
+          },
+          "expected": 7,
+          "correct": true
+        },
+        {
+          "answer": -102,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -5,
+              -17,
+              -5
+            ]
+          },
+          "expected": -102,
+          "correct": true
+        },
+        {
+          "answer": 229,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              0,
+              20,
+              17
+            ]
+          },
+          "expected": 229,
+          "correct": true
+        },
+        {
+          "answer": 286,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              20,
+              5,
+              0,
+              -4,
+              7,
+              16
+            ]
+          },
+          "expected": 286,
+          "correct": true
+        },
+        {
+          "answer": -58,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -16
+            ]
+          },
+          "expected": -58,
+          "correct": true
+        },
+        {
+          "answer": 8,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              1,
+              -7,
+              1
+            ]
+          },
+          "expected": 8,
+          "correct": true
+        },
+        {
+          "answer": -141,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              4,
+              -4,
+              -20,
+              -17
+            ]
+          },
+          "expected": -141,
+          "correct": true
+        },
+        {
+          "answer": 81,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              3,
+              -3,
+              5,
+              -13,
+              7,
+              4
+            ]
+          },
+          "expected": 81,
+          "correct": true
+        },
+        {
+          "answer": -38,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -12
+            ]
+          },
+          "expected": -38,
+          "correct": true
+        },
+        {
+          "answer": -92,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -11,
+              -3,
+              -11
+            ]
+          },
+          "expected": -92,
+          "correct": true
+        },
+        {
+          "answer": -101,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -17,
+              17,
+              -12,
+              -17
+            ]
+          },
+          "expected": -101,
+          "correct": true
+        },
+        {
+          "answer": -39,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -7,
+              -20,
+              -2,
+              13,
+              15,
+              -20
+            ]
+          },
+          "expected": -39,
+          "correct": true
+        },
+        {
+          "answer": -102,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -15,
+              3,
+              -15
+            ]
+          },
+          "expected": -102,
+          "correct": true
+        },
+        {
+          "answer": -46,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              11,
+              -11,
+              2,
+              -20
+            ]
+          },
+          "expected": -46,
+          "correct": true
+        },
+        {
+          "answer": -84,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -4,
+              -20,
+              -13,
+              16,
+              10,
+              -19
+            ]
+          },
+          "expected": -84,
+          "correct": true
+        },
+        {
+          "answer": -78,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -20
+            ]
+          },
+          "expected": -78,
+          "correct": true
+        },
+        {
+          "answer": -102,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -10,
+              -7,
+              -10
+            ]
+          },
+          "expected": -102,
+          "correct": true
+        },
+        {
+          "answer": 49,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              0,
+              3,
+              -2
+            ]
+          },
+          "expected": 49,
+          "correct": true
+        },
+        {
+          "answer": -24,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              -20,
+              -7,
+              -11,
+              -14,
+              17,
+              17
+            ]
+          },
+          "expected": -24,
+          "correct": true
+        },
+        {
+          "answer": -3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "rows": [
+              0,
+              -5
+            ]
+          },
+          "expected": -3,
+          "correct": true
+        }
+      ]
+    },
+    "prior_attempts": [
+      {
+        "source": "def investigate(context, acquire):\n    rows = context.get(\"rows\", [])\n    if not rows:\n        return 0\n    # Infer calibration parameters s and b from known examples\n    # From example: {\"rows\": [0]} -> expected 11 => s*0 + b = 11 => b = 11\n    # From example: {\"rows\": [1]} -> expected 16 => s*1 + b = 16 => s = 5\n    s = 5\n    b = 11\n    calibrated_sum = sum(s * x + b for x in rows)\n    return int(calibrated_sum)",
+        "scope": "The function `investigate` processes a list of sensor readings (`context[\"rows\"]`) by applying an affine transformation (s*x + b) to each reading, where `s=5` and `b=11`. It then sums up the transformed values. If the input list is empty, it returns 0.",
+        "change": "Replaced the placeholder logic with the correct implementation based on inferred calibration parameters (`s=5`, `b=11`). Added handling for an empty input list to ensure compliance with the task specification.",
+        "node_id": "task-0-global-0",
+        "response_error": null,
+        "constraint_error": null,
+        "development": {
+          "correct": 32,
+          "total": 32,
+          "errors": 0,
+          "rows": [
+            {
+              "answer": 0,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": []
+              },
+              "expected": 0,
+              "correct": true
+            },
+            {
+              "answer": 11,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0
+                ]
+              },
+              "expected": 11,
+              "correct": true
+            },
+            {
+              "answer": 16,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  1
+                ]
+              },
+              "expected": 16,
+              "correct": true
+            },
+            {
+              "answer": 6,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  -1
+                ]
+              },
+              "expected": 6,
+              "correct": true
+            },
+            {
+              "answer": 26,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  3
+                ]
+              },
+              "expected": 26,
+              "correct": true
+            },
+            {
+              "answer": 37,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  1,
+                  2
+                ]
+              },
+              "expected": 37,
+              "correct": true
+            },
+            {
+              "answer": 37,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  4,
+                  -1
+                ]
+              },
+              "expected": 37,
+              "correct": true
+            },
+            {
+              "answer": 33,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0,
+                  0,
+                  0
+                ]
+              },
+              "expected": 33,
+              "correct": true
+            },
+            {
+              "answer": 72,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0,
+                  10
+                ]
+              },
+              "expected": 72,
+              "correct": true
+            },
+            {
+              "answer": 263,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  17,
+                  12,
+                  17
+                ]
+              },
+              "expected": 263,
+              "correct": true
+            },
+            {
+              "answer": 109,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  20,
+                  -20,
+                  0,
+                  13
+                ]
+              },
+              "expected": 109,
+              "correct": true
+            },
+            {
+              "answer": 161,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  2,
+                  -11,
+                  14,
+                  7,
+                  -1,
+                  8
+                ]
+              },
+              "expected": 161,
+              "correct": true
+            },
+            {
+              "answer": 7,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0,
+                  -3
+                ]
+              },
+              "expected": 7,
+              "correct": true
+            },
+            {
+              "answer": -102,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  -5,
+                  -17,
+                  -5
+                ]
+              },
+              "expected": -102,
+              "correct": true
+            },
+            {
+              "answer": 229,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0,
+                  0,
+                  20,
+                  17
+                ]
+              },
+              "expected": 229,
+              "correct": true
+            },
+            {
+              "answer": 286,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  20,
+                  5,
+                  0,
+                  -4,
+                  7,
+                  16
+                ]
+              },
+              "expected": 286,
+              "correct": true
+            },
+            {
+              "answer": -58,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0,
+                  -16
+                ]
+              },
+              "expected": -58,
+              "correct": true
+            },
+            {
+              "answer": 8,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  1,
+                  -7,
+                  1
+                ]
+              },
+              "expected": 8,
+              "correct": true
+            },
+            {
+              "answer": -141,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  4,
+                  -4,
+                  -20,
+                  -17
+                ]
+              },
+              "expected": -141,
+              "correct": true
+            },
+            {
+              "answer": 81,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  3,
+                  -3,
+                  5,
+                  -13,
+                  7,
+                  4
+                ]
+              },
+              "expected": 81,
+              "correct": true
+            },
+            {
+              "answer": -38,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0,
+                  -12
+                ]
+              },
+              "expected": -38,
+              "correct": true
+            },
+            {
+              "answer": -92,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  -11,
+                  -3,
+                  -11
+                ]
+              },
+              "expected": -92,
+              "correct": true
+            },
+            {
+              "answer": -101,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  -17,
+                  17,
+                  -12,
+                  -17
+                ]
+              },
+              "expected": -101,
+              "correct": true
+            },
+            {
+              "answer": -39,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  -7,
+                  -20,
+                  -2,
+                  13,
+                  15,
+                  -20
+                ]
+              },
+              "expected": -39,
+              "correct": true
+            },
+            {
+              "answer": -102,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  -15,
+                  3,
+                  -15
+                ]
+              },
+              "expected": -102,
+              "correct": true
+            },
+            {
+              "answer": -46,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  11,
+                  -11,
+                  2,
+                  -20
+                ]
+              },
+              "expected": -46,
+              "correct": true
+            },
+            {
+              "answer": -84,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  -4,
+                  -20,
+                  -13,
+                  16,
+                  10,
+                  -19
+                ]
+              },
+              "expected": -84,
+              "correct": true
+            },
+            {
+              "answer": -78,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0,
+                  -20
+                ]
+              },
+              "expected": -78,
+              "correct": true
+            },
+            {
+              "answer": -102,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  -10,
+                  -7,
+                  -10
+                ]
+              },
+              "expected": -102,
+              "correct": true
+            },
+            {
+              "answer": 49,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0,
+                  0,
+                  3,
+                  -2
+                ]
+              },
+              "expected": 49,
+              "correct": true
+            },
+            {
+              "answer": -24,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  -20,
+                  -7,
+                  -11,
+                  -14,
+                  17,
+                  17
+                ]
+              },
+              "expected": -24,
+              "correct": true
+            },
+            {
+              "answer": -3,
+              "trace": [],
+              "error": null,
+              "input": {
+                "rows": [
+                  0,
+                  -5
+                ]
+              },
+              "expected": -3,
+              "correct": true
+            }
+          ]
+        },
+        "prompt_sha256": "afd82bbb9e961383af015e3816129451484891cb1421c93e42ffcb88d56dc0a7",
+        "raw_sha256": "92beb19241a460787329bc72e7a57c0a82c07c7a1a6190dbf777c71adb7051fd",
+        "elapsed_seconds": 4.622366875002626,
+        "structure": [
+          {
+            "name": "investigate",
+            "arguments": [
+              "context",
+              "acquire"
+            ],
+            "calls": [],
+            "called_by": []
+          }
+        ]
+      }
+    ],
+    "required_return": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scope",
+        "change"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nFor loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "raw": "{\"change\":\"Replaced sum-based readout with exact polynomial p(x)=x+2*x*x+2*x*x*x and three cumulative-sum passes over per-position contributions; empty input returns 0.\",\"scope\":\"investigate, summarize_values, readout\",\"source\":\"def poly(x):\\n    return x + 2 * x * x + 2 * x * x * x\\n\\ndef investigate(context, acquire):\\n    values = context[\\\"values\\\"]\\n    contrib = [poly(x) for x in values]\\n    for step in range(3):\\n        total = 0\\n        new = []\\n        for c in contrib:\\n            total = total + c\\n            new.append(total)\\n        contrib = new\\n    if len(contrib) == 0:\\n        return 0\\n    return contrib[-1]\\n\"}",
+  "prompt_sha256": "6d5b473a6a810e3d6df31e28a55dbd70de22288e7348366bce54cdd0ff2aa7ee"
+}

@@ -1,0 +1,5 @@
+{
+  "source": "def investigate(context, acquire):\n    events = acquire(\"events\")\n    seen = set()\n    total = 0\n    for event in events:\n        event_id = event[\"event_id\"]\n        if event_id not in seen:\n            seen.add(event_id)\n            total += event[\"work\"]\n    return {\"findings\": [], \"unresolved\": [], \"ratio\": total}",
+  "scope": "Deduplicates events by event_id and sums work once per unique ID.",
+  "lesson": "Duplicate deliveries must not double-count work; distinct IDs with equal work both count."
+}

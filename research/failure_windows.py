@@ -162,7 +162,7 @@ def _pointer(value, pointer):
 
 
 def annotate(episode, case, annotation):
-    """Verify quotes and node bindings; keep semantic judgments as hypotheses."""
+    """Verify observations and node bindings; keep semantic judgments as hypotheses."""
     required = {'case_id', 'node_id', 'evidence_state', 'mechanism', 'rationale', 'reviewer', 'citations'}
     if set(annotation) != required or annotation['evidence_state'] not in STATES:
         raise ValueError('Invalid annotation fields or evidence state')
@@ -185,9 +185,9 @@ def annotate(episode, case, annotation):
         value, ref = _load(path, path.parent if role == 'external' else root)
         if citation.get('sha256') != ref['sha256']:
             raise ValueError('Citation source bytes changed')
-        quoted = _pointer(value, citation['pointer'])
-        if _digest(quoted) != _digest(citation['value']):
-            raise ValueError('Citation quote does not match source')
+        observationd = _pointer(value, citation['pointer'])
+        if _digest(observationd) != _digest(citation['value']):
+            raise ValueError('Citation observation does not match source')
         if role == 'node_input':
             if path.parent != root / 'handoff/requests' or not _packet(value, path, manifest) or value['node_id'] != node:
                 raise ValueError('Input is not a prompt-bound request for this node')

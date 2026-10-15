@@ -1,0 +1,101 @@
+{
+  "experiments": [
+    [
+      {
+        "op": "begin",
+        "connection": "main",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "update",
+        "connection": "main",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "delete",
+        "connection": "main",
+        "key": "a",
+        "value": null
+      }
+    ],
+    [
+      {
+        "op": "begin",
+        "connection": "other",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "update",
+        "connection": "other",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "delete",
+        "connection": "other",
+        "key": "a",
+        "value": null
+      },
+      {
+        "op": "rollback",
+        "connection": "other",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "main",
+        "key": "b",
+        "value": 1
+      }
+    ],
+    [
+      {
+        "op": "begin",
+        "connection": "other",
+        "key": null,
+        "value": null
+      },
+      {
+        "op": "put",
+        "connection": "other",
+        "key": "a",
+        "value": 1
+      },
+      {
+        "op": "update",
+        "connection": "other",
+        "key": "a",
+        "value": 2
+      },
+      {
+        "op": "delete",
+        "connection": "other",
+        "key": "a",
+        "value": null
+      },
+      {
+        "op": "commit",
+        "connection": "other",
+        "key": null,
+        "value": null
+      }
+    ]
+  ],
+  "purpose": "Distinguish whether the channel counts uncommitted main-transaction changes, rolled-back other-connection changes, and committed other-connection changes that cancel in committed state."
+}

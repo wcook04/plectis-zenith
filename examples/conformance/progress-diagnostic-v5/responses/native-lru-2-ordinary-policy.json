@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    events = [{'op':'call','key':1},{'op':'call','key':2},{'op':'call','key':3},{'op':'call','key':1},{'op':'call','key':4},{'op':'call','key':1}]\\n    return {'query': {'capacity': 3, 'events': events}, 'note': {'hypothesis':'parent evicts LRU on miss, but native lru_cache may evict oldest insertion on capacity 3'}}\\n\",\"scope\":\"Compare capacity-3 LRU behavior after a hit promotes key 1, then a miss inserts key 4, then key 1 is re-called.\",\"change\":\"Use sequence call 1,2,3,1,4,1 at capacity 3; parent predicts hits=2, misses=4, size=3, while a native insertion-order eviction would predict hits=1, misses=5, size=3.\"}",
+  "prompt_sha256": "f243535e171ccd08543526243230989976f9ecba14563cf49c1525b6891c7935"
+}

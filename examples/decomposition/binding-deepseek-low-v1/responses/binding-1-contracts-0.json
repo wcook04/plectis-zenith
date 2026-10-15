@@ -1,0 +1,4 @@
+{
+  "raw": "{\"change\":\"Replaced last-value readout with full weighted polynomial evaluation across all input positions; empty list returns zero.\",\"scope\":\"Model inferred: p(x)=2*x*x*x-2*x*x, no extra g*x term, exactly four cumulative-sum passes. Output is sum over positions i of binomial(n-i+2,3)*p(x_i).\",\"source\":\"def investigate(context, acquire):\\n    values = context[\\\"values\\\"]\\n    n = len(values)\\n    total = 0\\n    for i in range(n):\\n        x = values[i]\\n        p = 2 * x * x * x - 2 * x * x\\n        w = (n - i + 2) * (n - i + 1) * (n - i) // 6\\n        total = total + w * p\\n    return total\\n\"}",
+  "prompt_sha256": "f0ac7eb08ac718b8b32c4f759d74c3a98f9e47dc870c80eaf66e9040628f6d0b"
+}

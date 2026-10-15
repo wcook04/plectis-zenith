@@ -1,0 +1,69 @@
+{
+  "model": "deepseek/deepseek-v4.1-flash",
+  "provider_slug": "baidu/fp8",
+  "reasoning_effort": "none",
+  "max_calls": 1,
+  "max_cost_usd": "0.05",
+  "max_output_tokens": 4096,
+  "prompt": {
+    "request": "Return exactly one JSON object matching the schema, never an array. Write investigate(context, acquire) in Python. acquire(\"events\") returns records with event_id and work. Return {\"findings\": [], \"unresolved\": [], \"ratio\": sum of work once per unique event_id}. Duplicate deliveries repeat exactly. Distinct IDs with equal work must both count. No imports, top-level assignments, annotations or default function arguments. This is an interface canary, not a research evaluation."
+  },
+  "schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "lesson": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "lesson"
+    ],
+    "additionalProperties": false
+  },
+  "selection_reason": "Explicit newly authorized route/interface canary with reasoning disabled; not a retry of prior research or interface attempts.",
+  "source_protocol_sha256": "b054d06be57703bc7348aa7cc32bb1f67a0a41ca7cdea6cec0fca7b8750b7f11",
+  "runtime_source": {
+    "path": "/Users/willcook/src/plectis-zenith-distinctions/work/openrouter-route-canary-20261013-baidu/runtime-source.zip",
+    "sha256": "b9ef74e4b156e75829e16ae0a34c2ae794994654c148c081149c6fe095509f13",
+    "scope": "Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads"
+  },
+  "runtime_fingerprints": {
+    "zenith/budgeted.py": "f3652cb7fdb9e020f9e89a509301e55ff1ec3cb7d813e9b053534ea07c7be3e5",
+    "zenith/provider_policy.py": "963682e3221f5e306ddb0890ce5e0e22c97a02817090574791ad3ac51f6041cc",
+    "zenith/investigation_program.py": "cc28eaa110d6861b54b7235c44ac5e04172891e6eefe22a3788a3535c18600cf",
+    "system/lib/openrouter_free_runtime.py": "3b45810bf5105d3d7ed4ef4053ee2f4f800bdd04d548f748d520eb4b0cecb3eb"
+  },
+  "fixture": {
+    "tables": {
+      "events": [
+        {
+          "event_id": "a",
+          "work": 2
+        },
+        {
+          "event_id": "a",
+          "work": 2
+        },
+        {
+          "event_id": "b",
+          "work": 2
+        }
+      ]
+    },
+    "expected": {
+      "findings": [],
+      "unresolved": [],
+      "ratio": 4
+    },
+    "original_fixture_sha256": "11090e5777f949193d611eba17eb63465c43e93457ec5cf549457a3447e93a2e"
+  },
+  "frozen_at_utc": "2026-10-13T20:36:52.509625+00:00"
+}

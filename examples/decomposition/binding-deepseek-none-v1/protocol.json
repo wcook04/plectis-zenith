@@ -1,0 +1,267 @@
+{
+  "schema": "zenith_decomposition_study_v1",
+  "created_at": "2026-10-14T16:17:14.051944+00:00",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "providers": [
+    "deepinfra/fp8",
+    "baidu/fp8",
+    "morph/fp8"
+  ],
+  "task_routes": {
+    "binding-0": "deepinfra/fp8",
+    "binding-1": "baidu/fp8",
+    "binding-2": "morph/fp8",
+    "binding-3": "deepinfra/fp8",
+    "binding-4": "baidu/fp8",
+    "binding-5": "morph/fp8"
+  },
+  "task_arm_order": {
+    "binding-0": [
+      "contracts"
+    ],
+    "binding-1": [
+      "contracts"
+    ],
+    "binding-2": [
+      "contracts"
+    ],
+    "binding-3": [
+      "contracts"
+    ],
+    "binding-4": [
+      "contracts"
+    ],
+    "binding-5": [
+      "contracts"
+    ]
+  },
+  "arms": [
+    "contracts"
+  ],
+  "proposals": 2,
+  "max_calls": 12,
+  "seed": 20261014,
+  "max_cost_usd": "0.60",
+  "max_output_tokens": 6144,
+  "reasoning_effort": "none",
+  "workers": 3,
+  "dataset_sha256": "497617691b3583eeb6eb0dbaab862baeaed134ea2f8e5e968390402b5c9530d1",
+  "runtime_dependencies": {
+    "research/decomposition_study.py": "9d10467a6476859fdc888e056e5e6a0020eeb3b0c913fced7bd74bb15e43f4a6",
+    "research/decomposition_tasks.py": "5a3b2853402c390d297d73058d5d913ac9600e2546ac84cd6217fc133017d42c",
+    "research/investigator_study.py": "82015199d676c21ccef89b94f33fb19efb367bdf1928167b8d7f7cd43eaa93b1",
+    "zenith/investigation_program.py": "3456c13ac48a7ad6334ef707db9127d9eaa014703bf7aa7c1f80fd46df609c43",
+    "zenith/budgeted.py": "1a4640b57af3ae7d5cf1ce029c596b77f03ede16ce77d24c65d8b63682de7bd1",
+    "zenith/provider_policy.py": "5e1ce647a4f4481cb4bdce545a08df36dc406dab141e2989c5ae800b9d251b1d",
+    "zenith/providers.py": "45d131dd915c65ece8211abd9459008c66eca0411f777f904df196d70db8f4d1",
+    "system/lib/openrouter_free_runtime.py": "3b45810bf5105d3d7ed4ef4053ee2f4f800bdd04d548f748d520eb4b0cecb3eb"
+  },
+  "source": {
+    "path": "runtime-source.zip",
+    "sha256": "43c9799ff9939d6a3b4f3810f0fc078f1efa39ee741de8f2a130079a701d091b",
+    "scope": "Python implementation, research runners, native graphs/contracts and master configuration; no credentials or run payloads"
+  },
+  "model_evidence": {
+    "observed_at": "2026-10-14T15:49:36.989664+00:00",
+    "routes": [
+      {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "canonical_slug": "deepseek/deepseek-v4.1-flash-20260910",
+        "provider_slug": "deepinfra/fp8",
+        "model_catalogue_created_utc": "2026-09-10T06:21:25+00:00",
+        "developer": "deepseek",
+        "endpoint_status": 0,
+        "reasoning_effort": "none",
+        "request_reasoning": {
+          "enabled": false
+        },
+        "rationale": "primary; established campaign route",
+        "prices_usd_per_million_tokens": {
+          "prompt": "0.14000000",
+          "completion": "0.42000000",
+          "input_cache_read": "0.0042000000"
+        },
+        "request_fee_usd": "0",
+        "endpoint_pricing_raw": {
+          "prompt": "0.00000014",
+          "completion": "0.00000042",
+          "input_cache_read": "0.0000000042",
+          "discount": 0.3
+        },
+        "effective_reservation_prices_usd_per_million": {
+          "prompt": "0.14000000",
+          "completion": "0.891000000",
+          "input_cache_read": "0.0054000000"
+        },
+        "context_length": 1048576,
+        "max_completion_tokens": 131072,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "top_p",
+          "stop",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "top_k",
+          "seed",
+          "min_p",
+          "logit_bias",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "response_format",
+          "reasoning_effort"
+        ],
+        "quantization": "fp8",
+        "uptime_last_1d": 100,
+        "endpoint_source_url": "https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints",
+        "endpoint_evidence_file": "20261014T154441Z-deepseek--deepseek-v4.1-flash-endpoints.json",
+        "reasoning_none_eligible": true,
+        "reasoning_low_eligible": true,
+        "model_supported_efforts": [
+          "max",
+          "high",
+          "low"
+        ],
+        "historical_evidence_note": "Earlier retained DeepSeek protocols use none and low; this scout performed metadata/offline checks only."
+      },
+      {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "canonical_slug": "deepseek/deepseek-v4.1-flash-20260910",
+        "provider_slug": "baidu/fp8",
+        "model_catalogue_created_utc": "2026-09-10T06:21:25+00:00",
+        "developer": "deepseek",
+        "endpoint_status": 0,
+        "reasoning_effort": "none",
+        "request_reasoning": {
+          "enabled": false
+        },
+        "rationale": "previously used explicit alternate; not automatic fallback",
+        "prices_usd_per_million_tokens": {
+          "prompt": "0.1497000000",
+          "completion": "0.5988000000",
+          "input_cache_read": "0.002994000000"
+        },
+        "request_fee_usd": "0",
+        "endpoint_pricing_raw": {
+          "prompt": "0.0000001497",
+          "completion": "0.0000005988",
+          "input_cache_read": "0.000000002994",
+          "discount": 0.501
+        },
+        "effective_reservation_prices_usd_per_million": {
+          "prompt": "0.1497000000",
+          "completion": "0.891000000",
+          "input_cache_read": "0.0054000000"
+        },
+        "context_length": 1048576,
+        "max_completion_tokens": 393216,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "temperature",
+          "top_p",
+          "max_tokens",
+          "stop",
+          "response_format",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "reasoning_effort"
+        ],
+        "quantization": "fp8",
+        "uptime_last_1d": 100,
+        "endpoint_source_url": "https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints",
+        "endpoint_evidence_file": "20261014T154441Z-deepseek--deepseek-v4.1-flash-endpoints.json",
+        "reasoning_none_eligible": true,
+        "reasoning_low_eligible": true,
+        "model_supported_efforts": [
+          "max",
+          "high",
+          "low"
+        ],
+        "historical_evidence_note": "Earlier retained DeepSeek protocols use none and low; this scout performed metadata/offline checks only."
+      },
+      {
+        "model": "deepseek/deepseek-v4.1-flash",
+        "canonical_slug": "deepseek/deepseek-v4.1-flash-20260910",
+        "provider_slug": "morph/fp8",
+        "model_catalogue_created_utc": "2026-09-10T06:21:25+00:00",
+        "developer": "deepseek",
+        "endpoint_status": 0,
+        "reasoning_effort": "none",
+        "request_reasoning": {
+          "enabled": false
+        },
+        "rationale": "previously used explicit alternate; not automatic fallback",
+        "prices_usd_per_million_tokens": {
+          "prompt": "0.028000000",
+          "completion": "0.8000000",
+          "input_cache_read": "0.009000000"
+        },
+        "request_fee_usd": "0",
+        "endpoint_pricing_raw": {
+          "prompt": "0.000000028",
+          "completion": "0.0000008",
+          "input_cache_read": "0.000000009",
+          "discount": 0
+        },
+        "effective_reservation_prices_usd_per_million": {
+          "prompt": "0.028000000",
+          "completion": "0.891000000",
+          "input_cache_read": "0.009000000"
+        },
+        "context_length": 1048576,
+        "max_completion_tokens": 943718,
+        "supported_parameters": [
+          "reasoning",
+          "include_reasoning",
+          "max_tokens",
+          "temperature",
+          "stop",
+          "top_p",
+          "top_k",
+          "min_p",
+          "frequency_penalty",
+          "presence_penalty",
+          "repetition_penalty",
+          "seed",
+          "logit_bias",
+          "response_format",
+          "structured_outputs",
+          "tools",
+          "tool_choice",
+          "reasoning_effort"
+        ],
+        "quantization": "fp8",
+        "uptime_last_1d": 100,
+        "endpoint_source_url": "https://openrouter.ai/api/v1/models/deepseek/deepseek-v4.1-flash/endpoints",
+        "endpoint_evidence_file": "20261014T154441Z-deepseek--deepseek-v4.1-flash-endpoints.json",
+        "reasoning_none_eligible": true,
+        "reasoning_low_eligible": true,
+        "model_supported_efforts": [
+          "max",
+          "high",
+          "low"
+        ],
+        "historical_evidence_note": "Earlier retained DeepSeek protocols use none and low; this scout performed metadata/offline checks only."
+      }
+    ],
+    "task_boundary": [
+      "Six new configurations in the same supplied finite family; no new-domain transfer claim.",
+      "None, adjacent and prefix interactions are balanced; signed polynomial coefficients and pass counts vary.",
+      "Calibration uniquely identifies each selected configuration; the exact recurrence and competent reference remain host-only.",
+      "Whole-sequence prediction establishes rule induction, not discovery of a bounded sufficient streaming state.",
+      "The syntax clarification belongs to a new stage; comparisons with old stages also contain an executor/interface engineering change.",
+      "Fixed-source cases, model-setting comparisons and further-case reuse are not independent task replications.",
+      "No acquired investigation policy or learning-policy transfer is implemented by this fixture."
+    ]
+  },
+  "selection": "All visible calibration+development (correct,-errors), later attempt on ties. Arm order rotated across tasks. All arms frozen before either protected panel. Fixed is diagnostic; global versus contextual/contracts is primary.",
+  "boundary": "Authored mechanism tasks; only allocator is native SQLite. No autonomous goal or representation-language invention, production-value or general intelligence claim. All model outputs preserved unedited.",
+  "feedback": "All arms share measured development inputs/labels; each receives its own complete candidate and actual execution outcomes. No protected labels in prompts.",
+  "structure": "Ordinary Python function calls; no forced code expansion or special graph execution."
+}

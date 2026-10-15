@@ -1,0 +1,106 @@
+{
+  "schema": "zenith_progress_campaign_plan_v1",
+  "status": "prospective_not_run",
+  "claim_boundary": "Engineering delivery and within-family investigation mechanism; no transfer or learned-memory claim",
+  "protocol_document": "docs/progress-protocol-20261014.md",
+  "source_contracts": ["lru", "sqlite", "utf8"],
+  "model_route": {
+    "model_candidate": "inclusionai/ling-3.1-flash",
+    "endpoint": "verify_and_pin_at_prepare_time",
+    "reasoning_effort": "none",
+    "max_output_tokens_per_call": 12288,
+    "max_in_flight_host": 3,
+    "max_in_flight_pinned_endpoint": 1,
+    "automatic_retry": false,
+    "expensive_fallback": false,
+    "current_metadata_required": true
+  },
+  "preflight": {
+    "paid_calls": 0,
+    "use_exposed_archive_for_delivery_debugging_only": true,
+    "checks": [
+      "source_and_dataset_hashes",
+      "direct_json_schema",
+      "second_distinct_query",
+      "legal_stop",
+      "duplicate_slot_without_new_native_execution",
+      "typed_stage_error_ownership",
+      "masked_outcome_fields",
+      "frozen_selection_before_panels"
+    ]
+  },
+  "arms": [
+    "ordinary",
+    "fixed",
+    "direct_batch",
+    "direct_adaptive",
+    "direct_masked",
+    "repair_only"
+  ],
+  "unchanged_parent_control": true,
+  "max_probe_slots_per_arm": 8,
+  "fixed_rival": {
+    "lru_sqlite": "existing_authored_fixed_queries",
+    "utf8": "return16_rfc3629_boundary_pack_filtered_against_public_examples",
+    "utf8_byte_words_hex": ["c0", "c1", "f5", "ff", "e09f", "eda0", "f08f", "f490"],
+    "expected_answers_embedded": false,
+    "retrospective_stronger_prior_not_learned": true
+  },
+  "direct_turns": {
+    "direct_batch": [8],
+    "direct_adaptive": [4, 4],
+    "direct_masked": [4, 4]
+  },
+  "masked_second_turn": {
+    "keep": ["prior_query_identities", "json_delivery_errors", "remaining_slots"],
+    "hide": ["native_expected", "parent_answer", "parent_error", "verified_counterexample", "query_legality_errors"],
+    "shared_first_turn_required_for_feedback_isolation": true,
+    "shared_call_id_suffix": "direct-shared-turn-1",
+    "charge_shared_call_once_per_parent": true,
+    "first_queries_remeasured_in_each_arm": true,
+    "first_native_observations_expected_identical": true,
+    "native_work_charged_to_each_arm": true
+  },
+  "stages": [
+    {
+      "id": "qualification",
+      "parents_per_contract": 1,
+      "parent_episodes": 3,
+      "dataset_seed": "freeze_distinct_seed_before_any_paid_call",
+      "max_planned_model_calls": 36,
+      "hard_cash_ceiling_usd": "0.60",
+      "analysis_role": "interface_qualification_excluded_from_diagnostic",
+      "pass_conditions": {
+        "valid_direct_delivery_each_contract": true,
+        "actual_second_turn_with_distinct_legal_proposal": true,
+        "maximum_investigator_error_misattributed_to_parent": 0
+      }
+    },
+    {
+      "id": "diagnostic",
+      "parents_per_contract": 4,
+      "parent_episodes": 12,
+      "dataset_seed": "freeze_distinct_seed_before_any_paid_call",
+      "max_planned_model_calls": 144,
+      "hard_cash_ceiling_usd": "0.60",
+      "analysis_role": "fresh_within_family_diagnostic_not_independent_confirmation",
+      "requires": "qualification_passed_without_protocol_change"
+    }
+  ],
+  "analysis": {
+    "primary_conditional_contrast": "direct_adaptive_minus_direct_masked_confirmation_correct_with_identical_first_turn",
+    "if_first_turn_not_shared": "descriptive_only_no_feedback_isolation_claim",
+    "unit": "paired_parent_episode",
+    "strata": "three_native_contract_families",
+    "case_rows_are_not_independent_subjects": true,
+    "other_controls": ["fixed", "direct_batch", "ordinary", "repair_only", "parent"],
+    "report": ["confirmation_correct", "screen_correct", "valid_distinct_probes", "duplicates", "invalid_proposals", "verified_discrepancies", "actual_model_calls", "tokens", "settled_cost", "unknown_cost", "selected_repair", "unchanged_repair", "native_units_by_family"],
+    "script": "scripts/analyze_progress_campaign.py"
+  },
+  "stop_rules": [
+    "A failed qualification ends that frozen study; any changed interface starts a new version",
+    "An unknown provider charge remains unknown and halts automatic budget continuation",
+    "No protected diagnostic panel is opened until all repair selections freeze",
+    "No transfer or memory claim follows from this three-contract diagnostic"
+  ]
+}

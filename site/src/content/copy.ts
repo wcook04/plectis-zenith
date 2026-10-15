@@ -4,40 +4,37 @@
 
 export const EVIDENCE_KIND_LABEL: Record<string, { label: string; note: string }> = {
   proposed_process: {
-    label: 'Proposed process',
-    note: 'How the loop is meant to work. The full loop has not run end to end.',
+    label: 'Proposed procedure',
+    note: 'A proposed procedure; execution and useful improvement are separate claims.',
   },
   authored_mechanism: {
-    label: 'Authored mechanism',
-    note: 'The executable graph as it is defined in the repository today.',
+    label: 'Defined in the code',
+    note: 'The procedure implemented in the repository today.',
   },
+  measured_experiment: { label: 'Measured experiment', note: 'Saved execution evidence; not necessarily an improvement.' },
   measured_execution: {
-    label: 'Measured execution',
+    label: 'Measured run',
     note: 'What actually ran, read from saved results.',
   },
   verified_preparation: {
-    label: 'Verified preparation',
-    note: 'Inputs loaded and the first request prepared. No model output yet.',
+    label: 'Checked preparation',
+    note: 'The inputs were loaded and the first request was prepared. No model output exists.',
   },
   research_proposal: {
-    label: 'Research proposal',
-    note: 'An extension that has not been implemented or tested.',
+    label: 'Research question',
+    note: 'A question that needs evidence before adoption.',
   },
 };
 
 export const SECTION_LABEL: Record<string, string> = {
-  idea: 'Section 1, Evaluation protocol',
-  lab: 'Section 2, The executable graph',
-  oracle: 'Section 2, Figure 3',
-  trace: 'Section 2, Failure diagnosis',
-  research: 'Section 3, Context-conditioned prompts',
-  results: 'Section 4, Execution study and limitations',
+  idea: 'The research question', lab: 'The native observation task',
+  oracle: 'Measured repair', trace: 'Frozen prediction programs',
+  research: 'Interpretation and next evidence', results: 'Measured comparisons',
 };
 
 export const HERO = {
-  lede: 'A language-model reasoning graph built to read saved market feeds, freeze a prediction, then check it against what happened next.',
-  question:
-    'Can recurring failures in a multi-stage language-model program guide revisions that help on later inputs? This site follows the paper section by section, and every node of the executable graph opens to show its instruction, inputs and output.',
+  lede: 'Can an earlier investigation improve the next one?',
+  question: 'Zenith tests which questions expose a program’s limits, whether measured answers improve its repair, and when a retained procedure earns its cost against ordinary code and tests.',
 };
 
 // Counts come from the graph the backend serves, never from this file.
@@ -59,70 +56,42 @@ const list = (items: string[]) =>
 
 export function labParagraphs(f: GraphFacts | null): string[] {
   if (!f) return CHAPTER_COPY.lab.paragraphs;
-  const edition =
-    f.real.length > 0 && f.synthetic.length > 0
-      ? ` In this edition ${list(f.real)} are real saved inputs and ${list(f.synthetic)} are synthetic examples; each feed node is marked.`
-      : '';
+  const edition = ' This historical demonstration uses only invented observations of System A; derived summaries are computed from those observations.';
   return [
-    `The Lab is ${f.total} nodes: ${f.feeds} feed artifacts and ${f.reasoning} reasoning steps. ${capital(numberWord(f.acquired.length))} feeds are acquired (${list(f.acquired)}), and a calculator derives regime summaries from the stock, ETF and macro feeds.${edition}`,
-    `${capital(numberWord(f.miners))} miners each read one feed. The first synthesis maps where their findings agree and conflict, Orient builds causal hypotheses, and Decide freezes a thesis as checkpoint CP1. A second, directed pass re-reads every feed for that thesis before the Director freezes predictions at CP2. Integrity then audits both passes.`,
-    CHAPTER_COPY.lab.paragraphs[2],
+    `The retained historical graph has ${f.total} nodes: ${numberWord(f.feeds)} data feeds and ${f.reasoning} reasoning steps. ${capital(numberWord(f.acquired.length))} feeds are source observations (${list(f.acquired)}), and a tool computes summaries from measurements, subsystem readings and context.${edition}`,
+    `${capital(numberWord(f.miners))} miners, one for each feed, each extract the main signals from their feed. The first synthesis maps where their findings agree and conflict, Orient builds causal hypotheses, and Decide freezes a thesis as checkpoint CP1. A second, directed pass re-reads every feed for that thesis before the Director freezes predictions at CP2. Integrity then audits both passes.`,
+    CHAPTER_COPY.lab.paragraphs[0],
   ];
 }
 
 export const CHAPTER_COPY: Record<string, { kicker: string; paragraphs: string[] }> = {
-  idea: {
-    kicker: 'The loop',
-    paragraphs: [
-      'Zenith runs in rounds. The Lab reads feeds saved at a cutoff and freezes its forecast. Later feeds arrive. Oracle compares the frozen forecast with them and records a hypothesis about what went wrong. Evolve turns that guess into one concrete change to an instruction, an input or a dependency.',
-      'The change counts only if it does better on inputs nobody used to choose it. So the original graph and the revised graph run again on another window, with the base model held fixed, and the score is fixed before the outcomes are seen.',
-      'The cutoff separates what the Lab may read from what is later used to judge it. Nothing from after the cutoff may reach the Lab’s inputs. Research done after the outcome can explain an event, but it cannot become evidence the earlier run had.',
-    ],
-  },
-  lab: {
-    kicker: 'Read earlier evidence',
-    paragraphs: [
-      'The Lab reads saved feed artifacts through a graph of reasoning steps. A calculator derives regime summaries from the stock, ETF and macro feeds.',
-      'One miner reads each feed. The first synthesis maps where their findings agree and conflict, Orient builds causal hypotheses, and Decide freezes a thesis as checkpoint CP1. A second, directed pass re-reads every feed for that thesis before the Director freezes predictions at CP2. Integrity then audits both passes.',
-      'Every node saves its output, so a reviewer can find the step where an unsupported claim first appeared and see what that step was given. Click any node to read its instruction, its inputs and what it must produce.',
-    ],
-  },
-  oracle: {
-    kicker: 'Compare with later evidence',
-    paragraphs: [
-      'Oracle receives two things: the frozen Lab record with the feeds it saw, and the same sources captured after the cutoff. Tools compute numeric before-and-after differences without a model. One review per lane describes what that source shows later.',
-      'An evidence summary combines those findings, and a failure hypothesis maps them back onto the Lab’s own evidence. That attribution is a hypothesis about a failure. It does not identify a cause.',
-    ],
-  },
-  evolve: {
-    kicker: 'Propose one change',
-    paragraphs: [
-      'Evolve reads Oracle’s report and drafts one revision: which part of a node’s dossier to change and how. A version step records the change so the original and the revision can both be run again.',
-      'A proposed change is a hypothesis. Showing that it helps takes a separate comparison on later cases, with a score fixed in advance, counting regressions as well as gains.',
-    ],
-  },
-  results: {
-    kicker: 'What actually ran',
-    paragraphs: [
-      'The full loop has not run end to end yet. What did run is the Lab, on original saved feeds from several dates, with the graph, policy, model and response limit held fixed.',
-      'The numbers below are read from the published receipts. Valid JSON from one node is an execution result. It says nothing yet about forecast accuracy.',
-    ],
-  },
-  'results:verified_preparation': {
-    kicker: 'What has been prepared',
-    paragraphs: [
-      'This edition runs the native graph on mixed inputs: real saved stock, ETF and prediction-market data, invented macro and news examples, and calculator summaries recomputed from both. The real payloads stay off the public site while their permissions are reviewed; the synthetic ones are published in full.',
-      'What has been verified is preparation. The native Lab loads every input, prepares its first reasoning request and waits for a model response. No model has been called in this configuration, so there is no forecast, Oracle diagnosis or Evolve comparison yet.',
-    ],
-  },
-  next: {
-    kicker: 'What still needs testing',
-    paragraphs: [
-      'Each reasoning node would keep a fixed job, the same inputs and the same output contract. A small neural controller would read context available at the cutoff, such as VIX and sentiment, and pick slightly different wording for how a node interprets its evidence.',
-      'The controller’s outputs are prompt settings: numbers between 0 and 1 that index a versioned catalogue of written variants. The exact rendered prompt is saved with every run. Backpropagation could train the controller from measured losses, but no derivative flows through the language model or the text choice.',
-      'None of this has been built. It would be fitted on development cases, frozen, then tested on later cases, including regime changes and regressions.',
-    ],
-  },
+  idea: { kicker: 'Knowledge that can do work', paragraphs: [
+    'An observed counterexample can require a different computation. Retain useful alternative programs, measured failures and the evidence on which predictions depend.',
+    'The current study asks what a native SQLite channel measures. A counter can include rolled-back changes or auxiliary writes even when committed item count stays unchanged.',
+  ] },
+  lab: { kicker: 'Measure an unfamiliar source', paragraphs: [
+    'The model proposes action sequences. The host executes disposable native SQLite experiments and records the channel alongside separately read committed count and value sum.',
+    'Every construction policy receives the same observed transcript. Model-written Python predicts new action combinations; a restricted process records its acquired history and execution errors.',
+  ] },
+  oracle: { kicker: 'Make failure observable', paragraphs: [
+    'Measured calibration outputs check each proposed program. Rejected candidates and their execution errors remain available to the next repair request.',
+    'Development selection permits valid neutral revisions and reports regressions. Protected compositions are evaluated only after every construction call has finished; source identification remains conditional on the frozen native family.',
+  ] },
+  evolve: { kicker: 'Freeze before comparison', paragraphs: [
+    'Incremental repair sees the latest challenger; archive construction retains earlier attempts; the fresh compiler starts with final evidence. All receive the same proposal allowance and executable interface.',
+    'Freeze every checkpoint before protected evaluation. A first-checkpoint control, empty-history replay and unlearned program test what the final computation and supplied observations contribute.',
+  ] },
+  results: { kicker: 'Replay the evidence', paragraphs: [
+    'The table below shows the initial native comparison. Follow-on receipts and the repository explanation compare fresh reconstruction, complementary candidate pools, new observations, archive selection and composition.',
+    'Complete receipts compare frozen exact answers, unsupported commitments and execution errors. Configured native sources are conditional replications in one software family, not independent domains.',
+  ] },
+  'results:verified_preparation': { kicker: 'Historical fixture preparation', paragraphs: [
+    'The retained System A fixture uses invented observations. Its preparation receipt loaded inputs and prepared a request without inference.',
+  ] },
+  next: { kicker: 'Make the knowledge cumulative', paragraphs: [
+    'Test transfer to independently implemented sources and misleading near-matches. A bounded native comparison cannot by itself establish broad semantic discovery or lifetime economic value.',
+    'Compare complete evidence, execution and inference costs. Preserve unresolved goals and failed attempts when the current computation does not support a new conclusion.',
+  ] },
 };
 
 export const LOOP_STAGES = [
@@ -131,30 +100,30 @@ export const LOOP_STAGES = [
     side: 'before',
     title: 'Earlier evidence',
     detail: 'Feeds saved at the cutoff',
-    receives: 'The acquired feeds and the calculator, exactly as saved at time t.',
+    receives: 'The source observations and derived summaries, exactly as saved at time t.',
     produces: 'A fixed input universe. Anything absent here was unavailable to the run.',
   },
   {
     id: 'lab',
     side: 'before',
     title: 'Lab',
-    detail: 'Multi-step reasoning graph',
+    detail: 'Inspect, compare, commit',
     receives: 'Only the saved feeds and its own earlier outputs.',
-    produces: 'A saved output at every node, a thesis at CP1 and predictions at CP2.',
+    produces: 'An action trace, numerical receipts and a frozen complete decision.',
   },
   {
     id: 'frozen',
     side: 'boundary',
     title: 'Frozen prediction',
     detail: 'Sealed before outcome',
-    receives: 'The Lab’s CP1 and CP2 records.',
+    receives: 'The completed Lab commitment.',
     produces: 'A record nobody may edit after later evidence is revealed.',
   },
   {
     id: 'later',
     side: 'after',
     title: 'Later evidence',
-    detail: 'Same sources at t + h',
+    detail: 'Same sources after the horizon',
     receives: 'The same sources, captured after the horizon.',
     produces: 'What actually happened, for comparison only.',
   },
@@ -164,7 +133,7 @@ export const LOOP_STAGES = [
     title: 'Oracle',
     detail: 'Compare and diagnose',
     receives: 'The frozen record, the feeds the Lab saw, and the later feeds.',
-    produces: 'Numeric differences, lane reviews and a failure hypothesis.',
+    produces: 'A supported diagnosis or no change, with evidence and an alternative explanation.',
   },
   {
     id: 'evolve',
@@ -172,7 +141,7 @@ export const LOOP_STAGES = [
     title: 'Evolve',
     detail: 'Propose one change',
     receives: 'Oracle’s report.',
-    produces: 'One revision to an instruction, input or dependency, recorded as a new version.',
+    produces: 'One exact reusable procedure replacement, recorded as a candidate version.',
   },
   {
     id: 'compare',
@@ -180,7 +149,7 @@ export const LOOP_STAGES = [
     title: 'Compare on another window',
     detail: 'Original and revision, same later inputs',
     receives: 'Both versions and later cases nobody used to choose the revision.',
-    produces: 'Gains and regressions under a score fixed in advance. Not yet run end to end.',
+    produces: 'Gains and regressions under a score fixed in advance. Protected-case improvement remains unproved.',
   },
 ] as const;
 

@@ -1,0 +1,1730 @@
+{
+  "source_id": "source-14b99a8dd1e8c3320ae0",
+  "primitive_ids": [],
+  "primitive_rounds": [
+    {
+      "proposal": {
+        "dependencies": [],
+        "lesson": "Channel and conflict handling are inferred by intersecting native SQLite semantics (changes() excludes trigger work and reports only the last direct statement; total_changes includes trigger inserts; REPLACE counts delete+insert; IGNORE reports 0 on conflict; UPSERT reports 1) against every calibration receipt; a goal is answered only when all surviving family members agree.",
+        "scope": "Disposable SQLite source with private stable (conflict handling, optional AFTER INSERT log trigger, channel) combination; predict channel or committed state for new sequences from receipts.",
+        "source": "def make_candidates():\n    cands = []\n    for conflict in [\"ignore\", \"replace\", \"upsert\"]:\n        for trig in [False, True]:\n            for ch in [\"changes\", \"total_main\", \"total_both\"]:\n                cands.append({\"conflict\": conflict, \"trigger\": trig, \"channel\": ch})\n    return cands\n\ndef simulate(cand, actions):\n    committed = {}\n    main_total = 0\n    other_total = 0\n    main_last = 0\n    txn = None\n    pending = {}\n    deleted = set()\n    for action in actions:\n        op = action.get(\"op\")\n        if op == \"begin\":\n            if txn is None:\n                txn = action.get(\"connection\") or \"main\"\n                pending = {}\n                deleted = set()\n        elif op == \"commit\":\n            if txn is not None:\n                for k in pending:\n                    committed[k] = pending[k]\n                for k in deleted:\n                    committed.pop(k, None)\n                txn = None\n                pending = {}\n                deleted = set()\n        elif op == \"rollback\":\n            txn = None\n            pending = {}\n            deleted = set()\n        else:\n            conn = action.get(\"connection\") or \"main\"\n            if txn is not None:\n                conn = txn\n            key = action.get(\"key\")\n            if txn is not None:\n                if key in deleted:\n                    cur = None\n                elif key in pending:\n                    cur = pending[key]\n                else:\n                    cur = committed.get(key)\n            else:\n                cur = committed.get(key)\n            ch = 0\n            trig = 0\n            store = txn is not None\n            if op == \"put\":\n                val = action.get(\"value\")\n                if cur is None:\n                    ch = 1\n                    if cand[\"trigger\"]:\n                        trig = 1\n                    if store:\n                        pending[key] = val\n                        deleted.discard(key)\n                    else:\n                        committed[key] = val\n                elif cand[\"conflict\"] == \"ignore\":\n                    ch = 0\n                elif cand[\"conflict\"] == \"replace\":\n                    ch = 2\n                    if cand[\"trigger\"]:\n                        trig = 1\n                    if store:\n                        pending[key] = val\n                        deleted.discard(key)\n                    else:\n                        committed[key] = val\n                else:\n                    ch = 1\n                    if store:\n                        pending[key] = val\n                    else:\n                        committed[key] = val\n            elif op == \"update\":\n                val = action.get(\"value\")\n                if cur is not None:\n                    ch = 1\n                    if store:\n                        pending[key] = val\n                    else:\n                        committed[key] = val\n            elif op == \"delete\":\n                if cur is not None:\n                    ch = 1\n                    if store:\n                        deleted.add(key)\n                        pending.pop(key, None)\n                    else:\n                        committed.pop(key, None)\n            if conn == \"main\":\n                main_last = ch\n                main_total = main_total + ch + trig\n            else:\n                other_total = other_total + ch + trig\n    if cand[\"channel\"] == \"changes\":\n        channel = main_last\n    elif cand[\"channel\"] == \"total_main\":\n        channel = main_total\n    else:\n        channel = main_total + other_total\n    count = len(committed)\n    total = sum(committed.values())\n    return {\"channel\": channel, \"committed_count\": count, \"committed_sum\": total}\n\ndef filter_candidates(receipts):\n    survivors = []\n    for cand in make_candidates():\n        ok = True\n        for r in receipts:\n            obs = r.get(\"observed\")\n            sim = simulate(cand, r.get(\"actions\"))\n            if sim[\"channel\"] != obs.get(\"channel\"):\n                ok = False\n            elif sim[\"committed_count\"] != obs.get(\"committed_count\"):\n                ok = False\n            elif sim[\"committed_sum\"] != obs.get(\"committed_sum\"):\n                ok = False\n            if not ok:\n                break\n        if ok:\n            survivors.append(cand)\n    return survivors\n\ndef answer(survivors, actions, goal):\n    if len(survivors) == 0:\n        return {\"value\": None, \"unresolved\": True}\n    vals = []\n    for cand in survivors:\n        sim = simulate(cand, actions)\n        vals.append(sim[goal])\n    v = vals[0]\n    for x in vals:\n        if x != v:\n            return {\"value\": None, \"unresolved\": True}\n    return {\"value\": v, \"unresolved\": False}\n\ndef investigate(context, acquire):\n    receipts = acquire(\"history\")\n    survivors = filter_candidates(receipts)\n    return answer(survivors, context.get(\"actions\"), context.get(\"goal\"))\n\ndef transition(state, action, context, acquire):\n    if state is None:\n        state = {\"actions\": [], \"receipts\": None, \"survivors\": None}\n    state[\"actions\"].append(action)\n    return state\n\ndef readout(state, context, acquire):\n    receipts = state.get(\"receipts\")\n    if receipts is None:\n        receipts = acquire(\"history\")\n        state[\"receipts\"] = receipts\n    survivors = state.get(\"survivors\")\n    if survivors is None:\n        survivors = filter_candidates(receipts)\n        state[\"survivors\"] = survivors\n    return answer(survivors, state.get(\"actions\"), context.get(\"goal\"))\n"
+      },
+      "result": {
+        "correct": 27,
+        "total": 27,
+        "unsupported": 0,
+        "errors": 0,
+        "rows": [
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "600627bcc05a8efb1d0d64e5b831a1e90cd452b30e265e0906c9908f0f6ce981",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "fb05e8f61711be7952487a63ce4d5e40f6f78bf8d0c5a42378a7562d6c5dd62c",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "466a064a98ebc86b056998d0d505c05714866a167e76e64df1aca94dc5240cc6",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "c8040881e8e3067aef08250c9b03b5e0b342a42d60f536ce46956a1e7cfe83fd",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "716cc65f7378b8973532391f0f936c70d43f5f52c18360034073a63d7b31c4f4",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "da1ad452211025db1e0f10a119c1077fafbfeb905f1143cc4717041a9fddf46f",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "224195fc4c7364c2f8b477ba9a5a8faee5ab45a5902fe23e6ca509f524ac3e3c",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "c657e374930868c9da95eebac1af8bd2c4f03107616a4048a0c719d540d0dbff",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "cd03738924f9fdc56c65e554367e43315aebcf65792c328809304d3cac11ea98",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "4e19ce3b6677733e4ffda65124dc7e2f2aa7bbcd3d9a3d12686cd17b903ad1b7",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "ca680af5e1bcb240716c8a4b2ddf18c4c0d240caed0da8a8f0f71ad8687ed846",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 5,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "4eaf1dd5f5f8d1606a7c37341b5f48a8c2cbb0290fee30ab623000d1ef6a51c2",
+            "expected": {
+              "value": 5,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "538bc2704069dff7301391bdf102ab058d87802d112c62364cee1bf633d77e3d",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "1650d5a85facb37f90ec8678db0eda5b6201a3f2935ea9231219a28f83d554ff",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 4,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "a2e5dcc4cdda1397928025827cabd55c05637cf61ebc13facf1c1f6e4ed50c34",
+            "expected": {
+              "value": 4,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "ef882034529eae294c77e9ae68b327abd0550835673bbd4ae2725a0b487493c6",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 3,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "d322115d9a0e3a99a34d0a73a77678e20655ea11cd0158fbcf530e6751aec3fd",
+            "expected": {
+              "value": 3,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 9,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "a0539e80daed4f9877bfe4f7f1654e6ea789933abfd7e87edef227285dece40f",
+            "expected": {
+              "value": 9,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "3ed6b7007909e59462eab5160d3b601793af21d45b3c8a2a02166939a9f3c4e5",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "e3b45d8ac68e59e947525d2f6585ac578910d1682f0677c05c47059f0c4212c5",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "bc649ddc7348b40cf63486aecdeae546196d342a79bc8388126bfe77f7391891",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "3d979ceb126a1fad9958a311518da2052d48fbc7690949cb7fb9025cc293bec4",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "9f96d6c9cf3bb8de7a0ab75b0716a692d72161c5e94ab4c0a827f0f9612cf98d",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "d381d5085cef068cfd7b80ddf30a7f3ea84eb4567e5d3694db9dba4bf6a4ea1f",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "071447fd9e4713294ce166898fd96c0af8f95e91f535e1306dae85e070aac649",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "3ef027b865b5a35141aff169929cf338b10e624d8b88b2f1f6507ae3a2b9c03a",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 6,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "ad052cff337b6d96abf71f21a5c294df4b695f33af71746393eb10d1a0072fba",
+            "expected": {
+              "value": 6,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          }
+        ]
+      },
+      "interface_result": {
+        "correct": 24,
+        "total": 27,
+        "unsupported": 0,
+        "errors": 3,
+        "rows": [
+          {
+            "answer": null,
+            "trace": [],
+            "error": "AttributeError: 'NoneType' object has no attribute 'get'",
+            "id": "600627bcc05a8efb1d0d64e5b831a1e90cd452b30e265e0906c9908f0f6ce981",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "trace": [],
+            "error": "AttributeError: 'NoneType' object has no attribute 'get'",
+            "id": "fb05e8f61711be7952487a63ce4d5e40f6f78bf8d0c5a42378a7562d6c5dd62c",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "trace": [],
+            "error": "AttributeError: 'NoneType' object has no attribute 'get'",
+            "id": "466a064a98ebc86b056998d0d505c05714866a167e76e64df1aca94dc5240cc6",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "c8040881e8e3067aef08250c9b03b5e0b342a42d60f536ce46956a1e7cfe83fd",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "716cc65f7378b8973532391f0f936c70d43f5f52c18360034073a63d7b31c4f4",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "da1ad452211025db1e0f10a119c1077fafbfeb905f1143cc4717041a9fddf46f",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "224195fc4c7364c2f8b477ba9a5a8faee5ab45a5902fe23e6ca509f524ac3e3c",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "c657e374930868c9da95eebac1af8bd2c4f03107616a4048a0c719d540d0dbff",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "cd03738924f9fdc56c65e554367e43315aebcf65792c328809304d3cac11ea98",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "4e19ce3b6677733e4ffda65124dc7e2f2aa7bbcd3d9a3d12686cd17b903ad1b7",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "ca680af5e1bcb240716c8a4b2ddf18c4c0d240caed0da8a8f0f71ad8687ed846",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 5,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "4eaf1dd5f5f8d1606a7c37341b5f48a8c2cbb0290fee30ab623000d1ef6a51c2",
+            "expected": {
+              "value": 5,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "538bc2704069dff7301391bdf102ab058d87802d112c62364cee1bf633d77e3d",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "1650d5a85facb37f90ec8678db0eda5b6201a3f2935ea9231219a28f83d554ff",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 4,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "a2e5dcc4cdda1397928025827cabd55c05637cf61ebc13facf1c1f6e4ed50c34",
+            "expected": {
+              "value": 4,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "ef882034529eae294c77e9ae68b327abd0550835673bbd4ae2725a0b487493c6",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 3,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "d322115d9a0e3a99a34d0a73a77678e20655ea11cd0158fbcf530e6751aec3fd",
+            "expected": {
+              "value": 3,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 9,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "a0539e80daed4f9877bfe4f7f1654e6ea789933abfd7e87edef227285dece40f",
+            "expected": {
+              "value": 9,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "3ed6b7007909e59462eab5160d3b601793af21d45b3c8a2a02166939a9f3c4e5",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "e3b45d8ac68e59e947525d2f6585ac578910d1682f0677c05c47059f0c4212c5",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 0,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "bc649ddc7348b40cf63486aecdeae546196d342a79bc8388126bfe77f7391891",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "3d979ceb126a1fad9958a311518da2052d48fbc7690949cb7fb9025cc293bec4",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "9f96d6c9cf3bb8de7a0ab75b0716a692d72161c5e94ab4c0a827f0f9612cf98d",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "d381d5085cef068cfd7b80ddf30a7f3ea84eb4567e5d3694db9dba4bf6a4ea1f",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 1,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "071447fd9e4713294ce166898fd96c0af8f95e91f535e1306dae85e070aac649",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 2,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "3ef027b865b5a35141aff169929cf338b10e624d8b88b2f1f6507ae3a2b9c03a",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          },
+          {
+            "answer": {
+              "value": 6,
+              "unresolved": false
+            },
+            "trace": [
+              {
+                "table": "history",
+                "rows": 9,
+                "sha256": "b4fc183dcf9b9075ef2c45a69e01080377f62c191d93c4eace81059a88136b5b"
+              }
+            ],
+            "error": null,
+            "id": "ad052cff337b6d96abf71f21a5c294df4b695f33af71746393eb10d1a0072fba",
+            "expected": {
+              "value": 6,
+              "unresolved": false
+            },
+            "correct": true,
+            "unsupported": false
+          }
+        ]
+      },
+      "response_content_sha256": "dc07f3e0ab0fbac4729debc8914b7eed3ca8066dd421aecdf3942b35273f3562",
+      "response_error": null,
+      "interface_error": "ValueError: exported state transitions/readout disagree with investigate"
+    },
+    {
+      "proposal": {
+        "dependencies": [],
+        "lesson": "Channel and conflict handling are inferred by intersecting native SQLite semantics (changes() reports only the last direct statement's row changes and excludes trigger work; total_changes accumulates including trigger inserts; REPLACE counts delete+insert; IGNORE reports 0 on conflict; UPSERT reports 1) against every calibration receipt; a goal is answered only when all surviving family members agree. Exported transition/readout must tolerate a None context and None state to stay consistent with investigate.",
+        "scope": "Disposable SQLite source with private stable (conflict handling, optional AFTER INSERT log trigger, channel) combination; predict channel or committed state for new sequences from receipts.",
+        "source": "def make_candidates():\n    cands = []\n    for conflict in [\"ignore\", \"replace\", \"upsert\"]:\n        for trig in [False, True]:\n            for ch in [\"changes\", \"total_main\", \"total_both\"]:\n                cands.append({\"conflict\": conflict, \"trigger\": trig, \"channel\": ch})\n    return cands\n\ndef simulate(cand, actions):\n    committed = {}\n    main_total = 0\n    other_total = 0\n    main_last = 0\n    txn = None\n    pending = {}\n    deleted = set()\n    for action in actions:\n        op = action.get(\"op\")\n        if op == \"begin\":\n            if txn is None:\n                txn = action.get(\"connection\") or \"main\"\n                pending = {}\n                deleted = set()\n        elif op == \"commit\":\n            if txn is not None:\n                for k in pending:\n                    committed[k] = pending[k]\n                for k in deleted:\n                    committed.pop(k, None)\n                txn = None\n                pending = {}\n                deleted = set()\n        elif op == \"rollback\":\n            txn = None\n            pending = {}\n            deleted = set()\n        else:\n            conn = action.get(\"connection\") or \"main\"\n            if txn is not None:\n                conn = txn\n            key = action.get(\"key\")\n            if txn is not None:\n                if key in deleted:\n                    cur = None\n                elif key in pending:\n                    cur = pending[key]\n                else:\n                    cur = committed.get(key)\n            else:\n                cur = committed.get(key)\n            ch = 0\n            trig = 0\n            store = txn is not None\n            if op == \"put\":\n                val = action.get(\"value\")\n                if cur is None:\n                    ch = 1\n                    if cand[\"trigger\"]:\n                        trig = 1\n                    if store:\n                        pending[key] = val\n                        deleted.discard(key)\n                    else:\n                        committed[key] = val\n                elif cand[\"conflict\"] == \"ignore\":\n                    ch = 0\n                elif cand[\"conflict\"] == \"replace\":\n                    ch = 2\n                    if cand[\"trigger\"]:\n                        trig = 1\n                    if store:\n                        pending[key] = val\n                        deleted.discard(key)\n                    else:\n                        committed[key] = val\n                else:\n                    ch = 1\n                    if store:\n                        pending[key] = val\n                    else:\n                        committed[key] = val\n            elif op == \"update\":\n                val = action.get(\"value\")\n                if cur is not None:\n                    ch = 1\n                    if store:\n                        pending[key] = val\n                    else:\n                        committed[key] = val\n            elif op == \"delete\":\n                if cur is not None:\n                    ch = 1\n                    if store:\n                        deleted.add(key)\n                        pending.pop(key, None)\n                    else:\n                        committed.pop(key, None)\n            if conn == \"main\":\n                main_last = ch\n                main_total = main_total + ch + trig\n            else:\n                other_total = other_total + ch + trig\n    if cand[\"channel\"] == \"changes\":\n        channel = main_last\n    elif cand[\"channel\"] == \"total_main\":\n        channel = main_total\n    else:\n        channel = main_total + other_total\n    count = len(committed)\n    total = sum(committed.values())\n    return {\"channel\": channel, \"committed_count\": count, \"committed_sum\": total}\n\ndef filter_candidates(receipts):\n    survivors = []\n    for cand in make_candidates():\n        ok = True\n        for r in receipts:\n            obs = r.get(\"observed\")\n            sim = simulate(cand, r.get(\"actions\"))\n            if sim[\"channel\"] != obs.get(\"channel\"):\n                ok = False\n            elif sim[\"committed_count\"] != obs.get(\"committed_count\"):\n                ok = False\n            elif sim[\"committed_sum\"] != obs.get(\"committed_sum\"):\n                ok = False\n            if not ok:\n                break\n        if ok:\n            survivors.append(cand)\n    return survivors\n\ndef answer(survivors, actions, goal):\n    if len(survivors) == 0:\n        return {\"value\": None, \"unresolved\": True}\n    sims = []\n    for cand in survivors:\n        sims.append(simulate(cand, actions))\n    if goal is None or goal not in sims[0]:\n        vals = []\n        for g in [\"channel\", \"committed_count\", \"committed_sum\"]:\n            v = sims[0][g]\n            for s in sims:\n                if s[g] != v:\n                    return {\"value\": None, \"unresolved\": True}\n            vals.append(v)\n        if vals[0] == vals[1] and vals[1] == vals[2]:\n            return {\"value\": vals[0], \"unresolved\": False}\n        return {\"value\": None, \"unresolved\": True}\n    v = sims[0][goal]\n    for s in sims:\n        if s[goal] != v:\n            return {\"value\": None, \"unresolved\": True}\n    return {\"value\": v, \"unresolved\": False}\n\ndef investigate(context, acquire):\n    receipts = acquire(\"history\")\n    survivors = filter_candidates(receipts)\n    actions = []\n    goal = None\n    if context is not None:\n        actions = context.get(\"actions\") or []\n        goal = context.get(\"goal\")\n    return answer(survivors, actions, goal)\n\ndef transition(state, action, context, acquire):\n    if state is None:\n        state = {\"actions\": [], \"receipts\": None, \"survivors\": None}\n    state[\"actions\"].append(action)\n    return state\n\ndef readout(state, context, acquire):\n    if state is None:\n        state = {\"actions\": [], \"receipts\": None, \"survivors\": None}\n    receipts = state.get(\"receipts\")\n    if receipts is None:\n        receipts = acquire(\"history\")\n        state[\"receipts\"] = receipts\n    survivors = state.get(\"survivors\")\n    if survivors is None:\n        survivors = filter_candidates(receipts)\n        state[\"survivors\"] = survivors\n    actions = state.get(\"actions\") or []\n    goal = None\n    if context is not None:\n        goal = context.get(\"goal\")\n    return answer(survivors, actions, goal)\n}"
+      },
+      "result": {
+        "correct": 0,
+        "total": 27,
+        "unsupported": 0,
+        "errors": 27,
+        "rows": [
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "600627bcc05a8efb1d0d64e5b831a1e90cd452b30e265e0906c9908f0f6ce981",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "fb05e8f61711be7952487a63ce4d5e40f6f78bf8d0c5a42378a7562d6c5dd62c",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "466a064a98ebc86b056998d0d505c05714866a167e76e64df1aca94dc5240cc6",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "c8040881e8e3067aef08250c9b03b5e0b342a42d60f536ce46956a1e7cfe83fd",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "716cc65f7378b8973532391f0f936c70d43f5f52c18360034073a63d7b31c4f4",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "da1ad452211025db1e0f10a119c1077fafbfeb905f1143cc4717041a9fddf46f",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "224195fc4c7364c2f8b477ba9a5a8faee5ab45a5902fe23e6ca509f524ac3e3c",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "c657e374930868c9da95eebac1af8bd2c4f03107616a4048a0c719d540d0dbff",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "cd03738924f9fdc56c65e554367e43315aebcf65792c328809304d3cac11ea98",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "4e19ce3b6677733e4ffda65124dc7e2f2aa7bbcd3d9a3d12686cd17b903ad1b7",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "ca680af5e1bcb240716c8a4b2ddf18c4c0d240caed0da8a8f0f71ad8687ed846",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "4eaf1dd5f5f8d1606a7c37341b5f48a8c2cbb0290fee30ab623000d1ef6a51c2",
+            "expected": {
+              "value": 5,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "538bc2704069dff7301391bdf102ab058d87802d112c62364cee1bf633d77e3d",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "1650d5a85facb37f90ec8678db0eda5b6201a3f2935ea9231219a28f83d554ff",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "a2e5dcc4cdda1397928025827cabd55c05637cf61ebc13facf1c1f6e4ed50c34",
+            "expected": {
+              "value": 4,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "ef882034529eae294c77e9ae68b327abd0550835673bbd4ae2725a0b487493c6",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "d322115d9a0e3a99a34d0a73a77678e20655ea11cd0158fbcf530e6751aec3fd",
+            "expected": {
+              "value": 3,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "a0539e80daed4f9877bfe4f7f1654e6ea789933abfd7e87edef227285dece40f",
+            "expected": {
+              "value": 9,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "3ed6b7007909e59462eab5160d3b601793af21d45b3c8a2a02166939a9f3c4e5",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "e3b45d8ac68e59e947525d2f6585ac578910d1682f0677c05c47059f0c4212c5",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "bc649ddc7348b40cf63486aecdeae546196d342a79bc8388126bfe77f7391891",
+            "expected": {
+              "value": 0,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "3d979ceb126a1fad9958a311518da2052d48fbc7690949cb7fb9025cc293bec4",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "9f96d6c9cf3bb8de7a0ab75b0716a692d72161c5e94ab4c0a827f0f9612cf98d",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "d381d5085cef068cfd7b80ddf30a7f3ea84eb4567e5d3694db9dba4bf6a4ea1f",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "071447fd9e4713294ce166898fd96c0af8f95e91f535e1306dae85e070aac649",
+            "expected": {
+              "value": 1,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "3ef027b865b5a35141aff169929cf338b10e624d8b88b2f1f6507ae3a2b9c03a",
+            "expected": {
+              "value": 2,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          },
+          {
+            "answer": null,
+            "error": "SyntaxError: unmatched '}' (<unknown>, line 187)",
+            "trace": [],
+            "id": "ad052cff337b6d96abf71f21a5c294df4b695f33af71746393eb10d1a0072fba",
+            "expected": {
+              "value": 6,
+              "unresolved": false
+            },
+            "correct": false,
+            "unsupported": false
+          }
+        ]
+      },
+      "interface_result": null,
+      "response_content_sha256": "8a013ec2bf002f8aba94fa63a09702d2693a8adee460f0da23bd192ad692723d",
+      "response_error": null,
+      "interface_error": "SyntaxError: unmatched '}' (<unknown>, line 187)"
+    }
+  ],
+  "history": [
+    {
+      "source_id": "source-14b99a8dd1e8c3320ae0",
+      "actions": [],
+      "observed": {
+        "channel": 0,
+        "committed_count": 0,
+        "committed_sum": 0
+      },
+      "authority": "native SQLite; independent committed-state connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "fa5ca8c06a99b267ac406e83c949178283258f6b32db50939e9e6fb6a5f9d7de"
+    },
+    {
+      "source_id": "source-14b99a8dd1e8c3320ae0",
+      "actions": [
+        {
+          "op": "put",
+          "key": "a",
+          "value": 2,
+          "connection": "main"
+        }
+      ],
+      "observed": {
+        "channel": 1,
+        "committed_count": 1,
+        "committed_sum": 2
+      },
+      "authority": "native SQLite; independent committed-state connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "7427319d60f86de1425806620056f93795b66deca0b92deae055512ccc8ee7c6"
+    },
+    {
+      "source_id": "source-14b99a8dd1e8c3320ae0",
+      "actions": [
+        {
+          "op": "put",
+          "key": "a",
+          "value": 2,
+          "connection": "other"
+        }
+      ],
+      "observed": {
+        "channel": 0,
+        "committed_count": 1,
+        "committed_sum": 2
+      },
+      "authority": "native SQLite; independent committed-state connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "9bc14a68bc545efcad8635a6ab0e384ac84a9ebb3c4b3c954aff5f9aa6f0c325"
+    },
+    {
+      "source_id": "source-14b99a8dd1e8c3320ae0",
+      "actions": [
+        {
+          "op": "put",
+          "key": "a",
+          "value": 2,
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "key": "a",
+          "value": 5,
+          "connection": "main"
+        }
+      ],
+      "observed": {
+        "channel": 1,
+        "committed_count": 1,
+        "committed_sum": 5
+      },
+      "authority": "native SQLite; independent committed-state connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "fb9f68a8e6c77718fde5fa706ccc422bc85e573bd857f9dae34f700768a41b46"
+    },
+    {
+      "source_id": "source-14b99a8dd1e8c3320ae0",
+      "actions": [
+        {
+          "op": "put",
+          "key": "a",
+          "value": 2,
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "key": "b",
+          "value": 2,
+          "connection": "main"
+        }
+      ],
+      "observed": {
+        "channel": 1,
+        "committed_count": 2,
+        "committed_sum": 4
+      },
+      "authority": "native SQLite; independent committed-state connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "108e033764c759db70934beb0666c1a4da4d109d479406795bcd58235ab438cd"
+    },
+    {
+      "source_id": "source-14b99a8dd1e8c3320ae0",
+      "actions": [
+        {
+          "op": "put",
+          "key": "a",
+          "value": 2,
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "key": "b",
+          "value": 3,
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "key": "c",
+          "value": 4,
+          "connection": "main"
+        }
+      ],
+      "observed": {
+        "channel": 1,
+        "committed_count": 3,
+        "committed_sum": 9
+      },
+      "authority": "native SQLite; independent committed-state connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "3a0913743a19dfb47342cac590fa3913221dbb9bef148d3b68eab0ba766ff8d5"
+    },
+    {
+      "source_id": "source-14b99a8dd1e8c3320ae0",
+      "actions": [
+        {
+          "op": "begin"
+        },
+        {
+          "op": "put",
+          "key": "a",
+          "value": 2,
+          "connection": "main"
+        },
+        {
+          "op": "rollback"
+        }
+      ],
+      "observed": {
+        "channel": 1,
+        "committed_count": 0,
+        "committed_sum": 0
+      },
+      "authority": "native SQLite; independent committed-state connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "3a8b9624089fca54f2d5fda07413800e4c671ad123508c84cf5a645b489bd9eb"
+    },
+    {
+      "source_id": "source-14b99a8dd1e8c3320ae0",
+      "actions": [
+        {
+          "op": "put",
+          "key": "a",
+          "value": 2,
+          "connection": "main"
+        },
+        {
+          "op": "update",
+          "key": "a",
+          "value": 2
+        }
+      ],
+      "observed": {
+        "channel": 1,
+        "committed_count": 1,
+        "committed_sum": 2
+      },
+      "authority": "native SQLite; independent committed-state connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "a9c0849aa9d091df7be557e84e946fb2a7e40564d585202e3e0f1d1a8f9e4681"
+    },
+    {
+      "source_id": "source-14b99a8dd1e8c3320ae0",
+      "actions": [
+        {
+          "op": "put",
+          "key": "a",
+          "value": 2,
+          "connection": "main"
+        },
+        {
+          "op": "put",
+          "key": "b",
+          "value": 4,
+          "connection": "other"
+        }
+      ],
+      "observed": {
+        "channel": 1,
+        "committed_count": 2,
+        "committed_sum": 6
+      },
+      "authority": "native SQLite; independent committed-state connection",
+      "sqlite_version": "3.45.3",
+      "receipt_sha256": "db318efc5e46257f63641362649c97596ae5bc04bb6f55cfe14f0967ad05e0f3"
+    }
+  ],
+  "nodes": {},
+  "arms": {
+    "graph": {
+      "champion": {
+        "program": {
+          "source": "def investigate(context, acquire):\n    return {\"value\": None, \"unresolved\": True}\n",
+          "scope": "No learned source model.",
+          "lesson": ""
+        },
+        "dependencies": []
+      },
+      "rounds": [],
+      "checkpoints": []
+    },
+    "flat": {
+      "champion": {
+        "program": {
+          "source": "def investigate(context, acquire):\n    return {\"value\": None, \"unresolved\": True}\n",
+          "scope": "No learned source model.",
+          "lesson": ""
+        },
+        "dependencies": []
+      },
+      "rounds": [],
+      "checkpoints": []
+    },
+    "fresh": {
+      "champion": {
+        "program": {
+          "source": "def investigate(context, acquire):\n    return {\"value\": None, \"unresolved\": True}\n",
+          "scope": "No learned source model.",
+          "lesson": ""
+        },
+        "dependencies": []
+      },
+      "rounds": [],
+      "checkpoints": []
+    }
+  }
+}

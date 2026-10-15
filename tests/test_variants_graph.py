@@ -44,7 +44,7 @@ class GraphVariantTests(unittest.TestCase):
     def test_full_graph_scope_contracts_and_rank_certificate(self):
         loader = FrozenGraphLoader(self.loader, self.example)
         graph = loader.load_all_nodes()
-        self.assertEqual(len(graph), 51)
+        self.assertEqual(len(graph), len(self.graph) + 1)
         self.assertIn("lab_evidence_check", graph["lab_decide"].dependencies)
         self.assertNotIn("lab_orient", graph["lab_decide"].dependencies)
         for node_id in ("lab_decide", "lab_director", "lab_integrity"):
@@ -92,7 +92,7 @@ class GraphVariantTests(unittest.TestCase):
     def test_mandatory_ancestry_and_feed_tool_mutation_refused(self):
         for operation in [
             {"op": "remove_edge", "dependency_id": "lab_orient", "node_id": "lab_decide"},
-            {"op": "add_edge", "dependency_id": "lab_orient", "node_id": "global_calculator_feed"},
+            {"op": "add_edge", "dependency_id": "lab_orient", "node_id": "global_derived_feed"},
             {"op": "remove_experimental_node", "node_id": "lab_integrity"},
         ]:
             with self.subTest(operation=operation), self.assertRaises(ValueError):

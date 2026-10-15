@@ -50,16 +50,16 @@ class CohortTests(unittest.TestCase):
             horizon = issue + timedelta(days=1)
             feed = self.base / f'feed-{index}'
             write_json(feed / 'runtime_context.json', {'as_of': issue.isoformat()})
-            write_json(feed / 'artifacts/global_stock_feed.json', {'status': 'success',
-                'metadata': {'status': 'success', 'price_basis': 'synthetic_point_quote', 'currency': 'USD', 'synthetic_fixture': True},
-                'data': {'columns': ['Ticker', 'Price', 'timestamp'], 'rows': [['XOM', 100.0, issue.isoformat()]]}})
+            write_json(feed / 'artifacts/global_measurements_feed.json', {'status': 'success',
+                'metadata': {'status': 'success', 'observation_basis': 'explicit_observation', 'unit': 'dimensionless', 'synthetic_fixture': True},
+                'data': {'columns': ['target_id', 'Value', 'timestamp'], 'rows': [['SIGNAL_A', 100.0, issue.isoformat()]]}})
             issues.append({'issue_id': f'issue-{index}', 'feed_source': str(feed), 'time_anchor': issue.isoformat(),
-                'target_time': horizon.isoformat(), 'horizon_id': '24h', 'target_ids': ['XOM'],
+                'target_time': horizon.isoformat(), 'horizon_id': '24h', 'target_ids': ['SIGNAL_A'],
                 'split': 'development' if index < count else 'holdout'})
             if truth:
-                rows.append({'target_id': 'XOM', 'timestamp': horizon.isoformat(), 'price': 101.0})
-        write_json(self.base / 'truth.json', {'metadata': {'status': 'success', 'price_basis': 'synthetic_point_quote',
-            'currency': 'USD', 'synthetic_fixture': True}, 'data': {'rows': rows}})
+                rows.append({'target_id': 'SIGNAL_A', 'timestamp': horizon.isoformat(), 'available_at':horizon.isoformat(), 'value': 101.0})
+        write_json(self.base / 'truth.json', {'metadata': {'status': 'success', 'observation_basis': 'explicit_observation',
+            'unit': 'dimensionless', 'synthetic_fixture': True}, 'data': {'rows': rows}})
         candidate = {'candidate_id': 'baseline', 'hypothesis': 'fixed fixture baseline', 'change': 'none',
             'source_commit': 'offline-fixture', 'model': 'offline-synthetic-fixture', 'execution_kind': 'captured_replay',
             'provider': 'captured', 'graph_variant': None, 'reasoning_policy': None,
@@ -93,7 +93,7 @@ class CohortTests(unittest.TestCase):
         for node in candidate['scope']:
             if node != 'lab_director':
                 write_json(run / 'artifacts' / f'{node}.json', {'status': 'success', 'data': {}})
-        (run / 'artifacts/global_stock_feed.json').write_bytes((source / 'artifacts/global_stock_feed.json').read_bytes())
+        (run / 'artifacts/global_measurements_feed.json').write_bytes((source / 'artifacts/global_measurements_feed.json').read_bytes())
         template = read_json(run / 'handoff/receipts/fixture.json')
         template.update(actual_model=candidate['actual_model'], requested_model=candidate['model'],
                         provider=candidate['provider'], execution_kind=candidate['execution_kind'])
@@ -212,18 +212,18 @@ class CohortTests(unittest.TestCase):
         self.assertIsNone(result['per_issue_scores'])
         self.assertIsNone(result['paired_issue_deltas'])
         self.assertEqual(result['per_issue_coverage']['baseline']['issue-0']['scored_target_count'], 0)
-        self.assertEqual(result['per_issue_coverage']['baseline']['issue-0']['missing_target_ids'], ['XOM'])
+        self.assertEqual(result['per_issue_coverage']['baseline']['issue-0']['missing_target_ids'], ['SIGNAL_A'])
 
     def test_issue_scores_and_paired_deltas_preserve_equal_issue_weight_with_unequal_targets(self):
         self.prepare(2)
         raw = read_json(self.base / 'spec.json')
-        raw['issues'][0]['target_ids'].append('SPY')
-        feed_path = Path(raw['issues'][0]['feed_source']) / 'artifacts/global_stock_feed.json'
+        raw['issues'][0]['target_ids'].append('SUBSYSTEM_A')
+        feed_path = Path(raw['issues'][0]['feed_source']) / 'artifacts/global_measurements_feed.json'
         feed = read_json(feed_path)
-        feed['data']['rows'].append(['SPY', 100.0, raw['issues'][0]['time_anchor']])
+        feed['data']['rows'].append(['SUBSYSTEM_A', 100.0, raw['issues'][0]['time_anchor']])
         write_json(feed_path, feed)
         truth = read_json(self.base / 'truth.json')
-        truth['data']['rows'].append({'target_id': 'SPY', 'timestamp': raw['issues'][0]['target_time'], 'price': 200.0})
+        truth['data']['rows'].append({'target_id': 'SUBSYSTEM_A', 'timestamp': raw['issues'][0]['target_time'], 'available_at':raw['issues'][0]['target_time'], 'value': 200.0})
         write_json(self.base / 'truth.json', truth)
         write_json(self.base / 'multi-spec.json', raw)
         self.study = self.base / 'multi-cohort'
@@ -233,15 +233,15 @@ class CohortTests(unittest.TestCase):
             run = self.run_fixture(candidate, 0)
             cp2_path = run / 'artifacts/lab_director.json'
             cp2 = read_json(cp2_path)
-            extra = dict(cp2['data']['predictions_t'][0], target_id='SPY',
-                         target_price=110.0 if candidate == 'baseline' else 200.0,
-                         invalidation='Synthetic SPY at or below baseline at the declared horizon.')
+            extra = dict(cp2['data']['predictions_t'][0], target_id='SUBSYSTEM_A',
+                         target_value=110.0 if candidate == 'baseline' else 200.0,
+                         invalidation='Synthetic SUBSYSTEM_A at or below baseline at the declared horizon.')
             cp2['data']['predictions_t'].append(extra)
             cp2['data']['evidence_dictionary'].append({
-                'ref_id': '[2]', 'ledger_id': 'S_00000002', 'subject': 'SPY',
-                'signal_summary': 'Synthetic fixture, not market evidence.'})
-            for field in ('epicentre_thesis', 'trade_rationale'):
-                cp2['data'][field] += ' [2] Synthetic SPY shares the declared fixture baseline.'
+                'ref_id': '[2]', 'ledger_id': 'S_00000002', 'subject': 'SUBSYSTEM_A',
+                'signal_summary': 'Synthetic fixture, not system evidence.'})
+            for field in ('epicentre_thesis', 'forecast_rationale'):
+                cp2['data'][field] += ' [2] Synthetic SUBSYSTEM_A shares the declared fixture baseline.'
             write_json(cp2_path, cp2)
             self.assertEqual(cohort.attach(self.study, candidate_id=candidate, issue_id='issue-0', run=run)['state'], 'complete')
             self.assertEqual(self.attach(candidate, 1, target=110.0 if candidate == 'baseline' else 105.0)['state'], 'complete')
@@ -254,7 +254,7 @@ class CohortTests(unittest.TestCase):
         self.assertAlmostEqual(result['paired_issue_deltas']['candidate']['issue-1'], -5 / 101)
         coverage = result['per_issue_coverage']['candidate']
         self.assertEqual(coverage['issue-0']['expected_target_count'], 2)
-        self.assertEqual(coverage['issue-0']['scored_target_ids'], ['SPY', 'XOM'])
+        self.assertEqual(coverage['issue-0']['scored_target_ids'], ['SIGNAL_A', 'SUBSYSTEM_A'])
         self.assertEqual(coverage['issue-1']['expected_target_count'], 1)
         self.assertEqual(result['decisions']['candidate'], 'insufficient_issues')
 
@@ -337,7 +337,7 @@ class CohortTests(unittest.TestCase):
         write_json(self.base / 'baseline-0/artifacts/lab_director.json', {'arbitrary_score': 0})
         with self.assertRaisesRegex(ValueError, 'outputs changed'):
             cohort.evaluate(self.study)
-        frozen_input = self.study / self.spec['issues'][0]['feed_source'] / 'artifacts/global_stock_feed.json'
+        frozen_input = self.study / self.spec['issues'][0]['feed_source'] / 'artifacts/global_measurements_feed.json'
         frozen_input.write_text('{}')
         with self.assertRaisesRegex(ValueError, 'input or candidate changed'):
             cohort.evaluate(self.study)

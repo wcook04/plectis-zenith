@@ -1,0 +1,1479 @@
+{
+  "prompt": {
+    "task": {
+      "id": "binding-1",
+      "family": "synthetic_integer_sequence",
+      "description": "Synthetic resettable integer source. Input is exactly\n{\"values\":[integer,...]}, length 0..32, values -8..8. Return one JSON integer;\nthe empty sequence returns zero. Allowed probes use this same schema. There\nare no tables, clocks, external data or persistent state across queries.\n\nThe following finite family is supplied research bias. Choose a nonzero\npolynomial p(x)=a*x+b*x*x+c*x*x*x, with a,b,c each in {-2,-1,0,1,2}. For each\nlist position its contribution is p(x), optionally plus g*x times either the\nimmediately preceding value or the sum of all preceding values; g is in\n{-2,-1,1,2}, and missing preceding values contribute zero. Apply between one\nand four inclusive cumulative-sum passes to the contribution list, preserving\nlist order. Return the last entry after those passes. The source's choices\nare fixed and private; none is specified by the seed program. Use the measured\nexamples to infer a predictor. Implement investigate(context, acquire).\n\nExecution interface clarification: Use named or single-underscore loop\nvariables; other leading-underscore names remain forbidden. Use multiplication\nrather than **; no defaults.\n",
+      "focus_function": "readout",
+      "calibration": [
+        {
+          "input": {
+            "values": []
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              0
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              1
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              2
+            ]
+          },
+          "expected": 8
+        },
+        {
+          "input": {
+            "values": [
+              -1
+            ]
+          },
+          "expected": -4
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              0
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              1
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              2,
+              1
+            ]
+          },
+          "expected": 32
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              1,
+              0
+            ]
+          },
+          "expected": 80
+        }
+      ],
+      "development": [
+        {
+          "input": {
+            "values": [
+              3,
+              -3
+            ]
+          },
+          "expected": 72
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              0,
+              0
+            ]
+          },
+          "expected": -240
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              2,
+              2,
+              2
+            ]
+          },
+          "expected": 280
+        },
+        {
+          "input": {
+            "values": [
+              -1,
+              1,
+              -1,
+              1,
+              -1
+            ]
+          },
+          "expected": -184
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              0,
+              0,
+              -1,
+              0,
+              0
+            ]
+          },
+          "expected": -40
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              3
+            ]
+          },
+          "expected": -60
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              -1,
+              -2
+            ]
+          },
+          "expected": -280
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              -2,
+              0
+            ]
+          },
+          "expected": -96
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              -3,
+              -3,
+              -3,
+              -3
+            ]
+          },
+          "expected": -5040
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2,
+              2,
+              -2,
+              2
+            ]
+          },
+          "expected": -1552
+        },
+        {
+          "input": {
+            "values": [
+              -4,
+              0
+            ]
+          },
+          "expected": -640
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              0,
+              3
+            ]
+          },
+          "expected": -204
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              -3,
+              2,
+              -1
+            ]
+          },
+          "expected": -2132
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              3
+            ]
+          },
+          "expected": 36
+        },
+        {
+          "input": {
+            "values": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 0
+        },
+        {
+          "input": {
+            "values": [
+              -4,
+              4
+            ]
+          },
+          "expected": -544
+        },
+        {
+          "input": {
+            "values": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "expected": -40
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              0,
+              0,
+              -2
+            ]
+          },
+          "expected": 136
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              1,
+              -3,
+              2,
+              0
+            ]
+          },
+          "expected": -408
+        },
+        {
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              2,
+              0,
+              0
+            ]
+          },
+          "expected": 80
+        },
+        {
+          "input": {
+            "values": [
+              -3,
+              -3
+            ]
+          },
+          "expected": -360
+        },
+        {
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": -232
+        },
+        {
+          "input": {
+            "values": [
+              2,
+              0,
+              0,
+              4
+            ]
+          },
+          "expected": 256
+        },
+        {
+          "input": {
+            "values": [
+              -1,
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "expected": -132
+        }
+      ]
+    },
+    "instruction": "Improve the whole ordinary program using the function contracts and measured examples. Check whether the information passed across interfaces suffices for the requested result. You may change ANY function/interface/state, add/remove helpers or replace the whole program. Choose the simplest useful refactoring; preserving correct code is allowed.",
+    "current_program": "def summarize_values(values):\n    return values[-1] if values else 0\n\ndef readout(summary):\n    return summary\n\ndef investigate(context, acquire):\n    return readout(summarize_values(context[\"values\"]))\n",
+    "current_development": {
+      "correct": 4,
+      "total": 36,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": []
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1
+            ]
+          },
+          "expected": 0,
+          "correct": false
+        },
+        {
+          "answer": 2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2
+            ]
+          },
+          "expected": 8,
+          "correct": false
+        },
+        {
+          "answer": -1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1
+            ]
+          },
+          "expected": -4,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              0
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              1
+            ]
+          },
+          "expected": 0,
+          "correct": false
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1
+            ]
+          },
+          "expected": 0,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              0,
+              0
+            ]
+          },
+          "expected": 0,
+          "correct": true
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 0,
+          "correct": false
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              2,
+              1
+            ]
+          },
+          "expected": 32,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              1,
+              0
+            ]
+          },
+          "expected": 80,
+          "correct": false
+        },
+        {
+          "answer": -3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              3,
+              -3
+            ]
+          },
+          "expected": 72,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              0,
+              0
+            ]
+          },
+          "expected": -240,
+          "correct": false
+        },
+        {
+          "answer": 2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              2,
+              2,
+              2
+            ]
+          },
+          "expected": 280,
+          "correct": false
+        },
+        {
+          "answer": -1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1,
+              1,
+              -1,
+              1,
+              -1
+            ]
+          },
+          "expected": -184,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              0,
+              0,
+              -1,
+              0,
+              0
+            ]
+          },
+          "expected": -40,
+          "correct": false
+        },
+        {
+          "answer": 3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              3
+            ]
+          },
+          "expected": -60,
+          "correct": false
+        },
+        {
+          "answer": -2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              -1,
+              -2
+            ]
+          },
+          "expected": -280,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              -2,
+              0
+            ]
+          },
+          "expected": -96,
+          "correct": false
+        },
+        {
+          "answer": -3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              -3,
+              -3,
+              -3,
+              -3
+            ]
+          },
+          "expected": -5040,
+          "correct": false
+        },
+        {
+          "answer": 2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2,
+              2,
+              -2,
+              2
+            ]
+          },
+          "expected": -1552,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -4,
+              0
+            ]
+          },
+          "expected": -640,
+          "correct": false
+        },
+        {
+          "answer": 3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              0,
+              3
+            ]
+          },
+          "expected": -204,
+          "correct": false
+        },
+        {
+          "answer": -1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              -3,
+              2,
+              -1
+            ]
+          },
+          "expected": -2132,
+          "correct": false
+        },
+        {
+          "answer": 3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              0,
+              3
+            ]
+          },
+          "expected": 36,
+          "correct": false
+        },
+        {
+          "answer": 1,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              1,
+              1,
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          "expected": 0,
+          "correct": false
+        },
+        {
+          "answer": 4,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -4,
+              4
+            ]
+          },
+          "expected": -544,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1,
+              0,
+              0
+            ]
+          },
+          "expected": -40,
+          "correct": false
+        },
+        {
+          "answer": -2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              0,
+              0,
+              -2
+            ]
+          },
+          "expected": 136,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              1,
+              -3,
+              2,
+              0
+            ]
+          },
+          "expected": -408,
+          "correct": false
+        },
+        {
+          "answer": 0,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              0,
+              0,
+              0,
+              2,
+              0,
+              0
+            ]
+          },
+          "expected": 80,
+          "correct": false
+        },
+        {
+          "answer": -3,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -3,
+              -3
+            ]
+          },
+          "expected": -360,
+          "correct": false
+        },
+        {
+          "answer": -2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -2,
+              2,
+              -2
+            ]
+          },
+          "expected": -232,
+          "correct": false
+        },
+        {
+          "answer": 4,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              2,
+              0,
+              0,
+              4
+            ]
+          },
+          "expected": 256,
+          "correct": false
+        },
+        {
+          "answer": 2,
+          "trace": [],
+          "error": null,
+          "input": {
+            "values": [
+              -1,
+              0,
+              0,
+              0,
+              2
+            ]
+          },
+          "expected": -132,
+          "correct": false
+        }
+      ]
+    },
+    "prior_attempts": [
+      {
+        "change": "Replaced the identity readout with a full inference program. It enumerates the private family (polynomial coefficients a,b,c in {-2..2}, optional g*x times previous value or prefix sum, 1..4 cumulative passes), filters candidates by all calibration and development examples, and returns the unique surviving candidate's prediction. The empty list returns 0.",
+        "scope": "investigate now performs candidate enumeration and consistency filtering over the supplied examples, then applies the surviving model to the query values. summarize_values and readout are retained as helpers but the main logic is self-contained in investigate.",
+        "source": "def summarize_values(values):\n    return values[-1] if values else 0\n\ndef readout(summary):\n    return summary\n\ndef _poly(x, a, b, c):\n    return a * x + b * x * x + c * x * x * x\n\ndef _apply_passes(contrib, passes):\n    cur = list(contrib)\n    for _ in range(passes):\n        nxt = []\n        run = 0\n        for v in cur:\n            run = run + v\n            nxt.append(run)\n        cur = nxt\n    return cur\n\ndef _predict(values, a, b, c, mode, g, passes):\n    if len(values) == 0:\n        return 0\n    contrib = []\n    prefix = 0\n    for i in range(len(values)):\n        x = values[i]\n        base = _poly(x, a, b, c)\n        extra = 0\n        if mode == 1:\n            if i > 0:\n                extra = g * x * values[i - 1]\n        elif mode == 2:\n            extra = g * x * prefix\n        contrib.append(base + extra)\n        prefix = prefix + x\n    out = _apply_passes(contrib, passes)\n    return out[-1]\n\ndef _candidates():\n    cands = []\n    for a in range(-2, 3):\n        for b in range(-2, 3):\n            for c in range(-2, 3):\n                if a == 0 and b == 0 and c == 0:\n                    continue\n                for mode in range(3):\n                    gs = [0] if mode == 0 else [-2, -1, 1, 2]\n                    for g in gs:\n                        for passes in range(1, 5):\n                            cands.append((a, b, c, mode, g, passes))\n    return cands\n\ndef _examples():\n    ex = []\n    ex.append(([], 0))\n    ex.append(([0], 0))\n    ex.append(([1], 0))\n    ex.append(([2], 8))\n    ex.append(([-1], -4))\n    ex.append(([1, 0], 0))\n    ex.append(([0, 1], 0))\n    ex.append(([1, 1], 0))\n    ex.append(([1, 0, 0], 0))\n    ex.append(([1, 1, 1], 0))\n    ex.append(([1, 2, 1], 32))\n    ex.append(([2, 1, 0], 80))\n    ex.append(([3, -3], 72))\n    ex.append(([-2, 0, 0], -240))\n    ex.append(([2, 2, 2, 2], 280))\n    ex.append(([-1, 1, -1, 1, -1], -184))\n    ex.append(([1, 0, 0, -1, 0, 0], -40))\n    ex.append(([-2, 3], -60))\n    ex.append(([-2, -1, -2], -280))\n    ex.append(([0, 0, -2, 0], -96))\n    ex.append(([-3, -3, -3, -3, -3], -5040))\n    ex.append(([-2, 2, -2, 2, -2, 2], -1552))\n    ex.append(([-4, 0], -640))\n    ex.append(([-2, 0, 3], -204))\n    ex.append(([-3, -3, 2, -1], -2132))\n    ex.append(([0, 0, 0, 0, 3], 36))\n    ex.append(([1, 1, 1, 1, 1, 1], 0))\n    ex.append(([-4, 4], -544))\n    ex.append(([-1, 0, 0], -40))\n    ex.append(([2, 0, 0, -2], 136))\n    ex.append(([2, 1, -3, 2, 0], -408))\n    ex.append(([0, 0, 0, 2, 0, 0], 80))\n    ex.append(([-3, -3], -360))\n    ex.append(([-2, 2, -2], -232))\n    ex.append(([2, 0, 0, 4], 256))\n    ex.append(([-1, 0, 0, 0, 2], -132))\n    return ex\n\ndef investigate(context, acquire):\n    values = context[\"values\"]\n    ex = _examples()\n    good = []\n    for cand in _candidates():\n        a, b, c, mode, g, passes = cand\n        ok = True\n        for inp, exp in ex:\n            if _predict(inp, a, b, c, mode, g, passes) != exp:\n                ok = False\n                break\n        if ok:\n            good.append(cand)\n    if len(good) == 0:\n        return 0\n    a, b, c, mode, g, passes = good[0]\n    return _predict(values, a, b, c, mode, g, passes)\n",
+        "node_id": "binding-1-contracts-0",
+        "response_error": null,
+        "constraint_error": "ValueError: private names are not permitted",
+        "development": {
+          "correct": 0,
+          "total": 36,
+          "errors": 36,
+          "rows": [
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": []
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2
+                ]
+              },
+              "expected": 8,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -1
+                ]
+              },
+              "expected": -4,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  0
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0,
+                  1
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  1
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  0,
+                  0
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  2,
+                  1
+                ]
+              },
+              "expected": 32,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2,
+                  1,
+                  0
+                ]
+              },
+              "expected": 80,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  3,
+                  -3
+                ]
+              },
+              "expected": 72,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -2,
+                  0,
+                  0
+                ]
+              },
+              "expected": -240,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2,
+                  2,
+                  2,
+                  2
+                ]
+              },
+              "expected": 280,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -1,
+                  1,
+                  -1,
+                  1,
+                  -1
+                ]
+              },
+              "expected": -184,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  0,
+                  0,
+                  -1,
+                  0,
+                  0
+                ]
+              },
+              "expected": -40,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -2,
+                  3
+                ]
+              },
+              "expected": -60,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -2,
+                  -1,
+                  -2
+                ]
+              },
+              "expected": -280,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  -2,
+                  0
+                ]
+              },
+              "expected": -96,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -3,
+                  -3,
+                  -3,
+                  -3,
+                  -3
+                ]
+              },
+              "expected": -5040,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -2,
+                  2,
+                  -2,
+                  2,
+                  -2,
+                  2
+                ]
+              },
+              "expected": -1552,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -4,
+                  0
+                ]
+              },
+              "expected": -640,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -2,
+                  0,
+                  3
+                ]
+              },
+              "expected": -204,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -3,
+                  -3,
+                  2,
+                  -1
+                ]
+              },
+              "expected": -2132,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  3
+                ]
+              },
+              "expected": 36,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              },
+              "expected": 0,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -4,
+                  4
+                ]
+              },
+              "expected": -544,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -1,
+                  0,
+                  0
+                ]
+              },
+              "expected": -40,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2,
+                  0,
+                  0,
+                  -2
+                ]
+              },
+              "expected": 136,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2,
+                  1,
+                  -3,
+                  2,
+                  0
+                ]
+              },
+              "expected": -408,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  0,
+                  0,
+                  0,
+                  2,
+                  0,
+                  0
+                ]
+              },
+              "expected": 80,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -3,
+                  -3
+                ]
+              },
+              "expected": -360,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -2,
+                  2,
+                  -2
+                ]
+              },
+              "expected": -232,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  2,
+                  0,
+                  0,
+                  4
+                ]
+              },
+              "expected": 256,
+              "correct": false
+            },
+            {
+              "answer": null,
+              "trace": [],
+              "error": "ValueError: ValueError: private names are not permitted",
+              "input": {
+                "values": [
+                  -1,
+                  0,
+                  0,
+                  0,
+                  2
+                ]
+              },
+              "expected": -132,
+              "correct": false
+            }
+          ]
+        },
+        "prompt_sha256": "f0ac7eb08ac718b8b32c4f759d74c3a98f9e47dc870c80eaf66e9040628f6d0b",
+        "raw_sha256": "6d1f2db150e0ab5f5d856de2ad6e55f64d215cc2e521a69f9b6cbc408e1ac9a7",
+        "elapsed_seconds": 8.161883917025989,
+        "structure": null
+      }
+    ],
+    "required_return": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "change": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "scope",
+        "change"
+      ],
+      "additionalProperties": false
+    },
+    "function_contracts": [
+      "summarize_values(values); calls []; used by ['investigate']",
+      "readout(summary); calls []; used by ['investigate']",
+      "investigate(context, acquire); calls ['readout', 'summarize_values']; used by []"
+    ]
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, while loops, I/O or global state.\nThe single local name _ is allowed; other leading-underscore names are not.\nUse x*x and x*x*x rather than exponentiation (**); do not use function defaults.\nFor loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

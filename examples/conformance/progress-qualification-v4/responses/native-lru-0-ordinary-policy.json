@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    capacity = context['capacity']\\n    events = [{'op': 'call', 'key': 1}, {'op': 'call', 'key': 2}, {'op': 'call', 'key': 3}, {'op': 'call', 'key': 1}, {'op': 'call', 'key': 4}, {'op': 'call', 'key': 2}]\\n    return {'query': {'capacity': capacity, 'events': events}, 'note': {'hypothesis': 'parent evicts LRU on miss before inserting; native evicts after insertion, so capacity-3 sequence 1,2,3,1,4,2 should differ in final size and hits'}}\\n\",\"scope\":\"Compare parent LRU eviction timing against native functools.lru_cache on capacity 3 with a repeated key followed by two fresh keys.\",\"change\":\"Use event sequence call 1,2,3,1,4,2 at capacity 3; parent predicts hits=1, misses=5, size=2, while native should retain key 1 and yield hits=2, misses=4, size=3.\"}",
+  "prompt_sha256": "f087c560535788b89606d9866c6a6bb47464908b43cf065b2f8324c2fb1637fd"
+}

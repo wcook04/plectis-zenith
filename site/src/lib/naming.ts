@@ -4,19 +4,16 @@
 import { laneLabel, laneName } from './lanes';
 
 const LANE_TOKEN: Record<string, string> = {
-  stock: 'STOCK',
-  etf: 'ETF',
-  macro: 'MACRO',
-  news: 'NEWS',
-  poly: 'POLYMARKET',
-  polymarket: 'POLYMARKET',
-  calc: 'CALCULATOR',
-  calculator: 'CALCULATOR',
-  stockgrid: 'STOCKGRID',
+  measurements: 'MEASUREMENTS',
+  subsystems: 'SUBSYSTEMS',
+  environment: 'ENVIRONMENT',
+  events: 'EVENTS',
+  interventions: 'INTERVENTIONS',
+  derived: 'DERIVED',
 };
 
 const FIXED: Record<string, string> = {
-  global_calculator_feed: 'Calculator',
+  global_derived_feed: 'Derived summaries',
   lab_seed_state: 'Seed state',
   lab_cross_corr_v1: 'Synthesis 1',
   lab_cross_corr_v2: 'Synthesis 2',
@@ -28,14 +25,14 @@ const FIXED: Record<string, string> = {
   oracle_subject_lab_cross_corr_v2: 'Saved Synthesis 2',
   oracle_subject_lab_decide: 'Saved CP1',
   oracle_subject_lab_director: 'Saved CP2',
-  oracle_truth_diff_equity: 'Equity differences',
-  oracle_truth_diff_macro: 'Macro differences',
+  oracle_truth_diff_observations: 'Observation differences',
+  oracle_truth_diff_environment: 'Environment differences',
   oracle_truth_map: 'Evidence summary',
   oracle_attribution_map: 'Failure hypothesis',
   oracle_explain: 'Later context',
   oracle_cp2_emitter: 'Oracle report',
   delta_analyzer: 'Delta analyser',
-  dossier_updater: 'Dossier updater',
+  dossier_updater: 'Instruction updater',
   version_committer: 'Version committer',
 };
 
@@ -64,7 +61,7 @@ export type Family = { key: string; label: string; summary: string };
 const FAMILIES: Array<{ test: RegExp; family: Family }> = [
   {
     test: /^global_\w+_feed$/,
-    family: { key: 'feeds', label: 'Saved feeds', summary: 'Acquired feeds and the derived calculator' },
+    family: { key: 'feeds', label: 'Saved feeds', summary: 'Source observations and computed summaries' },
   },
   {
     test: /^lab_miner_v2_/,
@@ -72,7 +69,7 @@ const FAMILIES: Array<{ test: RegExp; family: Family }> = [
   },
   {
     test: /^lab_miner_/,
-    family: { key: 'miners', label: 'First-pass miners', summary: 'One feed-specific reader per lane' },
+    family: { key: 'miners', label: 'First-pass miners', summary: 'One reader for each data feed' },
   },
   {
     test: /^oracle_subject_\w+_feed$/,
@@ -87,8 +84,8 @@ const FAMILIES: Array<{ test: RegExp; family: Family }> = [
     family: { key: 'diffs', label: 'Numeric differences', summary: 'Before and after, computed without a model' },
   },
   {
-    test: /^oracle_truth_(stock|etf|macro|news|poly|calc|stockgrid)$/,
-    family: { key: 'lane_reviews', label: 'Lane reviews', summary: 'What each lane shows after the cutoff' },
+    test: /^oracle_truth_(measurements|subsystems|environment|events|interventions|derived)$/,
+    family: { key: 'lane_reviews', label: 'Source reviews', summary: 'What each data source shows after the cutoff' },
   },
 ];
 
@@ -102,7 +99,7 @@ export function nodeFamily(id: string, mission = 'lab'): Family | null {
 
 // One plain line under each card, paraphrasing the node's authored purpose.
 const ROLE: Record<string, string> = {
-  global_calculator_feed: 'Regime metrics from stocks, ETFs, macro',
+  global_derived_feed: 'Summaries computed from the earlier observations',
   lab_seed_state: 'Maps what data exists and what is missing',
   lab_cross_corr_v1: 'Where the miners agree and conflict',
   lab_cross_corr_v2: 'Where evidence converges on targets',
@@ -114,13 +111,13 @@ const ROLE: Record<string, string> = {
   oracle_subject_lab_cross_corr_v2: 'The Lab’s second synthesis',
   oracle_subject_lab_decide: 'The Lab’s frozen thesis',
   oracle_subject_lab_director: 'The Lab’s frozen predictions',
-  oracle_truth_diff_equity: 'Stock and ETF before and after',
-  oracle_truth_diff_macro: 'Macro before and after',
-  oracle_truth_map: 'Combines the lane reviews',
+  oracle_truth_diff_observations: 'Target values before and after',
+  oracle_truth_diff_environment: 'Environment before and after',
+  oracle_truth_map: 'Combines the source reviews',
   oracle_attribution_map: 'Maps what happened onto the Lab’s evidence',
   oracle_explain: 'Optional later context for misses',
   oracle_cp2_emitter: 'Records the reconstruction for review',
-  delta_analyzer: 'Which dossier sections to change',
+  delta_analyzer: 'Which parts of an instruction to change',
   dossier_updater: 'Writes the exact patch',
   version_committer: 'Applies it as a new version',
 };
@@ -136,7 +133,7 @@ export function nodeRole(id: string, mission = 'lab'): string {
   m = /^oracle_subject_(\w+?)_feed$/.exec(id);
   if (m) return 'As the Lab saw it';
   m = /^oracle_truth_(\w+)$/.exec(id);
-  if (m) return 'What this lane shows later';
+  if (m) return 'What this source shows later';
   return '';
 }
 

@@ -1,0 +1,252 @@
+{
+  "phase": "target_query",
+  "arm": "cold",
+  "turn": 2,
+  "system": "Investigate the opaque client under its public contract.\nReturn exactly JSON {\"queries\": [legal query objects], \"note\": string or null}.\nDistinguish measured observations from proposed experiments.\nYou may design new legal queries from the public contract and full query grammar,\nincluding before any target receipt exists. Development receipts may motivate\nquestions and measured target receipts may guide later choices. A proposed query\ndoes not assert its outcome. Never present an unmeasured reference/client outcome\nor an old exact answer as a measured target result. Stopping remains allowed.\nDo not repeat the public example or earlier queries. Queries are actions, not a\nrepaired implementation. Empty queries stops.",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "queries": {
+        "type": "array",
+        "maxItems": 1,
+        "items": {
+          "type": "object"
+        }
+      },
+      "note": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "queries",
+      "note"
+    ],
+    "additionalProperties": false
+  },
+  "prompt": {
+    "public_task": {
+      "id": "transfer-m6",
+      "family": "transfer",
+      "contract": "Each account transfer is all-or-nothing on real SQLite balances: debit then credit, with no negative balance. Missing source, missing destination or insufficient funds makes only that transfer fail. Later transfers and a caller continuation still run. An existing caller transaction, its earlier writes, and its right to roll back remain intact. Observe each transfer's success, balances and transaction state, then the continuation and caller rollback. No implementation source is supplied.",
+      "query_shape": {
+        "outer": "Boolean: true opens a caller-owned transaction before initial state; the caller rolls it back after the continuation.",
+        "steps": "1..3 ordered operations; every step is attempted, including after a failure.",
+        "initial": "List of 2..4 [id,balance] pairs: DISTINCT integer ids 1..9 and integer balances 0..9.",
+        "steps_item": "[source_id,destination_id,amount]: integer ids 1..10 and integer amount 1..9. Missing ids and insufficient funds are legal cases.",
+        "continuation": "[account_id,positive_credit]: integer id 1..10 and integer credit 1..3, applied by the caller after every step."
+      },
+      "probe_limit": 6,
+      "example": {
+        "query": {
+          "outer": false,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": false
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": false,
+          "state_after_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ]
+        },
+        "discrepancy": false
+      }
+    },
+    "development_history": [],
+    "target_receipts": [
+      {
+        "query": {
+          "outer": true,
+          "initial": [
+            [
+              1,
+              5
+            ],
+            [
+              2,
+              2
+            ]
+          ],
+          "steps": [
+            [
+              1,
+              2,
+              1
+            ]
+          ],
+          "continuation": [
+            2,
+            1
+          ]
+        },
+        "reference": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": true
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": true,
+          "state_after_caller_rollback": []
+        },
+        "client": {
+          "steps": [
+            {
+              "ok": true,
+              "state": [
+                [
+                  1,
+                  4
+                ],
+                [
+                  2,
+                  3
+                ]
+              ],
+              "transaction_open": true
+            }
+          ],
+          "continuation_ok": true,
+          "state_before_caller_rollback": [
+            [
+              1,
+              4
+            ],
+            [
+              2,
+              4
+            ]
+          ],
+          "transaction_open_before_caller_rollback": true,
+          "state_after_caller_rollback": []
+        },
+        "discrepancy": false,
+        "slot": 1,
+        "note": "Probe whether an outer caller transaction changes transfer atomicity/visibility: with outer=true, the transfer's debit/credit may occur inside the caller transaction, so the continuation and pre-rollback state should reveal whether the transfer is committed independently or remains part of the caller's transaction."
+      }
+    ],
+    "remaining_slots": 5,
+    "max_queries_this_turn": 1
+  }
+}

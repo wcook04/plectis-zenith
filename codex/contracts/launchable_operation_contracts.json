@@ -180,28 +180,28 @@
       "provider_cost_class": "nvidia_embedding"
     },
     {
-      "operation_id": "market_snapshot",
+      "operation_id": "system_snapshot",
       "automatic_dispatch_allowed": true,
       "dispatch_modes": [
         "manual",
         "metabolismd"
       ],
-      "owner_surface": "tools/meta/control/market_snapshot.py",
+      "owner_surface": "tools/meta/control/system_snapshot.py",
       "output_surface": [
-        "state/metabolism/market_timeline.jsonl"
+        "state/metabolism/system_timeline.jsonl"
       ],
       "satisfaction_refs": [
-        "docs/finance/market_experiments.md",
-        "system/server/tests/test_metabolism_market_clock.py"
+        "docs/observations/system_experiments.md",
+        "system/server/tests/test_metabolism_system_clock.py"
       ],
       "residual_routing": {
         "primary": "metabolismd terminal receipt",
         "stale_or_failed": "Missed captures retire before fetch; provider/data failures retained separately from model scores."
       },
       "result_landing_contract": {
-        "produces": "Timestamped public market observations and explicit quality or failure receipts.",
+        "produces": "Timestamped public system observations and explicit quality or failure receipts.",
         "lands_at": [
-          "state/metabolism/market_timeline.jsonl"
+          "state/metabolism/system_timeline.jsonl"
         ],
         "success_signal": "Current fire collected, artifact timestamps and per-symbol coverage preserved.",
         "residual_signal": "Missed window, unavailable feed or model, incomplete scoring truth."
@@ -209,37 +209,37 @@
       "local_cost_class": "remote_light_local_light",
       "provider_cost_class": "free_only",
       "input_freshness_contract": {
-        "mode": "market_capture_window",
+        "mode": "system_capture_window",
         "max_delay_seconds": 900
       }
     },
     {
-      "operation_id": "market_feed_bundle",
+      "operation_id": "system_feed_bundle",
       "automatic_dispatch_allowed": true,
       "dispatch_modes": [
         "manual",
         "metabolismd"
       ],
-      "owner_surface": "tools/finance/scheduled_feed_bundle.py",
+      "owner_surface": "tools/observations/scheduled_feed_bundle.py",
       "output_surface": [
         "state/runs/<run_id>/artifacts/feed_readiness_summary.json",
-        "state/reports/market_feeds/latest_evidence_card.json",
-        "state/finance_eval/market_experiments/latest_cycle.json"
+        "state/reports/system_feeds/latest_evidence_card.json",
+        "state/observations_eval/system_experiments/latest_cycle.json"
       ],
       "satisfaction_refs": [
-        "docs/finance/market_experiments.md",
-        "system/server/tests/test_metabolism_market_clock.py"
+        "docs/observations/system_experiments.md",
+        "system/server/tests/test_metabolism_system_clock.py"
       ],
       "residual_routing": {
         "primary": "metabolismd terminal receipt",
         "stale_or_failed": "Missed captures retire before fetch; provider/data failures retained separately from model scores."
       },
       "result_landing_contract": {
-        "produces": "Timestamped public market observations and explicit quality or failure receipts.",
+        "produces": "Timestamped public system observations and explicit quality or failure receipts.",
         "lands_at": [
           "state/runs/<run_id>/artifacts/feed_readiness_summary.json",
-          "state/reports/market_feeds/latest_evidence_card.json",
-          "state/finance_eval/market_experiments/latest_cycle.json"
+          "state/reports/system_feeds/latest_evidence_card.json",
+          "state/observations_eval/system_experiments/latest_cycle.json"
         ],
         "success_signal": "Current fire collected, artifact timestamps and per-symbol coverage preserved.",
         "residual_signal": "Missed window, unavailable feed or model, incomplete scoring truth."
@@ -247,7 +247,7 @@
       "local_cost_class": "remote_light_local_light",
       "provider_cost_class": "free_only",
       "input_freshness_contract": {
-        "mode": "market_capture_window",
+        "mode": "system_capture_window",
         "max_delay_seconds": 900
       }
     }

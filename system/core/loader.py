@@ -94,7 +94,7 @@ class _NodeIndexer:
     - Ownership: Owns `root` and derived `nodes_dir` paths; produces manifest dict for `PhysicalLoader`.
     - Mutability: `root`/`nodes_dir` stable after init; manifest produced per `scan()` call.
     - Concurrency: No internal locks; caller must serialize scans if filesystem contents are mutable.
-    - Writes: stdout warnings for malformed JSON and helper assets (JSON without `"id"`).
+    - Writes: stdout warnings for malformed JSON and helper targets (JSON without `"id"`).
     """
 
     def __init__(self, root: Union[str, Path] = ".") -> None:
@@ -160,7 +160,7 @@ class _NodeIndexer:
                         raise DuplicateIDError(f"Duplicate Node ID '{nid}' in {path} vs {manifest[nid]}")
                     manifest[nid] = path.resolve()
                 else:
-                    # Helper assets allowed, just warn
+                    # Helper targets allowed, just warn
                     print(f"⚠️  [LOADER] SKIPPING NON-NODE JSON (No 'id'): {path.name}")
 
         return manifest

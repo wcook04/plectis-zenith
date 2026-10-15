@@ -11,11 +11,74 @@ import { Results } from './components/Results';
 import { RunPicker, type RunChoice } from './components/RunPicker';
 import type { RunContext } from './components/Inspector';
 import { latexToText } from './lib/latex';
-import { SiteEvidenceContext } from './lib/siteContext';
+import { SiteEvidenceContext, SiteFiguresContext } from './lib/siteContext';
 import { Preparation, preparationSummary } from './components/Preparation';
 import { nodeName } from './lib/naming';
 import { useAsync } from './lib/hooks';
 import { ThemeToggle } from './components/ThemeToggle';
+import { CopyButton } from './components/CopyButton';
+
+const RECEIPT_LABEL: Record<string, string> = {
+  'progress-campaign': 'Current investigation comparison and ordinary tester controls',
+  'client-investigation': 'Separate SQLite client investigation pilot',
+  'client-investigation-v2': 'SQLite client pilot v2, reasoning none',
+  'client-investigation-v2-low': 'SQLite client pilot v2, reasoning low',
+  'advance-campaign': 'Advance conformance campaign and continuation-memory evidence',
+  'decomposition-result': 'Structural revision and synthetic rule-induction studies',
+  'observation-learning-result': 'Native observation-learning study',
+  'observation-screens': 'Follow-on repair, candidate search and composition tests',
+  'investigation-learning-result': 'Operational investigation campaigns',
+  sources: 'Where each input comes from, with file hashes',
+  replacements: 'Synthetic multi-feed observations',
+  'demo-result': 'Preparation record',
+  observations: 'Synthetic observations',
+  'window-result': 'Window experiment record',
+  'conditional-result': 'Conditional continuation record',
+};
+
+const PROGRESS_COPY: Record<string, string[]> = {
+  idea: ['A useful retained result is a source-bound procedure: which question to ask, what the source measured, and when that answer must be checked again. The current comparison tests whether such investigation improves later repair.'],
+  lab: ['A model may deliver a bounded native question directly or as a compiled selector. The host records each legal measurement, repeated proposal, invalid query and delivery failure. A strong fixed tester and ordinary code provide controls.'],
+  oracle: ['Measured outcomes and the failed program reach repair. The selected revision must preserve every earlier measured success; later cases remain protected until selection freezes. A repair-only arm tests the value of new evidence.'],
+  evolve: ['The corrected exact-class learner keeps useful continuation questions as an ordinary diagnostic baseline. Its acquisition cost and generic-question rival remain separate from the model investigation comparison.'],
+  results: ['The native comparison keeps qualification and diagnostic studies separate. The client pilot tests retained investigation within an authored SQLite family; the exact-class learner has its own acquisition comparison. Each study keeps its own costs and evaluation panel.'],
+  next: ['A useful new measurement or retained procedure must earn its lifetime cost against capable ordinary testing on later changed clients. Delivery, repair and transfer are separate claims.'],
+};
+
+// Older site metadata still names Advance as active. Keep its reading path
+// available without using that receipt as the current Progress result.
+const ADVANCE_COPY: Record<string, string[]> = {
+  idea: ['Experience should change useful distinctions, computations, interfaces or experiments. The research programme tests whether that retained knowledge makes later work more capable or less costly.'],
+  lab: ['Model-written investigators propose bounded native experiments. The host records legal measurements, invalid queries and delivery failures separately.'],
+  oracle: ['Measured outcomes and the failed program reach repair. Selection preserves every measured obligation the parent already satisfied, then freezes the chosen program before later panels.'],
+  evolve: ['Continuation and fork operations test what retained state can support. Authored mechanism checks remain separate from model acquisition.'],
+  results: ['The Advance receipt separates conformance studies and continuation-memory checks. Calls and reported costs are totalled; outcomes from different studies are not pooled.'],
+  next: ['Useful transfer, composition and improvement of the learning rule remain research questions. The programme preserves simpler ordinary-code controls and unresolved conclusions.'],
+};
+
+function activeEvidenceUrl(site: Site, chapter?: Chapter): string | undefined {
+  return site.active_evidence_id ? site.evidence[site.active_evidence_id] : chapter?.evidence_urls[0];
+}
+
+const FIGURE_LABEL: Record<string, string> = {
+  replay: 'The full loop',
+  lab: 'Lab overview',
+  oracle: 'Oracle overview',
+  evolve: 'Evolve overview',
+  'lab-detail': 'Lab, every node',
+  'oracle-detail': 'Oracle, every node',
+  'evolve-detail': 'Evolve, every node',
+};
+
+// Each chapter's figure gets the track its content needs.
+const FIGURE_TRACK: Record<string, string> = {
+  idea: 'wide',
+  lab: 'full',
+  oracle: 'full',
+  evolve: 'compact',
+  results: 'wide',
+  next: 'wide',
+};
 
 const NAV_LABEL: Record<string, string> = {
   idea: 'The idea',
@@ -53,8 +116,29 @@ export default function App() {
   return <Page site={site.value} paper={paper.status === 'ready' ? paper.value : null} />;
 }
 
+function useCurrentChapter(ids: string[]): string | null {
+  const [current, setCurrent] = useState<string | null>(null);
+  useEffect(() => {
+    if (ids.length === 0 || typeof IntersectionObserver === 'undefined') return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible[0]) setCurrent(visible[0].target.id);
+      },
+      { rootMargin: '-120px 0px -60% 0px' },
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [ids.join('|')]); // eslint-disable-line react-hooks/exhaustive-deps
+  return current;
+}
+
 function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
   const [noticeOpen, setNoticeOpen] = useState(false);
+  const current = useCurrentChapter(site ? [...site.chapters.map((c) => c.id), 'paper'] : []);
   return (
     <>
       <a className="skip" href="#main">
@@ -64,8 +148,8 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
         <div className="notice-bar">
           <div className="wrap notice-bar__inner">
             <p>
-              <strong>{site?.notice ?? 'This is not financial advice.'}</strong>
-              <span className="notice-bar__extra"> Zenith is an experimental research prototype.</span>
+              <strong>{site?.notice ?? 'Experimental research prototype.'}</strong>
+              <span className="notice-bar__extra"> Constructed experiments with measured native behavior.</span>
             </p>
             <button type="button" className="z-link-button" onClick={() => setNoticeOpen(true)}>
               Research notice
@@ -79,11 +163,13 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
           {site && (
             <nav aria-label="Chapters" className="nav">
               {site.chapters.map((chapter) => (
-                <a key={chapter.id} href={`#${chapter.id}`}>
-                  {NAV_LABEL[chapter.id] ?? chapter.title}
+                <a key={chapter.id} href={`#${chapter.id}`} aria-current={current === chapter.id ? 'true' : undefined}>
+                  {chapter.evidence_kind === 'verified_preparation' ? 'Preparation' : (NAV_LABEL[chapter.id] ?? chapter.title)}
                 </a>
               ))}
-              <a href="#paper">Paper</a>
+              <a href="#paper" aria-current={current === 'paper' ? 'true' : undefined}>
+                Paper
+              </a>
             </nav>
           )}
           <ThemeToggle />
@@ -110,7 +196,7 @@ function NoticeDialog({ url, onClose }: { url: string; onClose: () => void }) {
         {doc.status === 'ready' ? (
           <Markdown source={doc.value.content} base={doc.value.base_url} />
         ) : doc.status === 'error' ? (
-          <p>The notice could not be loaded. This is not financial advice.</p>
+          <p>The notice could not be loaded. Experimental research prototype.</p>
         ) : (
           <p role="status">Loading…</p>
         )}
@@ -130,12 +216,18 @@ function useGraph(url: string | null) {
 
 function Page({ site, paper }: { site: Site; paper: Paper | null }) {
   const byId = useMemo(() => new Map(site.chapters.map((c) => [c.id, c])), [site]);
-  const lab = useGraph(byId.get('lab')?.graph_url ?? '/api/v1/graph?mission=lab');
+  const progressActive = site.active_evidence_id === 'progress-campaign';
+  const advanceActive = site.active_evidence_id === 'advance-campaign';
+  const learningActive = Boolean(site.active_evidence_id
+    || site.evidence['observation-learning-result'] || site.evidence['investigation-learning-result']);
+  const lab = useGraph(byId.get('lab')?.graph_url ?? null);
   const deepLink = useMemo(() => new URLSearchParams(window.location.search).get('node'), []);
   const byline = useByline(site);
+  const latex = usePaperLatex(site);
 
   return (
     <SiteEvidenceContext.Provider value={site.evidence}>
+    <SiteFiguresContext.Provider value={site.figures}>
     <Shell site={site}>
       <section className="hero wrap" id="top" aria-labelledby="title">
         <div className="hero__main">
@@ -143,27 +235,39 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
         <p className="hero__lede">{HERO.lede}</p>
         <p className="hero__question">{HERO.question}</p>
         <div className="hero__actions">
-          <a className="button" href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">
-            Read the paper (PDF)
+          <a className="button" href={apiUrl(paper?.source.url ?? site.documents.paper ?? '/api/v1/documents/paper')} target="_blank" rel="noreferrer">
+            Current paper source
           </a>
           <a className="button button--ghost" href="#lab">
-            Open the Lab graph
+            Explore the investigation
           </a>
           {byline && <span className="hero__byline">{byline}</span>}
         </div>
         </div>
-        <nav className="hero__map" aria-label="What each chapter shows">
-          <p className="hero__map-head">What each part of the site shows</p>
-          <ol>
-            {site.chapters.map((chapter) => (
-              <li key={chapter.id} className={`map-row map-row--${chapter.evidence_kind}`}>
-                <a href={`#${chapter.id}`}>
-                  <span className="map-row__title">{chapter.title}</span>
-                  <span className="map-row__kind">{EVIDENCE_KIND_LABEL[chapter.evidence_kind]?.label ?? chapter.evidence_kind}</span>
-                </a>
-              </li>
-            ))}
-          </ol>
+        <nav className="hero__map" aria-labelledby="contents-caption">
+          <table>
+            <caption id="contents-caption">Contents and the status of the material in each section</caption>
+            <thead>
+              <tr>
+                <th scope="col">
+                  <span className="visually-hidden">Number</span>
+                </th>
+                <th scope="col">Section</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {site.chapters.map((chapter, i) => (
+                <tr key={chapter.id} className={`map-row map-row--${chapter.evidence_kind}`}>
+                  <td className="map-row__num">{i + 1}</td>
+                  <th scope="row" className="map-row__title">
+                    <a href={`#${chapter.id}`}>{chapter.title}</a>
+                  </th>
+                  <td className="map-row__kind">{EVIDENCE_KIND_LABEL[chapter.evidence_kind]?.label ?? chapter.evidence_kind}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </nav>
       </section>
       <StatusStrip site={site} />
@@ -174,22 +278,24 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           chapter={chapter}
           index={index}
           paper={paper}
+          latex={latex}
           paragraphs={
-            chapter.id === 'lab'
+            progressActive ? PROGRESS_COPY[chapter.id] : advanceActive ? ADVANCE_COPY[chapter.id] : chapter.id === 'lab' && !learningActive
               ? labParagraphs(lab.status === 'ready' && lab.value ? graphFacts(lab.value) : null)
               : CHAPTER_COPY[`${chapter.id}:${chapter.evidence_kind}`]?.paragraphs
           }
         >
-          {chapter.id === 'idea' && <LoopDiagram />}
-          {chapter.id === 'lab' && (
+          {chapter.id === 'idea' && !learningActive && <><LoopDiagram /><ApplicationExample /></>}
+          {chapter.id === 'lab' && !learningActive && (
             <LabFigure site={site} graph={lab.status === 'ready' ? lab.value : null} deepLink={deepLink} />
           )}
-          {chapter.id === 'oracle' && <OracleFigure chapter={chapter} />}
-          {chapter.id === 'evolve' && <EvolveFigure chapter={chapter} />}
+          {chapter.id === 'oracle' && !learningActive && <OracleFigure chapter={chapter} />}
+          {chapter.id === 'evolve' && !learningActive && <EvolveFigure chapter={chapter} />}
           {chapter.id === 'results' && (
-            <ResultsFigure chapter={chapter} labGraph={lab.status === 'ready' ? lab.value : null} site={site} />
+            <><ResultsFigure chapter={chapter} labGraph={lab.status === 'ready' ? lab.value : null} site={site} />
+              {progressActive && <ClientStudy site={site} />}</>
           )}
-          {chapter.id === 'next' && <NextFigure chapter={chapter} />}
+          {chapter.id === 'next' && !learningActive && <NextFigure chapter={chapter} />}
         </ChapterSection>
       ))}
 
@@ -197,8 +303,8 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
       <footer className="footer">
         <div className="wrap footer__inner">
           <p>
-            <strong>This is not financial advice.</strong> Historical examples and model outputs are not investment
-            recommendations and must not be used to make financial decisions.
+            <strong>Experimental research prototype.</strong> Native diagnostics and authored mechanism checks retain separate scopes.
+            Their bounded results do not establish reliable production operation. Earlier studies remain historical.
           </p>
           <p>
             <a href="https://github.com/wcook04/plectis-zenith" target="_blank" rel="noreferrer">
@@ -208,34 +314,122 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
         </div>
       </footer>
     </Shell>
+    </SiteFiguresContext.Provider>
     </SiteEvidenceContext.Provider>
+  );
+}
+
+function ApplicationExample() {
+  const views = [
+    ['Measurements', 'Air temperature and humidity'],
+    ['Subsystems', 'Soil moisture and fan readings'],
+    ['Environment', 'Weather observations and forecasts available at the cutoff'],
+    ['Events', 'Door openings and sensor outage reports'],
+    ['Interventions', 'Planned and executed irrigation or ventilation'],
+    ['Derived summaries', 'Trends calculated from those same readings'],
+  ];
+  return (
+    <section className="application-example" aria-labelledby="application-example-title">
+      <div>
+        <p className="paper-aside__head">A possible application</p>
+        <h3 id="application-example-title">What will a greenhouse be like in six hours?</h3>
+        <p>Freeze the information available at noon. Predict the air temperature and humidity at 6 pm, with units and uncertainty. Later, compare those predictions with the readings.</p>
+        <p>The reasoning has to connect these views: a missing sensor reading is not evidence of stable conditions, two summaries of one weather report are not independent confirmation, and scheduled irrigation has not necessarily happened.</p>
+        <p>In physics, this is a problem of predicting an evolving state from partial observations. The graph would organise the measurements, conditions and competing explanations, using an appropriate physical model or numerical solver where available. Sensor history can matter: a single position measurement does not tell us which way something is moving. <a href="https://underactuated.mit.edu/output_feedback.html" target="_blank" rel="noreferrer">Background: partial observations and state estimation.</a></p>
+        <p>A useful study would compare the graph with a simple forecast and an appropriate numerical model. This is a motivating example; the published System A data are a separate abstract toy, not a greenhouse simulation.</p>
+      </div>
+      <div>
+        <table>
+          <caption>Different perspectives on one greenhouse</caption>
+          <thead><tr><th scope="col">Feed role</th><th scope="col">Possible observations</th></tr></thead>
+          <tbody>{views.map(([role, observations]) => <tr key={role}><th scope="row">{role}</th><td>{observations}</td></tr>)}</tbody>
+        </table>
+        <p className="application-example__other"><strong>Heat flow:</strong> temperature probes, heater power, ambient conditions and vent logs could support a forecast of a chamber’s temperature six hours later. <a href="https://openstax.org/books/university-physics-volume-2/pages/1-6-mechanisms-of-heat-transfer" target="_blank" rel="noreferrer">Heat-transfer background.</a></p>
+        <p className="application-example__other"><strong>Vibration:</strong> camera positions, accelerometer readings, applied-force history and calibration records could support a forecast of a vibrating mass’s displacement one second later. <a href="https://openstax.org/books/university-physics-volume-1/pages/15-5-damped-oscillations" target="_blank" rel="noreferrer">Damped-oscillation background.</a></p>
+        <p className="application-example__other"><strong>Transport:</strong> concentration sensors, flow measurements, geometry and valve logs could support a forecast of concentration at a downstream sensor. The model would need the relevant initial and boundary conditions.</p>
+        <p className="application-example__other">These are proposed uses. No physical solver is connected or evaluated in this demonstration. The reasoning graph records computational dependencies; its arrows are not claims about physical causation. Physical feedback belongs in the system model.</p>
+        <p className="application-example__other">Finance is another possible application, with its own data and evaluation requirements. This research is not financial advice.</p>
+      </div>
+    </section>
   );
 }
 
 // One line under the hero with where the work actually stands, read from the
 // receipt bound to the results chapter.
 function StatusStrip({ site }: { site: Site }) {
-  const chapter = site.chapters.find((c) => c.evidence_kind === 'measured_execution' || c.evidence_kind === 'verified_preparation');
-  const url = chapter?.evidence_urls[0];
+  const chapter = site.chapters.find((c) => c.id === 'results')
+    ?? site.chapters.find((c) => c.evidence_kind === 'measured_experiment' || c.evidence_kind === 'measured_execution' || c.evidence_kind === 'verified_preparation');
+  const url = activeEvidenceUrl(site, chapter);
   const evidence = useAsync<Evidence | null>(() => (url ? api.evidence(url) : Promise.resolve(null)), [url]);
-  if (!chapter) return null;
+  const progressActive = site.active_evidence_id === 'progress-campaign';
+  const advanceActive = site.active_evidence_id === 'advance-campaign';
+  const observationActive = site.active_evidence_id === 'observation-learning-result';
+  const sourcesUrl = site.active_evidence_id || site.evidence['investigation-learning-result'] ? undefined : site.evidence.sources;
+  const sources = useAsync<Evidence | null>(() => (sourcesUrl ? api.evidence(sourcesUrl) : Promise.resolve(null)), [sourcesUrl]);
+  const composition = sources.status === 'ready' && sources.value ? compositionSentence(sources.value) : null;
   let summary: string | null = null;
   if (evidence.status === 'ready' && evidence.value) {
     const schema = String(evidence.value.data.schema ?? '');
-    if (schema.startsWith('zenith_demo_preparation')) summary = preparationSummary(evidence.value);
+    if (schema === 'zenith_progress_campaign_report_v1' && validProgressReceipt(evidence.value.data)) {
+      const data = evidence.value.data;
+      summary = data.conformance_studies.length
+        ? `Current Progress campaign: ${progressStatusLabel(data.status)}; ${data.conformance_studies.length} source-bound ${data.conformance_studies.length === 1 ? 'study' : 'studies'} published.`
+        : 'Current Progress campaign results pending.';
+    }
+    else if (schema === 'zenith_advance_campaign_v1' && validAdvanceReceipt(evidence.value.data)) {
+      const data = evidence.value.data;
+      summary = `${data.status === 'complete' ? 'Advance campaign analysis complete' : 'Advance campaign analysis pending'}; ${data.total_calls} recorded call attempts; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
+    }
+    else if (schema.startsWith('zenith_demo_preparation')) summary = preparationSummary(evidence.value);
     else if (schema.startsWith('zenith_original_feed_window')) summary = windowSummary(evidence.value);
+    else if (schema === 'zenith_learning_evidence_v1') summary = `${evidence.value.data.total_calls} model calls; $${Number(evidence.value.data.total_reported_cost_usd).toFixed(4)} reported cost across all recorded attempts.`;
+    else if (schema === 'zenith_observation_learning_evidence_v1') {
+      const data = evidence.value.data as unknown as ObservationReceipt;
+      summary = `Initial native comparison: ${observationStatus(data)}; ${data.total_calls} calls including canary attempts; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
+    }
   }
+  if (progressActive && !url) summary = 'Current Progress campaign results pending.';
+  else if (progressActive && evidence.status === 'error') summary = 'Current-campaign receipt unavailable.';
+  else if (progressActive && evidence.status === 'ready' && (!evidence.value || !validProgressReceipt(evidence.value.data))) summary = 'Current-campaign receipt schema unsupported.';
+  else if (advanceActive && !url) summary = 'Advance campaign results pending.';
+  else if (advanceActive && evidence.status === 'error') summary = 'Advance-campaign receipt unavailable.';
+  else if (advanceActive && evidence.status === 'ready' && (!evidence.value || !validAdvanceReceipt(evidence.value.data))) summary = 'Advance-campaign receipt schema unsupported.';
+  else if (observationActive && !url) summary = 'Observation study results pending.';
+  else if (observationActive && evidence.status === 'error') summary = 'Observation-study receipt unavailable.';
+  else if (observationActive && evidence.status === 'ready' && evidence.value
+    && evidence.value.data.schema !== 'zenith_observation_learning_evidence_v1') summary = 'Observation-study receipt schema unsupported.';
+  if (!chapter) return null;
   return (
     <section className="status-strip" aria-label="Current status">
       <div className="wrap status-strip__inner">
-        <p>
-          <strong>Where it stands.</strong> {summary ?? 'The full loop has not run end to end.'}
-          {site.data_note && <span className="status-strip__note"> {site.data_note}</span>}
-        </p>
+        <div>
+          <p className="status-strip__lead">
+            <strong>{summary ?? 'Loading the recorded experiment status…'}</strong>
+          </p>
+          {(composition ?? site.data_note) && <p className="status-strip__note">{composition ?? site.data_note}</p>}
+        </div>
         <a href={`#${chapter.id}`}>{chapter.title}</a>
       </div>
     </section>
   );
+}
+
+// One literal sentence on what the inputs are and what this site publishes,
+// read from the provenance receipt.
+function compositionSentence(sources: Evidence): string | null {
+  const snapshots = (sources.data.snapshots as Array<{ lanes?: Array<{ node_id: string; input_origin: string; public_payload?: string }> }>) ?? [];
+  const lanes = snapshots[0]?.lanes;
+  if (!lanes) return null;
+  const name = (id: string) => nodeName(id).replace(/ feed$/, '').toLowerCase().replace('subsystemss', 'SUBSYSTEMS').replace('measurements', 'measurements').replace('interventions', 'intervention');
+  const list = (items: string[]) => (items.length <= 1 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`);
+  const real = lanes.filter((l) => l.input_origin === 'real_saved_input').map((l) => name(l.node_id));
+  const synthetic = lanes.filter((l) => l.input_origin === 'authored_synthetic').map((l) => name(l.node_id));
+  const derived = lanes.filter((l) => l.input_origin === 'derived_synthetic_inputs').map((l) => name(l.node_id));
+  const parts: string[] = [];
+  if (real.length) parts.push(`The ${list(real)} feeds contain real saved data, which this site does not publish.`);
+  if (synthetic.length) parts.push(`The ${list(synthetic)} feeds contain synthetic examples written for this demonstration, published here in full.`);
+  if (derived.length) parts.push(`The ${list(derived)} feed is computed from the numeric observations.`);
+  return parts.join(' ');
 }
 
 function windowSummary(evidence: Evidence): string {
@@ -257,6 +451,11 @@ function titleParts(title: string) {
   );
 }
 
+function usePaperLatex(site: Site): string | null {
+  const doc = useAsync(() => api.document(site.documents.paper ?? '/api/v1/documents/paper'), [site]);
+  return doc.status === 'ready' ? doc.value.content : null;
+}
+
 function useByline(site: Site): string | null {
   const doc = useAsync(() => api.document(site.documents.paper ?? '/api/v1/documents/paper'), [site]);
   if (doc.status !== 'ready') return null;
@@ -269,7 +468,7 @@ function graphFacts(graph: Graph): GraphFacts {
   return {
     total: graph.nodes.length,
     feeds: feeds.length,
-    acquired: feeds.filter((n) => n.lane !== 'CALCULATOR').sort((a, b) => laneIndex(a.lane) - laneIndex(b.lane)).map((n) => laneName(n.lane)),
+    acquired: feeds.filter((n) => n.lane !== 'DERIVED').sort((a, b) => laneIndex(a.lane) - laneIndex(b.lane)).map((n) => laneName(n.lane)),
     real: feeds.filter((n) => n.demo_provenance?.input_origin === 'real_saved_input').sort((a, b) => laneIndex(a.lane) - laneIndex(b.lane)).map((n) => laneName(n.lane)),
     synthetic: feeds.filter((n) => n.demo_provenance?.input_origin === 'authored_synthetic').sort((a, b) => laneIndex(a.lane) - laneIndex(b.lane)).map((n) => laneName(n.lane)),
     reasoning: graph.nodes.filter((n) => n.type === 'reasoning').length,
@@ -281,12 +480,14 @@ function ChapterSection({
   chapter,
   index,
   paper,
+  latex,
   paragraphs,
   children,
 }: {
   chapter: Chapter;
   index: number;
   paper: Paper | null;
+  latex: string | null;
   paragraphs?: string[];
   children: React.ReactNode;
 }) {
@@ -295,15 +496,19 @@ function ChapterSection({
     <section className={`chapter chapter--${chapter.id}`} id={chapter.id} aria-labelledby={`${chapter.id}-title`}>
       <div className="wrap chapter__grid">
         <div className="chapter__text">
-          <h2 id={`${chapter.id}-title`}>
-            <span className="chapter__num" aria-hidden="true">{index + 1}</span>
-            {chapter.title}
-          </h2>
+          <p className={`chapter__status status--${chapter.evidence_kind}`}>
+            <span className="chapter__num">{String(index + 1).padStart(2, '0')}</span>
+            <span>{EVIDENCE_KIND_LABEL[chapter.evidence_kind]?.label ?? chapter.evidence_kind}</span>
+          </p>
+          <h2 id={`${chapter.id}-title`}>{chapter.title}</h2>
+          {EVIDENCE_KIND_LABEL[chapter.evidence_kind] && (
+            <p className="chapter__boundary">{EVIDENCE_KIND_LABEL[chapter.evidence_kind].note}</p>
+          )}
           {(paragraphs ?? copy?.paragraphs)?.map((p) => <p key={p}>{p}</p>)}
         </div>
-        <PaperAside chapter={chapter} paper={paper} />
+        <PaperAside chapter={chapter} paper={paper} latex={latex} />
       </div>
-      <div className="wrap chapter__figure">{children}</div>
+      <div className={`wrap chapter__figure chapter__figure--${FIGURE_TRACK[chapter.id] ?? 'wide'}`}>{children}</div>
       {chapter.document_url && <SourceDocument url={chapter.document_url} />}
     </section>
   );
@@ -359,6 +564,7 @@ function LabFigure({ site, graph, deepLink }: { site: Site; graph: Graph | null;
       key={choice.value}
       graph={graph}
       title="The Lab graph"
+      context={choice.run && choice.run.kind === 'local' ? `Lab graph: saved run ${choice.run.runId}` : 'Lab graph: definitions'}
       initialSelected={selected && graph.nodes.some((n) => n.id === selected) ? selected : null}
       run={choice.run}
       onSelectionChange={(id) => {
@@ -386,7 +592,7 @@ function OracleFigure({ chapter }: { chapter: Chapter }) {
   return (
     <>
       {graph.status === 'ready' && graph.value ? (
-        <GraphExplorer graph={graph.value} title="The Oracle graph" maxHeight={640} />
+        <GraphExplorer graph={graph.value} title="The Oracle graph" context="Oracle graph: definitions" maxHeight={640} />
       ) : graph.status === 'error' ? (
         <p className="inspector__warn">The Oracle graph could not be loaded: {graph.message}</p>
       ) : (
@@ -425,7 +631,7 @@ function EvolveFigure({ chapter }: { chapter: Chapter }) {
     <div className="evolve">
       <div className="evolve__graph">
         {graph.status === 'ready' && graph.value ? (
-          <GraphExplorer graph={graph.value} title="The Evolve graph" maxHeight={320} />
+          <GraphExplorer graph={graph.value} title="The Evolve graph" context="Evolve graph: definitions" maxHeight={320} />
         ) : (
           <Loading what="the Evolve graph" />
         )}
@@ -440,8 +646,8 @@ function EvolveFigure({ chapter }: { chapter: Chapter }) {
           <svg viewBox="0 0 48 16" width="48" height="16"><path d="M2 8h40" className="loop-wire loop-wire--test" /><path d="M40 3l6 5-6 5z" fill="var(--edge-strong)" /></svg>
         </div>
         <div className="contrast contrast--test">
-          <h3>Showing it helps</h3>
-          <p>Run the original and the revision on later cases nobody used to choose it, scored by a rule fixed in advance.</p>
+          <h3>Demonstrating an improvement</h3>
+          <p>Run the original and the revised graph on later cases that were not used to choose the revision, scored by a rule declared in advance.</p>
           <p className="contrast__state">Requires a separate comparison</p>
         </div>
       </div>
@@ -449,12 +655,418 @@ function EvolveFigure({ chapter }: { chapter: Chapter }) {
   );
 }
 
+type InvestigationScore = { correct: number; total: number };
+type InvestigationCampaign = {
+  id: string; model: string; complete: boolean; reported_cost_usd: string;
+  learners?: Array<{ first_proposal_heldout: InvestigationScore; heldout: InvestigationScore; transfer: InvestigationScore }>;
+};
+
+function InvestigationResults({ result }: { result: Evidence }) {
+  const campaigns = result.data.campaigns as InvestigationCampaign[];
+  const score = (s: InvestigationScore) => `${s.correct}/${s.total}`;
+  return <div className="diagnosis">
+    {campaigns.filter(c => c.learners?.length).map(c => <section key={c.id}>
+      <h3 className="block-head">{c.id}{c.complete ? '' : ' — controls incomplete'}</h3>
+      <p>{c.model} · ${Number(c.reported_cost_usd).toFixed(4)} reported inference cost</p>
+      <table className="diagnosis__table">
+        <thead><tr><th>Learner</th><th>First proposal</th><th>Frozen final</th><th>Renamed schema</th></tr></thead>
+        <tbody>{c.learners?.map((l, i) => <tr key={i}>
+          <th>{i + 1}{i === 0 ? ' (primary)' : ''}</th><td>{score(l.first_proposal_heldout)}</td><td>{score(l.heldout)}</td><td>{score(l.transfer)}</td>
+        </tr>)}</tbody>
+      </table>
+    </section>)}
+    <p>{campaigns.filter(c => !c.complete).length} incomplete attempts remain in the receipt and total cost. Ratios use the declared numerical tolerance; findings and unresolved sets must match exactly.</p>
+    <p>Repeated learners share the same model and inputs. Improvements across versions do not isolate changes to model, prompts or execution.</p>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete evidence receipt</a>
+  </div>;
+}
+
+type ObservationScore = { correct: number; total: number; unsupported: number; errors: number };
+type AdvanceStudy = {
+  id: string; complete: boolean; calls: number; reported_cost_usd: string;
+  model: string; reasoning_effort: string;
+};
+type AdvanceReceipt = Record<string, unknown> & {
+  schema: 'zenith_advance_campaign_v1'; summary: string; status: string;
+  total_calls: number; total_reported_cost_usd: string;
+  conformance_studies: AdvanceStudy[]; memory: Record<string, unknown>;
+};
+
+function validAdvanceReceipt(data: Record<string, unknown>): data is AdvanceReceipt {
+  const cost = (value: unknown) => typeof value === 'string' && value.trim() !== ''
+    && Number.isFinite(Number(value)) && Number(value) >= 0;
+  const count = (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 0;
+  return data.schema === 'zenith_advance_campaign_v1' && typeof data.summary === 'string'
+    && typeof data.status === 'string' && count(data.total_calls) && cost(data.total_reported_cost_usd)
+    && data.memory !== null && typeof data.memory === 'object' && !Array.isArray(data.memory)
+    && Array.isArray(data.conformance_studies) && data.conformance_studies.every(value => {
+      if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+      const row = value as Record<string, unknown>;
+      return typeof row.id === 'string' && typeof row.complete === 'boolean'
+        && count(row.calls) && cost(row.reported_cost_usd)
+        && typeof row.model === 'string' && typeof row.reasoning_effort === 'string';
+    });
+}
+
+function AdvanceResults({ result, site }: { result: Evidence; site: Site }) {
+  const data = result.data as AdvanceReceipt;
+  return <div className="diagnosis">
+    <h3 className="block-head">{data.status === 'complete' ? 'Advance campaign analysis complete' : 'Advance campaign analysis pending'}</h3>
+    <p>{data.summary}</p>
+    <p>{data.total_calls} recorded call attempts; ${Number(data.total_reported_cost_usd).toFixed(4)} reported inference cost across the recorded Advance campaign.</p>
+    {typeof data.accounting_boundary === 'string' && <p>{data.accounting_boundary}</p>}
+    <p>Analysis completion includes stopped studies and unresolved results. Each study retains its own construction and evaluation status.</p>
+    <table className="diagnosis__table">
+      <caption>Recorded Advance conformance studies; outcomes remain separate</caption>
+      <thead><tr><th>Study, model and reasoning</th><th>Construction</th><th>Recorded attempts and reported cost</th></tr></thead>
+      <tbody>{data.conformance_studies.map(study => <tr key={study.id}>
+        <th scope="row">{study.id}<br />{study.model}; {study.reasoning_effort}</th>
+        <td>{study.complete ? 'Complete' : 'Incomplete'}</td>
+        <td>{study.calls} attempts<br />${Number(study.reported_cost_usd).toFixed(4)}</td>
+      </tr>)}</tbody>
+    </table>
+    {typeof data.memory.summary === 'string' && <p>{data.memory.summary}</p>}
+    <p>Continuation-memory checks retain their own source, costs and limits in the repository explanation.</p>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete Advance-campaign receipt</a>
+    <HistoricalReceipts site={site} />
+  </div>;
+}
+
+type ProgressScore = { correct: number; total: number; errors: number };
+type ProgressLearner = {
+  native_configurations: number; authored_native_families: number;
+  conditions: { ordinary_witness: { acquisition_source_calls: number };
+    generic_singletons: { acquisition_source_calls: number } };
+  ordinary_minus_generic_acquisition_source_calls: number; boundary: string;
+};
+type ProgressStudy = {
+  id: string; version: string; stage: 'qualification' | 'diagnostic'; complete: boolean;
+  model: string; reasoning_effort: string; parent_episodes: number;
+  actual_calls: number; reported_cost_usd: string; unknown_cost_calls: number;
+  qualification?: { passed: boolean };
+  forfeited?: boolean; forfeiture_reason?: string;
+  panel_summary?: { confirmation?: { overall?: Record<string, ProgressScore> } };
+};
+type ProgressReceipt = Record<string, unknown> & {
+  schema: 'zenith_progress_campaign_report_v1'; summary: string; status: string;
+  claim_boundary: string; conformance_studies: ProgressStudy[]; learner: ProgressLearner | null;
+};
+
+function progressStatusLabel(status: string): string {
+  return ({ complete: 'diagnostic complete', diagnostic_pending: 'diagnostic in progress',
+    qualification_failed: 'interface qualification failed', protocol_deviation: 'protocol deviation',
+    pending: 'results pending' } as Record<string, string>)[status] ?? 'status unavailable';
+}
+
+function validProgressReceipt(data: Record<string, unknown>): data is ProgressReceipt {
+  const cost = (value: unknown) => typeof value === 'string' && value.trim() !== ''
+    && Number.isFinite(Number(value)) && Number(value) >= 0;
+  const count = (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 0;
+  const record = (value: unknown): value is Record<string, unknown> => value !== null
+    && typeof value === 'object' && !Array.isArray(value);
+  const learner = (value: unknown) => value === null || (record(value)
+    && count(value.native_configurations) && count(value.authored_native_families)
+    && typeof value.ordinary_minus_generic_acquisition_source_calls === 'number'
+    && Number.isInteger(value.ordinary_minus_generic_acquisition_source_calls)
+    && typeof value.boundary === 'string' && record(value.conditions)
+    && record(value.conditions.ordinary_witness) && count(value.conditions.ordinary_witness.acquisition_source_calls)
+    && record(value.conditions.generic_singletons) && count(value.conditions.generic_singletons.acquisition_source_calls));
+  const scores = (value: unknown) => record(value) && Object.values(value).every(score =>
+    record(score) && count(score.correct) && count(score.total) && count(score.errors)
+      && Number(score.correct) <= Number(score.total));
+  return data.schema === 'zenith_progress_campaign_report_v1' && typeof data.summary === 'string'
+    && typeof data.status === 'string' && typeof data.claim_boundary === 'string'
+    && record(data.source_bindings) && learner(data.learner)
+    && Array.isArray(data.conformance_studies) && data.conformance_studies.every(value => {
+      if (!record(value)) return false;
+      const row = value as Record<string, unknown>;
+      return typeof row.id === 'string' && typeof row.version === 'string'
+        && typeof row.complete === 'boolean'
+        && (row.stage === 'qualification' || row.stage === 'diagnostic')
+        && count(row.parent_episodes) && count(row.actual_calls) && count(row.unknown_cost_calls)
+        && cost(row.reported_cost_usd)
+        && typeof row.model === 'string' && typeof row.reasoning_effort === 'string'
+        && (row.forfeited === undefined || typeof row.forfeited === 'boolean')
+        && (row.forfeiture_reason === undefined || typeof row.forfeiture_reason === 'string')
+        && (row.stage !== 'diagnostic' || (record(row.panel_summary)
+          && record(row.panel_summary.confirmation)
+          && scores(row.panel_summary.confirmation.overall)));
+    });
+}
+
+function ProgressResults({ result, site }: { result: Evidence; site: Site }) {
+  const data = result.data as ProgressReceipt;
+  const diagnostic = data.conformance_studies.find(study => study.stage === 'diagnostic');
+  const confirmation = diagnostic?.panel_summary?.confirmation?.overall;
+  const roles = ['parent', 'repair_only', 'fixed', 'ordinary', 'direct_batch', 'direct_masked', 'direct_adaptive'];
+  const heading = data.status === 'complete' ? 'Progress campaign report complete'
+    : data.status === 'qualification_failed' ? 'Interface qualification did not pass'
+      : data.status === 'protocol_deviation' ? 'Protocol deviation in the campaign'
+        : 'Progress campaign report pending';
+  return <div className="diagnosis">
+    <h3 className="block-head">{heading}</h3>
+    <p>{data.summary}</p>
+    {data.conformance_studies.length > 0 && <table className="diagnosis__table">
+      <caption>Source-bound Progress studies; qualification is excluded from diagnostic estimates</caption>
+      <thead><tr><th>Study, model and reasoning</th><th>Parent episodes</th><th>Recorded attempts and reported cost</th></tr></thead>
+      <tbody>{data.conformance_studies.map(study => <tr key={study.id}>
+        <th scope="row">{study.version} {study.stage}: {study.id}<br />{study.model}; {study.reasoning_effort}</th>
+        <td>{study.parent_episodes}{study.forfeited ? <><br />Diagnostic forfeited</>
+          : study.stage === 'qualification' && study.qualification && <><br />{study.qualification.passed ? 'Interface passed' : 'Interface did not pass'}</>}</td>
+        <td>{study.actual_calls} attempts<br />${Number(study.reported_cost_usd).toFixed(4)} reported{study.unknown_cost_calls > 0 && <><br />{study.unknown_cost_calls} unknown-charge attempts</>}</td>
+      </tr>)}</tbody>
+    </table>}
+    {data.conformance_studies.filter(study => study.forfeited && study.forfeiture_reason).map(study =>
+      <p key={`${study.id}-forfeiture`}>{study.version} diagnostic forfeited: {study.forfeiture_reason}</p>)}
+    {diagnostic && confirmation && <table className="diagnosis__table">
+      <caption>Diagnostic confirmation answers; separate from interface qualification</caption>
+      <thead><tr><th>Condition</th><th>Correct / total</th></tr></thead>
+      <tbody>{roles.filter(role => confirmation[role]).map(role => <tr key={role}>
+        <th scope="row">{role.replaceAll('_', ' ')}</th>
+        <td>{confirmation[role].correct}/{confirmation[role].total}</td>
+      </tr>)}</tbody>
+    </table>}
+    {data.learner && <section aria-label="Separate exact-class learner check">
+      <h4>Separate exact-class learner check</h4>
+      <p>{data.learner.native_configurations} native configurations across {data.learner.authored_native_families} authored families.</p>
+      <table className="diagnosis__table">
+        <caption>Source acquisition calls with ordinary witness and generic singleton questions</caption>
+        <thead><tr><th>Question condition</th><th>Source calls</th></tr></thead>
+        <tbody><tr><th scope="row">Ordinary witness</th><td>{data.learner.conditions.ordinary_witness.acquisition_source_calls}</td></tr>
+          <tr><th scope="row">Generic singletons</th><td>{data.learner.conditions.generic_singletons.acquisition_source_calls}</td></tr></tbody>
+      </table>
+      <p>{data.learner.boundary}</p>
+    </section>}
+    <p>{data.claim_boundary}</p>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete current-campaign receipt</a>
+    <HistoricalReceipts site={site} />
+  </div>;
+}
+
+function HistoricalReceipts({ site }: { site: Site }) {
+  return <div>
+    <p>Earlier source-bound receipts</p>
+    <ul>{['advance-campaign', 'observation-learning-result', 'decomposition-result', 'investigation-learning-result']
+      .filter(id => id !== site.active_evidence_id).map(id =>
+      site.evidence[id] ? <li key={id}><a href={apiUrl(site.evidence[id])} target="_blank" rel="noreferrer">Historical: {RECEIPT_LABEL[id]}</a></li> : null)}</ul>
+  </div>;
+}
+
+const CLIENT_ARMS = [
+  ['procedure', 'Frozen investigator'], ['ordinary_reuse', 'Frozen ordinary tester'],
+  ['same_history', 'Fresh, same history'], ['cold', 'Fresh, no history'], ['fixed', 'Fixed tests'],
+] as const;
+const CLIENT_VERSIONS = [
+  { id: 'client-investigation', label: 'v1, reasoning none', protocol: 'client-investigation-protocol' },
+  { id: 'client-investigation-v2', label: 'v2, reasoning none', protocol: 'client-investigation-protocol-v2' },
+  { id: 'client-investigation-v2-low', label: 'v2, reasoning low', protocol: 'client-investigation-protocol-v2' },
+] as const;
+type ClientArm = typeof CLIENT_ARMS[number][0];
+type ClientMetric = {
+  failed_targets_detected: number; total_failing_targets: number;
+  query_slots: number; valid_probes: number; model_call_attempts: number;
+  runs: number; not_run_targets: number;
+};
+type ClientReceipt = Record<string, unknown> & {
+  schema: 'zenith_client_investigation_report_v1'; complete: boolean;
+  protected_panel_opened: boolean; target_count: number; total_failing_targets: number;
+  model_attempts: number; reported_model_cost_usd: string; unknown_cost_attempts: number;
+  model: string; reasoning_effort: string; boundary: string;
+  arm_metrics: Record<ClientArm, ClientMetric>;
+  artifacts: Record<'procedure' | 'ordinary_reuse', { error: string | null }>;
+};
+
+function validClientReceipt(data: Record<string, unknown>): data is ClientReceipt {
+  const count = (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 0;
+  const record = (value: unknown): value is Record<string, unknown> => value !== null
+    && typeof value === 'object' && !Array.isArray(value);
+  return data.schema === 'zenith_client_investigation_report_v1'
+    && typeof data.complete === 'boolean' && typeof data.protected_panel_opened === 'boolean'
+    && count(data.target_count) && count(data.total_failing_targets)
+    && Number(data.total_failing_targets) <= Number(data.target_count)
+    && count(data.model_attempts) && count(data.unknown_cost_attempts)
+    && typeof data.reported_model_cost_usd === 'string' && data.reported_model_cost_usd.trim() !== ''
+    && Number.isFinite(Number(data.reported_model_cost_usd)) && Number(data.reported_model_cost_usd) >= 0
+    && typeof data.model === 'string' && typeof data.reasoning_effort === 'string'
+    && typeof data.boundary === 'string' && record(data.arm_metrics) && record(data.artifacts)
+    && ['procedure', 'ordinary_reuse'].every(arm => {
+      const artifact = (data.artifacts as Record<string, unknown>)[arm];
+      return record(artifact) && (artifact.error === null || typeof artifact.error === 'string');
+    })
+    && CLIENT_ARMS.every(([arm]) => {
+      const metric = (data.arm_metrics as Record<string, unknown>)[arm];
+      return record(metric) && count(metric.failed_targets_detected)
+        && metric.total_failing_targets === data.total_failing_targets
+        && Number(metric.failed_targets_detected) <= Number(metric.total_failing_targets)
+        && count(metric.query_slots) && count(metric.valid_probes)
+        && Number(metric.valid_probes) <= Number(metric.query_slots)
+        && count(metric.model_call_attempts) && count(metric.runs) && count(metric.not_run_targets)
+        && Number(metric.runs) + Number(metric.not_run_targets) <= Number(data.target_count);
+    });
+}
+
+function ClientStudy({ site }: { site: Site }) {
+  const versions = CLIENT_VERSIONS.filter(version => site.evidence[version.id]);
+  const latest = versions.at(-1);
+  const urls = versions.map(version => site.evidence[version.id]);
+  const receipts = useAsync(() => Promise.all(versions.map(async version => {
+    try {
+      return { version, result: await api.evidence(site.evidence[version.id]), error: null };
+    } catch (error) {
+      return { version, result: null, error: error instanceof Error ? error.message : String(error) };
+    }
+  })), [urls.join('|')]);
+  const selected = receipts.status === 'ready' ? receipts.value.find(row => row.version.id === latest?.id) : null;
+  const method = latest ? site.documents[latest.protocol] : site.documents['client-investigation-protocol'];
+  const explanation = latest ? site.documents[latest.id] : undefined;
+  return <section className="diagnosis" aria-labelledby="client-study-title">
+    <h3 id="client-study-title" className="block-head">Separate SQLite client pilot</h3>
+    {latest && <p>Latest published version: {latest.label}.</p>}
+    {!latest ? <p role="status">Client pilot results pending. No client receipt is published.</p>
+      : receipts.status === 'loading' ? <Loading what="the client-pilot receipt" />
+        : receipts.status === 'error' || selected?.error
+          ? <p role="status">The client-pilot receipt is unavailable: {selected?.error ?? (receipts.status === 'error' ? receipts.message : '')}</p>
+          : selected?.result && validClientReceipt(selected.result.data)
+            ? <ClientResults result={selected.result} />
+            : <p role="status">The client-pilot receipt has an unsupported schema; no outcomes are displayed.</p>}
+    {receipts.status === 'ready' && receipts.value.length > 0 && <>
+      <h4>Recorded client versions</h4>
+      <p>Each version keeps its own prompts, source, results and costs.</p>
+      <ul>{receipts.value.map(row => <li key={row.version.id}>
+        <strong>{row.version.label}:</strong>{' '}
+        {row.result && validClientReceipt(row.result.data)
+          ? <ClientVersionSummary data={row.result.data} />
+          : row.error ? 'Receipt unavailable.' : 'Unsupported receipt; outcomes withheld.'}{' '}
+        <a href={apiUrl(site.evidence[row.version.id])} target="_blank" rel="noreferrer">Receipt</a>
+        {site.documents[row.version.id] && <>{' · '}<a href={apiUrl(site.documents[row.version.id])} target="_blank" rel="noreferrer">Analysis</a></>}
+      </li>)}</ul>
+    </>}
+    {method && <p><a href={apiUrl(method)} target="_blank" rel="noreferrer">Read the client-pilot protocol</a></p>}
+    {explanation && <SourceDocument url={explanation} />}
+  </section>;
+}
+
+function ClientVersionSummary({ data }: { data: ClientReceipt }) {
+  const procedure = data.arm_metrics.procedure;
+  const ordinary = data.arm_metrics.ordinary_reuse;
+  if (data.artifacts.procedure.error) return <>Invalid investigator artifact; {procedure.not_run_targets} target runs skipped. {ordinary.runs > 0 && ordinary.query_slots === 0 ? 'Ordinary tester ran but issued no target queries.' : ''}</>;
+  if (data.complete && procedure.runs > 0 && ordinary.runs > 0 && procedure.query_slots === 0 && ordinary.query_slots === 0)
+    return <>Both frozen testers stopped without target queries.</>;
+  return <>{data.complete && data.protected_panel_opened
+    ? `Frozen investigator ${procedure.failed_targets_detected}/${procedure.total_failing_targets}; ordinary reuse ${ordinary.failed_targets_detected}/${ordinary.total_failing_targets}.`
+    : 'Protected results pending.'}</>;
+}
+
+function ClientResults({ result }: { result: Evidence }) {
+  const data = result.data as ClientReceipt;
+  return <>
+    <p>{data.complete ? 'Pilot complete.' : 'Pilot incomplete.'} {data.model_attempts} recorded model attempts; ${data.reported_model_cost_usd} reported inference cost. {data.model}; reasoning {data.reasoning_effort}.</p>
+    {data.unknown_cost_attempts > 0 && <p>{data.unknown_cost_attempts} attempts have unresolved charges.</p>}
+    {data.complete && data.protected_panel_opened ? <>
+      <p>{data.target_count} later clients were evaluated; {data.total_failing_targets} contained a fault in the protected finite panel.</p>
+      <table className="diagnosis__table">
+        <caption>Failing later clients detected and target investigation work; query slots include invalid and repeated proposals</caption>
+        <thead><tr><th>Method</th><th>Faults found</th><th>Valid / slots</th><th>Model calls</th></tr></thead>
+        <tbody>{CLIENT_ARMS.map(([arm, label]) => <tr key={arm}>
+          <th scope="row">{label}</th>
+          <td>{data.arm_metrics[arm].not_run_targets > 0 ? <>Not run<br />{data.arm_metrics[arm].not_run_targets} clients</>
+            : <>{data.arm_metrics[arm].failed_targets_detected}/{data.arm_metrics[arm].total_failing_targets}</>}</td>
+          <td>{data.arm_metrics[arm].valid_probes}/{data.arm_metrics[arm].query_slots}</td>
+          <td>{data.arm_metrics[arm].model_call_attempts}</td>
+        </tr>)}</tbody>
+      </table>
+      {(['procedure', 'ordinary_reuse'] as const).filter(arm => data.artifacts[arm].error).map(arm =>
+        <p key={arm}>{arm === 'procedure' ? 'Frozen investigator' : 'Frozen ordinary tester'} artifact error: {data.artifacts[arm].error}</p>)}
+      {data.arm_metrics.procedure.runs > 0 && data.arm_metrics.ordinary_reuse.runs > 0
+        && data.arm_metrics.procedure.query_slots === 0 && data.arm_metrics.ordinary_reuse.query_slots === 0
+        && <p>Both frozen testers issued no target queries. This pilot does not establish an advantage from reuse.</p>}
+      {data.arm_metrics.procedure.query_slots > 0 && data.arm_metrics.ordinary_reuse.query_slots > 0
+        && data.arm_metrics.procedure.failed_targets_detected === data.arm_metrics.ordinary_reuse.failed_targets_detected
+        && <p>The frozen investigator matched the ordinary reusable tester on detected faults. This comparison does not establish an advantage from learned reuse.</p>}
+      {data.arm_metrics.procedure.model_call_attempts === 0 && data.arm_metrics.ordinary_reuse.model_call_attempts === 0
+        && <p>Acquisition and compilation costs are included in the total above. Model calls in the table count target investigation only.</p>}
+      <p>This small authored set does not establish a false-accusation rate.</p>
+    </> : <p>Protected outcome tables remain unavailable until the pilot and its protected evaluation complete.</p>}
+    <p>{data.boundary}</p>
+    <p><a href={result.source.url} target="_blank" rel="noreferrer">Read the complete client-pilot receipt</a></p>
+  </>;
+}
+
+type ObservationComparison = {
+  worlds: number; mean_accuracy_difference: number; paired_bootstrap_95_percentile: [number, number];
+  wins: number; ties: number; losses: number;
+};
+type ObservationReceipt = {
+  status: string; complete: boolean; campaign: string; planned_worlds: number; frozen_worlds: number;
+  model: string; provider_slug: string; total_calls: number; total_reported_cost_usd: string;
+  unreported_cost_calls: number; unreported_cost_reservations_usd: string; cost_bounds_usd: [string, string];
+  aggregate: Record<string, ObservationScore> | null;
+  comparisons: Record<string, ObservationComparison> | null;
+  failure: { error?: string } | null; boundary: string;
+};
+
+function observationComplete(data: ObservationReceipt): boolean {
+  return data.complete === true && data.status === 'complete' && data.aggregate != null;
+}
+
+function observationStatus(data: ObservationReceipt): string {
+  if (observationComplete(data)) return 'Protected evaluation complete';
+  if (data.status === 'failed') return 'Campaign stopped';
+  if (data.status === 'interrupted') return 'Campaign interrupted';
+  if (data.status === 'pilot') return 'Pilot snapshot';
+  if (data.status === 'running') return 'Campaign running';
+  return 'Partial snapshot';
+}
+
+const OBSERVATION_ARMS = [
+  ['incremental', 'Incremental (primary)'], ['archive', 'Full construction archive'],
+  ['fresh', 'Fresh from final evidence'], ['freeze_and_grow', 'Frozen first checkpoint (control)'],
+  ['empty_history', 'Final program, empty history (control)'], ['cold', 'Unlearned program (control)'],
+] as const;
+
+function ObservationResults({ result }: { result: Evidence }) {
+  const data = result.data as unknown as ObservationReceipt;
+  const complete = observationComplete(data);
+  const points = (value: number) => `${(value * 100).toFixed(1)} percentage points`;
+  return <div className="diagnosis">
+    <h3 className="block-head">{observationStatus(data)}</h3>
+    <p>Campaign: {data.campaign}</p>
+    <p>{data.frozen_worlds}/{data.planned_worlds} source streams frozen. {data.model} via {data.provider_slug}.</p>
+    <p>{data.total_calls} calls including canary attempts; ${Number(data.total_reported_cost_usd).toFixed(4)} reported inference cost.</p>
+    {data.unreported_cost_calls > 0 && <p>Billing remains unresolved for {data.unreported_cost_calls} {data.unreported_cost_calls === 1 ? 'call' : 'calls'}; ${Number(data.unreported_cost_reservations_usd).toFixed(4)} remains reserved. Cost bounds: ${Number(data.cost_bounds_usd[0]).toFixed(4)} to ${Number(data.cost_bounds_usd[1]).toFixed(4)}.</p>}
+    {data.failure?.error && <p role="status">Recorded failure: {data.failure.error}</p>}
+    {complete ? <>
+      <table className="diagnosis__table">
+        <caption>Protected exact answers and conditional identification errors</caption>
+        <thead><tr><th>Policy or control</th><th>Exact answers</th><th>Unsupported exact</th><th>Execution or response errors</th></tr></thead>
+        <tbody>{OBSERVATION_ARMS.map(([id, label]) => {
+          const score = data.aggregate?.[id];
+          return score ? <tr key={id}><th>{label}</th><td>{score.correct}/{score.total}</td><td>{score.unsupported}</td><td>{score.errors}</td></tr> : null;
+        })}</tbody>
+      </table>
+      {data.comparisons && <table className="diagnosis__table">
+        <caption>Incremental accuracy minus each comparison, paired by native source</caption>
+        <thead><tr><th>Comparison</th><th>Mean difference</th><th>Descriptive 95% interval</th><th>Wins / ties / losses</th></tr></thead>
+        <tbody>{OBSERVATION_ARMS.filter(([id]) => id === 'archive' || id === 'fresh' || id === 'freeze_and_grow').map(([id, label]) => {
+          const comparison = data.comparisons?.[id];
+          return comparison ? <tr key={id}><th>{label}</th><td>{points(comparison.mean_accuracy_difference)}</td><td>{points(comparison.paired_bootstrap_95_percentile[0])} to {points(comparison.paired_bootstrap_95_percentile[1])}</td><td>{comparison.wins} / {comparison.ties} / {comparison.losses}</td></tr> : null;
+        })}</tbody>
+      </table>}
+      <p>Configured sources are conditional replications in one native software family. These comparisons do not establish transfer across domains or general intelligence.</p>
+    </> : <p>Protected outcome tables are unavailable until construction and the protected evaluation complete. Frozen stream counts and inference calls do not establish learning success.</p>}
+    <p>{data.boundary}</p>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete observation-study receipt</a>
+  </div>;
+}
+
 function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph: Graph | null; site: Site }) {
   const windowUrl = chapter.evidence_urls.find((u) => u.endsWith('window-result')) ?? site.evidence['window-result'];
   const condUrl = chapter.evidence_urls.find((u) => u.endsWith('conditional-result')) ?? site.evidence['conditional-result'];
   // The chapter binds whichever receipt the current edition has; the view
   // follows the receipt's schema.
-  const bound = chapter.evidence_urls[0];
+  const bound = activeEvidenceUrl(site, chapter);
+  const progressActive = site.active_evidence_id === 'progress-campaign';
+  const advanceActive = site.active_evidence_id === 'advance-campaign';
   const kind = useAsync<Evidence | null>(() => (bound ? api.evidence(bound) : Promise.resolve(null)), [bound]);
   const isPreparation = kind.status === 'ready' && String(kind.value?.data.schema ?? '').startsWith('zenith_demo_preparation');
   const sourcesUrl = site.evidence.sources;
@@ -464,17 +1076,47 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
   );
   const evidence = useAsync<[Evidence, Evidence] | null>(
     () =>
-      kind.status === 'ready' && !isPreparation && windowUrl && condUrl
+      kind.status === 'ready' && !isPreparation && !progressActive && !advanceActive && windowUrl && condUrl
         ? Promise.all([api.evidence(windowUrl), api.evidence(condUrl)])
         : Promise.resolve(null),
-    [kind.status, isPreparation, windowUrl, condUrl],
+    [kind.status, isPreparation, progressActive, advanceActive, windowUrl, condUrl],
   );
+  if (progressActive) {
+    if (!bound) return <><p role="status">Current campaign results pending. No current receipt is published; historical receipts remain separate.</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'error') return <><p role="status">The current-campaign receipt is unavailable: {kind.message}</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'ready') return kind.value && validProgressReceipt(kind.value.data)
+      ? <ProgressResults result={kind.value} site={site} />
+      : <><p role="status">The current-campaign receipt has an unsupported schema; no outcomes are displayed.</p><HistoricalReceipts site={site} /></>;
+    return <Loading what="the current-campaign receipt" />;
+  }
+  if (advanceActive) {
+    if (!bound) return <><p role="status">Advance campaign results pending. No Advance receipt is published; older receipts remain separate.</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'error') return <><p role="status">The Advance-campaign receipt is unavailable: {kind.message}</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'ready') return kind.value && validAdvanceReceipt(kind.value.data)
+      ? <AdvanceResults result={kind.value} site={site} />
+      : <><p role="status">The Advance-campaign receipt has an unsupported schema; no outcomes are displayed.</p><HistoricalReceipts site={site} /></>;
+    return <Loading what="the Advance-campaign receipt" />;
+  }
+  if (kind.status === 'ready' && kind.value?.data.schema === 'zenith_learning_evidence_v1') {
+    return <InvestigationResults result={kind.value} />;
+  }
+  if (kind.status === 'ready' && kind.value?.data.schema === 'zenith_observation_learning_evidence_v1') {
+    return <><ObservationResults result={kind.value} />
+      {site.evidence['observation-screens'] && <p><a href={site.evidence['observation-screens']} target="_blank" rel="noreferrer">Read the follow-on repair, candidate search and composition receipts</a></p>}
+    </>;
+  }
+  if (site.active_evidence_id === 'observation-learning-result') {
+    if (kind.status === 'error') return <p role="status">The observation-study receipt is unavailable: {kind.message}</p>;
+    if (!bound) return <p role="status">Results pending. The current study has no published observation receipt. Protected scores will appear only after measured evaluation.</p>;
+    if (kind.status === 'ready') return <p role="status">The observation-study receipt has an unsupported schema; no scores are displayed.</p>;
+    return <Loading what="the observation-study receipt" />;
+  }
   if (isPreparation && labGraph && kind.status === 'ready' && kind.value) {
     return (
       <>
         <p className="model-notice">
-          <strong>This is not financial advice.</strong> The demonstration mixes real saved market data with invented
-          examples. Nothing below is a prediction or a recommendation.
+          <strong>Experimental research prototype.</strong> All observations in this demonstration are synthetic.
+          Input preparation does not establish prediction accuracy.
         </p>
         <Preparation result={kind.value} sources={sources.status === 'ready' ? sources.value : null} labGraph={labGraph} localRuns={site.local_runs_enabled} />
       </>
@@ -484,7 +1126,7 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
     return (
       <div className="model-notice">
         <p>
-          <strong>The measured-result receipts are not available from this server</strong> ({evidence.message}). The
+          <strong>The measured results are not available from this server</strong> ({evidence.message}). The
           paper’s Section 4 reports the execution study and its limits.
         </p>
         {chapter.paper_section && (
@@ -496,14 +1138,14 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
     );
   }
   if (kind.status === 'error') {
-    return <p className="inspector__warn">The result receipt could not be loaded: {kind.message}</p>;
+    return <p className="inspector__warn">The result record could not be loaded: {kind.message}</p>;
   }
   if (evidence.status === 'loading' || kind.status === 'loading' || !labGraph || !evidence.value) return <Loading what="the recorded results" />;
   return (
     <>
       <p className="model-notice">
-        <strong>This is not financial advice.</strong> The runs below used historical market data. Their outputs are
-        research records, not recommendations.
+        <strong>Experimental research prototype.</strong> Saved execution records show what ran.
+        They establish predictive accuracy only when paired with a defined evaluation.
       </p>
       <Results windowResult={evidence.value[0]} conditional={evidence.value[1]} labGraph={labGraph} localRuns={site.local_runs_enabled} />
     </>
@@ -528,34 +1170,40 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
           <h2 id="paper-title">The paper and its evidence</h2>
           <p>
             <a className="button" href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">
-              Read the paper (PDF)
+              Previous edition (PDF)
             </a>
           </p>
           {paper && (
-            <p className="paper-band__hash">
-              PDF SHA-256 <code className="hash">{paper.pdf_sha256}</code>
-              <br />
+            <div className="paper-band__hash">
               <a href={paper.source.url} target="_blank" rel="noreferrer">
-                LaTeX source
+                Current LaTeX source on GitHub
               </a>
-            </p>
+              <details>
+                <summary>Verify the retained PDF bytes</summary>
+                <p>
+                  SHA-256 <code className="hash">{paper.pdf_sha256}</code>
+                </p>
+                <CopyButton text={paper.pdf_sha256} label="Copy hash" />
+              </details>
+            </div>
           )}
-          <h3 className="paper-aside__head">Receipts</h3>
+          <p>The LaTeX source is current. The retained PDF is a previous edition awaiting a verified export.</p>
+          <h3 className="paper-aside__head">Records</h3>
           <ul className="plain-list">
             {Object.entries(site.evidence).map(([id, url]) => (
               <li key={id}>
                 <a href={apiUrl(url)} target="_blank" rel="noreferrer">
-                  {id.replace(/-/g, ' ')}
+                  {RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}
                 </a>
               </li>
             ))}
           </ul>
-          <h3 className="paper-aside__head">Diagrams from the repository</h3>
+          <h3 className="paper-aside__head">Historical graph profiles</h3>
           <ul className="plain-list">
             {Object.entries(site.figures).map(([id, url]) => (
               <li key={id}>
                 <a href={apiUrl(url)} target="_blank" rel="noreferrer">
-                  {id.replace(/-/g, ' ')} (SVG)
+                  {FIGURE_LABEL[id] ?? id.replace(/-/g, ' ')} (SVG)
                 </a>
               </li>
             ))}
@@ -566,13 +1214,18 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
           {paper ? (
             <ol className="refs refs--full">
               {paper.citations.map((citation) => (
-                <li key={citation.id}>
-                  {latexToText(citation.latex)}
-                  {citation.urls.map((url) => (
-                    <a key={url} className="refs__link" href={url} target="_blank" rel="noreferrer">
-                      {linkLabel(url)}
-                    </a>
-                  ))}
+                <li key={citation.id} id={`ref-${citation.id}`}>
+                  {latexToText(citation.latex)}{' '}
+                  <span className="refs__links">
+                    ({citation.urls.map((url, i) => (
+                      <span key={url}>
+                        {i > 0 && ', '}
+                        <a href={url} target="_blank" rel="noreferrer">
+                          {linkLabel(url)}
+                        </a>
+                      </span>
+                    ))})
+                  </span>
                 </li>
               ))}
             </ol>

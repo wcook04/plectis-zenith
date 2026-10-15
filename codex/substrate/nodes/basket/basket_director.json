@@ -1,0 +1,23 @@
+{
+  "id": "basket_director",
+  "type": "reasoning",
+  "group": "basket",
+  "lane": "SPINE",
+  "dependencies": [
+    "basket_investigations"
+  ],
+  "meta": {},
+  "is_artifact": true,
+  "teleology": "Cutoff-bound shared-universe basket investigation",
+  "output_schema": "json",
+  "instruction": "Return one JSON object with keys selected_candidates (an array of candidate_id strings) and reason (a brief explanation). Select at most ONE candidate for each target, using the target field in the supplied numerical result. Omit candidates you do not adopt; the deterministic tool retains the baseline for every other basket and derives target assignments itself. An empty array keeps every baseline. Never invent an ID or include the string baseline in the array. Compare validation gains, their small sample size, and the actual question tested. Small gains may be noise; keeping the baseline is valid. Do not output a target-to-candidate map or calculate forecast values. These are empirical research forecasts.",
+  "platform": "chatgpt",
+  "execution": {
+    "retries": 0,
+    "cache_policy": "standard",
+    "tools": [],
+    "timeout": 120
+  },
+  "routing_class": "SYNTHESIZE",
+  "boundary": "Use only supplied cutoff data. Do not infer physical causality or invent numerical results."
+}

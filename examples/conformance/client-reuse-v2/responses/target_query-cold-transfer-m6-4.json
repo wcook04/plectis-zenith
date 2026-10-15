@@ -1,0 +1,4 @@
+{
+  "raw": "{\"queries\": [{\"outer\": true, \"initial\": [[1, 3], [2, 3], [4, 0]], \"steps\": [[1, 2, 2], [2, 4, 5], [4, 1, 1]], \"continuation\": [4, 3]}], \"note\": \"Probe whether a failed transfer inside an outer caller transaction leaves the caller transaction usable for later steps and continuation, and whether the caller's rollback discards both successful and failed transfer effects. Step 1 should succeed, step 2 should fail on insufficient funds (id 4 has 0), step 3 should fail on missing source (id 4 has 0), then continuation credits id 4. This tests failure isolation and rollback scope within an existing caller transaction.\"}",
+  "envelope_sha256": "9ee855b1d0fbae2c4e1385356d98d94d32b94116a6276559f4b51839e051d829"
+}

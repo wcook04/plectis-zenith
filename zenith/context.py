@@ -1,7 +1,7 @@
 """Audited metadata projection for full feed data in reasoning context.
 
 This profile removes duplicate acquisition/debug metadata only. It never reduces
-feed data, edits a canonical artifact, or silently substitutes a price basis.
+feed data, edits a canonical artifact, or silently substitutes a value basis.
 """
 from __future__ import annotations
 
@@ -15,8 +15,8 @@ PROFILE = "compact_feeds"
 METADATA_KEYS = frozenset({
     "schema_version", "data_schema_version", "tool", "status", "error", "message",
     "timestamp", "timestamp_iso", "timestamp_epoch_s", "as_of", "time_anchor", "effective_date", "effective_time",
-    "run_id", "provider", "source", "price_basis", "price_observations", "interval", "auto_adjust",
-    "currency", "timezone", "session_date", "bar_date", "observation_time", "observed_at", "acquired_at",
+    "run_id", "provider", "source", "observation_basis", "value_observations", "interval", "auto_adjust",
+    "unit", "timezone", "session_date", "bar_date", "observation_time", "observed_at", "acquired_at",
     "vintage_date", "observation_date", "available_at", "release_time", "event_time",
     "items_count", "data_quality", "quality", "feed_health", "freshness", "coverage",
     "config_ref", "merged_hash", "override_keys", "hydrated_from", "hydrated_from_truth",
@@ -24,9 +24,9 @@ METADATA_KEYS = frozenset({
 })
 DIAGNOSTIC_KEYS = frozenset({
     "input_rows", "output_rows", "dropped_rows", "warnings", "errors", "items_count",
-    "data_available_unused_count", "price_observations", "data_quality", "quality", "feed_health",
-    "source_status", "source_statuses", "missing_fields", "missing_tickers", "missing_series",
-    "provider", "interval", "auto_adjust", "session_date", "price_basis", "currency", "timezone",
+    "data_available_unused_count", "value_observations", "data_quality", "quality", "feed_health",
+    "source_status", "source_statuses", "missing_fields", "missing_target_ids", "missing_series",
+    "provider", "interval", "auto_adjust", "session_date", "observation_basis", "unit", "timezone",
     "lag_seconds", "freshness", "coverage", "error_count", "warning_count",
 })
 
