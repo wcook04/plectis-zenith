@@ -11,10 +11,12 @@ Inspect original node inputs, instructions and contracts before editing. Keep
 selection quality distinct from forecast accuracy. Keep the full denominator,
 abstentions and failed attempts. Oracle offers causal hypotheses, not proofs.
 
-Prioritize faithful historical data for the six acquired feeds and calculator.
+Prioritize faithful historical data for the five acquired feeds and derived
+calculator feed.
 Do not let a convenient narrow dataset redefine the original job. Use native
 import/validation for agent responses and existing budget controls for paid
 calls. Never reset an exhausted study to continue spending.
 
-Keep the implementation small and the paper at three pages. Removed studies
-remain research history; do not rebuild their machinery without a concrete need.
+Keep the implementation small and follow the paper length limit in AGENTS.md.
+Removed studies remain research history; do not rebuild their machinery without
+a concrete need.
