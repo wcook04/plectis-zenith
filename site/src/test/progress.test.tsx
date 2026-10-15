@@ -105,29 +105,32 @@ afterEach(() => { cleanup(); vi.unstubAllEnvs(); });
 it('uses the current receipt, separate study scores and retained historical links', async () => {
   mockSite(receipt());
   render(<App />);
-  expect(await screen.findByRole('heading', { name: 'Native repair' })).toBeInTheDocument();
-  for (const label of ['Qualification, costs and full interpretation', 'Separate learner comparison', 'Earlier experiment records', 'Earlier studies, graphs and paper edition']) {
+  expect(await screen.findByRole('heading', { name: 'Repairing database, cache and text programs' })).toBeInTheDocument();
+  for (const label of ['How the model interface was tested, costs and full results', 'Separate learner comparison', 'Earlier experiment records', 'Earlier studies, graphs and paper edition']) {
     fireEvent.click(screen.getByText(label));
   }
   expect(screen.getByRole('rowheader', { name: /fixture-qualification/ })).toBeInTheDocument();
   expect(screen.getByRole('rowheader', { name: /fixture-v4-qualification/ })).toBeInTheDocument();
   expect(screen.getByRole('rowheader', { name: /fixture-diagnostic/ })).toBeInTheDocument();
   expect(screen.getByText(/Interface passed/)).toBeInTheDocument();
-  expect(screen.getAllByText(/Diagnostic forfeited/).length).toBeGreaterThan(0);
+  expect(screen.getAllByText(/Repair comparison not completed/).length).toBeGreaterThan(0);
   expect(screen.getByText(/Repair candidates were blocked by admission/)).toBeInTheDocument();
   expect(screen.queryByRole('region', { name: 'Current status' })).toBeNull();
   expect(within(screen.getByRole('navigation', { name: 'Chapters' })).getAllByRole('link').map(link => link.textContent))
-    .toEqual(['The research question', 'How it works', 'What we found', 'The frontier', 'Paper']);
+    .toEqual(['The research question', 'How it works', 'What we found', 'What we still need to test', 'Paper']);
   expect(document.getElementById('lab')).not.toBeNull();
   expect(document.getElementById('evolve')).not.toBeNull();
   expect(screen.getByText(/1 unknown-charge attempts/)).toBeInTheDocument();
   expect(screen.getByText('7/12')).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Learner repair' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Repairing the learner’s memory' })).toBeInTheDocument();
   expect(screen.getByText('11395')).toBeInTheDocument();
   expect(screen.getByText('11379')).toBeInTheDocument();
+  expect(screen.getByText(/Passing these examples shows agreement on those particular inputs/)).toBeInTheDocument();
+  expect(screen.getByText(/Passing that preliminary test does not establish that its repairs work/)).toBeInTheDocument();
+  expect(screen.getByText(/These are software executions, not requests to an AI/)).toBeInTheDocument();
   expect(screen.getByText(/Three authored native contracts; no transfer claim/)).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /Historical: Advance conformance campaign/ })).toHaveAttribute('href', advance);
-  expect(screen.getByRole('link', { name: /Historical: Native observation-learning study/ })).toHaveAttribute('href', historical);
+  expect(screen.getByRole('link', { name: /Historical: Earlier Advance repair/ })).toHaveAttribute('href', advance);
+  expect(screen.getByRole('link', { name: /Historical: Earlier experiment learning to predict software responses/ })).toHaveAttribute('href', historical);
   expect(screen.queryByRole('heading', { name: 'Protected evaluation complete' })).toBeNull();
   expect(screen.queryByText('13 recorded call attempts')).toBeNull();
   expect(screen.getAllByRole('link', { name: 'Previous edition (PDF)' })).toHaveLength(1);
@@ -135,7 +138,7 @@ it('uses the current receipt, separate study scores and retained historical link
   expect(screen.getByRole('link', { name: 'Current LaTeX source on GitHub' })).toHaveAttribute('href', source.url);
   expect(screen.queryByRole('link', { name: 'Read the paper (PDF)' })).toBeNull();
   expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph') && String(url) !== historical)).toBe(true);
-  const toggle = screen.getByText('Read the repository’s own explanation').parentElement as HTMLDetailsElement;
+  const toggle = screen.getByText('Read the detailed method and research notes').parentElement as HTMLDetailsElement;
   toggle.open = true;
   fireEvent(toggle, new Event('toggle'));
   expect(await screen.findByRole('heading', { name: 'Current synthesis' })).toBeInTheDocument();
@@ -145,8 +148,8 @@ it('shows pending current evidence when only historical receipts exist', async (
   mockSite(receipt(), { published: false });
   render(<App />);
   expect(await screen.findByText('Current Progress campaign results pending.')).toBeInTheDocument();
-  expect(screen.getByText(/No current receipt is published/)).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /Historical: Native observation-learning study/ })).toHaveAttribute('href', historical);
+  expect(screen.getByText(/No current result file is published/)).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: /Historical: Earlier experiment learning to predict software responses/ })).toHaveAttribute('href', historical);
   expect(screen.queryByText(/Initial native comparison/)).toBeNull();
   expect(vi.mocked(fetch).mock.calls.every(([url]) => String(url) !== historical)).toBe(true);
 });
@@ -154,8 +157,8 @@ it('shows pending current evidence when only historical receipts exist', async (
 it('shows a current receipt fetch error without substituting historical results', async () => {
   mockSite(receipt(), { status: 503 });
   render(<App />);
-  expect(await screen.findByText('Current-campaign receipt unavailable.')).toBeInTheDocument();
-  expect(screen.getByText(/The current-campaign receipt is unavailable:/)).toBeInTheDocument();
+  expect(await screen.findByText('The current experiment result file could not be loaded.')).toBeInTheDocument();
+  expect(screen.getByText(/The current experiment result file could not be loaded:/)).toBeInTheDocument();
   expect(screen.queryByText('fixture-qualification')).toBeNull();
   expect(vi.mocked(fetch).mock.calls.every(([url]) => String(url) !== historical)).toBe(true);
 });
@@ -166,8 +169,8 @@ it.each([
 ])('withholds unsupported current receipts despite older schema availability', async data => {
   mockSite(data);
   render(<App />);
-  expect(await screen.findByText('Current-campaign receipt schema unsupported.')).toBeInTheDocument();
-  expect(screen.getByText(/The current-campaign receipt has an unsupported schema/)).toBeInTheDocument();
+  expect(await screen.findByText('The current experiment result file uses an unsupported format.')).toBeInTheDocument();
+  expect(screen.getByText('The current experiment result file uses an unsupported format; no outcomes are displayed.')).toBeInTheDocument();
   expect(screen.queryByText(/Initial native comparison/)).toBeNull();
   expect(screen.queryByText('fixture-qualification')).toBeNull();
 });
@@ -180,7 +183,7 @@ it('keeps outdated PDF links out of current paper section citations', () => {
   render(<PaperAside chapter={chapter} paper={paper} latex={null} />);
   expect(screen.queryByRole('link', { name: 'Previous edition PDF' })).toBeNull();
   expect(screen.getByRole('link', { name: 'Measured comparisons' })).toHaveAttribute('href', 'https://example.org/current.tex#L40');
-  expect(screen.getByText(/current LaTeX source, lines 40/)).toBeInTheDocument();
+  expect(screen.getByText(/paper text and formatting code, lines 40/)).toBeInTheDocument();
 });
 
 it('publishes the client pilot independently while the native campaign is pending', async () => {
@@ -190,25 +193,25 @@ it('publishes the client pilot independently while the native campaign is pendin
   const pilot = within(heading.parentElement as HTMLElement);
   expect(await pilot.findByText(/42 recorded model attempts; \$0.005186696 reported inference cost/)).toBeInTheDocument();
   expect(pilot.getByText(/5 later database programs were tested; 4 contained a known fault/)).toBeInTheDocument();
-  expect(pilot.getByText(/Both frozen testers issued no target queries/)).toBeInTheDocument();
-  const frozen = pilot.getByRole('rowheader', { name: 'Frozen investigator' }).parentElement as HTMLElement;
+  expect(pilot.getByText(/Neither saved tester tried an input on the later programs/)).toBeInTheDocument();
+  const frozen = pilot.getByRole('rowheader', { name: 'Saved learned tester' }).parentElement as HTMLElement;
   expect(within(frozen).getByText('0/4')).toBeInTheDocument();
-  const fresh = pilot.getByRole('rowheader', { name: 'Fresh, same history' }).parentElement as HTMLElement;
+  const fresh = pilot.getByRole('rowheader', { name: 'New AI, earlier results' }).parentElement as HTMLElement;
   expect(within(fresh).getByText('4/4')).toBeInTheDocument();
   expect(pilot.getByText(/how often the tester would report a fault incorrectly/)).toBeInTheDocument();
-  expect(pilot.getByRole('link', { name: 'Read the complete client-pilot receipt' })).toHaveAttribute('href', 'https://example.org/client.json');
+  expect(pilot.getByRole('link', { name: 'Read the saved tester-reuse results and costs' })).toHaveAttribute('href', 'https://example.org/client.json');
   expect(pilot.getByRole('link', { name: 'Read the client-pilot protocol' })).toHaveAttribute('href', '/api/v1/documents/client-investigation-protocol');
   expect(screen.getByText('Current Progress campaign results pending.')).toBeInTheDocument();
 });
 
 it.each([
-  ['diagnostic_pending', 'diagnostic in progress'],
-  ['qualification_failed', 'interface qualification failed'],
-  ['protocol_deviation', 'protocol deviation'],
+  ['diagnostic_pending', 'comparison in progress'],
+  ['qualification_failed', 'preliminary interface test failed'],
+  ['protocol_deviation', 'the experiment departed from its written procedure'],
 ])('translates campaign status %s into reader-facing text', async (status, label) => {
   mockSite({ ...receipt(), status });
   render(<App />);
-  expect(await screen.findByText(`Current Progress campaign: ${label}; 3 source-bound studies published.`)).toBeInTheDocument();
+  expect(await screen.findByText(`Current repair experiments: ${label}; 3 studies published.`)).toBeInTheDocument();
   expect(screen.queryByText(new RegExp(status))).toBeNull();
 });
 
@@ -231,15 +234,15 @@ it('shows the latest client version while retaining both earlier engineering fai
   const history = pilot.queryByText('Earlier client attempts');
   if (history) fireEvent.click(history);
   expect(await pilot.findByText(/40 recorded model attempts; \$0.012345678 reported inference cost/)).toBeInTheDocument();
-  expect(pilot.getByText('Latest published version: v2, reasoning low.')).toBeInTheDocument();
-  const investigator = pilot.getByRole('rowheader', { name: 'Frozen investigator' }).parentElement as HTMLElement;
+  expect(pilot.getByText(/Latest published version: v2, reasoning low/)).toBeInTheDocument();
+  const investigator = pilot.getByRole('rowheader', { name: 'Saved learned tester' }).parentElement as HTMLElement;
   expect(within(investigator).getByText('3/4')).toBeInTheDocument();
-  const fresh = pilot.getByRole('rowheader', { name: 'Fresh, same history' }).parentElement as HTMLElement;
+  const fresh = pilot.getByRole('rowheader', { name: 'New AI, earlier results' }).parentElement as HTMLElement;
   expect(within(fresh).getByText('15')).toBeInTheDocument();
   expect(pilot.getByText(/matched the ordinary reusable tester/)).toBeInTheDocument();
-  expect(pilot.getByText(/Both frozen testers stopped without target queries/)).toBeInTheDocument();
-  expect(pilot.getByText(/Invalid investigator artifact; 5 target runs skipped/)).toBeInTheDocument();
-  expect(pilot.getAllByRole('link', { name: /^Receipt$/ }).map(link => link.getAttribute('href'))).toEqual([
+  expect(pilot.getByText(/Both saved testers stopped without trying any inputs/)).toBeInTheDocument();
+  expect(pilot.getByText(/The generated tester could not run; 5 later programs not tested/)).toBeInTheDocument();
+  expect(pilot.getAllByRole('link', { name: /^Result data$/ }).map(link => link.getAttribute('href'))).toEqual([
     client, `${client}-v2`, `${client}-v2-low`,
   ]);
   expect(pilot.getAllByRole('link', { name: /^Analysis$/ })).toHaveLength(3);
@@ -255,19 +258,19 @@ it('labels a skipped invalid client investigator as not run instead of a measure
   const pilot = within((await screen.findByRole('heading', { name: 'Reusable tests' })).parentElement as HTMLElement);
   const history = pilot.queryByText('Earlier client attempts');
   if (history) fireEvent.click(history);
-  const header = await pilot.findByRole('rowheader', { name: 'Frozen investigator' });
+  const header = await pilot.findByRole('rowheader', { name: 'Saved learned tester' });
   const row = within(header.parentElement as HTMLElement);
   expect(row.getByText(/Not run/)).toBeInTheDocument();
   expect(row.queryByText('0/4')).toBeNull();
-  expect(pilot.getByText(/artifact error: SyntaxError: fixture/)).toBeInTheDocument();
+  expect(pilot.getByText(/program error: SyntaxError: fixture/)).toBeInTheDocument();
 });
 
 it('does not display protected client outcomes for an incomplete pilot', async () => {
   mockSite(receipt(), { clientData: { ...clientReceipt(), complete: false, protected_panel_opened: false } });
   render(<App />);
-  expect(await screen.findByText(/Protected outcome tables remain unavailable until the pilot/)).toBeInTheDocument();
-  expect(screen.queryByRole('rowheader', { name: 'Frozen investigator' })).toBeNull();
-  expect(screen.getByRole('heading', { name: 'Native repair' })).toBeInTheDocument();
+  expect(await screen.findByText(/Results on the later programs appear only after the tester/)).toBeInTheDocument();
+  expect(screen.queryByRole('rowheader', { name: 'Saved learned tester' })).toBeNull();
+  expect(screen.getByRole('heading', { name: 'Repairing database, cache and text programs' })).toBeInTheDocument();
 });
 
 it('loads one static API snapshot under a deployment prefix and preserves public read links', async () => {
@@ -308,13 +311,13 @@ it('rejects an unsupported static snapshot without trying live endpoints', async
 });
 
 it.each([
-  { clientData: { ...clientReceipt(), arm_metrics: null }, message: /client-pilot receipt has an unsupported schema/ },
-  { clientData: { ...clientReceipt(), reported_model_cost_usd: '-1' }, message: /client-pilot receipt has an unsupported schema/ },
-  { clientData: clientReceipt(), clientStatus: 503, message: /client-pilot receipt is unavailable/ },
+  { clientData: { ...clientReceipt(), arm_metrics: null }, message: /tester-reuse result file uses an unsupported format/ },
+  { clientData: { ...clientReceipt(), reported_model_cost_usd: '-1' }, message: /tester-reuse result file uses an unsupported format/ },
+  { clientData: clientReceipt(), clientStatus: 503, message: /tester-reuse result file could not be loaded/ },
 ])('withholds unavailable or unsupported client results without affecting the native receipt', async ({ message, ...options }) => {
   mockSite(receipt(), options);
   render(<App />);
   expect(await screen.findByText(message)).toBeInTheDocument();
-  expect(screen.queryByRole('rowheader', { name: 'Frozen investigator' })).toBeNull();
-  expect(screen.getByRole('heading', { name: 'Native repair' })).toBeInTheDocument();
+  expect(screen.queryByRole('rowheader', { name: 'Saved learned tester' })).toBeNull();
+  expect(screen.getByRole('heading', { name: 'Repairing database, cache and text programs' })).toBeInTheDocument();
 });

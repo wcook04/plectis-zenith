@@ -26,12 +26,12 @@ export const STATE_LABEL: Record<NodeState, string> = {
 };
 
 export const STATE_DESCRIPTION: Record<NodeState, string> = {
-  success: 'Executed in this run and produced an output that passed validation.',
+  success: 'This step ran and its output passed the program’s required format checks. That does not establish that its explanation or prediction is correct.',
   loaded: 'Loaded from saved data. Not computed in this run.',
   pending: 'The request is prepared. No model call is recorded, so no output exists.',
-  failure: 'Executed in this run and failed.',
+  failure: 'This step was attempted but did not produce an accepted output. Read the saved error for the reason.',
   not_started: 'Never started in this run.',
-  not_reached: 'Execution stopped before this node.',
+  not_reached: 'The program stopped before it could attempt this step.',
   unknown: 'This run has no record for the node.',
 };
 

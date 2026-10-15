@@ -6,6 +6,20 @@ evidence. It has no model-execution or editing endpoints.
 
 Keep the experimental boundary visible beside examples and model output.
 
+The public static website is also agent-navigable. Its generated
+[`llms.txt`](https://wcook04.github.io/plectis-zenith/llms.txt) links to a
+[`agent-map.md`](https://wcook04.github.io/plectis-zenith/agent-map.md) reading
+and graph map and an
+[`agent-index.json`](https://wcook04.github.io/plectis-zenith/agent-index.json)
+route table. `scripts/export_site_snapshot.py` derives all three from this
+same public API. Every exported request, including `?mission=` and
+`?task_profile=`, has a static JSON file; resolve its filename relative to the
+index URL. Source hashes, document `base_url`, graph node IDs, prerequisites,
+consumers and profile distinctions remain unchanged. The static host does not
+execute API queries. The combined `public-api.json` is optional for agents;
+fetch individual responses to avoid downloading unrelated evidence. The live
+backend continues to use its API routes as described below.
+
 ## Start
 
 From the repo root, with the existing Python environment active:

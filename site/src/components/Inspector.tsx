@@ -160,7 +160,7 @@ function NodeLinks({ ids, graph, onNavigate }: { ids: string[]; graph: Graph; on
               </button>
             ) : (
               <span className="node-link node-link--outside">
-                {nodeName(id)} <span className="inspector__quiet">(outside this mission)</span>
+                {nodeName(id)} <span className="inspector__quiet">(outside the selected part of the program)</span>
               </span>
             )}
           </li>
@@ -190,7 +190,7 @@ function Definition({
         <p>{node.purpose}</p>
         {node.boundary && (
           <p className="inspector__boundary">
-            <span>Boundary.</span> {node.boundary}
+            <span>Limits.</span> {node.boundary}
           </p>
         )}
       </section>
@@ -199,11 +199,11 @@ function Definition({
 
       <div className="inspector__io">
         <section className="inspector__section">
-          <h4>Reads</h4>
+          <h4>Reads outputs from</h4>
           <NodeLinks ids={node.dependencies} graph={graph} onNavigate={onNavigate} />
         </section>
         <section className="inspector__section">
-          <h4>Feeds into</h4>
+          <h4>Sends its output to</h4>
           <NodeLinks ids={node.consumers} graph={graph} onNavigate={onNavigate} />
         </section>
       </div>
@@ -212,7 +212,7 @@ function Definition({
         <h4>Expected output</h4>
         <p>{node.expectation}</p>
         <p className="inspector__quiet">
-          Output format: <code>{node.output_schema}</code>
+          Required output format: <code>{node.output_schema}</code>. This specifies the fields the program expects; meeting it does not make an answer true.
         </p>
       </section>
 
@@ -222,8 +222,8 @@ function Definition({
           <CopyButton text={node.instruction} label="Copy instruction" />
         </div>
         <p className="inspector__quiet">
-          The authored text in the repository today. A past run may have used a different prompt; open a run
-          record to see what it saved.
+          These are the instructions currently stored in the code. A saved execution, called a run, may have
+          sent different instructions to the model. Open its run record to read what was actually saved.
         </p>
         <pre className={`z-pre inspector__instruction${open ? ' is-open' : ''}`} tabIndex={0}>
           {node.instruction}
@@ -237,15 +237,16 @@ function Definition({
 
       {node.dossier && (
         <section className="inspector__section">
-          <h4>Feed dossier</h4>
-          <p className="inspector__quiet">The perspective, evidence rules and limits used by this lane.</p>
+          <h4>Rules for reading this data source</h4>
+          <p className="inspector__quiet">These instructions specify what the model should look for in this source, which evidence it may use and what it must not infer.</p>
           <JsonView label="Dossier" value={node.dossier.data} />
-          <a href={node.dossier.source.url} target="_blank" rel="noreferrer">Dossier source</a>
+          <a href={node.dossier.source.url} target="_blank" rel="noreferrer">Read these instructions in the source file</a>
         </section>
       )}
 
       <details className="inspector__section inspector__provenance">
-        <summary>Source and provenance</summary>
+        <summary>Source file and recorded origin</summary>
+        <p>The SHA-256 checksum identifies the exact file contents used here. It does not certify the correctness of an instruction or result.</p>
         <dl>
           <dt>Defined in</dt>
           <dd>
@@ -447,7 +448,7 @@ function LocalRecord({
       {isFailureEnvelope && failureData && (
         <section className="inspector__section">
           <h4>Last invalid output</h4>
-          <p className="inspector__quiet">The response the validator rejected, as saved.</p>
+          <p className="inspector__quiet">The saved response did not meet the program’s required output format. The recorded error explains which requirement it failed.</p>
           <pre className="z-pre z-pre--short">{String(failureData.last_invalid_output ?? '')}</pre>
         </section>
       )}

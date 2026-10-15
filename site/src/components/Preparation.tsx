@@ -115,16 +115,16 @@ export function Preparation({
       {snapshots.length > 0 && (
         <section className="results__block" aria-labelledby="inputs-head">
           <h3 id="inputs-head" className="block-head">
-            Provenance of the inputs
+            Where the input data came from
           </h3>
           <p className="block-lede">
-            The demonstration contains invented observations at {numberWord(snapshots.length)} cutoffs. All five source
-            perspectives and the computed summaries are published in full. Select a feed below or in the graph to inspect it.
+            The demonstration contains invented observations saved at {numberWord(snapshots.length)} times. The five data sources
+            and the summaries calculated from them are published in full. Select a data source below or in the diagram to read it.
           </p>
           <table className="shape__table inputs-table">
             <thead>
               <tr>
-                <th scope="col">Feed</th>
+                <th scope="col">Data source</th>
                 <th scope="col">Origin</th>
                 <th scope="col">Public availability</th>
               </tr>

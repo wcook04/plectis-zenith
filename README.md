@@ -28,6 +28,8 @@ These are constructed, inspected workloads. They establish working mechanisms an
 
 *The [website](https://wcook04.github.io/plectis-zenith/) is the short reading route. The [paper guide](paper/README.md) distinguishes the current source from the previous PDF edition.*
 
+Agents can read the site without JavaScript or an account: [llms.txt](https://wcook04.github.io/plectis-zenith/llms.txt) gives the starting points, the [research and graph map](https://wcook04.github.io/plectis-zenith/agent-map.md) explains the records, and the [machine route index](https://wcook04.github.io/plectis-zenith/agent-index.json) lists their URLs. Graph records name program steps and inputs; source checksums identify versions, not scientific validity.
+
 <a id="what-is-being-tested"></a>
 
 ## How it works

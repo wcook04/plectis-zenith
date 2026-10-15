@@ -75,10 +75,10 @@ EVIDENCE = {
 FIGURES = ("replay", "lab", "oracle", "evolve", "lab-detail", "oracle-detail", "evolve-detail", "basket-detail", "basket-serial-detail", "investigator-detail")
 CHAPTERS = (
     ("idea", "The idea", "introduction", None, None, "authored_mechanism"),
-    ("lab", "Investigate native behavior", "conformance-study", None, None, "authored_mechanism"),
-    ("oracle", "Check experiments and repairs", "conformance-study", None, None, "authored_mechanism"),
-    ("evolve", "Retain useful continuation state", "continuation-learner", None, None, "authored_mechanism"),
-    ("results", "Current campaign and limits", "progress-results", None, None, "measured_execution"),
+    ("lab", "Choose inputs to test the software", "conformance-study", None, None, "authored_mechanism"),
+    ("oracle", "Compare repaired programs with reference software", "conformance-study", None, None, "authored_mechanism"),
+    ("evolve", "Remember earlier actions to predict later answers", "continuation-learner", None, None, "authored_mechanism"),
+    ("results", "Current experiments and their limits", "progress-results", None, None, "measured_execution"),
     ("next", "What still needs testing", "research-programme", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
@@ -314,7 +314,7 @@ class PublicContent:
                 "evidence": {k: f"{API}/evidence/{k}" for k,v in EVIDENCE.items() if (self.root / v).is_file()},
                 "active_evidence_id": "progress-campaign",
                 "data_mode": "source_bound_acquisition_research",
-                "data_note": "The native investigation comparison, SQLite client pilot and exact-class learner retain separate evidence boundaries. Earlier Advance, observation learning, decomposition, financial studies and System A remain available as historical profiles.",
+                "data_note": "The software-repair experiment, database-tester pilot and separate memory learner answer different questions; their scores are reported separately. Earlier experiments and program versions remain available with their original results and limits.",
                 "local_runs_enabled": local_runs,
                 "run_index_url": f"{API}/runs" if local_runs else None,
                 "capabilities": {"read_graph": True, "read_paper": True, "read_local_runs": local_runs,

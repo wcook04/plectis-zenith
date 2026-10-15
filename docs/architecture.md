@@ -37,6 +37,8 @@ Direct investigation uses the conformance runner's invocation helper. Some retai
 
 Unused private-system operation registries and the speculative reasoning-packet/plan framework have been removed. The retired `build_reasoning_contract_packet`, `build_reasoning_execution_plan` and `verify_reasoning_execution_plan` commands have no replacement: they were not used by the graph or research runners. Actual graph-contract validation remains available through `python -m tools.meta.factory.validate_reasoning_contracts --check`. Its runtime schema and vocabulary are preserved. Live Markdown contracts have one owner, `codex/contracts/`; archived copies remain in their original experiment bundles.
 
+The website exporter, [`export_site_snapshot.py`](../scripts/export_site_snapshot.py), also publishes `llms.txt`, `agent-map.md` and `agent-index.json`. These derive from the same document, evidence and graph owners as the browser interface; they do not create a separate research catalogue. Each mission/profile has readable static records.
+
 ## Repository roles
 
 | Directory | Role |

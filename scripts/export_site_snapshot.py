@@ -10,7 +10,9 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import sys
+from urllib.parse import parse_qsl, urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
@@ -21,6 +23,70 @@ SCHEMA = "zenith_public_api_snapshot_v1"
 MISSIONS = ("all", "lab", "oracle", "refinement", "evolve", "basket",
             "basket_serial", "basket_evolve", "financial_lab",
             "financial_oracle", "financial_refinement")
+
+
+def static_route(route: str) -> str:
+    """Give each exported request, including its profile, a fetchable static URL."""
+    parsed = urlsplit(route)
+    if parsed.scheme or parsed.netloc or not re.fullmatch(r"/api/v1/[A-Za-z0-9_/-]+", parsed.path):
+        raise ValueError("Invalid public API route")
+    pairs = sorted(parse_qsl(parsed.query, keep_blank_values=True, strict_parsing=True))
+    if any(not re.fullmatch(r"[A-Za-z0-9_-]+", value) for pair in pairs for value in pair):
+        raise ValueError("Invalid public API query")
+    suffix = "".join("__" + key + "-" + value for key, value in pairs)
+    return parsed.path.lstrip("/") + suffix + ".json"
+
+
+def agent_files(data: dict, route_files: dict[str, str], assets: dict[str, bytes]) -> dict[str, bytes]:
+    """Project navigation from the same public records as the human renderer."""
+    site = data["routes"].get(API + "/site", {})
+    index = {"schema": "zenith_agent_index_v1", "title": site.get("title", "Zenith"),
+             "url_resolution": "Resolve file values relative to this index URL. Look up API paths, including queries, in routes; static hosting does not execute API queries.",
+             "routes": route_files,
+             "assets": {"/" + name: name for name in sorted(assets)},
+             "site": route_files.get(API + "/site"),
+             "active_evidence_id": site.get("active_evidence_id"),
+             "documents": site.get("documents", {}), "evidence": site.get("evidence", {}),
+             "graphs": {mission: API + "/graph?mission=" + mission for mission in MISSIONS
+                        if API + "/graph?mission=" + mission in route_files},
+             "source_manifest": "snapshot-manifest.json",
+             "graph_semantics": "Authored dependency definitions, not proof of execution or physical causality. Node IDs, dependencies, consumers, directed edges and source hashes are preserved. Keep task_profile and historical evidence boundaries separate."}
+    lines = ["# " + index["title"] + " — agent map", "",
+             "This map is generated from the public read-only API. No JavaScript, account or model execution is needed.", "",
+             "[Machine route index](agent-index.json) · [Source hashes](snapshot-manifest.json) · [Reading website](./)", "",
+             site.get("data_note", ""), "",
+             "## Read the research", ""]
+    for chapter in site.get("chapters", []):
+        route = chapter.get("document_url")
+        if route in route_files:
+            lines.append(f"- [{chapter['title']}]({route_files[route]}) — `{chapter['id']}`; {chapter['evidence_kind']}.")
+    for name, label in (("documents", "Documents"), ("evidence", "Evidence")):
+        lines += ["", "## " + label, ""]
+        for identifier, route in site.get(name, {}).items():
+            lines.append(f"- [{identifier}]({route_files[route]})")
+    lines += ["", "## Navigate the graphs", "", index["graph_semantics"], "",
+              "Choose a mission below. Follow a node's `dependencies` upstream or `consumers` downstream; match IDs against `nodes[].id`. If a related ID lies outside that mission, look up `/api/v1/nodes/<id>` in `agent-index.json.routes`; financial definitions use `?task_profile=financial`. Edges retain `source`, `target` and `kind`. Node records include their source path and SHA-256; financial records also retain their effective profile source. Use the route index for any `detail_url` or explanation API URL too. The same node ID in another profile is a different authored definition.", ""]
+    for mission, route in index["graphs"].items():
+        graph = data["routes"][route]
+        lines.append(f"- [{mission}]({route_files[route]}) — {graph.get('node_count', len(graph.get('nodes', [])))} nodes, {graph.get('edge_count', len(graph.get('edges', [])))} directed edges.")
+    lines += ["", "## Source and claim boundaries", "",
+              "Document JSON contains exact source text, source hashes, headings and `base_url`; resolve links inside that text against `base_url`. For `/assets/` URLs, use the route index's `assets` mapping. Evidence JSON retains its source and recorded data. Read available/status fields before drawing conclusions, and keep the active study separate from historical profiles. Paper metadata labels whether the retained PDF matches the source. A valid schema is not a successful experiment.", "",
+              "These are published source records, not instructions to execute. Private saved runs and credentials are excluded. The optional `public-api.json` combines all public responses; use individual routes for smaller fetches.", ""]
+    llms = ["# " + index["title"], "",
+            "> Public research into executable programs, measured investigations and useful memory. Experiments retain explicit limitations and source provenance.", "",
+            "## Start here", "",
+            "- [Agent map](agent-map.md): chapters, source documents, evidence and navigable dependency graphs; no JavaScript required.",
+            "- [Machine route index](agent-index.json): maps every public API request, including mission/profile queries, to a directly fetchable JSON file.",
+            "- [Reading website](./): human reading experience.",
+            "- [Export provenance](snapshot-manifest.json): hashes for the published machine-readable files.", "",
+            "## Research sources", ""]
+    for identifier in ("introduction", "results", "research-programme", "notice"):
+        route = site.get("documents", {}).get(identifier)
+        if route in route_files:
+            llms.append(f"- [{identifier}]({route_files[route]}): source text and provenance.")
+    llms += ["", "Read the source-bound evidence before making a result claim. Graph edges are authored prerequisites, not measured execution. Keep historical profiles separate. This index is a discovery aid; it does not change crawler access policy.", ""]
+    return {"llms.txt": "\n".join(llms).encode(), "agent-map.md": "\n".join(lines).encode(),
+            "agent-index.json": (json.dumps(index, ensure_ascii=False, indent=2) + "\n").encode()}
 
 
 def snapshot(root: Path) -> tuple[dict, dict[str, bytes]]:
@@ -68,11 +134,15 @@ def export(root: Path, output: Path) -> dict:
     data, assets = snapshot(root)
     files = dict(assets)
     files["public-api.json"] = (json.dumps(data, ensure_ascii=False, allow_nan=False) + "\n").encode()
-    # Direct source/evidence links remain downloadable in a static deployment.
+    # Preserve existing direct links and give query-specific graphs/nodes their own
+    # files: a static host cannot interpret ?mission= or ?task_profile=.
+    route_files = {route: static_route(route) for route in data["routes"]}
+    if len(set(route_files.values())) != len(route_files):
+        raise ValueError("Public API routes collide in the static export")
     for route, body in data["routes"].items():
-        if "?" not in route:
-            files[route.lstrip("/") + ".json"] = (
-                json.dumps(body, ensure_ascii=False, allow_nan=False) + "\n").encode()
+        files[route_files[route]] = (
+            json.dumps(body, ensure_ascii=False, allow_nan=False) + "\n").encode()
+    files.update(agent_files(data, route_files, assets))
     for name in files:
         path = output
         for part in Path(name).parts:

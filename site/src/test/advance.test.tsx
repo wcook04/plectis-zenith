@@ -52,7 +52,7 @@ it('still renders an Advance receipt when older site metadata names it active', 
   expect(screen.getByText('Incomplete')).toBeInTheDocument();
   expect(screen.getByText(/13 recorded call attempts; \$0.0243 reported cost/)).toBeInTheDocument();
   expect(screen.getByText(/Separate authored continuation-memory fixture/)).toBeInTheDocument();
-  expect(screen.getByRole('link', { name: /Historical: Native observation-learning study/ })).toHaveAttribute('href', historical);
-  expect(screen.queryByRole('link', { name: /Historical: Advance conformance campaign/ })).toBeNull();
+  expect(screen.getByRole('link', { name: /Historical: Earlier experiment learning to predict software responses/ })).toHaveAttribute('href', historical);
+  expect(screen.queryByRole('link', { name: /Historical: Earlier Advance repair/ })).toBeNull();
   expect(vi.mocked(fetch).mock.calls.every(([url]) => String(url) !== historical)).toBe(true);
 });

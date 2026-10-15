@@ -107,18 +107,18 @@ function mockObservationSite(receipt: ReturnType<typeof observationFixture> | nu
 it('shows pending observation results without substituting historical scores', async () => {
   mockObservationSite(null);
   render(<App />);
-  expect(await screen.findByText(/The current study has no published observation receipt/)).toBeInTheDocument();
+  expect(await screen.findByText(/The current study has no published observation result file/)).toBeInTheDocument();
   expect(screen.getByText('Observation study results pending.')).toBeInTheDocument();
-  expect(screen.queryByText('Protected exact answers and conditional identification errors')).toBeNull();
+  expect(screen.queryByText('Correct answers and errors on the later test inputs')).toBeNull();
   expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph'))).toBe(true);
 });
 
 it.each(['running', 'partial_snapshot', 'failed', 'interrupted', 'pilot'])('retains %s status and costs without protected score tables', async status => {
   mockObservationSite(observationFixture(status, false));
   render(<App />);
-  expect(await screen.findByText(/Protected outcome tables are unavailable/)).toBeInTheDocument();
+  expect(await screen.findByText(/Later test results appear only after the programs/)).toBeInTheDocument();
   expect(screen.getByText(/Billing remains unresolved for 1 call/)).toBeInTheDocument();
-  expect(screen.queryByText('Protected exact answers and conditional identification errors')).toBeNull();
+  expect(screen.queryByText('Correct answers and errors on the later test inputs')).toBeNull();
   if (status === 'failed') expect(screen.getByText(/fixture provider stopped/)).toBeInTheDocument();
 });
 
@@ -128,22 +128,22 @@ it('renders completed native comparisons and negative differences without a hist
   expect(await screen.findByRole('heading', { name: 'Protected evaluation complete' })).toBeInTheDocument();
   expect(screen.getAllByText('5/8')).toHaveLength(6);
   expect(screen.getAllByText('-12.5 percentage points')).toHaveLength(3);
-  expect(screen.getByText(/Configured sources are conditional replications/)).toBeInTheDocument();
+  expect(screen.getByText(/The examples use different settings of one software family/)).toBeInTheDocument();
   expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph'))).toBe(true);
 });
 
 it('withholds complete-looking aggregates when campaign status is partial', async () => {
   mockObservationSite({ ...observationFixture('complete', true), status: 'partial_snapshot' });
   render(<App />);
-  expect(await screen.findByText(/Protected outcome tables are unavailable/)).toBeInTheDocument();
+  expect(await screen.findByText(/Later test results appear only after the programs/)).toBeInTheDocument();
   expect(screen.queryByText('5/8')).toBeNull();
 });
 
 it('shows an unsupported observation receipt without loading historical graphs or scores', async () => {
   mockObservationSite({ ...observationFixture('complete', true), schema: 'test-unsupported-schema' });
   render(<App />);
-  expect(await screen.findByText('Observation-study receipt schema unsupported.')).toBeInTheDocument();
-  expect(screen.getByText(/The observation-study receipt has an unsupported schema/)).toBeInTheDocument();
+  expect(await screen.findByText('The observation experiment result file uses an unsupported format.')).toBeInTheDocument();
+  expect(screen.getByText('The observation experiment result file uses an unsupported format; no scores are displayed.')).toBeInTheDocument();
   expect(screen.queryByText('5/8')).toBeNull();
   expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/graph'))).toBe(true);
 });
@@ -289,7 +289,7 @@ describe('dependency disclosure', () => {
     render(<GraphExplorer graph={lab} title="Lab" />);
     fireEvent.click(screen.getAllByRole('button', { name: /Measurements directed miner/ })[0]);
     const dialog = await screen.findByRole('dialog', { name: /Measurements directed miner/ });
-    const reads = within(dialog).getByRole('heading', { name: 'Reads' }).parentElement!;
+    const reads = within(dialog).getByRole('heading', { name: 'Reads outputs from' }).parentElement!;
     expect(within(reads).getByRole('button', { name: /Measurements feed/ })).toBeInTheDocument();
   });
 });

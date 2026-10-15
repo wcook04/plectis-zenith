@@ -19,15 +19,15 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { CopyButton } from './components/CopyButton';
 
 const RECEIPT_LABEL: Record<string, string> = {
-  'progress-campaign': 'Current investigation comparison and ordinary tester controls',
+  'progress-campaign': 'Current repair experiment and comparisons with ordinary tests',
   'client-investigation': 'Separate SQLite client investigation pilot',
   'client-investigation-v2': 'SQLite client pilot v2, reasoning none',
   'client-investigation-v2-low': 'SQLite client pilot v2, reasoning low',
-  'advance-campaign': 'Advance conformance campaign and continuation-memory evidence',
-  'decomposition-result': 'Structural revision and synthetic rule-induction studies',
-  'observation-learning-result': 'Native observation-learning study',
+  'advance-campaign': 'Earlier Advance repair and memory experiments',
+  'decomposition-result': 'Earlier program-restructuring and rule-learning experiments',
+  'observation-learning-result': 'Earlier experiment learning to predict software responses',
   'observation-screens': 'Follow-on repair, candidate search and composition tests',
-  'investigation-learning-result': 'Operational investigation campaigns',
+  'investigation-learning-result': 'Earlier software-testing experiments',
   sources: 'Where each input comes from, with file hashes',
   replacements: 'Synthetic multi-feed observations',
   'demo-result': 'Preparation record',
@@ -37,18 +37,18 @@ const RECEIPT_LABEL: Record<string, string> = {
 };
 
 const PROGRESS_COPY: Record<string, string[]> = {
-  idea: ['Zenith studies whether experience can teach a model better ways to investigate software. What it keeps is code, measured observations and tests that expose the code’s limits.',
-    'The ambition is cumulative: solving one problem should make the next investigation more effective or cheaper. The current experiments show working repair and test reuse. They have not yet shown a better investigation method than ordinary code and fixed tests.'],
-  oracle: ['A model sees a program and its task, then proposes a test. Zenith runs the test against both the program and the reference software. The measured difference goes back to the model for repair.',
-    'A candidate must preserve every previously correct measured case. Zenith freezes the selected code before testing further cases. A separate experiment freezes a reusable tester and applies it to later clients.',
-    'Lab, Oracle and Evolve name roles in this loop. The current implementation uses ordinary programs and tests.'],
-  results: ['Three experiments test different parts of the idea. The ordinary alternatives matter as much as the learned programs.'],
-  next: ['The next test needs independently sourced software with faults that competent fixed tests do not already catch. A tester learned from earlier problems must be frozen before it sees those clients.',
-    'An advance would be a procedure that uses its experience to choose useful new tests, finds more faults or needs fewer queries than ordinary reuse, and repays the cost of learning it. General self-improvement remains an open goal.'],
+  idea: ['An AI can suggest a repair to a faulty program. Zenith asks a further question: can the AI learn a way to test programs that is useful again, when it encounters another problem?',
+    'We save the code it writes, the tests it chooses, and the software’s actual responses. Later experiments compare that saved code with ordinary reusable code and tests chosen in advance. Some repairs work, and some tests can be reused. So far, the learned testing methods have not beaten those simpler alternatives.'],
+  oracle: ['Zenith gives a language model a program to repair and a description of what it should do. The model proposes inputs to try. Zenith runs those inputs through the proposed program and the reference software, whose actual behavior supplies the expected answer. It sends any disagreement and the code back to the model for repair.',
+    'Zenith accepts a proposed repair only if it still answers every previously correct measured example correctly. It then stops changing that version and tries additional examples that were not used to choose the repair. Passing these examples shows agreement on those particular inputs; it does not prove the program works for every possible input.',
+    'A separate experiment asks the model to write a tester: a program that chooses tests for other software. Zenith saves the tester unchanged before trying it on later database programs. In the older diagrams, Lab names the steps that investigate, Oracle the steps that compare results, and Evolve the steps that propose a change.'],
+  results: ['The experiments below ask three different questions: can a saved tester find faults in later programs, can new tests help the model repair code, and can a learner retain the information it needs to predict later behavior? Each has its own comparison and limits.'],
+  next: ['We need to test software obtained independently of this project, with faults that a competent set of ordinary tests does not already find. The learned tester must be saved before it sees that software, so the later answers cannot influence its design.',
+    'A useful result would be a tester that chooses better inputs because of earlier experience: it finds more faults, or needs fewer attempts, than ordinary reusable tests. The comparison must include the cost of learning the tester. We have not yet demonstrated this advantage.'],
 };
 
 const CURRENT_TITLES: Record<string, string> = {
-  idea: 'The research question', oracle: 'How it works', results: 'What we found', next: 'The frontier',
+  idea: 'The research question', oracle: 'How it works', results: 'What we found', next: 'What we still need to test',
 };
 
 // Keep the API's six chapter IDs and old deep links, but give the current
@@ -62,12 +62,12 @@ function readingSite(site: Site): Site {
 // Older site metadata still names Advance as active. Keep its reading path
 // available without using that receipt as the current Progress result.
 const ADVANCE_COPY: Record<string, string[]> = {
-  idea: ['Experience should change useful distinctions, computations, interfaces or experiments. The research programme tests whether that retained knowledge makes later work more capable or less costly.'],
-  lab: ['Model-written investigators propose bounded native experiments. The host records legal measurements, invalid queries and delivery failures separately.'],
-  oracle: ['Measured outcomes and the failed program reach repair. Selection preserves every measured obligation the parent already satisfied, then freezes the chosen program before later panels.'],
-  evolve: ['Continuation and fork operations test what retained state can support. Authored mechanism checks remain separate from model acquisition.'],
-  results: ['The Advance receipt separates conformance studies and continuation-memory checks. Calls and reported costs are totalled; outcomes from different studies are not pooled.'],
-  next: ['Useful transfer, composition and improvement of the learning rule remain research questions. The programme preserves simpler ordinary-code controls and unresolved conclusions.'],
+  idea: ['These earlier experiments ask whether code learned during one task helps with a later task. We compare the answers the programs produce and the amount of testing they require.'],
+  lab: ['The AI writes programs that choose inputs to try on reference software. Zenith limits the permitted operations and records the software’s answers, requests that break those rules, and requests that could not be delivered.'],
+  oracle: ['Zenith sends the test results and the failed program back to the AI for repair. A proposed repair must preserve every previously correct measured answer. Zenith then saves that version unchanged and tests it on additional inputs.'],
+  evolve: ['A separate learner tries to predict software responses after a sequence of actions. We test whether it remembers enough to continue the sequence or try a different action from the same point. Programs written by the researchers remain separate from programs learned by the AI.'],
+  results: ['The saved Advance results distinguish software-repair experiments from experiments about memory. Requests to the AI and their reported costs are totalled, but scores from different experiments are reported separately.'],
+  next: ['We still need to show that learned code helps on other tasks, works when combined with other learned code, or improves the method that does the learning. Comparisons with ordinary reusable code remain necessary.'],
 };
 
 function activeEvidenceUrl(site: Site, chapter?: Chapter): string | undefined {
@@ -118,10 +118,12 @@ export default function App() {
     return (
       <Shell>
         <div className="page-status" role="alert">
-          <h1>The Zenith backend is not answering</h1>
+          <h1>The research data could not be loaded</h1>
           <p>
-            This site reads everything from the read-only Zenith API ({site.message}). Start it from the repository
-            root with <code>python -m zenith serve --port 4175</code> and reload.
+            The website could not read its published data ({site.message}). You can read the
+            <a href="https://github.com/wcook04/plectis-zenith/blob/main/docs/status.md"> saved results on GitHub</a>.
+            If you are running the website on your own computer, start its data server from the repository
+            directory with <code>python -m zenith serve --port 4175</code> and reload.
           </p>
         </div>
       </Shell>
@@ -163,7 +165,7 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
           <div className="wrap notice-bar__inner">
             <p>
               <strong>{site?.notice ?? 'Experimental research prototype.'}</strong>
-              <span className="notice-bar__extra"> Constructed experiments with measured native behavior.</span>
+              <span className="notice-bar__extra"> Tests on software examples written for this research.</span>
             </p>
             <button type="button" className="z-link-button" onClick={() => setNoticeOpen(true)}>
               Research notice
@@ -319,8 +321,8 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
       <footer className="footer">
         <div className="wrap footer__inner">
           <p>
-            <strong>Experimental research prototype.</strong> Native diagnostics and authored mechanism checks retain separate scopes.
-            Their bounded results do not establish reliable production operation. Earlier studies remain historical.
+            <strong>Experimental research prototype.</strong> Each result describes the particular programs and inputs tested.
+            These experiments do not establish that Zenith can reliably test or repair other software. Earlier studies are labelled separately.
           </p>
           <p>
             <a href="https://github.com/wcook04/plectis-zenith" target="_blank" rel="noreferrer">
@@ -389,7 +391,7 @@ function StatusStrip({ site }: { site: Site }) {
     if (schema === 'zenith_progress_campaign_report_v1' && validProgressReceipt(evidence.value.data)) {
       const data = evidence.value.data;
       summary = data.conformance_studies.length
-        ? `Current Progress campaign: ${progressStatusLabel(data.status)}; ${data.conformance_studies.length} source-bound ${data.conformance_studies.length === 1 ? 'study' : 'studies'} published.`
+        ? `Current repair experiments: ${progressStatusLabel(data.status)}; ${data.conformance_studies.length} ${data.conformance_studies.length === 1 ? 'study' : 'studies'} published.`
         : 'Current Progress campaign results pending.';
     }
     else if (schema === 'zenith_advance_campaign_v1' && validAdvanceReceipt(evidence.value.data)) {
@@ -401,19 +403,19 @@ function StatusStrip({ site }: { site: Site }) {
     else if (schema === 'zenith_learning_evidence_v1') summary = `${evidence.value.data.total_calls} model calls; $${Number(evidence.value.data.total_reported_cost_usd).toFixed(4)} reported cost across all recorded attempts.`;
     else if (schema === 'zenith_observation_learning_evidence_v1') {
       const data = evidence.value.data as unknown as ObservationReceipt;
-      summary = `Initial native comparison: ${observationStatus(data)}; ${data.total_calls} calls including canary attempts; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
+      summary = `Earlier software-prediction comparison: ${observationStatus(data)}; ${data.total_calls} requests to the AI including connection tests; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
     }
   }
   if (progressActive && !url) summary = 'Current Progress campaign results pending.';
-  else if (progressActive && evidence.status === 'error') summary = 'Current-campaign receipt unavailable.';
-  else if (progressActive && evidence.status === 'ready' && (!evidence.value || !validProgressReceipt(evidence.value.data))) summary = 'Current-campaign receipt schema unsupported.';
+  else if (progressActive && evidence.status === 'error') summary = 'The current experiment result file could not be loaded.';
+  else if (progressActive && evidence.status === 'ready' && (!evidence.value || !validProgressReceipt(evidence.value.data))) summary = 'The current experiment result file uses an unsupported format.';
   else if (advanceActive && !url) summary = 'Advance campaign results pending.';
-  else if (advanceActive && evidence.status === 'error') summary = 'Advance-campaign receipt unavailable.';
-  else if (advanceActive && evidence.status === 'ready' && (!evidence.value || !validAdvanceReceipt(evidence.value.data))) summary = 'Advance-campaign receipt schema unsupported.';
+  else if (advanceActive && evidence.status === 'error') summary = 'The earlier Advance experiment result file could not be loaded.';
+  else if (advanceActive && evidence.status === 'ready' && (!evidence.value || !validAdvanceReceipt(evidence.value.data))) summary = 'The earlier Advance experiment result file uses an unsupported format.';
   else if (observationActive && !url) summary = 'Observation study results pending.';
-  else if (observationActive && evidence.status === 'error') summary = 'Observation-study receipt unavailable.';
+  else if (observationActive && evidence.status === 'error') summary = 'The observation experiment result file could not be loaded.';
   else if (observationActive && evidence.status === 'ready' && evidence.value
-    && evidence.value.data.schema !== 'zenith_observation_learning_evidence_v1') summary = 'Observation-study receipt schema unsupported.';
+    && evidence.value.data.schema !== 'zenith_observation_learning_evidence_v1') summary = 'The observation experiment result file uses an unsupported format.';
   if (!chapter || (progressActive && evidence.status === 'ready' && evidence.value
     && validProgressReceipt(evidence.value.data) && evidence.value.data.status === 'complete')) return null;
   return (
@@ -540,7 +542,7 @@ function SourceDocument({ url }: { url: string }) {
   return (
     <div className="wrap source-doc">
       <details onToggle={(event) => setOpen((event.target as HTMLDetailsElement).open)}>
-        <summary>Read the repository’s own explanation</summary>
+        <summary>Read the detailed method and research notes</summary>
         {doc.status === 'ready' && doc.value && (
           <>
             <p className="source-doc__from">
@@ -695,9 +697,9 @@ function InvestigationResults({ result }: { result: Evidence }) {
         </tr>)}</tbody>
       </table>
     </section>)}
-    <p>{campaigns.filter(c => !c.complete).length} incomplete attempts remain in the receipt and total cost. Ratios use the declared numerical tolerance; findings and unresolved sets must match exactly.</p>
+    <p>{campaigns.filter(c => !c.complete).length} incomplete attempts remain in the saved record and total cost. Ratios use the declared numerical tolerance; findings and unresolved sets must match exactly.</p>
     <p>Repeated learners share the same model and inputs. Improvements across versions do not isolate changes to model, prompts or execution.</p>
-    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete evidence receipt</a>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the saved inputs, outputs and costs</a>
   </div>;
 }
 
@@ -732,13 +734,14 @@ function AdvanceResults({ result, site }: { result: Evidence; site: Site }) {
   const data = result.data as AdvanceReceipt;
   return <div className="diagnosis">
     <h3 className="block-head">{data.status === 'complete' ? 'Advance campaign analysis complete' : 'Advance campaign analysis pending'}</h3>
+    <p>Advance is the name of an earlier group of experiments. Some compared repaired programs with reference software; others tested what a separate learner remembered after a sequence of actions. Their results are reported separately below.</p>
     <p>{data.summary}</p>
     <p>{data.total_calls} recorded call attempts; ${Number(data.total_reported_cost_usd).toFixed(4)} reported inference cost across the recorded Advance campaign.</p>
     {typeof data.accounting_boundary === 'string' && <p>{data.accounting_boundary}</p>}
     <p>Analysis completion includes stopped studies and unresolved results. Each study retains its own construction and evaluation status.</p>
     <table className="diagnosis__table">
-      <caption>Recorded Advance conformance studies; outcomes remain separate</caption>
-      <thead><tr><th>Study, model and reasoning</th><th>Construction</th><th>Recorded attempts and reported cost</th></tr></thead>
+      <caption>Earlier experiments comparing programs with reference software</caption>
+      <thead><tr><th>Study, model and reasoning setting</th><th>Program-writing stage</th><th>Requests to the AI and reported cost</th></tr></thead>
       <tbody>{data.conformance_studies.map(study => <tr key={study.id}>
         <th scope="row">{study.id}<br />{study.model}; {study.reasoning_effort}</th>
         <td>{study.complete ? 'Complete' : 'Incomplete'}</td>
@@ -746,8 +749,8 @@ function AdvanceResults({ result, site }: { result: Evidence; site: Site }) {
       </tr>)}</tbody>
     </table>
     {typeof data.memory.summary === 'string' && <p>{data.memory.summary}</p>}
-    <p>Continuation-memory checks retain their own source, costs and limits in the repository explanation.</p>
-    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete Advance-campaign receipt</a>
+    <p>The memory experiment asks whether the learner can predict later behavior after earlier actions. Its programs, test inputs, costs and limits are described separately in the linked research notes.</p>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the saved Advance experiment results and costs</a>
     <HistoricalReceipts site={site} />
   </div>;
 }
@@ -773,8 +776,8 @@ type ProgressReceipt = Record<string, unknown> & {
 };
 
 function progressStatusLabel(status: string): string {
-  return ({ complete: 'diagnostic complete', diagnostic_pending: 'diagnostic in progress',
-    qualification_failed: 'interface qualification failed', protocol_deviation: 'protocol deviation',
+  return ({ complete: 'comparison complete', diagnostic_pending: 'comparison in progress',
+    qualification_failed: 'preliminary interface test failed', protocol_deviation: 'the experiment departed from its written procedure',
     pending: 'results pending' } as Record<string, string>)[status] ?? 'status unavailable';
 }
 
@@ -819,12 +822,13 @@ function ProgressResults({ result, site }: { result: Evidence; site: Site }) {
   const diagnostic = data.conformance_studies.find(study => study.stage === 'diagnostic');
   const confirmation = diagnostic?.panel_summary?.confirmation?.overall;
   const roles = ['parent', 'repair_only', 'fixed', 'ordinary', 'direct_batch', 'direct_masked', 'direct_adaptive'];
-  const heading = data.status === 'complete' ? 'Native repair'
-    : data.status === 'qualification_failed' ? 'Interface qualification did not pass'
-      : data.status === 'protocol_deviation' ? 'Protocol deviation in the campaign'
-        : 'Progress campaign report pending';
+  const heading = data.status === 'complete' ? 'Repairing database, cache and text programs'
+    : data.status === 'qualification_failed' ? 'The preliminary interface test did not pass'
+      : data.status === 'protocol_deviation' ? 'The experiment departed from its written procedure'
+        : 'Repair experiment results pending';
   return <div className="diagnosis">
     <h3 className="block-head">{heading}</h3>
+    <p>Zenith asks the model to repair programs that imitate SQLite database operations, a cache that stores recently used items, or UTF-8 text decoding. It compares each answer with the actual software. A correct answer agrees on that test input; the totals below are not a proof that every input will work.</p>
     {diagnostic && <p>{diagnostic.actual_calls} model calls; ${diagnostic.reported_cost_usd} reported inference cost.</p>}
     {confirmation?.repair_only && confirmation.parent && <p>
       Repair alone: {confirmation.parent.correct}/{confirmation.parent.total} → {confirmation.repair_only.correct}/{confirmation.repair_only.total} correct answers.
@@ -833,44 +837,48 @@ function ProgressResults({ result, site }: { result: Evidence; site: Site }) {
         && ' Extra investigation does not beat it in this comparison.'}
     </p>}
     {diagnostic && confirmation && <table className="diagnosis__table">
-      <caption>Diagnostic confirmation answers; separate from interface qualification</caption>
+      <caption>Answers on additional inputs, tried after the repairs were chosen</caption>
       <thead><tr><th>Condition</th><th>Correct / total</th></tr></thead>
       <tbody>{roles.filter(role => confirmation[role]).map(role => <tr key={role}>
-        <th scope="row">{{ parent: 'Starting program', repair_only: 'Repair only', fixed: 'Fixed tests + repair', ordinary: 'Compiled investigation + repair', direct_batch: 'Batch queries + repair', direct_masked: 'Queries with outcomes hidden + repair', direct_adaptive: 'Queries with feedback + repair' }[role] ?? role}</th>
+        <th scope="row">{{ parent: 'Starting program', repair_only: 'Repair only', fixed: 'Tests chosen in advance + repair', ordinary: 'Saved tester + repair', direct_batch: 'Tests chosen together + repair', direct_masked: 'Test answers hidden + repair', direct_adaptive: 'See each answer before the next test + repair' }[role] ?? role}</th>
         <td>{confirmation[role].correct}/{confirmation[role].total}</td>
       </tr>)}</tbody>
     </table>}
-    <p>These are constructed SQLite, cache and text-decoding tasks. Repeated programs and test cases do not count as independent applications.</p>
-    <p><a href={result.source.url} target="_blank" rel="noreferrer">Read the complete current-campaign receipt</a></p>
+    <p>Tests chosen in advance, tests chosen by the model, and a repair request with no new tests are compared on the same starting programs. The examples were written for this study; repeated versions of them are not independent real-world applications.</p>
+    <p><a href={result.source.url} target="_blank" rel="noreferrer">Read the saved repair results and costs</a></p>
     <details className="source-doc">
-      <summary>Qualification, costs and full interpretation</summary>
+      <summary>How the model interface was tested, costs and full results</summary>
+      <p>Before comparing repair methods, a separate preliminary test checks whether the model can send requests in the required format and use the allowed operations. Passing that preliminary test does not establish that its repairs work. The records below keep these stages separate.</p>
+      <details><summary>Original technical summary from the saved result file</summary>
+      <p>These two paragraphs quote the experiment record. In this record, a “parent” is a starting program, “confirmation” means tests tried after choosing the repair, and “acquisition source calls” are executions of the reference software. The ordinary-language explanation and scores appear above.</p>
       <p>{data.summary}</p>
       <p>{data.claim_boundary}</p>
+      </details>
     {data.conformance_studies.length > 0 && <table className="diagnosis__table">
-      <caption>Source-bound Progress studies; qualification is excluded from diagnostic estimates</caption>
-      <thead><tr><th>Study, model and reasoning</th><th>Parent episodes</th><th>Recorded attempts and reported cost</th></tr></thead>
+      <caption>Preliminary interface tests and repair comparisons, reported separately</caption>
+      <thead><tr><th>Study, model and reasoning setting</th><th>Starting program examples</th><th>Requests to the AI and reported cost</th></tr></thead>
       <tbody>{data.conformance_studies.map(study => <tr key={study.id}>
-        <th scope="row">{study.version} {study.stage}: {study.id}<br />{study.model}; {study.reasoning_effort}</th>
-        <td>{study.parent_episodes}{study.forfeited ? <><br />Diagnostic forfeited</>
+        <th scope="row">{study.version} {study.stage === 'qualification' ? 'preliminary interface test' : 'repair comparison'}: {study.id}<br />{study.model}; {study.reasoning_effort}</th>
+        <td>{study.parent_episodes}{study.forfeited ? <><br />Repair comparison not completed</>
           : study.stage === 'qualification' && study.qualification && <><br />{study.qualification.passed ? 'Interface passed' : 'Interface did not pass'}</>}</td>
         <td>{study.actual_calls} attempts<br />${Number(study.reported_cost_usd).toFixed(4)} reported{study.unknown_cost_calls > 0 && <><br />{study.unknown_cost_calls} unknown-charge attempts</>}</td>
       </tr>)}</tbody>
     </table>}
     {data.conformance_studies.filter(study => study.forfeited && study.forfeiture_reason).map(study =>
-      <p key={`${study.id}-forfeiture`}>{study.version} diagnostic forfeited: {study.forfeiture_reason}</p>)}
+      <p key={`${study.id}-forfeiture`}>{study.version} repair comparison not completed: {study.forfeiture_reason}</p>)}
     </details>
-    {data.learner && <section id="evolve" aria-label="Separate exact-class learner check">
-      <h3 className="block-head">Learner repair</h3>
-      <p>The corrected learner keeps the history that exposed each missing distinction. Its learned state and the reusable testers above are separate mechanisms.</p>
-      <p>The repaired learner used {data.learner.conditions.ordinary_witness.acquisition_source_calls.toLocaleString('en-US')} source calls; generic one-step questions used {data.learner.conditions.generic_singletons.acquisition_source_calls.toLocaleString('en-US')}. Later checks still found errors.</p>
+    {data.learner && <section id="evolve" aria-label="Separate learner memory experiment">
+      <h3 className="block-head">Repairing the learner’s memory</h3>
+      <p>This is a separate learning algorithm, not the AI-written tester above. It tries to predict how software will respond after a sequence of actions. We repaired it to retain the earlier actions that exposed an incorrect prediction, along with the later question that revealed the error.</p>
+      <p>The repaired learner ran the reference software {data.learner.conditions.ordinary_witness.acquisition_source_calls.toLocaleString('en-US')} times to collect answers. A comparison using generic one-action questions needed {data.learner.conditions.generic_singletons.acquisition_source_calls.toLocaleString('en-US')}. These are software executions, not requests to an AI. When we tried additional inputs later, the learner still made prediction errors.</p>
       <details className="source-doc"><summary>Separate learner comparison</summary>
-      <p>{data.learner.boundary}</p>
-      <p>{data.learner.native_configurations} native configurations across {data.learner.authored_native_families} authored families.</p>
+      <p>{data.learner.native_configurations} settings of the reference software, covering {data.learner.authored_native_families} groups of examples written for this study.</p>
+      <p>Limits recorded in the original research file: <q>{data.learner.boundary}</q></p>
       <table className="diagnosis__table">
-        <caption>Source acquisition calls with ordinary witness and generic singleton questions</caption>
-        <thead><tr><th>Question condition</th><th>Source calls</th></tr></thead>
-        <tbody><tr><th scope="row">Ordinary witness</th><td>{data.learner.conditions.ordinary_witness.acquisition_source_calls}</td></tr>
-          <tr><th scope="row">Generic singletons</th><td>{data.learner.conditions.generic_singletons.acquisition_source_calls}</td></tr></tbody>
+        <caption>Number of executions used to learn from the reference software</caption>
+        <thead><tr><th>How the learner chooses questions</th><th>Software executions</th></tr></thead>
+        <tbody><tr><th scope="row">Retain the actions that exposed an error</th><td>{data.learner.conditions.ordinary_witness.acquisition_source_calls}</td></tr>
+          <tr><th scope="row">Use generic one-action questions</th><td>{data.learner.conditions.generic_singletons.acquisition_source_calls}</td></tr></tbody>
       </table>
       </details>
       {site.documents['continuation-learner'] && <SourceDocument url={site.documents['continuation-learner']} />}
@@ -889,8 +897,8 @@ function HistoricalReceipts({ site }: { site: Site }) {
 }
 
 const CLIENT_ARMS = [
-  ['procedure', 'Frozen investigator'], ['ordinary_reuse', 'Frozen ordinary tester'],
-  ['same_history', 'Fresh, same history'], ['cold', 'Fresh, no history'], ['fixed', 'Fixed tests'],
+  ['procedure', 'Saved learned tester'], ['ordinary_reuse', 'Saved ordinary tester'],
+  ['same_history', 'New AI, earlier results'], ['cold', 'New AI, no earlier results'], ['fixed', 'Fixed tests'],
 ] as const;
 const CLIENT_VERSIONS = [
   { id: 'client-investigation', label: 'v1, reasoning none', protocol: 'client-investigation-protocol' },
@@ -957,15 +965,15 @@ function ClientStudy({ site }: { site: Site }) {
   const explanation = latest ? site.documents[latest.id] : undefined;
   return <section className="diagnosis" aria-labelledby="client-study-title">
     <h3 id="client-study-title" className="block-head">Reusable tests</h3>
-    <p>The model is asked to turn database import examples into a tester for account-transfer code.</p>
-    {latest && <p>Latest published version: {latest.label}.</p>}
-    {!latest ? <p role="status">Client pilot results pending. No client receipt is published.</p>
-      : receipts.status === 'loading' ? <Loading what="the client-pilot receipt" />
+    <p>The model first sees tests and results from programs that import data into a database. It then writes a tester for different programs that transfer money between accounts in the same kind of database. A tester finds a fault when an allowed test exposes a disagreement with the expected behavior.</p>
+    {latest && <p>Latest published version: {latest.label}. “Reasoning” is the provider’s setting for the model’s internal reasoning effort.</p>}
+    {!latest ? <p role="status">Client pilot results pending. No result file has been published for the tester-reuse experiment.</p>
+      : receipts.status === 'loading' ? <Loading what="the tester-reuse result file" />
         : receipts.status === 'error' || selected?.error
-          ? <p role="status">The client-pilot receipt is unavailable: {selected?.error ?? (receipts.status === 'error' ? receipts.message : '')}</p>
+          ? <p role="status">The tester-reuse result file could not be loaded: {selected?.error ?? (receipts.status === 'error' ? receipts.message : '')}</p>
           : selected?.result && validClientReceipt(selected.result.data)
             ? <ClientResults result={selected.result} version={selected.version.id} />
-            : <p role="status">The client-pilot receipt has an unsupported schema; no outcomes are displayed.</p>}
+            : <p role="status">The tester-reuse result file uses an unsupported format; no outcomes are displayed.</p>}
     {receipts.status === 'ready' && receipts.value.length > 0 && <>
       <details className="source-doc"><summary>Earlier client attempts</summary>
       <p>Each version keeps its own prompts, source, results and costs.</p>
@@ -973,8 +981,8 @@ function ClientStudy({ site }: { site: Site }) {
         <strong>{row.version.label}:</strong>{' '}
         {row.result && validClientReceipt(row.result.data)
           ? <ClientVersionSummary data={row.result.data} />
-          : row.error ? 'Receipt unavailable.' : 'Unsupported receipt; outcomes withheld.'}{' '}
-        <a href={apiUrl(site.evidence[row.version.id])} target="_blank" rel="noreferrer">Receipt</a>
+          : row.error ? 'Result file could not be loaded.' : 'The result file uses an unsupported format; no outcome is shown.'}{' '}
+        <a href={apiUrl(site.evidence[row.version.id])} target="_blank" rel="noreferrer">Result data</a>
         {site.documents[row.version.id] && <>{' · '}<a href={apiUrl(site.documents[row.version.id])} target="_blank" rel="noreferrer">Analysis</a></>}
       </li>)}</ul>
       </details>
@@ -987,12 +995,12 @@ function ClientStudy({ site }: { site: Site }) {
 function ClientVersionSummary({ data }: { data: ClientReceipt }) {
   const procedure = data.arm_metrics.procedure;
   const ordinary = data.arm_metrics.ordinary_reuse;
-  if (data.artifacts.procedure.error) return <>Invalid investigator artifact; {procedure.not_run_targets} target runs skipped. {ordinary.runs > 0 && ordinary.query_slots === 0 ? 'Ordinary tester ran but issued no target queries.' : ''}</>;
+  if (data.artifacts.procedure.error) return <>The generated tester could not run; {procedure.not_run_targets} later programs not tested. {ordinary.runs > 0 && ordinary.query_slots === 0 ? 'The ordinary tester ran but tried no inputs on the later programs.' : ''}</>;
   if (data.complete && procedure.runs > 0 && ordinary.runs > 0 && procedure.query_slots === 0 && ordinary.query_slots === 0)
-    return <>Both frozen testers stopped without target queries.</>;
+    return <>Both saved testers stopped without trying any inputs on the later programs.</>;
   return <>{data.complete && data.protected_panel_opened
-    ? `Frozen investigator ${procedure.failed_targets_detected}/${procedure.total_failing_targets}; ordinary reuse ${ordinary.failed_targets_detected}/${ordinary.total_failing_targets}.`
-    : 'Protected results pending.'}</>;
+    ? `Saved learned tester ${procedure.failed_targets_detected}/${procedure.total_failing_targets}; ordinary reuse ${ordinary.failed_targets_detected}/${ordinary.total_failing_targets}.`
+    : 'Results on the later test inputs are not yet available.'}</>;
 }
 
 function ClientResults({ result, version }: { result: Evidence; version: string }) {
@@ -1004,30 +1012,30 @@ function ClientResults({ result, version }: { result: Evidence; version: string 
       <p>{data.target_count} later database programs were tested; {data.total_failing_targets} contained a known fault.</p>
       <table className="diagnosis__table">
         <caption>Faults detected and work on later programs</caption>
-        <thead><tr><th>Method</th><th>Faults found</th><th>Valid / slots</th><th>Model calls</th></tr></thead>
+        <thead><tr><th>Method</th><th>Faults found</th><th>Allowed tests / attempted tests</th><th>Requests to the AI</th></tr></thead>
         <tbody>{CLIENT_ARMS.map(([arm, label]) => <tr key={arm}>
           <th scope="row">{label}</th>
-          <td>{data.arm_metrics[arm].not_run_targets > 0 ? <>Not run<br />{data.arm_metrics[arm].not_run_targets} clients</>
+          <td>{data.arm_metrics[arm].not_run_targets > 0 ? <>Not run<br />{data.arm_metrics[arm].not_run_targets} programs</>
             : <>{data.arm_metrics[arm].failed_targets_detected}/{data.arm_metrics[arm].total_failing_targets}</>}</td>
           <td>{data.arm_metrics[arm].valid_probes}/{data.arm_metrics[arm].query_slots}</td>
           <td>{data.arm_metrics[arm].model_call_attempts}</td>
         </tr>)}</tbody>
       </table>
       {(['procedure', 'ordinary_reuse'] as const).filter(arm => data.artifacts[arm].error).map(arm =>
-        <p key={arm}>{arm === 'procedure' ? 'Frozen investigator' : 'Frozen ordinary tester'} artifact error: {data.artifacts[arm].error}</p>)}
+        <p key={arm}>{arm === 'procedure' ? 'Saved learned tester' : 'Saved ordinary tester'} program error: {data.artifacts[arm].error}</p>)}
       {data.arm_metrics.procedure.runs > 0 && data.arm_metrics.ordinary_reuse.runs > 0
         && data.arm_metrics.procedure.query_slots === 0 && data.arm_metrics.ordinary_reuse.query_slots === 0
-        && <p>Both frozen testers issued no target queries. This pilot does not establish an advantage from reuse.</p>}
+        && <p>Neither saved tester tried an input on the later programs. This pilot does not establish an advantage from reuse.</p>}
       {data.arm_metrics.procedure.query_slots > 0 && data.arm_metrics.ordinary_reuse.query_slots > 0
         && data.arm_metrics.procedure.failed_targets_detected === data.arm_metrics.ordinary_reuse.failed_targets_detected
-        && <p>The frozen investigator matched the ordinary reusable tester on detected faults. This comparison does not establish an advantage from learned reuse.</p>}
-      {version === 'client-investigation-v2-low' && <p>In this published version, both compiled testers repeat one constant query and ignore feedback.</p>}
+        && <p>The saved learned tester matched the ordinary reusable tester on detected faults. This comparison does not establish an advantage from learned reuse.</p>}
+      {version === 'client-investigation-v2-low' && <p>In this published version, both generated testers repeat the same test input and ignore the response when deciding what to try next.</p>}
       {data.arm_metrics.procedure.model_call_attempts === 0 && data.arm_metrics.ordinary_reuse.model_call_attempts === 0
-        && <p>The total cost includes learning and compilation. The table counts later work only; slots include invalid and repeated tests.</p>}
+        && <p>The total cost includes the model requests used to learn from the earlier examples and write the testers. The table counts only work on the later programs. Attempted tests include invalid and repeated requests; an allowed test need not find a fault. A request to the AI is a separate operation from running a software test.</p>}
       <p>These examples were written for this study. They do not establish performance on independent software or how often the tester would report a fault incorrectly.</p>
-    </> : <p>Protected outcome tables remain unavailable until the pilot and its protected evaluation complete.</p>}
+    </> : <p>Results on the later programs appear only after the tester has been saved unchanged and those programs have been tested.</p>}
     <details className="source-doc"><summary>Scope of this result</summary><p>{data.boundary}</p></details>
-    <p><a href={result.source.url} target="_blank" rel="noreferrer">Read the complete client-pilot receipt</a></p>
+    <p><a href={result.source.url} target="_blank" rel="noreferrer">Read the saved tester-reuse results and costs</a></p>
   </>;
 }
 
@@ -1069,32 +1077,33 @@ function ObservationResults({ result }: { result: Evidence }) {
   const points = (value: number) => `${(value * 100).toFixed(1)} percentage points`;
   return <div className="diagnosis">
     <h3 className="block-head">{observationStatus(data)}</h3>
+    <p>This earlier experiment asks the model to write programs that predict a software library’s responses. The programs are saved unchanged before Zenith tries the later test inputs. These later inputs are called the protected evaluation because their answers were not supplied while the model was writing the programs.</p>
     <p>Campaign: {data.campaign}</p>
-    <p>{data.frozen_worlds}/{data.planned_worlds} source streams frozen. {data.model} via {data.provider_slug}.</p>
-    <p>{data.total_calls} calls including canary attempts; ${Number(data.total_reported_cost_usd).toFixed(4)} reported inference cost.</p>
+    <p>{data.frozen_worlds}/{data.planned_worlds} planned sets of reference-software examples have been saved unchanged. Model: {data.model}; provider: {data.provider_slug}.</p>
+    <p>{data.total_calls} requests to the AI, including preliminary requests to test the connection; ${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.</p>
     {data.unreported_cost_calls > 0 && <p>Billing remains unresolved for {data.unreported_cost_calls} {data.unreported_cost_calls === 1 ? 'call' : 'calls'}; ${Number(data.unreported_cost_reservations_usd).toFixed(4)} remains reserved. Cost bounds: ${Number(data.cost_bounds_usd[0]).toFixed(4)} to ${Number(data.cost_bounds_usd[1]).toFixed(4)}.</p>}
     {data.failure?.error && <p role="status">Recorded failure: {data.failure.error}</p>}
     {complete ? <>
       <table className="diagnosis__table">
-        <caption>Protected exact answers and conditional identification errors</caption>
-        <thead><tr><th>Policy or control</th><th>Exact answers</th><th>Unsupported exact</th><th>Execution or response errors</th></tr></thead>
+        <caption>Correct answers and errors on the later test inputs</caption>
+        <thead><tr><th>Program-writing method</th><th>Answers matching the reference</th><th>Exact claims without supporting evidence</th><th>Execution or response errors</th></tr></thead>
         <tbody>{OBSERVATION_ARMS.map(([id, label]) => {
           const score = data.aggregate?.[id];
           return score ? <tr key={id}><th>{label}</th><td>{score.correct}/{score.total}</td><td>{score.unsupported}</td><td>{score.errors}</td></tr> : null;
         })}</tbody>
       </table>
       {data.comparisons && <table className="diagnosis__table">
-        <caption>Incremental accuracy minus each comparison, paired by native source</caption>
+        <caption>Difference in correct-answer rates on the same reference-software examples</caption>
         <thead><tr><th>Comparison</th><th>Mean difference</th><th>Descriptive 95% interval</th><th>Wins / ties / losses</th></tr></thead>
         <tbody>{OBSERVATION_ARMS.filter(([id]) => id === 'archive' || id === 'fresh' || id === 'freeze_and_grow').map(([id, label]) => {
           const comparison = data.comparisons?.[id];
           return comparison ? <tr key={id}><th>{label}</th><td>{points(comparison.mean_accuracy_difference)}</td><td>{points(comparison.paired_bootstrap_95_percentile[0])} to {points(comparison.paired_bootstrap_95_percentile[1])}</td><td>{comparison.wins} / {comparison.ties} / {comparison.losses}</td></tr> : null;
         })}</tbody>
       </table>}
-      <p>Configured sources are conditional replications in one native software family. These comparisons do not establish transfer across domains or general intelligence.</p>
-    </> : <p>Protected outcome tables are unavailable until construction and the protected evaluation complete. Frozen stream counts and inference calls do not establish learning success.</p>}
+      <p>The examples use different settings of one software family. These comparisons do not establish success on unrelated software or general intelligence.</p>
+    </> : <p>Later test results appear only after the programs have been written, saved unchanged and tested. Counts of saved examples or AI requests do not establish that the model learned a useful program.</p>}
     <p>{data.boundary}</p>
-    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete observation-study receipt</a>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the saved observation-study results and costs</a>
   </div>;
 }
 
@@ -1121,34 +1130,34 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
     [kind.status, isPreparation, progressActive, advanceActive, windowUrl, condUrl],
   );
   if (progressActive) {
-    if (!bound) return <><p role="status">Current campaign results pending. No current receipt is published; historical receipts remain separate.</p><HistoricalReceipts site={site} /></>;
-    if (kind.status === 'error') return <><p role="status">The current-campaign receipt is unavailable: {kind.message}</p><HistoricalReceipts site={site} /></>;
+    if (!bound) return <><p role="status">Current campaign results pending. No current result file is published; earlier experiment results are listed separately.</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'error') return <><p role="status">The current experiment result file could not be loaded: {kind.message}</p><HistoricalReceipts site={site} /></>;
     if (kind.status === 'ready') return kind.value && validProgressReceipt(kind.value.data)
       ? <ProgressResults result={kind.value} site={site} />
-      : <><p role="status">The current-campaign receipt has an unsupported schema; no outcomes are displayed.</p><HistoricalReceipts site={site} /></>;
-    return <Loading what="the current-campaign receipt" />;
+      : <><p role="status">The current experiment result file uses an unsupported format; no outcomes are displayed.</p><HistoricalReceipts site={site} /></>;
+    return <Loading what="the current experiment result file" />;
   }
   if (advanceActive) {
-    if (!bound) return <><p role="status">Advance campaign results pending. No Advance receipt is published; older receipts remain separate.</p><HistoricalReceipts site={site} /></>;
-    if (kind.status === 'error') return <><p role="status">The Advance-campaign receipt is unavailable: {kind.message}</p><HistoricalReceipts site={site} /></>;
+    if (!bound) return <><p role="status">Advance campaign results pending. No result file is published for this experiment; earlier results are listed separately.</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'error') return <><p role="status">The Advance experiment result file could not be loaded: {kind.message}</p><HistoricalReceipts site={site} /></>;
     if (kind.status === 'ready') return kind.value && validAdvanceReceipt(kind.value.data)
       ? <AdvanceResults result={kind.value} site={site} />
-      : <><p role="status">The Advance-campaign receipt has an unsupported schema; no outcomes are displayed.</p><HistoricalReceipts site={site} /></>;
-    return <Loading what="the Advance-campaign receipt" />;
+      : <><p role="status">The Advance experiment result file uses an unsupported format; no outcomes are displayed.</p><HistoricalReceipts site={site} /></>;
+    return <Loading what="the Advance experiment result file" />;
   }
   if (kind.status === 'ready' && kind.value?.data.schema === 'zenith_learning_evidence_v1') {
     return <InvestigationResults result={kind.value} />;
   }
   if (kind.status === 'ready' && kind.value?.data.schema === 'zenith_observation_learning_evidence_v1') {
     return <><ObservationResults result={kind.value} />
-      {site.evidence['observation-screens'] && <p><a href={site.evidence['observation-screens']} target="_blank" rel="noreferrer">Read the follow-on repair, candidate search and composition receipts</a></p>}
+      {site.evidence['observation-screens'] && <p><a href={site.evidence['observation-screens']} target="_blank" rel="noreferrer">Read the follow-on repair, candidate search and program-combination results</a></p>}
     </>;
   }
   if (site.active_evidence_id === 'observation-learning-result') {
-    if (kind.status === 'error') return <p role="status">The observation-study receipt is unavailable: {kind.message}</p>;
-    if (!bound) return <p role="status">Results pending. The current study has no published observation receipt. Protected scores will appear only after measured evaluation.</p>;
-    if (kind.status === 'ready') return <p role="status">The observation-study receipt has an unsupported schema; no scores are displayed.</p>;
-    return <Loading what="the observation-study receipt" />;
+    if (kind.status === 'error') return <p role="status">The observation experiment result file could not be loaded: {kind.message}</p>;
+    if (!bound) return <p role="status">Results pending. The current study has no published observation result file. Scores on later inputs appear only after those tests have been run.</p>;
+    if (kind.status === 'ready') return <p role="status">The observation experiment result file uses an unsupported format; no scores are displayed.</p>;
+    return <Loading what="the observation experiment result file" />;
   }
   if (isPreparation && labGraph && kind.status === 'ready' && kind.value) {
     return (
@@ -1209,10 +1218,10 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
     <section className="paper-band" id="paper" aria-labelledby="paper-title">
       <div className="wrap paper-band__grid">
         <div>
-          <h2 id="paper-title">Paper and reproduction</h2>
+          <h2 id="paper-title">Paper, code and instructions to repeat the experiments</h2>
           <p><a className="button" href={apiUrl(paper?.source.url ?? site.documents.paper ?? '/api/v1/documents/paper')}
             target="_blank" rel="noreferrer">Current LaTeX source on GitHub</a></p>
-          <p>The three-page source is current. The repository includes installation commands, offline examples and experiment replay.</p>
+          <p>The current paper is stored as LaTeX, the text and formatting code used to prepare a research paper. The GitHub repository contains installation commands and examples you can run without an AI account. Its replay commands run the saved programs again and compare their behavior with the published results.</p>
           <p><a href="https://github.com/wcook04/plectis-zenith#try-it-without-an-account" target="_blank" rel="noreferrer">Run the examples or replay the evidence</a></p>
           <h3 className="paper-aside__head">Current experiment records</h3>
           <ul className="plain-list">
@@ -1225,7 +1234,8 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
             <p>The PDF predates the current source. The financial studies and earlier graph experiments remain here as historical records.</p>
             <p><a href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">Previous edition (PDF)</a></p>
             {paper && <details>
-              <summary>Verify the retained PDF bytes</summary>
+              <summary>Compare the downloaded PDF with the saved file</summary>
+              <p>SHA-256 is a checksum calculated from a file’s contents. Matching checksums show that the files contain the same bytes; they do not establish that the paper’s claims are correct.</p>
               <p>SHA-256 <code className="hash">{paper.pdf_sha256}</code></p>
               <CopyButton text={paper.pdf_sha256} label="Copy hash" />
             </details>}
@@ -1234,7 +1244,8 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
                 <li key={id}><a href={apiUrl(url)} target="_blank" rel="noreferrer">{RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}</a></li>
               ))}
             </ul>
-            <h3 className="paper-aside__head">Historical graph profiles</h3>
+            <h3 className="paper-aside__head">Diagrams of the earlier program versions</h3>
+            <p>Each box represents a source of data or a step in the program. An arrow means one step reads another step’s output. The diagram describes the intended dependencies; it does not show that the steps ran or that a prediction was correct. A profile is a version configured for a particular task, such as the earlier financial experiment.</p>
             <ul className="plain-list">
               {Object.entries(site.figures).map(([id, url]) => (
                 <li key={id}><a href={apiUrl(url)} target="_blank" rel="noreferrer">{FIGURE_LABEL[id] ?? id.replace(/-/g, ' ')} (SVG)</a></li>

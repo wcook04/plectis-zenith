@@ -65,7 +65,7 @@ const FAMILIES: Array<{ test: RegExp; family: Family }> = [
   },
   {
     test: /^lab_miner_v2_/,
-    family: { key: 'miners_v2', label: 'Directed miners', summary: 'Re-read each feed for the frozen thesis' },
+    family: { key: 'miners_v2', label: 'Directed miners', summary: 'Re-read each data source for the saved explanation' },
   },
   {
     test: /^lab_miner_/,
@@ -77,7 +77,7 @@ const FAMILIES: Array<{ test: RegExp; family: Family }> = [
   },
   {
     test: /^oracle_subject_(index|lab_)/,
-    family: { key: 'subject_lab', label: 'Saved Lab record', summary: 'The frozen run Oracle reviews' },
+    family: { key: 'subject_lab', label: 'Saved Lab record', summary: 'The saved predictions Oracle compares with later observations' },
   },
   {
     test: /^oracle_truth_diff_/,
@@ -101,22 +101,22 @@ export function nodeFamily(id: string, mission = 'lab'): Family | null {
 const ROLE: Record<string, string> = {
   global_derived_feed: 'Summaries computed from the earlier observations',
   lab_seed_state: 'Maps what data exists and what is missing',
-  lab_cross_corr_v1: 'Where the miners agree and conflict',
-  lab_cross_corr_v2: 'Where evidence converges on targets',
-  lab_orient: 'Builds and ranks causal hypotheses',
-  lab_decide: 'Freezes one dominant thesis',
-  lab_director: 'Freezes directional predictions',
-  lab_integrity: 'Audits the reasoning of both passes',
-  oracle_subject_index: 'Grounding context from the paired Lab run',
+  lab_cross_corr_v1: 'Combines agreements and conflicts between data sources',
+  lab_cross_corr_v2: 'Combines evidence about the selected measurements',
+  lab_orient: 'Ranks possible explanations for the observations',
+  lab_decide: 'Saves one explanation before seeing later observations',
+  lab_director: 'Saves predictions of which measurements will rise or fall',
+  lab_integrity: 'Looks for contradictions and unsupported claims',
+  oracle_subject_index: 'Identifies the earlier Lab execution being reviewed',
   oracle_subject_lab_cross_corr_v2: 'The Lab’s second synthesis',
-  oracle_subject_lab_decide: 'The Lab’s frozen thesis',
-  oracle_subject_lab_director: 'The Lab’s frozen predictions',
+  oracle_subject_lab_decide: 'The Lab’s saved explanation',
+  oracle_subject_lab_director: 'The Lab’s saved predictions',
   oracle_truth_diff_observations: 'Target values before and after',
   oracle_truth_diff_environment: 'Environment before and after',
   oracle_truth_map: 'Combines the source reviews',
-  oracle_attribution_map: 'Maps what happened onto the Lab’s evidence',
-  oracle_explain: 'Optional later context for misses',
-  oracle_cp2_emitter: 'Records the reconstruction for review',
+  oracle_attribution_map: 'Suggests why earlier predictions were wrong',
+  oracle_explain: 'Additional observations that may explain prediction errors',
+  oracle_cp2_emitter: 'Saves the comparison of predictions and later observations',
   delta_analyzer: 'Which parts of an instruction to change',
   dossier_updater: 'Writes the exact patch',
   version_committer: 'Applies it as a new version',
@@ -127,9 +127,9 @@ export function nodeRole(id: string, mission = 'lab'): string {
   let m = /^global_(\w+?)_feed$/.exec(id);
   if (m) return mission === 'oracle' ? 'Captured after the cutoff' : 'Saved at the cutoff';
   m = /^lab_miner_v2_(\w+)$/.exec(id);
-  if (m) return `Re-reads ${laneName(LANE_TOKEN[m[1]] ?? m[1])} for the thesis`;
+  if (m) return `Re-reads ${laneName(LANE_TOKEN[m[1]] ?? m[1])} for the saved explanation`;
   m = /^lab_miner_(\w+)$/.exec(id);
-  if (m) return `Extracts signals from ${laneName(LANE_TOKEN[m[1]] ?? m[1])}`;
+  if (m) return `Reads observations from ${laneName(LANE_TOKEN[m[1]] ?? m[1])}`;
   m = /^oracle_subject_(\w+?)_feed$/.exec(id);
   if (m) return 'As the Lab saw it';
   m = /^oracle_truth_(\w+)$/.exec(id);
