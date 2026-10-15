@@ -849,8 +849,11 @@ function ProgressResults({ result, site }: { result: Evidence; site: Site }) {
     <details className="source-doc">
       <summary>How the model interface was tested, costs and full results</summary>
       <p>Before comparing repair methods, a separate preliminary test checks whether the model can send requests in the required format and use the allowed operations. Passing that preliminary test does not establish that its repairs work. The records below keep these stages separate.</p>
+      <details><summary>Original technical summary from the saved result file</summary>
+      <p>These two paragraphs quote the experiment record. In this record, a “parent” is a starting program, “confirmation” means tests tried after choosing the repair, and “acquisition source calls” are executions of the reference software. The ordinary-language explanation and scores appear above.</p>
       <p>{data.summary}</p>
       <p>{data.claim_boundary}</p>
+      </details>
     {data.conformance_studies.length > 0 && <table className="diagnosis__table">
       <caption>Preliminary interface tests and repair comparisons, reported separately</caption>
       <thead><tr><th>Study, model and reasoning setting</th><th>Starting program examples</th><th>Requests to the AI and reported cost</th></tr></thead>
@@ -869,8 +872,8 @@ function ProgressResults({ result, site }: { result: Evidence; site: Site }) {
       <p>This is a separate learning algorithm, not the AI-written tester above. It tries to predict how software will respond after a sequence of actions. We repaired it to retain the earlier actions that exposed an incorrect prediction, along with the later question that revealed the error.</p>
       <p>The repaired learner ran the reference software {data.learner.conditions.ordinary_witness.acquisition_source_calls.toLocaleString('en-US')} times to collect answers. A comparison using generic one-action questions needed {data.learner.conditions.generic_singletons.acquisition_source_calls.toLocaleString('en-US')}. These are software executions, not requests to an AI. When we tried additional inputs later, the learner still made prediction errors.</p>
       <details className="source-doc"><summary>Separate learner comparison</summary>
-      <p>{data.learner.boundary}</p>
       <p>{data.learner.native_configurations} settings of the reference software, covering {data.learner.authored_native_families} groups of examples written for this study.</p>
+      <p>Limits recorded in the original research file: <q>{data.learner.boundary}</q></p>
       <table className="diagnosis__table">
         <caption>Number of executions used to learn from the reference software</caption>
         <thead><tr><th>How the learner chooses questions</th><th>Software executions</th></tr></thead>
