@@ -6,6 +6,7 @@ import { SECTION_LABEL } from '../content/copy';
 import { sectionTitle, shortCitation } from '../lib/latex';
 
 const EVIDENCE_LABEL: Record<string, string> = {
+  'progress-campaign': 'Native repair comparison',
   sources: 'Where each input comes from, with file hashes',
   observations: 'Synthetic observations, earlier and later',
   'window-result': 'Window experiment record',
@@ -31,10 +32,7 @@ export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper:
               {' '}
               (current LaTeX source, lines {section.start_line}&ndash;{section.end_line})
             </span>
-            <br />
-            <a href={apiUrl(section.pdf_url)} target="_blank" rel="noreferrer">
-              {currentPdf ? 'Section PDF' : 'Previous edition PDF'}
-            </a>
+            {currentPdf && <><br /><a href={apiUrl(section.pdf_url)} target="_blank" rel="noreferrer">Section PDF</a></>}
           </p>
         </div>
       )}

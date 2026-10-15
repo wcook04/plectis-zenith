@@ -37,13 +37,27 @@ const RECEIPT_LABEL: Record<string, string> = {
 };
 
 const PROGRESS_COPY: Record<string, string[]> = {
-  idea: ['A useful retained result is a source-bound procedure: which question to ask, what the source measured, and when that answer must be checked again. The current comparison tests whether such investigation improves later repair.'],
-  lab: ['A model may deliver a bounded native question directly or as a compiled selector. The host records each legal measurement, repeated proposal, invalid query and delivery failure. A strong fixed tester and ordinary code provide controls.'],
-  oracle: ['Measured outcomes and the failed program reach repair. The selected revision must preserve every earlier measured success; later cases remain protected until selection freezes. A repair-only arm tests the value of new evidence.'],
-  evolve: ['The corrected exact-class learner keeps useful continuation questions as an ordinary diagnostic baseline. Its acquisition cost and generic-question rival remain separate from the model investigation comparison.'],
-  results: ['The native comparison keeps qualification and diagnostic studies separate. The client pilot tests retained investigation within an authored SQLite family; the exact-class learner has its own acquisition comparison. Each study keeps its own costs and evaluation panel.'],
-  next: ['A useful new measurement or retained procedure must earn its lifetime cost against capable ordinary testing on later changed clients. Delivery, repair and transfer are separate claims.'],
+  idea: ['Zenith studies whether experience can teach a model better ways to investigate software. What it keeps is code, measured observations and tests that expose the code’s limits.',
+    'The ambition is cumulative: solving one problem should make the next investigation more effective or cheaper. The current experiments show working repair and test reuse. They have not yet shown a better investigation method than ordinary code and fixed tests.'],
+  oracle: ['A model sees a program and its task, then proposes a test. Zenith runs the test against both the program and the reference software. The measured difference goes back to the model for repair.',
+    'A candidate must preserve every previously correct measured case. Zenith freezes the selected code before testing further cases. A separate experiment freezes a reusable tester and applies it to later clients.',
+    'Lab, Oracle and Evolve name roles in this loop. The current implementation uses ordinary programs and tests.'],
+  results: ['Three experiments test different parts of the idea. The ordinary alternatives matter as much as the learned programs.'],
+  next: ['The next test needs independently sourced software with faults that competent fixed tests do not already catch. A tester learned from earlier problems must be frozen before it sees those clients.',
+    'An advance would be a procedure that uses its experience to choose useful new tests, finds more faults or needs fewer queries than ordinary reuse, and repays the cost of learning it. General self-improvement remains an open goal.'],
 };
+
+const CURRENT_TITLES: Record<string, string> = {
+  idea: 'The research question', oracle: 'How it works', results: 'What we found', next: 'The frontier',
+};
+
+// Keep the API's six chapter IDs and old deep links, but give the current
+// programme one shorter reading path. Historical profiles keep their layout.
+function readingSite(site: Site): Site {
+  if (site.active_evidence_id !== 'progress-campaign') return site;
+  return { ...site, chapters: site.chapters.filter(c => c.id !== 'lab' && c.id !== 'evolve')
+    .map(c => ({ ...c, title: CURRENT_TITLES[c.id] ?? c.title })) };
+}
 
 // Older site metadata still names Advance as active. Keep its reading path
 // available without using that receipt as the current Progress result.
@@ -96,7 +110,7 @@ export default function App() {
   if (site.status === 'loading') {
     return (
       <Shell>
-        <p className="page-status" role="status">Loading the paper and graph…</p>
+        <p className="page-status" role="status">Loading the research…</p>
       </Shell>
     );
   }
@@ -113,7 +127,7 @@ export default function App() {
       </Shell>
     );
   }
-  return <Page site={site.value} paper={paper.status === 'ready' ? paper.value : null} />;
+  return <Page site={readingSite(site.value)} paper={paper.status === 'ready' ? paper.value : null} />;
 }
 
 function useCurrentChapter(ids: string[]): string | null {
@@ -164,7 +178,8 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
             <nav aria-label="Chapters" className="nav">
               {site.chapters.map((chapter) => (
                 <a key={chapter.id} href={`#${chapter.id}`} aria-current={current === chapter.id ? 'true' : undefined}>
-                  {chapter.evidence_kind === 'verified_preparation' ? 'Preparation' : (NAV_LABEL[chapter.id] ?? chapter.title)}
+                  {site.active_evidence_id === 'progress-campaign' ? chapter.title
+                    : chapter.evidence_kind === 'verified_preparation' ? 'Preparation' : (NAV_LABEL[chapter.id] ?? chapter.title)}
                 </a>
               ))}
               <a href="#paper" aria-current={current === 'paper' ? 'true' : undefined}>
@@ -238,16 +253,16 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           <a className="button" href={apiUrl(paper?.source.url ?? site.documents.paper ?? '/api/v1/documents/paper')} target="_blank" rel="noreferrer">
             Current paper source
           </a>
-          <a className="button button--ghost" href="#lab">
-            Explore the investigation
+          <a className="button button--ghost" href={progressActive ? '#results' : '#lab'}>
+            {progressActive ? 'Read the findings' : 'Explore the investigation'}
           </a>
           {byline && <span className="hero__byline">{byline}</span>}
         </div>
         </div>
         <nav className="hero__map" aria-labelledby="contents-caption">
           <table>
-            <caption id="contents-caption">Contents and the status of the material in each section</caption>
-            <thead>
+            <caption id="contents-caption">{progressActive ? 'On this page' : 'Contents and the status of the material in each section'}</caption>
+            {!progressActive && <thead>
               <tr>
                 <th scope="col">
                   <span className="visually-hidden">Number</span>
@@ -255,15 +270,15 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
                 <th scope="col">Section</th>
                 <th scope="col">Status</th>
               </tr>
-            </thead>
+            </thead>}
             <tbody>
               {site.chapters.map((chapter, i) => (
                 <tr key={chapter.id} className={`map-row map-row--${chapter.evidence_kind}`}>
-                  <td className="map-row__num">{i + 1}</td>
+                  {!progressActive && <td className="map-row__num">{i + 1}</td>}
                   <th scope="row" className="map-row__title">
                     <a href={`#${chapter.id}`}>{chapter.title}</a>
                   </th>
-                  <td className="map-row__kind">{EVIDENCE_KIND_LABEL[chapter.evidence_kind]?.label ?? chapter.evidence_kind}</td>
+                  {!progressActive && <td className="map-row__kind">{EVIDENCE_KIND_LABEL[chapter.evidence_kind]?.label ?? chapter.evidence_kind}</td>}
                 </tr>
               ))}
             </tbody>
@@ -279,6 +294,7 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           index={index}
           paper={paper}
           latex={latex}
+          concise={progressActive}
           paragraphs={
             progressActive ? PROGRESS_COPY[chapter.id] : advanceActive ? ADVANCE_COPY[chapter.id] : chapter.id === 'lab' && !learningActive
               ? labParagraphs(lab.status === 'ready' && lab.value ? graphFacts(lab.value) : null)
@@ -292,8 +308,8 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           {chapter.id === 'oracle' && !learningActive && <OracleFigure chapter={chapter} />}
           {chapter.id === 'evolve' && !learningActive && <EvolveFigure chapter={chapter} />}
           {chapter.id === 'results' && (
-            <><ResultsFigure chapter={chapter} labGraph={lab.status === 'ready' ? lab.value : null} site={site} />
-              {progressActive && <ClientStudy site={site} />}</>
+            <>{progressActive && <ClientStudy site={site} />}
+              <ResultsFigure chapter={chapter} labGraph={lab.status === 'ready' ? lab.value : null} site={site} /></>
           )}
           {chapter.id === 'next' && !learningActive && <NextFigure chapter={chapter} />}
         </ChapterSection>
@@ -398,7 +414,8 @@ function StatusStrip({ site }: { site: Site }) {
   else if (observationActive && evidence.status === 'error') summary = 'Observation-study receipt unavailable.';
   else if (observationActive && evidence.status === 'ready' && evidence.value
     && evidence.value.data.schema !== 'zenith_observation_learning_evidence_v1') summary = 'Observation-study receipt schema unsupported.';
-  if (!chapter) return null;
+  if (!chapter || (progressActive && evidence.status === 'ready' && evidence.value
+    && validProgressReceipt(evidence.value.data) && evidence.value.data.status === 'complete')) return null;
   return (
     <section className="status-strip" aria-label="Current status">
       <div className="wrap status-strip__inner">
@@ -482,6 +499,7 @@ function ChapterSection({
   paper,
   latex,
   paragraphs,
+  concise = false,
   children,
 }: {
   chapter: Chapter;
@@ -489,19 +507,21 @@ function ChapterSection({
   paper: Paper | null;
   latex: string | null;
   paragraphs?: string[];
+  concise?: boolean;
   children: React.ReactNode;
 }) {
   const copy = CHAPTER_COPY[chapter.id];
   return (
     <section className={`chapter chapter--${chapter.id}`} id={chapter.id} aria-labelledby={`${chapter.id}-title`}>
+      {concise && chapter.id === 'oracle' && <span id="lab" />}
       <div className="wrap chapter__grid">
         <div className="chapter__text">
-          <p className={`chapter__status status--${chapter.evidence_kind}`}>
+          {!concise && <p className={`chapter__status status--${chapter.evidence_kind}`}>
             <span className="chapter__num">{String(index + 1).padStart(2, '0')}</span>
             <span>{EVIDENCE_KIND_LABEL[chapter.evidence_kind]?.label ?? chapter.evidence_kind}</span>
-          </p>
+          </p>}
           <h2 id={`${chapter.id}-title`}>{chapter.title}</h2>
-          {EVIDENCE_KIND_LABEL[chapter.evidence_kind] && (
+          {!concise && EVIDENCE_KIND_LABEL[chapter.evidence_kind] && (
             <p className="chapter__boundary">{EVIDENCE_KIND_LABEL[chapter.evidence_kind].note}</p>
           )}
           {(paragraphs ?? copy?.paragraphs)?.map((p) => <p key={p}>{p}</p>)}
@@ -799,13 +819,33 @@ function ProgressResults({ result, site }: { result: Evidence; site: Site }) {
   const diagnostic = data.conformance_studies.find(study => study.stage === 'diagnostic');
   const confirmation = diagnostic?.panel_summary?.confirmation?.overall;
   const roles = ['parent', 'repair_only', 'fixed', 'ordinary', 'direct_batch', 'direct_masked', 'direct_adaptive'];
-  const heading = data.status === 'complete' ? 'Progress campaign report complete'
+  const heading = data.status === 'complete' ? 'Native repair'
     : data.status === 'qualification_failed' ? 'Interface qualification did not pass'
       : data.status === 'protocol_deviation' ? 'Protocol deviation in the campaign'
         : 'Progress campaign report pending';
   return <div className="diagnosis">
     <h3 className="block-head">{heading}</h3>
-    <p>{data.summary}</p>
+    {diagnostic && <p>{diagnostic.actual_calls} model calls; ${diagnostic.reported_cost_usd} reported inference cost.</p>}
+    {confirmation?.repair_only && confirmation.parent && <p>
+      Repair alone: {confirmation.parent.correct}/{confirmation.parent.total} → {confirmation.repair_only.correct}/{confirmation.repair_only.total} correct answers.
+      {roles.slice(2).some(role => confirmation[role]) && roles.slice(2).filter(role => confirmation[role]).every(role =>
+        confirmation[role].total === confirmation.repair_only.total && confirmation[role].correct <= confirmation.repair_only.correct)
+        && ' Extra investigation does not beat it in this comparison.'}
+    </p>}
+    {diagnostic && confirmation && <table className="diagnosis__table">
+      <caption>Diagnostic confirmation answers; separate from interface qualification</caption>
+      <thead><tr><th>Condition</th><th>Correct / total</th></tr></thead>
+      <tbody>{roles.filter(role => confirmation[role]).map(role => <tr key={role}>
+        <th scope="row">{{ parent: 'Starting program', repair_only: 'Repair only', fixed: 'Fixed tests + repair', ordinary: 'Compiled investigation + repair', direct_batch: 'Batch queries + repair', direct_masked: 'Queries with outcomes hidden + repair', direct_adaptive: 'Queries with feedback + repair' }[role] ?? role}</th>
+        <td>{confirmation[role].correct}/{confirmation[role].total}</td>
+      </tr>)}</tbody>
+    </table>}
+    <p>These are constructed SQLite, cache and text-decoding tasks. Repeated programs and test cases do not count as independent applications.</p>
+    <p><a href={result.source.url} target="_blank" rel="noreferrer">Read the complete current-campaign receipt</a></p>
+    <details className="source-doc">
+      <summary>Qualification, costs and full interpretation</summary>
+      <p>{data.summary}</p>
+      <p>{data.claim_boundary}</p>
     {data.conformance_studies.length > 0 && <table className="diagnosis__table">
       <caption>Source-bound Progress studies; qualification is excluded from diagnostic estimates</caption>
       <thead><tr><th>Study, model and reasoning</th><th>Parent episodes</th><th>Recorded attempts and reported cost</th></tr></thead>
@@ -818,16 +858,13 @@ function ProgressResults({ result, site }: { result: Evidence; site: Site }) {
     </table>}
     {data.conformance_studies.filter(study => study.forfeited && study.forfeiture_reason).map(study =>
       <p key={`${study.id}-forfeiture`}>{study.version} diagnostic forfeited: {study.forfeiture_reason}</p>)}
-    {diagnostic && confirmation && <table className="diagnosis__table">
-      <caption>Diagnostic confirmation answers; separate from interface qualification</caption>
-      <thead><tr><th>Condition</th><th>Correct / total</th></tr></thead>
-      <tbody>{roles.filter(role => confirmation[role]).map(role => <tr key={role}>
-        <th scope="row">{role.replaceAll('_', ' ')}</th>
-        <td>{confirmation[role].correct}/{confirmation[role].total}</td>
-      </tr>)}</tbody>
-    </table>}
-    {data.learner && <section aria-label="Separate exact-class learner check">
-      <h4>Separate exact-class learner check</h4>
+    </details>
+    {data.learner && <section id="evolve" aria-label="Separate exact-class learner check">
+      <h3 className="block-head">Learner repair</h3>
+      <p>The corrected learner keeps the history that exposed each missing distinction. Its learned state and the reusable testers above are separate mechanisms.</p>
+      <p>The repaired learner used {data.learner.conditions.ordinary_witness.acquisition_source_calls.toLocaleString('en-US')} source calls; generic one-step questions used {data.learner.conditions.generic_singletons.acquisition_source_calls.toLocaleString('en-US')}. Later checks still found errors.</p>
+      <details className="source-doc"><summary>Separate learner comparison</summary>
+      <p>{data.learner.boundary}</p>
       <p>{data.learner.native_configurations} native configurations across {data.learner.authored_native_families} authored families.</p>
       <table className="diagnosis__table">
         <caption>Source acquisition calls with ordinary witness and generic singleton questions</caption>
@@ -835,21 +872,20 @@ function ProgressResults({ result, site }: { result: Evidence; site: Site }) {
         <tbody><tr><th scope="row">Ordinary witness</th><td>{data.learner.conditions.ordinary_witness.acquisition_source_calls}</td></tr>
           <tr><th scope="row">Generic singletons</th><td>{data.learner.conditions.generic_singletons.acquisition_source_calls}</td></tr></tbody>
       </table>
-      <p>{data.learner.boundary}</p>
+      </details>
+      {site.documents['continuation-learner'] && <SourceDocument url={site.documents['continuation-learner']} />}
     </section>}
-    <p>{data.claim_boundary}</p>
-    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete current-campaign receipt</a>
     <HistoricalReceipts site={site} />
   </div>;
 }
 
 function HistoricalReceipts({ site }: { site: Site }) {
-  return <div>
-    <p>Earlier source-bound receipts</p>
+  return <details className="source-doc">
+    <summary>Earlier experiment records</summary>
     <ul>{['advance-campaign', 'observation-learning-result', 'decomposition-result', 'investigation-learning-result']
       .filter(id => id !== site.active_evidence_id).map(id =>
       site.evidence[id] ? <li key={id}><a href={apiUrl(site.evidence[id])} target="_blank" rel="noreferrer">Historical: {RECEIPT_LABEL[id]}</a></li> : null)}</ul>
-  </div>;
+  </details>;
 }
 
 const CLIENT_ARMS = [
@@ -920,17 +956,18 @@ function ClientStudy({ site }: { site: Site }) {
   const method = latest ? site.documents[latest.protocol] : site.documents['client-investigation-protocol'];
   const explanation = latest ? site.documents[latest.id] : undefined;
   return <section className="diagnosis" aria-labelledby="client-study-title">
-    <h3 id="client-study-title" className="block-head">Separate SQLite client pilot</h3>
+    <h3 id="client-study-title" className="block-head">Reusable tests</h3>
+    <p>The model is asked to turn database import examples into a tester for account-transfer code.</p>
     {latest && <p>Latest published version: {latest.label}.</p>}
     {!latest ? <p role="status">Client pilot results pending. No client receipt is published.</p>
       : receipts.status === 'loading' ? <Loading what="the client-pilot receipt" />
         : receipts.status === 'error' || selected?.error
           ? <p role="status">The client-pilot receipt is unavailable: {selected?.error ?? (receipts.status === 'error' ? receipts.message : '')}</p>
           : selected?.result && validClientReceipt(selected.result.data)
-            ? <ClientResults result={selected.result} />
+            ? <ClientResults result={selected.result} version={selected.version.id} />
             : <p role="status">The client-pilot receipt has an unsupported schema; no outcomes are displayed.</p>}
     {receipts.status === 'ready' && receipts.value.length > 0 && <>
-      <h4>Recorded client versions</h4>
+      <details className="source-doc"><summary>Earlier client attempts</summary>
       <p>Each version keeps its own prompts, source, results and costs.</p>
       <ul>{receipts.value.map(row => <li key={row.version.id}>
         <strong>{row.version.label}:</strong>{' '}
@@ -940,6 +977,7 @@ function ClientStudy({ site }: { site: Site }) {
         <a href={apiUrl(site.evidence[row.version.id])} target="_blank" rel="noreferrer">Receipt</a>
         {site.documents[row.version.id] && <>{' · '}<a href={apiUrl(site.documents[row.version.id])} target="_blank" rel="noreferrer">Analysis</a></>}
       </li>)}</ul>
+      </details>
     </>}
     {method && <p><a href={apiUrl(method)} target="_blank" rel="noreferrer">Read the client-pilot protocol</a></p>}
     {explanation && <SourceDocument url={explanation} />}
@@ -957,15 +995,15 @@ function ClientVersionSummary({ data }: { data: ClientReceipt }) {
     : 'Protected results pending.'}</>;
 }
 
-function ClientResults({ result }: { result: Evidence }) {
+function ClientResults({ result, version }: { result: Evidence; version: string }) {
   const data = result.data as ClientReceipt;
   return <>
     <p>{data.complete ? 'Pilot complete.' : 'Pilot incomplete.'} {data.model_attempts} recorded model attempts; ${data.reported_model_cost_usd} reported inference cost. {data.model}; reasoning {data.reasoning_effort}.</p>
     {data.unknown_cost_attempts > 0 && <p>{data.unknown_cost_attempts} attempts have unresolved charges.</p>}
     {data.complete && data.protected_panel_opened ? <>
-      <p>{data.target_count} later clients were evaluated; {data.total_failing_targets} contained a fault in the protected finite panel.</p>
+      <p>{data.target_count} later database programs were tested; {data.total_failing_targets} contained a known fault.</p>
       <table className="diagnosis__table">
-        <caption>Failing later clients detected and target investigation work; query slots include invalid and repeated proposals</caption>
+        <caption>Faults detected and work on later programs</caption>
         <thead><tr><th>Method</th><th>Faults found</th><th>Valid / slots</th><th>Model calls</th></tr></thead>
         <tbody>{CLIENT_ARMS.map(([arm, label]) => <tr key={arm}>
           <th scope="row">{label}</th>
@@ -983,11 +1021,12 @@ function ClientResults({ result }: { result: Evidence }) {
       {data.arm_metrics.procedure.query_slots > 0 && data.arm_metrics.ordinary_reuse.query_slots > 0
         && data.arm_metrics.procedure.failed_targets_detected === data.arm_metrics.ordinary_reuse.failed_targets_detected
         && <p>The frozen investigator matched the ordinary reusable tester on detected faults. This comparison does not establish an advantage from learned reuse.</p>}
+      {version === 'client-investigation-v2-low' && <p>In this published version, both compiled testers repeat one constant query and ignore feedback.</p>}
       {data.arm_metrics.procedure.model_call_attempts === 0 && data.arm_metrics.ordinary_reuse.model_call_attempts === 0
-        && <p>Acquisition and compilation costs are included in the total above. Model calls in the table count target investigation only.</p>}
-      <p>This small authored set does not establish a false-accusation rate.</p>
+        && <p>The total cost includes learning and compilation. The table counts later work only; slots include invalid and repeated tests.</p>}
+      <p>These examples were written for this study. They do not establish performance on independent software or how often the tester would report a fault incorrectly.</p>
     </> : <p>Protected outcome tables remain unavailable until the pilot and its protected evaluation complete.</p>}
-    <p>{data.boundary}</p>
+    <details className="source-doc"><summary>Scope of this result</summary><p>{data.boundary}</p></details>
     <p><a href={result.source.url} target="_blank" rel="noreferrer">Read the complete client-pilot receipt</a></p>
   </>;
 }
@@ -1163,51 +1202,45 @@ function NextFigure({ chapter }: { chapter: Chapter }) {
 }
 
 function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
+  const currentIds = site.active_evidence_id === 'progress-campaign'
+    ? ['progress-campaign', [...CLIENT_VERSIONS].reverse().find(v => site.evidence[v.id])?.id]
+    : Object.keys(site.evidence);
   return (
     <section className="paper-band" id="paper" aria-labelledby="paper-title">
       <div className="wrap paper-band__grid">
         <div>
-          <h2 id="paper-title">The paper and its evidence</h2>
-          <p>
-            <a className="button" href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">
-              Previous edition (PDF)
-            </a>
-          </p>
-          {paper && (
-            <div className="paper-band__hash">
-              <a href={paper.source.url} target="_blank" rel="noreferrer">
-                Current LaTeX source on GitHub
-              </a>
-              <details>
-                <summary>Verify the retained PDF bytes</summary>
-                <p>
-                  SHA-256 <code className="hash">{paper.pdf_sha256}</code>
-                </p>
-                <CopyButton text={paper.pdf_sha256} label="Copy hash" />
-              </details>
-            </div>
-          )}
-          <p>The LaTeX source is current. The retained PDF is a previous edition awaiting a verified export.</p>
-          <h3 className="paper-aside__head">Records</h3>
+          <h2 id="paper-title">Paper and reproduction</h2>
+          <p><a className="button" href={apiUrl(paper?.source.url ?? site.documents.paper ?? '/api/v1/documents/paper')}
+            target="_blank" rel="noreferrer">Current LaTeX source on GitHub</a></p>
+          <p>The three-page source is current. The repository includes installation commands, offline examples and experiment replay.</p>
+          <p><a href="https://github.com/wcook04/plectis-zenith#try-it-without-an-account" target="_blank" rel="noreferrer">Run the examples or replay the evidence</a></p>
+          <h3 className="paper-aside__head">Current experiment records</h3>
           <ul className="plain-list">
-            {Object.entries(site.evidence).map(([id, url]) => (
-              <li key={id}>
-                <a href={apiUrl(url)} target="_blank" rel="noreferrer">
-                  {RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}
-                </a>
-              </li>
+            {Object.entries(site.evidence).filter(([id]) => currentIds.includes(id)).map(([id, url]) => (
+              <li key={id}><a href={apiUrl(url)} target="_blank" rel="noreferrer">{RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}</a></li>
             ))}
           </ul>
-          <h3 className="paper-aside__head">Historical graph profiles</h3>
-          <ul className="plain-list">
-            {Object.entries(site.figures).map(([id, url]) => (
-              <li key={id}>
-                <a href={apiUrl(url)} target="_blank" rel="noreferrer">
-                  {FIGURE_LABEL[id] ?? id.replace(/-/g, ' ')} (SVG)
-                </a>
-              </li>
-            ))}
-          </ul>
+          <details className="source-doc">
+            <summary>Earlier studies, graphs and paper edition</summary>
+            <p>The PDF predates the current source. The financial studies and earlier graph experiments remain here as historical records.</p>
+            <p><a href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">Previous edition (PDF)</a></p>
+            {paper && <details>
+              <summary>Verify the retained PDF bytes</summary>
+              <p>SHA-256 <code className="hash">{paper.pdf_sha256}</code></p>
+              <CopyButton text={paper.pdf_sha256} label="Copy hash" />
+            </details>}
+            <ul className="plain-list">
+              {Object.entries(site.evidence).filter(([id]) => !currentIds.includes(id)).map(([id, url]) => (
+                <li key={id}><a href={apiUrl(url)} target="_blank" rel="noreferrer">{RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}</a></li>
+              ))}
+            </ul>
+            <h3 className="paper-aside__head">Historical graph profiles</h3>
+            <ul className="plain-list">
+              {Object.entries(site.figures).map(([id, url]) => (
+                <li key={id}><a href={apiUrl(url)} target="_blank" rel="noreferrer">{FIGURE_LABEL[id] ?? id.replace(/-/g, ' ')} (SVG)</a></li>
+              ))}
+            </ul>
+          </details>
         </div>
         <div>
           <h3 className="paper-aside__head">References</h3>

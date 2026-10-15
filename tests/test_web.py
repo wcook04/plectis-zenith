@@ -82,8 +82,8 @@ def test_teaching_material_uses_current_sources(website):
     assert any(c['complete'] for c in learning['campaigns'])
     assert site['data_mode']=='source_bound_acquisition_research'
     assert '/documents/conformance-study' in next(c for c in site['chapters'] if c['id'] == 'lab')['document_url']
-    assert '/documents/continuation-memory' in next(c for c in site['chapters'] if c['id'] == 'evolve')['document_url']
-    assert '/documents/progress-synthesis' in results['document_url']
+    assert '/documents/continuation-learner' in next(c for c in site['chapters'] if c['id'] == 'evolve')['document_url']
+    assert '/documents/progress-results' in results['document_url']
     assert site['evidence']['advance-campaign'] == '/api/v1/evidence/advance-campaign'
     assert '/api/v1/documents/advance-synthesis' in site['documents'].values()
     current_method=json.loads(website.get('/api/v1/documents/observation-learning').body)

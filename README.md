@@ -2,9 +2,11 @@
 
 **Public research draft.** The experiments and offline examples run; a general advantage from learned investigation remains an open question.
 
-[Research website](https://wcook04.github.io/plectis-zenith/) · [Results](docs/status.md) · [Paper source](paper/zenith.tex) · [Run locally](#try-it-without-an-account) · [Credits](#credits-and-license)
+[Read the research website →](https://wcook04.github.io/plectis-zenith/)
 
-![Zenith’s reading website, with chapters and the completed campaign status](https://raw.githubusercontent.com/wcook04/plectis-zenith/main/docs/images/zenith-research.png)
+[Results](docs/status.md) · [Paper source](paper/zenith.tex) · [Run locally](#try-it-without-an-account) · [Credits](#credits-and-license)
+
+[![Zenith’s research website](https://raw.githubusercontent.com/wcook04/plectis-zenith/main/docs/images/zenith-research.png)](https://wcook04.github.io/plectis-zenith/)
 
 **Learn a program together with the questions that expose its limits.** Zenith lets a model propose experiments, measures their answers against native software, and uses the evidence to repair ordinary code. A later test checks whether the repair helped. The longer-term question is whether experience can make the next investigation cheaper or more effective.
 
@@ -75,7 +77,7 @@ A separate [client investigation pilot](docs/client-investigation-protocol-v2-20
 - [Current three-page paper source](paper/zenith.tex) · [previous PDF edition](paper/zenith.pdf)
 - [Research programme and relation to the graph](program.md)
 - [Nineteen PROGRESS returns: synthesis, custody and reproduction](docs/progress-returns-20261014.md)
-- [Read-only research website](site/README.md)
+- [Live research website](https://wcook04.github.io/plectis-zenith/) · [Frontend development](site/README.md)
 
 ## Source map
 

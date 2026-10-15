@@ -29,6 +29,8 @@ DOCUMENTS = {
     "continuation-memory": "docs/continuation-memory.md",
     "advance-synthesis": "docs/advance-returns-20261014.md",
     "progress-synthesis": "docs/progress-returns-20261014.md",
+    "progress-results": "docs/progress-campaign-20261014.md",
+    "continuation-learner": "examples/continuation-memory/witness-preserving-v1/README.md",
     "client-investigation-protocol": "docs/client-investigation-protocol-20261014.md",
     "client-investigation": "docs/client-investigation-20261014.md",
     "client-investigation-protocol-v2": "docs/client-investigation-protocol-v2-20261015.md",
@@ -74,8 +76,8 @@ CHAPTERS = (
     ("idea", "The idea", "introduction", None, None, "authored_mechanism"),
     ("lab", "Investigate native behavior", "conformance-study", None, None, "authored_mechanism"),
     ("oracle", "Check experiments and repairs", "conformance-study", None, None, "authored_mechanism"),
-    ("evolve", "Retain useful continuation state", "continuation-memory", None, None, "authored_mechanism"),
-    ("results", "Current campaign and limits", "progress-synthesis", None, None, "measured_execution"),
+    ("evolve", "Retain useful continuation state", "continuation-learner", None, None, "authored_mechanism"),
+    ("results", "Current campaign and limits", "progress-results", None, None, "measured_execution"),
     ("next", "What still needs testing", "research-programme", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {

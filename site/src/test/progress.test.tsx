@@ -60,7 +60,7 @@ function mockSite(data: unknown, { published = true, status = 200, clientData = 
   clientStatus = 200, clientVersions = {} }: { published?: boolean; status?: number;
     clientData?: unknown; clientStatus?: number; clientVersions?: Record<string, unknown> } = {}) {
   const clients: Record<string, unknown> = { ...(clientData === undefined ? {} : { 'client-investigation': clientData }), ...clientVersions };
-  const chapters = ['lab', 'oracle', 'evolve', 'results'].map(id => ({
+  const chapters = ['idea', 'lab', 'oracle', 'evolve', 'results', 'next'].map(id => ({
     id, title: id, evidence_kind: id === 'results' ? 'measured_execution' : 'authored_mechanism',
     graph_url: null, figure_url: null, paper_section: null, available: true,
     document_url: id === 'results' ? '/api/v1/documents/progress-synthesis' : null,
@@ -105,17 +105,24 @@ afterEach(() => { cleanup(); vi.unstubAllEnvs(); });
 it('uses the current receipt, separate study scores and retained historical links', async () => {
   mockSite(receipt());
   render(<App />);
-  expect(await screen.findByRole('heading', { name: 'Progress campaign report complete' })).toBeInTheDocument();
+  expect(await screen.findByRole('heading', { name: 'Native repair' })).toBeInTheDocument();
+  for (const label of ['Qualification, costs and full interpretation', 'Separate learner comparison', 'Earlier experiment records', 'Earlier studies, graphs and paper edition']) {
+    fireEvent.click(screen.getByText(label));
+  }
   expect(screen.getByRole('rowheader', { name: /fixture-qualification/ })).toBeInTheDocument();
   expect(screen.getByRole('rowheader', { name: /fixture-v4-qualification/ })).toBeInTheDocument();
   expect(screen.getByRole('rowheader', { name: /fixture-diagnostic/ })).toBeInTheDocument();
   expect(screen.getByText(/Interface passed/)).toBeInTheDocument();
   expect(screen.getAllByText(/Diagnostic forfeited/).length).toBeGreaterThan(0);
   expect(screen.getByText(/Repair candidates were blocked by admission/)).toBeInTheDocument();
-  expect(screen.getByText(/Current Progress campaign: diagnostic complete; 3 source-bound studies published/)).toBeInTheDocument();
+  expect(screen.queryByRole('region', { name: 'Current status' })).toBeNull();
+  expect(within(screen.getByRole('navigation', { name: 'Chapters' })).getAllByRole('link').map(link => link.textContent))
+    .toEqual(['The research question', 'How it works', 'What we found', 'The frontier', 'Paper']);
+  expect(document.getElementById('lab')).not.toBeNull();
+  expect(document.getElementById('evolve')).not.toBeNull();
   expect(screen.getByText(/1 unknown-charge attempts/)).toBeInTheDocument();
   expect(screen.getByText('7/12')).toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: 'Separate exact-class learner check' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Learner repair' })).toBeInTheDocument();
   expect(screen.getByText('11395')).toBeInTheDocument();
   expect(screen.getByText('11379')).toBeInTheDocument();
   expect(screen.getByText(/Three authored native contracts; no transfer claim/)).toBeInTheDocument();
@@ -165,13 +172,13 @@ it.each([
   expect(screen.queryByText('fixture-qualification')).toBeNull();
 });
 
-it('labels the retained PDF separately from the current source and its line numbers', () => {
+it('keeps outdated PDF links out of current paper section citations', () => {
   const section = { id: 'results', start_line: 40, end_line: 50, source,
     source_url: 'https://example.org/current.tex#L40', pdf_url: '/assets/paper.pdf#nameddest=results', citation_ids: [] };
   const chapter = { id: 'results', title: 'Results', evidence_urls: [], paper_section: section } as unknown as Chapter;
   const paper = { source, citations: [], sections: [section], pdf_current: false } as unknown as Paper;
   render(<PaperAside chapter={chapter} paper={paper} latex={null} />);
-  expect(screen.getByRole('link', { name: 'Previous edition PDF' })).toHaveAttribute('href', '/assets/paper.pdf#nameddest=results');
+  expect(screen.queryByRole('link', { name: 'Previous edition PDF' })).toBeNull();
   expect(screen.getByRole('link', { name: 'Measured comparisons' })).toHaveAttribute('href', 'https://example.org/current.tex#L40');
   expect(screen.getByText(/current LaTeX source, lines 40/)).toBeInTheDocument();
 });
@@ -179,16 +186,16 @@ it('labels the retained PDF separately from the current source and its line numb
 it('publishes the client pilot independently while the native campaign is pending', async () => {
   mockSite(receipt(), { published: false, clientData: clientReceipt() });
   render(<App />);
-  const heading = await screen.findByRole('heading', { name: 'Separate SQLite client pilot' });
+  const heading = await screen.findByRole('heading', { name: 'Reusable tests' });
   const pilot = within(heading.parentElement as HTMLElement);
   expect(await pilot.findByText(/42 recorded model attempts; \$0.005186696 reported inference cost/)).toBeInTheDocument();
-  expect(pilot.getByText(/5 later clients were evaluated; 4 contained a fault/)).toBeInTheDocument();
+  expect(pilot.getByText(/5 later database programs were tested; 4 contained a known fault/)).toBeInTheDocument();
   expect(pilot.getByText(/Both frozen testers issued no target queries/)).toBeInTheDocument();
   const frozen = pilot.getByRole('rowheader', { name: 'Frozen investigator' }).parentElement as HTMLElement;
   expect(within(frozen).getByText('0/4')).toBeInTheDocument();
   const fresh = pilot.getByRole('rowheader', { name: 'Fresh, same history' }).parentElement as HTMLElement;
   expect(within(fresh).getByText('4/4')).toBeInTheDocument();
-  expect(pilot.getByText(/does not establish a false-accusation rate/)).toBeInTheDocument();
+  expect(pilot.getByText(/how often the tester would report a fault incorrectly/)).toBeInTheDocument();
   expect(pilot.getByRole('link', { name: 'Read the complete client-pilot receipt' })).toHaveAttribute('href', 'https://example.org/client.json');
   expect(pilot.getByRole('link', { name: 'Read the client-pilot protocol' })).toHaveAttribute('href', '/api/v1/documents/client-investigation-protocol');
   expect(screen.getByText('Current Progress campaign results pending.')).toBeInTheDocument();
@@ -220,7 +227,9 @@ it('shows the latest client version while retaining both earlier engineering fai
     'client-investigation-v2': invalid, 'client-investigation-v2-low': latest,
   } });
   render(<App />);
-  const pilot = within((await screen.findByRole('heading', { name: 'Separate SQLite client pilot' })).parentElement as HTMLElement);
+  const pilot = within((await screen.findByRole('heading', { name: 'Reusable tests' })).parentElement as HTMLElement);
+  const history = pilot.queryByText('Earlier client attempts');
+  if (history) fireEvent.click(history);
   expect(await pilot.findByText(/40 recorded model attempts; \$0.012345678 reported inference cost/)).toBeInTheDocument();
   expect(pilot.getByText('Latest published version: v2, reasoning low.')).toBeInTheDocument();
   const investigator = pilot.getByRole('rowheader', { name: 'Frozen investigator' }).parentElement as HTMLElement;
@@ -243,7 +252,9 @@ it('labels a skipped invalid client investigator as not run instead of a measure
     arm_metrics: { ...first.arm_metrics, procedure: { ...first.arm_metrics.procedure, runs: 0, not_run_targets: 5 } } };
   mockSite(receipt(), { clientData: first, clientVersions: { 'client-investigation-v2': invalid } });
   render(<App />);
-  const pilot = within((await screen.findByRole('heading', { name: 'Separate SQLite client pilot' })).parentElement as HTMLElement);
+  const pilot = within((await screen.findByRole('heading', { name: 'Reusable tests' })).parentElement as HTMLElement);
+  const history = pilot.queryByText('Earlier client attempts');
+  if (history) fireEvent.click(history);
   const header = await pilot.findByRole('rowheader', { name: 'Frozen investigator' });
   const row = within(header.parentElement as HTMLElement);
   expect(row.getByText(/Not run/)).toBeInTheDocument();
@@ -256,7 +267,7 @@ it('does not display protected client outcomes for an incomplete pilot', async (
   render(<App />);
   expect(await screen.findByText(/Protected outcome tables remain unavailable until the pilot/)).toBeInTheDocument();
   expect(screen.queryByRole('rowheader', { name: 'Frozen investigator' })).toBeNull();
-  expect(screen.getByRole('heading', { name: 'Progress campaign report complete' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Native repair' })).toBeInTheDocument();
 });
 
 it('loads one static API snapshot under a deployment prefix and preserves public read links', async () => {
@@ -305,5 +316,5 @@ it.each([
   render(<App />);
   expect(await screen.findByText(message)).toBeInTheDocument();
   expect(screen.queryByRole('rowheader', { name: 'Frozen investigator' })).toBeNull();
-  expect(screen.getByRole('heading', { name: 'Progress campaign report complete' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Native repair' })).toBeInTheDocument();
 });
