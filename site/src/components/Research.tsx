@@ -1,6 +1,6 @@
 // The proposed context-conditioned prompt mechanism (paper Section 3, Figure 4)
 // and a hands-on illustration of one prompt setting. The variants are read
-// from docs/research-direction.md at runtime. Nothing here runs a model or
+// from program.md at runtime. Nothing here runs a model or
 // represents a trained controller.
 import { useId, useMemo, useState } from 'react';
 import type { Doc } from '../api';

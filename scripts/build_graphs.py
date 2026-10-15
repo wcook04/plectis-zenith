@@ -488,29 +488,29 @@ def main():
          "Review receives actual execution and later outcomes through a separately frozen feed.",
          "Study coordinator replays both procedures and supplies the measured result to the next review."],
         notice="Research prototype. Scaffold bounds differ from each run's exported execution graph.")
-    (ROOT / "docs/graphs.md").write_text(f"""# Actual graph diagrams
+    (ROOT / "docs/history/graphs.md").write_text(f"""# Historical graph diagrams
 
-The new [adaptive investigator](graphs/investigator-detail.svg) is the bounded
+The new [adaptive investigator](../graphs/investigator-detail.svg) is the bounded
 native execution scaffold for [investigator v1](investigator.md). Each run exports
 its actual active dependencies in `execution_graph.json`; inactive slots make no
 model calls. The two-node review mission receives later evidence separately.
 
-The historical basket profiles are [the directed graph](graphs/basket-detail.svg) and
-[the serial controller](graphs/basket-serial-detail.svg). Their numerical evaluator
+The historical basket profiles are [the directed graph](../graphs/basket-detail.svg) and
+[the serial controller](../graphs/basket-serial-detail.svg). Their numerical evaluator
 and development-only Evolve comparison are described in [the basket protocol](baskets.md).
 The diagrams below describe the separate legacy System A profile.
 
 > **Experimental research prototype.** The example uses invented observations.
-> See the [research notice](../RESEARCH_NOTICE.md).
+> See the [research notice](../../RESEARCH_NOTICE.md).
 
-The [saved-snapshot replay](graphs/replay.svg) shows the intended workflow.
+The [saved-snapshot replay](../graphs/replay.svg) shows the intended workflow.
 The current example uses five invented perspectives on System A. A sixth feed
 computes summaries from those observations; it is not independent evidence.
 It has prepared the first reasoning request, with no forecast yet.
-See [current status](status.md) and [per-feed provenance](../examples/demo/provenance.json).
+See [current status](../status.md) and [per-feed provenance](../../examples/demo/provenance.json).
 SVG metadata hashes the node definitions used to draw the graphs.
 
-![Replay workflow: earlier saved feeds and DERIVED through Lab and frozen CP2; later feeds through Oracle diagnosis, Evolve review and a later matched comparison](graphs/replay.svg)
+![Replay workflow: earlier saved feeds and DERIVED through Lab and frozen CP2; later feeds through Oracle diagnosis, Evolve review and a later matched comparison](../graphs/replay.svg)
 
 Read the three columns from issue time to truth time to a further test. The
 earlier saved feeds enter Lab; its CP2 forecast is frozen before the later feeds
@@ -520,7 +520,7 @@ inputs.
 
 The grouped views below open those stages into their native operators.
 
-![Lab: five feeds and DERIVED through two reasoning passes, CP1, CP2 and Integrity](graphs/lab.svg)
+![Lab: five feeds and DERIVED through two reasoning passes, CP1, CP2 and Integrity](../graphs/lab.svg)
 
 Follow one row: the saved MEASUREMENTS table enters the measurements miner, which reports
 observations with source references. Cross-correlation joins all six miner
@@ -530,7 +530,7 @@ thesis against CP1 and the earlier measurements feed. The second Cross and Direc
 assemble CP2; Integrity checks artifacts from both passes. The second pass
 does not refit CP1's frozen estimates.
 
-![Oracle: original Lab subjects and later evidence through truth reviews to Oracle CP2](graphs/oracle.svg)
+![Oracle: original Lab subjects and later evidence through truth reviews to Oracle CP2](../graphs/oracle.svg)
 
 Oracle reads the original Lab reasoning beside the later saved feeds. Code
 computes numerical observation and context differences; the six lane reviews inspect
@@ -539,7 +539,7 @@ differences, then Attribution and Explain propose a diagnosis. Oracle CP2 keeps
 the original subject targets and citation eligibility. A diagnosis is a
 hypothesis about an outcome, not a new prediction or proof of improvement.
 
-![Evolve: native dossier changes beside the separate reviewed daily policy workflow](graphs/evolve.svg)
+![Evolve: native dossier changes beside the separate reviewed daily policy workflow](../graphs/evolve.svg)
 
 The upper row is the native Delta Analyzer → Dossier Updater → Version Committer
 dependency path. Paired Lab and Oracle records enter through runner inputs;
@@ -558,9 +558,9 @@ the measurements, subsystem and context feeds.
 
 | Exact dependency view | Native nodes | Declared edges |
 |---|---:|---:|
-| [Lab detail](graphs/lab-detail.svg) | {lab[0]} | {lab[1]} |
-| [Oracle detail](graphs/oracle-detail.svg) | {oracle[0]} | {oracle[1]} |
-| [Evolve detail](graphs/evolve-detail.svg) | {evolve[0]} | {evolve[1]} |
+| [Lab detail](../graphs/lab-detail.svg) | {lab[0]} | {lab[1]} |
+| [Oracle detail](../graphs/oracle-detail.svg) | {oracle[0]} | {oracle[1]} |
+| [Evolve detail](../graphs/evolve-detail.svg) | {evolve[0]} | {evolve[1]} |
 
 In each detail diagram, repeated cards name the same artifact and every declared
 edge appears once. Integrity's 20 inputs occupy two continued panels.

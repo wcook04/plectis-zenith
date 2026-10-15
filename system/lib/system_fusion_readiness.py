@@ -3,9 +3,9 @@
 - Teleology: Project the system-evidence fusion spine into a refusal-first
   readiness gate before any Lab, Oracle, or Station consumer turns raw feed
   presence into cross-feed interpretation.
-- Mechanism: Deterministic lane rows and candidate situation gates over the
-  six feed lanes, using the three mature lifecycle specimens as evidence
-  while keeping relation/Oracle gaps explicit.
+- Mechanism: Retain the extracted lane rows and candidate situation gates.
+  Upstream lifecycle references identify their historical basis; they do not
+  establish that those acquisition modules ship in this public checkout.
 - Non-goal: This is not a SystemEvidenceObject runtime schema and not an
   operator-facing divergence card generator.
 
@@ -509,20 +509,25 @@ def build_readiness_gate() -> dict[str, Any]:
         "artifact_id": "cross_feed_measurement_readiness_gate_v0",
         "authority_boundary": {
             "projection_not_authority": True,
-            "source_authority": "codex/doctrine/paper_modules/system_evidence_fusion_spine.md",
+            "source_authority": "system/lib/system_fusion_readiness.py",
             "not_a_runtime_schema": "SystemEvidenceObject_not_built",
             "not_operator_facing_cards": True,
         },
         "source_surfaces": [
-            "codex/doctrine/paper_modules/system_evidence_fusion_spine.md",
-            "codex/doctrine/paper_modules/data_feed_lanes.md",
-            "codex/doctrine/paper_modules/lab_oracle_evolve_pipeline.md",
-            "codex/nodes/lab/cross_corr_v1.json",
-            "codex/nodes/lab/cross_corr_v2.json",
-            "codex/nodes/oracle/",
+            "system/lib/system_fusion_readiness.py",
+            "docs/history/architecture.md",
+            "codex/substrate/nodes/lab/cross_corr_v1.json",
+            "codex/substrate/nodes/lab/cross_corr_v2.json",
+            "codex/substrate/nodes/oracle/",
             "system/lib/feed_envelope.py",
             "system/lib/feed_quality.py",
         ],
+        "historical_evidence_reference_boundary": (
+            "Lane and candidate evidence_refs retain upstream extraction identifiers. "
+            "They do not claim that private acquisition/lifecycle modules ship here "
+            "or that current fixture inputs have that maturity. The fixed readiness "
+            "and refusal policy is preserved; maintained public source is listed in source_surfaces."
+        ),
         "sidecar_conventions": {
             "global_measurements_feed": ["metadata.sidecars.observation_lifecycle_snapshot"],
             "global_subsystems_feed": ["metadata.sidecars.observation_lifecycle_snapshot"],
@@ -543,12 +548,12 @@ def build_readiness_gate() -> dict[str, Any]:
         "candidate_situation_gates": _dict_rows(candidate_rows),
         "consumer_hook_state": {
             "lab_cross_corr_v1": {
-                "path": "codex/nodes/lab/cross_corr_v1.json",
+                "path": "codex/substrate/nodes/lab/cross_corr_v1.json",
                 "state": "prompt_surface_without_direct_measurement_readiness_gate",
                 "required_before_cards": "consume lane_readiness and candidate_situation_gates before emitting actionable divergence cards",
             },
             "lab_cross_corr_v2": {
-                "path": "codex/nodes/lab/cross_corr_v2.json",
+                "path": "codex/substrate/nodes/lab/cross_corr_v2.json",
                 "state": "prompt_surface_without_direct_measurement_readiness_gate",
                 "required_before_cards": "consume lane_readiness and candidate_situation_gates before emitting target-swarm claims",
             },

@@ -3,7 +3,7 @@ r"""
 [PURPOSE]
 - Teleology: Provide machine-checkable, deterministic validators for CP1 and CP2 artifact schemas,
   producing stable ValidationResult objects that the engine can act on (retry, hard-fail, persist).
-- Mechanism: Pure functions over dict payloads; error codes from the locked list in PLAN.md;
+- Mechanism: Pure functions over dict payloads with stable error codes;
   ValidationResult.errors is always sorted(set(...)) for deterministic ordering.
 
 [INTERFACE]
@@ -28,7 +28,7 @@ r"""
 [CONSTRAINTS]
 - Validators must not mutate payloads. Derived values (e.g. normalized lane) live in local variables.
 - ValidationResult.errors is always sorted(set(errors)) — deterministic, deduplicated.
-- detect_malformed_citations runs before validate_citations (per Locked Decision 9).
+- detect_malformed_citations runs before validate_citations.
 - Word count: len(re.findall(r"\S+", text)) on raw text.
 - Lane/target_id comparison: .upper().strip() normalization.
 - This module must remain free of engine, server, and bridge imports.
@@ -147,7 +147,7 @@ def _build_ledger_id_re(cfg: dict) -> re.Pattern:
 
 
 # ---------------------------------------------------------------------------
-# Word count (Locked Decision 7)
+# Word count
 # ---------------------------------------------------------------------------
 
 def _count_words(text: str) -> int:

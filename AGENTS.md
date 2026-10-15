@@ -1,6 +1,6 @@
 # Working in Zenith
 
-Read README.md and program.md. The active research unit is executable code, source-bound measurements and questions whose later value is tested. docs/conformance-study.md owns native investigation and repair; docs/continuation-memory.md owns the separate controlled memory comparison. docs/status.md and source-bound receipts own measured claims. Keep their populations, budgets and evidence boundaries separate. Keep the paper within three pages and the repository barebones.
+Read README.md and program.md. The active research unit is executable code, source-bound measurements and questions whose later value is tested. docs/studies/native/conformance-study.md owns native investigation and repair; docs/history/continuation-memory.md owns the separate controlled memory comparison. docs/status.md and source-bound receipts own measured claims. Keep their populations, budgets and evidence boundaries separate. Keep the paper within three pages and the repository barebones.
 
 ## Execution and evidence
 

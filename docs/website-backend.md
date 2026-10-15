@@ -64,7 +64,7 @@ an authored mechanism, verified preparation and a research proposal.
 hashes, citation IDs, URLs and the manuscript lines where citations are used. The current source compiles in the existing editor, while the retained PDF is a previous edition (`pdf_current=false`, `pdf_edition=retained_previous_edition`). Source and PDF are labelled separately; independent file hashes do not prove that they match.
 `/api/v1/documents/paper` returns the exact LaTeX source. Browser-readable
 explanations come from the existing Markdown, including the
-[research direction](research-direction.md) and [spoken walkthrough](zenith-walkthrough-script.md).
+[research direction](../program.md) and [spoken walkthrough](history/zenith-walkthrough-script.md).
 A document response includes its hash, heading line numbers and `base_url` for
 relative links. Sanitize rendered Markdown and treat model output as data.
 
@@ -72,12 +72,12 @@ Use the recorded experiment status. Successful JSON validation alone must not be
 documents and receipts instead of hardcoding result counts into the frontend.
 
 The current results explanation is `/api/v1/documents/progress-results`, bound
-to `docs/progress-campaign-20261014.md`. The learner explanation is
+to `docs/studies/native/progress-campaign-20261014.md`. The learner explanation is
 `/api/v1/documents/continuation-learner`, bound to the witness-preserving
 demonstration README. The earlier assimilation remains available through
 `/api/v1/documents/progress-synthesis`. Site metadata selects
 `/api/v1/evidence/progress-campaign`, bound to
-`docs/progress-campaign-20261014.json` when that receipt is published. Its
+`docs/studies/native/progress-campaign-20261014.json` when that receipt is published. Its
 schema is `zenith_progress_campaign_report_v1`. A missing receipt means current
 results pending; the frontend does not substitute an older campaign. The
 qualification and diagnostic stages retain separate parent populations,
@@ -87,7 +87,7 @@ engineering failure, not a diagnostic result. The source-bound receipt supplies
 all displayed scores and costs.
 
 The separate `/api/v1/evidence/client-investigation` route reads
-`docs/client-investigation-20261014.json` with schema
+`examples/conformance/client-reuse-v1/report.json` with schema
 `zenith_client_investigation_report_v1`. Its method is available at
 `/api/v1/documents/client-investigation-protocol`. The frontend renders this
 study's analysis from `/api/v1/documents/client-investigation`. It shows the
@@ -188,7 +188,7 @@ oversized and malformed evidence, and mounting a future frontend build.
 ## Historical native observation edition
 
 The initial comparison receipt remains immutable. `/api/v1/evidence/observation-screens`
-serves `docs/observation-screens-20261013.json` for the later repair, candidate-pool,
+serves `docs/history/observation-screens-20261013.json` for the later repair, candidate-pool,
 composition and fixed-inventory selection tests, with separate protocols and cost
 accounting. The historical receipt and manuscript retain their own population;
 they do not overwrite the current Progress comparison.
@@ -220,6 +220,6 @@ Fetch current evidence URLs; do not restore historical result fixtures as
 results for this configuration. Keep provenance visible when opening nodes.
 Missing output means not run; never fill it with a fabricated response.
 Recorded private runs are an explicit opt-in local capability, excluded from
-public examples. See [data boundaries](data.md) and [the demo](demo.md).
+public examples. See [data boundaries](history/data.md) and [the demo](history/demo.md).
 
 Financial graph node records include `detail_url` for profile-preserving inspection. The node route defaults to the generic fixture for compatibility; use the explicit financial parameter for the research graph. The completed experiment used reasoning schema v3; current contracts are v4 after correcting citation requirements and role separation. Public traces keep their original version.

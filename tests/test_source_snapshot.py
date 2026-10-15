@@ -50,15 +50,20 @@ def test_old_import_paths_remain_compatible():
     assert implementation_hashes() == snapshot.implementation_hashes()
 
 
-def test_current_runner_import_does_not_load_historical_engine():
-    code = '''import sys, json
+@pytest.mark.parametrize("runner", (
+    "research.decomposition_study", "research.investigation_learning_study",
+))
+def test_current_runner_import_does_not_load_historical_engine(runner):
+    code = '''import sys, json, importlib
 sys.path.insert(0, sys.argv[1])
 before = set(sys.modules)
-import research.decomposition_study
+runner = importlib.import_module(sys.argv[2])
+assert runner.archive_runtime is importlib.import_module("zenith.source_snapshot").archive_runtime
 forbidden = ("research.investigator_study", "zenith.runtime", "zenith.basket_panel",
-             "zenith.investigator", "system.core.engine", "numpy", "pandas")
+             "zenith.investigator", "zenith.market_graph", "zenith.market_data",
+             "system.core.engine", "numpy", "pandas")
 print(json.dumps([name for name in forbidden if name in sys.modules and name not in before]))
 '''
-    result = subprocess.run([sys.executable, "-I", "-c", code, str(ROOT)],
+    result = subprocess.run([sys.executable, "-I", "-c", code, str(ROOT), runner],
                             cwd=ROOT, env={}, check=True, capture_output=True, text=True)
     assert json.loads(result.stdout) == []

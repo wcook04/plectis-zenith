@@ -5,8 +5,8 @@
   "title": "Reasoning Node Standard",
   "status": "active",
   "scope": "repository-wide reasoning nodes under codex/substrate/nodes/**",
-  "description": "Runtime-compatible contract for LLM-driven reasoning nodes, extended with a v2 constitutional overlay for context injection, authority boundaries, topology, oracle checks, fact extraction, and dossier learning.",
-  "purpose": "A reasoning node is a typed decision surface, not just an LLM prompt. The executable v1 node fields stay stable for the current loader; richer v2 contracts are declared under meta.reasoning_contract until the runtime dataclass grows first-class fields.",
+  "description": "Runtime reasoning-node fields and optional contract metadata used by retained graph experiments. The loader preserves overlays; validation checks their declared vocabulary and invariants.",
+  "purpose": "Keep node identity, evidence inputs, outputs and review requirements explicit while using the existing graph engine.",
   "compatibility": {
     "runtime_core": "system.core.governance compiles schema.* into allowed/required node keys and constructs system.lib.types.CodexNode.",
     "preserved_fields": [
@@ -29,8 +29,7 @@
       "meta"
     ],
     "v2_overlay_home": "meta.reasoning_contract",
-    "runtime_rule": "Do not add new top-level node keys for v2 contracts until system.lib.types.CodexNode and governance parsing preserve them. Store v2 declarations under meta.reasoning_contract.",
-    "paper_module_companion": "codex/doctrine/paper_modules/reasoning_node_contracts.md"
+    "runtime_rule": "Do not add new top-level node keys for v2 contracts until system.lib.types.CodexNode and governance parsing preserve them. Store v2 declarations under meta.reasoning_contract."
   },
   "schema": {
     "id": "string (Unique runtime handle. Ex: 'lab_director' or 'prover_oracle_reconciler')",
@@ -55,10 +54,8 @@
     "home": "meta.reasoning_contract",
     "status": "v2_overlay_preserved_by_loader_not_interpreted_by_runtime",
     "required_when": [
-      "authoring new reasoning-node families",
-      "adding Prover-Lab / Prover-Oracle / Prover-Evolve substrate nodes",
-      "routing low-authority provider workers through node-shaped packets",
-      "declaring fan-out / fan-in, dossier learning, or oracle-backed checks"
+      "authoring reasoning nodes with explicit input or review contracts",
+      "adding experimental reasoning nodes through variants.graph"
     ],
     "shape": {
       "role_contract": {
@@ -181,80 +178,33 @@
     "withheld_exclusions"
   ],
   "oracle_and_learning_invariants": [
-    "A reasoning node may emit candidates; the oracle or validator decides acceptance.",
-    "A provider or model id is runtime metadata, not the constitutional identity of the node.",
-    "Forward-mode nodes must declare truth-side withhold/forbidden classes before receiving a context packet.",
-    "Learning is permitted only from checked artifacts. Environment-blocked, data-blocked, reconciliation-blocked, or leakage-contaminated runs do not teach solver or system lessons.",
-    "Dossier writes are process/domain-memory deltas behind review gates; they are not theorem truth, system truth, or raw-seed authority.",
-    "Fan-out requires a shard key and a reducer. Multiple workers without typed shard isolation are parallel prompting, not governed fan-out.",
-    "Fact extraction emits candidates with source, freshness, authority, contradiction status, and destination. It does not mutate durable truth by itself."
+    "A reasoning node may emit candidates; measured evidence and review decide acceptance.",
+    "A provider or model id is runtime metadata, not the identity of the node.",
+    "Forward-mode contracts declare truth-side evidence exclusions.",
+    "Learning claims require checked artifacts; environment, data or leakage failures remain explicit.",
+    "Dossier changes are reviewed process-memory candidates, not certified domain facts.",
+    "Fan-out declarations identify a shard key and a reducer; metadata alone does not execute or isolate workers.",
+    "The loader preserves contract metadata. Preservation is not proof that every declared policy is enforced at execution time."
   ],
   "validation_rules": [
-    "Existing runtime node files must continue to validate with the v1 top-level schema.",
-    "New v2 declarations must live under meta.reasoning_contract until CodexNode and governance parsing explicitly preserve new top-level fields.",
-    "tools/meta/factory/validate_reasoning_contracts.py checks meta.reasoning_contract overlays when present and intentionally ignores nodes without overlays.",
-    "tools/meta/factory/validate_reasoning_contracts.py must fail overlay-bearing node JSON on duplicate object keys so parseable JSON cannot silently overwrite contract fields.",
-    "tools/meta/factory/build_reasoning_contract_packet.py may consume meta.reasoning_contract to emit a dry-run packet manifest, but it must not execute nodes, dispatch providers, write artifacts, or mutate runtime state.",
-    "reasoning_contract_packet_manifest_v0 output is governed by codex/substrate/contracts/schema_reasoning_contract_packet_manifest.json; future launchers, provider routers, fan-out runners, or dossier consumers must consume the manifest IR rather than re-reading meta.reasoning_contract ad hoc.",
-    "reasoning_execution_plan_v0 output is governed by codex/substrate/contracts/schema_reasoning_execution_plan.json; future schedulers and launchers must consume plan IR composed from packet manifests rather than raw meta.reasoning_contract overlays.",
-    "tools/meta/factory/build_reasoning_execution_plan.py may compose packet manifests into dry-run execution plans with ready-set, edge, context-partition, recovery, and residual-routing fields, but it must not execute nodes, dispatch providers, write artifacts, or mutate runtime state.",
-    "reasoning_execution_plan_verification_report_v0 output is governed by codex/substrate/contracts/schema_reasoning_execution_plan_verification_report.json; future schedulers, launchers, and provider routers must pass static semantic verification before consuming plan IR.",
-    "tools/meta/factory/verify_reasoning_execution_plan.py may verify graph semantics, embedded manifests, ready-set derivation, status derivation, context-policy scope, dry-run side-effect invariants, recovery posture, and witness reporting, but it must not execute nodes, dispatch providers, write artifacts, or mutate runtime state.",
-    "reasoning_execution_lineage_v0 output is governed by codex/substrate/contracts/schema_reasoning_execution_lineage.json; future schedulers, launchers, provider routers, fan-out runners, and dossier consumers must consume lineage over verified plans rather than raw overlays, raw manifests, or aggregate context partitions.",
-    "tools/meta/factory/build_reasoning_execution_lineage.py may bind dry-run execution plans, verifier reports, packet manifests, node source hashes, node-scoped context lineage, available context/artifacts, replay identities, source refs, and WorkItem refs, but it must not execute nodes, dispatch providers, write artifacts, or mutate runtime state.",
-    "reasoning_execution_lineage_v0 node replay identities must hash node-effective context/artifact dependencies, not every globally available context class or artifact. Effective context is available_context intersected with node-local inject/reference_only/withhold/forbidden policy; effective artifacts are available_artifacts intersected with required/optional/forbidden artifact policy.",
-    "reasoning_execution_replay_scope_v0 output is governed by codex/substrate/contracts/schema_reasoning_execution_replay_scope.json; future schedulers and launchers must consume replay-scope reports before deciding no-replay, partial replay, full replay, blocked replay, or invalid replay.",
-    "tools/meta/factory/build_reasoning_execution_replay_scope.py may compare base/candidate lineage records, identify direct replay-identity changes, compute downstream affected nodes from candidate plan edges, preserve unaffected independent branches, and block invalid or contaminated lineages, but it must not execute nodes, dispatch providers, write artifacts, or mutate runtime state.",
-    "reasoning_execution_schedule_preflight_v0 output is governed by codex/substrate/contracts/schema_reasoning_execution_schedule_preflight.json; future schedulers and launchers must consume schedule preflight before treating replay-required nodes as launch-eligible.",
-    "tools/meta/factory/build_reasoning_execution_schedule_preflight.py may intersect replay-scope impact with explicit demand targets, emit reuse/replay/skip_not_demanded/blocked/invalid node actions, and compute deterministic topological replay order for demanded affected nodes, but it must not execute nodes, dispatch providers, write artifacts, or mutate runtime state.",
-    "replay_required_node_ids is supply-side impact, not a schedule. Schedule eligibility is replay_required_node_ids intersected with the target demand closure, after blocked and invalid nodes are removed.",
-    "Schedule preflight must carry node-scoped context_lineage forward from reasoning_execution_lineage_v0; future launchers must not authorize injection from aggregate context partitions.",
-    "reasoning_execution_authority_envelope_v0 output is governed by codex/substrate/contracts/schema_reasoning_execution_authority_envelope.json; future schedulers, launchers, providers, tools, and write-capable runners must consume the authority envelope before materializing any runtime grant or execution receipt.",
-    "tools/meta/factory/build_reasoning_execution_authority_envelope.py may map schedule-preflight node actions to no_grant_needed/grantable/denied/invalid authority decisions with node-scoped context egress, side-effect ceilings, provider/tool policy refs, provenance materials, and future receipt requirements, but it must not authorize launch, materialize grants, execute nodes, dispatch providers, invoke tools, write artifacts, or mutate runtime state.",
-    "replay_order_node_ids is not an execution command. A replay action is only grantable after the authority envelope proves node-scoped context egress, output contract, side-effect ceiling, provider/tool policy posture, and receipt requirements.",
-    "reasoning_execution_grant_lease_v0 output is governed by codex/substrate/contracts/schema_reasoning_execution_grant_lease.json; future schedulers, launchers, providers, tools, and write-capable runners must bind any runtime execution claim to a grant lease that matches the authority envelope, node id, capability set, context caveats, side-effect ceiling, output contract, and receipt requirement.",
-    "tools/meta/factory/build_reasoning_execution_grant_lease.py may lower a grantable authority-envelope node decision into an eligible_unissued caveated grant lease, but v0 must keep grant_materialized=false and launch_authorized=false and must not execute nodes, dispatch providers, invoke tools, write artifacts, or create real execution receipts.",
-    "reasoning_execution_receipt_v0 output is governed by codex/substrate/contracts/schema_reasoning_execution_receipt.json; future schedulers, launchers, providers, tools, and write-capable runners must emit a validator-accepted receipt before any execution claim can be trusted.",
-    "tools/meta/factory/validate_reasoning_execution_receipt.py validates supplied receipts against the receipt schema, authority envelope, and optional grant lease. It may reject synthetic or future runtime receipts for hash mismatch, authority decision mismatch, grant lease mismatch, forbidden context egress, side-effect ceiling breach, output contract mismatch, or execution claims without launch authorization and materialized grant, but it must not execute nodes, dispatch providers, invoke tools, write artifacts, or create real runtime receipts.",
-    "If meta.reasoning_contract.input_contract.forbidden_artifacts is non-empty, the launch or packet builder must fail closed when a forbidden class is present.",
-    "If a node declares learning_ledger_rows=append_after_oracle_gate, it must also declare an oracle_contract with blocked_conditions.",
-    "If topology_contract.fan_out_reason is not none, shard_key and fan_in_reducer must not be none.",
-    "Provider routing belongs in role_contract or execution metadata; provider standards remain governed by std_compute_provider and std_provider_adapter.",
-    "Output schemas beyond the current runtime enum require a contract schema and validator before becoming executable output_schema values."
+    "Existing node files continue to validate with the runtime schema fields.",
+    "Optional reasoning-contract declarations live under meta.reasoning_contract.",
+    "tools/meta/factory/validate_reasoning_contracts.py checks overlays when present and ignores nodes without overlays.",
+    "Overlay-bearing node JSON fails validation on duplicate object keys.",
+    "Overlay validation requires role, context mode, output, side-effect and residual-routing declarations.",
+    "Enumerated values and injected context classes must belong to the declared vocabulary.",
+    "Forbidden inputs require a failure shape or blocked conditions.",
+    "A non-none fan_out_reason requires a non-none shard_key and fan_in_reducer.",
+    "append_after_oracle_gate requires blocked conditions, no_learning_when and a mutation gate.",
+    "commit_allowed requires version_committer_required or human_required.",
+    "variants.graph validates experimental-node shape, dependencies, output contracts and read-only effects before admitting a graph change.",
+    "New runtime output_schema modes require implementation and validation before use."
   ],
   "authority_surfaces": {
     "runtime_type_contract": "system/lib/types.py::CodexNode",
     "runtime_governance": "system/core/governance.py",
     "loader": "system/core/loader.py",
-    "node_doctrine": "codex/doctrine/components/codex_nodes.md",
-    "provider_policy": "codex/standards/std_compute_provider.json",
-    "provider_adapter_policy": "codex/standards/std_provider_adapter.json",
-    "system_pipeline_specimen": "codex/doctrine/paper_modules/lab_oracle_evolve_pipeline.md",
-    "math_pipeline_specimen": "codex/doctrine/paper_modules/mathematics_mission_pipeline.md",
     "overlay_validator": "tools/meta/factory/validate_reasoning_contracts.py",
-    "packet_manifest_builder": "tools/meta/factory/build_reasoning_contract_packet.py",
-    "packet_manifest_schema": "codex/substrate/contracts/schema_reasoning_contract_packet_manifest.json",
-    "execution_plan_builder": "tools/meta/factory/build_reasoning_execution_plan.py",
-    "execution_plan_schema": "codex/substrate/contracts/schema_reasoning_execution_plan.json",
-    "execution_plan_verifier": "tools/meta/factory/verify_reasoning_execution_plan.py",
-    "execution_plan_verification_report_schema": "codex/substrate/contracts/schema_reasoning_execution_plan_verification_report.json",
-    "execution_lineage_builder": "tools/meta/factory/build_reasoning_execution_lineage.py",
-    "execution_lineage_schema": "codex/substrate/contracts/schema_reasoning_execution_lineage.json",
-    "execution_replay_scope_builder": "tools/meta/factory/build_reasoning_execution_replay_scope.py",
-    "execution_replay_scope_schema": "codex/substrate/contracts/schema_reasoning_execution_replay_scope.json",
-    "execution_schedule_preflight_builder": "tools/meta/factory/build_reasoning_execution_schedule_preflight.py",
-    "execution_schedule_preflight_schema": "codex/substrate/contracts/schema_reasoning_execution_schedule_preflight.json",
-    "execution_authority_envelope_builder": "tools/meta/factory/build_reasoning_execution_authority_envelope.py",
-    "execution_authority_envelope_schema": "codex/substrate/contracts/schema_reasoning_execution_authority_envelope.json",
-    "execution_grant_lease_builder": "tools/meta/factory/build_reasoning_execution_grant_lease.py",
-    "execution_grant_lease_schema": "codex/substrate/contracts/schema_reasoning_execution_grant_lease.json",
-    "execution_receipt_validator": "tools/meta/factory/validate_reasoning_execution_receipt.py",
-    "execution_receipt_schema": "codex/substrate/contracts/schema_reasoning_execution_receipt.json",
-    "agentspex_annex": "annexes/arxiv-2604-13346/distillation.json",
-    "agentproof_annex": "annexes/arxiv-2603-20356/distillation.json",
-    "execution_lineage_annex": "annexes/arxiv-2605-06365/distillation.json",
-    "build_systems_annex": "annexes/build-systems-a-la-carte/distillation.json",
-    "forward_build_systems_annex": "annexes/arxiv-2202-05328/distillation.json",
-    "companion_module": "codex/doctrine/paper_modules/reasoning_node_contracts.md"
+    "experimental_graph_validator": "variants/graph.py"
   }
 }

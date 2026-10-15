@@ -103,7 +103,7 @@ The site metadata explicitly selects the Progress campaign; the Advance and bask
 The current chapters route to `/api/v1/documents/progress-synthesis`, `conformance-study` and `progress-results` and `continuation-learner`; `/api/v1/evidence/progress-campaign` serves the derived source-bound receipt when published. Its qualification and diagnostic studies keep their own actual attempts, known reported costs and evaluation panels. A forfeited protocol version remains visible without being pooled into a later diagnostic. `/api/v1/evidence/advance-campaign`, `/api/v1/documents/advance-synthesis`, `/api/v1/evidence/observation-learning-result` and other earlier routes remain historical references. Actual private provider records remain local CLI artifacts.
 
 `/api/v1/evidence/client-investigation` serves `zenith_client_investigation_report_v1`
-from `docs/client-investigation-20261014.json`; `/api/v1/documents/client-investigation-protocol`
+from `examples/conformance/client-reuse-v1/report.json`; `/api/v1/documents/client-investigation-protocol`
 serves its method, with the analysis at `/api/v1/documents/client-investigation`.
 The results section renders this pilot independently of the native
 campaign. It displays exact model cost, detected faults and valid target queries by

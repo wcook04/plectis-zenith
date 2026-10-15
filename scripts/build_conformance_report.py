@@ -590,7 +590,11 @@ def funding_reuse(root, studies):
     separately. A financial amendment must identify both protocol snapshots.
     """
     linked = []; earlier_seen = set(); later_seen = set()
-    for amendment in sorted((root / 'docs').glob('*funding-amendment-*.json')):
+    # Maintained amendment receipts live with the native study. The legacy
+    # location remains readable for previously exported source checkouts.
+    amendments = list((root / 'docs/studies/native').glob('*funding-amendment-*.json'))
+    amendments += list((root / 'docs').glob('*funding-amendment-*.json'))
+    for amendment in sorted(amendments):
         receipt = read(amendment)
         if receipt.get('schema') != 'zenith_conformance_funding_continuation_v1':
             continue

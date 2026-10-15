@@ -9,7 +9,7 @@ const current = '/api/v1/evidence/progress-campaign';
 const advance = '/api/v1/evidence/advance-campaign';
 const historical = '/api/v1/evidence/observation-learning-result';
 const client = '/api/v1/evidence/client-investigation';
-const source = { path: 'docs/progress-campaign-20261014.json', sha256: 'fixture', url: 'https://example.org/current.json' };
+const source = { path: 'docs/studies/native/progress-campaign-20261014.json', sha256: 'fixture', url: 'https://example.org/current.json' };
 
 function receipt() {
   return { schema: 'zenith_progress_campaign_report_v1', status: 'complete',
@@ -86,7 +86,7 @@ function mockSite(data: unknown, { published = true, status = 200, clientData = 
     else if (url.endsWith('/documents/paper')) body = { content: '', source };
     else if (url.endsWith('/documents/progress-synthesis')) body = {
       id: 'progress-synthesis', format: 'markdown', content: '# Current synthesis\n\nBounded evidence.',
-      source: { ...source, path: 'docs/progress-returns-20261014.md' },
+      source: { ...source, path: 'docs/history/progress-returns-20261014.md' },
       base_url: 'https://example.org/docs/', headings: [] };
     else if (url.endsWith('/paper')) body = { source, citations: [], sections: [], pdf_sha256: 'fixture' };
     else throw new Error(`Unexpected request: ${url}`);

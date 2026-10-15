@@ -33,7 +33,7 @@ FREEZE_SOURCE_LAYOUT = {
     "v5": ("prospective-v5-freeze.json", "prospective-v5-source"),
 }
 LEARNER = Path("examples/continuation-memory/witness-preserving-v1")
-FUNDING_AMENDMENT = Path("docs/progress-v5-funding-amendment-20261015.json")
+FUNDING_AMENDMENT = Path("docs/studies/native/progress-v5-funding-amendment-20261015.json")
 RESERVATION_STOP = Path("examples/conformance/progress-diagnostic-v5-reservation-stop")
 
 
@@ -610,8 +610,8 @@ def build(root: Path = ROOT) -> dict:
 
 def render_markdown(report: dict) -> str:
     lines = ["# Progress campaign: measured receipt", "", report["summary"], "",
-             "The [v4 protocol](progress-protocol-20261014.md) and "
-             "[v5 amendment](progress-protocol-v5-20261014.md) fix the arms and decision rules. "
+             "The [v4 protocol](../../progress-protocol-20261014.md) and "
+             "[v5 amendment](../../progress-protocol-v5-20261014.md) fix the arms and decision rules. "
              "The [machine receipt](progress-campaign-20261014.json) binds the published source manifests.", ""]
     by_stage = {(study["version"], study["stage"]): study
                 for study in report["conformance_studies"]}

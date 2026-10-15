@@ -73,7 +73,7 @@ class Website:
                 f"{API}/evidence/{{id}}": {"ids": list(EVIDENCE), "returns": "Public measured-result JSON with source hash; not private run files."},
                 f"{API}/runs": {"enabled": self.local_runs, "query": {"q": "substring", "mission": "optional native mission", "limit": "1..100, default40", "offset": "nonnegative, default0"}, "returns": "Paginated saved-run summaries; loaded and success remain distinct."},
                 f"{API}/runs/{{run_id}}/nodes/{{node_id}}": {"enabled": self.local_runs, "returns": "Artifact data/status/lineage, bounded recorded attempts and explicit omitted/error/truncation markers."},
-                "/assets/paper.pdf": "Current manuscript PDF.",
+                "/assets/paper.pdf": "Retained previous PDF edition; consult the paper endpoint for current source and edition metadata.",
                 "/assets/graphs/{id}.svg": {"ids": list(FIGURES)},
                 f"{API}/health": "Service version and available capabilities.",
                 f"{API}/contract": "This contract.",

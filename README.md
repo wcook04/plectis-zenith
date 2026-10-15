@@ -1,28 +1,51 @@
 # Plectis Zenith
 
-**Public research draft.** The experiments and offline examples run; a general advantage from learned investigation remains an open question.
+**Work in progress.** A research testbed for model-proposed experiments, measured code repair and reusable tests.
 
-[Read the research website →](https://wcook04.github.io/plectis-zenith/)
+Zenith asks whether solving one problem can leave behind a better way to investigate the next. A language model proposes tests or code; the host runs them against reference software, records what happened, and checks whether a repair helped. The intended memory is a program, its measured evidence, and questions that expose its limits.
 
-[Results](docs/status.md) · [Paper source](paper/zenith.tex) · [Run locally](#try-it-without-an-account) · [Credits](#credits-and-license)
+The current prototype can repair programs and reuse generated testers. **It has not yet shown that its learned investigation methods outperform ordinary reusable code or fixed tests.** Model weights stay fixed; learning here means changing the retained code, tests or state representation.
 
-[![Zenith’s research website](https://raw.githubusercontent.com/wcook04/plectis-zenith/main/docs/images/zenith-research.png)](https://wcook04.github.io/plectis-zenith/)
+**[Explore the research website →](https://wcook04.github.io/plectis-zenith/)**
 
-**Learn a program together with the questions that expose its limits.** Zenith lets a model propose experiments, measures their answers against native software, and uses the evidence to repair ordinary code. A later test checks whether the repair helped. The longer-term question is whether experience can make the next investigation cheaper or more effective.
-
-The working implementation is deliberately small: programs, queries, measured receipts and a selection rule. A graph can organize these dependencies, but extra nodes and persuasive explanations are not success measures. Fixed tests and a repair call without new investigation are first-class competitors.
+[Current paper](paper/zenith.tex) · [Results and limits](docs/status.md) · [Try it locally](#try-it-without-an-account) · [Architecture](docs/architecture.md)
 
 ## What works today
 
-A DeepSeek V4.1 Flash run acquired executable testers from batch-import investigations, then applied them to account-transfer clients. The retained tester found **3 of 4 authored faults with no target-stage model calls**. Ordinary reusable code matched it; a fixed tester found **4 of 4**. The acquired code repeated the same probe when it failed to find a discrepancy, so this is working test reuse, not an adaptive investigation advantage.
+The paper reports three separate experiments. The continuation learner is an authored algorithm; it does not power the model-generated testers.
 
-The complete low-reasoning run used **46 model calls for $0.007117764**. Two earlier engineering versions remain published: one produced stop-only testers; the next produced one invalid program and another stop. All three client runs together used 133 calls for $0.019295552. The clients belong to one already inspected SQLite family, and the later interface was supplied before compilation. [Results, full costs and replay](docs/client-investigation-v2-low-20261015.md).
+| Experiment | Observed result | What the comparison tells us |
+|---|---|---|
+| [Reusable SQLite testers](docs/studies/client/client-investigation-v2-low-20261015.md) | Generated code found **3 of 4 authored faults**, with no model calls on the later clients. | Ordinary reusable code tied it; fixed tests found **4 of 4**. Both generated testers repeat a constant query and ignore feedback. |
+| [Native program repair](docs/studies/native/progress-campaign-20261014.md) | A repair call alone improved later answers from **259/576 to 365/576**. | None of the extra investigation methods beat repair alone. The twelve parent episodes cover only three authored contracts. |
+| [Continuation learner repair](examples/continuation-memory/witness-preserving-v1/README.md) | Keeping the history that witnessed a missing distinction lets all **8 native configurations** finish fitting. | Generic questions cost slightly less: **11,379 vs 11,395** source calls. Later UTF-8 and SQLite checks still find errors. |
 
-A separate native repair comparison improves **259/576 → 365/576** later answers with a repair call alone. Extra investigation does not beat that control: fixed tests score 364, compiled investigation 354, and feedback-aware direct queries 343. The full comparison used **130 calls for $0.12982944**. Its twelve parent episodes cover three authored contracts, not independent applications. [Complete paired results and costs](docs/progress-campaign-20261014.md).
+The working client run used DeepSeek V4.1 Flash: **46 calls, $0.00712** reported inference cost, including acquisition and compilation. The separate native diagnostic used Ling3.1Flash: **130 calls, $0.12983**. These are recorded run costs, not current price quotes. Qualification and earlier attempts remain in their linked reports.
+
+These are constructed, inspected workloads. They establish working mechanisms and reproducible limits; they do not establish independent transfer, a general learning advantage or recursive self-improvement.
+
+[![The Zenith research website: question, method, findings and frontier](docs/images/zenith-research.png)](https://wcook04.github.io/plectis-zenith/)
+
+*The [website](https://wcook04.github.io/plectis-zenith/) is the short reading route. The [paper guide](paper/README.md) distinguishes the current source from the previous PDF edition.*
+
+<a id="what-is-being-tested"></a>
+
+## How it works
+
+1. **Propose a question.** The model sees the task, candidate program, examples and measurements available to its condition.
+2. **Measure the answer.** The host executes the candidate and reference software separately. Their disagreement supplies evidence; a model's explanation does not certify the cause.
+3. **Repair and check.** A replacement must preserve every previously correct measured case. Selection freezes before later evaluation.
+4. **Test reuse separately.** The client study compiles a tester from earlier investigations, freezes it, and compares it with ordinary code, fresh investigation and fixed tests on later clients.
+
+Lab, Oracle and Evolve name the execution, review and revision roles. A graph can organize their dependencies; the current studies use ordinary programs and tests. The [programme](program.md) explains the graph ambition, the separate learner and their still-unbuilt connections.
+
+## What remains open
+
+The next useful result would be a procedure that learns to choose **new, informative tests** on changed software, finds more faults or uses less work than competent ordinary testing, and repays its acquisition cost. That needs independently sourced clients with genuine room to improve, a frozen selection rule, and comparisons that include failed attempts and all stages of work. Reusing a successful probe is a starting point, not that result.
 
 ## Try it without an account
 
-Use Python 3.11 or newer. From a fresh checkout:
+Use Python 3.11 or newer from a source checkout on Linux, macOS or a suitable WSL environment. The runtime uses POSIX facilities. The examples below make no model calls.
 
 ```sh
 git clone https://github.com/wcook04/plectis-zenith.git
@@ -30,23 +53,25 @@ cd plectis-zenith
 python3 -m venv .venv
 . .venv/bin/activate
 python -m pip install -e '.[test,research]'
-python scripts/demo_continuation_learning.py
-python scripts/demo_continuation_learning.py --native
 ```
 
-The first command runs a small learning example in ten source calls. A bounded queue eventually stops growing. The learner must preserve both the history that exposed this and the future question that distinguishes it; retaining only the question had caused the earlier learner to fail. The repaired version fits five rational-linear coordinates and passes lengths 0–32. A simple nonlinear counter solves this particular task more compactly.
-
-The native demonstration fits all eight inspected configurations, but finite later checks still find errors in UTF-8 and SQLite. Its 11,395 acquisition calls also exceed the generic singleton-question control's 11,379. **This is a reproducible learner repair, not a demonstrated memory advantage.** [Exact results, source hashes and replay](examples/continuation-memory/witness-preserving-v1/README.md).
-
-Replay the published client result without an API key:
+**Replay the published client result:**
 
 ```sh
 python scripts/build_client_investigation_report.py replay-behavior examples/conformance/client-reuse-v2-low
 ```
 
-This checks the preserved prompts, replies, queries, outcomes and costs. It permits a different SQLite version only when behavior and work counters still match, and reports both environments. The [exact replay](docs/client-investigation-v2-low-20261015.md#evidence-and-replay) additionally checks the original SQLite identity.
+A successful run reports `behavioral_match`: the archived prompts, replies, queries, outcomes, work counters and costs agree. It reports the archived and local SQLite versions; changed behavior still fails. The [strict replay](docs/studies/client/client-investigation-v2-low-20261015.md#evidence-and-replay) also requires the original runtime identity. Replay checks recorded work; it does not ask a model to solve the tasks again.
 
-To run the read-only website locally, install Node.js 22.12 or newer:
+**Run the separate learner example:**
+
+```sh
+python scripts/demo_continuation_learning.py
+```
+
+Expect ten source calls, five rational-linear coordinates and correct outputs for queue lengths 0–32. This small example uses only the Python standard library. A single nonlinear counter solves it more simply. Add `--native` to reproduce the eight-configuration diagnostic and its residual errors.
+
+For the website, install Node.js 22.12 or newer, then run:
 
 ```sh
 npm ci --prefix site
@@ -54,67 +79,32 @@ npm run build --prefix site
 python -m zenith serve --port 4175 --frontend-dir site/dist
 ```
 
-Open [localhost:4175](http://localhost:4175). Public mode serves published evidence and excludes private saved runs. The [frontend guide](site/README.md) covers development. The separately labelled [synthetic graph example](docs/demo.md#synthetic-offline-first-run) teaches the earlier Lab/Oracle contracts without model calls.
-
-## What is being tested
-
-The model comparison asks whether measured investigation adds anything beyond another repair call. It starts every arm from the same program and keeps invalid programs and unhelpful investigations in the result:
-
-| Method | Additional evidence before repair |
-|---|---|
-| Repair only | Public contract and examples |
-| Fixed tests | Up to eight predeclared native queries |
-| Compiled investigator | A model-written Python selector with up to eight query slots |
-| Direct batch | One model response proposing up to eight queries |
-| Direct adaptive | Up to two query batches; the second sees measured outcomes |
-| Outcome-masked control | Same first model response, with outcomes hidden from the second |
-
-The host executes the source and parent separately. Repairs can change the complete program; selection must preserve every previously correct measured case. All selections freeze before later evaluation. That finite rule cannot guarantee correctness on unseen inputs. The [v5 protocol](docs/progress-protocol-v5-20261014.md), [original comparison](docs/progress-protocol-20261014.md) and [method](docs/conformance-study.md) specify what each comparison can establish.
-
-A separate [client investigation pilot](docs/client-investigation-protocol-v2-20261015.md) moves from atomic batch imports to account transfers. A model investigates earlier clients, writes a reusable tester, then deploys it unchanged against later clients. We compare it with ordinary reusable code, fresh investigation with the same history, cold investigation, and fixed tests. Both retained testers know the later interface before compilation. This tests working reuse within an authored SQLite family; it does not establish transfer to an independent project.
-
-- [Current results and limits](docs/status.md)
-- [Current three-page paper source](paper/zenith.tex) · [previous PDF edition](paper/zenith.pdf)
-- [Research programme and relation to the graph](program.md)
-- [Nineteen PROGRESS returns: synthesis, custody and reproduction](docs/progress-returns-20261014.md)
-- [Live research website](https://wcook04.github.io/plectis-zenith/) · [Frontend development](site/README.md)
+Open [localhost:4175](http://localhost:4175). The public-mode server exposes published evidence, with no model-execution endpoint or private saved runs. [Frontend guide](site/README.md).
 
 ## Source map
 
-| Owner | Role |
+| Area | Start here |
 |---|---|
-| [Conformance study](research/conformance_study.py) | Paired investigations, measured repair and frozen later evaluation |
-| [Direct investigation](research/direct_investigation.py) | Query delivery, native measurements and feedback masking |
-| [Native tasks](research/native_conformance_tasks.py) | SQLite, LRU and UTF-8 contracts and query panels |
-| [Client investigation study](research/client_investigation_study.py) | Acquire, freeze and compare reusable testers against later client workflows |
-| [Client tasks](research/client_investigation_tasks.py) | Native SQLite failure, continuation and caller-transaction obligations |
-| [Continuation learner](research/continuation_learning.py) | Exact arithmetic, witness-preserving refinement and finite challenges |
-| [Offline learner demonstration](scripts/demo_continuation_learning.py) | Small reproducible failure and eight native configurations |
-| [Campaign analysis](scripts/analyze_progress_campaign.py) | Parent-paired outcomes, repeated programs and cost accounting |
-| [Conformance publication](scripts/build_conformance_report.py) | Allowlisted evidence and replay from each archived runtime |
-| [Client publication](scripts/build_client_investigation_report.py) | Preserved model replies, native replay and lifecycle cost accounting |
-| [Funding continuation](scripts/continue_conformance_budget.py) | Explicit reservation-cap amendment that reuses settled responses without retrying them |
-| [Website snapshot](scripts/export_site_snapshot.py) | Publish the existing read-only interface from allowlisted API data |
-| [Restricted execution](zenith/investigation_program.py) | Explicit Python syntax, process, time and memory limits |
-| [Source custody](zenith/source_snapshot.py) | Archived runtime identity |
-| [Budgeted provider](zenith/budgeted.py) and [model policy](zenith/provider_policy.py) | Pinned inexpensive routes, budgets and bounded concurrency |
-| [Architecture](docs/architecture.md) | Current source ownership and retained historical profiles |
+| Current experiments | [Native repair](research/conformance_study.py), [client test reuse](research/client_investigation_study.py), [continuation learner](research/continuation_learning.py) |
+| Shared execution | [Restricted Python](zenith/investigation_program.py), [provider budgets](zenith/budgeted.py), [model policy](zenith/provider_policy.py), [source snapshots](zenith/source_snapshot.py) |
+| Evidence and replay | [Published bundles](examples/conformance), [learner example](examples/continuation-memory/witness-preserving-v1), [report/replay commands](scripts) |
+| Reading surfaces | [Paper](paper/README.md), [current status](docs/status.md), [website source](site/README.md) |
+| Retained graph and earlier studies | [Historical architecture and source owners](docs/history/architecture.md) |
 
-For a new paid experiment, use the [explicit run commands](docs/conformance-study.md#reproduce-or-run), verify current model prices and set a hard ceiling. Model selection favors recent, capable, inexpensive Chinese-developed models. There is no automatic retry or expensive fallback. A ceiling is not an expected invoice; exact replay requires no API calls.
+The [architecture guide](docs/architecture.md) maps dependencies, command owners and evidence boundaries. Runtime and study entry points remain stable; it also documents the retired unused tools and the documentation migration.
+
+## Development
 
 ```sh
-python -m pytest tests
-python -m zenith validate
-python scripts/check_structure.py
-python scripts/check_extraction.py
+make validate       # source layout, custody and retained graph contracts
+make test-current   # current experiments and shared execution regressions
+make test           # complete suite, including historical studies
 ```
 
-For an agent-assisted review, clone this repository and ask the agent to read `AGENTS.md`, this README, `program.md` and the selected experiment's protocol. The website explains the research; machine receipts and archived source support exact checks. [Contributing](CONTRIBUTING.md) · [Research boundary](RESEARCH_NOTICE.md).
+`make demo` and `make replay` run the two offline examples above. See [CONTRIBUTING.md](CONTRIBUTING.md) for frontend checks and how to publish a new experiment. Useful contributions include stronger ordinary baselines, independently sourced client tasks, clearer failure reproductions and cheaper experiments with the same controls.
 
-Earlier [memory studies](docs/continuation-memory.md), [native observation studies](docs/executable-investigations.md), [structural studies](docs/decomposition-20261014.md), [financial investigator](docs/investigator.md), [full graph](docs/full-graph-case.md), [basket pilot](docs/baskets.md) and [System A fixture](docs/demo.md) retain their original artifacts. Their results are not pooled with the current comparison.
+New inference runs require an explicit command, your own credentials and a declared budget. Model selection favors recent, capable, inexpensive Chinese-developed models with verified endpoint prices; there is no automatic expensive fallback. [Run protocol](docs/studies/native/conformance-study.md#reproduce-or-run) · [Security and execution limits](SECURITY.md).
 
 ## Credits and license
 
-Created by Will Cook with AI coding agents. Zenith adapts the `ai_workflow` research system and the explicitly attributed research-return components in [NOTICE](NOTICE). The [extraction manifest](docs/extraction-manifest.json) records source custody and maintained adaptations. Software is licensed under [Apache 2.0](LICENSE).
-
-The website uses React, React Flow and React Markdown; its graph viewer and inspectors adapt the earlier research UI. [Reuse details](site/README.md#what-came-from-the-original-zenith-ui) and the [SIL Open Font Licenses](site/public/fonts/) are retained. Software licensing does not grant rights to separately acquired datasets or provider responses.
+Created by Will Cook with AI coding agents. Zenith adapts the `ai_workflow` research system and attributed research-return components; [NOTICE](NOTICE) records their provenance. [Apache 2.0](LICENSE) covers the software. Dataset and provider-response rights are separate. The website's [reuse notes](site/README.md#what-came-from-the-original-zenith-ui) credit its components and fonts.

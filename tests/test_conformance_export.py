@@ -337,7 +337,7 @@ def linked_funding_exports(tmp_path):
     first = tmp_path / 'examples/conformance/prefix'
     second = tmp_path / 'examples/conformance/continuation'
     shutil.copytree(source, first); shutil.copytree(source, second)
-    receipt_path = tmp_path / 'docs/progress-v5-funding-amendment-20261015.json'
+    receipt_path = tmp_path / 'docs/studies/native/progress-v5-funding-amendment-20261015.json'
     receipt_path.parent.mkdir(parents=True)
     shutil.copyfile(source_root / 'docs' / receipt_path.name, receipt_path)
     receipt = study.read(receipt_path)

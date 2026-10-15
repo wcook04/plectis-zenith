@@ -24,7 +24,7 @@
 - Both .md and .json extensions are recognized.
 - Functions must remain side-effect free.
 - When-needed: Open when a caller needs the canonical parser for mixed contract-reference formats before indexing or validating contract mentions.
-- Escalates-to: system/lib/codex_paths.py::normalize_read_path; codex/CODEX.md
+- Related source: system/core/loader.py; codex/contracts/
 - Navigation-group: kernel_lib
 """
 

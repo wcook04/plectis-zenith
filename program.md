@@ -2,7 +2,7 @@
 
 Zenith studies whether solving one problem can leave behind a better way to investigate the next. The useful retained object is a program **and the experiments that reveal when it stops working**. Experience should change what the system can compute, distinguish or ask, then measurably improve later work.
 
-The [PROGRESS synthesis](docs/progress-returns-20261014.md) covers the nineteen supplied returns, numbered 02–20. It supports one small loop: propose an executable operation or experiment; measure it against the source; preserve the evidence; revise the program and any affected interfaces; test further use. Lab, Oracle and Evolve are roles in this loop. They need not be separate agents. Ordinary code is the current executable representation.
+The [PROGRESS synthesis](docs/history/progress-returns-20261014.md) covers the nineteen supplied returns, numbered 02–20. It supports one small loop: propose an executable operation or experiment; measure it against the source; preserve the evidence; revise the program and any affected interfaces; test further use. Lab, Oracle and Evolve are roles in this loop. They need not be separate agents. Ordinary code is the current executable representation.
 
 ## The promising connection
 
@@ -12,11 +12,11 @@ This connection is implemented in the returned continuation-test learner. Its co
 
 <a id="current-implementation"></a>
 
-The live [native conformance experiment](docs/conformance-study.md) tests the complementary model-driven part: choose an experiment, execute it, deliver its measurements and failed code, and repair a fresh program. Direct JSON actions now make the host responsible for validation, iteration and source access. The [new comparison](docs/progress-protocol-20261014.md) includes compiled selectors, direct batches, two-step investigation with and without outcomes, fixed tests, and repair without new investigation. It asks whether new evidence adds value over another repair call.
+The live [native conformance experiment](docs/studies/native/conformance-study.md) tests the complementary model-driven part: choose an experiment, execute it, deliver its measurements and failed code, and repair a fresh program. Direct JSON actions now make the host responsible for validation, iteration and source access. The [new comparison](docs/progress-protocol-20261014.md) includes compiled selectors, direct batches, two-step investigation with and without outcomes, fixed tests, and repair without new investigation. It asks whether new evidence adds value over another repair call.
 
 The maintained continuation learner now keeps the access history that witnessed a missing distinction. The smallest bounded-deque failure fits in ten source calls, but an ordinary nonlinear counter solves that same task more simply. Across eight inspected native configurations, the corrected learner completes every fit; finite later panels still expose errors in UTF-8 and SQLite. A generic singleton-question control is slightly cheaper than its default refinement. The [offline demonstration](examples/continuation-memory/witness-preserving-v1/README.md) makes both the repair and its limits reproducible.
 
-The [client investigation pilot](docs/client-investigation-protocol-20261014.md) makes one connection executable: measured development investigations feed the preparation of a frozen reusable tester. Later clients test that artifact against ordinary code reuse and fresh investigation with the same history. It is a known-interface, within-family test; the exact continuation learner remains a separate mechanism, not a component silently credited for the tester's behavior.
+The [client investigation pilot](docs/client-investigation-protocol-v2-20261015.md) makes one connection executable: measured development investigations feed the preparation of a frozen reusable tester. Later clients test that artifact against ordinary code reuse and fresh investigation with the same history. The [working condition](docs/studies/client/client-investigation-v2-low-20261015.md) and [earlier v1 attempt](docs/studies/client/client-investigation-20261014.md) retain separate evidence. It is a known-interface, within-family test; the exact continuation learner remains a separate mechanism, not a component silently credited for the tester's behavior.
 
 <a id="relation-to-the-graph-ambition"></a>
 
@@ -37,7 +37,7 @@ Keep these outcomes separate:
 - **Useful memory:** a retained program, test or procedure improves a later task beyond the same cached observations and ordinary alternatives.
 - **Improved learning method:** experience changes how acquisition works, and that change helps fresh problems after all discovery costs are charged.
 
-The first three can be valuable contributions without establishing the fourth. A new model call is not automatically a learning step. In the earlier six-source rule study, every winning global first proposal already worked; the second proposal added no benefit. Those exact artifacts remain in the [historical campaign](docs/decomposition-20261014.md).
+The first three can be valuable contributions without establishing the fourth. A new model call is not automatically a learning step. In the earlier six-source rule study, every winning global first proposal already worked; the second proposal added no benefit. Those exact artifacts remain in the [historical campaign](docs/history/decomposition-20261014.md).
 
 ## How to choose the next experiment
 
@@ -54,10 +54,10 @@ The decisive advance would be a reusable investigative procedure that experience
 ## Source and evidence
 
 - [Current results and historical record](docs/status.md)
-- [Native conformance method and commands](docs/conformance-study.md)
-- [Nineteen PROGRESS returns: adoption and reproduction](docs/progress-returns-20261014.md)
-- [Earlier ADVANCE returns](docs/advance-returns-20261014.md)
-- [Earlier executable observation studies](docs/executable-investigations.md)
+- [Native conformance method and commands](docs/studies/native/conformance-study.md)
+- [Nineteen PROGRESS returns: adoption and reproduction](docs/history/progress-returns-20261014.md)
+- [Earlier ADVANCE returns](docs/history/advance-returns-20261014.md)
+- [Earlier executable observation studies](docs/history/executable-investigations.md)
 - [Three-page manuscript](paper/zenith.tex)
 
 Current model selection favors recent, capable, inexpensive Chinese-developed models with verified endpoint prices and working delivery. Independent calls may run with the host-wide bound of three and one per pinned endpoint. Every experiment freezes its own route, reasoning setting, runtime and dollar ceiling; old source archives retain their original behavior.

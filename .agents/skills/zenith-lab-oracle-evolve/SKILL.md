@@ -23,7 +23,7 @@ advance the clock, measure outcomes and compare on later matched inputs. Keep
 selection quality distinct from forecast accuracy. Keep the full denominator,
 abstentions and failed attempts. Oracle offers causal hypotheses, not proofs.
 
-Keep the public example wholly synthetic: five perspectives on the same abstract system and one computed summary feed.
+Keep the historical System A example wholly synthetic: five perspectives on the same abstract system and one computed summary feed.
 A source dossier defines that perspective, its evidence rules and inferential limits.
 Cutoff availability, units, missingness and frozen forecast targets are part of the contract.
 Do not relabel historical source rows as invented observations.

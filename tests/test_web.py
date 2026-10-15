@@ -214,7 +214,7 @@ def test_historical_observation_receipt_remains_source_bound_without_becoming_ac
     receipt = {'schema': 'zenith_observation_learning_evidence_v1',
                'status': status, 'complete': complete, 'aggregate': aggregate,
                'campaign': 'test-fixture-only'}
-    path = tmp_path/'docs/observation-learning-20261013.json'
+    path = tmp_path/'docs/history/observation-learning-20261013.json'
     path.write_text(json.dumps(receipt))
     app = Website(tmp_path)
     site = json.loads(app.get('/api/v1/site').body)
@@ -234,7 +234,7 @@ def test_current_campaign_routing_preserves_historical_receipts_and_analysis_sco
     for directory in ('codex', 'paper', 'docs', 'examples'):
         shutil.copytree(ROOT/directory, tmp_path/directory)
     shutil.copy2(ROOT/'master_config.json', tmp_path/'master_config.json')
-    path = tmp_path/'docs/progress-campaign-20261014.json'
+    path = tmp_path/'docs/studies/native/progress-campaign-20261014.json'
     path.unlink(missing_ok=True)
     receipt = {'schema': 'zenith_progress_campaign_report_v1', 'status': 'pending',
                'summary': 'Controlled qualification fixture; no diagnostic is published.',
@@ -278,19 +278,20 @@ def test_client_pilot_has_separate_source_bound_evidence_and_protocol(website):
     path = ROOT / 'docs/client-investigation-protocol-20261014.md'
     assert protocol['content'] == path.read_text()
     assert protocol['source']['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
-    for identifier, filename in (
-        ('client-investigation', 'client-investigation-20261014'),
-        ('client-investigation-v2', 'client-investigation-v2-20261015'),
-        ('client-investigation-v2-low', 'client-investigation-v2-low-20261015'),
+    for identifier, filename, bundle_name in (
+        ('client-investigation', 'client-investigation-20261014', 'client-reuse-v1'),
+        ('client-investigation-v2', 'client-investigation-v2-20261015', 'client-reuse-v2'),
+        ('client-investigation-v2-low', 'client-investigation-v2-low-20261015', 'client-reuse-v2-low'),
     ):
-        evidence_path = ROOT / f'docs/{filename}.json'
+        evidence_path = ROOT / f'examples/conformance/{bundle_name}/report.json'
         if evidence_path.exists():
             evidence = json.loads(website.get(site['evidence'][identifier]).body)
+            assert evidence['source']['path'] == evidence_path.relative_to(ROOT).as_posix()
             assert evidence['data'] == json.loads(evidence_path.read_text())
             assert evidence['source']['sha256'] == hashlib.sha256(evidence_path.read_bytes()).hexdigest()
             assert evidence['data']['schema'] == 'zenith_client_investigation_report_v1'
             explanation = json.loads(website.get(site['documents'][identifier]).body)
-            assert explanation['content'] == (ROOT / f'docs/{filename}.md').read_text()
+            assert explanation['content'] == (ROOT / f'docs/studies/client/{filename}.md').read_text()
         else:
             assert identifier not in site['evidence']
             with pytest.raises(FileNotFoundError):

@@ -5,7 +5,7 @@ import { clearApiCache } from '../api';
 
 const advance = '/api/v1/evidence/advance-campaign';
 const historical = '/api/v1/evidence/observation-learning-result';
-const source = { path: 'docs/advance-campaign-20261014.json', sha256: 'fixture', url: 'https://example.org/advance.json' };
+const source = { path: 'docs/history/advance-campaign-20261014.json', sha256: 'fixture', url: 'https://example.org/advance.json' };
 
 beforeEach(() => {
   clearApiCache();

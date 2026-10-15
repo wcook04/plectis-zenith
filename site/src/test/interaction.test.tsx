@@ -248,7 +248,7 @@ describe('markdown from the backend', () => {
     expect(container.querySelector('script')).toBeNull();
     const links = [...container.querySelectorAll('a')].map((a) => a.getAttribute('href'));
     expect(links).not.toContain('javascript:alert(1)');
-    expect(links).toContain('https://github.com/wcook04/plectis-zenith/blob/main/docs/graphs.md');
+    expect(links).toContain('https://github.com/wcook04/plectis-zenith/blob/main/docs/history/graphs.md');
   });
 });
 

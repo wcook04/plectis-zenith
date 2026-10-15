@@ -84,5 +84,5 @@ def build(root=ROOT):
 
 if __name__ == '__main__':
     result = build()
-    (ROOT / 'docs/advance-campaign-20261014.json').write_text(json.dumps(result, indent=2)+'\n')
+    (ROOT / 'docs/history/advance-campaign-20261014.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps({k:result[k] for k in ('status', 'total_calls', 'total_reported_cost_usd', 'unresolved_attempts')}))
