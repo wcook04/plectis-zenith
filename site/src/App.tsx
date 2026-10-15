@@ -314,6 +314,12 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
               <ResultsFigure chapter={chapter} labGraph={lab.status === 'ready' ? lab.value : null} site={site} /></>
           )}
           {chapter.id === 'next' && !learningActive && <NextFigure chapter={chapter} />}
+          {chapter.id === 'next' && progressActive && <div className="chapter__text">
+            <h3>Improving future improvement</h3>
+            <p>The longer-term question is whether experience improves the procedure that makes future improvements. We would compare an original and revised improver on the same untouched starting programs and fresh task families, then test whether the successor helps produce a better next generation. The complete cost and failed attempts belong in that comparison. This has not been demonstrated.</p>
+            <p>The <a href="https://github.com/wcook04/plectis-erdos">Plectis mathematical corpus</a> supplies proofs, partial results and open obligations; <a href="https://github.com/wcook04/plectis-atlas">Plectis Atlas</a> helps readers inspect OpenAI’s mathematics release and attributed outside assessments. These could support experiments on which argument or check to try next. They are not yet a learning integration with Zenith. Lean checks a supplied proof; failed search does not establish that a statement is false.</p>
+            <p>I’m building Zenith with AI coding agents and learning the research methods as I go, with limited experience in this area. This is my current understanding. Collaboration, corrections and guidance on prior work, fair comparisons and useful tasks are welcome through <a href="https://github.com/wcook04/plectis-zenith/issues">project issues</a>. The <a href="https://github.com/wcook04/plectis-zenith#what-we-want-to-find-out">README explains these possible directions and their precedents</a>.</p>
+          </div>}
         </ChapterSection>
       ))}
 
@@ -1211,6 +1217,7 @@ function NextFigure({ chapter }: { chapter: Chapter }) {
 }
 
 function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
+  const currentPdf = paper?.pdf_current === true;
   const currentIds = site.active_evidence_id === 'progress-campaign'
     ? ['progress-campaign', [...CLIENT_VERSIONS].reverse().find(v => site.evidence[v.id])?.id]
     : Object.keys(site.evidence);
@@ -1219,10 +1226,17 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
       <div className="wrap paper-band__grid">
         <div>
           <h2 id="paper-title">Paper, code and instructions to repeat the experiments</h2>
+          {currentPdf && <p><a className="button" href={apiUrl(paper.pdf_url)} target="_blank" rel="noreferrer">Read the paper (PDF)</a></p>}
           <p><a className="button" href={apiUrl(paper?.source.url ?? site.documents.paper ?? '/api/v1/documents/paper')}
             target="_blank" rel="noreferrer">Current LaTeX source on GitHub</a></p>
           <p>The current paper is stored as LaTeX, the text and formatting code used to prepare a research paper. The GitHub repository contains installation commands and examples you can run without an AI account. Its replay commands run the saved programs again and compare their behavior with the published results.</p>
           <p><a href="https://github.com/wcook04/plectis-zenith#try-it-without-an-account" target="_blank" rel="noreferrer">Run the examples or replay the evidence</a></p>
+          {paper && <details>
+            <summary>Compare the downloaded PDF with the saved file</summary>
+            <p>SHA-256 is a checksum calculated from a file’s contents. Matching checksums show that the files contain the same bytes; they do not establish that the paper’s claims are correct.</p>
+            <p>SHA-256 <code className="hash">{paper.pdf_sha256}</code></p>
+            <CopyButton text={paper.pdf_sha256} label="Copy hash" />
+          </details>}
           <h3 className="paper-aside__head">Current experiment records</h3>
           <ul className="plain-list">
             {Object.entries(site.evidence).filter(([id]) => currentIds.includes(id)).map(([id, url]) => (
@@ -1231,14 +1245,8 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
           </ul>
           <details className="source-doc">
             <summary>Earlier studies, graphs and paper edition</summary>
-            <p>The PDF predates the current source. The financial studies and earlier graph experiments remain here as historical records.</p>
-            <p><a href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">Previous edition (PDF)</a></p>
-            {paper && <details>
-              <summary>Compare the downloaded PDF with the saved file</summary>
-              <p>SHA-256 is a checksum calculated from a file’s contents. Matching checksums show that the files contain the same bytes; they do not establish that the paper’s claims are correct.</p>
-              <p>SHA-256 <code className="hash">{paper.pdf_sha256}</code></p>
-              <CopyButton text={paper.pdf_sha256} label="Copy hash" />
-            </details>}
+            <p>The financial studies and earlier graph experiments remain here as historical records.</p>
+            {!currentPdf && <p>The PDF has no verified binding to the current source. <a href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">Previous edition (PDF)</a></p>}
             <ul className="plain-list">
               {Object.entries(site.evidence).filter(([id]) => !currentIds.includes(id)).map(([id, url]) => (
                 <li key={id}><a href={apiUrl(url)} target="_blank" rel="noreferrer">{RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}</a></li>

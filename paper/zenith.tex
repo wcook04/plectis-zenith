@@ -16,49 +16,44 @@ Will Cook \quad\textbullet\quad 15 October 2026
 \end{center}
 \hypertarget{idea}{}
 \textbf{Abstract.}
-Zenith retains executable programs, measured evidence and questions that can
-expose a program's limits. A model proposes an investigation; the host executes
-it against a source; measured discrepancies inform whole-program repair.
-Two acquired testers run unchanged on five authored SQLite clients and detect
-three of four faults without target-stage model calls. Ordinary code reuse ties
-the retained-procedure condition; fixed tests detect all four. The complete
-DeepSeek V4.1 Flash run costs \$0.00712. A separate learner repair preserves the
-history witnessing each new distinction, but a generic control remains cheaper.
-Earlier memory experiments likewise distinguish a useful question from an
-advantageous learning architecture. These reproducible engineering results do
-not establish selective transfer, recursive self-improvement or a general
-advantage over ordinary testing.
+Zenith asks whether solving one problem can improve how the next is investigated.
+It retains programs, measured evidence and questions that expose their limits.
+Three separate mechanisms currently run: model-driven program repair, reuse of
+generated testers, and an authored continuation learner. Repair alone improves
+259/576 later answers to 365/576; added investigation does not beat it.
+Two generated testers find three of four authored faults; fixed tests find all
+four. Retained questions help in a controlled memory comparison, while the whole
+learner still costs more than ordinary alternatives. These results motivate a
+question about improving future improvement, without demonstrating a new general
+learning method or recursive self-improvement. We describe the missing connection,
+a possible mathematics application and the comparisons needed to test them.
 
-\textbf{1. Learn code and the questions that challenge it.}
+\textbf{1. Programs, evidence and questions.}
 The retained object is $(P,E,Q)$: a program, source-bound observations and
-executable tests or distinguishing continuations. A useful addition must
-improve later behavior or reduce the work required to acquire it. Cached
-answers, acquired representations and better investigation procedures are
-different possible contributions; each needs its own removal control.
-A graph is one organisation of ordinary code and evidence. It may be revised,
-bypassed or removed when a simpler implementation works better.
+executable tests or distinguishing continuations. A useful addition must improve
+later behavior or reduce the work required to acquire it. Cached answers,
+learned representations and better investigation procedures require separate
+controls. Model weights remain fixed in these studies.
 
 \hypertarget{lab}{}
-\textbf{Locate the failure before growing the graph.}
-A wrong output may reflect lost information, an incorrect update, an incorrect
-readout of sufficient state, or a boundary absent from the observations.
-The archived SQLite model, for example, retained pending inserts but omitted
-them when reading allocation state inside an open transaction. More state was
-not needed. A rows-only helper in another task really did discard history.
-A local impossibility claim requires two different obligations under the same
-\emph{complete} available input, including hidden state and caller context.
-A node's account of its own limitations is a proposal, not such a certificate.
+\textbf{Find what needs to change.}
+A wrong answer may reflect discarded history, an incorrect use of sufficient
+state, or behavior never observed. The archived SQLite program retained pending
+inserts but ignored them when reading allocation state; another rows-only helper
+really did discard necessary history. These need different interventions.
+The records expose the distinction; they do not establish reliable autonomous
+diagnosis. A model's explanation of a failure remains a hypothesis.
 
 \hypertarget{oracle}{}
-\textbf{One executable loop.}
-In the native repair study, each investigator sees the public contract, whole
-parent program, examples and its own measured receipts. It returns a query and, optionally, a compact
-hypothesis about the obligation, suspected defect and useful change. The host
-compares the native answer with the parent's answer. A repair can change any
-function, interface or state; selection preserves every previously correct
-measured case as well as the aggregate development result. Ties are retained
-without being called improvements. All proposals and failures remain recorded.
-
+\textbf{The implemented loop.}
+In the native study, a model receives a task contract, a whole candidate program,
+examples and the measurements available to its condition. It proposes queries;
+the host compares candidate and reference answers. A repair request proposes
+replacement code. Selection preserves every previously correct measured case
+and the aggregate development result before later panels open. Rejected
+proposals and failures remain recorded. Passing these finite checks does not
+prove general correctness. Lab, Oracle and Evolve name execution, review and
+revision roles; they need not be separate agents.
 \begin{center}
 \begin{tikzpicture}[font=\small,box/.style={draw,rounded corners,align=center,
 minimum height=12mm,text width=38mm},>=Stealth,node distance=8mm]
@@ -69,89 +64,49 @@ minimum height=12mm,text width=38mm},>=Stealth,node distance=8mm]
 \draw[->] (test.south)--++(0,-7mm)-|node[pos=.25,below]{measured evidence and retained experiments} (lab.south);
 \end{tikzpicture}
 \end{center}
-A better program does not by itself establish a better learning rule. The
-client pilot therefore freezes a tester before later client execution and
-compares it with ordinary reusable code, fresh investigation and fixed tests.
-The public target interface is supplied during acquisition; the client programs
-and measured target outcomes are withheld. This tests reuse on a known task
-family, not discovery of an unseen interface. We charge the cost of getting there.
+The client study separately compiles testers from development investigations,
+then freezes them for later clients whose interface is supplied in advance.
+The continuation learner below is not called by either model-driven study.
+A graph can expose dependencies between code and evidence, but it may shrink
+or disappear when simpler code works better. Its existence is not a result.
 \newpage
 \hypertarget{evolve}{}
-\textbf{2. Preserve the experience that justifies a new state.}
-A continuation asks what a source will return after more actions. Two histories
-can have the same present output but different future consequences. An authored
-rational-linear learner uses measured answers to selected continuations as
-state coordinates, then fits transition and readout maps. This follows ordinary
-weighted observation-table learning~\cite{weighted}; the model class and
-extraction procedure are supplied, not invented by a language model.
+\textbf{2. What the experiments establish.}
+\textbf{Question memory and learner repair.}
+A continuation asks what a source returns after further actions. Two histories
+with the same current output can have different future consequences. An authored
+rational-linear learner uses answers to selected continuations as coordinates,
+then fits transition and readout maps. Predictive state representations and
+weighted automata learning are established precedents~\cite{psr,weighted};
+Zenith does not discover this model class.
 
-\textbf{A reproduced learner defect.}
-The earlier implementation could keep a newly distinguishing continuation while
-discarding the access history that witnessed it. The next fitting step then
-lacked the independent evidence needed to represent that distinction. The
-maintained implementation retains both. It also initializes from a nonzero
-finite challenge when the empty word and one-symbol observations are all zero.
-A failed fit must not be interpreted as proof that the source needs a richer
-representation: the learner itself may have lost its witness.
-
-The smallest reproduction observes a queue with capacity four, receiving the
-same unit input repeatedly. Its output is $\min(n,4)$ after $n$ inputs. The
-repaired learner uses ten source calls, fits five rational-linear coordinates
-and agrees on lengths 0--32. That coordinate count is relative to the imposed
-linear class. One nonlinear integer counter with update
-$c\leftarrow\min(c+1,4)$ is simpler. The example demonstrates a concrete
-algorithm repair, not discovery of an optimal representation.
+The earlier learner sometimes retained a distinguishing question but discarded
+the access history witnessing it. Keeping both repairs this defect. The smallest
+queue example fits in ten source calls and agrees on lengths 0--32. Its five
+rational-linear coordinates are relative to the imposed class: one nonlinear
+integer counter represents that queue more simply.
 
 \hypertarget{trace}{}
-\textbf{Native checks and an ordinary rival.}
-We adapt eight inspected fixtures: three bounded queues, two LRU capacities,
-incremental UTF-8 and two SQLite allocation modes. Both conditions use the
-same authored integer alphabet and finite challenge generator. The default
-refinement is compared with a generic bank of one-symbol questions; that bank
-uses no earlier task experience. Both complete all eight fits.
+Across eight inspected native configurations, both the repaired refinement and
+a generic bank of one-symbol questions complete every fit. Generic questions
+cost 11,379 acquisition calls versus 11,395. Later finite checks retain errors:
+UTF-8 scores 4,903/4,913; SQLite rowid 190/192 and AUTOINCREMENT 191/192.
+These are diagnostic fixtures, not eight independent applications.
 
-\begin{center}\small
-\begin{tabular}{lrr}
-\toprule
-Acquisition method & Source calls & Completed fits\\
-\midrule
-Witness-preserving refinement & 11,395 & 8/8\\
-Generic singleton questions & 11,379 & 8/8\\
-\bottomrule
-\end{tabular}
-\end{center}
-The generic control saves sixteen calls on one queue and ties the other seven.
-There is no learned-memory advantage in this comparison. Later finite panels
-also reveal residual error: UTF-8 scores 4,903/4,913 on length-three words;
-SQLite rowid scores 190/192 and AUTOINCREMENT 191/192 on lengths 16--32.
-Other fixture/panel combinations pass. Acquisition costs exclude later audit
-executions. These eight configurations are an inspected diagnostic workload,
-not eight independent applications or universal equivalence certificates.
+A separate six-teacher study holds cached answers identical. Retaining acquired
+questions reduces extension queries by 11.2--63.1\% in six declared conditions.
+Yet every joint lifetime costs 5,427--5,698 source executions, versus 3,071 for
+separate ordinary modules. Blindly transferring all learned suffixes into the
+simpler learner costs 3,541 and hurts five of six targets. Exact certificates
+there concern supplied rational-linear references, not arbitrary native software.
+Useful questions have not yet made the full architecture economical.
 
-\textbf{What remains of the earlier memory result.}
-A separate study of six previously acquired program teachers retained the same
-measurement cache in both arms. Keeping acquired questions reduced extension
-queries by 11.2--63.1\% in six declared conditions. Yet acquiring separate
-ordinary modules cost 3,071 source executions, below every joint lifetime
-(5,427--5,698). A frozen follow-up transferring every learned suffix into the
-simpler learner cost 3,541 versus 3,071 and hurt five of six targets. Exact
-certificates there concern supplied rational-linear references, not arbitrary
-native sources. These earlier populations and costs are not pooled with the
-new eight-fixture diagnostic.
-
-A question can be useful memory without every representation or transfer rule
-being worthwhile. The next mechanism must select questions that pay for their
-acquisition and preserve the evidence needed to use them.
-\newpage
 \hypertarget{results}{}
-\textbf{3. Working test reuse and its limits.}
-Five authored SQLite batch clients supply development experience. A model
-compiles a retained investigation procedure and an ordinary reusable tester;
-both then run unchanged on five account-transfer clients, four faulty and one
-correct. Each arm has six query slots per client and stops at a host-verified
-reference/client discrepancy. Invalid and duplicate queries consume slots.
-All target executions finish before a separate 400-case client panel opens.
-
+\textbf{Reusable SQLite testers.}
+Five authored batch clients supply development experience. Two generated testers
+then run unchanged on five account-transfer clients, four faulty and one correct.
+Each has six query slots per client; invalid and duplicate queries consume slots.
+Target execution finishes before a separate 400-case panel opens.
 \begin{center}\small
 \begin{tabular}{lrrr}
 \toprule
@@ -165,22 +120,13 @@ Fixed tester & 4 & 7 & 0\\
 \bottomrule
 \end{tabular}
 \end{center}
-Both compiled programs repeat one constant query and ignore feedback. Each
-spends ten slots on duplicates. Their tests miss a partial-debit fault that
-the fixed tester exposes. The result is working code reuse, not an adaptive
-policy advantage. The task family was inspected during engineering; supplied
-interfaces, shared clients and sequential condition selection preclude an
-independent-transfer or statistical-significance claim.
-
-DeepSeek V4.1 Flash, pinned to Morph, used 46 calls for \$0.007117764,
-including development and compilation. Development plus procedure acquisition
-costs \$0.001148298; development plus ordinary preparation costs \$0.000981024.
-These alternatives share the same development cost. Study probes, public
-examples and later checks total 467 reference and 467 client executions.
-Two earlier versions produced stopping or invalid testers. All three versions
-remain published: 133 calls and \$0.019295552. The working condition requests
-low reasoning and a larger output allowance; the provider reports zero
-reasoning tokens. Its success cannot be attributed to reasoning alone.
+Both generated testers repeat one constant query, ignore feedback and spend ten
+slots on duplicates. DeepSeek V4.1 Flash on Morph uses 46 calls for \$0.007117764,
+including development and compilation. All three sequential versions, including
+two earlier unsuccessful attempts, cost \$0.019295552 across 133 calls.
+The family was inspected during engineering. This establishes executable reuse,
+not adaptive testing or independent transfer. Charges exclude engineering and
+host costs; these populations are not pooled with the other studies.
 
 % BEGIN current_native_result
 \textbf{Separate investigation diagnostic.}
@@ -196,25 +142,71 @@ uses 130 calls for \$0.12982944. Separate qualification, failed host admission
 and a funding-only continuation retain their own receipts; no failed attempt
 is erased or counted twice.
 % END current_native_result
-
+\newpage
 \hypertarget{research}{}
-\textbf{Contribution and next test.}
-The open target is selective reuse of questions that pays for its acquisition
-on changed mechanisms, beyond an ordinary tester with the same experience.
-LLM testing with feedback~\cite{coverup,testgen} and reusable skills~\cite{voyager}
-are prior art. Our current contribution is a repaired learner, executable
-comparisons and inspectable negative controls, not a new general learning
-method. Original prompts, replies, failures, sources and offline replays are public.
+\textbf{3. A direction to test, open to correction.}
+The candidate connection is to retain the experiment that reveals a missing
+distinction, the histories and outcomes justifying it, the revised program, and
+a procedure for recognising when a similar investigation would help elsewhere.
+Selective, economical transfer between representation and investigation remains
+unbuilt. The current contribution is a repaired learner and reproducible
+comparisons with informative negative controls.
 
-\begin{thebibliography}{4}\small
-\setlength{\itemsep}{1pt}\setlength{\parskip}{0pt}
-\bibitem{weighted} J. Worrell. \emph{Exactly Learning Weighted Automata over a Field}.
-\href{https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf}{Oxford lecture notes}.
-\bibitem{coverup} J. A. Pizzorno and E. D. Berger. \emph{CoverUp: Effective High Coverage Test Generation for Python}. 2025.
-\href{https://arxiv.org/abs/2403.16218}{arXiv:2403.16218}.
-\bibitem{testgen} N. Alshahwan et al. \emph{Automated Unit Test Improvement using Large Language Models at Meta}. 2024.
-\href{https://arxiv.org/abs/2402.09171}{arXiv:2402.09171}.
-\bibitem{voyager} G. Wang et al. \emph{Voyager: An Open-Ended Embodied Agent with Large Language Models}. 2023.
-\href{https://arxiv.org/abs/2305.16291}{arXiv:2305.16291}.
+\textbf{Relation to earlier work.}
+Learning tests or reusable procedures is already studied in
+ILF~\cite{ilf}, CoverUp~\cite{coverup} and Voyager~\cite{voyager}.
+STOP~\cite{stop} applies a code improver to itself;
+Hyperagents~\cite{hyperagents} makes the task agent and its improvement machinery
+editable. Self-editing, a graph or fixed foundation-model weights cannot establish
+Zenith's novelty. A contribution would require a specified mechanism linking
+measured distinctions to better subsequent improvement, and evidence beyond
+these neighbours and strong ordinary alternatives.
+
+\textbf{Testing improvement of the improver.}
+Let an initial improver produce a successor. Compare both on untouched copies
+of the same starting solvers and fresh task families under matched lifetime
+budgets. Then compare reinvesting the successor to produce another generation
+with continuing the original improver. Keep the evaluator independent of edits;
+count failed proposals, acquisition, evaluation, execution and human intervention.
+Remove the learned questions or procedure while retaining the same observations
+and saved code. Better final answers alone do not show that the improver became
+better. Any positive result would be bounded by the tested tasks and budgets,
+without establishing open-ended acceleration.
+
+\textbf{Why mathematics might help.}
+The \href{https://github.com/wcook04/plectis-erdos}{Plectis mathematical corpus}
+contains Lean proofs, partial results and open obligations. Its argument-continuation
+exporter identifies candidate theorems for a required hypothesis and remaining
+obligations. This suggests decisions to study: prove a prerequisite, try another
+route, or seek a counterexample. \href{https://github.com/wcook04/plectis-atlas}{Plectis Atlas}
+helps readers inspect OpenAI's mathematics release and attributed outside
+assessments; the mathematics and assessments belong to their named authors.
+Neither project is a demonstrated learning integration with Zenith.
+A useful record would connect what was known, the action, measured outcome,
+cost and effect on the target. Finished proofs do not supply missing histories
+of alternatives. Lean checks a supplied proof; failed search does not establish
+falsehood, and correct lemmas need evidence of relevance. Begin with cheap
+software tests; mathematics is a possible harder transfer domain.
+
+\textbf{Collaboration.}
+I am building Zenith with AI coding agents and learning as I go, with limited
+experience in this research area. This is my current understanding. I welcome
+corrections, collaboration and guidance on prior work, evaluations, real tasks
+and the mathematics connection through the
+\href{https://github.com/wcook04/plectis-zenith/issues}{project's issues}.
+\href{https://github.com/wcook04/plectis-zenith/blob/main/docs/status.md}{Results and replay links}
+retain failures and exact costs; the
+\href{https://github.com/wcook04/plectis-zenith/blob/main/program.md}{programme}
+expands the proposed comparisons.
+
+\begin{thebibliography}{7}\footnotesize
+\setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
+\bibitem{psr} M. Littman, R. Sutton and S. Singh. \href{https://proceedings.neurips.cc/paper/2001/hash/1e4d36177d71bbb3558e43af9577d70e-Abstract.html}{Predictive Representations of State}. NeurIPS, 2001.
+\bibitem{weighted} J. Worrell. \href{https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf}{Exactly Learning Weighted Automata over a Field}. Oxford notes.
+\bibitem{ilf} J. He et al. \href{https://eth-sri.github.io/publications/he19ilf}{Learning to Fuzz from Symbolic Execution}. CCS, 2019.
+\bibitem{coverup} J. A. Pizzorno and E. D. Berger. \href{https://arxiv.org/abs/2403.16218}{CoverUp: Effective High Coverage Test Generation for Python}. 2025.
+\bibitem{voyager} G. Wang et al. \href{https://arxiv.org/abs/2305.16291}{Voyager: An Open-Ended Embodied Agent with Large Language Models}. 2023.
+\bibitem{stop} E. Zelikman et al. \href{https://arxiv.org/abs/2310.02304}{Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation}. 2023.
+\bibitem{hyperagents} J. Zhang et al. \href{https://arxiv.org/abs/2603.19461}{Hyperagents}. 2026.
 \end{thebibliography}
 \end{document}

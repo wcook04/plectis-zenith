@@ -20,6 +20,6 @@ The learner now keeps the access history that witnesses a new distinguishing que
 
 Use ordinary reusable code and fixed testing as the present baseline. The next research question is whether experience can select a useful **new** question on changed mechanisms at lower total cost than that baseline. Saving target model calls is insufficient when fixed tests catch more faults. The current contribution is a working, inspectable testbed and a reproduced learner repair; a general learning advantage remains unproven.
 
-The [three-page paper source](../paper/zenith.tex), [README](../README.md) and [read-only website](../site/README.md) present this current scope. Every published client condition replays without inference, including a separately labelled cross-SQLite behavioral check. The PDF download is explicitly the previous edition until a current editor export is available.
+The [three-page paper](../paper/zenith.pdf), its [source](../paper/zenith.tex), [README](../README.md) and [read-only website](../site/README.md) present this current scope. Every published client condition replays without inference, including a separately labelled cross-SQLite behavioral check. The revised paper also describes improvement of the improver and a possible mathematics connection as future directions. No new experiment or integrated-learning result accompanies this editorial update.
 
 Earlier stages are preserved in the [historical research record](history/status-20261015.md). Their results and original populations remain separate.

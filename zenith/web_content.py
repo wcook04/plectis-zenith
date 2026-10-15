@@ -9,6 +9,8 @@ from pathlib import Path
 from . import runtime
 
 API = "/api/v1"
+# Reviewed source/PDF pair. Update together after compiling and inspecting all pages.
+PAPER_EDITION = {"source_sha256": "898d0bb122d48a3dc276cf870dd98cf18d11fe87bbb19843d66e4e61593cc4af", "pdf_sha256": "03510c6be1baacee1b10c8f65b5f2e689124d913bc4efe8d24e9a82af4fed01d"}
 DOCUMENTS = {
     "introduction": "README.md",
     "paper": "paper/zenith.tex",
@@ -156,6 +158,8 @@ class PublicContent:
             citations.append({"id": key, "latex": body,
                               "urls": re.findall(r"\\(?:url|href)\{([^}]+)\}", body), "used_at": used})
         pdf = safe_read(self.root, "paper/zenith.pdf")
+        current_pdf = (source["source"]["sha256"] == PAPER_EDITION["source_sha256"]
+                       and digest(pdf) == PAPER_EDITION["pdf_sha256"])
         anchors = list(re.finditer(r"\\hypertarget\{([a-z-]+)\}\{\}", tex))
         sections = []
         for index, anchor in enumerate(anchors):
@@ -171,10 +175,10 @@ class PublicContent:
         return {"title": title[1] if title else "Zenith", "source": source["source"],
                 "source_url": f"{API}/documents/paper", "pdf_url": "/assets/paper.pdf",
                 "pdf_sha256": digest(pdf), "citations": citations, "sections": sections,
-                # The current source has changed without an exported PDF and
-                # there is no verified source-to-PDF binding receipt.
-                "pdf_current": False, "pdf_edition": "retained_previous_edition",
-                "pdf_note": "The LaTeX source is current. The retained PDF is a previous edition without a verified current-source binding.",
+                "pdf_current": current_pdf,
+                "pdf_edition": "reviewed_current_source" if current_pdf else "retained_previous_edition",
+                "pdf_note": ("The PDF and manuscript match the pair compiled and visually reviewed on 15 October 2026."
+                             if current_pdf else "The PDF or manuscript differs from the reviewed pair; use the current source."),
                 "notice_url": f"{API}/documents/notice"}
 
     def node(self, identifier: str, task_profile: str = "generic") -> dict:

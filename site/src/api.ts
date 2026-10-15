@@ -66,6 +66,9 @@ export type Paper = {
   source_url: string;
   pdf_url: string;
   pdf_sha256: string;
+  pdf_current?: boolean;
+  pdf_edition?: string;
+  pdf_note?: string;
   citations: Citation[];
   sections: PaperSection[];
   notice_url: string;

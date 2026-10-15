@@ -14,6 +14,21 @@ from zenith.web_runs import RunStore
 ROOT = Path(__file__).resolve().parents[1]
 
 
+@pytest.mark.parametrize("changed_path", ["paper/zenith.tex", "paper/zenith.pdf"])
+def test_paper_current_status_requires_both_reviewed_files(monkeypatch, changed_path):
+    from zenith import web_content
+    original_read = web_content.safe_read
+
+    def changed_read(root, path):
+        data = original_read(root, path)
+        return data + b"\n% later edit\n" if path == changed_path else data
+
+    monkeypatch.setattr(web_content, "safe_read", changed_read)
+    paper = Website(ROOT).content.paper()
+    assert paper["pdf_current"] is False
+    assert paper["pdf_edition"] == "retained_previous_edition"
+
+
 @pytest.fixture(scope="module")
 def website():
     return Website(ROOT)
@@ -61,8 +76,8 @@ def test_teaching_material_uses_current_sources(website):
         assert doc["content"] == (ROOT / doc["source"]["path"]).read_text()
     paper = json.loads(website.get(site["paper_url"]).body)
     assert paper["pdf_sha256"] == hashlib.sha256((ROOT / "paper/zenith.pdf").read_bytes()).hexdigest()
-    assert paper['pdf_current'] is False
-    assert paper['pdf_edition'] == 'retained_previous_edition'
+    assert paper['pdf_current'] is True
+    assert paper['pdf_edition'] == 'reviewed_current_source'
     assert paper['source']['sha256'] == hashlib.sha256((ROOT / 'paper/zenith.tex').read_bytes()).hexdigest()
     assert paper["citations"]
     assert all(c["used_at"] for c in paper["citations"])
