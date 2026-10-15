@@ -40,12 +40,13 @@ Only function definitions at module level. No imports, annotations, decorators,
 default arguments, private names, exceptions, I/O or global state.
 The single local name _ is allowed; other leading-underscore names are not.
 Use x*x and x*x*x rather than exponentiation (**); do not use function defaults.
-For and while loops, comprehensions, lambda, nonlocal closure variables and arithmetic
-except power are permitted. No classes, try/except, yield or recursion tricks.
+For and while loops, comprehensions, lambda, nonlocal closure variables,
+arithmetic except power, and bit shifts are permitted. No classes,
+try/except, yield or recursion tricks.
 All execution remains bounded by the worker CPU, memory and wall-time limits.
-Builtins: abs all any bool dict enumerate float int isinstance len list max min
+Builtins: abs all any bool chr dict enumerate float int isinstance len list max min
 range repr reversed round set sorted str sum tuple zip.
-Methods: get items keys values append extend sort lower upper strip split
+Methods: get items keys values append extend sort lower upper strip split join
 setdefault add discard copy count index pop remove clear update.
 Limit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a
 chain-of-thought transcript. No source evaluator or hidden configuration is available.

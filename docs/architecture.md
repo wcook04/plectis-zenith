@@ -1,6 +1,35 @@
 # Active and historical architectures
 
-The active executable-investigation architecture is specified in [the current method](executable-investigations.md). It reuses the provider, budget and source-custody layers, while `zenith/investigation_program.py` owns restricted program execution and `research/investigation_learning_study.py` owns experimental coordination. The financial investigator and graph described below are retained historical profiles, not the active task. Their interfaces and evidence remain available.
+The active implementation studies how to investigate and repair ordinary programs. It reuses the provider, budget and source-custody layers. The financial investigator and graph below are retained historical profiles with their original interfaces and evidence.
+
+## Current source owners
+
+| Source | Responsibility |
+|---|---|
+| `research/conformance_study.py` | Freeze native tasks, make fresh parent programs, compare investigations, select repairs on development evidence, then open later panels |
+| `research/direct_investigation.py` | Validate direct query plans, execute native measurements, retain typed receipts and control what later model calls can see |
+| `research/native_conformance_tasks.py` | SQLite, LRU and UTF-8 contracts, public examples, fixed tests and later cases |
+| `research/client_investigation_study.py` | Acquire an investigation history, compile two rival testers, freeze them and compare later client investigations |
+| `research/client_investigation_tasks.py` | Opaque SQLite client workflows, public query grammar, native measurements and withheld implementation custody |
+| `research/continuation_learning.py` | Fit rational linear models from measured histories and continuations, preserving the witness that motivates refinement |
+| `zenith/investigation_program.py` | Run proposed Python under explicit syntax, acquisition and resource limits |
+| `zenith/budgeted.py`, `zenith/provider_policy.py` | Pin an eligible model route, reserve costs and bound host/endpoint concurrency |
+| `zenith/source_snapshot.py` | Archive the exact implementation used by a study |
+| `scripts/build_conformance_report.py` | Publish allowlisted evidence and replay the archived runtime without inference |
+| `scripts/continue_conformance_budget.py` | Preserve a terminal funding stop, verify exact settled responses and continue only unattempted calls under an explicit larger reservation ceiling |
+| `scripts/export_site_snapshot.py` | Derive static public API responses and assets from the existing read-only backend for the same website renderer |
+| `scripts/build_client_investigation_report.py` | Export exact client-study records, derive lifecycle costs and replay the archived runtime with strict or explicitly behavioral comparison |
+| `scripts/analyze_progress_campaign.py` | Check paired comparisons and reconstruct scores and costs from recorded outputs |
+| `scripts/demo_continuation_learning.py` | Reproduce the learner repair and eight authored native configurations without API access |
+| `examples/continuation-memory/witness-preserving-v1/` | Finite learner results and source hashes |
+
+An investigation returns queries, not asserted answers. The host measures the native source and executes the parent independently. A verified disagreement becomes evidence for whole-program repair. The repair is selected using only public examples and that arm's measured observations; each previously correct measured case must remain correct. Source and selections freeze before later evaluation. This preservation rule is finite: it cannot guarantee correctness on new inputs.
+
+The direct interface lets the model spend its response on experiment choice instead of implementing a cursor in Python. A batch arm gets one call; paired adaptive and outcome-masked arms share the same first response, then differ in the outcomes visible at the second call. Each arm reexecutes and pays for its own native measurements. Fixed tests and repair without new tests remain simpler controls. See the [prospective comparison](progress-protocol-20261014.md).
+
+The continuation learner is a separate exact-arithmetic mechanism. A history is represented by what selected future continuations reveal about it. When a finite challenge refutes the fitted model, both the history and its distinguishing continuation must survive refinement. Its authored linear hypothesis class and finite challenge set limit what a successful fit establishes. Placing this learner beside model-driven investigation does not establish learned transfer between them.
+
+The client pilot tests a concrete connection between investigation and reuse. A development transcript supplies both a retained diagnostic procedure and an ordinary reusable tester. Their executable code freezes before later client measurements. Fresh investigators with and without that transcript, and a fixed tester, provide controls. Every arm receives the same public target contract and native measurement interface. Source hashes and SQL work counters belong to the audit record and never enter model context. The pilot uses authored batch-import and transfer clients within SQLite; its later panel characterizes client defects, not an investigator's prediction accuracy. The [v1 result](client-investigation-20261014.md) and [public evidence bundle](../examples/conformance/client-reuse-v1/manifest.json) preserve the failed compiled reuse. The [v2 protocol](client-investigation-protocol-v2-20261015.md) separately clarifies permission to propose unmeasured questions.
 
 # Architecture
 

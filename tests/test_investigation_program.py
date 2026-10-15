@@ -77,6 +77,41 @@ def test_policy_can_deduplicate_json_queries_with_repr():
     assert result['answer'] == {'query': {'events': []}}
 
 
+def test_bounded_unicode_construction_and_bit_shifts_execute_in_worker():
+    source = '''def investigate(context, acquire):
+    lead = context["lead"]
+    need = context["need"]
+    value = lead & (127 >> need)
+    value = (value << 6) | context["continuation"]
+    return {"text": "".join([chr(value), chr(33)]), "value": value}
+'''
+    cases = [{'tables': {}, 'lead': 194, 'need': 1, 'continuation': 34},
+             {'tables': {}, 'lead': 195, 'need': 1, 'continuation': 10}]
+    result = execute(source, cases, answer_contract='json')
+    assert [row['answer'] for row in result] == [
+        {'text': '\u00a2!', 'value': 162}, {'text': '\u00ca!', 'value': 202}]
+    assert all(row['error'] is None for row in result)
+
+
+def test_invalid_bit_shifts_and_chr_are_contained_and_next_worker_is_healthy():
+    for expression, error in (('1 << -1', 'negative shift count'),
+                              ('8 >> -2', 'negative shift count'),
+                              ('chr(1114112)', 'chr() arg not in range')):
+        source = 'def investigate(context, acquire): return ' + expression
+        result = execute(source, [{'tables': {}}], answer_contract='json')[0]
+        assert result['answer'] is None and error in result['error']
+    healthy = execute('def investigate(context, acquire): return chr(65)',
+                      [{'tables': {}}], answer_contract='json')[0]
+    assert healthy['answer'] == 'A' and healthy['error'] is None
+    unavailable = execute('def investigate(context, acquire): return open("/etc/passwd")',
+                          [{'tables': {}}], answer_contract='json')[0]
+    assert unavailable['answer'] is None and 'not defined' in unavailable['error']
+    for source in ('def investigate(context, acquire): return "x".__class__',
+                   'def investigate(context, acquire): return 2 ** 100'):
+        with pytest.raises(ValueError):
+            validate_source(source)
+
+
 def test_while_scanner_supports_break_continue_and_fresh_case_state():
     source = '''def investigate(context, acquire):
     index = 0

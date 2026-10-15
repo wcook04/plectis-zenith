@@ -55,7 +55,7 @@ def test_native_scopes_sources_and_focus(website):
 def test_teaching_material_uses_current_sources(website):
     site = json.loads(website.get("/api/v1/site").body)
     assert [chapter["id"] for chapter in site["chapters"]] == ["idea", "lab", "oracle", "evolve", "results", "next"]
-    assert site['active_evidence_id'] == 'advance-campaign'
+    assert site['active_evidence_id'] == 'progress-campaign'
     for url in site["documents"].values():
         doc = json.loads(website.get(url).body)
         assert doc["content"] == (ROOT / doc["source"]["path"]).read_text()
@@ -73,7 +73,7 @@ def test_teaching_material_uses_current_sources(website):
         assert section["pdf_url"].endswith("#nameddest=" + section["id"])
         assert all(website.get(url).body for url in chapter["evidence_urls"])
     results = next(c for c in site["chapters"] if c["id"] == "results")
-    active = site['evidence'].get('advance-campaign')
+    active = site['evidence'].get('progress-campaign')
     assert results["evidence_urls"] == ([active] if active else [])
     if not active:
         assert results['evidence_kind'] == 'research_proposal'
@@ -83,7 +83,9 @@ def test_teaching_material_uses_current_sources(website):
     assert site['data_mode']=='source_bound_acquisition_research'
     assert '/documents/conformance-study' in next(c for c in site['chapters'] if c['id'] == 'lab')['document_url']
     assert '/documents/continuation-memory' in next(c for c in site['chapters'] if c['id'] == 'evolve')['document_url']
-    assert '/documents/advance-synthesis' in results['document_url']
+    assert '/documents/progress-synthesis' in results['document_url']
+    assert site['evidence']['advance-campaign'] == '/api/v1/evidence/advance-campaign'
+    assert '/api/v1/documents/advance-synthesis' in site['documents'].values()
     current_method=json.loads(website.get('/api/v1/documents/observation-learning').body)
     historical_method=json.loads(website.get('/api/v1/documents/executable-investigations').body)
     assert current_method['source'] == historical_method['source']
@@ -95,6 +97,17 @@ def test_teaching_material_uses_current_sources(website):
         evidence = json.loads(website.get(url).body)
         assert evidence["data"] == json.loads((ROOT / evidence["source"]["path"]).read_text())
     assert site["capabilities"]["execute_model"] is False
+
+
+@pytest.mark.parametrize("path", ["/api/v1/graph", "/api/v1/nodes/lab_director",
+                                  "/api/v1/evidence/replacements", "/api/v1/evidence/demo-result"])
+def test_standalone_api_output_retains_research_notice(website, path):
+    value = json.loads(website.get(path).body)
+    assert value["notice"] == "Experimental research prototype."
+    notice = json.loads(website.get(value["notice_url"]).body)
+    assert notice["content"] == (ROOT / "RESEARCH_NOTICE.md").read_text()
+    if path in ("/api/v1/graph", "/api/v1/nodes/lab_director"):
+        assert value["content_kind"].startswith("authored_research_definition")
 
 
 def test_public_http_head_etag_and_private_exclusion(server):
@@ -206,7 +219,7 @@ def test_historical_observation_receipt_remains_source_bound_without_becoming_ac
     app = Website(tmp_path)
     site = json.loads(app.get('/api/v1/site').body)
     results = next(chapter for chapter in site['chapters'] if chapter['id'] == 'results')
-    assert site['active_evidence_id'] == 'advance-campaign'
+    assert site['active_evidence_id'] == 'progress-campaign'
     assert '/api/v1/evidence/observation-learning-result' not in results['evidence_urls']
     assert '/api/v1/evidence/decomposition-result' not in results['evidence_urls']
     served = json.loads(app.get('/api/v1/evidence/observation-learning-result').body)
@@ -221,38 +234,71 @@ def test_current_campaign_routing_preserves_historical_receipts_and_analysis_sco
     for directory in ('codex', 'paper', 'docs', 'examples'):
         shutil.copytree(ROOT/directory, tmp_path/directory)
     shutil.copy2(ROOT/'master_config.json', tmp_path/'master_config.json')
-    path = tmp_path/'docs/advance-campaign-20261014.json'
+    path = tmp_path/'docs/progress-campaign-20261014.json'
     path.unlink(missing_ok=True)
-    receipt = {'schema': 'zenith_advance_campaign_v1', 'status': 'complete',
-               'summary': 'Controlled analysis fixture, including incomplete construction.',
-               'total_calls': 10, 'total_reported_cost_usd': '0.0213',
-               'conformance_studies': [{'id': 'fixture-stopped', 'complete': False,
-                   'calls': 10, 'reported_cost_usd': '0.0213', 'model': 'fixture-model',
-                   'reasoning_effort': 'low'}], 'memory': {'summary': 'Authored mechanism fixture.'}}
+    receipt = {'schema': 'zenith_progress_campaign_report_v1', 'status': 'pending',
+               'summary': 'Controlled qualification fixture; no diagnostic is published.',
+               'claim_boundary': 'Three authored native contracts, no transfer claim.',
+               'source_bindings': {'examples/conformance/fixture/manifest.json': 'fixture-hash'},
+               'conformance_studies': [{'id': 'fixture-qualification', 'version': 'v5', 'stage': 'qualification',
+                   'complete': True, 'parent_episodes': 3, 'actual_calls': 10,
+                   'reported_cost_usd': '0.0213', 'unknown_cost_calls': 0,
+                   'model': 'fixture-model', 'reasoning_effort': 'low',
+                   'qualification': {'passed': True}}], 'learner': None}
     if published:
         path.write_text(json.dumps(receipt))
     app = Website(tmp_path)
     site = json.loads(app.get('/api/v1/site').body)
     chapter = next(c for c in site['chapters'] if c['id'] == 'results')
-    assert site['active_evidence_id'] == 'advance-campaign'
-    assert chapter['evidence_urls'] == (['/api/v1/evidence/advance-campaign'] if published else [])
+    assert site['active_evidence_id'] == 'progress-campaign'
+    assert chapter['evidence_urls'] == (['/api/v1/evidence/progress-campaign'] if published else [])
     assert chapter['evidence_kind'] == ('measured_execution' if published else 'research_proposal')
-    for identifier in ('observation-learning-result', 'decomposition-result'):
+    for identifier in ('advance-campaign', 'observation-learning-result', 'decomposition-result'):
         assert site['evidence'][identifier] == f'/api/v1/evidence/{identifier}'
         assert app.get(site['evidence'][identifier]).body
     if published:
-        served = json.loads(app.get('/api/v1/evidence/advance-campaign').body)
+        served = json.loads(app.get('/api/v1/evidence/progress-campaign').body)
         assert served['data'] == receipt
         assert served['source']['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
     else:
         with pytest.raises(FileNotFoundError):
-            app.get('/api/v1/evidence/advance-campaign')
+            app.get('/api/v1/evidence/progress-campaign')
 
 
 def test_basket_nodes_use_their_own_protocol(website):
     node = json.loads(website.get('/api/v1/nodes/basket_reader_1').body)
     assert node['dossier'] is None
     assert node['explanation_url'] == '/api/v1/documents/experiment'
+
+
+def test_client_pilot_has_separate_source_bound_evidence_and_protocol(website):
+    site = json.loads(website.get('/api/v1/site').body)
+    assert site['active_evidence_id'] == 'progress-campaign'
+    protocol = json.loads(website.get(site['documents']['client-investigation-protocol']).body)
+    path = ROOT / 'docs/client-investigation-protocol-20261014.md'
+    assert protocol['content'] == path.read_text()
+    assert protocol['source']['sha256'] == hashlib.sha256(path.read_bytes()).hexdigest()
+    for identifier, filename in (
+        ('client-investigation', 'client-investigation-20261014'),
+        ('client-investigation-v2', 'client-investigation-v2-20261015'),
+        ('client-investigation-v2-low', 'client-investigation-v2-low-20261015'),
+    ):
+        evidence_path = ROOT / f'docs/{filename}.json'
+        if evidence_path.exists():
+            evidence = json.loads(website.get(site['evidence'][identifier]).body)
+            assert evidence['data'] == json.loads(evidence_path.read_text())
+            assert evidence['source']['sha256'] == hashlib.sha256(evidence_path.read_bytes()).hexdigest()
+            assert evidence['data']['schema'] == 'zenith_client_investigation_report_v1'
+            explanation = json.loads(website.get(site['documents'][identifier]).body)
+            assert explanation['content'] == (ROOT / f'docs/{filename}.md').read_text()
+        else:
+            assert identifier not in site['evidence']
+            with pytest.raises(FileNotFoundError):
+                website.get(f'/api/v1/evidence/{identifier}')
+    v2_protocol = json.loads(website.get(site['documents']['client-investigation-protocol-v2']).body)
+    assert v2_protocol['content'] == (ROOT / 'docs/client-investigation-protocol-v2-20261015.md').read_text()
+
+
 def test_financial_graph_exposes_typed_reasoning_contracts(website):
     for mission,count in [('lab',25),('oracle',28),('refinement',3)]:
         graph=json.loads(website.get('/api/v1/graph?mission=financial_'+mission).body)

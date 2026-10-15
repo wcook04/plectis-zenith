@@ -1,36 +1,47 @@
 # Executable investigations and measured repair
 
-The active test asks whether a model can write a useful experiment, observe a real discrepancy, and repair the program that produced it. Its simplest useful retained object is **a program together with the experiments that expose its limits**. The program's call graph helps inspection; it imposes no special execution architecture.
+Zenith asks whether an experiment provides evidence that helps repair a program. The retained object is ordinary executable code, measured observations and queries that expose its limits. A useful explanation must lead to a checkable change or a better next question.
 
-`research/conformance_study.py` implements the loop. `research/native_conformance_tasks.py` supplies three native diagnostic contracts: SQLite allocation across transactions, LRU cache counters, and incremental UTF8 decoding. These are authored wrappers around real library behavior, not production client workloads. Each contract receives two independently generated parent programs. Correct parents and invalid deliveries remain in the study. Nothing filters for attractive defects.
+The current six-arm runner is `research/conformance_study.py`. Its native contracts cover SQLite allocation across transactions, LRU cache counters and incremental UTF-8 decoding. These are authored diagnostic wrappers around library behavior. They are not independently acquired production applications. The [prospective protocol](progress-protocol-20261014.md) specifies the new comparison; the [PROGRESS synthesis](progress-returns-20261014.md) records its source ideas and reproduction limits.
 
 ## What runs
 
-1. Freeze the six tasks, public examples, two disjoint later panels, model settings, endpoint assignment and runtime source before inference.
-2. Ask for a fresh whole program from the public contract and eight measured examples. This first proposal is the no-change control.
-3. Compare three investigations of the same parent. **Ordinary** writes an unrestricted adaptive test program. **Witness** writes one with an optional compact account of the obligation, suspected assumption, evidence and proposed change. **Fixed** uses eight authored boundary/prefix tests without a policy-generation call.
-4. Run each investigation with at most eight query slots. A generated policy sees the contract, complete parent code, public examples and its own accumulated receipts. The host measures the native source and executes the parent separately. The first verified discrepancy stops investigation. Duplicates and invalid requests consume slots; invalid requests cannot refute a parent.
-5. Give each arm one whole-program repair call, including its actual measurements, failed execution and optional notes. A repair is selected only if it preserves every measured case the parent got right and does not worsen the aggregate development result. Rejected source is retained unchanged.
-6. Freeze all selections, then evaluate the two later panels. Replay rebuilds every prompt, parses the original responses, re-executes the policies, native measurements, selection and later outcomes from the archived source.
+1. Freeze the task data, public examples, two later panels, source archive, model route, analysis and budgets before inference.
+2. Generate a parent program from the public contract and eight measured examples. Keep correct, incorrect and invalid programs in the denominator.
+3. Give the same parent to six arms: **ordinary** compiles a Python selector; **fixed** uses predeclared boundary tests; **direct_batch** proposes up to eight queries in one JSON response; **direct_adaptive** can use measured outcomes to choose a second batch; **direct_masked** receives query identities without their outcomes; **repair_only** gets no new tests.
+4. The direct host owns validation, deduplication, iteration and source access. Each investigator has eight proposal slots and stops at the first verified discrepancy. Invalid and duplicate proposals consume slots. A source error permitted by the contract is an observation; an investigator error is not a parent defect.
+5. Every arm receives one whole-program repair call with its actual evidence. The selected repair must preserve every previously correct measured case and not worsen the aggregate development result. Rejected source and unchanged programs remain recorded.
+6. Freeze every selection before opening later panels. Archived replay reconstructs prompts, raw output parsing, measurements, selection and later scores without model calls.
 
-The witness account is a proposal, not privileged introspection. It may suggest a missing input, wrong update, wrong readout, new question or deletion of the decomposition. The host does not certify those explanations or route changes through a special graph. Both generated policies receive the same complete context and may use any approach. This comparison therefore tests prompting and its executable consequences, not a graph engine.
+The adaptive and masked arms share one exact first provider response. Each separately reexecutes the native measurements and parent; both executions count in their arm. Only the second model call differs in access to outcomes. Early stopping can mean no second decision occurs. This must be reported, rather than treating all parent episodes as feedback interventions. Fixed testing and repair-only each save investigation calls and remain serious cost-aware rivals.
 
-Each generated-policy arm spends two calls after the parent; fixed testing spends one. All arms receive a repair call even when they discover no discrepancy, so repair gains alone do not identify the value of investigation. The current pilot has 36 calls at most. Query attempts, valid native probes, source-specific valid completed-probe work units, execution failures, model tokens and billed cost are retained separately. Work units are not interchangeable across the three libraries. An invalid query may execute a native prefix before rejection; valid-probe units exclude that partial work. Query attempts and slots remain recorded, and these counters do not justify claims about total physical source work. The exact-copy public evidence is exported by `scripts/build_conformance_report.py`; transport records and credentials stay local.
+The qualification and diagnostic use separately seeded, nonoverlapping later panels. Their public contracts are shared; replicate-zero parent prompts repeat. New provider calls therefore do not guarantee unique source programs or independent mechanisms. Report repeated programs and family-level outcomes. Hundreds of query rows are not hundreds of experimental subjects.
 
-## Why these distinctions matter
+The restricted Python executor has an explicit language and resource contract. A language-delivery failure belongs to the observed pipeline; it does not show that a model cannot solve the native task with ordinary unrestricted Python. The direct interface removes selector-code delivery as one possible failure, while whole-program repair still uses that executor.
 
-The earlier SQLite failures retained the information they needed but ignored pending values at readout. Enlarging their state would have misdiagnosed the problem. A different, rows-only helper really did discard necessary history. An equal-input/different-obligation witness can rule out a particular local repair only when the captured input includes all available state and context. A node's claim that it needs more context does not establish this condition.
+## What the measurements mean
 
-An improved program and an improved way of learning are different outcomes. The current live study tests newly generated experiments and repair; it does not yet revise and transfer an investigator across episodes. The continuation-memory experiment takes a separate step: retain test directions acquired during one workload, then measure whether they reduce the queries needed to acquire a later model beyond retaining the same raw answers. That controlled mechanism uses an authored algebraic learner and must also be compared with ordinary separate implementations and known-family fitting.
+A model's note is a hypothesis, not privileged introspection. It can suggest missing information, an incorrect update or readout, a new test, or removal of a decomposition. The host certifies only what it measures. For example, an earlier SQLite program retained pending inserts but ignored them at readout. Enlarging its state would have misdiagnosed that failure. A different rows-only helper genuinely discarded history.
 
-The next useful advance is a reusable investigation procedure whose value survives a changed client or mechanism. It must outperform a competent ordinary tester with the same earlier experience, after accounting for acquisition and execution cost. A smaller graph, a bypassed helper or direct native operation is an acceptable winning result.
+An improved program and an improved learning procedure require different evidence. This study compares investigations of fresh programs. It does not update an investigator across episodes. The separate [continuation learner](../examples/continuation-memory/witness-preserving-v1/README.md) preserves histories and questions that distinguish them within an authored rational-linear class. Neither implementation alone establishes transfer of an acquired investigation strategy.
 
-## Commands
+Count provider attempts, valid distinct source queries, proposal slots, duplicates, execution failures, tokens and reported cost separately. Native work units are source-specific. A rejected query may execute a native prefix; completed-probe counters exclude that partial work and do not measure total physical work. Shared provider calls are billed once in campaign totals. Unknown charges remain unknown.
+
+## Reproduce or run
+
+The public bundles use each study's archived source, so later changes to the maintained runner cannot rewrite its results. The learner demonstration needs no account:
+
+```sh
+python scripts/demo_continuation_learning.py
+python scripts/demo_continuation_learning.py --native
+```
+
+To create a new paid study, first verify current inexpensive Chinese-developed model and endpoint metadata, then use an explicit route and ceiling:
 
 ```sh
 python -m research.conformance_study prepare work/native-pilot \
   --model inclusionai/ling-3.1-flash \
-  --providers deepinfra/fp4 --workers 1 \
+  --providers deepinfra/fp4 --workers 3 --parents-per-contract 1 \
   --reasoning-effort none --max-output-tokens 12288 --max-cost-usd 0.60
 python -m research.conformance_study run work/native-pilot --env-file /path/to/local.env
 python -m research.conformance_study confirm work/native-pilot
@@ -38,13 +49,9 @@ python scripts/build_conformance_report.py export work/native-pilot examples/con
 python scripts/build_conformance_report.py replay examples/conformance/native-pilot
 ```
 
-The dollar figure is a ceiling, not a predicted charge. Current inexpensive Chinese model and endpoint metadata must be checked when launching a new campaign. Independent episodes use at most three host calls and one call per pinned endpoint; dependent calls remain ordered. Failed deliveries are recorded, never automatically retried. New model outputs constitute a new experiment, while archived replay uses no model calls.
+The ceiling is a maximum, not an expected charge. Independent work uses at most three host calls and one per pinned endpoint. Dependent calls remain ordered. There is no automatic retry or expensive fallback. A changed interface starts a separately frozen study.
 
-The parent episode is the experimental unit. Two parents per contract and many query rows do not create six independent mechanisms or hundreds of independent replications. Both later panels test the same disclosed diagnostic population. These results can select the next experiment; they cannot establish general recursive self-improvement or a production advantage.
-
-[Fifteen-return assimilation](advance-returns-20261014.md) records which mechanisms were adopted, reproduced or deferred. [Earlier structural campaign](decomposition-20261014.md) retains its original methods and evidence.
-
-## Recorded campaign
+## Historical three-arm campaign
 
 The full frozen Ling3.1Flash comparison, `examples/conformance/ling-full-v3b`, completed all 36 calls for $0.03205644. The current metadata check selected this recently listed, eligible model and pinned DeepInfra's compatible endpoint at $0.30 input/$0.90 output per million tokens, with reasoning disabled. The protocol records the observation and prices; future runs must check again. Those prices apply to the chosen endpoint, not every host carrying the model.
 

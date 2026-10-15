@@ -69,20 +69,51 @@ relative links. Sanitize rendered Markdown and treat model output as data.
 Use the recorded experiment status. Successful JSON validation alone must not be displayed as predictive success. Use the current result
 documents and receipts instead of hardcoding result counts into the frontend.
 
-The active source is `/api/v1/documents/observation-learning`, an alias of
-`docs/executable-investigations.md`. Its public receipt is
-`/api/v1/evidence/observation-learning-result`, bound to
-`docs/observation-learning-20261013.json`. Site metadata names this active
-evidence ID even before a receipt is published. A missing receipt means results
-pending, rather than a fallback to historical operational scores.
+The active synthesis is `/api/v1/documents/progress-synthesis`, bound to
+`docs/progress-returns-20261014.md`. Site metadata selects
+`/api/v1/evidence/progress-campaign`, bound to
+`docs/progress-campaign-20261014.json` when that receipt is published. Its
+schema is `zenith_progress_campaign_report_v1`. A missing receipt means current
+results pending; the frontend does not substitute an older campaign. The
+qualification and diagnostic stages retain separate parent populations,
+actual model attempts, known reported costs, unknown-charge attempts and
+confirmation panels. A forfeited protocol version remains visible as an
+engineering failure, not a diagnostic result. The source-bound receipt supplies
+all displayed scores and costs.
 
-The receipt uses `zenith_observation_learning_evidence_v1`. Protected tables
-require `complete=true`, `status=complete` and a measured aggregate. Failed and
-partial snapshots publish status, calls, canaries, unresolved billing and source
-hashes without completed outcome tables. Absence of a failure does not establish
-that an external process is running. The site reads costs and comparison values
-from the receipt. The older `investigation-learning-result` route remains
-historical and retains its original schema.
+The separate `/api/v1/evidence/client-investigation` route reads
+`docs/client-investigation-20261014.json` with schema
+`zenith_client_investigation_report_v1`. Its method is available at
+`/api/v1/documents/client-investigation-protocol`. The frontend renders this
+study's analysis from `/api/v1/documents/client-investigation`. It shows the
+SQLite client pilot independently of the native campaign, including when the
+native receipt is pending. `arm_metrics` supplies the failing-client detection
+denominator and target query counts; model attempts and exact reported cost
+include acquisition and compilation. Protected outcomes are withheld unless
+the pilot and panel are complete. Missing, unavailable or unsupported evidence
+never borrows outcomes from another study. These finite authored checks cannot
+establish independent transfer or a false-accusation rate.
+
+The v1 evidence and document IDs retain their meaning. The separate
+`client-investigation-v2` and `client-investigation-v2-low` evidence and document
+IDs expose the subsequent attempts, while `client-investigation-protocol-v2`
+owns their clarified protocol. The UI displays the latest available version
+and retains links and engineering outcomes for its predecessors. Invalid
+artifacts show skipped target runs, without a measured detection score. Target
+model calls remain separate from full lifecycle attempts and costs.
+
+For a static deployment, the same frontend can read a snapshot with schema
+`zenith_public_api_snapshot_v1`. Its `routes` map contains exact public API
+paths and the JSON bodies produced by this backend. Set `VITE_ZENITH_SNAPSHOT=1`
+and use `VITE_ZENITH_API` plus Vite's `--base` for the deployment prefix.
+One snapshot request supplies the API client; absent routes return an explicit
+404 error. Separate `.json` files preserve queryless API read links. This
+mode has no local-run access and cannot execute models or write state.
+
+`/api/v1/evidence/advance-campaign` and
+`/api/v1/documents/advance-synthesis` retain the earlier campaign. The older
+`observation-learning-result` and `investigation-learning-result` routes keep
+their original schemas and historical evidence boundaries.
 
 ## API
 
@@ -101,7 +132,7 @@ All JSON routes are under `/api/v1`. `GET` and `HEAD` are supported; writes retu
 | `/runs/{run_id}/nodes/{node_id}` | Optional local artifact and recorded attempts |
 | `/health` | Version and enabled capabilities |
 
-Historical graph missions include `financial_lab`, `financial_oracle` and `financial_refinement`. Their graph responses include effective node hashes, instructions, dependencies and `reasoning_schema`. The generic `all`, `lab`, `oracle` and `refinement` graphs remain available; `evolve` aliases generic `refinement`. Earlier `basket`, `basket_serial` and `basket_evolve` graphs describe the reduced pilot. The active native observation study publishes source-bound programs and receipts and does not require those historical graphs to render its results.
+Historical graph missions include `financial_lab`, `financial_oracle` and `financial_refinement`. Their graph responses include effective node hashes, instructions, dependencies and `reasoning_schema`. The generic `all`, `lab`, `oracle` and `refinement` graphs remain available; `evolve` aliases generic `refinement`. Earlier `basket`, `basket_serial` and `basket_evolve` graphs describe the reduced pilot. The current Progress result renders from its source-bound receipt and does not require those historical graphs.
 Site metadata lists document and evidence IDs. The PDF is `/assets/paper.pdf`;
 figure URLs are `/assets/graphs/{id}.svg` and are listed by `/site`.
 
@@ -149,15 +180,15 @@ Checks cover native topology, manuscript links, result receipts, HTTP/ETags,
 private/public separation, CORS/Host/method rejection, traversal, symlinks,
 oversized and malformed evidence, and mounting a future frontend build.
 
-## Current native observation edition
+## Historical native observation edition
 
 The initial comparison receipt remains immutable. `/api/v1/evidence/observation-screens`
 serves `docs/observation-screens-20261013.json` for the later repair, candidate-pool,
 composition and fixed-inventory selection tests, with separate protocols and cost
-accounting. The results chapter links this receipt and the updated manuscript;
-it does not overwrite the original comparison table with a different population.
+accounting. The historical receipt and manuscript retain their own population;
+they do not overwrite the current Progress comparison.
 
-`site.data_mode` is `native_observation_research`. Constructed action sequences
+In that historical edition, `site.data_mode` was `native_observation_research`. Constructed action sequences
 produce actual native SQLite counter and committed-state observations. The
 comparison remains conditional on the frozen software family. The source-bound
 receipt separates primary policies, controls, errors and unsupported exact

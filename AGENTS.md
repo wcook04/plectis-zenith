@@ -23,3 +23,5 @@ The restricted Python harness has explicit syntax, acquisition and resource limi
 Retain the financial investigator, full graph, basket pilot and System A fixture with their own evidence boundaries. Historical cutoffs, label maturity, stale quotes, target vectors and comparison budgets remain authoritative for those tasks. Price histories do not establish market causes; constructed baskets are not traded ETFs. RESEARCH_NOTICE.md owns the boundary.
 
 Run relevant offline tests and the retained suite after runtime changes. Regenerate graphs and extraction receipts with their owners. Keep paper, programme, README, status and website document routes aligned with the active research, without relabelling historical artifacts. Commit only owned changes and preserve other work. Put a reusable lesson into the smallest relevant contract or test; avoid parallel frameworks and duplicate roadmaps.
+
+For repository layout changes, preserve source-compatible paths and run `python scripts/check_structure.py` with `tests/test_structure.py`. Document new source roles in README.md and docs/architecture.md.

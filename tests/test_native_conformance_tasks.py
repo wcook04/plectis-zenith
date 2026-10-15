@@ -228,8 +228,13 @@ def test_fixed_tester_is_public_input_only_and_uses_boundaries_and_proper_prefix
                 prefix = deepcopy(row["input"])
                 prefix[field] = prefix[field][:cut]
                 prefixes.add(canonical(prefix))
-        assert any(canonical(q) in prefixes for q in queries)
-        assert any(canonical(q) not in prefixes for q in queries)
+        if kind == 'utf8':
+            assert [q['events'][0]['bytes'] for q in queries] == [
+                [0xC0], [0xC1], [0xF5], [0xFF], [0xE0, 0x9F],
+                [0xED, 0xA0], [0xF0, 0x8F], [0xF4, 0x90]]
+        else:
+            assert any(canonical(q) in prefixes for q in queries)
+            assert any(canonical(q) not in prefixes for q in queries)
         assert all(query_units(q) <= dataset["max_query_units"][kind] for q in queries)
         assert sum(query_units(q) for q in queries) <= PROBE_BUDGET * dataset["max_query_units"][kind]
         for query in queries:

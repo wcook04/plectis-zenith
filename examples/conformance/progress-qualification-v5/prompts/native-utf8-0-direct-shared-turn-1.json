@@ -1,0 +1,426 @@
+{
+  "prompt": {
+    "observed_task": {
+      "id": "native-utf8-0",
+      "source_id": "utf8-0",
+      "examples": [
+        {
+          "input": {
+            "events": []
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  163
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  66,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  97
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        }
+      ],
+      "native_contract_not_response_instructions": "Native strict codecs UTF8 incremental-decoder diagnostic.\nA fresh query is exactly {\"events\":[event,...]}, with at most 32 events.\nAn event is exactly {\"op\":\"feed\",\"bytes\":[integer,...]}, {\"op\":\"finish\"},\nor {\"op\":\"reset\"}. Each byte is an integer 0..255, excluding booleans; each\nchunk has at most 64 bytes and the entire query at most 256 bytes. Empty chunks\nare legal. Feed invokes decode(bytes, final=False); finish invokes decode with\nempty bytes and final=True. Count Unicode code points in strings successfully\nreturned by these calls, not bytes or graphemes. A UnicodeDecodeError is a\nmeasured result: status becomes \"error\", and the failing call contributes ZERO\ncharacters, including any valid prefix in that same chunk. Successful finish\nsets status \"finished\". Otherwise status is \"open\", including incomplete byte\nprefixes. After either terminal status, only reset is legal. Reset creates a\nfresh strict decoder and sets count=0,status=\"open\". Reset may also occur while\nopen. Return {\"count\":integer,\"status\":\"open\"|\"finished\"|\"error\"}. Each query\nstarts fresh. Invalid/incomplete UTF8 bytes are allowed inputs; malformed query\nshapes and events after a terminal result without reset are illegal queries.\n \n"
+    },
+    "candidate_source": "def investigate(context, acquire):\n    def feed(state, data):\n        if state[1] != 'open':\n            return\n        pending = state[0]\n        stream = pending + list(data)\n        state[0] = []\n        index = 0\n        total = len(stream)\n        while index < total:\n            lead = stream[index]\n            if lead < 128:\n                state[2] += 1\n                index += 1\n            elif lead < 192:\n                state[1] = 'error'\n                return\n            elif lead < 224:\n                size = 2\n                low = 128\n                high = 191\n            elif lead < 240:\n                size = 3\n                if lead < 226:\n                    low = 160\n                elif lead < 237:\n                    low = 128\n                elif lead == 237:\n                    low = 128\n                    high = 159\n                else:\n                    low = 128\n            else:\n                if lead > 244:\n                    state[1] = 'error'\n                    return\n                size = 4\n                if lead == 240:\n                    low = 144\n                elif lead < 244:\n                    low = 128\n                else:\n                    low = 128\n                    high = 143\n            if index + size > total:\n                state[0] = stream[index:]\n                return\n            valid = True\n            for offset in range(1, size):\n                byte = stream[index + offset]\n                if byte < low or byte > high:\n                    valid = False\n                    break\n            if not valid:\n                state[1] = 'error'\n                return\n            state[2] += 1\n            index += size\n\n    def finish(state):\n        if state[1] != 'open':\n            return\n        if len(state[0]) != 0:\n            state[1] = 'error'\n        else:\n            state[1] = 'finished'\n\n    state = [[], 'open', 0]\n    for event in context['events']:\n        op = event['op']\n        if op == 'feed':\n            feed(state, event['bytes'])\n        elif op == 'finish':\n            finish(state)\n        elif op == 'reset':\n            state[0] = []\n            state[1] = 'open'\n            state[2] = 0\n    return {'count': state[2], 'status': state[1]}\n",
+    "candidate_on_examples": {
+      "correct": 4,
+      "total": 8,
+      "errors": 4,
+      "rows": [
+        {
+          "answer": {
+            "count": 0,
+            "status": "open"
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": []
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          },
+          "correct": true
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "UnboundLocalError: cannot access local variable 'size' where it is not associated with a value",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        },
+        {
+          "answer": {
+            "count": 0,
+            "status": "open"
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "count": 1,
+            "status": "finished"
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  163
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": true
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "UnboundLocalError: cannot access local variable 'high' where it is not associated with a value",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        },
+        {
+          "answer": {
+            "count": 0,
+            "status": "error"
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          },
+          "correct": true
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "UnboundLocalError: cannot access local variable 'size' where it is not associated with a value",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  66,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "UnboundLocalError: cannot access local variable 'size' where it is not associated with a value",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  97
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        }
+      ]
+    },
+    "turn": 1,
+    "remaining_slots": 8,
+    "max_queries_this_turn": 4,
+    "receipts": [],
+    "outcomes_available": false,
+    "earlier_delivery_errors": [],
+    "response_example": {
+      "queries": [],
+      "note": null
+    }
+  },
+  "system": "You are investigating a candidate program, not implementing it.\nReturn JSON with exactly \"queries\" (a list of native input objects) and \"note\"\n(a short string or null). Do not return Python, predicted answers, or source/scope/\nchange fields. The host executes queries and measures both native and candidate\noutputs. The native contract below defines the object under test, NOT your reply.\nChoose revealing legal inputs from code inspection and evidence. Do not repeat\nexamples or earlier queries. An empty queries list stops. Notes are unverified\nhypotheses: observed evidence takes precedence. The request states your remaining\nquery allowance. Your note may be null; a long explanation is not required.",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "queries": {
+        "type": "array",
+        "maxItems": 4,
+        "items": {
+          "type": "object"
+        }
+      },
+      "note": {
+        "anyOf": [
+          {
+            "type": "string",
+            "maxLength": 500
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "required": [
+      "queries",
+      "note"
+    ],
+    "additionalProperties": false
+  }
+}

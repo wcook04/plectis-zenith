@@ -9,3 +9,7 @@ Pass the earlier packet to `python -m zenith prepare lab`, declaring its cutoff 
 After Lab completes, Oracle receives that frozen subject and the later packet. Freeze numeric `snapshot_value` and `target_value` forecasts for named observables at the exact horizon. Keep unavailable or unmatched outcomes unresolved. Evolve may propose one reviewed change; compare original and revised graphs on further held-out cases under the same information and budget.
 
 This teaches the protocol. It does not validate physical dynamics, predictive accuracy or an improvement from revision.
+
+## Synthetic offline first run
+
+Run `python -m zenith offline-example --output work/first-run` to execute authored Lab and Oracle responses without an API key or network. It demonstrates contracts and retains an intentionally rejected response. It is not model inference or a forecasting result. See the generated `summary.json` and README.

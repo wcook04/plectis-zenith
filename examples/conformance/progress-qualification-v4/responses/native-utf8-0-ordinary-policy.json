@@ -1,0 +1,4 @@
+{
+  "raw": "{\"source\":\"def investigate(context, acquire):\\n    events = [{'op': 'feed', 'bytes': [224, 128, 128]}, {'op': 'finish'}]\\n    return {'query': {'events': events}, 'note': {'hypothesis': 'Parent accepts overlong E0 80 80 because it only checks decoded range 2048..65535; strict UTF8 requires E0 second byte A0..BF. Native should error with count 0.'}}\\n\",\"scope\":\"Strict UTF8 incremental decoder: overlong encoding and second-byte lead constraints for 3-byte sequences.\",\"change\":\"Use E0 80 80, an overlong U+0000, followed by finish; distinguish range-only validation from strict UTF8 second-byte bounds.\"}",
+  "prompt_sha256": "6ea6ec02148c392066f4d94cbaa678b3775c021f97e4df51375a3c65d7ce4e91"
+}

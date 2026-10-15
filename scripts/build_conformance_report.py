@@ -28,6 +28,8 @@ BILLING_FIELDS = ('call_id', 'node_id', 'requested_model', 'requested_provider_s
                   'reserved_cost_usd', 'network_elapsed_seconds', 'reasoning_effort',
                   'prompt_sha256', 'response_sha256')
 PRIVATE_METADATA = re.compile(r'/Users/|/home/|file://|"(?:api_key|password|authorization|token|access_token|secret)"', re.I)
+DIRECT_VERSIONS = {'zenith_conformance_study_v4_direct_actions',
+                   'zenith_conformance_study_v5_direct_actions_executor_compatibility'}
 
 
 def read(path):
@@ -99,7 +101,9 @@ def calls_and_files(folder):
             not {r['task_id'] for r in records} <= set(task_ids) or
             (frozen['complete'] and len(records) != len(task_ids))):
         raise ValueError('Frozen task membership mismatch')
+    direct_version = protocol['schema'] in DIRECT_VERSIONS
     nodes = []
+    needed_responses = set()
     for record in records:
         if (not set(record['arms']) <= set(protocol['arms']) or
                 (frozen['complete'] and set(record['arms']) != set(protocol['arms']))):
@@ -110,28 +114,58 @@ def calls_and_files(folder):
             continue
         nodes.append(record['parent']['call_id'])
         for arm, item in record['arms'].items():
-            if (item['policy'] is None) != (arm == 'fixed'):
+            if (item['policy'] is None) != (arm not in ('ordinary', 'witness')):
                 raise ValueError('Frozen policy call mismatch')
             if item['policy'] is not None:
                 nodes.append(item['policy']['call_id'])
+            for turn in item['investigation'].get('turns', []):
+                nodes.append(turn['call_id'])
+                if turn.get('raw') is not None:
+                    needed_responses.add(turn['call_id'])
+            if item.get('incomplete'):
+                if frozen['complete'] or item.get('candidate') is not None:
+                    raise ValueError('Incomplete direct arm in complete construction')
+                continue
             nodes.append(item['candidate']['call_id'])
             if item['selected']['call_id'] not in (record['parent']['call_id'], item['candidate']['call_id']):
                 raise ValueError('Selected program is not an actual candidate')
-    if ((frozen['complete'] and len(nodes) != protocol['max_calls']) or len(set(nodes)) != len(nodes) or
-            any(not isinstance(n, str) or not re.fullmatch(r'[A-Za-z0-9_-]+', n) for n in nodes)):
+    if direct_version:
+        # A paired first turn has one actual provider identity used by two arms.
+        duplicates = {n for n in nodes if nodes.count(n) > 1}
+        if any(not n.endswith('-direct-shared-turn-1') or nodes.count(n) != 2 for n in duplicates):
+            raise ValueError('Unexpected shared scientific call')
+        nodes = list(dict.fromkeys(nodes))
+    if ((frozen['complete'] and not direct_version and len(nodes) != protocol['max_calls'])
+            or len(nodes) > protocol['max_calls'] or len(set(nodes)) != len(nodes)
+            or any(not isinstance(n, str) or not re.fullmatch(r'[A-Za-z0-9_-]+', n) for n in nodes)):
         raise ValueError('Scientific call membership mismatch')
     allowed = {task + '-parent' for task in task_ids}
     for task in task_ids:
         for arm in protocol['arms']:
             allowed.add(task + '-' + arm + '-repair')
-            if arm != 'fixed': allowed.add(task + '-' + arm + '-policy')
+            if arm in ('ordinary', 'witness'):
+                allowed.add(task + '-' + arm + '-policy')
+            elif arm.startswith('direct_'):
+                from research.conformance_study import direct_call_ids
+                allowed.update(direct_call_ids(task, arm, protocol['shared_direct_first_turn']))
     if not set(nodes) <= allowed or len(allowed) != protocol['max_calls']:
         raise ValueError('Scientific calls do not match protocol')
     prompts = {n for n in allowed if (folder / 'prompts' / (n + '.json')).is_file()}
     responses = {n for n in allowed if (folder / 'responses' / (n + '.json')).is_file()}
-    if not responses <= prompts or not set(nodes) <= responses or (frozen['complete'] and prompts != set(nodes)):
+    # Uncompleted direct turns can have a durable attempt but no response.
+    failed_turns = {t['call_id'] for r in records for v in r['arms'].values()
+                    for t in v['investigation'].get('turns', []) if t.get('raw') is None}
+    needed_responses.update(set(nodes) - failed_turns)
+    if (not responses <= prompts or not needed_responses <= responses or
+            (frozen['complete'] and (prompts != set(nodes) or responses != set(nodes)))):
         raise ValueError('Scientific prompt/response membership mismatch')
     files = set(BASE_FILES)
+    if direct_version:
+        for record in records:
+            name = 'records/' + record['task_id'] + '.json'
+            if read(folder / name) != record:
+                raise ValueError('Durable task record disagrees with frozen construction')
+            files.add(name)
     if frozen['complete'] and not (folder / 'screen.json').is_file():
         raise ValueError('Completed protected screen is required')
     for panel in PANELS:
@@ -212,6 +246,8 @@ def checked_investigations(data, frozen):
     for record in frozen['records']:
         for arm, item in record['arms'].items():
             investigation = item['investigation']; rows = investigation['receipts']
+            if item.get('incomplete'):
+                continue  # Exact partial reconstruction belongs to the archived runtime.
             seen = {digest(e['input']) for e in tasks[record['task_id']]['examples']}
             attempted = 0
             for index, row in enumerate(rows, start=1):
@@ -229,7 +265,7 @@ def checked_investigations(data, frozen):
             witness = next((r for r in measured if r['verified_counterexample']), None)
             derived = {'native_probes': len(measured), 'query_attempts': attempted,
                        'query_units': sum(r['query_units'] for r in measured),
-                       'policy_executions': 0 if arm == 'fixed' else len(rows),
+                       'policy_executions': len(rows) if arm in ('ordinary', 'witness') else 0,
                        'slots_used': len(rows), 'detected': witness is not None,
                        'semantic_defect': witness is not None and witness['parent_error'] is None,
                        'technical_defect': witness is not None and witness['parent_error'] is not None,
@@ -240,6 +276,7 @@ def checked_investigations(data, frozen):
 
 def checked_summaries(folder, data, frozen, billing):
     checked_investigations(data, frozen)
+    direct_version = read(Path(folder) / 'protocol.json')['schema'] in DIRECT_VERSIONS
     results = {}
     for panel in PANELS:
         if not (Path(folder) / (panel + '.json')).exists():
@@ -269,6 +306,13 @@ def checked_summaries(folder, data, frozen, billing):
                 if derived != {k:score[k] for k in derived}:
                     raise ValueError('Protected score totals disagree with rows')
         derived = summarize_results(raw, frozen, billing)
+        if not direct_version:
+            # Historical schemas predate direct-action telemetry. Reconstruct
+            # their exact projection without rewriting immutable old receipts.
+            for counters in derived['detection'].values():
+                for name in ('slots_used', 'duplicate_slots', 'invalid_slots',
+                             'model_turn_attempts', 'invalid_deliveries'):
+                    counters.pop(name)
         if read(Path(folder) / (panel + '-summary.json')) != derived:
             raise ValueError('Published summary disagrees with protected rows and receipts')
         results[panel] = derived
@@ -299,6 +343,8 @@ def export(study, output):
     billing = {'schema': 'zenith_conformance_billing_v1',
                **{k:budget[k] for k in ('total_reported_cost_usd', 'total_reserved_usd', 'halted')},
                'entries': [{**{k:e.get(k) for k in BILLING_FIELDS},
+                            'actual_model':e.get('provider_receipt', {}).get('model') or e.get('provider_response', {}).get('model'),
+                            'finish_reasons':[c.get('finish_reason') for c in e.get('provider_response', {}).get('choices', []) if isinstance(c,dict)],
                             'usage': _numeric_usage(e.get('provider_receipt', {}).get('usage') or
                                                     e.get('provider_response', {}).get('usage') or e.get('usage')),
                             'error':sanitize(e.get('error'), error=True)}
@@ -348,7 +394,10 @@ def recover(study, output, *, reason='Final evidence file missing after interrup
     for task in data['tasks']:
         for arm in protocol['arms']:
             allowed.add(task['id'] + '-' + arm + '-repair')
-            if arm != 'fixed': allowed.add(task['id'] + '-' + arm + '-policy')
+            if arm in ('ordinary', 'witness'): allowed.add(task['id'] + '-' + arm + '-policy')
+            elif arm.startswith('direct_'):
+                from research.conformance_study import direct_call_ids
+                allowed.update(direct_call_ids(task['id'], arm, protocol['shared_direct_first_turn']))
     files = BASE_FILES - {'frozen.json', 'frozen-receipt.json'}
     files = set(files)
     for directory in ('prompts', 'responses'):
@@ -523,7 +572,10 @@ def replay(output):
             archive.extractall(runtime)
         script = (('import sys,json;sys.path.insert(0,sys.argv[1]);'
                    'from research.conformance_study import replay;print(json.dumps(replay(sys.argv[2])))')
-                  if checked['complete'] else PARTIAL_REPLAY)
+                  if checked['complete'] else
+                  ('import sys,json;sys.path.insert(0,sys.argv[1]);'
+                   'from research.conformance_study import replay_partial;print(json.dumps(replay_partial(sys.argv[2])))')
+                  if checked['protocol']['schema'] in DIRECT_VERSIONS else PARTIAL_REPLAY)
         result = subprocess.run([sys.executable, '-I', '-B', '-c', script, str(runtime), str(output)],
                                 cwd=runtime, env={}, capture_output=True, text=True, timeout=300)
         if result.returncode:
@@ -531,13 +583,73 @@ def replay(output):
         return json.loads(result.stdout)
 
 
+def funding_reuse(root, studies):
+    """Deduplicate only explicitly linked, byte-identical settled prefixes.
+
+    Request IDs are ledger-local: independent studies can reuse an ID and pay
+    separately. A financial amendment must identify both protocol snapshots.
+    """
+    linked = []; earlier_seen = set(); later_seen = set()
+    for amendment in sorted((root / 'docs').glob('*funding-amendment-*.json')):
+        receipt = read(amendment)
+        if receipt.get('schema') != 'zenith_conformance_funding_continuation_v1':
+            continue
+        earlier = [row for row in studies if row['protocol_sha256'] == receipt['original_protocol_sha256']]
+        later = [row for row in studies if row['protocol_sha256'] == receipt['amended_protocol_sha256']]
+        if not earlier or not later:
+            continue  # No shared exported population exists yet.
+        if len(earlier) != 1 or len(later) != 1:
+            raise ValueError('Ambiguous funding-linked export custody')
+        first, second = earlier[0], later[0]
+        old, new = first['checked'], second['checked']
+        partial = receipt['terminal_partial_replay']
+        old_cap, cap = amount(receipt['original_cap_usd']), amount(receipt['amended_cap_usd'])
+        if (first['id'] in earlier_seen or second['id'] in later_seen or
+                old['complete'] or old['panels'] or
+                old['protocol']['max_cost_usd'] != receipt['original_cap_usd'] or
+                new['protocol']['max_cost_usd'] != receipt['amended_cap_usd'] or
+                dict(new['protocol'], max_cost_usd=receipt['original_cap_usd']) != old['protocol'] or
+                not old_cap < cap <= 4 or not partial['ok'] or partial['complete'] or
+                partial['unknown_cost_attempts'] or partial['protected_partitions']):
+            raise ValueError('Funding-linked export changed scientific protocol or terminal custody')
+        prior = {entry['call_id']:entry for entry in old['billing']['entries']}
+        current = {entry['call_id']:entry for entry in new['billing']['entries']}
+        if (sorted(prior) != receipt['prior_call_ids'] or
+                sorted(entry['node_id'] for entry in prior.values()) != receipt['prior_node_ids'] or
+                len(prior) != receipt['prior_paid_attempts'] or
+                old['billing']['total_reported_cost_usd'] != receipt['prior_reported_cost_usd'] or
+                old['billing']['total_reserved_usd'] != receipt['prior_reserved_usd'] or
+                any(entry['status'] != 'response_supplied' or entry['cost'] is None or
+                    current.get(key) != entry for key,entry in prior.items())):
+            raise ValueError('Funding-linked export changed previously settled billing')
+        for entry in prior.values():
+            for directory in ('prompts', 'responses'):
+                name = directory + '/' + entry['node_id'] + '.json'
+                expected = receipt['original_files'].get(name)
+                if (not expected or sha(first['folder'] / name) != expected or
+                        sha(second['folder'] / name) != expected):
+                    raise ValueError('Funding-linked export changed prior prompt or raw response')
+        earlier_seen.add(first['id']); later_seen.add(second['id'])
+        linked.append({'earlier_study':first['id'], 'later_study':second['id'],
+                       'amendment':str(amendment.relative_to(root)), 'amendment_sha256':sha(amendment),
+                       'reused_paid_attempts':len(prior),
+                       'reused_reported_cost_usd':receipt['prior_reported_cost_usd']})
+    return linked
+
+
 def campaign(root=ROOT):
-    """Keep distinct studies/panels separate; sum only their new call costs."""
-    root = Path(root); rows = []; total = Decimal(0); calls = 0
+    """Keep study populations separate and subtract verified reused billing only."""
+    root = Path(root); rows = []; total = Decimal(0); calls = 0; studies = []
     for manifest in sorted((root / 'examples/conformance').glob('*/manifest.json')):
+        if read(manifest).get('schema') in {
+                'zenith_progress_prospective_publication_v1',
+                'zenith_client_investigation_export_v1'}:
+            continue  # Source freezes and the separate client study have other owners.
         folder = manifest.parent; checked = verify_manifest(folder)
         protocol = checked['protocol']; billing = checked['billing']
         calls += checked['calls']; total += amount(billing['total_reported_cost_usd'])
+        studies.append({'id':folder.name, 'folder':folder, 'checked':checked,
+                        'protocol_sha256':sha(folder / 'protocol.json')})
         rows.append({'id':folder.name, 'evidence':str(folder.relative_to(root)),
                      'model':protocol['model'], 'reasoning_effort':protocol['reasoning_effort'],
                      'dataset_sha256':protocol['dataset_sha256'], 'source_sha256':protocol['source']['sha256'],
@@ -545,9 +657,16 @@ def campaign(root=ROOT):
                      'prompt_attempts':checked['prompt_attempts'],
                      'reported_cost_usd':billing['total_reported_cost_usd'],
                      'panels':checked['panels']})
-    return {'schema':'zenith_conformance_campaign_v1', 'calls':calls,
-            'reported_cost_usd':str(total), 'studies':rows,
-            'boundary':'Distinct new calls are summed; source lineages, repeated model parents and shared panels are not independent replications or pooled accuracies.'}
+    linked = funding_reuse(root, studies)
+    reused_calls = sum(row['reused_paid_attempts'] for row in linked)
+    reused_cost = sum((amount(row['reused_reported_cost_usd']) for row in linked), Decimal(0))
+    return {'schema':'zenith_conformance_campaign_v1', 'calls':calls-reused_calls,
+            'reported_cost_usd':str(total-reused_cost),
+            'study_summed_calls':calls, 'study_summed_reported_cost_usd':str(total),
+            'custody_linked_reused_calls':reused_calls,
+            'custody_linked_reused_reported_cost_usd':str(reused_cost),
+            'funding_reuse':linked, 'studies':rows,
+            'boundary':'Study populations and panels remain separate. Billing totals subtract only exact settled prefixes linked by a verified funding amendment. Request IDs are local to each ledger; unrelated paid episodes are counted separately even when IDs or prompts recur. Repeated parents and shared panels are not independent replications or pooled accuracies. Native work counters describe frozen logical trajectories, excluding reconstruction and offline audit reexecutions; they are not physical-execution, CPU, or wall-clock lifecycle totals.'}
 
 
 def main():

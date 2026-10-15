@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from decimal import Decimal
 import hashlib
 import json
 from pathlib import Path
@@ -26,9 +27,17 @@ from zenith.providers import digest, now, write_json
 from zenith.source_snapshot import archive_runtime
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = 'zenith_conformance_study_v3'
-ARMS = ('ordinary', 'witness', 'fixed')
+VERSION = 'zenith_conformance_study_v5_direct_actions_executor_compatibility'
+LEGACY_ARMS = ('ordinary', 'witness', 'fixed')
+DIRECT_ARMS = ('direct_batch', 'direct_adaptive', 'direct_masked')
+ARMS = (*LEGACY_ARMS, *DIRECT_ARMS, 'repair_only')
+DEFAULT_ARMS = ('ordinary', 'fixed', *DIRECT_ARMS, 'repair_only')
 PROBE_CAP = 8
+DIRECT_CONFIG = {
+    'direct_batch': {'turns': 1, 'queries_per_turn': 8, 'feedback': True},
+    'direct_adaptive': {'turns': 2, 'queries_per_turn': 4, 'feedback': True},
+    'direct_masked': {'turns': 2, 'queries_per_turn': 4, 'feedback': False},
+}
 POLICY_LANGUAGE = '''You write an EXPERIMENT SELECTOR, not the program being tested.
 Return one JSON object with source, scope and change strings. source defines
 investigate(context, acquire). Its result MUST be an object with query and
@@ -54,6 +63,7 @@ POLICY_INSTRUCTIONS = {
 
 def dependencies():
     paths = ('research/conformance_study.py', 'research/native_conformance_tasks.py',
+             'research/direct_investigation.py',
              'research/decomposition_study.py', 'research/decomposition_tasks.py',
              'zenith/source_snapshot.py', 'zenith/investigation_program.py',
              'zenith/budgeted.py', 'zenith/provider_policy.py', 'zenith/providers.py',
@@ -157,6 +167,47 @@ def investigate(task, parent, policy=None, *, fixed=False, cap=PROBE_CAP):
             'witness_sha256': digest(witness) if witness else None}
 
 
+def empty_investigation():
+    """Evidence-only repair control: no investigation and no source queries."""
+    return {'receipts': [], 'native_probes': 0, 'query_attempts': 0,
+            'query_units': 0, 'policy_executions': 0, 'slots_used': 0,
+            'detected': False, 'semantic_defect': False, 'technical_defect': False,
+            'witness_sha256': None}
+
+
+def direct_call_ids(task_id, arm, paired):
+    if arm not in DIRECT_ARMS:
+        raise ValueError('Unknown direct arm.')
+    turns = DIRECT_CONFIG[arm]['turns']
+    return tuple(task_id + '-' + ('direct-shared-turn-1' if paired and
+                 arm in ('direct_adaptive', 'direct_masked') and turn == 1
+                 else f'{arm}-turn-{turn}') for turn in range(1, turns + 1))
+
+
+def planned_calls(protocol, data):
+    """Maximum provider calls; early stops and paired reuse can spend fewer."""
+    arms = protocol['arms']
+    paired = {'direct_adaptive', 'direct_masked'} <= set(arms)
+    actions = sum(DIRECT_CONFIG[a]['turns'] for a in arms if a in DIRECT_ARMS)
+    return len(data['tasks']) * (1 + len(arms) +
+        sum(a in ('ordinary', 'witness') for a in arms) + actions - int(paired))
+
+
+def recorded_calls(record):
+    """Unique persisted call IDs in one task, including an incomplete action."""
+    ids = []
+    if record.get('parent', {}).get('call_id'):
+        ids.append(record['parent']['call_id'])
+    for item in record.get('arms', {}).values():
+        if item.get('policy') is not None:
+            ids.append(item['policy']['call_id'])
+        ids.extend(turn['call_id'] for turn in item.get('investigation', {}).get('turns', [])
+                   if 'call_id' in turn)
+        if item.get('candidate') is not None:
+            ids.append(item['candidate']['call_id'])
+    return list(dict.fromkeys(ids))
+
+
 def parent_prompt(task):
     return {'task': public_task(task), 'instruction':
         'Implement the native behavior in ordinary restricted Python from this public contract and measured examples. You may use arbitrary helpers and state within a query. Return the simplest correct whole program. This is your first proposal; no source oracle or hidden evaluator is available.'}
@@ -177,6 +228,14 @@ def repair_examples(task, investigation):
 
 
 def repair_prompt(task, parent, investigation):
+    if 'turns' in investigation:
+        # The repair model sees the same measured-evidence shape in every arm.
+        # Action metadata and raw text remain in the frozen record; a direct
+        # no-query result is exactly the evidence-only repair prompt.
+        fields = ('receipts','native_probes','query_attempts','query_units',
+                  'policy_executions','slots_used','detected','semantic_defect',
+                  'technical_defect','witness_sha256')
+        investigation = {key: investigation[key] for key in fields}
     return {'task': public_task(task), 'parent_source': parent['source'],
             'parent_examples': parent['development'],
             'investigation': investigation,
@@ -198,8 +257,9 @@ def selected_candidate(parent, candidate, examples):
 
 
 def prepare(output, model, providers, *, seed=20261015, panel_size=48,
-            arms=ARMS, max_cost_usd='0.60', max_output_tokens=12288,
-            reasoning_effort='low', workers=3, model_evidence=None, dataset=None):
+            arms=DEFAULT_ARMS, max_cost_usd='0.60', max_output_tokens=12288,
+            reasoning_effort='low', workers=3, model_evidence=None, dataset=None,
+            parents_per_contract=2):
     output = Path(output).resolve()
     if not providers or not arms or len(set(arms)) != len(arms) or not set(arms) <= set(ARMS):
         raise ValueError('Explicit routes and distinct known arms required.')
@@ -207,14 +267,21 @@ def prepare(output, model, providers, *, seed=20261015, panel_size=48,
         raise ValueError('One to three workers required.')
     if reasoning_effort not in ('none', 'low', 'medium', 'high'):
         raise ValueError('Unknown reasoning effort.')
-    data = dataset if dataset is not None else build_dataset(seed=seed, panel_size=panel_size)
-    calls = len(data['tasks']) * (1 + len(arms) + sum(a != 'fixed' for a in arms))
+    if type(parents_per_contract) is not int or not 1 <= parents_per_contract <= 32:
+        raise ValueError('parents_per_contract must be in 1..32')
+    data = dataset if dataset is not None else build_dataset(
+        seed=seed, panel_size=panel_size, parents_per_contract=parents_per_contract)
+    paired = {'direct_adaptive', 'direct_masked'} <= set(arms)
+    calls = planned_calls({'arms': arms}, data)
     budget_options(model, max_cost_usd, calls, max_output_tokens, output/'budget')
     output.mkdir(parents=True, exist_ok=False)
     write_json(output/'datasets.json', data)
     archive = archive_runtime(output); archive['path'] = 'runtime-source.zip'
     protocol = {'schema': VERSION, 'created_at': now(), 'model': model,
         'providers': providers, 'arms': list(arms), 'max_calls': calls,
+        'max_calls_is_ceiling': True, 'parents_per_contract': parents_per_contract,
+        'direct_config': {a: DIRECT_CONFIG[a] for a in arms if a in DIRECT_ARMS},
+        'shared_direct_first_turn': paired,
         'max_cost_usd': str(max_cost_usd), 'max_output_tokens': max_output_tokens,
         'reasoning_effort': reasoning_effort, 'workers': workers, 'probe_cap': PROBE_CAP,
         'task_routes': {t['id']: providers[(i+i//len(providers)) % len(providers)] for i,t in enumerate(data['tasks'])},
@@ -222,8 +289,8 @@ def prepare(output, model, providers, *, seed=20261015, panel_size=48,
         'dataset_sha256': digest(data), 'dependencies': dependencies(), 'source': archive,
         'model_evidence': model_evidence or {},
         'selection': 'Fresh unfiltered first parents; native counterexamples; repair selected on supplied examples plus its own measured probes only, preserving every measured parent success. Every arm receives repair even without a counterexample; repair gains alone do not identify probe value.',
-        'comparison': 'Ordinary/witness each use one generated policy call plus one repair; fixed uses no policy call and one repair. Each has eight probe slots, no mandatory shared probe floor. First parent is the no-change control. Notes differ in prompting only; no privileged routing.',
-        'boundary': 'Exploratory comparison on authored wrappers for native software semantics. Six model parents are not six independent source mechanisms. No acquired update rule, protected novelty or production-value claim.'}
+        'comparison': 'Ordinary/witness compile one selector; fixed uses authored probes; repair_only sees original examples without new probes; direct_batch makes at most one action call and direct_adaptive/direct_masked at most two. Paired adaptive/masked arms share one exact first provider response; each independently reexecutes its native and parent measurements, counted in each arm. Second prompts receive observed versus outcome-masked evidence. Every arm gets one repair call. All investigation arms have eight query slots and stop on the first verified defect; maximum calls are a ceiling, not required spending.',
+        'boundary': 'Exploratory comparison on authored wrappers for native software semantics. Repeated parents within three native contracts are not independent source mechanisms. No acquired update rule, protected novelty or production-value claim.'}
     write_json(output/'protocol.json', protocol)
     write_json(output/'preparation.json', {'protocol_sha256': digest(protocol)})
     return protocol
@@ -236,6 +303,8 @@ def verify(output):
         raise ValueError('Frozen protocol or data changed.')
     if dependencies() != protocol['dependencies']:
         raise ValueError('Runtime changed; replay with the archived source.')
+    if planned_calls(protocol, data) != protocol['max_calls']:
+        raise ValueError('Call ceiling differs from frozen arm plan.')
     if hashlib.sha256((output/'runtime-source.zip').read_bytes()).hexdigest() != protocol['source']['sha256']:
         raise ValueError('Archived source changed.')
     return protocol, data
@@ -258,6 +327,7 @@ def run(output, env_file=None, *, provider_factory=None):
     def trajectory(task):
         record = {'task_id': task['id'], 'source_id': task['source_id'], 'arms': {}}
         provider = provider_factory(task, protocol['task_routes'][task['id']])
+        shared_action = {}
         def call(label, prompt, policy=False):
             if stop.is_set():
                 raise RuntimeError('Study halted before dispatch.')
@@ -278,6 +348,26 @@ def run(output, env_file=None, *, provider_factory=None):
                       'elapsed_seconds': time.monotonic()-before}
             print(node+': '+('valid source' if body['error'] is None else body['error'][:120]), flush=True)
             return result
+        def action_call(node, envelope):
+            if stop.is_set():
+                raise RuntimeError('Study halted before action dispatch.')
+            if node in shared_action:
+                if shared_action[node]['envelope'] != envelope:
+                    raise ValueError('Shared first-turn action envelope diverged.')
+                return shared_action[node]['raw']
+            write_json(output/'prompts'/f'{node}.json', envelope)
+            raw = provider.ask_ai(json.dumps(envelope['prompt'], ensure_ascii=False), {
+                'meta': {'session_id': provider.run_dir.name, 'node_id': node},
+                'system_prompt': envelope['system'],
+                'reasoning_effort': protocol['reasoning_effort'],
+                'response_format': {'type': 'json_schema', 'json_schema': {
+                    'name': 'conformance_direct_action', 'strict': True,
+                    'schema': envelope['response_schema']}}}, cancel=stop)
+            write_json(output/'responses'/f'{node}.json',
+                       {'raw': raw, 'prompt_sha256': digest(envelope)})
+            if node.endswith('direct-shared-turn-1'):
+                shared_action[node] = {'envelope': envelope, 'raw': raw}
+            return raw
         try:
             parent = call('parent', parent_prompt(task))
             parent['development'] = score_program(parent['source'], task['examples'], parent['error'])
@@ -285,15 +375,43 @@ def run(output, env_file=None, *, provider_factory=None):
             write_json(output/'records'/f'{task["id"]}.json', record)
             for arm in protocol['task_arm_order'][task['id']]:
                 if stop.is_set(): break
-                policy = None if arm == 'fixed' else call(arm+'-policy', policy_prompt(task, parent, arm), True)
                 before = time.monotonic()
-                investigation = investigate(task, parent['source'], policy['source'] if policy else None,
-                                            fixed=arm == 'fixed', cap=protocol['probe_cap'])
+                policy = None
+                if arm in ('ordinary', 'witness'):
+                    policy = call(arm+'-policy', policy_prompt(task, parent, arm), True)
+                    investigation = investigate(task, parent['source'], policy['source'],
+                                                cap=protocol['probe_cap'])
+                elif arm == 'fixed':
+                    investigation = investigate(task, parent['source'], fixed=True,
+                                                cap=protocol['probe_cap'])
+                elif arm == 'repair_only':
+                    investigation = empty_investigation()
+                else:
+                    from research.direct_investigation import run_direct
+                    config = protocol['direct_config'][arm]
+                    ids = direct_call_ids(task['id'], arm, protocol['shared_direct_first_turn'])
+                    def persist(snapshot):
+                        record['arms'][arm] = {'policy': None, 'investigation': snapshot,
+                                               'call_ids': ids, 'incomplete': True}
+                        write_json(output/'records'/f'{task["id"]}.json', record)
+                    turn_index = 0
+                    def ask(envelope):
+                        nonlocal turn_index
+                        node = ids[turn_index]
+                        turn_index += 1
+                        return action_call(node, envelope)
+                    investigation = run_direct(task, parent, ask,
+                        probe_cap=protocol['probe_cap'], on_event=persist,
+                        call_ids=ids, **config)
+                    if investigation['halted'] == 'adapter_failure':
+                        raise RuntimeError('Direct action provider failure; see persisted turn and budget receipt.')
                 elapsed = time.monotonic()-before
                 candidate = call(arm+'-repair', repair_prompt(task, parent, investigation))
                 selected = selected_candidate(parent, candidate, repair_examples(task, investigation))
+                from research.direct_investigation import repair_account
                 record['arms'][arm] = {'policy': policy, 'investigation': investigation,
-                    'investigation_elapsed_seconds': elapsed, 'candidate': candidate, 'selected': selected}
+                    'investigation_elapsed_seconds': elapsed, 'candidate': candidate,
+                    'selected': selected, 'repair_account': repair_account(parent,candidate,selected)}
                 write_json(output/'records'/f'{task["id"]}.json', record)
                 print(task['id']+' '+arm+': '+str(investigation['native_probes'])+' probes; semantic defect '+str(investigation['semantic_defect'])+'; selected '+str(selected['candidate_selected']), flush=True)
         except Exception as exc:
@@ -346,10 +464,15 @@ def summarize_results(data, frozen, budget=None):
     detection = {}
     for record in frozen['records']:
         for arm, item in record['arms'].items():
-            target = detection.setdefault(arm, dict(episodes=0,detected=0,semantic_defects=0,technical_defects=0,native_probes=0,query_attempts=0,query_units=0))
+            target = detection.setdefault(arm, dict(episodes=0,detected=0,semantic_defects=0,technical_defects=0,native_probes=0,query_attempts=0,query_units=0,slots_used=0,duplicate_slots=0,invalid_slots=0,model_turn_attempts=0,invalid_deliveries=0))
             target['episodes'] += 1
-            for out,src in [('detected','detected'),('semantic_defects','semantic_defect'),('technical_defects','technical_defect'),('native_probes','native_probes'),('query_attempts','query_attempts'),('query_units','query_units')]:
+            for out,src in [('detected','detected'),('semantic_defects','semantic_defect'),('technical_defects','technical_defect'),('native_probes','native_probes'),('query_attempts','query_attempts'),('query_units','query_units'),('slots_used','slots_used')]:
                 target[out] += item['investigation'][src]
+            receipts = item['investigation']['receipts']
+            target['duplicate_slots'] += sum(r.get('query_error','').startswith('Duplicate') for r in receipts)
+            target['invalid_slots'] += sum('query_error' in r and not r['query_error'].startswith('Duplicate') for r in receipts)
+            target['model_turn_attempts'] += item['investigation'].get('model_turn_attempts',0)
+            target['invalid_deliveries'] += sum(t.get('delivery_error') is not None for t in item['investigation'].get('turns',[]))
     result = {'partition': data['partition'], 'totals': totals, 'by_task': by_task, 'detection': detection}
     if budget is not None:
         result['billing'] = {k:budget[k] for k in ('total_reported_cost_usd','total_reserved_usd','halted')}
@@ -382,9 +505,8 @@ def evaluate(output, partition):
 def replay(output):
     output = Path(output); protocol, data = verify(output); frozen = read(output/'frozen.json')
     assert frozen['complete'] and digest(frozen) == read(output/'frozen-receipt.json')['frozen_sha256']
-    tasks = {t['id']:t for t in data['tasks']}; calls = 0
+    tasks = {t['id']:t for t in data['tasks']}; call_ids = set()
     def check_call(trial, prompt, policy=False):
-        nonlocal calls
         envelope = {'prompt':prompt,'system':POLICY_LANGUAGE if policy else LANGUAGE,'response_schema':SCHEMA}
         assert read(output/'prompts'/(trial['call_id']+'.json')) == envelope
         raw = read(output/'responses'/(trial['call_id']+'.json'))
@@ -392,7 +514,15 @@ def replay(output):
         assert hashlib.sha256(raw['raw'].encode()).hexdigest() == trial['raw_sha256']
         body = parse_model_response(raw['raw'])
         assert all(body[k] == trial[k] for k in (*SCHEMA['required'], 'error'))
-        calls += 1
+        assert trial['call_id'] not in call_ids
+        call_ids.add(trial['call_id'])
+    def check_action(node, envelope):
+        assert read(output/'prompts'/(node+'.json')) == envelope
+        raw = read(output/'responses'/(node+'.json'))
+        assert raw['prompt_sha256'] == digest(envelope)
+        assert type(raw['raw']) is str
+        call_ids.add(node)  # The paired first turn is one provider request.
+        return raw['raw']
     for record in frozen['records']:
         task = tasks[record['task_id']]; parent = record['parent']
         check_call(parent, parent_prompt(task))
@@ -400,11 +530,31 @@ def replay(output):
         for arm,item in record['arms'].items():
             policy = item['policy']
             if policy is not None: check_call(policy, policy_prompt(task,parent,arm), True)
-            investigation = investigate(task,parent['source'],policy['source'] if policy else None,fixed=arm=='fixed',cap=protocol['probe_cap'])
+            if arm in ('ordinary', 'witness', 'fixed'):
+                investigation = investigate(task,parent['source'],
+                    policy['source'] if policy else None,fixed=arm=='fixed',cap=protocol['probe_cap'])
+            elif arm == 'repair_only':
+                investigation = empty_investigation()
+            else:
+                from research.direct_investigation import run_direct
+                config = protocol['direct_config'][arm]
+                ids = direct_call_ids(task['id'], arm, protocol['shared_direct_first_turn'])
+                turn = 0
+                def saved_action(envelope):
+                    nonlocal turn
+                    node = ids[turn]
+                    turn += 1
+                    return check_action(node, envelope)
+                investigation = run_direct(task,parent,saved_action,
+                    probe_cap=protocol['probe_cap'],call_ids=ids,**config)
             assert investigation == item['investigation']
             check_call(item['candidate'], repair_prompt(task,parent,investigation))
             assert selected_candidate(parent,item['candidate'],repair_examples(task,investigation)) == item['selected']
-    assert calls == protocol['max_calls']
+            from research.direct_investigation import repair_account
+            assert repair_account(parent,item['candidate'],item['selected']) == item['repair_account']
+    assert len(call_ids) <= protocol['max_calls']
+    assert {p.stem for p in (output/'prompts').glob('*.json')} == call_ids
+    assert {p.stem for p in (output/'responses').glob('*.json')} == call_ids
     assert len(frozen['records']) == len(tasks)
     assert {r['task_id'] for r in frozen['records']} == set(tasks)
     assert all(set(r['arms']) == set(protocol['arms']) for r in frozen['records'])
@@ -419,13 +569,168 @@ def replay(output):
             assert read(output/(name+'-summary.json')) == summarize_results(
                 read(output/(name+'.json')),frozen,read(budget) if budget.exists() else None)
             partitions.append(name)
-    return {'ok':True,'model_calls_replayed':calls,'native_investigations':sum(len(r['arms']) for r in frozen['records']),'protected_partitions':partitions}
+    return {'ok':True,'model_calls_replayed':len(call_ids),'native_investigations':sum(len(r['arms']) for r in frozen['records']),'protected_partitions':partitions}
+
+
+def replay_partial(output):
+    """Verify a stopped v4 study's durable prefix without opening panels.
+
+    A killed process may leave a dispatched turn with no raw delivery. Such a
+    turn is reported unresolved, never reconstructed as a successful response.
+    """
+    output = Path(output); protocol, data = verify(output)
+    frozen = read(output/'frozen.json')
+    if frozen['complete']:
+        return replay(output)
+    if digest(frozen) != read(output/'frozen-receipt.json')['frozen_sha256']:
+        raise ValueError('Changed incomplete freeze.')
+    if any((output/name).exists() for name in ('screen.json','confirmation.json')):
+        raise ValueError('An incomplete study opened a protected panel.')
+    tasks = {task['id']: task for task in data['tasks']}
+    calls = set(); unresolved = []
+    def check_program(trial, prompt, policy=False):
+        node = trial['call_id']
+        envelope = {'prompt': prompt, 'system': POLICY_LANGUAGE if policy else LANGUAGE,
+                    'response_schema': SCHEMA}
+        assert read(output/'prompts'/(node+'.json')) == envelope
+        raw = read(output/'responses'/(node+'.json'))
+        assert raw['prompt_sha256'] == trial['prompt_sha256'] == digest(envelope)
+        assert hashlib.sha256(raw['raw'].encode()).hexdigest() == trial['raw_sha256']
+        parsed = parse_model_response(raw['raw'])
+        assert all(parsed[key] == trial[key] for key in (*SCHEMA['required'],'error'))
+        calls.add(node)
+    for record in frozen['records']:
+        task = tasks[record['task_id']]
+        assert read(output/'records'/(task['id']+'.json')) == record
+        parent = record.get('parent')
+        if parent is None:
+            unresolved.append(task['id']+':parent')
+            continue
+        check_program(parent, parent_prompt(task))
+        assert parent['development'] == score_program(parent['source'],task['examples'],parent['error'])
+        for arm,item in record['arms'].items():
+            policy = item.get('policy')
+            if policy is not None:
+                check_program(policy,policy_prompt(task,parent,arm),True)
+            if arm in ('ordinary','witness','fixed'):
+                investigation = investigate(task,parent['source'],
+                    policy['source'] if policy else None,fixed=arm=='fixed',cap=protocol['probe_cap'])
+            elif arm == 'repair_only':
+                investigation = empty_investigation()
+            else:
+                from research.direct_investigation import run_direct
+                saved = item['investigation'].get('turns',[])
+                ids = direct_call_ids(task['id'],arm,protocol['shared_direct_first_turn'])
+                for turn in saved:
+                    node = turn['call_id']; envelope = turn['envelope']
+                    assert node == ids[turn['turn']-1]
+                    assert turn['envelope_sha256'] == digest(envelope)
+                    assert read(output/'prompts'/(node+'.json')) == envelope
+                    if turn['raw'] is None:
+                        assert not (output/'responses'/(node+'.json')).exists()
+                    else:
+                        raw = read(output/'responses'/(node+'.json'))
+                        assert raw['prompt_sha256'] == digest(envelope)
+                        assert raw['raw'] == turn['raw']
+                        assert turn['raw_sha256'] == hashlib.sha256(raw['raw'].encode()).hexdigest()
+                    calls.add(node)
+                if saved and saved[-1]['raw'] is None and not saved[-1].get('delivery_error'):
+                    unresolved.append(task['id']+':'+arm+':undelivered')
+                    continue
+                index = 0
+                def saved_action(envelope):
+                    nonlocal index
+                    turn = saved[index]; index += 1
+                    assert envelope == turn['envelope']
+                    if turn['raw'] is not None:
+                        return turn['raw']
+                    name, _, message = turn['delivery_error'].partition(': ')
+                    raise type(name,(Exception,),{})(message)
+                investigation = run_direct(task,parent,saved_action,
+                    probe_cap=protocol['probe_cap'],call_ids=ids,
+                    **protocol['direct_config'][arm])
+            saved_investigation = item['investigation']
+            if item.get('incomplete'):
+                assert all(investigation[key] == value for key,value in saved_investigation.items())
+            else:
+                assert investigation == saved_investigation
+            candidate = item.get('candidate')
+            if candidate is not None:
+                check_program(candidate,repair_prompt(task,parent,investigation))
+                selected = selected_candidate(parent,candidate,repair_examples(task,investigation))
+                assert selected == item['selected']
+                from research.direct_investigation import repair_account
+                assert repair_account(parent,candidate,selected) == item['repair_account']
+    assert set(tasks) == {record['task_id'] for record in frozen['records']}
+    planned = set()
+    recorded_responses = {node for node in calls if (output/'responses'/(node+'.json')).exists()}
+    completed_investigations = sum('candidate' in item for record in frozen['records']
+                                   for item in record['arms'].values())
+    records_by_task = {record['task_id']:record for record in frozen['records']}
+    for task_id in tasks:
+        planned.add(task_id+'-parent')
+        for arm in protocol['arms']:
+            planned.add(task_id+'-'+arm+'-repair')
+            if arm in ('ordinary','witness'):
+                planned.add(task_id+'-'+arm+'-policy')
+            if arm in DIRECT_ARMS:
+                planned.update(direct_call_ids(task_id,arm,protocol['shared_direct_first_turn']))
+    for path in (output/'responses').glob('*.json'):
+        node = path.stem
+        if node in calls:
+            continue
+        assert node in planned
+        envelope = read(output/'prompts'/(node+'.json'))
+        raw = read(path)
+        assert raw['prompt_sha256'] == digest(envelope)
+        assert type(raw['raw']) is str
+        for task_id,task in tasks.items():
+            if node == task_id+'-parent':
+                assert envelope == {'prompt':parent_prompt(task),'system':LANGUAGE,
+                                    'response_schema':SCHEMA}
+            if node in (task_id+'-ordinary-policy',task_id+'-witness-policy'):
+                arm = node[len(task_id)+1:-len('-policy')]
+                parent = records_by_task[task_id].get('parent')
+                if parent is not None:
+                    assert envelope == {'prompt':policy_prompt(task,parent,arm),
+                                        'system':POLICY_LANGUAGE,'response_schema':SCHEMA}
+        if node.endswith(('-parent','-policy','-repair')):
+            parse_model_response(raw['raw'])
+        else:
+            from research.direct_investigation import decode
+            decode(raw['raw'], envelope['response_schema']['properties']['queries']['maxItems'])
+        calls.add(node)
+        unresolved.append(node+':delivered_before_record')
+    assert {p.stem for p in (output/'responses').glob('*.json')} <= calls
+    assert len(calls) <= protocol['max_calls']
+    response_files = {p.stem for p in (output/'responses').glob('*.json')}
+    billing_path = output/'billing.json'
+    if not billing_path.exists():
+        billing_path = output/'budget/budget.json'
+    entries = read(billing_path)['entries'] if billing_path.exists() else []
+    if isinstance(entries, dict):
+        entries = list(entries.values())
+    unknown = [entry for entry in entries if entry.get('cost') is None]
+    return {'ok':True,'complete':False,'call_ids_checked':len(calls),
+            'unresolved_dispatches':unresolved,'protected_partitions':[],
+            'prompt_attempts':len(list((output/'prompts').glob('*.json'))),
+            'budget_attempts':len(entries),
+            'known_cost_attempts':len(entries)-len(unknown),
+            'unknown_cost_attempts':len(unknown),
+            'unknown_cost_reservations_usd':str(sum(
+                (Decimal(str(entry['reserved_cost_usd'])) for entry in unknown),Decimal(0))),
+            'response_files_replayed':len(response_files),
+            'recorded_calls_replayed':len(recorded_responses),
+            'orphan_responses':len(response_files-recorded_responses),
+            'recorded_native_investigations':completed_investigations,
+            'recovered_metadata':(output/'recovery.json').exists(),
+            'scope':'Terminal partial evidence; missing deliveries were not reconstructed and no protected panel opened.'}
 
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__); subs=parser.add_subparsers(dest='command',required=True)
     p=subs.add_parser('prepare'); p.add_argument('output',type=Path);p.add_argument('--model',required=True);p.add_argument('--providers',nargs='+',required=True)
-    p.add_argument('--seed',type=int,default=20261015);p.add_argument('--panel-size',type=int,default=48);p.add_argument('--arms',nargs='+',choices=ARMS,default=ARMS)
+    p.add_argument('--seed',type=int,default=20261015);p.add_argument('--panel-size',type=int,default=48);p.add_argument('--parents-per-contract',type=int,default=2);p.add_argument('--arms',nargs='+',choices=ARMS,default=DEFAULT_ARMS)
     p.add_argument('--max-cost-usd',default='0.60');p.add_argument('--max-output-tokens',type=int,default=12288);p.add_argument('--reasoning-effort',default='low');p.add_argument('--workers',type=int,default=3);p.add_argument('--model-evidence',type=Path)
     for name in ('run','confirm','replay','summary'):
         p=subs.add_parser(name);p.add_argument('output',type=Path)

@@ -28,6 +28,12 @@ DOCUMENTS = {
     "conformance-study": "docs/conformance-study.md",
     "continuation-memory": "docs/continuation-memory.md",
     "advance-synthesis": "docs/advance-returns-20261014.md",
+    "progress-synthesis": "docs/progress-returns-20261014.md",
+    "client-investigation-protocol": "docs/client-investigation-protocol-20261014.md",
+    "client-investigation": "docs/client-investigation-20261014.md",
+    "client-investigation-protocol-v2": "docs/client-investigation-protocol-v2-20261015.md",
+    "client-investigation-v2": "docs/client-investigation-v2-20261015.md",
+    "client-investigation-v2-low": "docs/client-investigation-v2-low-20261015.md",
     "research-programme": "program.md",
     "model-repair": "docs/model-repair-20261013.md",
     "worked-case": "docs/full-graph-case.md",
@@ -36,6 +42,10 @@ DOCUMENTS = {
     "notice": "RESEARCH_NOTICE.md",
 }
 EVIDENCE = {
+    "progress-campaign": "docs/progress-campaign-20261014.json",
+    "client-investigation": "docs/client-investigation-20261014.json",
+    "client-investigation-v2": "docs/client-investigation-v2-20261015.json",
+    "client-investigation-v2-low": "docs/client-investigation-v2-low-20261015.json",
     "advance-campaign": "docs/advance-campaign-20261014.json",
     "decomposition-result": "docs/decomposition-20261014.json",
     "observation-learning-result": "docs/observation-learning-20261013.json",
@@ -65,15 +75,15 @@ CHAPTERS = (
     ("lab", "Investigate native behavior", "conformance-study", None, None, "authored_mechanism"),
     ("oracle", "Check experiments and repairs", "conformance-study", None, None, "authored_mechanism"),
     ("evolve", "Retain useful continuation state", "continuation-memory", None, None, "authored_mechanism"),
-    ("results", "Current campaign and limits", "advance-synthesis", None, None, "measured_execution"),
+    ("results", "Current campaign and limits", "progress-synthesis", None, None, "measured_execution"),
     ("next", "What still needs testing", "research-programme", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
-    "idea": (), "lab": (), "oracle": ("advance-campaign",), "evolve": ("advance-campaign",),
-    "results": ("advance-campaign",), "next": (),
+    "idea": (), "lab": (), "oracle": ("progress-campaign",), "evolve": ("progress-campaign",),
+    "results": ("progress-campaign",), "next": (),
 }
 PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
-                  "evolve": "trace", "results": "results", "next": "research"}
+                  "evolve": "evolve", "results": "results", "next": "research"}
 
 
 def digest(data: bytes) -> str:
@@ -278,7 +288,7 @@ class PublicContent:
 
     def site(self, local_runs: bool) -> dict:
         chapters = []
-        current_available = (self.root / EVIDENCE["advance-campaign"]).is_file()
+        current_available = (self.root / EVIDENCE["progress-campaign"]).is_file()
         paper = self.paper()
         sections = {section["id"]: section for section in paper["sections"]}
         for identifier, title, document, figure, mission, kind in CHAPTERS:
@@ -299,9 +309,9 @@ class PublicContent:
                 "documents": {k: f"{API}/documents/{k}" for k, v in DOCUMENTS.items() if (self.root / v).is_file()},
                 "figures": {k: f"/assets/graphs/{k}.svg" for k in FIGURES},
                 "evidence": {k: f"{API}/evidence/{k}" for k,v in EVIDENCE.items() if (self.root / v).is_file()},
-                "active_evidence_id": "advance-campaign",
+                "active_evidence_id": "progress-campaign",
                 "data_mode": "source_bound_acquisition_research",
-                "data_note": "Native conformance investigations and continuation-memory checks retain their separate evidence boundaries. Completed analysis includes failed and incomplete attempts. Observation learning, decomposition, financial studies and System A remain available as historical profiles.",
+                "data_note": "The native investigation comparison, SQLite client pilot and exact-class learner retain separate evidence boundaries. Earlier Advance, observation learning, decomposition, financial studies and System A remain available as historical profiles.",
                 "local_runs_enabled": local_runs,
                 "run_index_url": f"{API}/runs" if local_runs else None,
                 "capabilities": {"read_graph": True, "read_paper": True, "read_local_runs": local_runs,

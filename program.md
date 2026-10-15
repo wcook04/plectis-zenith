@@ -2,7 +2,7 @@
 
 Zenith studies whether solving one problem can leave behind a better way to investigate the next. The useful retained object is a program **and the experiments that reveal when it stops working**. Experience should change what the system can compute, distinguish or ask, then measurably improve later work.
 
-The [fifteen-return synthesis](docs/advance-returns-20261014.md) supports one small loop: propose an executable operation or experiment; measure it against the source; preserve the evidence; revise the program and any affected interfaces; test further use. Lab, Oracle and Evolve are roles in this loop. They need not be separate agents. Ordinary code is the current executable representation.
+The [PROGRESS synthesis](docs/progress-returns-20261014.md) covers the nineteen supplied returns, numbered 02–20. It supports one small loop: propose an executable operation or experiment; measure it against the source; preserve the evidence; revise the program and any affected interfaces; test further use. Lab, Oracle and Evolve are roles in this loop. They need not be separate agents. Ordinary code is the current executable representation.
 
 ## The promising connection
 
@@ -12,7 +12,11 @@ This connection is implemented in the returned continuation-test learner. Its co
 
 <a id="current-implementation"></a>
 
-The live [native conformance experiment](docs/conformance-study.md) tests the complementary model-driven part: write an adaptive experiment, execute it, deliver its measurements and failed code, and repair a fresh program. A useful next combination would let model-generated investigations produce reusable tests or operations, with exact learners used wherever their assumptions fit. We have not demonstrated that general combination by placing the two experiments side by side.
+The live [native conformance experiment](docs/conformance-study.md) tests the complementary model-driven part: choose an experiment, execute it, deliver its measurements and failed code, and repair a fresh program. Direct JSON actions now make the host responsible for validation, iteration and source access. The [new comparison](docs/progress-protocol-20261014.md) includes compiled selectors, direct batches, two-step investigation with and without outcomes, fixed tests, and repair without new investigation. It asks whether new evidence adds value over another repair call.
+
+The maintained continuation learner now keeps the access history that witnessed a missing distinction. The smallest bounded-deque failure fits in ten source calls, but an ordinary nonlinear counter solves that same task more simply. Across eight inspected native configurations, the corrected learner completes every fit; finite later panels still expose errors in UTF-8 and SQLite. A generic singleton-question control is slightly cheaper than its default refinement. The [offline demonstration](examples/continuation-memory/witness-preserving-v1/README.md) makes both the repair and its limits reproducible.
+
+The [client investigation pilot](docs/client-investigation-protocol-20261014.md) makes one connection executable: measured development investigations feed the preparation of a frozen reusable tester. Later clients test that artifact against ordinary code reuse and fresh investigation with the same history. It is a known-interface, within-family test; the exact continuation learner remains a separate mechanism, not a component silently credited for the tester's behavior.
 
 <a id="relation-to-the-graph-ambition"></a>
 
@@ -43,7 +47,7 @@ First establish headroom without selecting convenient failures. Then compare a c
 
 Pursue an advantage only if it survives its relevant ablation. For memory, retain the same raw answers and remove only the acquired questions or procedure. For node reports, keep ordinary reasoning and global refactoring available. For a changed representation, include continuation and recovery obligations; a correct reset-time model may still be unable to resume an existing process. Compare total cost as well as the cost of the next stage.
 
-The next workload should ask whether client behavior survives a changed implementation, interruption or recovery boundary. Recreating a fully documented library gives a capable model little need to investigate: three Ling parents already passed both panels. For a future client-compatibility campaign, keep changed implementations unseen during learning; give an ordinary tester the same earlier failures and tool access; measure the complete cost to expose a real regression and validate its repair. A retained question must identify useful new evidence, not merely replay an old answer or a known exact input. This is a proposed next workload, not an experiment completed in the current receipts.
+The client pilot asks whether behavior survives a changed implementation, interruption or recovery boundary. Recreating a fully documented library gives a capable model little need to investigate: three earlier Ling parents already passed both panels. Its batch-import and transfer workflows make caller-owned transactions and post-failure continuation observable. A competent fixed tester already detects every authored faulty client, so this population cannot establish a detection advantage over that baseline. It can establish whether acquired code works and what reuse costs. A stronger next campaign needs independently sourced clients with genuine headroom, chosen before observing learned-policy outcomes. A retained question must identify useful new evidence, not merely replay an old answer or a known exact input.
 
 The decisive advance would be a reusable investigative procedure that experience changes and that earns its cost across genuinely changed clients or mechanisms. That remains the target. The active implementation stays small enough to expose exactly which artifact changed, what evidence caused it, and which later behavior improved.
 
@@ -51,7 +55,8 @@ The decisive advance would be a reusable investigative procedure that experience
 
 - [Current results and historical record](docs/status.md)
 - [Native conformance method and commands](docs/conformance-study.md)
-- [All fifteen ADVANCE returns: adoption and reproduction](docs/advance-returns-20261014.md)
+- [Nineteen PROGRESS returns: adoption and reproduction](docs/progress-returns-20261014.md)
+- [Earlier ADVANCE returns](docs/advance-returns-20261014.md)
 - [Earlier executable observation studies](docs/executable-investigations.md)
 - [Three-page manuscript](paper/zenith.tex)
 

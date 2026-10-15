@@ -14,8 +14,8 @@ concurrency:
 
 jobs:
   source-checkout:
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
     steps:
       - name: Check out source
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -35,6 +35,7 @@ jobs:
           python -m zenith validate
           python -m zenith plan lab
           python scripts/check_extraction.py
+          python scripts/check_structure.py
           python scripts/build_learning_report.py replay
           python scripts/build_observation_report.py replay
       - name: Replay current experiments without inference
@@ -50,5 +51,49 @@ jobs:
           cd "$RUNNER_TEMP/zenith-memory"
           python -I verify_all.py --out run-v1
           python -I verify_all.py --out run-v2
+      - name: Replay retained client conditions without inference
+        timeout-minutes: 10
+        run: |
+          python scripts/build_client_investigation_report.py replay-behavior examples/conformance/client-reuse-v1
+          python scripts/build_client_investigation_report.py replay-behavior examples/conformance/client-reuse-v2
+          python scripts/build_client_investigation_report.py replay-behavior examples/conformance/client-reuse-v2-low
+      - name: Replay Progress qualifications and diagnostic evidence
+        timeout-minutes: 10
+        run: |
+          python scripts/build_conformance_report.py replay examples/conformance/progress-qualification-v4
+          python scripts/build_conformance_report.py replay examples/conformance/progress-qualification-v5
+          python scripts/build_conformance_report.py replay examples/conformance/progress-diagnostic-v5-reservation-stop
+          python scripts/build_conformance_report.py replay examples/conformance/progress-diagnostic-v5
+      - name: Verify Progress report and funding custody
+        timeout-minutes: 3
+        run: |
+          python scripts/build_progress_report.py --output-json "$RUNNER_TEMP/progress-campaign.json" --output-md "$RUNNER_TEMP/progress-campaign.md"
+          cmp docs/progress-campaign-20261014.json "$RUNNER_TEMP/progress-campaign.json"
+          cmp docs/progress-campaign-20261014.md "$RUNNER_TEMP/progress-campaign.md"
       - name: Run offline regression suite
+        timeout-minutes: 45
         run: python -m pytest tests
+
+  research-website:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: site
+    steps:
+      - name: Check out source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Test and build the reading website
+        run: |
+          npm test
+          npm run build

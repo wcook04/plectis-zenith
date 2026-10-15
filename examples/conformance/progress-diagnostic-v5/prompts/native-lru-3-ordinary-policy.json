@@ -1,0 +1,518 @@
+{
+  "prompt": {
+    "task": {
+      "id": "native-lru-3",
+      "source_id": "lru-3",
+      "contract": "Native functools.lru_cache diagnostic. A fresh query is exactly\n{\"capacity\": integer, \"events\": [event, ...]}, with capacity 1..4 and at most\n32 events. An event is exactly {\"op\":\"call\", \"key\":integer} with key 0..31,\nor {\"op\":\"reset\"}. Booleans are not integers. A fresh capacity-sized cache\nwraps a function returning its integer argument. Calls and resets operate in\nlist order. Reset calls cache_clear, clearing contents and hit/miss counters.\nReturn {\"hits\":integer,\"misses\":integer,\"size\":integer} from cache_info after\nthe events. Each query has an independent fresh cache. The source has no hidden\ncapacity or external data. Implement investigate(context, acquire), returning\nthat JSON object. No initial program is supplied. An allowed native probe uses\nexactly the same query schema.\n",
+      "examples": [
+        {
+          "input": {
+            "capacity": 1,
+            "events": []
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          }
+        },
+        {
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          }
+        },
+        {
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          }
+        },
+        {
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 2,
+            "size": 2
+          }
+        },
+        {
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 2
+          }
+        },
+        {
+          "input": {
+            "capacity": 3,
+            "events": [
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          }
+        },
+        {
+          "input": {
+            "capacity": 4,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 4
+          }
+        },
+        {
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 31
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "reset"
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          }
+        }
+      ]
+    },
+    "parent_source": "def investigate(context, acquire):\n    capacity = context['capacity']\n    events = context['events']\n    order = []\n    hits = 0\n    misses = 0\n    for event in events:\n        if event['op'] == 'reset':\n            order = []\n            hits = 0\n            misses = 0\n        else:\n            key = event['key']\n            if key in order:\n                hits = hits + 1\n                order.remove(key)\n                order.append(key)\n            else:\n                misses = misses + 1\n                order.append(key)\n                if len(order) > capacity:\n                    order.pop(0)\n    return {'hits': hits, 'misses': misses, 'size': len(order)}\n",
+    "parent_examples": {
+      "correct": 8,
+      "total": 8,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 1,
+            "events": []
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 2,
+            "size": 2
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 2,
+            "size": 2
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 4,
+            "size": 2
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 2
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 3,
+            "events": [
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 4,
+            "size": 4
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 4,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 4
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 31
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "reset"
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "correct": true
+        }
+      ]
+    },
+    "functions": [
+      {
+        "name": "investigate",
+        "arguments": [
+          "context",
+          "acquire"
+        ],
+        "calls": [],
+        "called_by": []
+      }
+    ],
+    "instruction": "Write the strongest small adaptive investigation program you can. Inspect the whole parent code and public native contract. Seek a legal input on which the parent disagrees with the native source. Use code inspection, examples, receipts, stateful testing and boundaries freely. Avoid duplicate queries; null stops. Up to eight native query slots are available. You may include a brief note useful for a later repair. No particular decomposition is required.",
+    "probe_slots": 8,
+    "context_fields": [
+      "source_id",
+      "contract",
+      "parent_source",
+      "examples",
+      "receipts",
+      "remaining_slots"
+    ],
+    "note_status": "Optional proposal, not verified introspection or evidence."
+  },
+  "system": "You write an EXPERIMENT SELECTOR, not the program being tested.\nReturn one JSON object with source, scope and change strings. source defines\ninvestigate(context, acquire). Its result MUST be an object with query and\noptional note: {\"query\": a legal native input object or null, \"note\": short JSON}.\nNever return the native source's answer shape. The quoted native contract and\nexamples describe the system you are testing, not your own return contract.\ncontext contains source_id, contract, parent_source, examples, receipts,\nremaining_slots. Inspect this context to choose one revealing input. The host\nexecutes that input on the native source and parent program, then invokes you\nagain with the resulting receipt. No API calls or external tables are available.\nPast receipts include query errors, native expected values, parent answers/errors,\nand verified_counterexample. Do not supply an expected answer yourself. Avoid\nqueries already in examples or receipts. Null stops. You have eight query slots.\nOptional notes are hypotheses for later whole-program repair, at most2048bytes.\nWrite a concise selector; do not recreate the entire native library unless a\nsmall local simulation actually helps select a discriminating input.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, I/O or global state.\nThe single local name _ is allowed; other leading-underscore names are not.\nUse x*x and x*x*x rather than exponentiation (**); do not use function defaults.\nFor and while loops, comprehensions, lambda, nonlocal closure variables,\narithmetic except power, and bit shifts are permitted. No classes,\ntry/except, yield or recursion tricks.\nAll execution remains bounded by the worker CPU, memory and wall-time limits.\nBuiltins: abs all any bool chr dict enumerate float int isinstance len list max min\nrange repr reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split join\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

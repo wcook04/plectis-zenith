@@ -19,11 +19,15 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { CopyButton } from './components/CopyButton';
 
 const RECEIPT_LABEL: Record<string, string> = {
-  'advance-campaign': 'Current conformance campaign and continuation-memory evidence',
+  'progress-campaign': 'Current investigation comparison and ordinary tester controls',
+  'client-investigation': 'Separate SQLite client investigation pilot',
+  'client-investigation-v2': 'SQLite client pilot v2, reasoning none',
+  'client-investigation-v2-low': 'SQLite client pilot v2, reasoning low',
+  'advance-campaign': 'Advance conformance campaign and continuation-memory evidence',
   'decomposition-result': 'Structural revision and synthetic rule-induction studies',
   'observation-learning-result': 'Native observation-learning study',
   'observation-screens': 'Follow-on repair, candidate search and composition tests',
-  'investigation-learning-result': 'Historical operational investigation campaigns',
+  'investigation-learning-result': 'Operational investigation campaigns',
   sources: 'Where each input comes from, with file hashes',
   replacements: 'Synthetic multi-feed observations',
   'demo-result': 'Preparation record',
@@ -32,12 +36,23 @@ const RECEIPT_LABEL: Record<string, string> = {
   'conditional-result': 'Conditional continuation record',
 };
 
+const PROGRESS_COPY: Record<string, string[]> = {
+  idea: ['A useful retained result is a source-bound procedure: which question to ask, what the source measured, and when that answer must be checked again. The current comparison tests whether such investigation improves later repair.'],
+  lab: ['A model may deliver a bounded native question directly or as a compiled selector. The host records each legal measurement, repeated proposal, invalid query and delivery failure. A strong fixed tester and ordinary code provide controls.'],
+  oracle: ['Measured outcomes and the failed program reach repair. The selected revision must preserve every earlier measured success; later cases remain protected until selection freezes. A repair-only arm tests the value of new evidence.'],
+  evolve: ['The corrected exact-class learner keeps useful continuation questions as an ordinary diagnostic baseline. Its acquisition cost and generic-question rival remain separate from the model investigation comparison.'],
+  results: ['The native comparison keeps qualification and diagnostic studies separate. The client pilot tests retained investigation within an authored SQLite family; the exact-class learner has its own acquisition comparison. Each study keeps its own costs and evaluation panel.'],
+  next: ['A useful new measurement or retained procedure must earn its lifetime cost against capable ordinary testing on later changed clients. Delivery, repair and transfer are separate claims.'],
+};
+
+// Older site metadata still names Advance as active. Keep its reading path
+// available without using that receipt as the current Progress result.
 const ADVANCE_COPY: Record<string, string[]> = {
   idea: ['Experience should change useful distinctions, computations, interfaces or experiments. The research programme tests whether that retained knowledge makes later work more capable or less costly.'],
   lab: ['Model-written investigators propose bounded native experiments. The host records legal measurements, invalid queries and delivery failures separately.'],
   oracle: ['Measured outcomes and the failed program reach repair. Selection preserves every measured obligation the parent already satisfied, then freezes the chosen program before later panels.'],
   evolve: ['Continuation and fork operations test what retained state can support. Authored mechanism checks remain separate from model acquisition.'],
-  results: ['The current receipt separates conformance studies and continuation-memory checks. Calls and reported costs are totalled; outcomes from different studies are not pooled.'],
+  results: ['The Advance receipt separates conformance studies and continuation-memory checks. Calls and reported costs are totalled; outcomes from different studies are not pooled.'],
   next: ['Useful transfer, composition and improvement of the learning rule remain research questions. The programme preserves simpler ordinary-code controls and unresolved conclusions.'],
 };
 
@@ -201,6 +216,7 @@ function useGraph(url: string | null) {
 
 function Page({ site, paper }: { site: Site; paper: Paper | null }) {
   const byId = useMemo(() => new Map(site.chapters.map((c) => [c.id, c])), [site]);
+  const progressActive = site.active_evidence_id === 'progress-campaign';
   const advanceActive = site.active_evidence_id === 'advance-campaign';
   const learningActive = Boolean(site.active_evidence_id
     || site.evidence['observation-learning-result'] || site.evidence['investigation-learning-result']);
@@ -264,7 +280,7 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           paper={paper}
           latex={latex}
           paragraphs={
-            advanceActive ? ADVANCE_COPY[chapter.id] : chapter.id === 'lab' && !learningActive
+            progressActive ? PROGRESS_COPY[chapter.id] : advanceActive ? ADVANCE_COPY[chapter.id] : chapter.id === 'lab' && !learningActive
               ? labParagraphs(lab.status === 'ready' && lab.value ? graphFacts(lab.value) : null)
               : CHAPTER_COPY[`${chapter.id}:${chapter.evidence_kind}`]?.paragraphs
           }
@@ -276,7 +292,8 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
           {chapter.id === 'oracle' && !learningActive && <OracleFigure chapter={chapter} />}
           {chapter.id === 'evolve' && !learningActive && <EvolveFigure chapter={chapter} />}
           {chapter.id === 'results' && (
-            <ResultsFigure chapter={chapter} labGraph={lab.status === 'ready' ? lab.value : null} site={site} />
+            <><ResultsFigure chapter={chapter} labGraph={lab.status === 'ready' ? lab.value : null} site={site} />
+              {progressActive && <ClientStudy site={site} />}</>
           )}
           {chapter.id === 'next' && !learningActive && <NextFigure chapter={chapter} />}
         </ChapterSection>
@@ -344,6 +361,7 @@ function StatusStrip({ site }: { site: Site }) {
     ?? site.chapters.find((c) => c.evidence_kind === 'measured_experiment' || c.evidence_kind === 'measured_execution' || c.evidence_kind === 'verified_preparation');
   const url = activeEvidenceUrl(site, chapter);
   const evidence = useAsync<Evidence | null>(() => (url ? api.evidence(url) : Promise.resolve(null)), [url]);
+  const progressActive = site.active_evidence_id === 'progress-campaign';
   const advanceActive = site.active_evidence_id === 'advance-campaign';
   const observationActive = site.active_evidence_id === 'observation-learning-result';
   const sourcesUrl = site.active_evidence_id || site.evidence['investigation-learning-result'] ? undefined : site.evidence.sources;
@@ -352,9 +370,15 @@ function StatusStrip({ site }: { site: Site }) {
   let summary: string | null = null;
   if (evidence.status === 'ready' && evidence.value) {
     const schema = String(evidence.value.data.schema ?? '');
-    if (schema === 'zenith_advance_campaign_v1' && validAdvanceReceipt(evidence.value.data)) {
+    if (schema === 'zenith_progress_campaign_report_v1' && validProgressReceipt(evidence.value.data)) {
       const data = evidence.value.data;
-      summary = `${data.status === 'complete' ? 'Current campaign analysis complete' : 'Current campaign analysis pending'}; ${data.total_calls} recorded call attempts; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
+      summary = data.conformance_studies.length
+        ? `Current Progress campaign: ${progressStatusLabel(data.status)}; ${data.conformance_studies.length} source-bound ${data.conformance_studies.length === 1 ? 'study' : 'studies'} published.`
+        : 'Current Progress campaign results pending.';
+    }
+    else if (schema === 'zenith_advance_campaign_v1' && validAdvanceReceipt(evidence.value.data)) {
+      const data = evidence.value.data;
+      summary = `${data.status === 'complete' ? 'Advance campaign analysis complete' : 'Advance campaign analysis pending'}; ${data.total_calls} recorded call attempts; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
     }
     else if (schema.startsWith('zenith_demo_preparation')) summary = preparationSummary(evidence.value);
     else if (schema.startsWith('zenith_original_feed_window')) summary = windowSummary(evidence.value);
@@ -364,9 +388,12 @@ function StatusStrip({ site }: { site: Site }) {
       summary = `Initial native comparison: ${observationStatus(data)}; ${data.total_calls} calls including canary attempts; $${Number(data.total_reported_cost_usd).toFixed(4)} reported cost.`;
     }
   }
-  if (advanceActive && !url) summary = 'Current campaign results pending.';
-  else if (advanceActive && evidence.status === 'error') summary = 'Current-campaign receipt unavailable.';
-  else if (advanceActive && evidence.status === 'ready' && (!evidence.value || !validAdvanceReceipt(evidence.value.data))) summary = 'Current-campaign receipt schema unsupported.';
+  if (progressActive && !url) summary = 'Current Progress campaign results pending.';
+  else if (progressActive && evidence.status === 'error') summary = 'Current-campaign receipt unavailable.';
+  else if (progressActive && evidence.status === 'ready' && (!evidence.value || !validProgressReceipt(evidence.value.data))) summary = 'Current-campaign receipt schema unsupported.';
+  else if (advanceActive && !url) summary = 'Advance campaign results pending.';
+  else if (advanceActive && evidence.status === 'error') summary = 'Advance-campaign receipt unavailable.';
+  else if (advanceActive && evidence.status === 'ready' && (!evidence.value || !validAdvanceReceipt(evidence.value.data))) summary = 'Advance-campaign receipt schema unsupported.';
   else if (observationActive && !url) summary = 'Observation study results pending.';
   else if (observationActive && evidence.status === 'error') summary = 'Observation-study receipt unavailable.';
   else if (observationActive && evidence.status === 'ready' && evidence.value
@@ -684,13 +711,13 @@ function validAdvanceReceipt(data: Record<string, unknown>): data is AdvanceRece
 function AdvanceResults({ result, site }: { result: Evidence; site: Site }) {
   const data = result.data as AdvanceReceipt;
   return <div className="diagnosis">
-    <h3 className="block-head">{data.status === 'complete' ? 'Campaign analysis complete' : 'Campaign analysis pending'}</h3>
+    <h3 className="block-head">{data.status === 'complete' ? 'Advance campaign analysis complete' : 'Advance campaign analysis pending'}</h3>
     <p>{data.summary}</p>
-    <p>{data.total_calls} recorded call attempts; ${Number(data.total_reported_cost_usd).toFixed(4)} reported inference cost across the recorded campaign.</p>
+    <p>{data.total_calls} recorded call attempts; ${Number(data.total_reported_cost_usd).toFixed(4)} reported inference cost across the recorded Advance campaign.</p>
     {typeof data.accounting_boundary === 'string' && <p>{data.accounting_boundary}</p>}
     <p>Analysis completion includes stopped studies and unresolved results. Each study retains its own construction and evaluation status.</p>
     <table className="diagnosis__table">
-      <caption>Recorded conformance studies; outcomes remain separate</caption>
+      <caption>Recorded Advance conformance studies; outcomes remain separate</caption>
       <thead><tr><th>Study, model and reasoning</th><th>Construction</th><th>Recorded attempts and reported cost</th></tr></thead>
       <tbody>{data.conformance_studies.map(study => <tr key={study.id}>
         <th scope="row">{study.id}<br />{study.model}; {study.reasoning_effort}</th>
@@ -700,14 +727,269 @@ function AdvanceResults({ result, site }: { result: Evidence; site: Site }) {
     </table>
     {typeof data.memory.summary === 'string' && <p>{data.memory.summary}</p>}
     <p>Continuation-memory checks retain their own source, costs and limits in the repository explanation.</p>
+    <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete Advance-campaign receipt</a>
+    <HistoricalReceipts site={site} />
+  </div>;
+}
+
+type ProgressScore = { correct: number; total: number; errors: number };
+type ProgressLearner = {
+  native_configurations: number; authored_native_families: number;
+  conditions: { ordinary_witness: { acquisition_source_calls: number };
+    generic_singletons: { acquisition_source_calls: number } };
+  ordinary_minus_generic_acquisition_source_calls: number; boundary: string;
+};
+type ProgressStudy = {
+  id: string; version: string; stage: 'qualification' | 'diagnostic'; complete: boolean;
+  model: string; reasoning_effort: string; parent_episodes: number;
+  actual_calls: number; reported_cost_usd: string; unknown_cost_calls: number;
+  qualification?: { passed: boolean };
+  forfeited?: boolean; forfeiture_reason?: string;
+  panel_summary?: { confirmation?: { overall?: Record<string, ProgressScore> } };
+};
+type ProgressReceipt = Record<string, unknown> & {
+  schema: 'zenith_progress_campaign_report_v1'; summary: string; status: string;
+  claim_boundary: string; conformance_studies: ProgressStudy[]; learner: ProgressLearner | null;
+};
+
+function progressStatusLabel(status: string): string {
+  return ({ complete: 'diagnostic complete', diagnostic_pending: 'diagnostic in progress',
+    qualification_failed: 'interface qualification failed', protocol_deviation: 'protocol deviation',
+    pending: 'results pending' } as Record<string, string>)[status] ?? 'status unavailable';
+}
+
+function validProgressReceipt(data: Record<string, unknown>): data is ProgressReceipt {
+  const cost = (value: unknown) => typeof value === 'string' && value.trim() !== ''
+    && Number.isFinite(Number(value)) && Number(value) >= 0;
+  const count = (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 0;
+  const record = (value: unknown): value is Record<string, unknown> => value !== null
+    && typeof value === 'object' && !Array.isArray(value);
+  const learner = (value: unknown) => value === null || (record(value)
+    && count(value.native_configurations) && count(value.authored_native_families)
+    && typeof value.ordinary_minus_generic_acquisition_source_calls === 'number'
+    && Number.isInteger(value.ordinary_minus_generic_acquisition_source_calls)
+    && typeof value.boundary === 'string' && record(value.conditions)
+    && record(value.conditions.ordinary_witness) && count(value.conditions.ordinary_witness.acquisition_source_calls)
+    && record(value.conditions.generic_singletons) && count(value.conditions.generic_singletons.acquisition_source_calls));
+  const scores = (value: unknown) => record(value) && Object.values(value).every(score =>
+    record(score) && count(score.correct) && count(score.total) && count(score.errors)
+      && Number(score.correct) <= Number(score.total));
+  return data.schema === 'zenith_progress_campaign_report_v1' && typeof data.summary === 'string'
+    && typeof data.status === 'string' && typeof data.claim_boundary === 'string'
+    && record(data.source_bindings) && learner(data.learner)
+    && Array.isArray(data.conformance_studies) && data.conformance_studies.every(value => {
+      if (!record(value)) return false;
+      const row = value as Record<string, unknown>;
+      return typeof row.id === 'string' && typeof row.version === 'string'
+        && typeof row.complete === 'boolean'
+        && (row.stage === 'qualification' || row.stage === 'diagnostic')
+        && count(row.parent_episodes) && count(row.actual_calls) && count(row.unknown_cost_calls)
+        && cost(row.reported_cost_usd)
+        && typeof row.model === 'string' && typeof row.reasoning_effort === 'string'
+        && (row.forfeited === undefined || typeof row.forfeited === 'boolean')
+        && (row.forfeiture_reason === undefined || typeof row.forfeiture_reason === 'string')
+        && (row.stage !== 'diagnostic' || (record(row.panel_summary)
+          && record(row.panel_summary.confirmation)
+          && scores(row.panel_summary.confirmation.overall)));
+    });
+}
+
+function ProgressResults({ result, site }: { result: Evidence; site: Site }) {
+  const data = result.data as ProgressReceipt;
+  const diagnostic = data.conformance_studies.find(study => study.stage === 'diagnostic');
+  const confirmation = diagnostic?.panel_summary?.confirmation?.overall;
+  const roles = ['parent', 'repair_only', 'fixed', 'ordinary', 'direct_batch', 'direct_masked', 'direct_adaptive'];
+  const heading = data.status === 'complete' ? 'Progress campaign report complete'
+    : data.status === 'qualification_failed' ? 'Interface qualification did not pass'
+      : data.status === 'protocol_deviation' ? 'Protocol deviation in the campaign'
+        : 'Progress campaign report pending';
+  return <div className="diagnosis">
+    <h3 className="block-head">{heading}</h3>
+    <p>{data.summary}</p>
+    {data.conformance_studies.length > 0 && <table className="diagnosis__table">
+      <caption>Source-bound Progress studies; qualification is excluded from diagnostic estimates</caption>
+      <thead><tr><th>Study, model and reasoning</th><th>Parent episodes</th><th>Recorded attempts and reported cost</th></tr></thead>
+      <tbody>{data.conformance_studies.map(study => <tr key={study.id}>
+        <th scope="row">{study.version} {study.stage}: {study.id}<br />{study.model}; {study.reasoning_effort}</th>
+        <td>{study.parent_episodes}{study.forfeited ? <><br />Diagnostic forfeited</>
+          : study.stage === 'qualification' && study.qualification && <><br />{study.qualification.passed ? 'Interface passed' : 'Interface did not pass'}</>}</td>
+        <td>{study.actual_calls} attempts<br />${Number(study.reported_cost_usd).toFixed(4)} reported{study.unknown_cost_calls > 0 && <><br />{study.unknown_cost_calls} unknown-charge attempts</>}</td>
+      </tr>)}</tbody>
+    </table>}
+    {data.conformance_studies.filter(study => study.forfeited && study.forfeiture_reason).map(study =>
+      <p key={`${study.id}-forfeiture`}>{study.version} diagnostic forfeited: {study.forfeiture_reason}</p>)}
+    {diagnostic && confirmation && <table className="diagnosis__table">
+      <caption>Diagnostic confirmation answers; separate from interface qualification</caption>
+      <thead><tr><th>Condition</th><th>Correct / total</th></tr></thead>
+      <tbody>{roles.filter(role => confirmation[role]).map(role => <tr key={role}>
+        <th scope="row">{role.replaceAll('_', ' ')}</th>
+        <td>{confirmation[role].correct}/{confirmation[role].total}</td>
+      </tr>)}</tbody>
+    </table>}
+    {data.learner && <section aria-label="Separate exact-class learner check">
+      <h4>Separate exact-class learner check</h4>
+      <p>{data.learner.native_configurations} native configurations across {data.learner.authored_native_families} authored families.</p>
+      <table className="diagnosis__table">
+        <caption>Source acquisition calls with ordinary witness and generic singleton questions</caption>
+        <thead><tr><th>Question condition</th><th>Source calls</th></tr></thead>
+        <tbody><tr><th scope="row">Ordinary witness</th><td>{data.learner.conditions.ordinary_witness.acquisition_source_calls}</td></tr>
+          <tr><th scope="row">Generic singletons</th><td>{data.learner.conditions.generic_singletons.acquisition_source_calls}</td></tr></tbody>
+      </table>
+      <p>{data.learner.boundary}</p>
+    </section>}
+    <p>{data.claim_boundary}</p>
     <a href={result.source.url} target="_blank" rel="noreferrer">Read the complete current-campaign receipt</a>
     <HistoricalReceipts site={site} />
   </div>;
 }
 
 function HistoricalReceipts({ site }: { site: Site }) {
-  return <p>{['observation-learning-result', 'decomposition-result', 'investigation-learning-result'].map(id =>
-    site.evidence[id] ? <span key={id}><a href={apiUrl(site.evidence[id])} target="_blank" rel="noreferrer">Historical: {RECEIPT_LABEL[id]}</a>{' '}</span> : null)}</p>;
+  return <div>
+    <p>Earlier source-bound receipts</p>
+    <ul>{['advance-campaign', 'observation-learning-result', 'decomposition-result', 'investigation-learning-result']
+      .filter(id => id !== site.active_evidence_id).map(id =>
+      site.evidence[id] ? <li key={id}><a href={apiUrl(site.evidence[id])} target="_blank" rel="noreferrer">Historical: {RECEIPT_LABEL[id]}</a></li> : null)}</ul>
+  </div>;
+}
+
+const CLIENT_ARMS = [
+  ['procedure', 'Frozen investigator'], ['ordinary_reuse', 'Frozen ordinary tester'],
+  ['same_history', 'Fresh, same history'], ['cold', 'Fresh, no history'], ['fixed', 'Fixed tests'],
+] as const;
+const CLIENT_VERSIONS = [
+  { id: 'client-investigation', label: 'v1, reasoning none', protocol: 'client-investigation-protocol' },
+  { id: 'client-investigation-v2', label: 'v2, reasoning none', protocol: 'client-investigation-protocol-v2' },
+  { id: 'client-investigation-v2-low', label: 'v2, reasoning low', protocol: 'client-investigation-protocol-v2' },
+] as const;
+type ClientArm = typeof CLIENT_ARMS[number][0];
+type ClientMetric = {
+  failed_targets_detected: number; total_failing_targets: number;
+  query_slots: number; valid_probes: number; model_call_attempts: number;
+  runs: number; not_run_targets: number;
+};
+type ClientReceipt = Record<string, unknown> & {
+  schema: 'zenith_client_investigation_report_v1'; complete: boolean;
+  protected_panel_opened: boolean; target_count: number; total_failing_targets: number;
+  model_attempts: number; reported_model_cost_usd: string; unknown_cost_attempts: number;
+  model: string; reasoning_effort: string; boundary: string;
+  arm_metrics: Record<ClientArm, ClientMetric>;
+  artifacts: Record<'procedure' | 'ordinary_reuse', { error: string | null }>;
+};
+
+function validClientReceipt(data: Record<string, unknown>): data is ClientReceipt {
+  const count = (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 0;
+  const record = (value: unknown): value is Record<string, unknown> => value !== null
+    && typeof value === 'object' && !Array.isArray(value);
+  return data.schema === 'zenith_client_investigation_report_v1'
+    && typeof data.complete === 'boolean' && typeof data.protected_panel_opened === 'boolean'
+    && count(data.target_count) && count(data.total_failing_targets)
+    && Number(data.total_failing_targets) <= Number(data.target_count)
+    && count(data.model_attempts) && count(data.unknown_cost_attempts)
+    && typeof data.reported_model_cost_usd === 'string' && data.reported_model_cost_usd.trim() !== ''
+    && Number.isFinite(Number(data.reported_model_cost_usd)) && Number(data.reported_model_cost_usd) >= 0
+    && typeof data.model === 'string' && typeof data.reasoning_effort === 'string'
+    && typeof data.boundary === 'string' && record(data.arm_metrics) && record(data.artifacts)
+    && ['procedure', 'ordinary_reuse'].every(arm => {
+      const artifact = (data.artifacts as Record<string, unknown>)[arm];
+      return record(artifact) && (artifact.error === null || typeof artifact.error === 'string');
+    })
+    && CLIENT_ARMS.every(([arm]) => {
+      const metric = (data.arm_metrics as Record<string, unknown>)[arm];
+      return record(metric) && count(metric.failed_targets_detected)
+        && metric.total_failing_targets === data.total_failing_targets
+        && Number(metric.failed_targets_detected) <= Number(metric.total_failing_targets)
+        && count(metric.query_slots) && count(metric.valid_probes)
+        && Number(metric.valid_probes) <= Number(metric.query_slots)
+        && count(metric.model_call_attempts) && count(metric.runs) && count(metric.not_run_targets)
+        && Number(metric.runs) + Number(metric.not_run_targets) <= Number(data.target_count);
+    });
+}
+
+function ClientStudy({ site }: { site: Site }) {
+  const versions = CLIENT_VERSIONS.filter(version => site.evidence[version.id]);
+  const latest = versions.at(-1);
+  const urls = versions.map(version => site.evidence[version.id]);
+  const receipts = useAsync(() => Promise.all(versions.map(async version => {
+    try {
+      return { version, result: await api.evidence(site.evidence[version.id]), error: null };
+    } catch (error) {
+      return { version, result: null, error: error instanceof Error ? error.message : String(error) };
+    }
+  })), [urls.join('|')]);
+  const selected = receipts.status === 'ready' ? receipts.value.find(row => row.version.id === latest?.id) : null;
+  const method = latest ? site.documents[latest.protocol] : site.documents['client-investigation-protocol'];
+  const explanation = latest ? site.documents[latest.id] : undefined;
+  return <section className="diagnosis" aria-labelledby="client-study-title">
+    <h3 id="client-study-title" className="block-head">Separate SQLite client pilot</h3>
+    {latest && <p>Latest published version: {latest.label}.</p>}
+    {!latest ? <p role="status">Client pilot results pending. No client receipt is published.</p>
+      : receipts.status === 'loading' ? <Loading what="the client-pilot receipt" />
+        : receipts.status === 'error' || selected?.error
+          ? <p role="status">The client-pilot receipt is unavailable: {selected?.error ?? (receipts.status === 'error' ? receipts.message : '')}</p>
+          : selected?.result && validClientReceipt(selected.result.data)
+            ? <ClientResults result={selected.result} />
+            : <p role="status">The client-pilot receipt has an unsupported schema; no outcomes are displayed.</p>}
+    {receipts.status === 'ready' && receipts.value.length > 0 && <>
+      <h4>Recorded client versions</h4>
+      <p>Each version keeps its own prompts, source, results and costs.</p>
+      <ul>{receipts.value.map(row => <li key={row.version.id}>
+        <strong>{row.version.label}:</strong>{' '}
+        {row.result && validClientReceipt(row.result.data)
+          ? <ClientVersionSummary data={row.result.data} />
+          : row.error ? 'Receipt unavailable.' : 'Unsupported receipt; outcomes withheld.'}{' '}
+        <a href={apiUrl(site.evidence[row.version.id])} target="_blank" rel="noreferrer">Receipt</a>
+        {site.documents[row.version.id] && <>{' · '}<a href={apiUrl(site.documents[row.version.id])} target="_blank" rel="noreferrer">Analysis</a></>}
+      </li>)}</ul>
+    </>}
+    {method && <p><a href={apiUrl(method)} target="_blank" rel="noreferrer">Read the client-pilot protocol</a></p>}
+    {explanation && <SourceDocument url={explanation} />}
+  </section>;
+}
+
+function ClientVersionSummary({ data }: { data: ClientReceipt }) {
+  const procedure = data.arm_metrics.procedure;
+  const ordinary = data.arm_metrics.ordinary_reuse;
+  if (data.artifacts.procedure.error) return <>Invalid investigator artifact; {procedure.not_run_targets} target runs skipped. {ordinary.runs > 0 && ordinary.query_slots === 0 ? 'Ordinary tester ran but issued no target queries.' : ''}</>;
+  if (data.complete && procedure.runs > 0 && ordinary.runs > 0 && procedure.query_slots === 0 && ordinary.query_slots === 0)
+    return <>Both frozen testers stopped without target queries.</>;
+  return <>{data.complete && data.protected_panel_opened
+    ? `Frozen investigator ${procedure.failed_targets_detected}/${procedure.total_failing_targets}; ordinary reuse ${ordinary.failed_targets_detected}/${ordinary.total_failing_targets}.`
+    : 'Protected results pending.'}</>;
+}
+
+function ClientResults({ result }: { result: Evidence }) {
+  const data = result.data as ClientReceipt;
+  return <>
+    <p>{data.complete ? 'Pilot complete.' : 'Pilot incomplete.'} {data.model_attempts} recorded model attempts; ${data.reported_model_cost_usd} reported inference cost. {data.model}; reasoning {data.reasoning_effort}.</p>
+    {data.unknown_cost_attempts > 0 && <p>{data.unknown_cost_attempts} attempts have unresolved charges.</p>}
+    {data.complete && data.protected_panel_opened ? <>
+      <p>{data.target_count} later clients were evaluated; {data.total_failing_targets} contained a fault in the protected finite panel.</p>
+      <table className="diagnosis__table">
+        <caption>Failing later clients detected and target investigation work; query slots include invalid and repeated proposals</caption>
+        <thead><tr><th>Method</th><th>Faults found</th><th>Valid / slots</th><th>Model calls</th></tr></thead>
+        <tbody>{CLIENT_ARMS.map(([arm, label]) => <tr key={arm}>
+          <th scope="row">{label}</th>
+          <td>{data.arm_metrics[arm].not_run_targets > 0 ? <>Not run<br />{data.arm_metrics[arm].not_run_targets} clients</>
+            : <>{data.arm_metrics[arm].failed_targets_detected}/{data.arm_metrics[arm].total_failing_targets}</>}</td>
+          <td>{data.arm_metrics[arm].valid_probes}/{data.arm_metrics[arm].query_slots}</td>
+          <td>{data.arm_metrics[arm].model_call_attempts}</td>
+        </tr>)}</tbody>
+      </table>
+      {(['procedure', 'ordinary_reuse'] as const).filter(arm => data.artifacts[arm].error).map(arm =>
+        <p key={arm}>{arm === 'procedure' ? 'Frozen investigator' : 'Frozen ordinary tester'} artifact error: {data.artifacts[arm].error}</p>)}
+      {data.arm_metrics.procedure.runs > 0 && data.arm_metrics.ordinary_reuse.runs > 0
+        && data.arm_metrics.procedure.query_slots === 0 && data.arm_metrics.ordinary_reuse.query_slots === 0
+        && <p>Both frozen testers issued no target queries. This pilot does not establish an advantage from reuse.</p>}
+      {data.arm_metrics.procedure.query_slots > 0 && data.arm_metrics.ordinary_reuse.query_slots > 0
+        && data.arm_metrics.procedure.failed_targets_detected === data.arm_metrics.ordinary_reuse.failed_targets_detected
+        && <p>The frozen investigator matched the ordinary reusable tester on detected faults. This comparison does not establish an advantage from learned reuse.</p>}
+      {data.arm_metrics.procedure.model_call_attempts === 0 && data.arm_metrics.ordinary_reuse.model_call_attempts === 0
+        && <p>Acquisition and compilation costs are included in the total above. Model calls in the table count target investigation only.</p>}
+      <p>This small authored set does not establish a false-accusation rate.</p>
+    </> : <p>Protected outcome tables remain unavailable until the pilot and its protected evaluation complete.</p>}
+    <p>{data.boundary}</p>
+    <p><a href={result.source.url} target="_blank" rel="noreferrer">Read the complete client-pilot receipt</a></p>
+  </>;
 }
 
 type ObservationComparison = {
@@ -783,6 +1065,7 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
   // The chapter binds whichever receipt the current edition has; the view
   // follows the receipt's schema.
   const bound = activeEvidenceUrl(site, chapter);
+  const progressActive = site.active_evidence_id === 'progress-campaign';
   const advanceActive = site.active_evidence_id === 'advance-campaign';
   const kind = useAsync<Evidence | null>(() => (bound ? api.evidence(bound) : Promise.resolve(null)), [bound]);
   const isPreparation = kind.status === 'ready' && String(kind.value?.data.schema ?? '').startsWith('zenith_demo_preparation');
@@ -793,18 +1076,26 @@ function ResultsFigure({ chapter, labGraph, site }: { chapter: Chapter; labGraph
   );
   const evidence = useAsync<[Evidence, Evidence] | null>(
     () =>
-      kind.status === 'ready' && !isPreparation && !advanceActive && windowUrl && condUrl
+      kind.status === 'ready' && !isPreparation && !progressActive && !advanceActive && windowUrl && condUrl
         ? Promise.all([api.evidence(windowUrl), api.evidence(condUrl)])
         : Promise.resolve(null),
-    [kind.status, isPreparation, advanceActive, windowUrl, condUrl],
+    [kind.status, isPreparation, progressActive, advanceActive, windowUrl, condUrl],
   );
-  if (advanceActive) {
+  if (progressActive) {
     if (!bound) return <><p role="status">Current campaign results pending. No current receipt is published; historical receipts remain separate.</p><HistoricalReceipts site={site} /></>;
     if (kind.status === 'error') return <><p role="status">The current-campaign receipt is unavailable: {kind.message}</p><HistoricalReceipts site={site} /></>;
-    if (kind.status === 'ready') return kind.value && validAdvanceReceipt(kind.value.data)
-      ? <AdvanceResults result={kind.value} site={site} />
+    if (kind.status === 'ready') return kind.value && validProgressReceipt(kind.value.data)
+      ? <ProgressResults result={kind.value} site={site} />
       : <><p role="status">The current-campaign receipt has an unsupported schema; no outcomes are displayed.</p><HistoricalReceipts site={site} /></>;
     return <Loading what="the current-campaign receipt" />;
+  }
+  if (advanceActive) {
+    if (!bound) return <><p role="status">Advance campaign results pending. No Advance receipt is published; older receipts remain separate.</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'error') return <><p role="status">The Advance-campaign receipt is unavailable: {kind.message}</p><HistoricalReceipts site={site} /></>;
+    if (kind.status === 'ready') return kind.value && validAdvanceReceipt(kind.value.data)
+      ? <AdvanceResults result={kind.value} site={site} />
+      : <><p role="status">The Advance-campaign receipt has an unsupported schema; no outcomes are displayed.</p><HistoricalReceipts site={site} /></>;
+    return <Loading what="the Advance-campaign receipt" />;
   }
   if (kind.status === 'ready' && kind.value?.data.schema === 'zenith_learning_evidence_v1') {
     return <InvestigationResults result={kind.value} />;

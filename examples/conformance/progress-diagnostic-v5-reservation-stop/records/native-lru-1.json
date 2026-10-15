@@ -1,0 +1,1765 @@
+{
+  "task_id": "native-lru-1",
+  "source_id": "lru-1",
+  "arms": {
+    "direct_masked": {
+      "policy": null,
+      "investigation": {
+        "receipts": [
+          {
+            "slot": 1,
+            "turn": 1,
+            "query": {
+              "capacity": 2,
+              "events": [
+                {
+                  "op": "call",
+                  "key": 1
+                },
+                {
+                  "op": "call",
+                  "key": 2
+                },
+                {
+                  "op": "call",
+                  "key": 3
+                },
+                {
+                  "op": "call",
+                  "key": 1
+                }
+              ]
+            },
+            "note": "Probe eviction order after capacity overflow and whether a hit refreshes recency before later eviction; candidate uses move-to-end LRU, but native lru_cache eviction details may differ.",
+            "expected": {
+              "hits": 0,
+              "misses": 4,
+              "size": 2
+            },
+            "parent_answer": {
+              "hits": 0,
+              "misses": 4,
+              "size": 2
+            },
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 5
+          },
+          {
+            "slot": 2,
+            "turn": 1,
+            "query": {
+              "capacity": 3,
+              "events": [
+                {
+                  "op": "call",
+                  "key": 1
+                },
+                {
+                  "op": "call",
+                  "key": 2
+                },
+                {
+                  "op": "call",
+                  "key": 3
+                },
+                {
+                  "op": "call",
+                  "key": 4
+                },
+                {
+                  "op": "call",
+                  "key": 1
+                },
+                {
+                  "op": "call",
+                  "key": 2
+                }
+              ]
+            },
+            "note": "Probe eviction order after capacity overflow and whether a hit refreshes recency before later eviction; candidate uses move-to-end LRU, but native lru_cache eviction details may differ.",
+            "expected": {
+              "hits": 0,
+              "misses": 6,
+              "size": 3
+            },
+            "parent_answer": {
+              "hits": 0,
+              "misses": 6,
+              "size": 3
+            },
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 7
+          },
+          {
+            "slot": 3,
+            "turn": 1,
+            "query": {
+              "capacity": 4,
+              "events": [
+                {
+                  "op": "call",
+                  "key": 1
+                },
+                {
+                  "op": "call",
+                  "key": 2
+                },
+                {
+                  "op": "call",
+                  "key": 3
+                },
+                {
+                  "op": "call",
+                  "key": 4
+                },
+                {
+                  "op": "call",
+                  "key": 5
+                },
+                {
+                  "op": "call",
+                  "key": 1
+                },
+                {
+                  "op": "call",
+                  "key": 2
+                }
+              ]
+            },
+            "note": "Probe eviction order after capacity overflow and whether a hit refreshes recency before later eviction; candidate uses move-to-end LRU, but native lru_cache eviction details may differ.",
+            "expected": {
+              "hits": 0,
+              "misses": 7,
+              "size": 4
+            },
+            "parent_answer": {
+              "hits": 0,
+              "misses": 7,
+              "size": 4
+            },
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 8
+          },
+          {
+            "slot": 4,
+            "turn": 1,
+            "query": {
+              "capacity": 2,
+              "events": [
+                {
+                  "op": "call",
+                  "key": 1
+                },
+                {
+                  "op": "call",
+                  "key": 2
+                },
+                {
+                  "op": "call",
+                  "key": 1
+                },
+                {
+                  "op": "call",
+                  "key": 3
+                },
+                {
+                  "op": "call",
+                  "key": 1
+                }
+              ]
+            },
+            "note": "Probe eviction order after capacity overflow and whether a hit refreshes recency before later eviction; candidate uses move-to-end LRU, but native lru_cache eviction details may differ.",
+            "expected": {
+              "hits": 2,
+              "misses": 3,
+              "size": 2
+            },
+            "parent_answer": {
+              "hits": 2,
+              "misses": 3,
+              "size": 2
+            },
+            "parent_error": null,
+            "verified_counterexample": false,
+            "query_units": 6
+          }
+        ],
+        "turns": [
+          {
+            "turn": 1,
+            "envelope": {
+              "prompt": {
+                "observed_task": {
+                  "id": "native-lru-1",
+                  "source_id": "lru-1",
+                  "examples": [
+                    {
+                      "input": {
+                        "capacity": 1,
+                        "events": []
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 1,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 1,
+                        "size": 1
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 1,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 3,
+                        "size": 1
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 2,
+                        "size": 2
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 3
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 2
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 3,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 4
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "reset"
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 1,
+                        "size": 1
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 4,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 3
+                          },
+                          {
+                            "op": "call",
+                            "key": 4
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 4
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 31
+                          },
+                          {
+                            "op": "reset"
+                          },
+                          {
+                            "op": "reset"
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      }
+                    }
+                  ],
+                  "native_contract_not_response_instructions": "Native functools.lru_cache diagnostic. A fresh query is exactly\n{\"capacity\": integer, \"events\": [event, ...]}, with capacity 1..4 and at most\n32 events. An event is exactly {\"op\":\"call\", \"key\":integer} with key 0..31,\nor {\"op\":\"reset\"}. Booleans are not integers. A fresh capacity-sized cache\nwraps a function returning its integer argument. Calls and resets operate in\nlist order. Reset calls cache_clear, clearing contents and hit/miss counters.\nReturn {\"hits\":integer,\"misses\":integer,\"size\":integer} from cache_info after\nthe events. Each query has an independent fresh cache. The source has no hidden\ncapacity or external data.   An allowed native probe uses\nexactly the same query schema.\n"
+                },
+                "candidate_source": "def investigate(context, acquire):\n    capacity = context['capacity']\n    events = context['events']\n    order = []\n    hits = 0\n    misses = 0\n    for event in events:\n        if event['op'] == 'reset':\n            order = []\n            hits = 0\n            misses = 0\n        else:\n            key = event['key']\n            if key in order:\n                order.remove(key)\n                order.append(key)\n                hits = hits + 1\n            else:\n                misses = misses + 1\n                if len(order) == capacity:\n                    order.pop(0)\n                order.append(key)\n    return {'hits': hits, 'misses': misses, 'size': len(order)}\n",
+                "candidate_on_examples": {
+                  "correct": 8,
+                  "total": 8,
+                  "errors": 0,
+                  "rows": [
+                    {
+                      "answer": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 1,
+                        "events": []
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 1,
+                        "misses": 1,
+                        "size": 1
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 1,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 1,
+                        "size": 1
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 0,
+                        "misses": 3,
+                        "size": 1
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 1,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 3,
+                        "size": 1
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 1,
+                        "misses": 2,
+                        "size": 2
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 2,
+                        "size": 2
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 2
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 3
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 2
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 0,
+                        "misses": 1,
+                        "size": 1
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 3,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 4
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "reset"
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 1,
+                        "size": 1
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 4
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 4,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 3
+                          },
+                          {
+                            "op": "call",
+                            "key": 4
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 4
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 31
+                          },
+                          {
+                            "op": "reset"
+                          },
+                          {
+                            "op": "reset"
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      },
+                      "correct": true
+                    }
+                  ]
+                },
+                "turn": 1,
+                "remaining_slots": 8,
+                "max_queries_this_turn": 4,
+                "receipts": [],
+                "outcomes_available": false,
+                "earlier_delivery_errors": [],
+                "response_example": {
+                  "queries": [],
+                  "note": null
+                }
+              },
+              "system": "You are investigating a candidate program, not implementing it.\nReturn JSON with exactly \"queries\" (a list of native input objects) and \"note\"\n(a short string or null). Do not return Python, predicted answers, or source/scope/\nchange fields. The host executes queries and measures both native and candidate\noutputs. The native contract below defines the object under test, NOT your reply.\nChoose revealing legal inputs from code inspection and evidence. Do not repeat\nexamples or earlier queries. An empty queries list stops. Notes are unverified\nhypotheses: observed evidence takes precedence. The request states your remaining\nquery allowance. Your note may be null; a long explanation is not required.",
+              "response_schema": {
+                "type": "object",
+                "properties": {
+                  "queries": {
+                    "type": "array",
+                    "maxItems": 4,
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "note": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "queries",
+                  "note"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "envelope_sha256": "9d07cd47029faf700018a33c4327043248653c5f568dbd6ab32dc3f5b388e985",
+            "raw": "{\"queries\":[{\"capacity\":2,\"events\":[{\"op\":\"call\",\"key\":1},{\"op\":\"call\",\"key\":2},{\"op\":\"call\",\"key\":3},{\"op\":\"call\",\"key\":1}]},{\"capacity\":3,\"events\":[{\"op\":\"call\",\"key\":1},{\"op\":\"call\",\"key\":2},{\"op\":\"call\",\"key\":3},{\"op\":\"call\",\"key\":4},{\"op\":\"call\",\"key\":1},{\"op\":\"call\",\"key\":2}]},{\"capacity\":4,\"events\":[{\"op\":\"call\",\"key\":1},{\"op\":\"call\",\"key\":2},{\"op\":\"call\",\"key\":3},{\"op\":\"call\",\"key\":4},{\"op\":\"call\",\"key\":5},{\"op\":\"call\",\"key\":1},{\"op\":\"call\",\"key\":2}]},{\"capacity\":2,\"events\":[{\"op\":\"call\",\"key\":1},{\"op\":\"call\",\"key\":2},{\"op\":\"call\",\"key\":1},{\"op\":\"call\",\"key\":3},{\"op\":\"call\",\"key\":1}]}],\"note\":\"Probe eviction order after capacity overflow and whether a hit refreshes recency before later eviction; candidate uses move-to-end LRU, but native lru_cache eviction details may differ.\"}",
+            "delivery_error": null,
+            "call_id": "native-lru-1-direct-shared-turn-1",
+            "raw_sha256": "b2706506551dbb8d795479ef674ceec05a7ff1907e7ee3efb47e6f853a703bc8",
+            "action": {
+              "queries": [
+                {
+                  "capacity": 2,
+                  "events": [
+                    {
+                      "op": "call",
+                      "key": 1
+                    },
+                    {
+                      "op": "call",
+                      "key": 2
+                    },
+                    {
+                      "op": "call",
+                      "key": 3
+                    },
+                    {
+                      "op": "call",
+                      "key": 1
+                    }
+                  ]
+                },
+                {
+                  "capacity": 3,
+                  "events": [
+                    {
+                      "op": "call",
+                      "key": 1
+                    },
+                    {
+                      "op": "call",
+                      "key": 2
+                    },
+                    {
+                      "op": "call",
+                      "key": 3
+                    },
+                    {
+                      "op": "call",
+                      "key": 4
+                    },
+                    {
+                      "op": "call",
+                      "key": 1
+                    },
+                    {
+                      "op": "call",
+                      "key": 2
+                    }
+                  ]
+                },
+                {
+                  "capacity": 4,
+                  "events": [
+                    {
+                      "op": "call",
+                      "key": 1
+                    },
+                    {
+                      "op": "call",
+                      "key": 2
+                    },
+                    {
+                      "op": "call",
+                      "key": 3
+                    },
+                    {
+                      "op": "call",
+                      "key": 4
+                    },
+                    {
+                      "op": "call",
+                      "key": 5
+                    },
+                    {
+                      "op": "call",
+                      "key": 1
+                    },
+                    {
+                      "op": "call",
+                      "key": 2
+                    }
+                  ]
+                },
+                {
+                  "capacity": 2,
+                  "events": [
+                    {
+                      "op": "call",
+                      "key": 1
+                    },
+                    {
+                      "op": "call",
+                      "key": 2
+                    },
+                    {
+                      "op": "call",
+                      "key": 1
+                    },
+                    {
+                      "op": "call",
+                      "key": 3
+                    },
+                    {
+                      "op": "call",
+                      "key": 1
+                    }
+                  ]
+                }
+              ],
+              "note": "Probe eviction order after capacity overflow and whether a hit refreshes recency before later eviction; candidate uses move-to-end LRU, but native lru_cache eviction details may differ."
+            }
+          },
+          {
+            "turn": 2,
+            "envelope": {
+              "prompt": {
+                "observed_task": {
+                  "id": "native-lru-1",
+                  "source_id": "lru-1",
+                  "examples": [
+                    {
+                      "input": {
+                        "capacity": 1,
+                        "events": []
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 1,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 1,
+                        "size": 1
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 1,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 3,
+                        "size": 1
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 2,
+                        "size": 2
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 3
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 2
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 3,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 4
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "reset"
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 1,
+                        "size": 1
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 4,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 3
+                          },
+                          {
+                            "op": "call",
+                            "key": 4
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 4
+                      }
+                    },
+                    {
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 31
+                          },
+                          {
+                            "op": "reset"
+                          },
+                          {
+                            "op": "reset"
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      }
+                    }
+                  ],
+                  "native_contract_not_response_instructions": "Native functools.lru_cache diagnostic. A fresh query is exactly\n{\"capacity\": integer, \"events\": [event, ...]}, with capacity 1..4 and at most\n32 events. An event is exactly {\"op\":\"call\", \"key\":integer} with key 0..31,\nor {\"op\":\"reset\"}. Booleans are not integers. A fresh capacity-sized cache\nwraps a function returning its integer argument. Calls and resets operate in\nlist order. Reset calls cache_clear, clearing contents and hit/miss counters.\nReturn {\"hits\":integer,\"misses\":integer,\"size\":integer} from cache_info after\nthe events. Each query has an independent fresh cache. The source has no hidden\ncapacity or external data.   An allowed native probe uses\nexactly the same query schema.\n"
+                },
+                "candidate_source": "def investigate(context, acquire):\n    capacity = context['capacity']\n    events = context['events']\n    order = []\n    hits = 0\n    misses = 0\n    for event in events:\n        if event['op'] == 'reset':\n            order = []\n            hits = 0\n            misses = 0\n        else:\n            key = event['key']\n            if key in order:\n                order.remove(key)\n                order.append(key)\n                hits = hits + 1\n            else:\n                misses = misses + 1\n                if len(order) == capacity:\n                    order.pop(0)\n                order.append(key)\n    return {'hits': hits, 'misses': misses, 'size': len(order)}\n",
+                "candidate_on_examples": {
+                  "correct": 8,
+                  "total": 8,
+                  "errors": 0,
+                  "rows": [
+                    {
+                      "answer": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 1,
+                        "events": []
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 1,
+                        "misses": 1,
+                        "size": 1
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 1,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 1,
+                        "size": 1
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 0,
+                        "misses": 3,
+                        "size": 1
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 1,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 3,
+                        "size": 1
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 1,
+                        "misses": 2,
+                        "size": 2
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 2,
+                        "size": 2
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 2
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 3
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 2
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 0,
+                        "misses": 1,
+                        "size": 1
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 3,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 4
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "reset"
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 1,
+                        "size": 1
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 4
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 4,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 1
+                          },
+                          {
+                            "op": "call",
+                            "key": 2
+                          },
+                          {
+                            "op": "call",
+                            "key": 3
+                          },
+                          {
+                            "op": "call",
+                            "key": 4
+                          },
+                          {
+                            "op": "call",
+                            "key": 1
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 1,
+                        "misses": 4,
+                        "size": 4
+                      },
+                      "correct": true
+                    },
+                    {
+                      "answer": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      },
+                      "trace": [],
+                      "error": null,
+                      "input": {
+                        "capacity": 2,
+                        "events": [
+                          {
+                            "op": "call",
+                            "key": 31
+                          },
+                          {
+                            "op": "reset"
+                          },
+                          {
+                            "op": "reset"
+                          }
+                        ]
+                      },
+                      "expected": {
+                        "hits": 0,
+                        "misses": 0,
+                        "size": 0
+                      },
+                      "correct": true
+                    }
+                  ]
+                },
+                "turn": 2,
+                "remaining_slots": 4,
+                "max_queries_this_turn": 4,
+                "receipts": [
+                  {
+                    "slot": 1,
+                    "turn": 1,
+                    "query": {
+                      "capacity": 2,
+                      "events": [
+                        {
+                          "op": "call",
+                          "key": 1
+                        },
+                        {
+                          "op": "call",
+                          "key": 2
+                        },
+                        {
+                          "op": "call",
+                          "key": 3
+                        },
+                        {
+                          "op": "call",
+                          "key": 1
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "slot": 2,
+                    "turn": 1,
+                    "query": {
+                      "capacity": 3,
+                      "events": [
+                        {
+                          "op": "call",
+                          "key": 1
+                        },
+                        {
+                          "op": "call",
+                          "key": 2
+                        },
+                        {
+                          "op": "call",
+                          "key": 3
+                        },
+                        {
+                          "op": "call",
+                          "key": 4
+                        },
+                        {
+                          "op": "call",
+                          "key": 1
+                        },
+                        {
+                          "op": "call",
+                          "key": 2
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "slot": 3,
+                    "turn": 1,
+                    "query": {
+                      "capacity": 4,
+                      "events": [
+                        {
+                          "op": "call",
+                          "key": 1
+                        },
+                        {
+                          "op": "call",
+                          "key": 2
+                        },
+                        {
+                          "op": "call",
+                          "key": 3
+                        },
+                        {
+                          "op": "call",
+                          "key": 4
+                        },
+                        {
+                          "op": "call",
+                          "key": 5
+                        },
+                        {
+                          "op": "call",
+                          "key": 1
+                        },
+                        {
+                          "op": "call",
+                          "key": 2
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "slot": 4,
+                    "turn": 1,
+                    "query": {
+                      "capacity": 2,
+                      "events": [
+                        {
+                          "op": "call",
+                          "key": 1
+                        },
+                        {
+                          "op": "call",
+                          "key": 2
+                        },
+                        {
+                          "op": "call",
+                          "key": 1
+                        },
+                        {
+                          "op": "call",
+                          "key": 3
+                        },
+                        {
+                          "op": "call",
+                          "key": 1
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "outcomes_available": false,
+                "earlier_delivery_errors": [],
+                "response_example": {
+                  "queries": [],
+                  "note": null
+                }
+              },
+              "system": "You are investigating a candidate program, not implementing it.\nReturn JSON with exactly \"queries\" (a list of native input objects) and \"note\"\n(a short string or null). Do not return Python, predicted answers, or source/scope/\nchange fields. The host executes queries and measures both native and candidate\noutputs. The native contract below defines the object under test, NOT your reply.\nChoose revealing legal inputs from code inspection and evidence. Do not repeat\nexamples or earlier queries. An empty queries list stops. Notes are unverified\nhypotheses: observed evidence takes precedence. The request states your remaining\nquery allowance. Your note may be null; a long explanation is not required.",
+              "response_schema": {
+                "type": "object",
+                "properties": {
+                  "queries": {
+                    "type": "array",
+                    "maxItems": 4,
+                    "items": {
+                      "type": "object"
+                    }
+                  },
+                  "note": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "maxLength": 500
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "queries",
+                  "note"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "envelope_sha256": "245698cf3827e3364d95130826760875659a5895d50a374ce6b0d69a6e8e96ef",
+            "raw": null,
+            "delivery_error": "RuntimeError: paid call cancelled while waiting for inference capacity; no reservation made",
+            "call_id": "native-lru-1-direct_masked-turn-2"
+          }
+        ],
+        "model_turn_attempts": 2,
+        "native_probes": 4,
+        "query_attempts": 4,
+        "query_units": 26,
+        "slots_used": 4,
+        "halted": "adapter_failure"
+      },
+      "call_ids": [
+        "native-lru-1-direct-shared-turn-1",
+        "native-lru-1-direct_masked-turn-2"
+      ],
+      "incomplete": true
+    }
+  },
+  "parent": {
+    "source": "def investigate(context, acquire):\n    capacity = context['capacity']\n    events = context['events']\n    order = []\n    hits = 0\n    misses = 0\n    for event in events:\n        if event['op'] == 'reset':\n            order = []\n            hits = 0\n            misses = 0\n        else:\n            key = event['key']\n            if key in order:\n                order.remove(key)\n                order.append(key)\n                hits = hits + 1\n            else:\n                misses = misses + 1\n                if len(order) == capacity:\n                    order.pop(0)\n                order.append(key)\n    return {'hits': hits, 'misses': misses, 'size': len(order)}\n",
+    "scope": "Implements an LRU cache diagnostic for one fresh query: capacity 1..4, at most 32 events, integer keys 0..31, call and reset operations only.",
+    "change": "Replaced native functools.lru_cache with an explicit ordered-key list: calls move an existing key to most-recent and count a hit, otherwise count a miss, evict the least-recent key at capacity, and insert; reset clears order, hits, and misses. Returns cache_info-equivalent hits, misses, and size.",
+    "error": null,
+    "call_id": "native-lru-1-parent",
+    "prompt_sha256": "3513752b1adf5c7829859f953edfcba2427bad6c90be70f4a10bf0fb47bc8873",
+    "raw_sha256": "7115e75bf6f248e4aa7ec370b7ea08d16c26fe238ef442db01ceb955e2607647",
+    "elapsed_seconds": 11.976618916000007,
+    "development": {
+      "correct": 8,
+      "total": 8,
+      "errors": 0,
+      "rows": [
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 1,
+            "events": []
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 1,
+            "size": 1
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 1,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 3,
+            "size": 1
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 2,
+            "size": 2
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 2,
+            "size": 2
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 4,
+            "size": 2
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 2
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 3,
+            "events": [
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "call",
+                "key": 2
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 1,
+            "size": 1
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 1,
+            "misses": 4,
+            "size": 4
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 4,
+            "events": [
+              {
+                "op": "call",
+                "key": 1
+              },
+              {
+                "op": "call",
+                "key": 2
+              },
+              {
+                "op": "call",
+                "key": 3
+              },
+              {
+                "op": "call",
+                "key": 4
+              },
+              {
+                "op": "call",
+                "key": 1
+              }
+            ]
+          },
+          "expected": {
+            "hits": 1,
+            "misses": 4,
+            "size": 4
+          },
+          "correct": true
+        },
+        {
+          "answer": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "trace": [],
+          "error": null,
+          "input": {
+            "capacity": 2,
+            "events": [
+              {
+                "op": "call",
+                "key": 31
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "reset"
+              }
+            ]
+          },
+          "expected": {
+            "hits": 0,
+            "misses": 0,
+            "size": 0
+          },
+          "correct": true
+        }
+      ]
+    }
+  },
+  "failure": "RuntimeError: Direct action provider failure; see persisted turn and budget receipt."
+}

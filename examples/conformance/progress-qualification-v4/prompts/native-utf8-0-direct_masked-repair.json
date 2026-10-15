@@ -1,0 +1,437 @@
+{
+  "prompt": {
+    "task": {
+      "id": "native-utf8-0",
+      "source_id": "utf8-0",
+      "contract": "Native strict codecs UTF8 incremental-decoder diagnostic.\nA fresh query is exactly {\"events\":[event,...]}, with at most 32 events.\nAn event is exactly {\"op\":\"feed\",\"bytes\":[integer,...]}, {\"op\":\"finish\"},\nor {\"op\":\"reset\"}. Each byte is an integer 0..255, excluding booleans; each\nchunk has at most 64 bytes and the entire query at most 256 bytes. Empty chunks\nare legal. Feed invokes decode(bytes, final=False); finish invokes decode with\nempty bytes and final=True. Count Unicode code points in strings successfully\nreturned by these calls, not bytes or graphemes. A UnicodeDecodeError is a\nmeasured result: status becomes \"error\", and the failing call contributes ZERO\ncharacters, including any valid prefix in that same chunk. Successful finish\nsets status \"finished\". Otherwise status is \"open\", including incomplete byte\nprefixes. After either terminal status, only reset is legal. Reset creates a\nfresh strict decoder and sets count=0,status=\"open\". Reset may also occur while\nopen. Return {\"count\":integer,\"status\":\"open\"|\"finished\"|\"error\"}. Each query\nstarts fresh. Invalid/incomplete UTF8 bytes are allowed inputs; malformed query\nshapes and events after a terminal result without reset are illegal queries.\nImplement investigate(context, acquire). No initial program is supplied.\n",
+      "examples": [
+        {
+          "input": {
+            "events": []
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  163
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  66,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          }
+        },
+        {
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  97
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          }
+        }
+      ]
+    },
+    "parent_source": "def investigate(context, acquire):\n    events = context.get('events')\n    if events is None:\n        events = []\n    count = 0\n    status = 'open'\n    pending = []\n    for event in events:\n        op = event.get('op')\n        if op == 'feed':\n            if status == 'error' or status == 'finished':\n                continue\n            data = event.get('bytes')\n            if data is None:\n                data = []\n            pending.extend(data)\n            text = None\n            while len(pending) > 0:\n                lead = pending[0]\n                if lead < 128:\n                    need = 0\n                elif 192 <= lead <= 223:\n                    need = 1\n                elif 224 <= lead <= 239:\n                    need = 2\n                elif 240 <= lead <= 247:\n                    need = 3\n                else:\n                    status = 'error'\n                    pending = []\n                    break\n                if len(pending) < 1 + need:\n                    break\n                valid = True\n                index = 1\n                while index <= need:\n                    trail = pending[index]\n                    if trail < 128 or 191 < trail:\n                        valid = False\n                        break\n                    index = index + 1\n                if not valid:\n                    status = 'error'\n                    pending = []\n                    break\n                if need == 0:\n                    low = 0\n                    high = 127\n                elif need == 1:\n                    low = 128\n                    high = 2047\n                elif need == 2:\n                    low = 2048\n                    high = 65535\n                else:\n                    low = 65536\n                    high = 1114111\n                value = lead & (127 >> need)\n                index = 1\n                while index <= need:\n                    value = (value << 6) | (pending[index] & 63)\n                    index = index + 1\n                if value < low or value > high or (55296 <= value <= 57343):\n                    status = 'error'\n                    pending = []\n                    break\n                text = ''.join(chr(item) for item in pending[:1 + need])\n                del pending[:1 + need]\n            if status == 'error':\n                continue\n            if text is not None:\n                count = count + len(text)\n        elif op == 'finish':\n            if status == 'error' or status == 'finished':\n                continue\n            if len(pending) > 0:\n                status = 'error'\n                pending = []\n            else:\n                status = 'finished'\n        elif op == 'reset':\n            count = 0\n            status = 'open'\n            pending = []\n    return {'count': count, 'status': status}\n",
+    "parent_examples": {
+      "correct": 0,
+      "total": 8,
+      "errors": 8,
+      "rows": [
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported method: join",
+          "input": {
+            "events": []
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported method: join",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported method: join",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "open"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported method: join",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  194
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  163
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported method: join",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  240,
+                  159,
+                  152,
+                  128
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported method: join",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  128
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 0,
+            "status": "error"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported method: join",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  65
+                ]
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  66,
+                  255
+                ]
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "error"
+          },
+          "correct": false
+        },
+        {
+          "answer": null,
+          "trace": [],
+          "error": "ValueError: ValueError: unsupported method: join",
+          "input": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  226,
+                  130
+                ]
+              },
+              {
+                "op": "finish"
+              },
+              {
+                "op": "reset"
+              },
+              {
+                "op": "feed",
+                "bytes": [
+                  97
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "expected": {
+            "count": 1,
+            "status": "finished"
+          },
+          "correct": false
+        }
+      ]
+    },
+    "investigation": {
+      "receipts": [
+        {
+          "slot": 1,
+          "turn": 1,
+          "query": {
+            "events": [
+              {
+                "op": "feed",
+                "bytes": [
+                  224,
+                  160
+                ]
+              },
+              {
+                "op": "finish"
+              }
+            ]
+          },
+          "note": "Probe strict-UTF8 edge cases: 3-byte overlong (E0 A0), surrogate (ED A0), >U+10FFF (F4 90), and stray continuation (BF). Candidate also crashes on ''.join, so all may error at runtime.",
+          "expected": {
+            "count": 0,
+            "status": "error"
+          },
+          "parent_answer": null,
+          "parent_error": "ValueError: unsupported method: join",
+          "verified_counterexample": true,
+          "query_units": 5
+        }
+      ],
+      "native_probes": 1,
+      "query_attempts": 1,
+      "query_units": 5,
+      "policy_executions": 0,
+      "slots_used": 1,
+      "detected": true,
+      "semantic_defect": false,
+      "technical_defect": true,
+      "witness_sha256": "4b360f58f91edfff3912f0953239181888074df116af7e8ecab4f8fb8a311fc6"
+    },
+    "instruction": "Repair the complete ordinary program using all measured outcomes. Investigator notes are hypotheses: inspect the code and receipts yourself. You may change any function, interface or state, remove the decomposition or preserve correct code. Retain all previously correct obligations, not only the latest witness. Return source, scope and change."
+  },
+  "system": "Return one JSON object with source, scope and change strings.\nsource is the COMPLETE executable Python program defining investigate(context, acquire).\nReturn exactly the JSON value requested in the task contract. Each query starts\nfresh. context contains the task input only. There are no external tables.\nUse the measured development examples to infer the source-specific behaviour.\nDo not hardcode the example outputs; later queries have new values/combinations.\nOnly function definitions at module level. No imports, annotations, decorators,\ndefault arguments, private names, exceptions, I/O or global state.\nThe single local name _ is allowed; other leading-underscore names are not.\nUse x*x and x*x*x rather than exponentiation (**); do not use function defaults.\nFor and while loops, comprehensions, lambda, nonlocal closure variables and arithmetic\nexcept power are permitted. No classes, try/except, yield or recursion tricks.\nAll execution remains bounded by the worker CPU, memory and wall-time limits.\nBuiltins: abs all any bool dict enumerate float int isinstance len list max min\nrange repr reversed round set sorted str sum tuple zip.\nMethods: get items keys values append extend sort lower upper strip split\nsetdefault add discard copy count index pop remove clear update.\nLimit 60000 UTF8 bytes. Use scope/change for concise technical claims, not a\nchain-of-thought transcript. No source evaluator or hidden configuration is available.\n",
+  "response_schema": {
+    "type": "object",
+    "properties": {
+      "source": {
+        "type": "string"
+      },
+      "scope": {
+        "type": "string"
+      },
+      "change": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "source",
+      "scope",
+      "change"
+    ],
+    "additionalProperties": false
+  }
+}

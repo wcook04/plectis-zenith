@@ -132,7 +132,7 @@ def test_measured_native_feedback_and_note_reach_the_actual_repair_request(tmp_p
 def test_actual_provider_requests_strip_truth_panels_and_fixed_probe_answers(tmp_path):
     tape = [response(PARENT), response(POLICY), response(),
             response(POLICY), response(), response()]
-    output, provider, unused = completed(tmp_path, arms=study.ARMS, responses=tape)
+    output, provider, unused = completed(tmp_path, arms=study.LEGACY_ARMS, responses=tape)
     assert len(provider.calls) == 6
     for call in provider.calls:
         material = json.dumps(call)

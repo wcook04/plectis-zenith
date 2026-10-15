@@ -84,7 +84,7 @@ def completed(tmp_path_factory):
     root = tmp_path_factory.mktemp('conformance-export-fixture')
     output = root / 'private-study'
     study.prepare(output, 'deepseek/deepseek-v4.1-flash', ['fixture/endpoint'],
-                  dataset=dataset(), arms=study.ARMS, workers=1, max_output_tokens=1024,
+                  dataset=dataset(), arms=('ordinary','witness','fixed'), workers=1, max_output_tokens=1024,
                   model_evidence={'authority':'offline fixture'})
     provider = FixtureProvider(output); provider.save_budget()
     study.run(output, provider_factory=lambda task, route:provider)
@@ -105,7 +105,7 @@ def test_export_copies_every_actual_call_and_excludes_private_transports(complet
     source, provider = completed; output = tmp_path / 'public'
     result = publication.export(source, output)
     assert result['calls'] == len(provider.calls) == 6
-    expected = set(publication.BASE_FILES) | {'billing.json'}
+    expected = set(publication.BASE_FILES) | {'billing.json', 'records/native-lru-0.json'}
     for panel in publication.PANELS:
         expected.update(panel + suffix for suffix in ('.json','-selection.json','-summary.json'))
     nodes = {r['node'] for r in provider.calls}
@@ -234,7 +234,7 @@ class FailingProvider(FixtureProvider):
 def test_terminal_partial_export_preserves_orphan_response_and_failed_attempt(tmp_path):
     source = tmp_path / 'partial'
     study.prepare(source, 'deepseek/deepseek-v4.1-flash', ['fixture/endpoint'],
-                  dataset=dataset(), arms=study.ARMS, workers=1, max_output_tokens=1024)
+                  dataset=dataset(), arms=('ordinary','witness','fixed'), workers=1, max_output_tokens=1024)
     provider = FailingProvider(source); provider.save_budget()
     result = study.run(source, provider_factory=lambda task, route:provider)
     assert not result['complete']
@@ -268,7 +268,7 @@ def test_terminal_partial_export_preserves_orphan_response_and_failed_attempt(tm
 def test_missing_final_freeze_recovers_exact_durable_records_without_inference(tmp_path):
     source = tmp_path / 'interrupted'
     study.prepare(source, 'deepseek/deepseek-v4.1-flash', ['fixture/endpoint'],
-                  dataset=dataset(), arms=study.ARMS, workers=1, max_output_tokens=1024)
+                  dataset=dataset(), arms=('ordinary','witness','fixed'), workers=1, max_output_tokens=1024)
     provider = FailingProvider(source); provider.save_budget()
     study.run(source, provider_factory=lambda task, route:provider)
     (source / 'frozen.json').unlink(); (source / 'frozen-receipt.json').unlink()
@@ -324,3 +324,94 @@ def test_source_archive_rejects_unsafe_members_and_credentials(tmp_path, member)
         elif member == 'credential': archive.writestr('config.json', json.dumps({'api_key':SECRET}))
         else: archive.writestr(member, 'pass')
     with pytest.raises(ValueError, match='Unsafe|private metadata'): publication.archive_members(path)
+
+
+@pytest.fixture
+def linked_funding_exports(tmp_path):
+    """Two public snapshots explicitly share the actual settled forty-call prefix."""
+    source_root = Path(__file__).resolve().parents[1]
+    name = 'progress-diagnostic-v5-reservation-stop'
+    source = source_root / 'examples/conformance' / name
+    if not source.exists():
+        pytest.skip('Funding prefix not published in this checkout')
+    first = tmp_path / 'examples/conformance/prefix'
+    second = tmp_path / 'examples/conformance/continuation'
+    shutil.copytree(source, first); shutil.copytree(source, second)
+    receipt_path = tmp_path / 'docs/progress-v5-funding-amendment-20261015.json'
+    receipt_path.parent.mkdir(parents=True)
+    shutil.copyfile(source_root / 'docs' / receipt_path.name, receipt_path)
+    receipt = study.read(receipt_path)
+    protocol = study.read(second / 'protocol.json')
+    protocol['max_cost_usd'] = receipt['amended_cap_usd']
+    study.write_json(second / 'protocol.json', protocol)
+    study.write_json(second / 'preparation.json', {'protocol_sha256':study.digest(protocol)})
+    frozen = study.read(second / 'frozen.json'); frozen['protocol_sha256'] = study.digest(protocol)
+    study.write_json(second / 'frozen.json', frozen)
+    frozen_receipt = study.read(second / 'frozen-receipt.json')
+    frozen_receipt['frozen_sha256'] = study.digest(frozen)
+    study.write_json(second / 'frozen-receipt.json', frozen_receipt)
+    for name in ('protocol.json', 'preparation.json', 'frozen.json', 'frozen-receipt.json'):
+        rehash(second, name)
+    return tmp_path, first, second
+
+
+def test_campaign_separates_study_populations_from_verified_reused_billing(linked_funding_exports):
+    root, unused, unused_second = linked_funding_exports
+    result = publication.campaign(root)
+    assert result['study_summed_calls'] == 80
+    assert result['calls'] == 40
+    assert len(result['studies']) == 2 and all(row['calls'] == 40 for row in result['studies'])
+    assert result['study_summed_reported_cost_usd'] == '0.10395516'
+    assert result['reported_cost_usd'] == '0.05197758'
+    assert result['custody_linked_reused_calls'] == 40
+    assert result['funding_reuse'][0]['reused_paid_attempts'] == 40
+
+
+@pytest.mark.parametrize('mutation', ['cost', 'raw-file'])
+def test_campaign_rejects_changed_same_identity_within_declared_funding_lineage(linked_funding_exports, mutation):
+    root, unused, second = linked_funding_exports
+    if mutation == 'cost':
+        billing = study.read(second / 'billing.json')
+        billing['entries'][0]['cost'] = str(Decimal(billing['entries'][0]['cost']) + Decimal('0.001'))
+        billing['total_reported_cost_usd'] = str(Decimal(billing['total_reported_cost_usd']) + Decimal('0.001'))
+        study.write_json(second / 'billing.json', billing); rehash(second, 'billing.json')
+    else:
+        name = next((second / 'responses').glob('*.json')).relative_to(second).as_posix()
+        path = second / name; path.write_text(path.read_text() + ' ')
+        rehash(second, name)
+    # Both exports remain internally well formed; the explicit shared prefix does not.
+    assert publication.verify_manifest(second)['calls'] == 40
+    with pytest.raises(ValueError, match='Funding-linked'):
+        publication.campaign(root)
+
+
+def test_independent_ledgers_with_same_request_ids_remain_separately_billed(completed, tmp_path):
+    source, unused = completed
+    first = tmp_path / 'examples/conformance/independent-one'
+    second = tmp_path / 'examples/conformance/independent-two'
+    publication.export(source, first); publication.export(source, second)
+    billing = study.read(second / 'billing.json')
+    billing['entries'][0]['cost'] = '0.002'
+    billing['total_reported_cost_usd'] = '0.007'
+    study.write_json(second / 'billing.json', billing); rehash(second, 'billing.json')
+    for panel in publication.PANELS:
+        summary = study.summarize_results(study.read(second / (panel + '.json')),
+                                          study.read(second / 'frozen.json'), billing)
+        study.write_json(second / (panel + '-summary.json'), summary)
+        rehash(second, panel + '-summary.json')
+    result = publication.campaign(tmp_path)
+    assert result['calls'] == result['study_summed_calls'] == 12
+    assert result['reported_cost_usd'] == '0.013'
+    assert result['custody_linked_reused_calls'] == 0
+
+
+@pytest.mark.parametrize('schema', ['zenith_progress_prospective_publication_v1',
+                                   'zenith_client_investigation_export_v1'])
+def test_campaign_keeps_other_source_and_experiment_owners_separate(tmp_path, schema):
+    folder = tmp_path / 'examples/conformance/protocol-source'
+    folder.mkdir(parents=True)
+    study.write_json(folder / 'manifest.json', {
+        'schema':schema, 'files':{}})
+    result = publication.campaign(tmp_path)
+    assert result['calls'] == 0 and result['studies'] == []
+    assert result['reported_cost_usd'] == '0'

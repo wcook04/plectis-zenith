@@ -6,8 +6,10 @@ the [research notice](../RESEARCH_NOTICE.md).
 
 A React frontend for the read-only website API in
 [docs/website-backend.md](../docs/website-backend.md). It walks through the
-paper's argument and displays the current Advance campaign receipt, with explicit
-failed, partial and complete states. Historical mission graphs and their node
+paper's argument and displays the current Progress campaign receipt when published,
+with qualification, diagnostic and cost boundaries kept separate. A separate SQLite
+client pilot compares two frozen testers with fresh investigation and fixed tests.
+The exact-class learner keeps its own acquisition comparison. Historical mission graphs and their node
 inspectors remain available through the retained API: instructions, dependencies,
 expected outputs and optional saved-run records retain their own provenance.
 
@@ -84,12 +86,41 @@ colour-blind separation in both themes.
 
 The shared-universe backend adds `basket`, `basket_serial` and `basket_evolve` mission scopes to `/api/v1/graph`. `/api/v1/documents/experiment` describes the numerical protocol; `/api/v1/evidence/basket-result`, `basket-protocol` and `basket-trace` expose reviewed research evidence. `/api/v1/documents/synthetic-fixture` retains the earlier System A instructions.
 
-The site metadata explicitly selects the Advance campaign; historical basket receipts retain their own provenance. Public mode serves allowlisted evidence only; it does not expose the downloaded panel, local credentials or arbitrary run files. Model execution stays in the explicit CLI. No frontend redesign is required to use these endpoints.
+The site metadata explicitly selects the Progress campaign; the Advance and basket receipts retain their own provenance. Public mode serves allowlisted evidence only; it does not expose the downloaded panel, local credentials or arbitrary run files. Model execution stays in the explicit CLI. No frontend redesign is required to use these endpoints.
 
 `/api/v1/evidence/basket-repair` serves the successful new-date interface check separately from the original pilot result. Graph API records for basket nodes link to their own protocol and do not attach a legacy System A dossier.
 
 ## Active study and historical reasoning graph
 
-The current chapters route to `/api/v1/documents/advance-synthesis`, `conformance-study` and `continuation-memory`; `/api/v1/evidence/advance-campaign` gives the current derived receipt. Completion means the analysis is complete: each underlying study retains its own construction status. The interface keeps failed attempts, known reported costs, pending evidence and historical links distinct. Native and algebraic outcomes are not pooled. The original `/api/v1/evidence/observation-learning-result` and other prior document/evidence routes remain historical references. Actual private provider records remain local CLI artifacts.
+The current chapters route to `/api/v1/documents/progress-synthesis`, `conformance-study` and `continuation-memory`; `/api/v1/evidence/progress-campaign` serves the derived source-bound receipt when published. Its qualification and diagnostic studies keep their own actual attempts, known reported costs and evaluation panels. A forfeited protocol version remains visible without being pooled into a later diagnostic. `/api/v1/evidence/advance-campaign`, `/api/v1/documents/advance-synthesis`, `/api/v1/evidence/observation-learning-result` and other earlier routes remain historical references. Actual private provider records remain local CLI artifacts.
+
+`/api/v1/evidence/client-investigation` serves `zenith_client_investigation_report_v1`
+from `docs/client-investigation-20261014.json`; `/api/v1/documents/client-investigation-protocol`
+serves its method, with the analysis at `/api/v1/documents/client-investigation`.
+The results section renders this pilot independently of the native
+campaign. It displays exact model cost, detected faults and valid target queries by
+method, and withholds protected outcomes for an incomplete or unsupported receipt.
+These are finite checks within an authored SQLite family; they do not establish
+independent transfer or a false-accusation rate.
+
+The client section displays the latest published version and keeps each earlier
+version's receipt and analysis linked. The v1 routes retain their original
+meaning. `/api/v1/evidence/client-investigation-v2` and `client-investigation-v2-low`
+serve the separate v2 attempts, with matching document IDs for their analyses.
+`/api/v1/documents/client-investigation-protocol-v2` serves the clarified protocol.
+An invalid compiled artifact is labelled with skipped target runs rather than
+reported as a measured zero. The table separates target queries and model calls;
+the headline cost includes acquisition and compilation.
+
+## Static publication
+
+Build with `VITE_ZENITH_SNAPSHOT=1` and `VITE_ZENITH_API` set to the deployment
+prefix, and pass the same prefix to Vite's `--base` option. The UI then reads
+one `public-api.json` snapshot with schema `zenith_public_api_snapshot_v1` and
+a `routes` map of exact public API paths to response bodies. Public read links
+point to the corresponding `.json` files; assets use the deployment prefix.
+Missing routes return a clear error without attempting a live backend.
+The snapshot is exported from the read-only backend, preserving source hashes
+and the public allowlist. See [website backend](../docs/website-backend.md).
 
 Use `financial_lab`, `financial_oracle` and `financial_refinement` as graph mission parameters. Responses expose effective dependencies, instructions and the persisted reasoning schema at each model node. `/api/v1/documents/reasoning-ontology` explains the contracts. `/api/v1/evidence/reasoning-schemas` exports them, and the `full-graph-result` and `full-graph-trace` evidence routes serve the completed experiment when present. The trace includes the frozen Lab graph and original-input bindings available to Oracle. This change concerns the backend and evidence; it does not redesign the frontend.

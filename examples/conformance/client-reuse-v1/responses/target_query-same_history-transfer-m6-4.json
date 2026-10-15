@@ -1,0 +1,4 @@
+{
+  "raw": "{\"queries\": [{\"outer\": true, \"initial\": [[1, 5], [2, 5], [3, 5]], \"steps\": [[1, 2, 5], [2, 3, 10], [3, 1, 5]], \"continuation\": [1, 3]}], \"note\": \"Probe caller-owned transaction with a successful transfer draining source 1 to 0, then an insufficient-funds transfer from 2 (which has 10 after first transfer, amount 10 would succeed; use amount 10 to test boundary) — actually amount 10 exceeds max 9, so use amount 9 to test insufficient funds from 2 (has 10, so 9 succeeds). Instead: first transfer 1->2 amount 5 (1 becomes 0, 2 becomes 10), second transfer 2->3 amount 10 is illegal (max 9), so use 2->3 amount 9 (2 becomes 1, 3 becomes 14), but\"}",
+  "envelope_sha256": "44755ee97271bd21cb66fe03f832586592f1081c3576acce322a6817dd24657a"
+}

@@ -33,8 +33,8 @@ export const SECTION_LABEL: Record<string, string> = {
 };
 
 export const HERO = {
-  lede: 'Can a measured failure become a computation that keeps working?',
-  question: 'Zenith turns measured source behavior into executable predictions. Retain alternative programs and their evidence, challenge them with observations, and test when selection, new code or composition actually helps.',
+  lede: 'Can an earlier investigation improve the next one?',
+  question: 'Zenith tests which questions expose a program’s limits, whether measured answers improve its repair, and when a retained procedure earns its cost against ordinary code and tests.',
 };
 
 // Counts come from the graph the backend serves, never from this file.

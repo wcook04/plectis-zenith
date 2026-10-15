@@ -15,6 +15,7 @@ from functools import lru_cache
 import json
 import platform
 import random
+import re
 import sqlite3
 
 from research import decomposition_tasks as sqlite_tasks
@@ -97,9 +98,12 @@ def _family(source_id):
         raise ValueError("source_id must be a registered string")
     if source_id in FAMILIES:
         return source_id
-    if source_id not in SOURCE_IDS:
+    if source_id in SOURCE_IDS:
+        return SOURCE_IDS[source_id]
+    match = re.fullmatch(r"(sqlite|lru|utf8)-([0-9]+)", source_id)
+    if match is None or int(match.group(2)) >= 32:
         raise ValueError("unknown native source_id")
-    return SOURCE_IDS[source_id]
+    return match.group(1)
 
 
 def _validate_shape(kind, query):
@@ -284,12 +288,35 @@ def _canonical(value):
 
 
 def authored_fixed_queries(source_id, examples):
-    """Eight authored probes: contract boundaries plus absent proper prefixes.
+    """Eight authored probes, including known UTF-8 standard boundaries.
 
     Only public input shapes are read. No expected answers, protected panels,
     candidate predictions, source measurements or private references are read.
     """
     kind = _family(source_id)
+    if kind == 'utf8':
+        # RFC 3629 restricted lead/continuation edges. This stronger authored
+        # rival was identified retrospectively on exposed studies; freeze it
+        # before new inference and do not embed source answers.
+        words = ((0xC0,), (0xC1,), (0xF5,), (0xFF,),
+                 (0xE0, 0x9F), (0xED, 0xA0), (0xF0, 0x8F), (0xF4, 0x90))
+        boundaries = [{'events': [_feed(word)]} for word in words]
+        known = {_canonical(row['input']) for row in examples}
+        fallback = []
+        for row in examples:
+            events = row['input']['events']
+            for cut in range(len(events) - 1, -1, -1):
+                fallback.append({'events': deepcopy(events[:cut])})
+        result = []
+        for query in boundaries + _boundaries(kind) + fallback:
+            key = _canonical(query)
+            if key in known:
+                continue
+            _validate_shape(kind, query)
+            known.add(key); result.append(deepcopy(query))
+            if len(result) == PROBE_BUDGET:
+                return result
+        raise ValueError('public examples leave too few authored fixed probes')
     boundaries = _boundaries(kind)
     field = "actions" if kind == "sqlite" else "events"
     prefixes = []
@@ -393,23 +420,24 @@ def _utf8_input(rng, index):
 GENERATORS = {"sqlite": _sqlite_input, "lru": _lru_input, "utf8": _utf8_input}
 
 
-def build_dataset(seed=DEFAULT_SEED, panel_size=48):
-    """Freeze six parent tasks before inference, without panel-based selection.
+def build_dataset(seed=DEFAULT_SEED, panel_size=48, parents_per_contract=2):
+    """Freeze parent tasks before inference, without panel-based selection.
 
-    Two parent replicates per authored contract are not independent production
+    Parent replicates per authored contract are not independent production
     problems. Each panel is freshly sampled and exact-input disjoint across
     both replicates of its contract, public examples and fixed tester probes.
     """
     if type(seed) is not int:
         raise ValueError("seed must be an integer")
     sqlite_tasks._integer(panel_size, 1, 256, "panel_size")
+    sqlite_tasks._integer(parents_per_contract, 1, 32, "parents_per_contract")
     public = {kind: [{"input": q, "expected": measure(kind, q)}
                      for q in _public_inputs(kind)] for kind in FAMILIES}
     fixed = {kind: authored_fixed_queries(kind, public[kind]) for kind in FAMILIES}
     seen = {kind: {_canonical(row["input"]) for row in public[kind]}
             | {_canonical(q) for q in fixed[kind]} for kind in FAMILIES}
     tasks = []
-    for replicate in range(2):
+    for replicate in range(parents_per_contract):
         for kind in FAMILIES:
             source_id = f"{kind}-{replicate}"
             task = {"id": f"native-{source_id}", "source_id": source_id,
@@ -435,7 +463,8 @@ def build_dataset(seed=DEFAULT_SEED, panel_size=48):
                                         "lru": LRU_REFERENCE, "utf8": None}[kind]
             tasks.append(task)
     return {"schema": "zenith_native_conformance_dataset_v1", "seed": seed,
-            "panel_size": panel_size, "probe_budget": PROBE_BUDGET,
+            "panel_size": panel_size, "parents_per_contract": parents_per_contract,
+            "probe_budget": PROBE_BUDGET,
             "max_query_units": {"sqlite": 34, "lru": 33, "utf8": 289},
             "source_versions": {"python": platform.python_version(), "sqlite": sqlite3.sqlite_version,
                                 "lru": "stdlib functools.lru_cache", "utf8": "stdlib codecs strict utf-8"},

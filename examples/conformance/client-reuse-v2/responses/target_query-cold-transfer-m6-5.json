@@ -1,0 +1,4 @@
+{
+  "raw": "{\"queries\": [{\"outer\": true, \"initial\": [[1, 4], [2, 4], [5, 0]], \"steps\": [[1, 2, 3], [2, 5, 2], [5, 1, 1]], \"continuation\": [5, 2]}], \"note\": \"Probe whether a failed transfer inside an outer caller transaction can leave partial effects when the failure is on the destination side. Step 1 should succeed (1->2, 3). Step 2 should fail on insufficient funds (id 5 has 0). Step 3 should fail on missing source (id 5 has 0). Continuation credits id 5. This tests debit/credit atomicity and whether the caller transaction remains usable after a failed transfer, distinct from prior slots by using a destination with zero balance and a later missing/\"}",
+  "envelope_sha256": "ed33949ba0b0530ec55565f216166ee27e6a31c7ac372eb8b384d4043f8d0aa5"
+}
