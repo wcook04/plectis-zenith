@@ -34,7 +34,7 @@ export const SECTION_LABEL: Record<string, string> = {
 
 export const HERO = {
   lede: 'Can an earlier investigation improve the next one?',
-  question: 'Zenith tests which questions expose a program’s limits, whether measured answers improve its repair, and when a retained procedure earns its cost against ordinary code and tests.',
+  question: 'A research prototype that writes tests, measures failures and repairs code. The goal is to learn better ways to investigate the next problem.',
 };
 
 // Counts come from the graph the backend serves, never from this file.

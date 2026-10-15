@@ -6,20 +6,26 @@
 Operational latency campaigns, financial experiments and the older System A fixture remain separately labelled historical profiles. See
 the [research notice](../RESEARCH_NOTICE.md).
 
-A React frontend for the read-only website API in
-[docs/website-backend.md](../docs/website-backend.md). It walks through the
-paper's argument and displays the current Progress campaign receipt when published,
-with qualification, diagnostic and cost boundaries kept separate. A separate SQLite
-client pilot compares two frozen testers with fresh investigation and fixed tests.
-The exact-class learner keeps its own acquisition comparison. Historical mission graphs and their node
-inspectors remain available through the retained API: instructions, dependencies,
-expected outputs and optional saved-run records retain their own provenance.
+The current page has four sections: the research question, how the method works,
+what the experiments found, and the frontier. The three findings remain separate:
+reusable client tests, native program repair and the continuation learner. Primary
+results and ordinary controls stay visible; qualification details, earlier attempts,
+financial studies and old graph diagrams are optional reading.
 
-Everything shown comes from the API at runtime: chapters, paper sections and
+This is a refinement of the existing `App.tsx`, `PaperAside`, result tables and
+`source-doc` disclosures, using the existing React stack, STIX/Source Sans fonts,
+tokens and styles. The paper source is the primary paper link. Its older PDF is
+labelled in the archive, not presented beside current manuscript sections.
+The API keeps its six chapter IDs; the current reading view combines them into
+four sections and preserves `#lab` and `#evolve` as aliases. Theme, source links,
+raw evidence, copy controls, historical graph views and offline replay remain.
+
+Measured results and source material come from the API at runtime: chapters, paper sections and
 citations from `/site` and `/paper`, graphs from `/graph`, node detail from
 `/nodes/{id}`, measured results from `/evidence/*`, and saved runs from `/runs`
 only when the backend enables them. Node counts, result numbers and requested
-bounds are read from those responses, never written into the source.
+bounds are read from those responses. The frontend supplies the reading order
+and concise explanations of the published studies.
 
 ## Develop
 
@@ -94,7 +100,7 @@ The site metadata explicitly selects the Progress campaign; the Advance and bask
 
 ## Active study and historical reasoning graph
 
-The current chapters route to `/api/v1/documents/progress-synthesis`, `conformance-study` and `continuation-memory`; `/api/v1/evidence/progress-campaign` serves the derived source-bound receipt when published. Its qualification and diagnostic studies keep their own actual attempts, known reported costs and evaluation panels. A forfeited protocol version remains visible without being pooled into a later diagnostic. `/api/v1/evidence/advance-campaign`, `/api/v1/documents/advance-synthesis`, `/api/v1/evidence/observation-learning-result` and other earlier routes remain historical references. Actual private provider records remain local CLI artifacts.
+The current chapters route to `/api/v1/documents/progress-synthesis`, `conformance-study` and `progress-results` and `continuation-learner`; `/api/v1/evidence/progress-campaign` serves the derived source-bound receipt when published. Its qualification and diagnostic studies keep their own actual attempts, known reported costs and evaluation panels. A forfeited protocol version remains visible without being pooled into a later diagnostic. `/api/v1/evidence/advance-campaign`, `/api/v1/documents/advance-synthesis`, `/api/v1/evidence/observation-learning-result` and other earlier routes remain historical references. Actual private provider records remain local CLI artifacts.
 
 `/api/v1/evidence/client-investigation` serves `zenith_client_investigation_report_v1`
 from `docs/client-investigation-20261014.json`; `/api/v1/documents/client-investigation-protocol`

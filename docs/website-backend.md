@@ -50,8 +50,10 @@ default without `--local-runs`, behind its usual TLS reverse proxy.
 
 ## Build the reading experience from these sources
 
-Fetch `/api/v1/site` first. Its ordered chapters cover the idea, Lab, Oracle,
-Evolve, preparation status and future research. Each points to the owning document,
+Fetch `/api/v1/site` first. Its six stable chapter IDs retain the idea, Lab,
+Oracle, Evolve, results and future-research routes. The current frontend groups
+them into research question, method, findings and frontier, preserving the
+`#lab` and `#evolve` anchors. Each points to the owning document,
 diagram and native mission graph, plus a `paper_section` with manuscript hash,
 source lines, PDF named destination and citation IDs. `evidence_urls` bind the
 relevant recorded evidence directly to the chapter; an empty list means no
@@ -69,8 +71,11 @@ relative links. Sanitize rendered Markdown and treat model output as data.
 Use the recorded experiment status. Successful JSON validation alone must not be displayed as predictive success. Use the current result
 documents and receipts instead of hardcoding result counts into the frontend.
 
-The active synthesis is `/api/v1/documents/progress-synthesis`, bound to
-`docs/progress-returns-20261014.md`. Site metadata selects
+The current results explanation is `/api/v1/documents/progress-results`, bound
+to `docs/progress-campaign-20261014.md`. The learner explanation is
+`/api/v1/documents/continuation-learner`, bound to the witness-preserving
+demonstration README. The earlier assimilation remains available through
+`/api/v1/documents/progress-synthesis`. Site metadata selects
 `/api/v1/evidence/progress-campaign`, bound to
 `docs/progress-campaign-20261014.json` when that receipt is published. Its
 schema is `zenith_progress_campaign_report_v1`. A missing receipt means current
