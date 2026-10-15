@@ -19,13 +19,15 @@ bounds are read from those responses, never written into the source.
 
 ## Develop
 
+Use Node.js 22.12 or newer and complete the [Python setup](../README.md#run-it) first.
+
 ```sh
 # from the repository root: the backend, with saved local runs for development
 python -m zenith serve --port 4175 --local-runs \
   --allow-origin http://localhost:5173 --allow-origin http://127.0.0.1:5173
 
 # in site/
-npm install
+npm ci
 npm run dev        # http://localhost:5173, proxies /api and /assets to :4175
 ```
 
@@ -35,9 +37,15 @@ directly.
 ## Build and serve
 
 ```sh
+# from the repository root
+cd site
+npm ci
 npm run build      # typecheck, bundle to dist/, write dist/zenith-public.json
-python -m zenith serve --frontend-dir site/dist   # public mode, from the repo root
+cd ..
+python -m zenith serve --port 4175 --frontend-dir site/dist
 ```
+
+Open [localhost:4175](http://localhost:4175).
 
 The build writes `zenith-public.json` listing every emitted file, which is the
 allow-list the backend serves. Bundles go under `static/`, so the backend's
@@ -79,3 +87,14 @@ Typefaces (STIX Two Text and Source Sans 3, SIL OFL, licences in
 `public/fonts/`) and the paper and night grounds come from the Plectis site.
 Lane colours are a categorical palette checked for lightness, chroma and
 colour-blind separation in both themes.
+
+## README screenshot
+
+[The root README image](../docs/images/zenith-lab.png) is a 1440 × 1000 browser
+capture of this frontend served by the public-mode backend from source revision
+`26f2d80`, with the button pointer-target correction in this branch. It shows the Lab definition graph with Saved feeds expanded, `lab_decide` selected, its
+inspector open and the graph fitted to the remaining canvas. The implementation
+is [GraphExplorer](src/components/graph/GraphExplorer.tsx) with
+[Inspector](src/components/Inspector.tsx); the visual styling and fonts are unchanged.
+No private saved run is enabled. This is an interface example, not execution
+evidence.
