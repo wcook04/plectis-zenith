@@ -122,6 +122,17 @@ the headline cost includes acquisition and compilation.
 
 ## Static publication
 
+The deployed website is agent-readable without JavaScript: start with
+[llms.txt](https://wcook04.github.io/plectis-zenith/llms.txt), then the
+[research and graph map](https://wcook04.github.io/plectis-zenith/agent-map.md) or
+[machine route index](https://wcook04.github.io/plectis-zenith/agent-index.json).
+For example, `curl -fsSL https://wcook04.github.io/plectis-zenith/agent-index.json`
+returns direct files for every exported API route. Node IDs, dependencies,
+consumers, directed edges, task profiles and source hashes remain intact.
+Follow the index's `routes` mapping for mission/profile queries; GitHub Pages
+does not execute API query parameters. These files are fetched on demand and
+add no JavaScript, network request or preload to the human application.
+
 Build with `VITE_ZENITH_SNAPSHOT=1` and `VITE_ZENITH_API` set to the deployment
 prefix, and pass the same prefix to Vite's `--base` option. The UI then reads
 one `public-api.json` snapshot with schema `zenith_public_api_snapshot_v1` and
@@ -130,5 +141,20 @@ point to the corresponding `.json` files; assets use the deployment prefix.
 Missing routes return a clear error without attempting a live backend.
 The snapshot is exported from the read-only backend, preserving source hashes
 and the public allowlist. See [website backend](../docs/website-backend.md).
+
+From the repository root, generate the complete publication with:
+
+```sh
+VITE_ZENITH_SNAPSHOT=1 VITE_ZENITH_API=/plectis-zenith npm run build --prefix site -- --base=/plectis-zenith/
+python scripts/export_site_snapshot.py site/dist
+python -m pytest tests/test_site_snapshot.py tests/test_structure.py
+python scripts/check_structure.py
+```
+
+The exporter owns the generated agent map and route index; edit its source,
+not `site/dist`. `snapshot-manifest.json` hashes those outputs as well as the
+direct graph, node, document and evidence files. A frontend-only development
+build does not include these publication files; its live API still exposes
+the same source records at `/api/v1/site`.
 
 Use `financial_lab`, `financial_oracle` and `financial_refinement` as graph mission parameters. Responses expose effective dependencies, instructions and the persisted reasoning schema at each model node. `/api/v1/documents/reasoning-ontology` explains the contracts. `/api/v1/evidence/reasoning-schemas` exports them, and the `full-graph-result` and `full-graph-trace` evidence routes serve the completed experiment when present. The trace includes the frozen Lab graph and original-input bindings available to Oracle. This change concerns the backend and evidence; it does not redesign the frontend.

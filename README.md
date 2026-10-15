@@ -8,6 +8,13 @@
 
 [![Zenith’s research website](https://raw.githubusercontent.com/wcook04/plectis-zenith/main/docs/images/zenith-research.png)](https://wcook04.github.io/plectis-zenith/)
 
+**Agents can navigate the website too.** Start with [llms.txt](https://wcook04.github.io/plectis-zenith/llms.txt), follow the [research and graph map](https://wcook04.github.io/plectis-zenith/agent-map.md), or fetch the [machine route index](https://wcook04.github.io/plectis-zenith/agent-index.json). These static routes expose the same documents, measured evidence and dependency graphs, with stable node IDs and source hashes; they need no JavaScript or account. Graph definitions retain their historical scope and do not establish measured success.
+
+```sh
+curl -fsSL https://wcook04.github.io/plectis-zenith/llms.txt
+curl -fsSL https://wcook04.github.io/plectis-zenith/agent-index.json
+```
+
 **Learn a program together with the questions that expose its limits.** Zenith lets a model propose experiments, measures their answers against native software, and uses the evidence to repair ordinary code. A later test checks whether the repair helped. The longer-term question is whether experience can make the next investigation cheaper or more effective.
 
 The working implementation is deliberately small: programs, queries, measured receipts and a selection rule. A graph can organize these dependencies, but extra nodes and persuasive explanations are not success measures. Fixed tests and a repair call without new investigation are first-class competitors.
@@ -109,7 +116,9 @@ python scripts/check_structure.py
 python scripts/check_extraction.py
 ```
 
-For an agent-assisted review, clone this repository and ask the agent to read `AGENTS.md`, this README, `program.md` and the selected experiment's protocol. The website explains the research; machine receipts and archived source support exact checks. [Contributing](CONTRIBUTING.md) · [Research boundary](RESEARCH_NOTICE.md).
+For an agent-assisted review, use the [website's agent map](https://wcook04.github.io/plectis-zenith/agent-map.md), or clone this repository and ask the agent to read `AGENTS.md`, this README, `program.md` and the selected experiment's protocol. The website explains the research; machine receipts and archived source support exact checks. [Contributing](CONTRIBUTING.md) · [Research boundary](RESEARCH_NOTICE.md).
+
+The [static site exporter](scripts/export_site_snapshot.py) owns the generated `llms.txt`, `agent-map.md`, `agent-index.json` and direct JSON files in `site/dist/`; [the frontend guide](site/README.md#static-publication) documents the build. The map reuses the public API from [zenith/web_content.py](zenith/web_content.py), with [publication regressions](tests/test_site_snapshot.py) and [layout validation](scripts/check_structure.py). Generated navigation adds no browser script, fetch or preload to human reading.
 
 Earlier [memory studies](docs/continuation-memory.md), [native observation studies](docs/executable-investigations.md), [structural studies](docs/decomposition-20261014.md), [financial investigator](docs/investigator.md), [full graph](docs/full-graph-case.md), [basket pilot](docs/baskets.md) and [System A fixture](docs/demo.md) retain their original artifacts. Their results are not pooled with the current comparison.
 
