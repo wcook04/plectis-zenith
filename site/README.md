@@ -2,15 +2,22 @@
 
 [Open the public research website](https://wcook04.github.io/plectis-zenith/).
 
-**Experimental research prototype.** The active programme compares executable investigations on native SQLite, LRU caching and UTF-8 decoding, with a separate continuation-memory study.
-Operational latency campaigns, financial experiments and the older System A fixture remain separately labelled historical profiles. See
-the [research notice](../RESEARCH_NOTICE.md).
+**Experimental research prototype.** The website explains experiments in which an AI proposes tests and repairs for database, cache and text-decoding programs. A separate experiment studies whether a learning algorithm remembers enough earlier actions to predict later behavior. Older financial experiments and System A, a toy example with invented data, remain labelled as earlier work. See the [research notice](../RESEARCH_NOTICE.md).
 
 The current page has four sections: the research question, how the method works,
-what the experiments found, and the frontier. The three findings remain separate:
-reusable client tests, native program repair and the continuation learner. Primary
-results and ordinary controls stay visible; qualification details, earlier attempts,
-financial studies and old graph diagrams are optional reading.
+what the experiments found, and what still needs testing. The page distinguishes
+three results: reusing a tester on later programs, repairing programs that imitate
+reference software, and repairing a learning algorithm’s memory. Each result stays
+beside the simpler method it was compared with. Expand the detailed records to read
+the preliminary interface tests, costs and earlier attempts.
+
+A **run** is one saved execution of a program. A **receipt** in the source code is
+a saved result record containing inputs, outputs, errors and costs. A **node** is
+a data source or a program step; a graph arrow means one step reads another step’s
+output. A **profile** selects a version configured for a particular task. A file
+**hash** is a checksum used to identify exact file contents. None of these records
+alone establishes that a prediction is correct. The public text explains which
+inputs were tested, what their answers were compared with and what remains unknown.
 
 This is a refinement of the existing `App.tsx`, `PaperAside`, result tables and
 `source-doc` disclosures, using the existing React stack, STIX/Source Sans fonts,
@@ -20,7 +27,7 @@ The API keeps its six chapter IDs; the current reading view combines them into
 four sections and preserves `#lab` and `#evolve` as aliases. Theme, source links,
 raw evidence, copy controls, historical graph views and offline replay remain.
 
-Measured results and source material come from the API at runtime: chapters, paper sections and
+The page reads measured results and source material through the API, the server’s data interface: chapters, paper sections and
 citations from `/site` and `/paper`, graphs from `/graph`, node detail from
 `/nodes/{id}`, measured results from `/evidence/*`, and saved runs from `/runs`
 only when the backend enables them. Node counts, result numbers and requested

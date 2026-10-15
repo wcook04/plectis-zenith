@@ -6,7 +6,7 @@ import { SECTION_LABEL } from '../content/copy';
 import { sectionTitle, shortCitation } from '../lib/latex';
 
 const EVIDENCE_LABEL: Record<string, string> = {
-  'progress-campaign': 'Native repair comparison',
+  'progress-campaign': 'Program-repair comparison',
   sources: 'Where each input comes from, with file hashes',
   observations: 'Synthetic observations, earlier and later',
   'window-result': 'Window experiment record',
@@ -30,7 +30,7 @@ export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper:
             </a>
             <span className="paper-aside__quiet">
               {' '}
-              (current LaTeX source, lines {section.start_line}&ndash;{section.end_line})
+              (paper text and formatting code, lines {section.start_line}&ndash;{section.end_line})
             </span>
             {currentPdf && <><br /><a href={apiUrl(section.pdf_url)} target="_blank" rel="noreferrer">Section PDF</a></>}
           </p>
@@ -50,7 +50,7 @@ export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper:
       )}
       {chapter.evidence_urls.length > 0 && (
         <div className="paper-aside__block">
-          <h3 className="paper-aside__head">Evidence</h3>
+          <h3 className="paper-aside__head">Saved experiment results</h3>
           <ul className="plain-list">
             {chapter.evidence_urls.map((url) => {
               const id = url.split('/').pop() ?? url;
@@ -59,7 +59,7 @@ export function PaperAside({ chapter, paper, latex }: { chapter: Chapter; paper:
                   <a href={apiUrl(url)} target="_blank" rel="noreferrer">
                     {EVIDENCE_LABEL[id] ?? id}
                   </a>
-                  <span className="paper-aside__quiet"> (JSON)</span>
+                  <span className="paper-aside__quiet"> (JSON data file)</span>
                 </li>
               );
             })}

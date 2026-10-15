@@ -5,24 +5,24 @@
 export const EVIDENCE_KIND_LABEL: Record<string, { label: string; note: string }> = {
   proposed_process: {
     label: 'Proposed procedure',
-    note: 'A proposed procedure; execution and useful improvement are separate claims.',
+    note: 'A procedure we propose to build. This section does not report a completed experiment.',
   },
   authored_mechanism: {
     label: 'Defined in the code',
-    note: 'The procedure implemented in the repository today.',
+    note: 'The source code describes this procedure. Its results must be established by a separate experiment.',
   },
-  measured_experiment: { label: 'Measured experiment', note: 'Saved execution evidence; not necessarily an improvement.' },
+  measured_experiment: { label: 'Recorded experiment', note: 'Saved inputs and outputs show what the program did. Compare the results below to see whether a change helped.' },
   measured_execution: {
-    label: 'Measured run',
+    label: 'Recorded execution',
     note: 'What actually ran, read from saved results.',
   },
   verified_preparation: {
-    label: 'Checked preparation',
+    label: 'Inputs and request prepared',
     note: 'The inputs were loaded and the first request was prepared. No model output exists.',
   },
   research_proposal: {
     label: 'Research question',
-    note: 'A question that needs evidence before adoption.',
+    note: 'An experiment we have not yet completed, or a result we have not yet established.',
   },
 };
 
@@ -33,8 +33,8 @@ export const SECTION_LABEL: Record<string, string> = {
 };
 
 export const HERO = {
-  lede: 'Can an earlier investigation improve the next one?',
-  question: 'A research prototype that writes tests, measures failures and repairs code. The goal is to learn better ways to investigate the next problem.',
+  lede: 'Can an AI learn better ways to find faults in software?',
+  question: 'Zenith asks an AI model to write tests, runs those tests on software, and gives the results back to the model so it can repair code. We then test whether anything it learned helps with a later program.',
 };
 
 // Counts come from the graph the backend serves, never from this file.
@@ -56,41 +56,41 @@ const list = (items: string[]) =>
 
 export function labParagraphs(f: GraphFacts | null): string[] {
   if (!f) return CHAPTER_COPY.lab.paragraphs;
-  const edition = ' This historical demonstration uses only invented observations of System A; derived summaries are computed from those observations.';
+  const edition = ' This earlier demonstration uses invented observations of a toy system called System A. It does not use measurements from a real physical system.';
   return [
-    `The retained historical graph has ${f.total} nodes: ${numberWord(f.feeds)} data feeds and ${f.reasoning} reasoning steps. ${capital(numberWord(f.acquired.length))} feeds are source observations (${list(f.acquired)}), and a tool computes summaries from measurements, subsystem readings and context.${edition}`,
-    `${capital(numberWord(f.miners))} miners, one for each feed, each extract the main signals from their feed. The first synthesis maps where their findings agree and conflict, Orient builds causal hypotheses, and Decide freezes a thesis as checkpoint CP1. A second, directed pass re-reads every feed for that thesis before the Director freezes predictions at CP2. Integrity then audits both passes.`,
+    `The diagram has ${f.total} boxes, called nodes: ${numberWord(f.feeds)} supply saved data and ${f.reasoning} describe reasoning steps. ${capital(numberWord(f.acquired.length))} data sources contain observations (${list(f.acquired)}). Another step calculates summaries from those same observations.${edition}`,
+    `${capital(numberWord(f.miners))} steps called miners each read one data source. Synthesis compares their findings. Orient proposes possible causes, and Decide saves one explanation at checkpoint CP1. The miners read the data again to examine that explanation. Director saves predictions at checkpoint CP2, and Integrity reviews the reasoning. These names identify steps in a program; they do not establish that its explanations or predictions are correct.`,
     CHAPTER_COPY.lab.paragraphs[0],
   ];
 }
 
 export const CHAPTER_COPY: Record<string, { kicker: string; paragraphs: string[] }> = {
-  idea: { kicker: 'Knowledge that can do work', paragraphs: [
-    'An observed counterexample can require a different computation. Retain useful alternative programs, measured failures and the evidence on which predictions depend.',
-    'The current study asks what a native SQLite channel measures. A counter can include rolled-back changes or auxiliary writes even when committed item count stays unchanged.',
+  idea: { kicker: 'Learn from a program’s wrong answers', paragraphs: [
+    'When a program gives the wrong answer, the test that exposed the error can help us decide how to change it. This earlier study saved proposed programs, failed examples and the observations used to make predictions.',
+    'The study asks what a counter reported by the SQLite database actually counts. It can include changes that were later undone, or extra writes, even when the number of saved items does not change.',
   ] },
-  lab: { kicker: 'Measure an unfamiliar source', paragraphs: [
-    'The model proposes action sequences. The host executes disposable native SQLite experiments and records the channel alongside separately read committed count and value sum.',
-    'Every construction policy receives the same observed transcript. Model-written Python predicts new action combinations; a restricted process records its acquired history and execution errors.',
+  lab: { kicker: 'Run tests on the reference software', paragraphs: [
+    'The model proposes sequences of database operations. Zenith runs each sequence in a disposable SQLite database. It records the reported counter, the number of saved items and the sum of their values.',
+    'Each method receives the same earlier tests and answers. The model writes Python code to predict the answers for other sequences. Zenith runs that code with limits on its operations and resources, and saves any execution errors.',
   ] },
-  oracle: { kicker: 'Make failure observable', paragraphs: [
-    'Measured calibration outputs check each proposed program. Rejected candidates and their execution errors remain available to the next repair request.',
-    'Development selection permits valid neutral revisions and reports regressions. Protected compositions are evaluated only after every construction call has finished; source identification remains conditional on the frozen native family.',
+  oracle: { kicker: 'Compare predictions with actual answers', paragraphs: [
+    'Zenith compares a proposed program’s predictions with the database’s actual responses. If the program is rejected, the next request to the model includes that code and its errors.',
+    'During development, a valid change may be retained even if its score is unchanged; worse results are also recorded. Additional combinations of operations are tested only after the model has finished writing code. The conclusions apply to the particular database implementations selected for this study.',
   ] },
-  evolve: { kicker: 'Freeze before comparison', paragraphs: [
-    'Incremental repair sees the latest challenger; archive construction retains earlier attempts; the fresh compiler starts with final evidence. All receive the same proposal allowance and executable interface.',
-    'Freeze every checkpoint before protected evaluation. A first-checkpoint control, empty-history replay and unlearned program test what the final computation and supplied observations contribute.',
+  evolve: { kicker: 'Save each version before testing it', paragraphs: [
+    'The comparison gives the model different histories: the latest proposed program, all earlier attempts, or only the final collected observations. Each method has the same limit on proposals and can use the same operations.',
+    'Zenith saves each version before trying the later test inputs. It also tests the first version, the final version without the earlier observations, and a program that has not learned from those observations. These comparisons ask whether the revisions and the supplied history actually helped.',
   ] },
-  results: { kicker: 'Replay the evidence', paragraphs: [
-    'The table below shows the initial native comparison. Follow-on receipts and the repository explanation compare fresh reconstruction, complementary candidate pools, new observations, archive selection and composition.',
-    'Complete receipts compare frozen exact answers, unsupported commitments and execution errors. Configured native sources are conditional replications in one software family, not independent domains.',
+  results: { kicker: 'Read the recorded results', paragraphs: [
+    'The table shows the initial comparison against the reference software. The linked later experiments ask whether rewriting from scratch, keeping several proposed programs or collecting more observations helps.',
+    'The saved records include correct answers, unsupported predictions and execution errors. Repeating the experiment with different settings of the same software does not establish that the method works in unrelated applications.',
   ] },
   'results:verified_preparation': { kicker: 'Historical fixture preparation', paragraphs: [
-    'The retained System A fixture uses invented observations. Its preparation receipt loaded inputs and prepared a request without inference.',
+    'System A is a toy example with invented observations. Zenith loaded its data and prepared a request, but did not send the request to a model. No prediction result was produced.',
   ] },
-  next: { kicker: 'Make the knowledge cumulative', paragraphs: [
-    'Test transfer to independently implemented sources and misleading near-matches. A bounded native comparison cannot by itself establish broad semantic discovery or lifetime economic value.',
-    'Compare complete evidence, execution and inference costs. Preserve unresolved goals and failed attempts when the current computation does not support a new conclusion.',
+  next: { kicker: 'Test software from other sources', paragraphs: [
+    'A later experiment should test independently written software, including programs that look similar but behave differently. The results here do not show that Zenith can discover the meaning of arbitrary software or save money over a long period.',
+    'Count the work needed to collect observations, execute programs and request AI responses. Keep unsuccessful attempts in the comparison, and leave unanswered questions open.',
   ] },
 };
 
@@ -99,32 +99,32 @@ export const LOOP_STAGES = [
     id: 'feeds',
     side: 'before',
     title: 'Earlier evidence',
-    detail: 'Feeds saved at the cutoff',
+    detail: 'Saved input data',
     receives: 'The source observations and derived summaries, exactly as saved at time t.',
-    produces: 'A fixed input universe. Anything absent here was unavailable to the run.',
+    produces: 'The data the program is allowed to read. It cannot use observations collected later.',
   },
   {
     id: 'lab',
     side: 'before',
     title: 'Lab',
-    detail: 'Inspect, compare, commit',
+    detail: 'Read data; predict',
     receives: 'Only the saved feeds and its own earlier outputs.',
-    produces: 'An action trace, numerical receipts and a frozen complete decision.',
+    produces: 'A saved list of actions, measured numbers and predictions that cannot be changed after the outcome is revealed.',
   },
   {
     id: 'frozen',
     side: 'boundary',
     title: 'Frozen prediction',
-    detail: 'Sealed before outcome',
-    receives: 'The completed Lab commitment.',
+    detail: 'Saved before outcome',
+    receives: 'The predictions produced by the Lab steps.',
     produces: 'A record nobody may edit after later evidence is revealed.',
   },
   {
     id: 'later',
     side: 'after',
     title: 'Later evidence',
-    detail: 'Same sources after the horizon',
-    receives: 'The same sources, captured after the horizon.',
+    detail: 'Later observations',
+    receives: 'New observations from the same sources, collected after the time being predicted.',
     produces: 'What actually happened, for comparison only.',
   },
   {
@@ -133,7 +133,7 @@ export const LOOP_STAGES = [
     title: 'Oracle',
     detail: 'Compare and diagnose',
     receives: 'The frozen record, the feeds the Lab saw, and the later feeds.',
-    produces: 'A supported diagnosis or no change, with evidence and an alternative explanation.',
+    produces: 'A proposed explanation for a prediction error, with the observations it relies on and an alternative explanation.',
   },
   {
     id: 'evolve',
@@ -141,21 +141,21 @@ export const LOOP_STAGES = [
     title: 'Evolve',
     detail: 'Propose one change',
     receives: 'Oracle’s report.',
-    produces: 'One exact reusable procedure replacement, recorded as a candidate version.',
+    produces: 'A proposed change to one instruction, saved as a new version for comparison.',
   },
   {
     id: 'compare',
     side: 'test',
-    title: 'Compare on another window',
+    title: 'Try later observations',
     detail: 'Original and revision, same later inputs',
     receives: 'Both versions and later cases nobody used to choose the revision.',
-    produces: 'Gains and regressions under a score fixed in advance. Protected-case improvement remains unproved.',
+    produces: 'Scores for both versions under the same rule, chosen before the test. The proposal itself does not establish an improvement.',
   },
 ] as const;
 
 export const DIAGNOSIS_ROWS = [
-  ['Evidence unavailable', 'Was the relevant information absent from the saved input universe?'],
-  ['Evidence not supplied', 'Was it in that universe but missing from the node’s actual input?'],
+  ['Evidence unavailable', 'Was the relevant information missing from all the saved inputs?'],
+  ['Evidence not supplied', 'Was the information saved, but omitted from the request this step received?'],
   ['Reasoning error', 'Did the node receive the evidence but draw an unsupported conclusion?'],
   ['Execution failure', 'Did truncation, parsing or another runtime error prevent a usable output?'],
 ] as const;

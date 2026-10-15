@@ -35,11 +35,11 @@ export function SettingsIllustration({ doc }: { doc: Doc }) {
   const chosen = nearestVariant(variants, value);
   return (
     <figure className="settings">
-      <p className="settings__badge">Illustration. No controller has been implemented; the slider selects among written examples and runs no model.</p>
+      <p className="settings__badge">Illustration. Move the slider to read instructions written by the researchers. It does not ask an AI anything. The proposed program for choosing instructions has not been built.</p>
       <div className="settings__grid">
         <div className="settings__control">
           <label htmlFor={id} className="settings__label">
-            Caution about attributing a change to an intervention
+            How cautiously to describe the effect of an action
           </label>
           <input
             id={id}
@@ -67,8 +67,9 @@ export function SettingsIllustration({ doc }: { doc: Doc }) {
         <div className="settings__prompt">
           <p className="settings__fixed">
             <span className="settings__tag">Fixed at every setting</span>
-            Same inputs (Seed state and the interventions feed), timestamp checks, source references,
-            deduplication and output structure. A recorded intervention alone does not prove its effect.
+            The AI would receive the same starting observations and recorded actions. It would still have to
+            identify sources and times, remove duplicate observations and use the required answer format.
+            An action followed by a change does not by itself prove the action caused the change.
           </p>
           <p className="settings__variant" aria-live="polite">
             <span className="settings__tag">Interpretation guidance at {chosen.setting.toFixed(1)}</span>
@@ -81,20 +82,20 @@ export function SettingsIllustration({ doc }: { doc: Doc }) {
         <a href={doc.source.url} target="_blank" rel="noreferrer">
           the research direction
         </a>
-        . The numbers are hand-picked indices into a written catalogue, not learned values, and a larger setting need
-        not perform better.
+        . The researchers chose these numbers to label the written instructions. No learning produced the numbers,
+        and a larger number does not mean a better answer.
       </figcaption>
     </figure>
   );
 }
 
 const MECH = [
-  { id: 'context', x: 20, title: 'Available context', lines: ['Variability, missingness', 'and feed disagreement'] },
-  { id: 'controller', x: 200, title: 'Prompt controller', lines: ['Shared encoder and a', 'small head per node'] },
-  { id: 'settings', x: 380, title: 'Settings for one node', lines: ['One number per', 'component: 0.1, 0.2 …'] },
-  { id: 'assemble', x: 560, title: 'Assemble the prompt', lines: ['Fixed task + chosen', 'variants; save exact text'] },
-  { id: 'task', x: 740, title: 'Same reasoning task', lines: ['Base model weights', 'stay fixed'] },
-  { id: 'output', x: 920, title: 'Saved output', lines: ['Passed to the next', 'nodes in the graph'] },
+  { id: 'context', x: 20, title: 'Available data', lines: ['Missing observations', 'and conflicting sources'] },
+  { id: 'controller', x: 200, title: 'Choose instructions', lines: ['Proposed program', 'reads the available data'] },
+  { id: 'settings', x: 380, title: 'Chosen settings', lines: ['Numbers select', 'written instructions'] },
+  { id: 'assemble', x: 560, title: 'Prepare instructions', lines: ['Fixed task + chosen', 'wording; save the text'] },
+  { id: 'task', x: 740, title: 'Ask the same AI', lines: ['Change instructions,', 'not the trained model'] },
+  { id: 'output', x: 920, title: 'Save the answer', lines: ['Pass it to the next', 'steps in the program'] },
 ];
 
 export function MechanismDiagram() {
@@ -111,8 +112,8 @@ export function MechanismDiagram() {
           ))}
         </ol>
         <p className="mech-list__dev">
-          Development only: fit or select the controller on development cases from context, configurations and
-          observed losses, freeze it, then test on later cases.
+          During development, use earlier examples and their prediction errors to choose the instruction-selection
+          program. Then save that program unchanged before testing it on later examples.
         </p>
       </figure>
     );
@@ -124,19 +125,19 @@ export function MechanismDiagram() {
     <figure className="mech">
       <p className="settings__badge">Proposed. Not implemented or tested.</p>
       <svg viewBox="0 0 1100 400" className="mech-svg" role="img" aria-labelledby="mech-title mech-desc">
-        <title id="mech-title">Proposed context-conditioned prompt selection</title>
+        <title id="mech-title">Proposed program for choosing instructions from the available data</title>
         <desc id="mech-desc">
-          Context available at the cutoff goes to a shared controller, which outputs settings for one node. The
-          settings select written variants that are assembled with the fixed task into a prompt. The same reasoning
-          task runs with the base model fixed and saves its output. A separate development loop fits the controller
-          from observed losses and freezes it before testing.
+          A proposed program reads the available data and chooses written instructions for one step. The instructions
+          are combined with the fixed task and sent to the same AI model. Its answer is saved. Earlier examples and
+          their prediction errors would be used to choose the instruction-selection program, which would be saved
+          unchanged before testing it on later examples.
         </desc>
         <defs>
           <marker id="mech-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M0 0L10 5L0 10z" fill="var(--edge-strong)" />
           </marker>
         </defs>
-        <text x="20" y="28" className="loop-zone__label">At prediction time, for each reasoning node</text>
+        <text x="20" y="28" className="loop-zone__label">When the program asks the AI for a prediction</text>
 
         <rect x="560" y="44" width={W} height="58" className="mech-fixed" />
         <text x="574" y="68" className="loop-node__title">Fixed task</text>
@@ -145,7 +146,7 @@ export function MechanismDiagram() {
 
         <rect x="740" y="44" width={W} height="58" className="mech-fixed" />
         <text x="754" y="68" className="loop-node__title">Permitted inputs</text>
-        <text x="754" y="88" className="loop-node__detail">Its feed + earlier outputs</text>
+        <text x="754" y="88" className="loop-node__detail">Data + earlier answers</text>
         <path d={`M${740 + W / 2} 102V${Y}`} className="loop-wire" markerEnd="url(#mech-arrow)" />
 
         {MECH.slice(0, -1).map((m) => (
@@ -164,9 +165,9 @@ export function MechanismDiagram() {
         <rect x="12" y="262" width="1076" height="128" className="loop-zone loop-zone--dev" />
         <text x="26" y="286" className="loop-zone__label">Development only, never on test cases</text>
         {[
-          { x: 200, t: 'Context, settings', d: 'and observed losses' },
-          { x: 470, t: 'Fit or select the controller', d: 'on development cases' },
-          { x: 740, t: 'Freeze the controller', d: 'then test on later cases' },
+          { x: 200, t: 'Data and instructions', d: 'with their prediction errors' },
+          { x: 470, t: 'Choose a selection program', d: 'using earlier examples' },
+          { x: 740, t: 'Save the program unchanged', d: 'then test on later examples' },
         ].map((b, i, all) => (
           <g key={b.t}>
             <rect x={b.x} y="304" width="230" height="62" rx="8" className="loop-node__box mech-dev" />
@@ -178,12 +179,13 @@ export function MechanismDiagram() {
           </g>
         ))}
         <path d={`M${580} 304V${Y + H + 28}H${280}V${Y + H}`} className="loop-wire loop-wire--test" markerEnd="url(#mech-arrow)" />
-        <text x="296" y={Y + H + 22} className="loop-wire__label">trains the controller only</text>
+        <text x="296" y={Y + H + 22} className="loop-wire__label">changes the selection program</text>
       </svg>
       <figcaption>
         After the paper’s Figure 4. Settings select text; they do not scale evidence or the model’s reasoning.
-        Fitting the controller requires measured outcomes and a suitable optimisation method. No gradient passes
-        through the language model or the text choice, and later test outcomes stay out of development.
+        Researchers would need measured outcomes and a method for choosing better instructions. This proposal changes
+        the instructions sent to the AI, while leaving the AI model itself unchanged. Answers from later tests must
+        not influence the selection program while it is being developed.
       </figcaption>
     </figure>
   );

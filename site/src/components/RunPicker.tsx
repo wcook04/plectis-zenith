@@ -35,7 +35,7 @@ export function RunPicker({ mission, value, onChange, receiptLabel, localEnabled
 
   return (
     <label className="run-picker">
-      <span className="run-picker__label">Node states from</span>
+      <span className="run-picker__label">Show what happened in</span>
       <select
         value={value}
         onChange={(event) => {
@@ -48,7 +48,7 @@ export function RunPicker({ mission, value, onChange, receiptLabel, localEnabled
           }
         }}
       >
-        <option value="none">No run (definitions only)</option>
+        <option value="none">Instructions only; no saved execution</option>
         {receiptLabel && <option value="receipt">{receiptLabel}</option>}
         {localEnabled && runs && (
           <optgroup label="Saved runs on this computer">

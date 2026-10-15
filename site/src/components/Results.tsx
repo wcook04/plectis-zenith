@@ -78,10 +78,11 @@ export function Results({
           {modes.length === 1 ? 'One failure mode' : `${capital(numberWord(modes.length))} failure modes`} across {numberWord(episodes.length)} snapshots
         </h3>
         <p className="block-lede">
-          {nodeName(change.node_id)} is asked to return one JSON map of where the miners agree and disagree. With the
+          {nodeName(change.node_id)} is asked to return one JSON data record comparing the findings from each data source. With the
           response limit fixed at {num(limit)} tokens,{' '}
           {allRanOut ? 'every original attempt ran out before the JSON closed.' : `${numberWord(ranOutCount)} of ${numberWord(episodes.length)} original attempts ran out before the JSON closed.`}
         </p>
+        <p>A token is a piece of text counted by the model provider. Here the model stopped at the response-length limit before finishing the required JSON structure. This is an output-format failure; this test does not measure whether its predictions were accurate.</p>
         <TokenChart episodes={episodes} limit={limit} />
       </section>
 
@@ -104,8 +105,8 @@ export function Results({
         </h3>
         <p className="block-lede">
           A separate continuation loaded the {numberWord(Object.keys((cond.reused_ancestor_sha256 as object) ?? {}).length)} unchanged
-          ancestor outputs from the {fmtDate(String(cond.time_anchor))} run and all{' '}
-          {numberWord(Object.keys((cond.frozen_feed_sha256 as object) ?? {}).length)} saved feeds, then ran forward with the
+          earlier step outputs from the {fmtDate(String(cond.time_anchor))} saved execution and all{' '}
+          {numberWord(Object.keys((cond.frozen_feed_sha256 as object) ?? {}).length)} saved data sources, then continued with the
           changed instruction. {String(cond.next_failure ?? '')}
         </p>
         <p className="block-lede">

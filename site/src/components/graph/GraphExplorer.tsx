@@ -441,7 +441,7 @@ function CanvasExplorer(props: ExplorerProps) {
     <figure className="explorer-figure" aria-label={title}>
     <figcaption className="explorer__context">
       <span className="explorer__context-label">{context ?? title}</span>
-      <span className="explorer__context-help">Select a node to see its instruction, the inputs it reads and the output it must produce.</span>
+      <span className="explorer__context-help">Each box, called a node, is a data source or a step in the program. An arrow means the next step reads its output. Select a box to read the instruction and expected result. This diagram alone does not show whether a step ran or produced a correct answer.</span>
     </figcaption>
     <div className={`explorer${compact ? ' explorer--compact' : ''}${selected ? ' has-inspector' : ''}${inspectorBelow ? ' inspector-below' : ''}`}>
       {(!compact || runControl) && (
