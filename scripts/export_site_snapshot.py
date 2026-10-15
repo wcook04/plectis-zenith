@@ -114,7 +114,8 @@ def snapshot(root: Path) -> tuple[dict, dict[str, bytes]]:
         if response.private or not response.content_type.startswith("application/json"):
             raise ValueError("Snapshot route is not public JSON")
         routes[target] = json.loads(response.body)
-    assets = {"assets/paper.pdf": website.get("/assets/paper.pdf").body}
+    assets = {name: website.get("/" + name).body
+              for name in ("assets/paper.pdf", "assets/repair-loop.svg")}
     for figure in FIGURES:
         name = "assets/graphs/" + figure + ".svg"
         assets[name] = website.get("/" + name).body

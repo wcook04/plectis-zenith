@@ -12,7 +12,10 @@ replay:
 # retained suite stays available through `make test` and the source-checkout CI job.
 test-current:
 	"$(PYTHON)" -m pytest \
+		tests/test_paper_references.py \
+		tests/test_paper_reading.py \
 		tests/test_continuation_learning.py \
+		tests/test_continuation_rank_witness.py \
 		tests/test_native_conformance_tasks.py \
 		tests/test_conformance_study.py \
 		tests/test_conformance_export.py \
@@ -38,9 +41,11 @@ test:
 	"$(PYTHON)" -m pytest tests
 
 validate:
+	"$(PYTHON)" scripts/build_paper_references.py --check
 	"$(PYTHON)" scripts/check_structure.py
 	"$(PYTHON)" scripts/check_extraction.py
 	"$(PYTHON)" -m zenith validate
 
 validate-index:
+	"$(PYTHON)" scripts/build_paper_references.py --index
 	"$(PYTHON)" scripts/check_structure.py --index

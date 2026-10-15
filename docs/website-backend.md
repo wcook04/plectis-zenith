@@ -64,18 +64,12 @@ default without `--local-runs`, behind its usual TLS reverse proxy.
 
 ## Build the reading experience from these sources
 
-Fetch `/api/v1/site` first. Its six stable chapter IDs retain the idea, Lab,
-Oracle, Evolve, results and future-research routes. The current frontend groups
-them into research question, method, findings and frontier, preserving the
-`#lab` and `#evolve` anchors. Each points to the owning document,
-diagram and native mission graph, plus a `paper_section` with manuscript hash,
-source lines, PDF named destination and citation IDs. `evidence_urls` bind the
-relevant recorded evidence directly to the chapter; an empty list means no
-measured result is attached to that chapter. `evidence_kind` separates a proposed process,
-an authored mechanism, verified preparation and a research proposal.
+Fetch `/api/v1/site` first. Its six stable chapter IDs and evidence routes remain available to API consumers and historical views. The current web edition renders `/api/v1/paper.reading`: the manuscript's abstract, three sections, paragraphs, result table, citation links and figure caption. `zenith/paper_reading.py` projects these directly from the supported TeX syntax and rejects unsupported content. There is no separately authored current website narrative.
 
-`/api/v1/paper` reads the current title and bibliography, including PDF and LaTeX
-hashes, citation IDs, URLs and the manuscript lines where citations are used. The current source compiles in the existing editor, while the retained PDF is a previous edition (`pdf_current=false`, `pdf_edition=retained_previous_edition`). Source and PDF are labelled separately; independent file hashes do not prove that they match.
+`/api/v1/paper` also exposes the title, source/PDF hashes, reviewed source editions, supporting section locators and exact manuscript citation bindings. `paper/references.json` owns the bibliography metadata; `scripts/build_paper_references.py --check` rejects stale claim excerpts, unknown citations and bibliography drift. Source verification does not imply replication of a cited experiment.
+
+`zenith/web_content.py::PAPER_EDITION` binds a visually reviewed manuscript/PDF pair and a separate TikZ/SVG pair. A changed manuscript or PDF removes the current-PDF label; a changed diagram source or SVG rejects the web projection until it has been regenerated and reviewed. `scripts/build_paper_reading.py` renders the paper's TikZ diagram for `/assets/repair-loop.svg`. Both the PDF and SVG are included in the static export.
+
 `/api/v1/documents/paper` returns the exact LaTeX source. Browser-readable
 explanations come from the existing Markdown, including the
 [research direction](../program.md) and [spoken walkthrough](history/zenith-walkthrough-script.md).
@@ -142,7 +136,7 @@ All JSON routes are under `/api/v1`. `GET` and `HEAD` are supported; writes retu
 | Route | Response |
 |---|---|
 | `/site` | Ordered chapters, document/figure/evidence links, notice and capabilities |
-| `/paper` | Manuscript metadata, citations, citation uses and PDF/source hashes |
+| `/paper` | Manuscript reading projection, reviewed sources and claim bindings, PDF/source and figure hashes |
 | `/documents/{id}` | Exact Markdown/LaTeX and its source binding |
 | `/graph?mission=lab&focus=lab_cross_corr_v1` | Native nodes, edges, waves and ancestors/descendants |
 | `/nodes/{id}?task_profile=financial` | Effective role, instruction, schema, inputs, consumers and profile source |
@@ -151,9 +145,9 @@ All JSON routes are under `/api/v1`. `GET` and `HEAD` are supported; writes retu
 | `/runs/{run_id}/nodes/{node_id}` | Optional local artifact and recorded attempts |
 | `/health` | Version and enabled capabilities |
 
-Historical graph missions include `financial_lab`, `financial_oracle` and `financial_refinement`. Their graph responses include effective node hashes, instructions, dependencies and `reasoning_schema`. The generic `all`, `lab`, `oracle` and `refinement` graphs remain available; `evolve` aliases generic `refinement`. Earlier `basket`, `basket_serial` and `basket_evolve` graphs describe the reduced pilot. The current Progress result renders from its source-bound receipt and does not require those historical graphs.
+Historical graph missions include `financial_lab`, `financial_oracle` and `financial_refinement`. Their graph responses include effective node hashes, instructions, dependencies and `reasoning_schema`. The generic `all`, `lab`, `oracle` and `refinement` graphs remain available; `evolve` aliases generic `refinement`. Earlier `basket`, `basket_serial` and `basket_evolve` graphs describe the reduced pilot. The current web edition renders the manuscript; linked Progress receipts retain the detailed source-bound results independently of historical graphs.
 Site metadata lists document and evidence IDs. The PDF is `/assets/paper.pdf`;
-figure URLs are `/assets/graphs/{id}.svg` and are listed by `/site`.
+the current repair diagram is `/assets/repair-loop.svg`; historical graph figures are `/assets/graphs/{id}.svg` and are listed by `/site`.
 
 Graph definitions come from the native loader and engine scope policy. There
 are no frontend coordinates. Use execution waves, lanes and directed edges to

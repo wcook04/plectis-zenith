@@ -2,31 +2,32 @@
 
 **Work in progress.** A research testbed for model-proposed experiments, measured code repair and reusable tests.
 
-Zenith asks whether solving one problem can leave behind a better way to investigate the next. A language model proposes tests or code; the host runs them against reference software, records what happened, and checks whether a repair helped. The intended memory is a program, its measured evidence, and questions that expose its limits.
+Zenith investigates whether retaining programs and their supporting experiments improves performance on subsequent tasks. We evaluate model-driven program repair, reuse of generated testers, and continuation learning separately. The host executes proposed queries against candidate and reference programs, records observations, and evaluates repairs before freezing them for later tests.
 
-The current prototype can repair programs and reuse generated testers. **It has not yet shown that its learned investigation methods outperform ordinary reusable code or fixed tests.** Model weights stay fixed; learning here means changing the retained code, tests or state representation.
+The current prototype can repair programs and reuse generated testers. **It has not yet shown that its retained investigation code outperforms ordinary reusable code or fixed tests.** Language-model weights stay fixed; learning here means changing the retained code, tests or state representation. The longer-term ambition is to improve the procedure that produces future improvements. That remains a research question.
 
-**[Explore the research website →](https://wcook04.github.io/plectis-zenith/)**
+**[Read the paper on the web →](https://wcook04.github.io/plectis-zenith/)**
 
-[Current paper](paper/zenith.tex) · [Results and limits](docs/status.md) · [Try it locally](#try-it-without-an-account) · [Architecture](docs/architecture.md)
+[Three-page paper (PDF)](paper/zenith.pdf) · [Paper source](paper/zenith.tex) · [Results and limits](docs/status.md) · [Future directions](#what-we-want-to-find-out) · [Try it locally](#try-it-without-an-account)
 
 ## What works today
 
-The paper reports three separate experiments. The continuation learner is an authored algorithm; it does not power the model-generated testers.
+The paper reports separate studies and diagnostics. The continuation learner is an authored algorithm; it does not power the model-generated testers.
 
 | Experiment | Observed result | What the comparison tells us |
 |---|---|---|
 | [Reusable SQLite testers](docs/studies/client/client-investigation-v2-low-20261015.md) | Generated code found **3 of 4 authored faults**, with no model calls on the later clients. | Ordinary reusable code tied it; fixed tests found **4 of 4**. Both generated testers repeat a constant query and ignore feedback. |
 | [Native program repair](docs/studies/native/progress-campaign-20261014.md) | A repair call alone improved later answers from **259/576 to 365/576**. | None of the extra investigation methods beat repair alone. The twelve parent episodes cover only three authored contracts. |
-| [Continuation learner repair](examples/continuation-memory/witness-preserving-v1/README.md) | Keeping the history that witnessed a missing distinction lets all **8 native configurations** finish fitting. | Generic questions cost slightly less: **11,379 vs 11,395** source calls. Later UTF-8 and SQLite checks still find errors. |
+| [Continuation learner repair](examples/continuation-memory/witness-preserving-v1/README.md) | Restoring the paired history/test requirement lets all **8 native configurations** finish fitting. | Generic questions cost slightly less: **11,379 vs 11,395** source executions. Later UTF-8 and SQLite checks still find errors. |
+| [Earlier controlled question memory](docs/history/continuation-memory.md) | Retaining acquired questions reduced additional queries by **11.2–63.1%**, with the same cached answers in both conditions. | Total joint learning still cost **5,427–5,698** source executions versus **3,071** for separate ordinary modules. Blind question transfer later hurt five of six targets. |
 
 The working client run used DeepSeek V4.1 Flash: **46 calls, $0.00712** reported inference cost, including acquisition and compilation. The separate native diagnostic used Ling3.1Flash: **130 calls, $0.12983**. These are recorded run costs, not current price quotes. Qualification and earlier attempts remain in their linked reports.
 
 These are constructed, inspected workloads. They establish working mechanisms and reproducible limits; they do not establish independent transfer, a general learning advantage or recursive self-improvement.
 
-[![The Zenith research website: question, method, findings and frontier](https://raw.githubusercontent.com/wcook04/plectis-zenith/main/docs/images/zenith-research.png)](https://wcook04.github.io/plectis-zenith/)
+[![The implemented repair loop: measured feedback, development selection and frozen held-out evaluation](paper/repair-loop.svg)](https://wcook04.github.io/plectis-zenith/)
 
-*The [website](https://wcook04.github.io/plectis-zenith/) is the short reading route. The [paper guide](paper/README.md) distinguishes the current source from the previous PDF edition.*
+*The [website](https://wcook04.github.io/plectis-zenith/) presents the paper in web form, with the same technical terms, table, citations and repair-loop diagram. The [paper guide](paper/README.md) links the PDF, source and reproductions.*
 
 Agents can read the site without JavaScript or an account: [llms.txt](https://wcook04.github.io/plectis-zenith/llms.txt) gives the starting points, the [research and graph map](https://wcook04.github.io/plectis-zenith/agent-map.md) explains the records, and the [machine route index](https://wcook04.github.io/plectis-zenith/agent-index.json) lists their URLs. Graph records name program steps and inputs; source checksums identify versions, not scientific validity.
 
@@ -44,6 +45,34 @@ Lab, Oracle and Evolve name the execution, review and revision roles. A graph ca
 ## What remains open
 
 The next useful result would be a procedure that learns to choose **new, informative tests** on changed software, finds more faults or uses less work than competent ordinary testing, and repays its acquisition cost. That needs independently sourced clients with genuine room to improve, a frozen selection rule, and comparisons that include failed attempts and all stages of work. Reusing a successful probe is a starting point, not that result.
+
+One proposed engineering step is to execute and refine generated testers on development cases before freezing them. Both the retained-procedure and ordinary-code conditions would receive the same refinement allowance, with the current one-shot preparation kept as a control. Target outcomes would remain unavailable during preparation. This would first test delivery and avoidance of repeated queries; useful learning would still need a separate comparison on later clients. The [programme](program.md#how-to-choose-the-next-experiment) gives the proposed controls.
+
+## What we want to find out
+
+Can experience help a system discover **what needs to change**, then improve how it makes the next improvement? A wrong answer might come from discarding necessary history, ignoring information already retained, or never asking the question that would reveal the problem. Those need different interventions. Zenith's records contain examples of these distinctions; they do not show that it reliably diagnoses them on its own.
+
+One possible connection is to retain the experiment that exposed a missing distinction, the histories and outcomes that justify it, the revised program, and a way to recognise when a similar investigation might help elsewhere. The separate continuation learner already represents state through answers to selected future questions. Connecting that mechanism to model-generated investigations, and making reuse selective and economical, remains future work.
+
+This is also a possible route toward **recursive self-improvement**: an improved procedure helps produce subsequent improvements. First test whether an acquired improver helps fresh problems. Hold each improver fixed while it edits untouched copies of identical, valid starting solvers. Select its proposed solver using development evidence only, freeze that solver's source hash, then evaluate it on withheld cases. Keep the evaluator outside the editable code and count acquisition, failed proposals, evaluation, execution and human intervention. Only after demonstrating a useful improver should a later experiment test whether reinvesting it produces a better successor at matched total cost. Any positive result would remain bounded by the tested tasks and budgets.
+
+The relevant methods are already established. [Predictive state representations (2001)](https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf) describe stochastic state through probabilities of future tests; the cited construction assumes a known model. Zenith's separate learner instead uses an **observation table**, whose rows are access histories and whose columns are future tests, or distinguishing continuations. Its [weighted-automata antecedent](https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf) requires counterexample refinement to retain both the new access history and its distinguishing continuation. Our repair restores that established requirement. Agreement on the finite challenges used here does not prove equivalence to the source on every input.
+
+For testing, [ILF (CCS 2019)](https://doi.org/10.1145/3319535.3363230) trains a neural testing policy from symbolic-execution demonstrations. [CoverUp (2025, v4)](https://arxiv.org/abs/2403.16218v4) uses an authored driver to refine generated regression tests with source coverage and execution errors. [Voyager (2023, v2)](https://arxiv.org/abs/2305.16291v2) retains and composes an executable skill library within a fixed acquisition procedure. [STOP (COLM 2024, v3)](https://arxiv.org/abs/2310.02304v3) recursively improves a code-improvement scaffold. [Hyperagents (2026, v1)](https://arxiv.org/abs/2603.19461v1) makes task-agent and meta-agent code editable and tests acquired improvement procedures in new domains. Its stronger compounding comparison remains statistically unresolved. These methods supply distinct precedents; they have not been reproduced as Zenith results.
+
+Our candidate contribution is the specific connection between measured distinctions, representation changes and better subsequent investigation. Its originality and value still need to be established against these neighbours and strong simple baselines. The [reviewed source records](paper/references.json) retain the exact editions, claim locators and limits used in the paper.
+
+### Why connect this with mathematics?
+
+The [Plectis mathematical corpus](https://github.com/wcook04/plectis-erdos) contains papers, Lean proofs, partial results and open obligations. Its [argument-continuation exporter](https://github.com/wcook04/plectis-erdos/blob/main/scripts/export_argument_continuations.lean) looks for theorems that could supply a required hypothesis and records remaining obligations. That suggests concrete decisions to study: try to prove a prerequisite, seek a different route, or look for a counterexample. [Plectis Atlas](https://github.com/wcook04/plectis-atlas) offers a complementary reading route through OpenAI's mathematics release and attributed outside assessments. The mathematics and those assessments belong to their named authors.
+
+These projects could supply problems, candidate arguments and evidence to inspect. They are **not yet connected to Zenith as a demonstrated learning system**. Finished proofs and paper collections do not supply complete records of alternative attempts or their costs. We would need records of what was known, which action was tried, its measured outcome, its cost and whether it helped the target, with solution material withheld from evaluation tasks.
+
+Lean checks a supplied proof; it does not tell us whether an unproved statement is false or whether a proposed lemma is worth pursuing. A failed search is not a negative truth label. Correct auxiliary results count as progress only when their relevance is established. Cheap software experiments are the practical first test; mathematics is a possible harder transfer domain, not a settled pivot.
+
+### Collaboration and guidance
+
+I'm building Zenith with AI coding agents and learning the research methods as I go. This is an ambitious target, and I have limited experience in this area. The account here is my current understanding, open to correction. I'd welcome collaboration and guidance on the closest prior work, fair evaluations, useful real software tasks, or whether this mathematics connection makes sense. Small reproductions, stronger baselines and reasons a proposed approach will fail are useful contributions too. [Open an issue](https://github.com/wcook04/plectis-zenith/issues) or start with the [contribution guide](CONTRIBUTING.md).
 
 ## Try it without an account
 
@@ -90,7 +119,8 @@ Open [localhost:4175](http://localhost:4175). The public-mode server exposes pub
 | Current experiments | [Native repair](research/conformance_study.py), [client test reuse](research/client_investigation_study.py), [continuation learner](research/continuation_learning.py) |
 | Shared execution | [Restricted Python](zenith/investigation_program.py), [provider budgets](zenith/budgeted.py), [model policy](zenith/provider_policy.py), [source snapshots](zenith/source_snapshot.py) |
 | Evidence and replay | [Published bundles](examples/conformance), [learner example](examples/continuation-memory/witness-preserving-v1), [report/replay commands](scripts) |
-| Reading surfaces | [Paper](paper/README.md), [current status](docs/status.md), [website source](site/README.md) |
+| Reading surfaces | [Paper](paper/README.md), [current status](docs/status.md), [website source](site/README.md), [manuscript-to-web projection](zenith/paper_reading.py) |
+| Paper publication | [Reviewed source records](paper/references.json), [bibliography and support checker](scripts/build_paper_references.py), [figure builder](scripts/build_paper_reading.py), [citation regressions](tests/test_paper_references.py) |
 | Retained graph and earlier studies | [Historical architecture and source owners](docs/history/architecture.md) |
 
 The [architecture guide](docs/architecture.md) maps dependencies, command owners and evidence boundaries. Runtime and study entry points remain stable; it also documents the retired unused tools and the documentation migration.
@@ -114,6 +144,7 @@ Created by Will Cook with AI coding agents. Zenith adapts the `ai_workflow` rese
 ## Related Plectis projects
 
 - The [mathematical research corpus](https://github.com/wcook04/plectis-erdos), with papers, Lean proofs and open questions.
+- [Plectis Atlas](https://github.com/wcook04/plectis-atlas), an independent reader for OpenAI's mathematics release and attributed external assessments.
 - The earlier [Plectis toolkit](https://github.com/wcook04/plectis), with reusable Python components and worked examples.
 - [One Checkout](https://github.com/wcook04/one-checkout), a tool for committing one reviewed patch from shared work.
 

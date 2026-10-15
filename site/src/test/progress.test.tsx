@@ -57,8 +57,8 @@ function clientReceipt() {
 }
 
 function mockSite(data: unknown, { published = true, status = 200, clientData = undefined,
-  clientStatus = 200, clientVersions = {} }: { published?: boolean; status?: number;
-    clientData?: unknown; clientStatus?: number; clientVersions?: Record<string, unknown> } = {}) {
+  clientStatus = 200, clientVersions = {}, currentPdf = false }: { published?: boolean; status?: number;
+    clientData?: unknown; clientStatus?: number; clientVersions?: Record<string, unknown>; currentPdf?: boolean } = {}) {
   const clients: Record<string, unknown> = { ...(clientData === undefined ? {} : { 'client-investigation': clientData }), ...clientVersions };
   const chapters = ['idea', 'lab', 'oracle', 'evolve', 'results', 'next'].map(id => ({
     id, title: id, evidence_kind: id === 'results' ? 'measured_execution' : 'authored_mechanism',
@@ -88,7 +88,12 @@ function mockSite(data: unknown, { published = true, status = 200, clientData = 
       id: 'progress-synthesis', format: 'markdown', content: '# Current synthesis\n\nBounded evidence.',
       source: { ...source, path: 'docs/history/progress-returns-20261014.md' },
       base_url: 'https://example.org/docs/', headings: [] };
-    else if (url.endsWith('/paper')) body = { source, citations: [], sections: [], pdf_sha256: 'fixture' };
+    else if (url.endsWith('/paper')) body = { source, citations: [{ id: 'fixture-source', latex: 'A. Author. A measured method.',
+      urls: ['https://example.org/paper/v2'], used_at: [{ line: 12, locator: 'Section 2' }],
+      review: { reviewed_source: { edition: 'Reviewed v2 edition', sha256: 'a'.repeat(64) },
+        application: 'Background for the proposed evaluation.',
+        source_locators: [{ id: 'method', locator: 'Section 2', supports: 'A fixed feedback driver.',
+          boundary: 'This is not a transfer result.' }] } }], sections: [], pdf_sha256: 'fixture', pdf_current: currentPdf, pdf_url: '/assets/paper.pdf' };
     else throw new Error(`Unexpected request: ${url}`);
     return new Response(JSON.stringify(body), { status: code, headers: { 'Content-Type': 'application/json' } });
   }) as typeof fetch;
@@ -101,6 +106,15 @@ beforeEach(() => {
   })) as unknown as typeof window.matchMedia;
 });
 afterEach(() => { cleanup(); vi.unstubAllEnvs(); });
+
+it('offers the reviewed current PDF and keeps proposed integration separate from results', async () => {
+  mockSite(receipt(), { currentPdf: true });
+  render(<App />);
+  expect(await screen.findByRole('link', { name: 'Read the paper (PDF)' })).toHaveAttribute('href', '/assets/paper.pdf');
+  expect(screen.queryByRole('link', { name: 'Previous edition (PDF)' })).toBeNull();
+  expect(screen.getByText(/They are not yet a learning integration with Zenith/)).toBeInTheDocument();
+  expect(screen.getByRole('link', { name: 'project issues' })).toHaveAttribute('href', 'https://github.com/wcook04/plectis-zenith/issues');
+});
 
 it('uses the current receipt, separate study scores and retained historical links', async () => {
   mockSite(receipt());
@@ -320,4 +334,18 @@ it.each([
   expect(await screen.findByText(message)).toBeInTheDocument();
   expect(screen.queryByRole('rowheader', { name: 'Saved learned tester' })).toBeNull();
   expect(screen.getByRole('heading', { name: 'Repairing database, cache and text programs' })).toBeInTheDocument();
+});
+
+
+it('exposes the reviewed edition, source support and application boundary', async () => {
+  mockSite(receipt(), { currentPdf: true });
+  render(<App />);
+  const summary = await screen.findByText('How this source relates to Zenith');
+  fireEvent.click(summary);
+  const details = summary.closest('details')!;
+  expect(details).toHaveAttribute('open');
+  expect(within(details).getByText('Reviewed v2 edition')).toBeVisible();
+  expect(within(details).getByText('Section 2')).toBeVisible();
+  expect(within(details).getByText('A fixed feedback driver.')).toBeVisible();
+  expect(within(details).getByText('This is not a transfer result.')).toBeVisible();
 });

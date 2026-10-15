@@ -57,7 +57,24 @@ export type Citation = {
   id: string;
   latex: string;
   urls: string[];
-  used_at: { line: number }[];
+  used_at: { line: number; locator?: string | null }[];
+  review?: {
+    reviewed_source: { edition: string; sha256: string };
+    application: string;
+    source_locators: { id: string; locator: string; supports: string; boundary: string }[];
+  };
+};
+
+export type PaperReading = {
+  abstract: string;
+  sections: {
+    id: string;
+    title: string;
+    blocks: (
+      | { kind: 'markdown'; content: string }
+      | { kind: 'figure'; url: string; alt: string; caption: string }
+    )[];
+  }[];
 };
 
 export type Paper = {
@@ -66,7 +83,12 @@ export type Paper = {
   source_url: string;
   pdf_url: string;
   pdf_sha256: string;
+  pdf_current?: boolean;
+  pdf_edition?: string;
+  pdf_note?: string;
   citations: Citation[];
+  references_source?: SourceRef;
+  reading?: PaperReading;
   sections: PaperSection[];
   notice_url: string;
 };

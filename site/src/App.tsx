@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { api, apiUrl, type Chapter, type Doc, type Evidence, type Graph, type Paper, type Site } from './api';
+import { api, apiUrl, type Chapter, type Doc, type Evidence, type Graph, type Paper, type PaperReading, type Site } from './api';
 import { CHAPTER_COPY, DIAGNOSIS_ROWS, EVIDENCE_KIND_LABEL, HERO, labParagraphs, type GraphFacts } from './content/copy';
 import { laneIndex, laneName } from './lib/lanes';
 import { GraphExplorer } from './components/graph/GraphExplorer';
@@ -129,6 +129,20 @@ export default function App() {
       </Shell>
     );
   }
+  if (site.value.active_evidence_id === 'progress-campaign') {
+    if (paper.status === 'loading') {
+      return <Shell><p className="page-status" role="status">Loading the paper…</p></Shell>;
+    }
+    if (paper.status === 'error') {
+      return <Shell><div className="page-status" role="alert">
+        <h1>The paper could not be loaded</h1>
+        <p>The current web edition is unavailable. <a href="https://github.com/wcook04/plectis-zenith/blob/main/paper/zenith.tex">Read the manuscript source</a>.</p>
+      </div></Shell>;
+    }
+    if (paper.status === 'ready' && paper.value.reading) {
+      return <PaperReadingPage site={site.value} paper={paper.value} reading={paper.value.reading} />;
+    }
+  }
   return <Page site={readingSite(site.value)} paper={paper.status === 'ready' ? paper.value : null} />;
 }
 
@@ -152,9 +166,14 @@ function useCurrentChapter(ids: string[]): string | null {
   return current;
 }
 
-function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
+function Shell({ children, site, chapters = site?.chapters, paperReading = false }: {
+  children: React.ReactNode;
+  site?: Site;
+  chapters?: Pick<Chapter, 'id' | 'title'>[];
+  paperReading?: boolean;
+}) {
   const [noticeOpen, setNoticeOpen] = useState(false);
-  const current = useCurrentChapter(site ? [...site.chapters.map((c) => c.id), 'paper'] : []);
+  const current = useCurrentChapter(chapters ? [...chapters.map((c) => c.id), 'paper'] : []);
   return (
     <>
       <a className="skip" href="#main">
@@ -165,7 +184,7 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
           <div className="wrap notice-bar__inner">
             <p>
               <strong>{site?.notice ?? 'Experimental research prototype.'}</strong>
-              <span className="notice-bar__extra"> Tests on software examples written for this research.</span>
+              {!paperReading && <span className="notice-bar__extra"> Tests on software examples written for this research.</span>}
             </p>
             <button type="button" className="z-link-button" onClick={() => setNoticeOpen(true)}>
               Research notice
@@ -178,10 +197,11 @@ function Shell({ children, site }: { children: React.ReactNode; site?: Site }) {
           </a>
           {site && (
             <nav aria-label="Chapters" className="nav">
-              {site.chapters.map((chapter) => (
+              {chapters?.map((chapter) => (
                 <a key={chapter.id} href={`#${chapter.id}`} aria-current={current === chapter.id ? 'true' : undefined}>
-                  {site.active_evidence_id === 'progress-campaign' ? chapter.title
-                    : chapter.evidence_kind === 'verified_preparation' ? 'Preparation' : (NAV_LABEL[chapter.id] ?? chapter.title)}
+                  {paperReading || site.active_evidence_id === 'progress-campaign' ? chapter.title
+                    : site.chapters.find(c => c.id === chapter.id)?.evidence_kind === 'verified_preparation'
+                      ? 'Preparation' : (NAV_LABEL[chapter.id] ?? chapter.title)}
                 </a>
               ))}
               <a href="#paper" aria-current={current === 'paper' ? 'true' : undefined}>
@@ -229,6 +249,61 @@ function NoticeDialog({ url, onClose }: { url: string; onClose: () => void }) {
 
 function useGraph(url: string | null) {
   return useAsync<Graph | null>(() => (url ? api.graph(url) : Promise.resolve(null)), [url]);
+}
+
+// The current reading view is a projection of the manuscript supplied by the
+// backend. Older API editions retain the chapter/receipt view below.
+function PaperReadingPage({ site, paper, reading }: { site: Site; paper: Paper; reading: PaperReading }) {
+  const byline = useByline(site);
+  const base = paper.source.url;
+  return (
+    <SiteFiguresContext.Provider value={site.figures}>
+      <Shell site={site} chapters={reading.sections} paperReading>
+        <section className="hero wrap paper-reading__hero" id="top" aria-labelledby="title">
+          <div className="hero__main">
+            <h1 id="title" aria-label={paper.title}>{titleParts(paper.title, true)}</h1>
+            {byline && <p className="hero__byline">{byline}</p>}
+            <nav className="hero__actions" aria-label="Publication">
+              {paper.pdf_current === true && <a className="button" href={apiUrl(paper.pdf_url)}
+                target="_blank" rel="noreferrer">Read the paper (PDF)</a>}
+              <a className="button button--ghost" href={apiUrl(paper.source.url)}
+                target="_blank" rel="noreferrer">Current paper source</a>
+            </nav>
+            <h2 className="paper-aside__head">Abstract</h2>
+            <Markdown source={reading.abstract} base={base} />
+          </div>
+        </section>
+        {reading.sections.map(section => (
+          <section className={`chapter chapter--${section.id}`} key={section.id} id={section.id}
+            aria-labelledby={`${section.id}-title`}>
+            <div className="wrap">
+              <div className="prose paper-reading__text">
+                <h2 id={`${section.id}-title`}>{section.title}</h2>
+                {section.blocks.map((block, index) => block.kind === 'markdown'
+                  ? <Markdown key={index} source={block.content} base={base} />
+                  : <figure className="chapter__figure" key={index}>
+                    <div className="paper-reading__figure-scroll" role="region" aria-label={block.alt} tabIndex={0}>
+                      <img src={apiUrl(block.url)} alt={block.alt} loading="lazy" />
+                    </div>
+                    {block.caption && <figcaption><Markdown source={block.caption} base={base} /></figcaption>}
+                  </figure>)}
+              </div>
+            </div>
+          </section>
+        ))}
+        <PaperSection site={site} paper={paper} paperReading />
+        <footer className="footer">
+          <div className="wrap footer__inner">
+            <p><a href="https://github.com/wcook04/plectis-zenith" target="_blank" rel="noreferrer">Source repository</a></p>
+            {site.documents.results && <p><a href={apiUrl(site.documents.results)}
+              target="_blank" rel="noreferrer">Results and replay links</a></p>}
+            {site.notice_url && <p><a href={apiUrl(site.notice_url)}
+              target="_blank" rel="noreferrer">Research notice</a></p>}
+          </div>
+        </footer>
+      </Shell>
+    </SiteFiguresContext.Provider>
+  );
 }
 
 function Page({ site, paper }: { site: Site; paper: Paper | null }) {
@@ -314,6 +389,12 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
               <ResultsFigure chapter={chapter} labGraph={lab.status === 'ready' ? lab.value : null} site={site} /></>
           )}
           {chapter.id === 'next' && !learningActive && <NextFigure chapter={chapter} />}
+          {chapter.id === 'next' && progressActive && <div className="chapter__text">
+            <h3>Improving future improvement</h3>
+            <p>The longer-term question is whether experience improves the procedure that makes future improvements. We would compare an original and revised improver on the same untouched starting programs and fresh task families, then test whether the successor helps produce a better next generation. The complete cost and failed attempts belong in that comparison. This has not been demonstrated.</p>
+            <p>The <a href="https://github.com/wcook04/plectis-erdos">Plectis mathematical corpus</a> supplies proofs, partial results and open obligations; <a href="https://github.com/wcook04/plectis-atlas">Plectis Atlas</a> helps readers inspect OpenAI’s mathematics release and attributed outside assessments. These could support experiments on which argument or check to try next. They are not yet a learning integration with Zenith. Lean checks a supplied proof; failed search does not establish that a statement is false.</p>
+            <p>I’m building Zenith with AI coding agents and learning the research methods as I go, with limited experience in this area. This is my current understanding. Collaboration, corrections and guidance on prior work, fair comparisons and useful tasks are welcome through <a href="https://github.com/wcook04/plectis-zenith/issues">project issues</a>. The <a href="https://github.com/wcook04/plectis-zenith#what-we-want-to-find-out">README explains these possible directions and their precedents</a>.</p>
+          </div>}
         </ChapterSection>
       ))}
 
@@ -459,12 +540,12 @@ function windowSummary(evidence: Evidence): string {
   return `${episodes.length} Lab attempts on original saved feeds stopped at ${nodeName(change.node_id ?? '')} when the response ran out of tokens. One instruction change gave valid output on ${Number(r.later_candidate_passes ?? 0)} of ${Number(r.paired_later_episodes ?? 0)} later inputs. No forecast has completed.`;
 }
 
-function titleParts(title: string) {
+function titleParts(title: string, preserveDelimiter = false) {
   const [head, ...rest] = title.split(':');
   if (rest.length === 0) return title;
   return (
     <>
-      <span className="hero__name" translate="no">{head}</span>
+      <span className="hero__name" translate="no">{head}{preserveDelimiter ? ':' : ''}</span>
       <span className="hero__sub">{rest.join(':').trim()}</span>
     </>
   );
@@ -1210,7 +1291,8 @@ function NextFigure({ chapter }: { chapter: Chapter }) {
   );
 }
 
-function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
+function PaperSection({ site, paper, paperReading = false }: { site: Site; paper: Paper | null; paperReading?: boolean }) {
+  const currentPdf = paper?.pdf_current === true;
   const currentIds = site.active_evidence_id === 'progress-campaign'
     ? ['progress-campaign', [...CLIENT_VERSIONS].reverse().find(v => site.evidence[v.id])?.id]
     : Object.keys(site.evidence);
@@ -1218,11 +1300,18 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
     <section className="paper-band" id="paper" aria-labelledby="paper-title">
       <div className="wrap paper-band__grid">
         <div>
-          <h2 id="paper-title">Paper, code and instructions to repeat the experiments</h2>
+          <h2 id="paper-title">{paperReading ? 'Paper, references and evidence' : 'Paper, code and instructions to repeat the experiments'}</h2>
+          {currentPdf && <p><a className="button" href={apiUrl(paper.pdf_url)} target="_blank" rel="noreferrer">Read the paper (PDF)</a></p>}
           <p><a className="button" href={apiUrl(paper?.source.url ?? site.documents.paper ?? '/api/v1/documents/paper')}
             target="_blank" rel="noreferrer">Current LaTeX source on GitHub</a></p>
-          <p>The current paper is stored as LaTeX, the text and formatting code used to prepare a research paper. The GitHub repository contains installation commands and examples you can run without an AI account. Its replay commands run the saved programs again and compare their behavior with the published results.</p>
+          {!paperReading && <p>The current paper is stored as LaTeX, the text and formatting code used to prepare a research paper. The GitHub repository contains installation commands and examples you can run without an AI account. Its replay commands run the saved programs again and compare their behavior with the published results.</p>}
           <p><a href="https://github.com/wcook04/plectis-zenith#try-it-without-an-account" target="_blank" rel="noreferrer">Run the examples or replay the evidence</a></p>
+          {paper && <details>
+            <summary>Compare the downloaded PDF with the saved file</summary>
+            <p>SHA-256 is a checksum calculated from a file’s contents. Matching checksums show that the files contain the same bytes; they do not establish that the paper’s claims are correct.</p>
+            <p>SHA-256 <code className="hash">{paper.pdf_sha256}</code></p>
+            <CopyButton text={paper.pdf_sha256} label="Copy hash" />
+          </details>}
           <h3 className="paper-aside__head">Current experiment records</h3>
           <ul className="plain-list">
             {Object.entries(site.evidence).filter(([id]) => currentIds.includes(id)).map(([id, url]) => (
@@ -1231,21 +1320,15 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
           </ul>
           <details className="source-doc">
             <summary>Earlier studies, graphs and paper edition</summary>
-            <p>The PDF predates the current source. The financial studies and earlier graph experiments remain here as historical records.</p>
-            <p><a href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">Previous edition (PDF)</a></p>
-            {paper && <details>
-              <summary>Compare the downloaded PDF with the saved file</summary>
-              <p>SHA-256 is a checksum calculated from a file’s contents. Matching checksums show that the files contain the same bytes; they do not establish that the paper’s claims are correct.</p>
-              <p>SHA-256 <code className="hash">{paper.pdf_sha256}</code></p>
-              <CopyButton text={paper.pdf_sha256} label="Copy hash" />
-            </details>}
+            {!paperReading && <p>The financial studies and earlier graph experiments remain here as historical records.</p>}
+            {!currentPdf && <p>The PDF has no verified binding to the current source. <a href={apiUrl(paper?.pdf_url ?? '/assets/paper.pdf')} target="_blank" rel="noreferrer">Previous edition (PDF)</a></p>}
             <ul className="plain-list">
               {Object.entries(site.evidence).filter(([id]) => !currentIds.includes(id)).map(([id, url]) => (
                 <li key={id}><a href={apiUrl(url)} target="_blank" rel="noreferrer">{RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}</a></li>
               ))}
             </ul>
             <h3 className="paper-aside__head">Diagrams of the earlier program versions</h3>
-            <p>Each box represents a source of data or a step in the program. An arrow means one step reads another step’s output. The diagram describes the intended dependencies; it does not show that the steps ran or that a prediction was correct. A profile is a version configured for a particular task, such as the earlier financial experiment.</p>
+            {!paperReading && <p>Each box represents a source of data or a step in the program. An arrow means one step reads another step’s output. The diagram describes the intended dependencies; it does not show that the steps ran or that a prediction was correct. A profile is a version configured for a particular task, such as the earlier financial experiment.</p>}
             <ul className="plain-list">
               {Object.entries(site.figures).map(([id, url]) => (
                 <li key={id}><a href={apiUrl(url)} target="_blank" rel="noreferrer">{FIGURE_LABEL[id] ?? id.replace(/-/g, ' ')} (SVG)</a></li>
@@ -1255,6 +1338,10 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
         </div>
         <div>
           <h3 className="paper-aside__head">References</h3>
+          <p>These references identify the editions reviewed and the limits of their
+            application to Zenith. Source review does not imply replication.</p>
+          {paper?.references_source && <p><a href={paper.references_source.url}
+            target="_blank" rel="noreferrer">Reviewed source records and manuscript bindings</a></p>}
           {paper ? (
             <ol className="refs refs--full">
               {paper.citations.map((citation) => (
@@ -1270,6 +1357,18 @@ function PaperSection({ site, paper }: { site: Site; paper: Paper | null }) {
                       </span>
                     ))})
                   </span>
+                  {citation.review && <details className="source-doc">
+                    <summary>How this source relates to Zenith</summary>
+                    <p>{citation.review.reviewed_source.edition}</p>
+                    <p>{citation.review.application}</p>
+                    <ul className="plain-list">
+                      {citation.review.source_locators.map(locator => <li key={locator.id}>
+                        <strong>{locator.locator}</strong>
+                        <p>{locator.supports}</p>
+                        <p>{locator.boundary}</p>
+                      </li>)}
+                    </ul>
+                  </details>}
                 </li>
               ))}
             </ol>
