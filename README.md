@@ -110,3 +110,11 @@ New inference runs require an explicit command, your own credentials and a decla
 ## Credits and license
 
 Created by Will Cook with AI coding agents. Zenith adapts the `ai_workflow` research system and attributed research-return components; [NOTICE](NOTICE) records their provenance. [Apache 2.0](LICENSE) covers the software. Dataset and provider-response rights are separate. The website's [reuse notes](site/README.md#what-came-from-the-original-zenith-ui) credit its components and fonts.
+
+## Related Plectis projects
+
+- The [mathematical research corpus](https://github.com/wcook04/plectis-erdos), with papers, Lean proofs and open questions.
+- The earlier [Plectis toolkit](https://github.com/wcook04/plectis), with reusable Python components and worked examples.
+- [One Checkout](https://github.com/wcook04/one-checkout), a tool for committing one reviewed patch from shared work.
+
+Will Cook uses AI agents to pursue research and build software, then prepares the results with explanations, source and checks so other people can understand, inspect and continue the work. Explore the [research corpus](https://github.com/wcook04/plectis-erdos) and [Plectis website](https://wcook04.github.io/plectis/). Each repository has its own setup and evidence limits.
