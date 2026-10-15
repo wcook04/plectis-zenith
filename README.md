@@ -24,7 +24,7 @@ The working client run used DeepSeek V4.1 Flash: **46 calls, $0.00712** reported
 
 These are constructed, inspected workloads. They establish working mechanisms and reproducible limits; they do not establish independent transfer, a general learning advantage or recursive self-improvement.
 
-[![The Zenith research website: question, method, findings and frontier](docs/images/zenith-research.png)](https://wcook04.github.io/plectis-zenith/)
+[![The Zenith research website: question, method, findings and frontier](https://raw.githubusercontent.com/wcook04/plectis-zenith/main/docs/images/zenith-research.png)](https://wcook04.github.io/plectis-zenith/)
 
 *The [website](https://wcook04.github.io/plectis-zenith/) is the short reading route. The [paper guide](paper/README.md) distinguishes the current source from the previous PDF edition.*
 
