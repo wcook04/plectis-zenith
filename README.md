@@ -12,7 +12,7 @@ The current prototype can repair programs and reuse generated testers. **It has 
 
 ## What works today
 
-The paper reports three separate experiments. The continuation learner is an authored algorithm; it does not power the model-generated testers.
+The paper reports separate studies and diagnostics. The continuation learner is an authored algorithm; it does not power the model-generated testers.
 
 | Experiment | Observed result | What the comparison tells us |
 |---|---|---|
