@@ -17,7 +17,7 @@ from urllib.parse import parse_qsl, urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from zenith.web import Website
-from zenith.web_content import API, FIGURES, safe_read
+from zenith.web_content import API, FIGURES, PAPER_EDITION, safe_read
 
 SCHEMA = "zenith_public_api_snapshot_v1"
 MISSIONS = ("all", "lab", "oracle", "refinement", "evolve", "basket",
@@ -115,7 +115,7 @@ def snapshot(root: Path) -> tuple[dict, dict[str, bytes]]:
             raise ValueError("Snapshot route is not public JSON")
         routes[target] = json.loads(response.body)
     assets = {name: website.get("/" + name).body
-              for name in ("assets/paper.pdf", "assets/repair-loop.svg")}
+              for name in ["assets/paper.pdf"] + [f"assets/{figure_id}.svg" for figure_id in PAPER_EDITION["figures"]]}
     for figure in FIGURES:
         name = "assets/graphs/" + figure + ".svg"
         assets[name] = website.get("/" + name).body
