@@ -56,3 +56,16 @@ The unit is the problem. Report the paired mean difference with a 95% bootstrap 
 ## Limits stated in advance
 
 All faults come from one benchmark of short, single-function Python problems. Natural faults come from three older code models; mechanical faults share operators across splits. A positive result would show transfer of testing experience to unseen problems within this benchmark, under a five-input budget, for one model. It would not show transfer to large systems, other languages or other models.
+
+## Addendum A (19 October 2026, before any experiment 2 call)
+
+**Written after** the five main held-out arms of experiment 1 were scored. Their result: no experience condition differed measurably from none (playbook v2 +3.0 points, 95% interval −3.9 to +10.3; playbook v1 −1.4; advice −3.4), while the model's chosen inputs beat five random EvalPlus inputs by 26 points. Experiment 1's record, imagined-fault arms and analysis are unchanged.
+
+**Experiment 2: experience without reasoning.** One question follows from experiment 1: at high reasoning effort the model may already derive what the record and playbooks say. Experiment 2 repeats four experiment 1 prompts with reasoning switched off (`reasoning: {"enabled": false}`, verified to return zero reasoning tokens on the pinned endpoint): `cold_nr`, `kept_nr`, `lessons_v1_nr`, `lessons_v2_nr`. Same 58 held-out problems, same frozen record and playbooks (none of which was derived from held-out problems), two replicates, same delivery rule, scoring and analysis.
+
+- **H5:** with reasoning off, `kept_nr` and `lessons_v2_nr` each expose more natural fault classes than `cold_nr` (paired by problem, bootstrap interval and sign test).
+- Exploratory: whether either recovers the gap between `cold_nr` and experiment 1's `cold`.
+
+Reusing the held-out problems is a second look at the same problems; a positive result would need confirmation on fresh problems.
+
+**Post-freeze code changes (none affects calls or scores):** `study.py` writes score files with `default=repr` so a bytes literal proposed as an input can be stored; `harness.py` adds the reasoning-off option and the `_nr` arm suffix for this addendum.

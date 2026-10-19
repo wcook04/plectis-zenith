@@ -164,7 +164,7 @@ def main(argv: list[str] | None = None) -> int:
             res = study.score_arm(args.arm, args.split, args.reps, args.population)
         out = args.root / "scores" / f"{args.arm}__{args.split}__{args.population}.json"
         out.parent.mkdir(exist_ok=True)
-        out.write_text(json.dumps(res, indent=1))
+        out.write_text(json.dumps(res, indent=1, default=repr))
         summ = H.summarise(res)
         print(json.dumps({k: summ[k] for k in ("arm", "population", "problems", "mean_fraction_exposed")}))
     elif args.cmd == "experience":

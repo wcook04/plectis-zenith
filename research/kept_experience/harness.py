@@ -122,7 +122,16 @@ def experience_text(records: list[dict]) -> str:
     return "\n".join(parts)
 
 
+NO_REASONING_SUFFIX = "_nr"
+
+
+def base_arm(arm: str) -> str:
+    """Experiment 2 arms reuse an experiment 1 prompt with reasoning switched off."""
+    return arm[:-len(NO_REASONING_SUFFIX)] if arm.endswith(NO_REASONING_SUFFIX) else arm
+
+
 def build_messages(arm: str, problem: dict, context: dict) -> list[dict]:
+    arm = base_arm(arm)
     k = context.get("k", BUDGET_K)
     user = spec_text(problem)
     if arm in ("imagine", "imagine_kept"):
@@ -193,8 +202,9 @@ def _api_key() -> str:
 def chat(messages: list[dict], *, effort: str, max_tokens: int, ledger: Ledger,
          tag: str, attempts: int = 4) -> dict:
     ledger.check()
+    reasoning = {"enabled": False} if effort == "off" else {"effort": effort}
     body = {"model": MODEL, "messages": messages, "max_tokens": max_tokens,
-            "reasoning": {"effort": effort}, "usage": {"include": True},
+            "reasoning": reasoning, "usage": {"include": True},
             "provider": {"order": PROVIDERS, "allow_fallbacks": False}}
     data = json.dumps(body).encode()
     last = None
@@ -398,7 +408,7 @@ class Study:
 
     def call_arm(self, arm: str, split: str, reps: int, workers: int = 8) -> None:
         ctx = self.context()
-        effort = self.protocol["effort"]
+        effort = "off" if arm.endswith(NO_REASONING_SUFFIX) else self.protocol["effort"]
         max_tokens = self.protocol["max_tokens"]["imagine" if arm.startswith("imagine") else "test"]
         todo = []
         for task_id in self.split(split):
