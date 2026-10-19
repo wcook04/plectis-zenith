@@ -4,7 +4,7 @@
 
 Zenith investigates whether retaining programs and their supporting experiments improves performance on subsequent tasks. We evaluate model-driven program repair, reuse of generated testers, and continuation learning separately. The host executes proposed queries against candidate and reference programs, records observations, and evaluates repairs before freezing them for later tests.
 
-The current prototype can repair programs and reuse generated testers. **It has not yet shown that its retained investigation code outperforms ordinary reusable code or fixed tests.** Language-model weights stay fixed; learning here means changing the retained code, tests or state representation. The longer-term ambition is to improve the procedure that produces future improvements. That remains a research question.
+The newest study asks whether a model tests unseen programs better when shown a record of its earlier misses. On 58 held-out HumanEval problems, DeepSeek V4.1 Flash choosing five inputs exposed **77.0%** of real model-written faults with that record against **69.2%** without it (+7.9 points, 95% interval 1.4 to 14.7); about half of the gain comes from very large inputs that time out slow faulty programs. Rule lists the model wrote from the same record, generic advice and imagined faults showed no measurable gain, and nothing helped with reasoning switched off. Earlier studies found that saved tester *programs* did not beat ordinary reusable code or fixed tests. Language-model weights stay fixed; learning here means changing the retained code, tests or state representation. The longer-term ambition is to improve the procedure that produces future improvements. That remains a research question.
 
 **[Read the paper on the web →](https://wcook04.github.io/plectis-zenith/)**
 
@@ -16,6 +16,7 @@ The paper reports separate studies and diagnostics. The continuation learner is 
 
 | Experiment | Observed result | What the comparison tells us |
 |---|---|---|
+| [Kept experience](docs/studies/kept-experience/README.md) | Shown the record of its practice misses, the model exposed **77.0% vs 69.2%** of 535 real model-written faults on 58 held-out problems; 1,565 calls, $5.70. | Pre-registered; half the gain is performance probes, wrong-answer-only +3.5 (interval includes zero). Its own rule lists did not help; nothing helped without reasoning. One benchmark, one model. |
 | [Reusable SQLite testers](docs/studies/client/client-investigation-v2-low-20261015.md) | Generated code found **3 of 4 authored faults**, with no model calls on the later clients. | Ordinary reusable code tied it; fixed tests found **4 of 4**. Both generated testers repeat a constant query and ignore feedback. |
 | [Native program repair](docs/studies/native/progress-campaign-20261014.md) | A repair call alone improved later answers from **259/576 to 365/576**. | None of the extra investigation methods beat repair alone. The twelve parent episodes cover only three authored contracts. |
 | [Continuation learner repair](examples/continuation-memory/witness-preserving-v1/README.md) | Restoring the paired history/test requirement lets all **8 native configurations** finish fitting. | Generic questions cost slightly less: **11,379 vs 11,395** source executions. Later UTF-8 and SQLite checks still find errors. |
