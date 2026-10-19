@@ -61,3 +61,14 @@ def test_sandbox_turns_memory_bombs_into_error_rows(monkeypatch):
     rows = S.run_jobs(_bomb, [1], processes=1, wall_s=60)
     assert rows[0]["ok"] is False
     assert S.run_jobs(_fine, [1, 2], processes=2) == [{"ok": True, "value": 2}, {"ok": True, "value": 4}]
+
+
+def test_isolated_scoring_counts_a_native_stall_as_exposed(monkeypatch):
+    from research.kept_experience import harness as H
+    monkeypatch.setattr(H, "ISOLATED_WALL_S", 3.0)
+    stall = dict(PROBLEM, canonical_solution="    return sum(range(10 ** 12)) > 0\n")
+    faults = [{"fault_id": "Toy/0#stall", "source": P.reference_source(stall)},
+              {"fault_id": "Toy/0#same", "source": P.reference_source(PROBLEM)}]
+    row = H.evaluate_isolated({"problem": PROBLEM, "faults": faults, "inputs": [[[1.0, 2.0], 0.5]]})
+    assert row["n_valid"] == 1
+    assert "Toy/0#stall" in row["killed"] and "Toy/0#same" not in row["killed"]

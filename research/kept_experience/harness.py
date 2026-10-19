@@ -325,6 +325,65 @@ def _evaluate(job: dict) -> dict:
             "killed": killed, "n_faults": len(faults)}
 
 
+ISOLATED_WALL_S = 20.0
+SCORING_JOB_WALL_S = 120.0
+
+
+def _reference_outcome(job: dict):
+    """One input on the reference, in its own child (isolated fallback)."""
+    N._guard()
+    sys.setrecursionlimit(10_000)
+    problem, args = job["problem"], job["args"]
+    sink = io.StringIO()
+    with contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
+        validator = P._load(P.validator_source(problem), problem["entry_point"])
+        if not P.valid_input(validator, args):
+            return None
+        return P.call(P._load(P.reference_source(problem), problem["entry_point"]), args, timeout=2.0)
+
+
+def _fault_against(job: dict):
+    """One fault on the reference-completed inputs, in its own child (isolated fallback)."""
+    N._guard()
+    sys.setrecursionlimit(10_000)
+    problem, fault = job["problem"], job["fault"]
+    sink = io.StringIO()
+    with contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
+        fn = P._load(fault["source"], problem["entry_point"])
+        for i, (args, ref) in enumerate(job["cases"]):
+            if P.outcomes_differ(ref, P.call(fn, args), problem.get("atol") or 0):
+                return i
+    return None
+
+
+def evaluate_isolated(job: dict) -> dict:
+    """Fallback when a whole evaluation job stalls inside uninterruptible native code.
+
+    Each input runs on the reference in its own child; an input the reference
+    cannot finish within ISOLATED_WALL_S is dropped (as a reference timeout is in
+    the normal path). Each fault then runs in its own child; a fault whose child
+    fails to finish, or dies, on inputs where the reference finished counts as
+    exposed, matching the per-call rule that a timeout differs from a returned value.
+    """
+    problem, inputs = job["problem"], job["inputs"]
+    refs = S.run_jobs(_reference_outcome, [{"problem": problem, "args": a} for a in inputs],
+                      wall_s=ISOLATED_WALL_S)
+    valid = [a for a, r in zip(inputs, refs) if r["ok"] and r["value"] is not None]
+    cases = [(a, r["value"]) for a, r in zip(inputs, refs)
+             if r["ok"] and r["value"] is not None and r["value"] != ("timeout",)]
+    killed = {}
+    results = S.run_jobs(_fault_against, [{"problem": problem, "fault": f, "cases": cases}
+                                          for f in job["faults"]], wall_s=ISOLATED_WALL_S)
+    for fault, r in zip(job["faults"], results):
+        if not r["ok"]:
+            if cases:
+                killed[fault["fault_id"]] = "isolated:" + r["error"][:40]
+        elif r["value"] is not None:
+            killed[fault["fault_id"]] = r["value"]
+    return {"task_id": problem["task_id"], "n_inputs": len(inputs), "n_valid": len(valid),
+            "killed": killed, "n_faults": len(job["faults"]), "isolated": True}
+
+
 def _imagine_select(job: dict) -> dict:
     """Choose K candidates by greedy cover of the model's own imagined bugs.
 
@@ -462,12 +521,11 @@ class Study:
         jobs = [{"problem": self.problems[t], "faults": self.faults_for(t, population),
                  "inputs": inputs, "rep": rep} for (t, rep), inputs in chosen.items()]
         jobs = [j for j in jobs if j["faults"]]
-        rows = pool_map(_evaluate, jobs)
+        rows = [r["value"] if r["ok"] else {"error": r["error"]}
+                for r in S.run_jobs(_evaluate, jobs, wall_s=SCORING_JOB_WALL_S)]
         for idx, (j, r) in enumerate(zip(jobs, rows)):
             if "error" in r:
-                rows[idx] = r = {"task_id": j["problem"]["task_id"], "n_inputs": len(j["inputs"]),
-                                 "n_valid": 0, "killed": {}, "n_faults": len(j["faults"]),
-                                 "error": r["error"]}
+                rows[idx] = r = evaluate_isolated(j)
             r["rep"] = j["rep"]
             r["inputs"] = j["inputs"]
         return {"arm": arm, "split": split, "population": population, "rows": rows}

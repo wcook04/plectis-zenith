@@ -69,3 +69,9 @@ All faults come from one benchmark of short, single-function Python problems. Na
 Reusing the held-out problems is a second look at the same problems; a positive result would need confirmation on fresh problems.
 
 **Post-freeze code changes (none affects calls or scores):** `study.py` writes score files with `default=repr` so a bytes literal proposed as an input can be stored; `harness.py` adds the reasoning-off option and the `_nr` arm suffix for this addendum.
+
+## Addendum B (19 October 2026): scoring robustness, applied to every arm
+
+While scoring experiment 1's record arm, an evaluation job stalled for more than ten minutes. The tester had chosen deliberately large inputs (for example `n = 10**18` for a modular-power function), and some faulty programs then compute inside native code that the per-call alarm cannot interrupt. Left alone, the job limit would have recorded that problem as exposing nothing, a bias against exactly the arms that probe performance.
+
+Scoring now caps each evaluation job at 120 seconds. A stalled job is re-run in isolation: each input runs on the reference in its own process, and an input the reference cannot finish within 20 seconds is dropped, as a reference timeout already was. Each fault then runs in its own process on the inputs the reference finished; a fault that cannot finish within 20 seconds, or whose process dies, counts as exposed, matching the existing rule that a timeout differs from a returned value. Every arm in both experiments is rescored with this code. Rows produced by the fallback carry `"isolated": true`. The model calls and replies are unchanged.
