@@ -1,7 +1,7 @@
 // Markdown from the backend is rendered as untrusted content: raw HTML is
 // skipped, link and image URLs pass react-markdown's safe URL filter, and
 // relative links resolve against the document's base_url.
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import ReactMarkdown, { defaultUrlTransform } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { apiUrl } from '../api';
@@ -40,6 +40,12 @@ function DocImage({ src, alt }: { src: string; alt: string }) {
   return <img src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} />;
 }
 
+// Keep the element identity stable when surrounding content updates so a
+// reader scrolling a table with the keyboard keeps their focus and position.
+function ScrollableTable({ children }: { children?: ReactNode }) {
+  return <table tabIndex={0}>{children}</table>;
+}
+
 export function Markdown({ source, base }: { source: string; base: string }) {
   const figures = useSiteFigures();
   return (
@@ -55,7 +61,7 @@ export function Markdown({ source, base }: { source: string; base: string }) {
             </a>
           ),
           img: ({ src, alt }) => (src ? <DocImage src={figureUrl(String(src), figures)} alt={alt ?? ''} /> : null),
-          table: ({ children }) => <table tabIndex={0}>{children}</table>,
+          table: ScrollableTable,
           h1: ({ children }) => <h4>{children}</h4>,
           h2: ({ children }) => <h5>{children}</h5>,
           h3: ({ children }) => <h6>{children}</h6>,
