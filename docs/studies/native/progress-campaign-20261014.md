@@ -1,6 +1,6 @@
 # Progress campaign: measured receipt
 
-The v5 twelve-parent diagnostic recorded 343/576 confirmation answers for feedback-aware direct investigation and 331/576 for outcome-masked investigation (paired difference +12 answers). Fixed probing scored 364/576 and repair-only 365/576. These are parents within three authored native contracts, not independent mechanism or transfer evidence. The separate finite witness-learner demonstration used 16 more acquisition source calls than its generic control; it does not show an acquired-question gain.
+The v5 twelve-parent diagnostic recorded 343/576 confirmation answers for feedback-aware direct investigation and 331/576 for outcome-masked investigation (paired difference +12 answers). Fixed probing scored 364/576 and repair-only 365/576. These are parents within three authored native contracts, not independent mechanism or transfer evidence. Every non-zero paired difference occurs in native-sqlite-1, where both arms stop before a second query decision and separate repair calls receive identical saved requests. This comparison does not identify a feedback benefit. The separate finite witness-learner demonstration used 16 more acquisition source calls than its generic control; it does not show an acquired-question gain.
 
 The [v4 protocol](../../progress-protocol-20261014.md) and [v5 amendment](../../progress-protocol-v5-20261014.md) fix the arms and decision rules. The [machine receipt](progress-campaign-20261014.json) binds the published source manifests.
 

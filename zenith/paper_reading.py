@@ -9,6 +9,18 @@ CENTER = re.compile(r"\\begin\{center\}.*?\\end\{center\}", re.S)
 TIKZ = re.compile(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", re.S)
 
 
+DIAGRAM_DESCRIPTION = (
+    "Native repair information flow. The model proposes a query; the host runs "
+    "the parent and reference programs and compares their answers. Outputs and "
+    "errors inform the model's proposed replacement code. Outcomes also inform "
+    "further queries in adaptive conditions only; repair-only omits new queries. "
+    "The host replays development cases and selects the parent or repair. "
+    "Only the selected, frozen source passes into held-out evaluation. "
+    "Held-out outcomes do not return to query proposals, repair or selection."
+
+)
+
+
 def diagram_source(tex: str) -> str:
     figures = list(TIKZ.finditer(tex))
     if len(figures) != 1:
@@ -77,7 +89,7 @@ def paper_reading(tex: str, keys: list[str]) -> dict:
                 if not figure:
                     raise ValueError("Unsupported manuscript figure content outside diagram/caption")
                 blocks.append({"kind": "figure", "url": "/assets/repair-loop.svg",
-                               "alt": "Native repair: query execution, measured feedback, development selection and frozen held-out evaluation.",
+                               "alt": DIAGRAM_DESCRIPTION,
                                "caption": inline(figure[2], keys)})
             else:
                 blocks.append({"kind": "markdown", "content": table_markdown(center[0], keys)})

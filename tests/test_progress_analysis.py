@@ -198,3 +198,59 @@ def test_old_complete_archive_remains_a_descriptive_input():
     assert report["panel_summary"]["confirmation"]["overall"]["fixed"]["correct"] == 239
     assert report["panel_summary"]["confirmation"]["overall"]["ordinary"]["correct"] == 216
     assert report["comparisons"] == {}
+
+
+def bind_repair_requests(folder: Path, *, different=False):
+    frozen = json.loads((folder / "frozen.json").read_text())
+    (folder / "prompts").mkdir()
+    for record in frozen["records"]:
+        for arm in ("direct_adaptive", "direct_masked"):
+            call_id = record["task_id"] + "-" + arm + "-repair"
+            request = {"model": "fixed", "messages": [{"role": "user", "content":
+                "repair " + (arm if different else "the same program")} ]}
+            record["arms"][arm]["candidate"].update(call_id=call_id, prompt_sha256=digest(request))
+            put(folder / "prompts" / (call_id + ".json"), request)
+    put(folder / "frozen.json", frozen)
+    put(folder / "frozen-receipt.json", {"frozen_sha256": digest(frozen)})
+    for name in ("confirmation.json", "confirmation-selection.json"):
+        data = json.loads((folder / name).read_text())
+        data["frozen_sha256"] = digest(frozen)
+        put(folder / name, data)
+
+
+@pytest.mark.parametrize("different", [False, True])
+def test_actual_saved_repair_requests_determine_comparability(tmp_path, different):
+    folder = fixture(tmp_path)
+    bind_repair_requests(folder, different=different)
+    pairs = analyze(folder)["adaptive_masked_repair_prompts"]
+    assert all(row["requests_verified"] for row in pairs.values())
+    assert all(row["identical"] is not different for row in pairs.values())
+    assert pairs["native-lru-0"]["confirmation_difference"] == 1
+    prompt = folder / "prompts/native-lru-0-direct_masked-repair.json"
+    prompt.unlink()
+    unknown = analyze(folder)["adaptive_masked_repair_prompts"]["native-lru-0"]
+    assert unknown["requests_verified"] is False
+    assert unknown["identical"] is None
+
+
+def test_modified_repair_request_cannot_support_attribution(tmp_path):
+    folder = fixture(tmp_path)
+    bind_repair_requests(folder)
+    put(folder / "prompts/native-lru-0-direct_masked-repair.json", {"changed": True})
+    with pytest.raises(ValueError, match="Repair prompt differs from frozen"):
+        analyze(folder)
+
+
+def test_native_feedback_difference_is_after_identical_repair_prompts():
+    root = Path(__file__).resolve().parents[1]
+    report = analyze(root / "examples/conformance/progress-diagnostic-v5")
+    pairs = report["adaptive_masked_repair_prompts"]
+    differing = {task: row for task, row in pairs.items() if row["confirmation_difference"]}
+    assert list(differing) == ["native-sqlite-1"]
+    assert differing["native-sqlite-1"] == {
+        "requests_verified": True, "identical": True, "confirmation_difference": 12}
+    assert report["adaptive_masked_second_turn_issued"]["native-sqlite-1"] == {
+        "adaptive": False, "masked": False, "both": False}
+    second = report["adaptive_masked_second_turn_issued"]
+    assert sum(row["both"] for row in second.values()) == 5
+    assert all(pairs[task]["confirmation_difference"] == 0 for task, row in second.items() if row["both"])

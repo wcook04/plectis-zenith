@@ -11,7 +11,7 @@ from .paper_reading import diagram_source, paper_reading
 
 API = "/api/v1"
 # Reviewed source/PDF and TikZ/SVG pairs. Update after compiling and visual inspection.
-PAPER_EDITION = {"source_sha256": "b15077b01d5345ea75f6d7c6ba528030554dd5d05192f96be28e5b4d5ad0b788", "pdf_sha256": "2d87ccc5007d4b023f537f25950ce04c34aaeae5ef5d288e017fe5c7e9e27d52", "figure_source_sha256": "c905bebf5be49a93d0c3ee4e8f0a4865a4bbc5cd9a1e7c47c68a7f7227adc2fe", "figure_sha256": "e63032ffa13264806412e13626fd8d00d1d60a2bbe6d28584b00e435fada5e92"}
+PAPER_EDITION = {"source_sha256": "773933322c364d3b4a59834cc6c1c026167daa2579e96744df9f12e7c8ae92c4", "pdf_sha256": "cee8ea6c9e8b2510d129719053f49a64bd99553dc260a76553951ff7bcac7d42", "figure_source_sha256": "53915467b1b07cfbafd5985461f81d74dab096505d4c997ac63dac9a1c4c0a21", "figure_sha256": "c664449f6020a27a973000494f38609ced0bc8cbb014459d7931a7870935724e"}
 DOCUMENTS = {
     "introduction": "README.md",
     "paper": "paper/zenith.tex",
@@ -48,6 +48,7 @@ DOCUMENTS = {
     "notice": "RESEARCH_NOTICE.md",
 }
 EVIDENCE = {
+    "continuation-learner": "examples/continuation-memory/witness-preserving-v1/results.json",
     "progress-campaign": "docs/studies/native/progress-campaign-20261014.json",
     "client-investigation": "examples/conformance/client-reuse-v1/report.json",
     "client-investigation-v2": "examples/conformance/client-reuse-v2/report.json",
@@ -85,6 +86,7 @@ CHAPTERS = (
     ("next", "What still needs testing", "research-programme", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
+    "continuation-learner": "examples/continuation-memory/witness-preserving-v1/results.json",
     "idea": (), "lab": (), "oracle": ("progress-campaign",), "evolve": ("progress-campaign",),
     "results": ("progress-campaign",), "next": (),
 }

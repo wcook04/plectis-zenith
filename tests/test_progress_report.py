@@ -283,3 +283,16 @@ def test_passed_qualification_with_no_diagnostic_is_explicitly_pending(tmp_path,
     report = publication.build(tmp_path)
     assert report['status'] == 'diagnostic_pending'
     assert 'no v5 twelve-parent diagnostic result is published' in report['summary']
+
+
+def test_identical_repair_warning_requires_complete_positive_evidence():
+    from scripts.build_progress_report import paired_repair_interpretation
+    stage = {"adaptive_masked_repair_prompts": {
+        "task": {"identical": True, "confirmation_difference": 12}},
+        "adaptive_masked_second_turn_issued": {"task": {"adaptive": False, "masked": False}}}
+    assert "does not identify a feedback benefit" in paired_repair_interpretation(stage)
+    stage["adaptive_masked_repair_prompts"]["task"]["identical"] = None
+    assert paired_repair_interpretation(stage) == ""
+    stage["adaptive_masked_repair_prompts"]["task"]["identical"] = True
+    stage["adaptive_masked_second_turn_issued"]["task"]["adaptive"] = True
+    assert paired_repair_interpretation(stage) == ""

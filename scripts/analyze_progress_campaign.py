@@ -336,9 +336,11 @@ def analyze(folder: Path) -> dict:
                                                     for v in by_family.values()) / len(by_family)}
     first_turn_same = None
     second_turn_issued = None
+    repair_prompt_comparison = None
     if {"direct_adaptive", "direct_masked"} <= arms:
         first_turn_same = {}
         second_turn_issued = {}
+        repair_prompt_comparison = {}
         for task_id, record in sorted(task_records.items()):
             adaptive = record["arms"]["direct_adaptive"]["investigation"]
             masked = record["arms"]["direct_masked"]["investigation"]
@@ -358,6 +360,28 @@ def analyze(folder: Path) -> dict:
                 "adaptive": len(a_turns) > 1,
                 "masked": len(m_turns) > 1,
                 "both": len(a_turns) > 1 and len(m_turns) > 1,
+            }
+            # A score difference can arise after identical investigation evidence.
+            # Compare the actual saved repair requests, bound to the frozen record;
+            # absent request files mean unknown, not equal or different.
+            requests = []
+            for arm in ("direct_adaptive", "direct_masked"):
+                candidate = record["arms"][arm]["candidate"]
+                call_id = candidate.get("call_id")
+                request_path = folder / "prompts" / (str(call_id) + ".json")
+                if not call_id or Path(str(call_id)).name != call_id or not request_path.is_file():
+                    requests.append(None)
+                    continue
+                request = read(request_path)
+                if digest(request) != candidate.get("prompt_sha256"):
+                    raise ValueError("Repair prompt differs from frozen candidate identity")
+                requests.append(request)
+            repair_prompt_comparison[task_id] = {
+                "requests_verified": all(request is not None for request in requests),
+                "identical": requests[0] == requests[1] if all(
+                    request is not None for request in requests) else None,
+                "confirmation_difference": comparisons["direct_adaptive_minus_direct_masked"]
+                    ["paired_parents"][task_id]["adaptive_minus_reference_correct"],
             }
             if protocol.get("shared_direct_first_turn") and len(a_turns) > 1:
                 a_prompt = a_turns[1]["envelope"]["prompt"]
@@ -382,6 +406,7 @@ def analyze(folder: Path) -> dict:
             "comparisons": comparisons,
             "adaptive_masked_first_turn_equal": first_turn_same,
             "adaptive_masked_second_turn_issued": second_turn_issued,
+            "adaptive_masked_repair_prompts": repair_prompt_comparison,
             "paired_second_turn_count": (sum(v["both"] for v in second_turn_issued.values())
                                          if second_turn_issued is not None else None),
             "paired_second_distinct_legal_count": (

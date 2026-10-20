@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Enforce source roles and entry-document routes in the working tree or index."""
+"""Check top-level placement, required anchors and entry-document file routes."""
 from pathlib import Path, PurePosixPath
 import argparse
 import json

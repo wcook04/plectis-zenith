@@ -30,6 +30,7 @@ test-current:
 		tests/test_provider_policy.py \
 		tests/test_zenith_budgeted.py \
 		tests/test_source_snapshot.py \
+		tests/test_extraction.py \
 		tests/test_strict_json.py \
 		tests/test_reasoning_contracts.py \
 		tests/test_progress_report.py \

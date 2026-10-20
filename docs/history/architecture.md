@@ -44,6 +44,7 @@ The reasoning DAG represents computational dependencies, not physical causality.
 | Area | Responsibility |
 |---|---|
 | `codex/substrate/`, `master_config.json` | Native graph definitions, node dossiers and configuration |
+| `codex/contracts/`, `codex/nodes/refinement/` | Markdown bodies and configuration read by the loader/engine; the separate direct Evolve runner reads the root refinement definitions. JSON schemas still reference both contract locations. |
 | `system/core/`, `system/lib/` | Extracted graph execution, artifacts, schemas and provider support |
 | `tools/`, `feedback/`, `variants/` | Native graph tools, review/selection records and candidate graph changes |
 | `zenith/runtime.py`, `zenith/cli.py` | Existing graph lifecycle and CLI, also used by the read-only website |
@@ -54,4 +55,4 @@ The reasoning DAG represents computational dependencies, not physical causality.
 
 The [status record](../status.md) labels earlier stages. Their local uses of “current” or “next” refer to the stage being recorded. [The graph reference](graphs.md), [financial investigator](investigator.md), [basket method](baskets.md), [System A demonstration](demo.md) and [earlier memory study](continuation-memory.md) retain their own scopes.
 
-Generated graph views come from `scripts/build_graphs.py`; the extraction manifest is maintained by `scripts/check_extraction.py`. Neither should be hand-edited. Frozen source archives under `examples/` are immutable experiment inputs, not copies to refresh during code cleanup.
+Regenerate graph views through `scripts/build_graphs.py`. The extraction manifest records original source custody and current export checksums; `scripts/check_extraction.py` checks it and refreshes only explicitly named maintained files. Retiring a path requires a reviewed manifest change that preserves its original row and replacement in `retired_files`; see the [cleanup rules](../architecture.md#retiring-a-source-path). Frozen source archives under `examples/` remain immutable experiment inputs.

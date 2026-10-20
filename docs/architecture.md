@@ -39,7 +39,9 @@ The preservation rule is finite; it does not prove a repaired program correct on
 
 Direct investigation uses the conformance runner's invocation helper. Some retained module names therefore remain in the active import path. Renaming these files alone would not simplify execution and would disturb published import and replay interfaces.
 
-Unused private-system operation registries and the speculative reasoning-packet/plan framework have been removed. The retired `build_reasoning_contract_packet`, `build_reasoning_execution_plan` and `verify_reasoning_execution_plan` commands have no replacement: they were not used by the graph or research runners. Actual graph-contract validation remains available through `python -m tools.meta.factory.validate_reasoning_contracts --check`. Its runtime schema and vocabulary are preserved. Live Markdown contracts have one owner, `codex/contracts/`; archived copies remain in their original experiment bundles.
+Unused private-system operation registries and the speculative reasoning-packet/plan framework have been removed. The retired `build_reasoning_contract_packet`, `build_reasoning_execution_plan` and `verify_reasoning_execution_plan` commands have no replacement: they were not used by the graph or research runners. Actual graph-contract validation remains available through `python -m tools.meta.factory.validate_reasoning_contracts --check`. Its runtime schema and vocabulary are preserved.
+
+The loader and engine read Markdown contract bodies from `codex/contracts/`. Seven unused Markdown copies under `codex/substrate/contracts/` have been retired; their original extraction records and replacement paths remain in `docs/extraction-manifest.json::retired_files`. JSON contracts and refinement nodes still have callers in both trees, as the [historical source map](history/architecture.md#retained-source-owners) explains. Frozen experimental evidence remains unchanged.
 
 The website exporter, [`export_site_snapshot.py`](../scripts/export_site_snapshot.py), also publishes `llms.txt`, `agent-map.md` and `agent-index.json`. These derive from the same document, evidence and graph owners as the browser interface; they do not create a separate research catalogue. Each mission/profile has readable static records.
 
@@ -54,9 +56,33 @@ The website exporter, [`export_site_snapshot.py`](../scripts/export_site_snapsho
 | `tests/` | Current and historical regression tests; `tests/upstream/` preserves extracted engine checks. |
 | `docs/`, `paper/` | Methods, results, architecture, manuscript and generated reading assets. Narrative does not own executable implementation. |
 | `site/` | React reading website and its own build, tests, fonts and components. |
-| `system/`, `tools/`, `feedback/`, `variants/`, `codex/` | Retained graph/runtime contracts and support; see the [historical source map](history/architecture.md#retained-source-owners). |
+| `system/` | Graph loading/execution and shared provider transport used by current studies. |
+| `tools/`, `feedback/`, `variants/`, `codex/` | Graph tools, refinement and data contracts; see [resource consumers](#resource-consumers) and the [historical source map](history/architecture.md#retained-source-owners). |
 
-The root keeps package/build configuration, contributor guidance and stable research entry points. The [layout gate](../scripts/check_structure.py) checks these roles and links in the entry documents. It reads working files by default; `--index` checks the staged version before a commit.
+The root keeps package/build configuration, contributor guidance and stable research entry points. The [layout gate](../scripts/check_structure.py) checks allowed top-level areas, required anchors, misplaced executable/test/cache files and local file destinations in its named entry documents. Import behaviour, archive membership and publication consistency have separate tests. It reads working files by default; `--index` checks the staged version before a commit.
+
+### Resource consumers
+
+Some similarly named resources serve different commands. Choose the path from the consumer that reads it:
+
+| Source path | Consumer and editing responsibility |
+|---|---|
+| `codex/contracts/` | [Graph loader](../system/core/loader.py) contract expansion, [engine](../system/core/engine.py) contract bundles (including `schema_cp1.json` and `schema_cp2.json`) and web-search policy, and [schema validator](../system/lib/schema_validator.py) settings. Edit live Markdown contract bodies here. |
+| `codex/substrate/contracts/*.json` | Schema references in the [graph node definitions](../codex/substrate/nodes/) and the [Evolve handoff](../tools/refinement/run_evolve.py). Use each consumer's declared schema path; similarly named schemas in `codex/contracts/` are not interchangeable. |
+| `codex/substrate/nodes/` | Preferred node tree for [graph loading](../system/core/loader.py) and source bindings in the [website](../zenith/web_content.py). The loader falls back to `codex/nodes/` only when the substrate node directory is absent. |
+| `codex/nodes/refinement/delta_analyzer.json` and `codex/nodes/refinement/dossier_updater.json` | [run_evolve.py](../tools/refinement/run_evolve.py) reads these files directly when building its prompts, independently of the graph loader's choice. They differ from the substrate definitions and remain live inputs. |
+| `master_config.json` | [Runtime](../zenith/runtime.py) run-directory resolution and [engine](../system/core/engine.py) execution/bridge configuration. Keep it at the checkout root used by those consumers. |
+
+Seven unused Markdown mirrors under `codex/substrate/contracts/` have been retired; their canonical bodies remain under `codex/contracts/` and their original extraction records remain in `retired_files`. The JSON schemas and directly read refinement nodes have the distinct consumers listed above.
+
+### Package, snapshot and publication boundaries
+
+[pyproject.toml](../pyproject.toml) installs six package families: `zenith`, `research`, `system`, `tools`, `feedback` and `variants`. Developer commands in `scripts/` and resources under `codex/`, `docs/`, `paper/` and `examples/` retain their source-checkout paths. Make, CI and the documented replay commands call those paths directly.
+
+[source_snapshot.py](../zenith/source_snapshot.py) preserves its established member policy: implementation Python under `zenith`, `system/core`, `system/lib`, `tools` and `variants`, plus research Python, Codex JSON and `master_config.json` in runtime archives. This is a recorded experiment boundary, not an inventory of every installed package. [Snapshot tests](../tests/test_source_snapshot.py) protect its members, bytes and compatibility imports. Published `examples/` bundles keep their original archived code even when maintained source changes.
+
+Public document and evidence IDs are mapped to source paths by [web_content.py](../zenith/web_content.py); [export_site_snapshot.py](../scripts/export_site_snapshot.py) projects those same owners. A future move must trace imports, relative resource lookups, snapshot membership, Make/CI commands, replay inputs and public source links together. The present layout preserves those interfaces.
+
 
 ## Documentation and evidence
 
@@ -93,7 +119,20 @@ Use the source checkout with an editable install on Linux, macOS or a suitable W
 
 [export_site_snapshot.py](../scripts/export_site_snapshot.py) exports the existing public API for the same frontend. GitHub Pages is a reading surface, not a remote experiment service. [Website backend](website-backend.md) and [frontend guide](../site/README.md) document its routes.
 
-Preserve frozen evidence byte for byte. After reviewed changes to maintained source, refresh only current export hashes with `python scripts/check_extraction.py --refresh`, inspect that diff, then validate. Never regenerate historical runtime archives to make them match current code.
+## Retiring a source path
+
+Trace consumers before retiring a file: imports, node declarations, command entry points, publication routes and source manifests can all depend on its path. Matching bytes alone do not establish that two files serve the same role. For example, the retired `codex/substrate/contracts/epicentre_thesis.md` matched its canonical Markdown body but had a different original source checksum. Its complete original extraction row is retained with its replacement path; the canonical file's provenance has not been substituted for it.
+
+The seven retired Markdown copies are `atomic_tuple.md`, `counter_vector.md`, `epicentre_thesis.md`, `exemplar_state.md`, `prediction_vector.md`, `scorecard.md` and `web_search_disabled.md`. Each resolves to its same-named owner under `codex/contracts/`. Their removal leaves all 75 loaded node definitions and the runtime-archive member policy unchanged. The historical daily controller also fingerprints all `codex/` Markdown and JSON: an existing frozen daily programme must continue in its original checkout. Do not rewrite that programme's recorded fingerprint to accept a cleanup.
+
+Preserve frozen evidence byte for byte. After reviewing maintained-source changes, name every affected extraction member explicitly, for example:
+
+```sh
+python scripts/check_extraction.py --refresh research/continuation_learning.py tests/test_continuation_learning.py
+python scripts/check_extraction.py
+```
+
+Refresh checks every recorded member before writing. An unselected changed or missing member aborts the update; paths under `examples/` cannot be refreshed. Original source paths, custody hashes and retirement records are preserved. New maintained files enter this inventory only when explicitly named. The checker neither discovers files nor decides which ones to remove. A retirement requires a reviewed manifest change retaining the original row and naming its replacement; inspect that diff and run validation. ZIP archives retain their separate bundle-level checks. Never regenerate historical runtime archives to make them match current code.
 
 <a id="active-and-historical-architectures"></a>
 <a id="physical-problem-setting"></a>
