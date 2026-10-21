@@ -12,6 +12,10 @@ The paper asks whether a program, its measured evidence and questions that expos
 
 The manuscript also distinguishes these results from the earlier controlled memory study. It does not claim independent transfer, recursive self-improvement or a general advantage over ordinary testing. Its final page describes the proposed link between measured distinctions and improving the improver, relevant prior work, and a possible mathematics connection. [Programme](../program.md), [current status](../docs/status.md) and [architecture](../docs/architecture.md) connect the claims to their implementations.
 
+## Authorship and AI use
+
+The first page carries the project's standard **Authorship and AI use** statement: Will Cook built and directed the research infrastructure and reviewed the claims when he could; AI agents did most of the research and drafting; Cook did not independently verify every claim. The website projects this disclosure from the manuscript beside its abstract. Retain it in every edition and check the rendered first page before publication. AI production is distinct from the models evaluated in the experiments and supplies no independent review.
+
 ## Reviewed sources and their use
 
 | Source edition | Use and boundary |
@@ -48,3 +52,5 @@ python scripts/build_paper_reading.py
 ```
 
 The source rejects exports longer than three pages. Compilation updates the local PDF; the figure builder uses the same TikZ through Tectonic and `pdftocairo` to update the SVG. Inspect every PDF page and the SVG before updating `zenith/web_content.py::PAPER_EDITION`. It keeps a reviewed manuscript/PDF hash pair and a separate diagram-source/SVG hash pair. Update the affected pair together after review. The website labels an artifact current only while its source and rendered output match the reviewed pair. Checksums bind the reviewed files, not the correctness of their claims.
+
+After binding the reviewed files, run `python scripts/build_paper_reading.py --check` (requires Poppler's `pdftotext`). It checks the current source/PDF pair, three-page length and the same disclosure on PDF page one and in the web payload. `make validate` and the Pages publication workflow run this check; a missing disclosure blocks publication.

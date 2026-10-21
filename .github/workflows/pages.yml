@@ -35,11 +35,14 @@ jobs:
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b
       - name: Install and validate sources
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y poppler-utils
           python -m pip install -r requirements-test.lock
           python -m pip install --no-deps -e .
           python -m zenith validate
           python scripts/check_structure.py
           python scripts/check_extraction.py
+          python scripts/build_paper_reading.py --check
       - name: Install and test the frontend
         run: |
           npm ci --prefix site

@@ -11,7 +11,7 @@ from .paper_reading import diagram_source, paper_reading
 
 API = "/api/v1"
 # Reviewed source/PDF and TikZ/SVG pairs. Update after compiling and visual inspection.
-PAPER_EDITION = {"source_sha256": "773933322c364d3b4a59834cc6c1c026167daa2579e96744df9f12e7c8ae92c4", "pdf_sha256": "cee8ea6c9e8b2510d129719053f49a64bd99553dc260a76553951ff7bcac7d42", "figure_source_sha256": "53915467b1b07cfbafd5985461f81d74dab096505d4c997ac63dac9a1c4c0a21", "figure_sha256": "c664449f6020a27a973000494f38609ced0bc8cbb014459d7931a7870935724e"}
+PAPER_EDITION = {"source_sha256": "dacd20500ace774fa97e2c1fee463677e71a45cc48fc7ce4838625bb3c248577", "pdf_sha256": "f3d0b5e8c89c7d11413fb6e446a4041ac1a519b3eb007ffe29cf3c292b7c3aae", "figure_source_sha256": "53915467b1b07cfbafd5985461f81d74dab096505d4c997ac63dac9a1c4c0a21", "figure_sha256": "c664449f6020a27a973000494f38609ced0bc8cbb014459d7931a7870935724e"}
 DOCUMENTS = {
     "introduction": "README.md",
     "paper": "paper/zenith.tex",
@@ -275,7 +275,7 @@ class PublicContent:
                 "figure_source": self.source("paper/repair-loop.svg", figure),
                 "pdf_current": current_pdf,
                 "pdf_edition": "reviewed_current_source" if current_pdf else "retained_previous_edition",
-                "pdf_note": ("The PDF and manuscript match the pair compiled and visually reviewed on 15 October 2026."
+                "pdf_note": ("The PDF and manuscript match the compiled and visually reviewed edition."
                              if current_pdf else "The PDF or manuscript differs from the reviewed pair; use the current source."),
                 "notice_url": f"{API}/documents/notice"}
 

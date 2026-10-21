@@ -32,6 +32,8 @@ jobs:
           python -m pip check
       - name: Check entry points and offline examples
         run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y poppler-utils
           make validate
           make validate-index
           make demo

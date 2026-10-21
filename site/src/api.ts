@@ -67,6 +67,7 @@ export type Citation = {
 
 export type PaperReading = {
   abstract: string;
+  disclosure: string;
   sections: {
     id: string;
     title: string;

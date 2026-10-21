@@ -31,6 +31,7 @@ The following checks require the complete source checkout:
 
 ```sh
 make test-current
+# Install Poppler (pdftotext) for the rendered-paper checks in make validate.
 make validate
 ```
 

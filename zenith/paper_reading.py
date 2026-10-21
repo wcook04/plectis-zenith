@@ -66,12 +66,18 @@ def table_markdown(center: str, keys: list[str]) -> str:
 def paper_reading(tex: str, keys: list[str]) -> dict:
     """Preserve every paragraph, table cell, citation and figure caption in order."""
     tex = re.sub(r"(?<!\\)%[^\n]*", "", tex)
-    body = tex.split(r"\textbf{Abstract.}", 1)[1].split(r"\begin{thebibliography}", 1)[0]
+    front, body = tex.split(r"\textbf{Abstract.}", 1)
+    disclosure = re.findall(
+        r"\\footnotetext\{(\\textbf\{Authorship and AI use\.\}[^{}]+)\}", front)
+    if len(disclosure) != 1:
+        raise ValueError("Expected one explicit first-page authorship and AI-use disclosure")
+    body = body.split(r"\begin{thebibliography}", 1)[0]
     body = re.sub(r"\\hypertarget\{[^}]+\}\{\}|\\newpage", "", body)
     headings = list(re.finditer(r"\\textbf\{([123])\. ([^}]+)\}", body))
     if [h[1] for h in headings] != ["1", "2", "3"]:
         raise ValueError("Expected the manuscript's three numbered sections")
-    result = {"abstract": inline(body[:headings[0].start()], keys), "sections": []}
+    result = {"abstract": inline(body[:headings[0].start()], keys),
+              "disclosure": inline(disclosure[0], keys), "sections": []}
     for index, heading in enumerate(headings):
         part = body[heading.end():headings[index + 1].start() if index < 2 else len(body)]
         blocks = []

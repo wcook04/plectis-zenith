@@ -10,6 +10,7 @@ const figure = '/assets/repair-loop.svg';
 function reading(): PaperReading {
   return {
     abstract: 'Manuscript abstract: a bounded comparison of retained tests.',
+    disclosure: '**Authorship and AI use.** The manuscript records the role of AI and limits of human review.',
     sections: [
       { id: 'idea', title: '1. Programs and observations', blocks: [
         { kind: 'markdown', content: '**Observation tables.** The paper defines its measured state [1](#ref-weighted).' },
@@ -83,6 +84,8 @@ it('reads the title, abstract, sections and navigation from the manuscript paylo
   expect(await screen.findByRole('heading', { name: 'Zenith: the actual manuscript title' })).toBeInTheDocument();
   expect(document.title).toBe('Zenith: the actual manuscript title');
   expect(screen.getByText('Manuscript abstract: a bounded comparison of retained tests.')).toBeInTheDocument();
+  expect(screen.getByText('Authorship and AI use.')).toBeInTheDocument();
+  expect(screen.getByText(/The manuscript records the role of AI and limits of human review/)).toBeInTheDocument();
   expect(screen.getByText(/The manuscript proposes a frozen-improver comparison/)).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Plectis mathematical corpus' })).toHaveAttribute('href', 'https://github.com/wcook04/plectis-erdos');
   const nav = within(screen.getByRole('navigation', { name: 'Chapters' })).getAllByRole('link');

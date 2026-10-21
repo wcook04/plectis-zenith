@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Render the manuscript's existing TikZ diagram as the website's SVG asset."""
+"""Render the paper figure or check the reviewed PDF and web reading edition."""
 import argparse
 from html import escape
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
@@ -12,11 +13,36 @@ sys.path.insert(0, str(ROOT))
 from zenith.paper_reading import DIAGRAM_DESCRIPTION, diagram_source
 
 
+def check_publication():
+    """Check the published bytes, including disclosure placement and page count."""
+    from zenith.web_content import PublicContent
+    paper = PublicContent(ROOT).paper()
+    if not paper['pdf_current']:
+        raise ValueError('The manuscript and PDF differ from the reviewed edition')
+    text = subprocess.check_output(
+        ['pdftotext', str(ROOT / 'paper/zenith.pdf'), '-'], text=True)
+    pages = [page for page in text.split('\f') if page.strip()]
+    if len(pages) != 3:
+        raise ValueError(f'Expected the three-page paper; found {len(pages)} pages')
+    def normalise(value):
+        value = re.sub(r'-\s*\n\s*', '', value)
+        return ' '.join(value.split())
+    disclosure = paper['reading']['disclosure'].replace('**', '')
+    if normalise(disclosure) not in normalise(pages[0]):
+        raise ValueError('The web disclosure must also appear on PDF page one')
+    print('Verified the reviewed three-page PDF and matching first-page/web AI-use disclosure.')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--check', action='store_true',
+                        help='Check the reviewed PDF and disclosure without rebuilding the figure')
     parser.add_argument("--engine", choices=("tectonic", "pdflatex"), default="tectonic",
                         help="TeX compiler (default: tectonic; pdflatex uses an installed TeX Live)")
     args = parser.parse_args()
+    if args.check:
+        check_publication()
+        return
     diagram = diagram_source((ROOT / "paper/zenith.tex").read_text())
     # Match the manuscript's 11pt base so \footnotesize has the same size.
     source = (r"\documentclass[11pt,tikz,border=2pt]{standalone}" + "\n"
