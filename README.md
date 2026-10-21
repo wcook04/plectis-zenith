@@ -2,11 +2,19 @@
 
 **Research prototype.** Zenith asks whether solving one software problem can leave behind a better way to investigate the next. It retains programs, executable tests and measured results, then checks what helps on later tasks.
 
-Consider a failed account transfer. One faulty SQLite client deducts money before discovering that the destination account does not exist. A useful test checks the balance after the failure. In Zenith's [saved comparison](docs/studies/client/client-investigation-v2-low-20261015.md#condition-and-paired-results), a fixed tester exposes that fault; both model-generated testers miss it. Running saved code without further model calls is useful, but ordinary code reuse does that too. The research question is whether experience produces better tests or repairs after the cost of acquiring them is counted.
+The [Zenith film](https://www.youtube.com/watch?v=-PITavNIUgg) follows one experiment: can an AI tester catch more bugs in new programs after reading a record of bugs it missed before? The model receives a description of what each function should do and chooses five test inputs. It cannot see the code it is testing, and its weights are unchanged.
 
-The newest study tests one form of that question directly. DeepSeek V4.1 Flash reads a HumanEval function's description and chooses five test inputs to detect bugs that code models actually wrote and the original tests missed. On 58 held-out problems, adding a record of the bugs it missed on earlier practice problems, each with an input that detects it, raises the share detected from **69.2% to 77.0%** (+7.9 percentage points, 95% interval 1.4 to 14.7). About half of that gain comes from very large inputs that make slow implementations time out; rules the model wrote from the same record did not help. [Study, protocol and replay](docs/studies/kept-experience/README.md).
+[Watch the experiment](https://www.youtube.com/watch?v=-PITavNIUgg) · [Read its study and replay instructions](docs/studies/kept-experience/README.md) · [Research website](https://wcook04.github.io/plectis-zenith/) · [Try the local learner demo](#try-it-without-an-account) · [Contribute](CONTRIBUTING.md)
 
-[Try it locally](#try-it-without-an-account) · [Paper](paper/zenith.pdf) · [Web edition](https://wcook04.github.io/plectis-zenith/) · [Results and limits](docs/status.md) · [Source map](#source-map) · [Contribute](CONTRIBUTING.md)
+## The experiment in the film
+
+One faulty program should sort the numbers at every other position in a list, but crashes when the list is empty. Without the practice record, the tester missed that input in both attempts; with the record, it tried the empty list both times. The record contains earlier missed bugs and inputs that expose them.
+
+Across 58 problems withheld from practice and development, tested twice each, DeepSeek V4.1 Flash caught an average **77.0% of the fault classes per problem**, compared with **69.2%** from the description alone. Faulty programs that fail on the same benchmark inputs count as one fault class. About half the gain came from large inputs that made slow programs exceed the one-second time limit. Counting only wrong answers and exceptions, the smaller advantage had an uncertainty interval that included zero. Rules the model wrote from its misses did not produce a clear improvement.
+
+This is one model on short benchmark functions, with no demonstrated transfer to larger software projects. The [study report](docs/studies/kept-experience/README.md) gives the comparisons, protocol changes, costs and limits. Its [paper](paper/zenith.pdf), saved replies and replay code are published at that fixed study revision on the `study/kept-experience-20261019` branch. Follow that report to reproduce the filmed experiment; the commands below run separate studies available on `main`.
+
+The [research website](https://wcook04.github.io/plectis-zenith/) and [paper](paper/zenith.pdf) also describe the earlier program-repair, reusable-tester and continuation-learner studies. Their [results and limits](docs/status.md) remain separate from the filmed experiment. The [Plectis introduction](https://www.youtube.com/watch?v=Ut9068O-HGU) explains the wider project.
 
 ## Try it without an account
 
@@ -59,13 +67,14 @@ Both modes exclude timestamps, elapsed times and selected failure metadata. Beha
 
 The [contribution guide](CONTRIBUTING.md#install-and-check-the-source-checkout) covers the complete test suite and building the website locally.
 
-## What works today
+<a id="what-works-today"></a>
 
-Zenith evaluates four mechanisms separately: a model's use of a kept record of its testing misses, model-proposed program repair, reuse of generated testers, and the authored continuation learner. The learner is not a component of either model-driven study. The earlier question-memory comparison is a separate controlled study of that learning approach.
+## Other studies
+
+The studies below evaluate three mechanisms separately: model-proposed program repair, reuse of generated testers, and the authored continuation learner. The learner is not a component of either model-driven study. The earlier question-memory comparison is a separate controlled study of that learning approach.
 
 | Study | Measured result | What the ordinary baseline tells us |
 |---|---|---|
-| [Kept experience](docs/studies/kept-experience/README.md) | With the record of its practice misses in the prompt, the model's five inputs detect **77.0%** of 535 real model-written bug classes on 58 held-out problems, against **69.2%** with the description alone. | Pre-registered. About half the gain is timeouts on very large inputs; counting only wrong outputs and exceptions, +3.5 points (interval includes zero). Model-written rules, generic advice and imagined bugs show no measurable gain; nothing helps with reasoning off. Five random EvalPlus inputs detect 42.8%. 1,565 calls, $5.70. |
 | [Native program repair](docs/studies/native/progress-campaign-20261014.md) | Repair without new investigation improves later answers from **259/576 to 365/576**. | No additional investigation method beats repair alone in aggregate. The twelve parent episodes cover three authored mechanisms. |
 | [Reusable SQLite testers](docs/studies/client/client-investigation-v2-low-20261015.md) | Each generated tester finds **3 of 4 authored faults**, with no model calls on the five later clients. | The retained-procedure and ordinary-code conditions tie; both prepare model-generated code. Fixed tests find **4 of 4**. Neither generated tester changes its query in response to feedback. |
 | [Continuation learner repair](examples/continuation-memory/witness-preserving-v1/README.md) | Keeping each new history with its distinguishing future test lets all **8 native configurations** finish fitting. | Seeding the same repaired learner with generic one-symbol questions costs **11,379** source executions versus **11,395** with its default seeds. Later UTF-8 and SQLite checks still find errors. |
@@ -123,7 +132,7 @@ The website projects the paper's prose, table, citations and diagram from the ma
 
 Useful contributions include a small failure reproduction, a stronger ordinary baseline, an independently sourced software task, or a correction to a claim or citation. Start with the [contribution guide](CONTRIBUTING.md) for setup, relevant tests and evidence-preservation rules. `make demo` and `make replay` are shortcuts for the examples above; the guide explains the broader validation and website commands.
 
-I'm developing Zenith with AI coding agents and learning the field as I go. Corrections and collaboration on prior work, useful tasks and fair evaluations are welcome through [project issues](https://github.com/wcook04/plectis-zenith/issues). The [Plectis introduction video](https://www.youtube.com/watch?v=uO2lbstEH9M) places Zenith in the wider project.
+I'm developing Zenith with AI coding agents and learning the field as I go. Corrections and collaboration on prior work, useful tasks and fair evaluations are welcome through [project issues](https://github.com/wcook04/plectis-zenith/issues).
 
 <a id="credits-and-license"></a>
 
