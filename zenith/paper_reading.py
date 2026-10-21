@@ -88,7 +88,12 @@ def paper_reading(tex: str, keys: list[str]) -> dict:
     """Preserve every paragraph, table cell, citation and figure caption in order."""
     records = iter(figures(tex))
     tex = re.sub(r"(?<!\\)%[^\n]*", "", tex)
-    body = tex.split(r"\textbf{Abstract.}", 1)[1].split(r"\begin{thebibliography}", 1)[0]
+    front, body = tex.split(r"\textbf{Abstract.}", 1)
+    disclosure = re.findall(
+        r"\\footnotetext\{(\\textbf\{Authorship and AI use\.\}[^{}]+)\}", front)
+    if len(disclosure) != 1:
+        raise ValueError("Expected one explicit first-page authorship and AI-use disclosure")
+    body = body.split(r"\begin{thebibliography}", 1)[0]
     body = body.replace(r"\newpage", "")
     headings = list(HEADING.finditer(body))
     if not headings or [int(h[2]) for h in headings] != list(range(1, len(headings) + 1)):
@@ -96,7 +101,8 @@ def paper_reading(tex: str, keys: list[str]) -> dict:
     body = re.sub(r"\\hypertarget\{[^}]+\}\{\}", "", body)
     headings = list(re.finditer(r"\\textbf\{(\d+)\. ([^}]+)\}", body))
     ids = [h[1] for h in HEADING.finditer(tex)]
-    result = {"abstract": inline(body[:headings[0].start()], keys), "sections": []}
+    result = {"abstract": inline(body[:headings[0].start()], keys),
+              "disclosure": inline(disclosure[0], keys), "sections": []}
     for index, heading in enumerate(headings):
         end = headings[index + 1].start() if index + 1 < len(headings) else len(body)
         part = body[heading.end():end]

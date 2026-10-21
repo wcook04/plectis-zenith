@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import App from '../App';
+import { Markdown } from '../components/Markdown';
 import { clearApiCache, type Paper, type PaperReading, type Site } from '../api';
 
 const source = { path: 'paper/zenith.tex', sha256: 'paper-fixture', url: 'https://example.org/zenith.tex' };
@@ -9,6 +10,7 @@ const figure = '/assets/repair-loop.svg';
 function reading(): PaperReading {
   return {
     abstract: 'Manuscript abstract: a bounded comparison of retained tests.',
+    disclosure: '**Authorship and AI use.** The manuscript records the role of AI and limits of human review.',
     sections: [
       { id: 'idea', title: '1. Programs and observations', blocks: [
         { kind: 'markdown', content: '**Observation tables.** The paper defines its measured state [1](#ref-weighted).' },
@@ -82,6 +84,8 @@ it('reads the title, abstract, sections and navigation from the manuscript paylo
   expect(await screen.findByRole('heading', { name: 'Zenith: the actual manuscript title' })).toBeInTheDocument();
   expect(document.title).toBe('Zenith: the actual manuscript title');
   expect(screen.getByText('Manuscript abstract: a bounded comparison of retained tests.')).toBeInTheDocument();
+  expect(screen.getByText('Authorship and AI use.')).toBeInTheDocument();
+  expect(screen.getByText(/The manuscript records the role of AI and limits of human review/)).toBeInTheDocument();
   expect(screen.getByText(/The manuscript proposes a frozen-improver comparison/)).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Plectis mathematical corpus' })).toHaveAttribute('href', 'https://github.com/wcook04/plectis-erdos');
   const nav = within(screen.getByRole('navigation', { name: 'Chapters' })).getAllByRole('link');
@@ -155,4 +159,15 @@ it('links the continuation guide and measurements among the current studies', as
   expect(vi.mocked(fetch).mock.calls.some(([url]) => String(url).endsWith('/documents/continuation-learner'))).toBe(false);
   fireEvent.click(guide);
   expect(await screen.findByText('Reproduce the saved continuation learner.')).toBeInTheDocument();
+});
+
+
+it('preserves table focus when surrounding manuscript content rerenders', () => {
+  const body = '| Method | Faults |\n| --- | --- |\n| Retained tester | 3 |';
+  const { rerender } = render(<Markdown source={'First paragraph.\n\n' + body} base={source.url} />);
+  const table = screen.getByRole('table');
+  table.focus();
+  rerender(<Markdown source={'Revised paragraph.\n\n' + body} base={source.url} />);
+  expect(screen.getByRole('table')).toBe(table);
+  expect(table).toHaveFocus();
 });

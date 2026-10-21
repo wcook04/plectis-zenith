@@ -43,6 +43,7 @@ test:
 
 validate:
 	"$(PYTHON)" scripts/build_paper_references.py --check
+	"$(PYTHON)" scripts/build_paper_reading.py --check
 	"$(PYTHON)" scripts/check_structure.py
 	"$(PYTHON)" scripts/check_extraction.py
 	"$(PYTHON)" -m zenith validate

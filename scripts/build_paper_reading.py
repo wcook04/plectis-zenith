@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render every manuscript TikZ figure as an accessible website SVG (paper/<id>.svg).
+"""Render every manuscript TikZ figure as an accessible SVG, or check the reviewed PDF.
 
 The standalone preamble reuses the manuscript's own TikZ libraries and the
 block between '% BEGIN figure styles' and '% END figure styles', so the PDF and
@@ -40,11 +40,45 @@ def accessible(svg: str, figure_id: str, description: str) -> str:
             + f'\n<desc id="{figure_id}-description">{escape(description)}</desc>\n' + svg[end:])
 
 
+def page_limit(tex: str) -> int:
+    """The page cap the manuscript itself enforces at compile time."""
+    found = re.search(r"\\ifnum\\value\{page\}>(\d+)", tex)
+    if not found:
+        raise ValueError("The manuscript must declare its page limit")
+    return int(found[1])
+
+
+def check_publication():
+    """Check the published bytes, including disclosure placement and page count."""
+    from zenith.web_content import PublicContent
+    paper = PublicContent(ROOT).paper()
+    if not paper['pdf_current']:
+        raise ValueError('The manuscript and PDF differ from the reviewed edition')
+    text = subprocess.check_output(
+        ['pdftotext', str(ROOT / 'paper/zenith.pdf'), '-'], text=True)
+    pages = [page for page in text.split('\f') if page.strip()]
+    limit = page_limit((ROOT / 'paper/zenith.tex').read_text())
+    if not 1 <= len(pages) <= limit:
+        raise ValueError(f'Expected a paper within its {limit}-page limit; found {len(pages)} pages')
+    def normalise(value):
+        value = re.sub(r'-\s*\n\s*', '', value)
+        return ' '.join(value.split())
+    disclosure = paper['reading']['disclosure'].replace('**', '')
+    if normalise(disclosure) not in normalise(pages[0]):
+        raise ValueError('The web disclosure must also appear on PDF page one')
+    print(f'Verified the reviewed {len(pages)}-page PDF and matching first-page/web AI-use disclosure.')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--check', action='store_true',
+                        help='Check the reviewed PDF and disclosure without rebuilding the figures')
     parser.add_argument("--engine", choices=("tectonic", "pdflatex"), default="tectonic",
                         help="TeX compiler (default: tectonic; pdflatex uses an installed TeX Live)")
     args = parser.parse_args()
+    if args.check:
+        check_publication()
+        return
     tex = (ROOT / "paper/zenith.tex").read_text()
     pre = preamble(tex)
     for figure in figures(tex):

@@ -129,4 +129,4 @@ I'm developing Zenith with AI coding agents and learning the field as I go. Corr
 
 ## Credits and licence
 
-Created by Will Cook with AI coding agents. [NOTICE](NOTICE) records the `ai_workflow` ancestry and attributed research-return components. The software uses the [Apache 2.0 licence](LICENSE); dataset and provider-response rights are separate. The [paper guide](paper/README.md) and [research programme](program.md) retain the literature and links to related Plectis research.
+Will Cook built and directed the research infrastructure and reviewed the claims when he could. AI agents did most of the research and drafting. Cook did not independently verify every claim. The paper and web edition carry the same disclosure. [NOTICE](NOTICE) records the `ai_workflow` ancestry and attributed research-return components. The software uses the [Apache 2.0 licence](LICENSE); dataset and provider-response rights are separate. The [paper guide](paper/README.md) and [research programme](program.md) retain the literature and links to related Plectis research.

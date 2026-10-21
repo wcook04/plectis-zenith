@@ -276,6 +276,7 @@ function PaperReadingPage({ site, paper, reading }: { site: Site; paper: Paper; 
             </nav>
             <h2 className="paper-aside__head">Abstract</h2>
             <Markdown source={reading.abstract} base={base} />
+            <Markdown source={reading.disclosure} base={base} />
           </div>
         </section>
         {reading.sections.map(section => (
