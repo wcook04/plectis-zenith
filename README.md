@@ -2,9 +2,9 @@
 
 **Research prototype.** Zenith asks whether solving one software problem can leave behind a better way to investigate the next. It retains programs, executable tests and measured results, then checks what helps on later tasks.
 
-The [Zenith film](https://www.youtube.com/watch?v=-PITavNIUgg) follows one experiment: can an AI tester catch more bugs in new programs after reading a record of bugs it missed before? The model receives a description of what each function should do and chooses five test inputs. It cannot see the code it is testing, and its weights are unchanged.
+The [Zenith film](https://www.youtube.com/watch?v=ZwGAxxWe1ak) follows one experiment: can an AI tester catch more bugs in new programs after reading a record of bugs it missed before? The model receives a description of what each function should do and chooses five test inputs. It cannot see the code it is testing, and its weights are unchanged.
 
-[Watch the experiment](https://www.youtube.com/watch?v=-PITavNIUgg) · [Read its study and replay instructions](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) · [Research website](https://wcook04.github.io/plectis-zenith/) · [Try the local learner demo](#try-it-without-an-account) · [Contribute](CONTRIBUTING.md)
+[Watch the experiment](https://www.youtube.com/watch?v=ZwGAxxWe1ak) · [Read its study and replay instructions](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) · [Research website](https://wcook04.github.io/plectis-zenith/) · [Try the local learner demo](#try-it-without-an-account) · [Contribute](CONTRIBUTING.md)
 
 ## The experiment in the film
 
@@ -14,7 +14,7 @@ Across 58 problems withheld from practice and development, tested twice each, De
 
 This is one model on short benchmark functions, with no demonstrated transfer to larger software projects. The [study report](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) gives the comparisons, protocol changes, costs and limits. Its [paper](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/paper/zenith.pdf), saved replies and replay code are published at that fixed study revision on the `study/kept-experience-20261019` branch. Follow that report to reproduce the filmed experiment; the commands below run separate studies available on `main`.
 
-The [research website](https://wcook04.github.io/plectis-zenith/) and [three-page paper on main](paper/zenith.pdf) describe the earlier program-repair, reusable-tester and continuation-learner studies. Their [results and limits](docs/status.md) remain separate from the filmed experiment. The [Plectis introduction](https://www.youtube.com/watch?v=Ut9068O-HGU) explains the wider project.
+The [research website](https://wcook04.github.io/plectis-zenith/) and [three-page paper on main](paper/zenith.pdf) describe the earlier program-repair, reusable-tester and continuation-learner studies. Their [results and limits](docs/status.md) remain separate from the filmed experiment. The [Plectis introduction](https://www.youtube.com/watch?v=K87Qk0W7-lk) explains the wider project.
 
 ## Try it without an account
 
