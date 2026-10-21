@@ -1,22 +1,9 @@
-"""
-[PURPOSE]
-- Teleology: Mark `system` as an importable package boundary for runtime, control, and server modules in this repository.
-- Mechanism: Package marker only; concrete behavior lives in subpackages and leaf modules.
+"""Graph execution and shared runtime support.
 
-[INTERFACE]
-- Exports: None.
-- Reads: None.
-- Writes: None.
+Graph loading, execution and provider bridges live in ``system.core``; start
+with ``system/core/loader.py`` and ``system/core/engine.py``. Shared helpers
+live in ``system.lib``. In particular, ``system/lib/openrouter_free_runtime.py``
+also supplies provider transport for the current research studies.
 
-[FLOW]
-- When-needed: Open when a route or import resolves to `system.*` and you need the package boundary before choosing a concrete subsystem file.
-- Escalates-to: system/control/documentation_route_focus.py
-- Navigation-group: python_misc_runtime.
-
-[DEPENDENCIES]
-- Required: None.
-
-[CONSTRAINTS]
-- Guarantee: Importing `system` adds no runtime behavior beyond standard package initialization.
-- Non-goal: This file does not re-export or summarize the full `system` tree.
+This package marker imports no components and defines no runtime behaviour.
 """

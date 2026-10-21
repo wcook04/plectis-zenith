@@ -366,6 +366,8 @@ def observed_study(root: Path, version: str, stage: str, name: str,
         "paired_second_turn_count": analysis["paired_second_turn_count"],
         "paired_second_distinct_legal_count": analysis["paired_second_distinct_legal_count"],
         "adaptive_masked_first_turn_equal": analysis["adaptive_masked_first_turn_equal"],
+        "adaptive_masked_second_turn_issued": analysis["adaptive_masked_second_turn_issued"],
+        "adaptive_masked_repair_prompts": analysis["adaptive_masked_repair_prompts"],
         "standalone_arm_cost_by_task": analysis["billing"]["standalone_arm_cost_by_task"],
         "arm_accounting": arm_accounting,
         "billing_boundary": analysis["billing"]["standalone_cost_boundary"],
@@ -490,6 +492,7 @@ def headline(studies: list[dict]) -> str:
     repair = overall["repair_only"]
     difference = primary["total_correct_difference"]
     sign = "+" if difference > 0 else ""
+    paired_note = paired_repair_interpretation(diagnostic)
     return (
         f"The v5 twelve-parent diagnostic recorded {adaptive['correct']}/{adaptive['total']} "
         f"confirmation answers for feedback-aware direct investigation and "
@@ -498,7 +501,23 @@ def headline(studies: list[dict]) -> str:
         f"{fixed['correct']}/{fixed['total']} and repair-only "
         f"{repair['correct']}/{repair['total']}. These are parents within three "
         "authored native contracts, not independent mechanism or transfer evidence."
+        + (" " + paired_note if paired_note else "")
     )
+
+
+def paired_repair_interpretation(study: dict) -> str:
+    prompts = study.get("adaptive_masked_repair_prompts") or {}
+    turns = study.get("adaptive_masked_second_turn_issued") or {}
+    differing = {task: row for task, row in prompts.items()
+                 if row["confirmation_difference"] != 0}
+    if differing and all(row["identical"] is True and task in turns and
+                         not turns[task]["adaptive"] and not turns[task]["masked"]
+                         for task, row in differing.items()):
+        names = ", ".join(sorted(differing))
+        return (f"Every non-zero paired difference occurs in {names}, where both arms "
+                "stop before a second query decision and separate repair calls receive "
+                "identical saved requests. This comparison does not identify a feedback benefit.")
+    return ""
 
 
 def build(root: Path = ROOT) -> dict:

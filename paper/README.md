@@ -1,6 +1,6 @@
 # Zenith paper
 
-**Zenith** — Will Cook, 15 October 2026. This is a three-page research draft for an unfinished system.
+**Zenith: program repair and the value of retained tests** — Will Cook, 21 October 2026. This is a three-page research draft for an unfinished system.
 
 [Read the current PDF](zenith.pdf) or inspect its [LaTeX source](zenith.tex). This edition separates measured results from proposed directions and invites collaboration and guidance. The [web edition](https://wcook04.github.io/plectis-zenith/) presents the manuscript with the same scholarly terminology, table, citations and repair-loop figure.
 
@@ -17,12 +17,12 @@ The manuscript also distinguishes these results from the earlier controlled memo
 | Source edition | Use and boundary |
 |---|---|
 | [Predictive Representations of State (2001)](https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf) | Conceptual context for future-test probabilities. Its construction assumes a known stochastic model; it does not supply Zenith's black-box learner. |
-| [Worrell's undated weighted-automata notes](https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf) | Observation tables and paired history/continuation rank refinement. Zenith's finite challenges replace the global equivalence oracle assumed by the notes. |
-| [ILF, CCS 2019](https://doi.org/10.1145/3319535.3363230) | A neural testing policy learned from symbolic-execution demonstrations. Fast deployment is separate from expert acquisition and weight training. |
-| [CoverUp, 2025, v4](https://arxiv.org/abs/2403.16218v4) | An authored coverage/error-feedback driver refines regression tests with a fixed LLM. Coverage does not establish specification correctness or acquired policy transfer. |
-| [Voyager, 2023, v2](https://arxiv.org/abs/2305.16291v2) | An executable skill library supports composition and reuse inside Minecraft; the acquisition procedure remains fixed. |
+| [Worrell's undated weighted-automata notes](https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf) | Observation tables and paired history/continuation rank refinement, presented in notes that credit Beimel et al. (2000). The guarantee concerns the hypothesis constructed from the table. Finite challenges can reveal valid counterexamples but cannot certify global equivalence. |
+| [ILF, CCS 2019](https://doi.org/10.1145/3319535.3363230) | A neural fuzzing policy learned from symbolic-execution demonstrations and evaluated on withheld Ethereum contracts in random five-fold cross-validation. Expert acquisition, weight training and deployment have separate costs. |
+| [CoverUp, 2025, v4](https://arxiv.org/abs/2403.16218v4) | An authored coverage/error-feedback driver refines regression tests with a fixed LLM, treating the current implementation as correct. Passing tests and added coverage do not supply an independent correctness oracle; the tests are intended to detect later regressions. |
+| [Voyager, 2023, v2](https://arxiv.org/abs/2305.16291v2) | An executable skill library supports composition and reuse inside Minecraft. The acquisition procedure is authored; its selected tasks, feedback and retained skills change. |
 | [STOP, COLM 2024, v3](https://arxiv.org/abs/2310.02304v3) | Recursive optimization of a code-improvement scaffold under a fixed language model, utilities and controller. |
-| [Hyperagents, 2026, v1](https://arxiv.org/abs/2603.19461v1) | Editable task/meta-agent code and tests of an acquired meta-agent's usefulness. Stronger compounding evidence remains statistically unresolved. |
+| [Hyperagents, 2026, v1](https://arxiv.org/abs/2603.19461v1) | Editable task/meta-agent code; useful maths-grading transfer is reported with the acquired meta-agent fixed for 50 steps. A separate 200-step comparison of transferred and fresh initialisations remains statistically unresolved. Both task and meta implementations transfer, so the starting solvers differ. |
 
 The [portable source records](references.json) own reviewed metadata, exact source-edition hashes, page or section locators, claim boundaries and the manuscript passages each source supports. They contain citation evidence rather than copies of the supplied source documents. The [citation builder](../scripts/build_paper_references.py) generates the manuscript's inline bibliography from these records and checks every citation against its reviewed supporting passage. The website reads the same records.
 

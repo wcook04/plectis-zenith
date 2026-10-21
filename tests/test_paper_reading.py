@@ -19,12 +19,13 @@ def test_web_edition_preserves_citations_results_and_every_figure():
     markdown = '\n'.join(b['content'] for b in blocks if b['kind'] == 'markdown')
     assert all(f'](#ref-{key})' in markdown for key in KEYS)
     assert 'Hₕ,ₜ = f(ht)' in markdown
-    assert '| Retained tester | 3 | 5 | 0 |' in markdown
+    assert '| Retained tester | 3 | 15 | 5 | 10 | 0 |' in markdown
     assert '$0.12982944' in markdown
     assert '- **Playbook v1.**' in markdown
     figures = [b for b in blocks if b['kind'] == 'figure']
     assert [f['id'] for f in figures] == FIGURES
     assert all(f['url'] == f"/assets/{f['id']}.svg" and f['alt'] and f['caption'] for f in figures)
+    assert 'Held-out outcomes are withheld from repair and selection.' in figures[-1]['caption']
     assert 'failed search does not establish falsehood' in markdown
 
 
@@ -38,9 +39,9 @@ def test_editing_manuscript_changes_web_text_without_a_second_copy():
     tex = (ROOT / 'paper/zenith.tex').read_text()
     reading = paper_reading(tex.replace('Zenith asks whether the experience', 'A revised opening asks whether the experience'), KEYS)
     assert reading['abstract'].startswith('A revised opening asks whether the experience')
-    tex = tex.replace('Retained tester & 3 & 5 & 0', 'Retained tester & 2 & 9 & 0')
+    tex = tex.replace('Retained tester & 3 & 15 & 5 & 10 & 0', 'Retained tester & 2 & 19 & 9 & 10 & 0')
     reading = paper_reading(tex, KEYS)
-    assert any('| Retained tester | 2 | 9 | 0 |' in b.get('content', '')
+    assert any('| Retained tester | 2 | 19 | 9 | 10 | 0 |' in b.get('content', '')
                for s in reading['sections'] for b in s['blocks'])
 
 

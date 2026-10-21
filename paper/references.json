@@ -140,6 +140,66 @@
    ]
   },
   {
+   "id": "weighted",
+   "authors": [
+    "James Worrell"
+   ],
+   "title": "Exactly Learning Weighted Automata over a Field",
+   "author_label": "J. Worrell",
+   "venue": "Oxford teaching notes",
+   "year_label": "undated",
+   "url": "https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf",
+   "reviewed_source": {
+    "filename": "MA-learning.pdf",
+    "sha256": "b50288b01850ecf938590603612ea8482acdb177e2eb5b3b0599033e60e24d48",
+    "edition": "Supplied three-page Oxford teaching note; no printed date or byline",
+    "annex_id": "weighted-automata-exact-learning-notes",
+    "attribution_note": "Attribution to James Worrell comes from his Oxford teaching index, https://www.cs.ox.ac.uk/people/james.worrell/lectures.html. PDF build metadata dated 23 February 2017 is not a verified publication year. The note credits the algorithm to Beimel, Bergadano, Bshouty, Kushilevitz and Varricchio (JACM 2000).",
+    "license": "No explicit redistribution license established; only metadata and source-located summaries are published.",
+    "distribution_policy": "local_only"
+   },
+   "verification_state": "source_verified",
+   "application": "Implemented antecedent: Zenith’s continuation learner constructs a weighted-automaton hypothesis from exact observation tables and retains paired history/test rank witnesses. Finite challenges can produce valid counterexamples but replace the note’s global equivalence oracle, so the repair restores an established invariant without certifying general source equivalence.",
+   "source_locators": [
+    {
+     "id": "observation-table",
+     "locator": "pp. 1–2, Preliminaries, The Algorithm, and the unnumbered hypothesis construction immediately before Proposition 1",
+     "supports": "For an exact field-valued series f, equal-sized row and column sets containing the empty word and a full-rank table H determine the hypothesis’s initial vector, final vector and transition matrices through H M(σ) = Hσ.",
+     "boundary": "The rank-refinement result concerns this table-induced hypothesis. Field arithmetic is exact. Finite-dimensional representability bounds repeated rank growth; it is not established for arbitrary native software by finite observations."
+    },
+    {
+     "id": "paired-rank-witness",
+     "locator": "Proposition 1, pp. 2–3, Eqs. (1)–(2)",
+     "supports": "For a counterexample to the table-induced hypothesis, the proof finds a prefix wσ at which the predicted test vector first becomes incorrect and a component i with nonzero residual. Adding row w and column σyi increases the table rank from n to n+1.",
+     "boundary": "The paired witnesses follow from the hypothesis construction; an arbitrary failed candidate and a full-rank table are insufficient. A valid finite-challenge counterexample suffices for this local refinement. Zenith’s repair restores an established invariant, not a new learning theorem."
+    },
+    {
+     "id": "oracle-assumptions",
+     "locator": "p. 1, Preliminaries and The Algorithm; p. 2, equivalence-query paragraph before Proposition 1; pp. 2–3, rank-refinement proof",
+     "supports": "Exact membership queries supply values of f. An equivalence query either certifies global equality or returns a counterexample. Rank growth is bounded when the target has a finite weighted-automaton representation.",
+     "boundary": "Finite challenges cannot certify global equality; exact arithmetic alone establishes neither finite representability nor correctness on unqueried inputs. The source does not establish cross-task transfer savings or lifetime economy for native software."
+    },
+    {
+     "id": "algorithm-attribution",
+     "locator": "p. 1, first sentence of The Algorithm; p. 3, reference [1]",
+     "supports": "The note explicitly credits its algorithm to Beimel, Bergadano, Bshouty, Kushilevitz and Varricchio, Learning functions represented as multiplicity automata (JACM, 2000).",
+     "boundary": "This verifies the attribution made by the supplied note, not an independent review of the full JACM article. Worrell is credited for the exposition; the note is not evidence that he originated the algorithm."
+    }
+   ],
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "With exact field-valued observations and a square full-rank table containing\nthe empty history and test, the weighted-automaton construction turns a\ncounterexample to its hypothesis into a paired row/column extension increasing rank~\\cite[Proposition 1, pp.\\ 2--3]{weighted}.\nOur repair restores that established requirement. Finite challenges replace\nthe global equivalence oracle, so a completed fit establishes only agreement\non those challenges. The five-coordinate queue model fits in ten acquisition\nexecutions and agrees on lengths 0--32; one nonlinear integer counter suffices.",
+     "excerpt_sha256": "1835e2ed8600512345308842e17db69449f8ec4d1727e57b233f3c870bdb5acf",
+     "source_locator_ids": [
+      "observation-table",
+      "paired-rank-witness",
+      "oracle-assumptions"
+     ]
+    }
+   ]
+  },
+  {
    "id": "psr",
    "authors": [
     "Michael L. Littman",
@@ -148,7 +208,7 @@
    ],
    "title": "Predictive Representations of State",
    "author_label": "M. L. Littman, R. S. Sutton and S. Singh",
-   "venue": "NeurIPS 14",
+   "venue": "NIPS, vol. 14",
    "year_label": "2001",
    "url": "https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf",
    "reviewed_source": {
@@ -171,7 +231,7 @@
     },
     {
      "id": "known-model-construction",
-     "locator": "§2, Theorem 1 and Lemma 1; physical PDF pp. 7, 9, 11 / content pp. 4–6 / proceedings pp. 1558–1560",
+     "locator": "Theorem 1 at the end of §1 and its §2 proof, including Lemma 1; physical PDF pp. 7, 9, 11 / content pp. 4–6 / proceedings pp. 1558–1560",
      "supports": "A finite POMDP has a linear PSR using no more tests than states in its minimal POMDP; the construction uses the supplied POMDP model.",
      "boundary": "This is a known-model representation result, not a black-box acquisition algorithm or a theorem that arbitrary software has finite rank."
     },
@@ -185,65 +245,11 @@
    "artifact_links": [
     {
      "path": "paper/zenith.tex",
-     "expected_text": "\\hypertarget{evolve}{}\n\\textbf{Continuation learning.}\nPredictive state representations encode stochastic state through probabilities\nof future tests. The cited theorem constructs a representation from a known\nfinite POMDP; it does not supply a black-box learning algorithm~\\cite[Theorem 1; \\S2]{psr}.\nOur continuation learner instead fits exact integer observations in a\nrational-linear model. The conceptual connection is the use of future tests\nto distinguish histories.",
-     "excerpt_sha256": "4a22e7eb8b44c819604d493ebb96156c77d0836c49064236d081cbd6f8d36148",
+     "expected_text": "Predictive state representations instead describe stochastic state through\nfuture-test probabilities. Their linear predictions use normalised conditional\nupdates; the cited construction starts from a known finite partially observable\nMarkov decision process~\\cite[\\S1, Eq.\\ (3); Theorem 1 and \\S2]{psr}.\nZenith fits deterministic outputs with rational-linear transitions and readouts.",
+     "excerpt_sha256": "d808fcc8d731ec84a10dd583ea9d6c379b09cc04d7567544a22aec5b76a842b1",
      "source_locator_ids": [
       "future-test-state",
       "known-model-construction"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "weighted",
-   "authors": [
-    "James Worrell"
-   ],
-   "title": "Exactly Learning Weighted Automata over a Field",
-   "author_label": "J. Worrell",
-   "venue": "Oxford teaching notes",
-   "year_label": "undated",
-   "url": "https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf",
-   "reviewed_source": {
-    "filename": "MA-learning.pdf",
-    "sha256": "b50288b01850ecf938590603612ea8482acdb177e2eb5b3b0599033e60e24d48",
-    "edition": "Supplied three-page Oxford teaching note; no printed date or byline",
-    "annex_id": "weighted-automata-exact-learning-notes",
-    "attribution_note": "Attribution to James Worrell comes from his Oxford teaching index, https://www.cs.ox.ac.uk/people/james.worrell/lectures.html. PDF build metadata dated 23 February 2017 is not a verified publication year. The note credits the algorithm to Beimel, Bergadano, Bshouty, Kushilevitz and Varricchio (JACM 2000).",
-    "license": "No explicit redistribution license established; only metadata and source-located summaries are published.",
-    "distribution_policy": "local_only"
-   },
-   "verification_state": "source_verified",
-   "application": "Implemented antecedent: Zenith’s continuation learner fits a weighted-linear observation table and retains paired history/test rank witnesses. Its finite challenge sequence replaces the note’s global equivalence oracle, so the repair restores an established invariant without proving general source equivalence.",
-   "source_locators": [
-    {
-     "id": "observation-table",
-     "locator": "pp. 1–2, field-valued series and unnumbered observation-table construction",
-     "supports": "Histories index Hankel rows, continuations index columns, and a square full-rank table determines transition maps through H M(σ) = Hσ.",
-     "boundary": "The model class and exact field arithmetic are assumptions; dimension bounds are relative to this linear representation."
-    },
-    {
-     "id": "paired-rank-witness",
-     "locator": "Proposition 1, pp. 2–3, Eqs. (1)–(2)",
-     "supports": "Counterexample refinement adds both an access history and a distinguishing continuation, increasing the observation table’s rank.",
-     "boundary": "Keeping a question alone does not preserve its rank witness. Zenith’s regression checks this established requirement; it is not a new learning theorem."
-    },
-    {
-     "id": "oracle-assumptions",
-     "locator": "p. 1, membership and equivalence queries; Proposition 1, pp. 2–3",
-     "supports": "Exact membership answers and a counterexample whenever the hypothesis is globally wrong support the learning procedure.",
-     "boundary": "Finite challenges cannot supply that equivalence guarantee; the note does not establish transfer savings or lifetime economy for native software."
-    }
-   ],
-   "artifact_links": [
-    {
-     "path": "paper/zenith.tex",
-     "expected_text": "Access histories $h$ and continuation tests $t$ index an observation table,\n$H_{h,t}=f(ht)$, for deterministic observations $f$. Given exact field-valued\nanswers and a square full-rank table, a counterexample supplies a history--test\npair whose nonzero residual increases the rank~\\cite[Proposition 1, pp.\\ 2--3]{weighted}.\nOur repair preserves the paired access history and distinguishing test required\nby this construction. Across eight native configurations both the repaired\nrefinement and a generic bank of one-symbol questions complete every fit;\ngeneric questions cost 11,379 acquisition source executions versus 11,395, and\nlater finite checks retain errors. Useful questions have not yet made that\narchitecture economical.",
-     "excerpt_sha256": "787e4720f288ee4d98931662dc8911787f65fd4f94cc6a19a9e1f67b4c509377",
-     "source_locator_ids": [
-      "observation-table",
-      "paired-rank-witness",
-      "oracle-assumptions"
      ]
     }
    ]
@@ -641,7 +647,7 @@
    "source_locators": [
     {
      "id": "trained-testing-policy",
-     "locator": "PDF p. 7, §4.2 “Learning from Expert”; pp. 7–9, §§5.1–5.2, Table 2 and Algorithm 1",
+     "locator": "PDF p. 7, §4.2, paragraph “Learning from Expert”; pp. 7–9, §§5.1–5.2, Table 2 and Algorithm 1",
      "supports": "A symbolic expert supplies coverage-improving transaction sequences; imitation learning updates neural policy weights, and the deployed policy consumes contract/history features.",
      "boundary": "Runtime history adaptation is distinct from retraining. Ethereum-specific features are authored; the paper does not discover arbitrary representation boundaries or improve its own training algorithm."
     },
@@ -661,10 +667,11 @@
    "artifact_links": [
     {
      "path": "paper/zenith.tex",
-     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a testing policy from symbolic-execution traces~\\cite[\\S\\S4--5]{ilf};\nZenith does not train model weights. CoverUp guides a fixed LLM with source,\ncoverage and execution feedback to generate regression tests~\\cite[\\S3]{coverup};\ncoverage is not fault detection. Voyager retains executable skills within a\nfixed acquisition loop~\\cite[\\S2]{voyager}.\nSTOP recursively rewrites its code-improvement scaffold~\\cite[\\S4]{stop}.\nHyperagents edits task and meta-agent code, then evaluates a fixed acquired\nmeta-agent in another domain. Its reported cross-domain compounding comparison\ndoes not establish a statistically significant advantage~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
-     "excerpt_sha256": "c3d7d4904af13804ff34bbd4616cee8c75d8131c0505dd1645871fd28a9a66f9",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
      "source_locator_ids": [
-      "trained-testing-policy"
+      "trained-testing-policy",
+      "withheld-contracts"
      ]
     }
    ]
@@ -709,15 +716,23 @@
      "locator": "evaluation.tex, §§4.1–4.5; table-cm.tex, Table 1; Table 3; FSE128:13–18",
      "supports": "The evaluation records model-matched comparisons, cumulative passes, tokens, model dollars and deployed wall time.",
      "boundary": "Cumulative passes are not independent acquisitions; asynchronous versus serial wall time is not a matched-compute advantage, and reported historical model prices are not current quotes."
+    },
+    {
+     "id": "regression-testing-assumption",
+     "locator": "introduction.tex:3–6, §1; implementation.tex:245–253, §3.3 (impl:dialogue)",
+     "supports": "Tests are generated from an implementation treated as correct for regression testing; CoverUp retains generated tests that pass and increase coverage.",
+     "boundary": "This supplies no independent specification oracle and does not establish fault-detection performance from coverage alone; the intended regression tests can still detect faults introduced by later changes."
     }
    ],
    "artifact_links": [
     {
      "path": "paper/zenith.tex",
-     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a testing policy from symbolic-execution traces~\\cite[\\S\\S4--5]{ilf};\nZenith does not train model weights. CoverUp guides a fixed LLM with source,\ncoverage and execution feedback to generate regression tests~\\cite[\\S3]{coverup};\ncoverage is not fault detection. Voyager retains executable skills within a\nfixed acquisition loop~\\cite[\\S2]{voyager}.\nSTOP recursively rewrites its code-improvement scaffold~\\cite[\\S4]{stop}.\nHyperagents edits task and meta-agent code, then evaluates a fixed acquired\nmeta-agent in another domain. Its reported cross-domain compounding comparison\ndoes not establish a statistically significant advantage~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
-     "excerpt_sha256": "c3d7d4904af13804ff34bbd4616cee8c75d8131c0505dd1645871fd28a9a66f9",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
      "source_locator_ids": [
-      "measured-test-refinement"
+      "measured-test-refinement",
+      "regression-testing-assumption",
+      "comparison-and-cost"
      ]
     }
    ]
@@ -761,8 +776,8 @@
     {
      "id": "fixed-feedback-loop",
      "locator": "2-method.tex:37–47, §2.3; appendix/pseudocode/voyager.py:1–51",
-     "supports": "A fixed four-attempt loop revises code using environment observations, execution errors and a separate GPT-4 critic before retaining successful skills.",
-     "boundary": "A separate model critic is fallible, not an independently correct executable reference; the foundation models and acquisition machinery remain fixed."
+     "supports": "An authored loop allows at most four code-generation attempts per task, using environment observations, execution errors and a GPT-4 critic before retaining successful skills.",
+     "boundary": "Fixed orchestration permits adaptive task selection and skill-library growth. The model critic is fallible, not an independently correct executable reference; the foundation models and acquisition machinery remain fixed."
     },
     {
      "id": "new-world-transfer",
@@ -774,8 +789,8 @@
    "artifact_links": [
     {
      "path": "paper/zenith.tex",
-     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a testing policy from symbolic-execution traces~\\cite[\\S\\S4--5]{ilf};\nZenith does not train model weights. CoverUp guides a fixed LLM with source,\ncoverage and execution feedback to generate regression tests~\\cite[\\S3]{coverup};\ncoverage is not fault detection. Voyager retains executable skills within a\nfixed acquisition loop~\\cite[\\S2]{voyager}.\nSTOP recursively rewrites its code-improvement scaffold~\\cite[\\S4]{stop}.\nHyperagents edits task and meta-agent code, then evaluates a fixed acquired\nmeta-agent in another domain. Its reported cross-domain compounding comparison\ndoes not establish a statistically significant advantage~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
-     "excerpt_sha256": "c3d7d4904af13804ff34bbd4616cee8c75d8131c0505dd1645871fd28a9a66f9",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
      "source_locator_ids": [
       "skill-retention",
       "fixed-feedback-loop"
@@ -831,10 +846,11 @@
    "artifact_links": [
     {
      "path": "paper/zenith.tex",
-     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a testing policy from symbolic-execution traces~\\cite[\\S\\S4--5]{ilf};\nZenith does not train model weights. CoverUp guides a fixed LLM with source,\ncoverage and execution feedback to generate regression tests~\\cite[\\S3]{coverup};\ncoverage is not fault detection. Voyager retains executable skills within a\nfixed acquisition loop~\\cite[\\S2]{voyager}.\nSTOP recursively rewrites its code-improvement scaffold~\\cite[\\S4]{stop}.\nHyperagents edits task and meta-agent code, then evaluates a fixed acquired\nmeta-agent in another domain. Its reported cross-domain compounding comparison\ndoes not establish a statistically significant advantage~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
-     "excerpt_sha256": "c3d7d4904af13804ff34bbd4616cee8c75d8131c0505dd1645871fd28a9a66f9",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
      "source_locator_ids": [
-      "recursive-scaffold"
+      "recursive-scaffold",
+      "heldout-and-transfer"
      ]
     }
    ]
@@ -867,7 +883,7 @@
     "license_url": "https://creativecommons.org/licenses/by/4.0/"
    },
    "verification_state": "source_verified",
-   "application": "Proposed protocol: freeze acquired meta-agents and compare their improvements on identical fresh solvers, selecting children before untouched evaluation. Current Zenith has no learned self-improver; the source’s architecture and meta-evaluation are precedents, not local results.",
+   "application": "Concrete precedent and proposed evaluation: distinguish useful fixed-meta transfer from the unresolved advantage of transferred initialisation during continued self-modification. Zenith’s proposed comparison freezes acquired improvers on identical fresh solvers; the current system has no learned self-improver. The source’s architecture and evaluations are precedents, not local results.",
    "source_locators": [
     {
      "id": "editable-meta-fixed-outer-loop",
@@ -877,22 +893,28 @@
     },
     {
      "id": "frozen-meta-transfer",
-     "locator": "paper.tex:254–283, §5.2; paper.tex:707–753, appendices app:genk-metric and app:transfer-selection",
-     "supports": "Improvement@k holds the meta-agent fixed, and validation-selected task agents test the usefulness of source-acquired improvement machinery in a new domain.",
-     "boundary": "The transfer carries both task and meta implementations, and initial format failures create headroom. Follow the main development/validation-before-test protocol rather than selecting the maximum test score from the appendix display."
+     "locator": "paper.tex:254–283, §5.2, especially 259, 268, 277 and 283; Figure 3 (fig:res-transfer); paper.tex:707–753, appendices app:genk-metric and app:transfer-selection",
+     "supports": "With both task and meta implementations transferred, §5.2 holds the acquired meta-agent fixed for 50 generation steps. Validation-selected maths graders yield reported median test score and improvement@50 of 0.630 (95% bootstrap CI 0.540–0.630); the source reports p < 0.05 against the initial-agent condition.",
+     "boundary": "The starting task agents differ, and the original agent fails the required output format. This is a system-level transfer result, not an isolated estimate of the meta-agent’s effect on identical solvers. Main §5.2 specifies validation selection before test reporting; the appendix’s generic maximum must not be read as test-set selection. Reported significance has not been independently reproduced."
     },
     {
      "id": "compounding-boundary",
-     "locator": "paper.tex:293–305, §5.3, label sec:results-compound",
-     "supports": "Continued runs compare transferred and initial agents; the 200-iteration transfer-versus-fresh result is explicitly not statistically significant.",
-     "boundary": "The reported 0.640 versus 0.610 comparison has p > 0.05; stronger task-agent improvements and qualitative memory examples do not by themselves establish accelerating recursive self-improvement."
+     "locator": "paper.tex:293–305, §5.3, especially 303; Figure 4 (fig:res-transfer-cont)",
+     "supports": "After 200 iterations with continued self-modification, transferred initialisation yields median 0.640 (95% bootstrap CI 0.550–0.720), versus 0.610 (0.510–0.680) from the original agent. The source reports p > 0.05 for this comparison.",
+     "boundary": "The unresolved advantage in §5.3 does not negate the distinct positive fixed-meta transfer result in §5.2; non-significance is not evidence of equivalence. The 200-step comparison changes initialisation while allowing continued self-modification in both arms; it does not isolate continued meta-agent editing against a matched-budget fixed transferred meta-agent. Neither comparison establishes unbounded or accelerating improvement."
+    },
+    {
+     "id": "reported-statistical-protocol",
+     "locator": "paper.tex:225, §5 opening paragraph; paper.tex:283, §5.2; paper.tex:303, §5.3",
+     "supports": "The paper reports five runs per experiment, medians, 95% bootstrap confidence intervals from 1,000 resamples and Wilcoxon signed-rank tests.",
+     "boundary": "The supplied v1 does not specify test sidedness, exact versus approximate computation, pairing or the observational unit for its p-values. Significance statements are attributed to the source rather than independently reproduced; this specification gap alone does not show that the reported result is false."
     }
    ],
    "artifact_links": [
     {
      "path": "paper/zenith.tex",
-     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a testing policy from symbolic-execution traces~\\cite[\\S\\S4--5]{ilf};\nZenith does not train model weights. CoverUp guides a fixed LLM with source,\ncoverage and execution feedback to generate regression tests~\\cite[\\S3]{coverup};\ncoverage is not fault detection. Voyager retains executable skills within a\nfixed acquisition loop~\\cite[\\S2]{voyager}.\nSTOP recursively rewrites its code-improvement scaffold~\\cite[\\S4]{stop}.\nHyperagents edits task and meta-agent code, then evaluates a fixed acquired\nmeta-agent in another domain. Its reported cross-domain compounding comparison\ndoes not establish a statistically significant advantage~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
-     "excerpt_sha256": "c3d7d4904af13804ff34bbd4616cee8c75d8131c0505dd1645871fd28a9a66f9",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
      "source_locator_ids": [
       "editable-meta-fixed-outer-loop",
       "frozen-meta-transfer",

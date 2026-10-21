@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import App from '../App';
 import { clearApiCache, type Paper, type PaperReading, type Site } from '../api';
@@ -34,9 +34,9 @@ function mockPaper(payload = reading(), active = 'progress-campaign') {
       paper_section: null, evidence_urls: [],
     })),
     notice: 'Experimental manuscript fixture.', notice_url: '/api/v1/documents/notice',
-    documents: { paper: '/api/v1/documents/paper', results: '/api/v1/documents/results' },
+    documents: { paper: '/api/v1/documents/paper', results: '/api/v1/documents/results', 'continuation-learner': '/api/v1/documents/continuation-learner' },
     figures: { 'paper-loop': figure },
-    evidence: { 'progress-campaign': '/api/v1/evidence/progress-campaign' },
+    evidence: { 'progress-campaign': '/api/v1/evidence/progress-campaign', 'continuation-learner': '/api/v1/evidence/continuation-learner' },
     local_runs_enabled: false, capabilities: {},
   };
   const paper: Paper = {
@@ -56,6 +56,10 @@ function mockPaper(payload = reading(), active = 'progress-campaign') {
     let body: unknown;
     if (url.endsWith('/site')) body = site;
     else if (url === '/api/v1/paper') body = paper;
+    else if (url.endsWith('/documents/continuation-learner')) body = {
+      format: 'markdown', content: 'Reproduce the saved continuation learner.',
+      base_url: 'https://example.org/learner.md', source,
+    };
     else if (url.endsWith('/documents/paper')) body = {
       content: '\\\\[4pt]\nWill Cook \\quad\\textbullet\\quad 15 October 2026\n', source,
     };
@@ -76,6 +80,7 @@ it('reads the title, abstract, sections and navigation from the manuscript paylo
   mockPaper();
   render(<App />);
   expect(await screen.findByRole('heading', { name: 'Zenith: the actual manuscript title' })).toBeInTheDocument();
+  expect(document.title).toBe('Zenith: the actual manuscript title');
   expect(screen.getByText('Manuscript abstract: a bounded comparison of retained tests.')).toBeInTheDocument();
   expect(screen.getByText(/The manuscript proposes a frozen-improver comparison/)).toBeInTheDocument();
   expect(screen.getByRole('link', { name: 'Plectis mathematical corpus' })).toHaveAttribute('href', 'https://github.com/wcook04/plectis-erdos');
@@ -134,4 +139,20 @@ it('does not substitute an older narrative when the current paper fails to load'
   expect(await screen.findByRole('alert')).toHaveTextContent('The paper could not be loaded');
   expect(screen.queryByText(/An AI can suggest a repair/)).toBeNull();
   expect(screen.getByRole('link', { name: 'Read the manuscript source' })).toHaveAttribute('href', 'https://github.com/wcook04/plectis-zenith/blob/main/paper/zenith.tex');
+});
+
+
+it('links the continuation guide and measurements among the current studies', async () => {
+  mockPaper();
+  render(<App />);
+  await screen.findByRole('heading', { name: 'Current experiment records' });
+  const guide = screen.getByText('Method, results and replay');
+  const item = guide.closest('li')!;
+  expect(item).toHaveTextContent('Continuation learner');
+  expect(within(item).getByRole('link', { name: 'Saved measurements (JSON)' }))
+    .toHaveAttribute('href', '/api/v1/evidence/continuation-learner');
+  expect(item.closest('details')).toBeNull();
+  expect(vi.mocked(fetch).mock.calls.some(([url]) => String(url).endsWith('/documents/continuation-learner'))).toBe(false);
+  fireEvent.click(guide);
+  expect(await screen.findByText('Reproduce the saved continuation learner.')).toBeInTheDocument();
 });

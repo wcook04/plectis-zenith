@@ -55,6 +55,7 @@ export function Markdown({ source, base }: { source: string; base: string }) {
             </a>
           ),
           img: ({ src, alt }) => (src ? <DocImage src={figureUrl(String(src), figures)} alt={alt ?? ''} /> : null),
+          table: ({ children }) => <table tabIndex={0}>{children}</table>,
           h1: ({ children }) => <h4>{children}</h4>,
           h2: ({ children }) => <h5>{children}</h5>,
           h3: ({ children }) => <h6>{children}</h6>,

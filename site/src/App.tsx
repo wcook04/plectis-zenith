@@ -19,6 +19,7 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { CopyButton } from './components/CopyButton';
 
 const RECEIPT_LABEL: Record<string, string> = {
+  'continuation-learner': 'Continuation learner and later checks',
   'progress-campaign': 'Current repair experiment and comparisons with ordinary tests',
   'client-investigation': 'Separate SQLite client investigation pilot',
   'client-investigation-v2': 'SQLite client pilot v2, reasoning none',
@@ -106,6 +107,10 @@ const NAV_LABEL: Record<string, string> = {
 export default function App() {
   const site = useAsync(() => api.site(), []);
   const paper = useAsync(() => api.paper(), []);
+  const paperTitle = paper.status === 'ready' ? paper.value.title : null;
+  useEffect(() => {
+    if (paperTitle) document.title = paperTitle;
+  }, [paperTitle]);
 
   if (site.status === 'loading') {
     return (
@@ -285,6 +290,7 @@ function PaperReadingPage({ site, paper, reading }: { site: Site; paper: Paper; 
                     <div className="paper-reading__figure-scroll" role="region" aria-label={block.alt} tabIndex={0}>
                       <img src={apiUrl(block.url)} alt={block.alt} loading="lazy" />
                     </div>
+                    <p className="paper-reading__scroll-hint">Scroll across the diagram to follow the complete repair loop.</p>
                     {block.caption && <figcaption><Markdown source={block.caption} base={base} /></figcaption>}
                   </figure>)}
               </div>
@@ -617,13 +623,14 @@ function ChapterSection({
   );
 }
 
-function SourceDocument({ url }: { url: string }) {
+function SourceDocument({ url, compact = false, label = 'Read the detailed method and research notes' }:
+  { url: string; compact?: boolean; label?: string }) {
   const [open, setOpen] = useState(false);
   const doc = useAsync<Doc | null>(() => (open ? api.document(url) : Promise.resolve(null)), [open, url]);
   return (
-    <div className="wrap source-doc">
+    <div className={compact ? 'source-doc source-doc--compact' : 'wrap source-doc'}>
       <details onToggle={(event) => setOpen((event.target as HTMLDetailsElement).open)}>
-        <summary>Read the detailed method and research notes</summary>
+        <summary>{label}</summary>
         {doc.status === 'ready' && doc.value && (
           <>
             <p className="source-doc__from">
@@ -1294,7 +1301,7 @@ function NextFigure({ chapter }: { chapter: Chapter }) {
 function PaperSection({ site, paper, paperReading = false }: { site: Site; paper: Paper | null; paperReading?: boolean }) {
   const currentPdf = paper?.pdf_current === true;
   const currentIds = site.active_evidence_id === 'progress-campaign'
-    ? ['progress-campaign', [...CLIENT_VERSIONS].reverse().find(v => site.evidence[v.id])?.id]
+    ? ['progress-campaign', [...CLIENT_VERSIONS].reverse().find(v => site.evidence[v.id])?.id, 'continuation-learner']
     : Object.keys(site.evidence);
   return (
     <section className="paper-band" id="paper" aria-labelledby="paper-title">
@@ -1315,7 +1322,14 @@ function PaperSection({ site, paper, paperReading = false }: { site: Site; paper
           <h3 className="paper-aside__head">Current experiment records</h3>
           <ul className="plain-list">
             {Object.entries(site.evidence).filter(([id]) => currentIds.includes(id)).map(([id, url]) => (
-              <li key={id}><a href={apiUrl(url)} target="_blank" rel="noreferrer">{RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}</a></li>
+              <li key={id}>
+                <strong>{RECEIPT_LABEL[id] ?? id.replace(/-/g, ' ')}</strong><br />
+                {site.documents[id === 'progress-campaign' ? 'progress-results' : id] &&
+                  <SourceDocument compact label="Method, results and replay"
+                    url={site.documents[id === 'progress-campaign' ? 'progress-results' : id]} />}
+
+                <a href={apiUrl(url)} target="_blank" rel="noreferrer">Saved measurements (JSON)</a>
+              </li>
             ))}
           </ul>
           <details className="source-doc">

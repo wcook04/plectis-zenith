@@ -11,7 +11,7 @@ from .paper_reading import diagram_sources, paper_reading
 
 API = "/api/v1"
 # Reviewed source/PDF and TikZ/SVG pairs. Update after compiling and visual inspection.
-PAPER_EDITION = {"source_sha256": "069e7e2b5facb1d7e89d7be6c800c92d39fe010a83dba0675776ba8101430d38", "pdf_sha256": "778e4122a97cfaaeb41ad6e25d5724ab777ef845a3d219c8bea8d2e461e53b8e", "reviewed_on": "19 October 2026", "figures": {"fault-population": {"source_sha256": "1cf1e7e8b3869e2f0d88b8e7fc8735ad1d68a1af24fc1513a6c0aaddf3e775f3", "svg_sha256": "7eb1bd4295ecd8e825d5b95ad5098e476a9120ee1e9eaa9c738cd8377807e0bc"}, "kept-experience-flow": {"source_sha256": "cf5959065f73b9b2e23448b484f87b8fdc69a7791fb28840f47de7e332924728", "svg_sha256": "90a62a89d7e1ed5470b0027b769e8948e7d8ae2223c38b6598e46acdef5709af"}, "imagined-faults": {"source_sha256": "d049ca87bae08f248b4b80cecd21c06ed600b9dcb7cc70811d92a78e5dea2fa9", "svg_sha256": "9c0fea9686bd7ef324b7cdabca78ac426d1110d12cd2f657075a9929979d6c02"}, "kept-experience-results": {"source_sha256": "41894a8d7968936e533ce4ced2905a97aa054eb0f1f91fc0d99e5dec0046a7c7", "svg_sha256": "6c18e61d1aebbe42babc5e0f7f9d0e4c2764011893d0972818b3147d681aecd2"}, "repair-loop": {"source_sha256": "c905bebf5be49a93d0c3ee4e8f0a4865a4bbc5cd9a1e7c47c68a7f7227adc2fe", "svg_sha256": "e63032ffa13264806412e13626fd8d00d1d60a2bbe6d28584b00e435fada5e92"}}}
+PAPER_EDITION = {"source_sha256": "55941358b0a7bc32c6458a9211896d3b3fa4a67835918dff1fd1112efbc00386", "pdf_sha256": "9db413432ab9b09a743382c608225270a17b25bcb695c4572396c76eb895edb8", "reviewed_on": "21 October 2026", "figures": {"fault-population": {"source_sha256": "1cf1e7e8b3869e2f0d88b8e7fc8735ad1d68a1af24fc1513a6c0aaddf3e775f3", "svg_sha256": "f7a3f38df0def9998da2abc03c1c5c05ec0515c212d9f5b309dc53c8ebf5425e"}, "kept-experience-flow": {"source_sha256": "cf5959065f73b9b2e23448b484f87b8fdc69a7791fb28840f47de7e332924728", "svg_sha256": "f5430175d5b7c3ccdf8a35db73b116bc5f91d063f309bee5a5a99daaaf54c080"}, "imagined-faults": {"source_sha256": "d049ca87bae08f248b4b80cecd21c06ed600b9dcb7cc70811d92a78e5dea2fa9", "svg_sha256": "48543992dd591596960ffa313d796ef8087e4e5873985de725ac6aa8a0a59b16"}, "kept-experience-results": {"source_sha256": "41894a8d7968936e533ce4ced2905a97aa054eb0f1f91fc0d99e5dec0046a7c7", "svg_sha256": "d65c171a840e029111623931a22a1511873ef0adfcdefda074b7f17b630f2aba"}, "repair-loop": {"source_sha256": "53915467b1b07cfbafd5985461f81d74dab096505d4c997ac63dac9a1c4c0a21", "svg_sha256": "e6fb3f2cd4172c59c42130f6a8e40d9f75a81379609b88067f4a4af4258020fa"}}}
 DOCUMENTS = {
     "introduction": "README.md",
     "paper": "paper/zenith.tex",
@@ -48,6 +48,7 @@ DOCUMENTS = {
     "notice": "RESEARCH_NOTICE.md",
 }
 EVIDENCE = {
+    "continuation-learner": "examples/continuation-memory/witness-preserving-v1/results.json",
     "progress-campaign": "docs/studies/native/progress-campaign-20261014.json",
     "client-investigation": "examples/conformance/client-reuse-v1/report.json",
     "client-investigation-v2": "examples/conformance/client-reuse-v2/report.json",
@@ -85,6 +86,7 @@ CHAPTERS = (
     ("next", "What still needs testing", "research-programme", None, None, "research_proposal"),
 )
 CHAPTER_EVIDENCE = {
+    "continuation-learner": "examples/continuation-memory/witness-preserving-v1/results.json",
     "idea": (), "lab": (), "oracle": ("progress-campaign",), "evolve": ("progress-campaign",),
     "results": ("progress-campaign",), "next": (),
 }

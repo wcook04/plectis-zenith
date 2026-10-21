@@ -13,6 +13,16 @@ import re
 
 CENTER = re.compile(r"\\begin\{center\}.*?\\end\{center\}", re.S)
 TIKZ = re.compile(r"\\begin\{tikzpicture\}.*?\\end\{tikzpicture\}", re.S)
+# Full description of the repair-loop figure; also its marker text in the manuscript.
+DIAGRAM_DESCRIPTION = (
+    "Native repair information flow. The model proposes a query; the host runs "
+    "the parent and reference programs and compares their answers. Outputs and "
+    "errors inform the model's proposed replacement code. Outcomes also inform "
+    "further queries in adaptive conditions only; repair-only omits new queries. "
+    "The host replays development cases and selects the parent or repair. "
+    "Only the selected, frozen source passes into held-out evaluation. "
+    "Held-out outcomes do not return to query proposals, repair or selection."
+)
 FIGURE_MARKER = re.compile(r"^%\s*figure:\s*([a-z0-9-]+)\s*\|\s*(.+?)\s*$\n\s*\\begin\{center\}", re.M)
 HEADING = re.compile(r"\\hypertarget\{([a-z0-9-]+)\}\{\}\s*\\textbf\{(\d+)\. ([^}]+)\}")
 MATH = {"$(P,E,Q)$": "(P, E, Q)", "$h$": "h", "$t$": "t",

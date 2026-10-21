@@ -1,6 +1,6 @@
-# Current research draft — 15 October 2026
+# Current research draft — 21 October 2026
 
-The nineteen supplied PROGRESS returns (02–20) have been assimilated into a witness-preserving learner, a direct investigation interface and a client test-reuse experiment. The implementation retains ordinary programs, executable questions, measured receipts and frozen comparisons. The [synthesis and custody record](history/progress-returns-20261014.md) separates implemented changes from returned proposals and authored demonstrations.
+The current draft reports three separate studies: native program repair, reuse of generated testers and an authored continuation learner. Their implementations retain ordinary programs, executable questions, measurements and frozen comparisons. The [implementation history](history/progress-returns-20261014.md) records earlier research reviews and separates implemented mechanisms from proposals.
 
 ## Working test reuse
 
@@ -10,7 +10,7 @@ The working condition used **46 calls for $0.007117764**, including development 
 
 ## Native investigation and repair
 
-The twelve-parent native diagnostic is complete: **130 calls for $0.12982944**. Repair without new investigation improves frozen confirmation from **259/576 to 365/576** correct answers. Fixed testing scores 364, compiled investigation 354, direct batch 339, feedback-aware direct investigation 343 and outcome-masked investigation 331. The feedback comparison gains twelve answers on one parent and ties on eleven; it remains below repair alone. Only three authored mechanisms are represented. The [derived receipt](studies/native/progress-campaign-20261014.md) preserves all outcomes, qualification and the forfeited earlier host-admission attempt. A funding-only continuation reuses the first forty settled replies, counting their charges once; its $4 reservation ceiling is not the invoice.
+The twelve-parent native diagnostic is complete: **130 calls for $0.12982944**. Repair without new investigation improves frozen confirmation from **259/576 to 365/576** correct answers. Fixed testing scores 364, compiled investigation 354, direct batch 339, feedback-aware direct investigation 343 and outcome-masked investigation 331. The paired comparison differs by twelve answers on one parent and ties on eleven. The sole difference comes from separate repair calls with identical saved prompts on an episode that stopped before a second query decision; it does not identify a feedback benefit. All five pairs reaching a second decision tie. No investigation arm exceeds repair alone in aggregate. Only three authored mechanisms are represented. The [derived receipt](studies/native/progress-campaign-20261014.md) preserves all outcomes, qualification and the forfeited earlier host-admission attempt. A funding-only continuation reuses the first forty settled replies, counting their charges once; its $4 reservation ceiling is not the invoice.
 
 ## A concrete learner repair
 
@@ -20,7 +20,7 @@ Counterexample refinement now retains each new access history with its distingui
 
 [Predictive state representations (2001)](https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf) provide conceptual context for future-test probabilities under a known stochastic model. The weighted-automata notes provide the observation-table construction used by the separate deterministic learner. [ILF (CCS 2019)](https://doi.org/10.1145/3319535.3363230) learns a neural testing policy from symbolic demonstrations; [CoverUp (2025, v4)](https://arxiv.org/abs/2403.16218v4) uses an authored driver and measured coverage/errors to refine regression tests; [Voyager (2023, v2)](https://arxiv.org/abs/2305.16291v2) retains and composes an executable skill library. These are distinct precedents, not external confirmations of Zenith's results.
 
-[STOP (COLM 2024, v3)](https://arxiv.org/abs/2310.02304v3) recursively improves a code-improvement scaffold. [Hyperagents (2026, v1)](https://arxiv.org/abs/2603.19461v1) edits task and meta-agent code and evaluates acquired improvement procedures; its stronger compounding comparison is statistically unresolved. Zenith has no acquired improver of this kind. The [reviewed source records](../paper/references.json) preserve exact editions, source locators, supported claims and limits, plus bindings to the manuscript passages. The [paper guide](../paper/README.md#reviewed-sources-and-their-use) explains the citation checks.
+[STOP (COLM 2024, v3)](https://arxiv.org/abs/2310.02304v3) recursively improves a code-improvement scaffold. [Hyperagents (2026, v1)](https://arxiv.org/abs/2603.19461v1) edits task and meta-agent code and reports useful transfer to maths grading with the acquired meta-agent held fixed. Its separate 200-step comparison of transferred and fresh initialisations is statistically unresolved; both task and meta implementations transfer. Zenith has no acquired improver of this kind. The [reviewed source records](../paper/references.json) preserve exact editions, source locators, supported claims and limits, plus bindings to the manuscript passages. The [paper guide](../paper/README.md#reviewed-sources-and-their-use) explains the citation checks.
 
 ## Research decision
 
