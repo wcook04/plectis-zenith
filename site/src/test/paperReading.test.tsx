@@ -82,7 +82,6 @@ it('reads the title, abstract, sections and navigation from the manuscript paylo
   mockPaper();
   render(<App />);
   expect(await screen.findByRole('heading', { name: 'Zenith: the actual manuscript title' })).toBeInTheDocument();
-  // The document title is set in an effect after the heading renders.
   await waitFor(() => expect(document.title).toBe('Zenith: the actual manuscript title'));
   expect(screen.getByText('Manuscript abstract: a bounded comparison of retained tests.')).toBeInTheDocument();
   expect(screen.getByText('Authorship and AI use.')).toBeInTheDocument();
