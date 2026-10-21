@@ -120,7 +120,7 @@ The website projects the paper's prose, table, citations and diagram from the ma
 
 Useful contributions include a small failure reproduction, a stronger ordinary baseline, an independently sourced software task, or a correction to a claim or citation. Start with the [contribution guide](CONTRIBUTING.md) for setup, relevant tests and evidence-preservation rules. `make demo` and `make replay` are shortcuts for the examples above; the guide explains the broader validation and website commands.
 
-I'm developing Zenith with AI coding agents and learning the field as I go. Corrections and collaboration on prior work, useful tasks and fair evaluations are welcome through [project issues](https://github.com/wcook04/plectis-zenith/issues). The [Plectis introduction video](https://www.youtube.com/watch?v=uO2lbstEH9M) places Zenith in the wider project.
+I'm developing Zenith with AI coding agents and learning the field as I go. Corrections and collaboration on prior work, useful tasks and fair evaluations are welcome through [project issues](https://github.com/wcook04/plectis-zenith/issues). The [Plectis introduction video (v2)](https://www.youtube.com/watch?v=Ut9068O-HGU) places Zenith in the wider project. The Zenith film, [Can an AI tester learn from the bugs it missed?](https://www.youtube.com/watch?v=-PITavNIUgg), explains one experiment.
 
 <a id="credits-and-license"></a>
 
