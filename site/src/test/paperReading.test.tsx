@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import App from '../App';
 import { Markdown } from '../components/Markdown';
@@ -82,7 +82,8 @@ it('reads the title, abstract, sections and navigation from the manuscript paylo
   mockPaper();
   render(<App />);
   expect(await screen.findByRole('heading', { name: 'Zenith: the actual manuscript title' })).toBeInTheDocument();
-  expect(document.title).toBe('Zenith: the actual manuscript title');
+  // The document title is set in an effect after the heading renders.
+  await waitFor(() => expect(document.title).toBe('Zenith: the actual manuscript title'));
   expect(screen.getByText('Manuscript abstract: a bounded comparison of retained tests.')).toBeInTheDocument();
   expect(screen.getByText('Authorship and AI use.')).toBeInTheDocument();
   expect(screen.getByText(/The manuscript records the role of AI and limits of human review/)).toBeInTheDocument();
