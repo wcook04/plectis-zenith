@@ -4,7 +4,7 @@
 
 The [Zenith film](https://www.youtube.com/watch?v=A1Kw5hXvzVw) follows one experiment: can an AI tester catch more bugs in new programs after reading a record of bugs it missed before? The model receives a description of what each function should do and chooses five test inputs. It cannot see the code it is testing, and its weights are unchanged.
 
-[Watch the experiment](https://www.youtube.com/watch?v=A1Kw5hXvzVw) · [Read its study and replay instructions](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) · [Research website](https://wcook04.github.io/plectis-zenith/) · [Try the local learner demo](#try-it-without-an-account) · [Contribute](CONTRIBUTING.md)
+[Watch the experiment](https://www.youtube.com/watch?v=A1Kw5hXvzVw) · [Read its study and replay instructions](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) · [Source map](#source-map) · [Contribute](CONTRIBUTING.md)
 
 ## The experiment in the film
 
@@ -14,7 +14,15 @@ Across 58 problems withheld from practice and development, tested twice each, De
 
 This is one model on short benchmark functions, with no demonstrated transfer to larger software projects. The [study report](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) gives the comparisons, protocol changes, costs and limits. Its [paper](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/paper/zenith.pdf), saved replies and replay code are published at that fixed study revision on the `study/kept-experience-20261019` branch. Follow that report to reproduce the filmed experiment; the commands below run separate studies available on `main`.
 
-The [research website](https://wcook04.github.io/plectis-zenith/) and [three-page paper on main](paper/zenith.pdf) describe the earlier program-repair, reusable-tester and continuation-learner studies. Their [results and limits](docs/status.md) remain separate from the filmed experiment. The [Plectis introduction](https://www.youtube.com/watch?v=U1z2-XaLe_w) explains the wider project.
+| What you want to reproduce | Where to start |
+|---|---|
+| The bug-finding experiment in the video | [Study report and replay instructions at the recorded revision](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) |
+| A small local example without a model account | [Continuation learner demo below](#try-it-without-an-account), a separate authored algorithm |
+| The earlier SQLite tester experiment | [Replay the saved client experiment](#replay-the-published-client-experiment), using its archived code and replies |
+
+The [research website](https://wcook04.github.io/plectis-zenith/) and
+[three-page paper on main](paper/zenith.pdf) describe the earlier studies.
+Their [results and limits](docs/status.md) remain separate from the filmed experiment.
 
 ## Try it without an account
 
@@ -114,8 +122,9 @@ A further question is whether experience improves the procedure that makes subse
 
 | To inspect | Start here |
 |---|---|
+| Filmed bug-finding study | [Recorded study revision](https://github.com/wcook04/plectis-zenith/tree/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience), including its evidence and replay guide |
 | Small runnable example | [Demo](scripts/demo_continuation_learning.py) and [continuation learner](research/continuation_learning.py) |
-| Current measurements | [Results and limits](docs/status.md) and the study reports linked above |
+| Measurements for the earlier studies on main | [Results and limits](docs/status.md) and the study reports linked above |
 | Saved evidence and replay | [Client bundle](examples/conformance/client-reuse-v2-low), [replay command implementation](scripts/build_client_investigation_report.py), [learner record](examples/continuation-memory/witness-preserving-v1) |
 | Implementation and dependencies | [Architecture and source owners](docs/architecture.md), [shared provider transport](system/lib/openrouter_free_runtime.py), [resource consumers](docs/architecture.md#resource-consumers) |
 | Paper and reading website | [Paper guide](paper/README.md), [manuscript](paper/zenith.tex), [manuscript-to-web projection](zenith/paper_reading.py) |
@@ -133,6 +142,17 @@ The website projects the paper's prose, table, citations and diagram from the ma
 Useful contributions include a small failure reproduction, a stronger ordinary baseline, an independently sourced software task, or a correction to a claim or citation. Start with the [contribution guide](CONTRIBUTING.md) for setup, relevant tests and evidence-preservation rules. `make demo` and `make replay` are shortcuts for the examples above; the guide explains the broader validation and website commands.
 
 I'm developing Zenith with AI coding agents and learning the field as I go. Corrections and collaboration on prior work, useful tasks and fair evaluations are welcome through [project issues](https://github.com/wcook04/plectis-zenith/issues).
+
+## Related projects
+
+In the [Plectis introduction](https://www.youtube.com/watch?v=U1z2-XaLe_w),
+Will explains why he uses AI to make its research and software easier for other
+people to inspect. The [Plectis website](https://wcook04.github.io/plectis/)
+collects the projects and their videos.
+
+- [Safety Core](https://github.com/wcook04/safety-core) compares written agent rules with executable checks in a small coding task. Its experiment asks a different question from Zenith's tester study.
+- [One Checkout](https://github.com/wcook04/one-checkout) commits a reviewed patch while preserving other unfinished edits in the same project folder.
+- [Plectis toolkit](https://github.com/wcook04/plectis) contains Python components and worked experiments; [Plectis Erdős](https://github.com/wcook04/plectis-erdos) contains the mathematical research, papers and proofs.
 
 <a id="credits-and-license"></a>
 
