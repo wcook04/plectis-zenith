@@ -2,15 +2,21 @@
 
 **Research prototype.** Zenith asks whether solving one software problem can leave behind a better way to investigate the next. It retains programs, executable tests and measured results, then checks what helps on later tasks.
 
-The [Zenith film](https://www.youtube.com/watch?v=A1Kw5hXvzVw) follows one experiment: can an AI tester catch more bugs in new programs after reading a record of bugs it missed before? The model receives a description of what each function should do and chooses five test inputs. It cannot see the code it is testing, and its weights are unchanged.
-
 [Watch the experiment](https://www.youtube.com/watch?v=A1Kw5hXvzVw) · [Read its study and replay instructions](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) · [Source map](#source-map) · [Contribute](CONTRIBUTING.md)
 
 ## The experiment in the film
 
+Can an AI tester catch more bugs in new programs after reading a record of bugs
+it missed before? The [Zenith film](https://www.youtube.com/watch?v=A1Kw5hXvzVw)
+follows that experiment. The model receives a description of what each function
+should do and chooses five test inputs. It cannot see the code it is testing,
+and its weights are unchanged.
+
 One faulty program should sort the numbers at every other position in a list, but crashes when the list is empty. Without the practice record, the tester missed that input in both attempts; with the record, it tried the empty list both times. The record contains earlier missed bugs and inputs that expose them.
 
-Across 58 problems withheld from practice and development, tested twice each, DeepSeek V4.1 Flash caught an average **77.0% of the fault classes per problem**, compared with **69.2%** from the description alone. Faulty programs that fail on the same benchmark inputs count as one fault class. About half the gain came from large inputs that made slow programs exceed the one-second time limit. Counting only wrong answers and exceptions, the smaller advantage had an uncertainty interval that included zero. Rules the model wrote from its misses did not produce a clear improvement.
+Across 58 problems withheld from practice and development, tested twice each, DeepSeek V4.1 Flash caught an average **77.0% of the fault classes per problem**, compared with **69.2%** from the description alone. Faulty programs that fail on the same benchmark inputs count as one fault class.
+
+About half the gain came from large inputs that made slow programs exceed the one-second time limit. Counting only wrong answers and exceptions, the smaller advantage had an uncertainty interval that included zero. Rules the model wrote from its misses did not produce a clear improvement.
 
 This is one model on short benchmark functions, with no demonstrated transfer to larger software projects. The [study report](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) gives the comparisons, protocol changes, costs and limits. Its [paper](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/paper/zenith.pdf), saved replies and replay code are published at that fixed study revision on the `study/kept-experience-20261019` branch. Follow that report to reproduce the filmed experiment; the commands below run separate studies available on `main`.
 
