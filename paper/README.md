@@ -1,6 +1,6 @@
 # Zenith paper
 
-**Zenith: program repair and the value of retained tests** — Will Cook, 21 October 2026. This is a three-page research draft for an unfinished system.
+**Zenith: programs, experiments and useful memory** — Will Cook, 21 October 2026. This is an eight-page research draft for an unfinished system; its main result is the [kept-experience study](../docs/studies/kept-experience/README.md).
 
 [Read the current PDF](zenith.pdf) or inspect its [LaTeX source](zenith.tex). This edition separates measured results from proposed directions and invites collaboration and guidance. The [web edition](https://wcook04.github.io/plectis-zenith/) presents the manuscript with the same scholarly terminology, table, citations and repair-loop figure.
 
@@ -51,6 +51,6 @@ tectonic paper/zenith.tex
 python scripts/build_paper_reading.py
 ```
 
-The source rejects exports longer than three pages. Compilation updates the local PDF; the figure builder uses the same TikZ through Tectonic and `pdftocairo` to update the SVG. Inspect every PDF page and the SVG before updating `zenith/web_content.py::PAPER_EDITION`. It keeps a reviewed manuscript/PDF hash pair and a separate diagram-source/SVG hash pair. Update the affected pair together after review. The website labels an artifact current only while its source and rendered output match the reviewed pair. Checksums bind the reviewed files, not the correctness of their claims.
+The source rejects exports longer than nine pages. Compilation updates the local PDF; the figure builder uses the same TikZ through Tectonic and `pdftocairo` to update the SVG. Inspect every PDF page and the SVG before updating `zenith/web_content.py::PAPER_EDITION`. It keeps a reviewed manuscript/PDF hash pair and a separate diagram-source/SVG hash pair. Update the affected pair together after review. The website labels an artifact current only while its source and rendered output match the reviewed pair. Checksums bind the reviewed files, not the correctness of their claims.
 
-After binding the reviewed files, run `python scripts/build_paper_reading.py --check` (requires Poppler's `pdftotext`). It checks the current source/PDF pair, three-page length and the same disclosure on PDF page one and in the web payload. `make validate` and the Pages publication workflow run this check; a missing disclosure blocks publication.
+After binding the reviewed files, run `python scripts/build_paper_reading.py --check` (requires Poppler's `pdftotext`). It checks the current source/PDF pair, page count within the manuscript's limit and the same disclosure on PDF page one and in the web payload. `make validate` and the Pages publication workflow run this check; a missing disclosure blocks publication.

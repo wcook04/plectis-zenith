@@ -4,14 +4,23 @@
 \usepackage{lmodern,microtype,booktabs,amsmath,array}
 \usepackage[colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
 \usepackage{enumitem,tikz}
-\usetikzlibrary{arrows.meta,positioning}
+\usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,decorations.pathreplacing}
 \setlist{nosep,leftmargin=*}
 \setlength{\parindent}{0pt}\setlength{\parskip}{6pt}
-\AddToHook{shipout/before}{\ifnum\value{page}>3
-\PackageError{zenith}{Paper exceeds three pages}{Shorten the paper before publishing.}\fi}
+% BEGIN figure styles
+\tikzset{
+  nohyph/.style={execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
+  box/.style={draw, rounded corners=1.5pt, align=center, inner sep=1.3mm,
+              minimum height=14.5mm, minimum width=27mm, nohyph},
+  record/.style={box, fill=black!7},
+  model/.style={box, very thick},
+}
+% END figure styles
+\AddToHook{shipout/before}{\ifnum\value{page}>9
+\PackageError{zenith}{Paper exceeds nine pages}{Shorten the paper before publishing.}\fi}
 \begin{document}
 \begin{center}
-{\Large\bfseries Zenith: program repair and the value of retained tests}\\[4pt]
+{\Large\bfseries Zenith: programs, experiments and useful memory}\\[4pt]
 Will Cook \quad\textbullet\quad 21 October 2026
 \end{center}
 \begingroup
@@ -23,18 +32,330 @@ independently verify every claim.}
 \endgroup
 \hypertarget{idea}{}
 \textbf{Abstract.}
-We investigate whether retaining programs, observations and tests improves later
-work. Separate studies test model-driven repair, generated testers and a
-continuation learner. Across twelve episodes from three contracts, repair raises
-correct later answers from 259/576 to 365/576; added investigation gives no
-aggregate improvement. Two generated testers
-each find three of four authored SQLite faults; fixed tests find all four.
-Retained continuations save extension queries with cached answers held identical,
-but joint acquisition remains costlier than separate ordinary modules.
-We propose testing whether experience helps select questions on new software
-at lower total cost.
+Zenith asks whether the experience an AI gains while testing programs can make
+it test the next, unseen program better. We fix one model, DeepSeek V4.1 Flash,
+and give it a hard budget: five inputs to expose a hidden fault, with only the
+function's specification in view. The faults are real: 535 behaviour classes
+of solutions written by three code models that pass every original HumanEval
+test yet fail an EvalPlus input. On 28 practice problems the model's misses,
+together with the inputs that would have exposed them, form a record; the model
+then distils the record into a short playbook. Shown that record, the model exposed 77.0\% of hidden fault classes on 58
+held-out problems, against 69.2\% when shown nothing: a gain of 7.9 points (95\%
+interval 1.4 to 14.7; better on 20 problems, worse on 6). About half of the gain
+comes from very large inputs that make slow faulty programs miss a one-second
+limit; counting only wrong answers and exceptions, the gain is 3.5 points
+($-$2.1 to 8.9). Playbooks the model wrote from the same record, generic advice and
+imagining faults before testing gave no measurable gain, and with reasoning
+switched off no form of experience helped. A development pilot had suggested a
+16-point gain for the first playbook; the held-out run did not reproduce it.
+Model weights never change; only what the tester is shown does. The result
+holds for one benchmark of short Python functions and one model, under a
+protocol committed before the held-out run.
 
-\textbf{1. Programs and measured repair.}
+\hypertarget{intro}{}
+\textbf{1. Introduction.}
+When a tester finds a mistake in a program, it learns something about how
+programs go wrong. Most automated testing throws that away: each program is
+tested afresh. We ask a narrow, measurable version of a broader question. If a
+model keeps the record of its earlier testing, including the mistakes it failed
+to expose, does it choose better tests for programs it has never seen?
+
+\textbf{Why a small budget.} With unlimited inputs, random or exhaustive testing
+eventually exposes most faults, and the question disappears. We give the tester
+five inputs per program. Choosing five inputs that expose a mistake nobody has
+described is the part of testing that needs judgement: where are the boundaries,
+which rules interact, what would a careless implementation get wrong?
+
+\textbf{Why model-written faults.} Hand-made faults risk measuring what the study
+author expected. Mechanical mutants are standard but are an imperfect proxy for
+real faults~\cite[\S3]{mutants}. We instead use mistakes that code models actually
+made: EvalPlus showed that many solutions accepted by HumanEval's original tests
+are wrong~\cite[\S1; \S3]{evalplus}. Each such solution is a fault that a
+competent-looking test suite missed.
+
+\textbf{Contributions.}
+\begin{itemize}
+\item \textbf{A population of natural faults.} We execute 64{,}887 distinct sampled
+solutions and keep the 2{,}452 wrong programs that every original test accepts:
+535 behaviour classes on 115 problems, selected by a fixed rule.
+\item \textbf{A controlled test of kept experience.} Seven conditions share one
+model, prompt frame and five-input budget, and differ only in what the tester is
+shown: nothing, generic advice, its practice record, a playbook it wrote, a revised
+playbook, or a method that imagines faults before choosing inputs.
+\item \textbf{Results.} On 58 held-out problems the raw practice record raises the
+share of faults exposed from 69.2\% to 77.0\%; written playbooks, advice and imagined
+faults do not measurably help, and nothing helps with reasoning switched off. The
+model's own five inputs beat five random EvalPlus inputs by 26 points.
+\end{itemize}
+
+The study is part of Zenith, a research testbed about retaining programs,
+experiments and the questions that expose their limits. Section~5 summarises the
+earlier Zenith studies, including the negative results this study was designed
+to move beyond.
+
+\hypertarget{setting}{}
+\textbf{2. Programs, faults and the testing task.}
+\textbf{Programs.} We use the 164 HumanEval problems as extended by
+EvalPlus~\cite[\S2]{evalplus}. Each problem supplies a public specification
+(signature, docstring and examples), a reference solution, the original
+HumanEval test inputs and about a thousand augmented inputs that EvalPlus
+generated by type-aware mutation of seed inputs. EvalPlus also supplies input
+contracts: assertions that a legal input must satisfy.
+
+\textbf{Natural faults.} EvalPlus released code sampled from many models. We take
+the 98{,}400 solutions sampled at temperature 0.8 from ChatGPT, CodeGen-16B and
+InCoder-6B. A solution is a \emph{natural fault} when it returns the reference's
+answer on every original HumanEval input but differs on at least one augmented
+input. These are mistakes that real code models made and that the original
+human-written tests did not catch. Faulty solutions that fail exactly the same
+augmented inputs form one \emph{fault class}. The rule is fixed and mechanical;
+neither we nor the tested model choose faults.
+
+% figure: fault-population | From 98,400 sampled solutions to 535 fault classes that pass every original test.
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize, >=Stealth,
+  stage/.style={box, minimum width=29mm},
+  rule/.style={font=\scriptsize\itshape, align=center, nohyph}]
+\node[stage] (s1) {\textbf{98{,}400} solutions\\sampled from\\three code models};
+\node[stage, right=13mm of s1] (s2) {\textbf{64{,}887}\\distinct programs};
+\node[stage, right=13mm of s2] (s3) {\textbf{2{,}452} wrong\\programs that pass\\every original test};
+\node[stage, right=13mm of s3, very thick] (s4) {\textbf{535} fault classes\\on \textbf{115} problems};
+\foreach \a/\b/\t in {s1/s2/{parse; remove duplicates}, s2/s3/{original tests pass;\\an EvalPlus input fails}, s3/s4/{group by the set\\of failing inputs}} {
+  \draw[->] (\a) -- (\b);
+  \node[rule, anchor=north] at ($(\a.east)!0.5!(\b.west) + (0,-9mm)$) {\t};
+  \draw[densely dotted] ($(\a.east)!0.5!(\b.west)$) -- ++(0,-8mm);
+}
+\end{tikzpicture}
+
+{\footnotesize Fault population. Executing every distinct sampled program on
+the original tests and on EvalPlus's augmented inputs leaves 2{,}452 wrong
+programs that the original tests accept, in 535 behaviour classes on 115 of
+the 164 problems. Eight batches of 40 programs exceeded the run's memory or
+time bounds and are excluded and recorded.}
+\end{center}
+
+As a secondary population we apply single-site mutation operators (relational,
+arithmetic, logical, constant and condition changes) to each reference and keep
+mutants with the same property. Mutant detection correlates with real-fault
+detection in Java projects, but about a quarter of real faults are not coupled to
+common mutants~\cite[\S3]{mutants}; we therefore treat model-written faults as
+primary.
+
+\textbf{The testing task.} A tester sees one problem's specification and its input
+contract, and chooses $K=5$ inputs. The host executes each legal input on the
+reference and on every hidden fault class of that problem. A fault class is
+\emph{exposed} when any chosen input yields a different return value, a
+different exception type, or no answer within one second where the reference answers. Illegal inputs are discarded and still use budget. The
+tester never sees the faulty code, any output, or the augmented inputs of the
+problem it is testing. A problem's score is the share of its fault classes
+exposed; the primary measure is the mean score over held-out problems.
+
+\textbf{Splits.} We order the 115 problems with natural faults by a fixed hash of
+their identifiers: the first quarter (28) is \emph{practice}, the only source of
+experience; the next quarter (29) is \emph{development}, used for pilots and for
+revising the playbook; the remaining half (58) is \emph{held out} and was run once,
+after the protocol, prompts and analysis were committed.
+
+\hypertarget{conditions}{}
+\textbf{3. What the tester is shown.}
+Every condition uses the same model, prompt frame and budget. Only the material
+placed before the specification differs.
+
+\begin{itemize}
+\item \textbf{None.} The specification alone.
+\item \textbf{Advice.} A fixed paragraph of generic testing advice: boundaries,
+ties, ordering, permitted types, size and interacting conditions.
+\item \textbf{Record.} The practice record: for each practice problem, the inputs
+chosen, how many faults they exposed and up to three missed faults, each with
+its code and an augmented input that exposes it.
+\item \textbf{Playbook v1.} A playbook of at most 400 words that the model wrote
+from the practice record, asked to generalise beyond the specific functions.
+\item \textbf{Playbook v2.} The model's revision of v1 after v1 was used on the
+development problems and its misses were revealed.
+\item \textbf{Imagined faults.} The model writes its own reference, eight
+plausible faulty versions and twenty candidate inputs; the host keeps the five
+candidates that expose the most imagined faults (greedy set cover).
+\end{itemize}
+
+% figure: kept-experience-flow | Experience is gathered on practice problems, revised on development problems and frozen before the held-out run.
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize, >=Stealth, node distance=3.6mm]
+% acquire row
+\node[model] (a1) {\textbf{Practice}\\28 problems: model\\chooses five inputs};
+\node[record, right=of a1] (a2) {Record: inputs\\tried, faults missed,\\exposing inputs};
+\node[model, right=of a2] (a3) {Model writes\\playbook v1\\from the record};
+\node[model, right=of a3] (a4) {\textbf{Development}\\29 problems tested\\with v1; misses shown};
+\node[record, right=of a4] (a5) {Model revises\\the playbook\\into v2};
+\foreach \a/\b in {a1/a2,a2/a3,a3/a4,a4/a5} \draw[->] (\a) -- (\b);
+% frozen bracket
+\draw[decorate, decoration={brace, mirror, amplitude=4pt}]
+  ([yshift=-2mm]a2.south west) -- ([yshift=-2mm]a5.south east)
+  node[midway, below=2.2mm, font=\scriptsize] (frz) {frozen before any held-out call: prompts, record, v1, v2, analysis};
+% evaluate row
+\node[box, below=22mm of a1] (e1) {\textbf{Held-out}\\58 problems:\\specification only};
+\node[box, right=of e1] (e2) {One condition: none,\\advice, record, v1,\\v2 or imagined faults};
+\node[model, right=of e2] (e3) {Model chooses\\five inputs};
+\node[box, right=of e3] (e4) {Host runs them on\\the reference and\\hidden faulty code};
+\node[record, right=of e4] (e5) {Score: share of\\hidden fault classes\\exposed};
+\foreach \a/\b in {e1/e2,e2/e3,e3/e4,e4/e5} \draw[->] (\a) -- (\b);
+\draw[->, rounded corners=2pt] (frz.south) -- ++(0,-2.5mm) -| (e2.north);
+\end{tikzpicture}
+
+{\footnotesize Study design. Experience comes only from practice problems; the
+revised playbook only from development problems. Prompts, records, playbooks
+and analysis are committed before any held-out call. Shaded boxes are stored
+records; heavy boxes are model calls.}
+\end{center}
+
+% figure: imagined-faults | The imagined-fault condition selects inputs using only the specification and model-written code.
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize, >=Stealth, node distance=7mm]
+\node[box, minimum width=22mm] (spec) {Specification};
+\node[model, right=of spec] (write) {Model writes its own\\reference, eight\\imagined faulty versions\\and twenty candidates};
+\node[box, right=of write] (cover) {Host runs candidates\\on that code, keeps\\the five exposing the\\most imagined faults};
+\node[record, right=9mm of cover] (score) {Five inputs scored\\on the true reference\\and hidden faults};
+\draw[->] (spec) -- (write);
+\draw[->] (write) -- (cover);
+\draw[->] (cover) -- (score);
+\begin{scope}[on background layer]
+\node[draw, densely dotted, rounded corners=3pt, inner sep=2.5mm, fit=(spec)(write)(cover),
+      label={[font=\scriptsize]above:input selection sees only the specification and model-written code}] {};
+\end{scope}
+\end{tikzpicture}
+
+{\footnotesize Imagined faults. Selection executes only model-written code and
+the public input contract. The true reference and hidden faults are used only
+for scoring, exactly as in the other conditions.}
+\end{center}
+
+\textbf{Model and accounting.} All conditions use DeepSeek V4.1 Flash (snapshot
+1017) through OpenRouter, pinned to one endpoint, with high reasoning effort.
+A reply whose answer field is empty or lacks the requested block is a delivery
+failure and is requested again, at most three times, identically in every
+condition; undelivered attempts remain in the record and the cost total.
+Every prompt, reply, cost and execution is stored; scoring replays with no
+network calls. A random baseline draws five augmented inputs uniformly; we
+report its exact expectation over 200 draws.
+
+
+\hypertarget{results}{}
+\textbf{4. Results.}
+The table and figure below give the pre-registered comparison. Each condition
+ran twice on each of the 58 held-out problems; a problem's score is averaged over
+the two runs, and every interval is a 95\% bootstrap over problems, paired against
+the tester shown nothing. Only the practice record shows a gain whose interval
+excludes zero. The two playbooks, which the model wrote from that same record,
+do not. Five inputs drawn at random from EvalPlus's augmented set expose 42.8\%,
+so the five inputs the model chooses unaided are worth about 28 random augmented
+inputs (69.8\% on average), and the five it chooses with its record about 47. Choosing the best five augmented inputs for each
+problem with hindsight would expose 99.3\%, so ample room remains.
+
+% BEGIN kept_experience_results
+\begin{center}\small
+\begin{tabular}{lrrr}
+\toprule
+Shown to the tester & Exposed (\%) & Change vs none & Better / worse problems\\
+\midrule
+None & 69.2 & -- & --\\
+Generic advice & 65.8 & $-$3.4 [$-$9.6, +2.6] & 14 / 16\\
+Practice record & 77.0 & +7.8 [+1.4, +14.7] & 20 / 6\\
+Playbook v1 & 68.4 & $-$0.8 [$-$7.3, +5.8] & 15 / 14\\
+Playbook v2 & 72.7 & +3.5 [$-$3.1, +10.7] & 14 / 11\\
+Imagined faults & 68.3 & $-$0.9 [$-$7.4, +5.8] & 14 / 17\\
+Imagined faults + record & 72.7 & +3.6 [$-$2.8, +10.1] & 17 / 15\\
+Five random EvalPlus inputs & 42.8 & $-$26.4 [$-$35.0, $-$17.6] & 12 / 45\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% figure: kept-experience-results | Change in the share of hidden model-written faults exposed, against a tester shown nothing, on 58 held-out problems.
+\begin{center}
+\begin{tikzpicture}[font=\footnotesize, y=-6.2mm]
+\draw[black!15] (0.000,-0.6) -- (0.000,6.6);
+\node[below, font=\scriptsize] at (0.000,6.6) {$-$40};
+\draw[black!15] (1.500,-0.6) -- (1.500,6.6);
+\node[below, font=\scriptsize] at (1.500,6.6) {$-$30};
+\draw[black!15] (3.000,-0.6) -- (3.000,6.6);
+\node[below, font=\scriptsize] at (3.000,6.6) {$-$20};
+\draw[black!15] (4.500,-0.6) -- (4.500,6.6);
+\node[below, font=\scriptsize] at (4.500,6.6) {$-$10};
+\draw[black!15] (6.000,-0.6) -- (6.000,6.6);
+\node[below, font=\scriptsize] at (6.000,6.6) {0};
+\draw[black!15] (7.500,-0.6) -- (7.500,6.6);
+\node[below, font=\scriptsize] at (7.500,6.6) {+10};
+\draw[black!15] (9.000,-0.6) -- (9.000,6.6);
+\node[below, font=\scriptsize] at (9.000,6.6) {+20};
+\draw[black!60] (6.000,-0.6) -- (6.000,6.6);
+\node[font=\scriptsize] at (4.50,7.5) {change against a tester shown nothing (percentage points), paired over problems};
+\node[anchor=east] at (-0.15,0) {Generic advice};
+\draw[thick] (4.566,0) -- (6.389,0);
+\fill[draw=black, fill=black] (5.487,0) circle (1.4pt);
+\node[anchor=east] at (-0.15,1) {Practice record};
+\draw[thick] (6.211,1) -- (8.211,1);
+\fill[draw=black, fill=black] (7.178,1) circle (1.4pt);
+\node[anchor=east] at (-0.15,2) {Playbook v1};
+\draw[thick] (4.907,2) -- (6.874,2);
+\fill[draw=black, fill=black] (5.884,2) circle (1.4pt);
+\node[anchor=east] at (-0.15,3) {Playbook v2};
+\draw[thick] (5.527,3) -- (7.597,3);
+\fill[draw=black, fill=black] (6.531,3) circle (1.4pt);
+\node[anchor=east] at (-0.15,4) {Imagined faults};
+\draw[thick] (4.886,4) -- (6.867,4);
+\fill[draw=black, fill=black] (5.872,4) circle (1.4pt);
+\node[anchor=east] at (-0.15,5) {Imagined faults + record};
+\draw[thick] (5.584,5) -- (7.516,5);
+\fill[draw=black, fill=black] (6.535,5) circle (1.4pt);
+\node[anchor=east] at (-0.15,6) {Five random EvalPlus inputs};
+\draw[thick, densely dashed] (0.744,6) -- (3.359,6);
+\fill[draw=black, fill=white] (2.046,6) circle (1.4pt);
+\end{tikzpicture}
+
+{\footnotesize Paired change against a tester shown nothing, 58 held-out problems. Dots are mean differences; bars are 95\% bootstrap intervals over problems. The open dot is five random EvalPlus inputs, which uses no model.}
+\end{center}
+% END kept_experience_results
+
+\textbf{An example.} HumanEval problem 37 asks for a list whose values at even
+positions are sorted. One sampled solution begins by asserting that the list is
+not empty; the specification allows an empty list, so the solution raises an
+exception where the reference returns an empty list. Shown nothing, the model never
+tried an empty list in either run. Shown its record, in which practice had revealed
+missed faults of the same kind, it included the empty list in both runs.
+
+\textbf{Where the gain comes from.} Exposure counts any different return value,
+different exception, or failure to answer within one second where the reference
+answers; the frozen scoring code applied this rule, though the protocol's prose
+named only values and exceptions. The record taught the model to add very large
+inputs, such as the prime 1{,}000{,}000{,}007 for factorisation, which make slow faulty
+programs time out. Counting only wrong values and exceptions, the record still leads,
+69.8\% against 66.3\%, but the interval includes zero ($-$2.1 to 8.9 points; better on
+19 problems, worse on 8). Part of the gain is also format: shown nothing, the model
+occasionally passed arguments in the wrong shape, which the input contract rejects.
+On the 53 problems where both conditions supplied five valid inputs in both runs,
+the record's gain is 6.0 points ($-$0.8 to 13.2).
+
+\textbf{Reasoning.} With reasoning switched off (experiment 2, pre-registered after
+the main arms were scored), the tester shown nothing exposes 55.9\%, 13.3 points
+below the same prompt with high reasoning. No form of experience helps without
+reasoning: the record scores 53.5\% and the playbooks 49.7\% and 48.3\%. With
+reasoning on, the playbooks shorten the model's reasoning (median about 4{,}400 to
+4{,}900 tokens against 6{,}400 for nothing), while the record lengthens it (7{,}300).
+This is consistent with the record helping because the model reasons over the
+concrete faults it shows, but the study does not isolate that mechanism.
+
+\textbf{Development and mechanical faults.} On the 29 development problems the
+first playbook had led by 16.5 points over a single run of the tester shown nothing,
+whose score there (56.9\%) was well below its practice and held-out levels; the
+held-out run did not reproduce the lead. On mechanical mutants (12 held-out
+problems) the record exposes 80.8\% against 63.0\%, with a wide interval (1.2 to 37.5
+points).
+
+\textbf{Cost.} The whole study used 1{,}565 provider calls for \$5.70, all on one
+endpoint: \$1.09 for practice, development and the two playbooks, \$4.42 for the
+seven held-out conditions of experiment 1 and \$0.19 for experiment 2. The
+imagined-fault conditions were the most expensive, at about \$0.008 per call.
+
+\hypertarget{earlier}{}
+\textbf{5. Earlier Zenith studies.}
 A fresh SQLite AUTOINCREMENT table and one with row 7 inserted then deleted
 are both empty. The next insert without an explicit identifier returns 1 or 8,
 respectively. A rows-only program loses a distinction needed by this continuation:
@@ -44,7 +365,6 @@ Zenith retains programs, tests and source-bound observations; we compare these
 with ordinary code reuse and cached answers. Language-model weights stay fixed;
 continuation learning uses a separate authored algorithm.
 
-\hypertarget{lab}{}
 \hypertarget{oracle}{}
 \textbf{Program repair.}
 A model generates a starting program from a contract and eight public examples.
@@ -56,6 +376,8 @@ The host replays examples and valid probes, rejecting inadmissible code,
 lost prior successes, fewer correct answers, or more errors when scores tie.
 Rejection retains the starting program; unchanged code may pass.
 Both later panels remain withheld until selection freezes.
+
+% figure: repair-loop | Native repair information flow. The model proposes a query; the host runs the parent and reference programs and compares their answers. Outputs and errors inform the model's proposed replacement code. Outcomes also inform further queries in adaptive conditions only; repair-only omits new queries. The host replays development cases and selects the parent or repair. Only the selected, frozen source passes into held-out evaluation. Held-out outcomes do not return to query proposals, repair or selection.
 \begin{center}
 \begin{tikzpicture}[font=\footnotesize,
 box/.style={draw,rounded corners=1mm,align=center,inner sep=1mm,
@@ -105,10 +427,6 @@ Ling3.1Flash calls for \$0.12982944; two separate qualifications bring these
 stages to 200 calls and \$0.19002522, counting the resumed prefix once.
 % END current_native_result
 
-\newpage
-\hypertarget{evolve}{}
-\textbf{2. Test reuse and continuation learning.}
-\hypertarget{results}{}
 \textbf{Reusable SQLite testers.}
 A model generates two Python testers from five authored batch clients'
 history and the transfer contract: a diagnostic procedure and ordinary reusable
@@ -141,6 +459,7 @@ invalid and its ordinary tester stopped. All three
 versions total 133 calls and \$0.019295552. The family was inspected during
 engineering; independent transfer remains untested. Charges exclude engineering and host costs.
 
+\hypertarget{evolve}{}
 \textbf{Continuation learning.}
 A continuation is a further input sequence. In a queue retaining at most four
 items, each input appends 1 and $f$ returns the sum. A history $h$ of three inputs
@@ -180,15 +499,39 @@ module acquisition, each condition costs 3,036--3,212 executions versus 3,071
 without transfer. Acquisition excludes later validation. Exact certificates
 apply to supplied rational-linear references; native checks establish finite agreement.
 
-\newpage
-\hypertarget{research}{}
-\textbf{3. Related work and next experiments.}
-The comparisons establish measured repairs, executable tester reuse and query
-savings inside an authored learner. The next question is whether retained
-distinctions help a procedure choose informative tests on changed mechanisms.
-The continuation learner and generated testers remain separate implementations.
+\hypertarget{related}{}
+\textbf{6. Related work.}
+\textbf{Test adequacy and faults.} EvalPlus extends HumanEval with inputs from
+model-written seeds and type-aware mutation, and shows that pass rates fall when
+the extra inputs are used~\cite[\S2.1; \S3]{evalplus}; we reuse its inputs as the
+ground truth that defines a fault. Just et al.\ find mutant detection positively
+correlated with real-fault detection, while about a quarter of real faults are not
+coupled to common mutants~\cite[\S3.1--3.3]{mutants}. CodeT uses model-generated
+tests to rank model-generated programs~\cite[\S2.1--2.2]{codet}; here tests are the
+product and are scored against faults the tester never sees.
 
-\textbf{Related work.}
+\textbf{Mutation-guided generation.} MuTAP returns surviving mutants of the same
+program to the prompt so that the next round of tests kills them~\cite[\S3.4]{mutap}.
+Meta's ACH asks a model to write faults of a stated concern and then tests that
+catch them, and deploys the tests~\cite[\S1; \S2]{ach}. ACH is the closest precedent
+for our imagined-fault condition; both MuTAP and ACH work within one program,
+whereas we ask whether experience transfers to unseen programs.
+
+\textbf{Learning from experience without changing weights.} Reflexion turns
+feedback into written reflections reused on later trials of the same
+task~\cite[\S1; \S4.3]{reflexion}. ExpeL gathers insights and successful
+trajectories on training tasks and evaluates on tasks not used for gathering; it
+finds distilled insights and retrieved examples complementary, with their
+relative value depending on the task~\cite[\S5.1--5.2]{expel}. Dynamic Cheatsheet
+keeps a curated memory at test time; appending the whole raw history did worse
+than curation, and generic structured instructions alone already helped~\cite[\S2.3; \S4.3]{cheatsheet}.
+ACE evolves such contexts as itemised playbooks and reports that rewriting a
+whole context can collapse it~\cite[\S2.2; \S4.3]{ace}. None of these evaluates
+software testing. Our record and playbook conditions apply the idea to the choice
+of test inputs, and the generic-advice condition separates experience from
+instruction.
+
+\textbf{Testing policies and self-improvement.}
 ILF trains a neural fuzzing policy from symbolic-execution demonstrations and
 evaluates it on withheld Ethereum contracts~\cite[\S\S4--6]{ilf}.
 CoverUp uses a fixed language model and coverage/error feedback to retain
@@ -204,16 +547,20 @@ It reports improved graders with the transferred meta-agent held fixed;
 after 200 steps of continued self-modification, the transferred-versus-fresh
 advantage is statistically unresolved~\cite[\S\S5.2--5.3]{hyperagents}.
 
-\textbf{The next comparison.}
-The present client family offers no detection headroom over fixed testing.
-Choose independently sourced clients before observing tester outcomes. Compare
-ordinary reusable code and fixed tests with a frozen procedure that selects
-retained questions, matching source access, development history and budgets.
-Hold selector and solver code fixed; vary access to retained questions while
-preserving the observation cache. Charge prior acquisition, selection and failures;
-report new-target queries separately from revisits to old sources.
+\hypertarget{research}{}
+\textbf{7. Limits and next steps.}
+\textbf{Limits.} All programs are short Python functions from one benchmark.
+The natural faults come from three code models released in 2022--2023, and the
+mechanical faults share operators across splits. One tester model is studied.
+Problems differ in difficulty and in their number of fault classes; we weight
+problems equally. EvalPlus inputs define the ground truth, so a fault that no
+augmented input exposes is invisible here. A positive result shows transfer of
+testing experience to unseen problems within this benchmark and budget; it does
+not show transfer to large systems, other languages or other models.
 
-\textbf{Evaluating an acquired improver.}
+\textbf{Improving the improver.} Playbook v2 is a first, single step of an
+improvement procedure revising itself from its own misses. On held-out problems v2 exposed 72.7\% against v1's 68.4\%, but
+neither differs measurably from the tester shown nothing.
 If this procedure helps fresh tasks, compare initial and successor improvers
 on identical untouched starting solvers. Freeze each improver, select its
 proposed repairs on development cases, then evaluate once on held-out inputs. Keep the
@@ -233,6 +580,10 @@ cost and target-relevance records; finished proofs omit alternative attempts.
 Lean checks supplied proofs; failed search does not establish falsehood.
 Mathematics remains a possible harder transfer domain after cheap software tests.
 
+\textbf{Reproduction.} The protocol, frozen inputs, every prompt, reply, cost and execution of the kept-experience study are in the
+\href{https://github.com/wcook04/plectis-zenith}{repository}; scoring replays with
+no network calls.
+
 \textbf{Collaboration.}
 Zenith is an exploratory project developed with AI coding agents. I welcome
 corrections and collaboration on prior work, evaluations and useful tasks through the
@@ -242,10 +593,19 @@ retain failures and exact costs; the
 \href{https://github.com/wcook04/plectis-zenith/blob/main/program.md}{programme}
 expands the proposed comparisons.
 
-\begin{thebibliography}{7}\footnotesize
+\begin{thebibliography}{16}\footnotesize
 \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}
-\bibitem{psr} M. L. Littman, R. S. Sutton and S. Singh. \href{https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf}{Predictive Representations of State}. NIPS, vol. 14, 2001.
+\bibitem{mutants} R. Just et al. \href{https://homes.cs.washington.edu/~rjust/publ/mutants_real_faults_fse_2014.pdf}{Are Mutants a Valid Substitute for Real Faults in Software Testing?}. FSE, 2014.
+\bibitem{evalplus} J. Liu, C. S. Xia, Y. Wang and L. Zhang. \href{https://arxiv.org/abs/2305.01210}{Is Your Code Generated by ChatGPT Really Correct? Rigorous Evaluation of Large Language Models for Code Generation}. NeurIPS 36, 2023.
 \bibitem{weighted} J. Worrell. \href{https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf}{Exactly Learning Weighted Automata over a Field}. Oxford teaching notes, undated.
+\bibitem{psr} M. L. Littman, R. S. Sutton and S. Singh. \href{https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf}{Predictive Representations of State}. NIPS, vol. 14, 2001.
+\bibitem{codet} B. Chen et al. \href{https://arxiv.org/abs/2207.10397}{CodeT: Code Generation with Generated Tests}. ICLR, 2023.
+\bibitem{mutap} A. M. Dakhel et al. \href{https://arxiv.org/abs/2308.16557}{Effective Test Generation Using Pre-trained Large Language Models and Mutation Testing}. arXiv 2308.16557, 2023.
+\bibitem{ach} C. Foster et al. \href{https://arxiv.org/abs/2501.12862}{Mutation-Guided LLM-based Test Generation at Meta}. FSE Companion, 2025.
+\bibitem{reflexion} N. Shinn et al. \href{https://arxiv.org/abs/2303.11366}{Reflexion: Language Agents with Verbal Reinforcement Learning}. NeurIPS 36, 2023.
+\bibitem{expel} A. Zhao et al. \href{https://arxiv.org/abs/2308.10144}{ExpeL: LLM Agents Are Experiential Learners}. AAAI, 2024.
+\bibitem{cheatsheet} M. Suzgun et al. \href{https://arxiv.org/abs/2504.07952}{Dynamic Cheatsheet: Test-Time Learning with Adaptive Memory}. arXiv 2504.07952, 2025.
+\bibitem{ace} Q. Zhang et al. \href{https://arxiv.org/abs/2510.04618}{Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models}. arXiv 2510.04618, 2025.
 \bibitem{ilf} J. He et al. \href{https://doi.org/10.1145/3319535.3363230}{Learning to Fuzz from Symbolic Execution with Application to Smart Contracts}. CCS, 2019.
 \bibitem{coverup} J. Altmayer Pizzorno and E. D. Berger. \href{https://arxiv.org/abs/2403.16218v4}{CoverUp: Effective High Coverage Test Generation for Python}. PACMSE 2 (FSE), 2025.
 \bibitem{voyager} G. Wang et al. \href{https://arxiv.org/abs/2305.16291v2}{Voyager: An Open-Ended Embodied Agent with Large Language Models}. arXiv, 2023.
