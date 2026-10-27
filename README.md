@@ -153,12 +153,12 @@ I'm developing Zenith with AI coding agents and learning the field as I go. Corr
 
 In the [Plectis introduction](https://www.youtube.com/watch?v=U1z2-XaLe_w),
 Will explains why he uses AI to make its research and software easier for other
-people to inspect. The [Plectis website](https://wcook04.github.io/plectis/)
+people to inspect. The [Plectis website](https://wcook04.github.io/practical-formal-verification/)
 collects the projects and their videos.
 
 - [Safety Core](https://github.com/wcook04/safety-core) compares written agent rules with executable checks in a small coding task. Its experiment asks a different question from Zenith's tester study.
 - [One Checkout](https://github.com/wcook04/one-checkout) commits a reviewed patch while preserving other unfinished edits in the same project folder.
-- [Plectis toolkit](https://github.com/wcook04/plectis) contains Python components and worked experiments; [Plectis Erdős](https://github.com/wcook04/plectis-erdos) contains the mathematical research, papers and proofs.
+- [Plectis toolkit](https://github.com/wcook04/practical-formal-verification) contains Python components and worked experiments; [Plectis Erdős](https://github.com/wcook04/plectis-erdos) contains the mathematical research, papers and proofs.
 
 <a id="credits-and-license"></a>
 
