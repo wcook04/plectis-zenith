@@ -55,7 +55,7 @@ The website exporter, [`export_site_snapshot.py`](../scripts/export_site_snapsho
 | `examples/` | Published evidence, original attempts, generated programs, hashes and frozen source archives. |
 | `tests/` | Current and historical regression tests; `tests/upstream/` preserves extracted engine checks. |
 | `docs/`, `paper/` | Methods, results, architecture, manuscript and generated reading assets. Narrative does not own executable implementation. |
-| `site/` | React reading website and its own build, tests, fonts and components. |
+| `site/` | React reading website and its own build, tests, fonts and components, with unchanged copies of the website list, styles and film stills shared by Will Cook's websites ([family links](../site/README.md#links-to-will-cooks-other-websites)). |
 | `system/` | Graph loading/execution and shared provider transport used by current studies. |
 | `tools/`, `feedback/`, `variants/`, `codex/` | Graph tools, refinement and data contracts; see [resource consumers](#resource-consumers) and the [historical source map](history/architecture.md#retained-source-owners). |
 

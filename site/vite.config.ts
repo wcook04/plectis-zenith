@@ -3,6 +3,28 @@ import { readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
+import { FAMILY, isReleased, siteFilms, spokenDuration } from './src/content/family';
+
+// Without JavaScript the reading page cannot render, so index.html's noscript
+// note carries the way back to Will Cook's home page and this site's films,
+// written from the same family.json at build time (wcook04.github.io
+// docs/family.md: no page depends on JavaScript to show its films).
+function familyNoscript(): Plugin {
+  const esc = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return {
+    name: 'zenith-family-noscript',
+    transformIndexHtml(html) {
+      const home = esc(FAMILY.owner.home);
+      const films = siteFilms().filter(isReleased).map(film => `<a href="${esc(film.youtube)}">${esc(film.title)}</a>`
+        + ` (video on YouTube, ${spokenDuration(film.duration_seconds)})`);
+      const text = [`<a href="${home}" rel="author">${esc(FAMILY.owner.name)}</a> / Zenith.`,
+        ...(films.length ? [`Film: ${films.join('; ')}.`] : []),
+        `<a href="${home}">All websites and films</a>.`].join(' ');
+      return html.replace('<!-- family links -->', `<p>${text}</p>`);
+    },
+  };
+}
 
 // The Python backend serves only the files listed in zenith-public.json
 // (docs/website-backend.md), so the build writes that list from what it emitted.
@@ -34,7 +56,7 @@ function publicManifest(): Plugin {
 const backend = process.env.ZENITH_API ?? 'http://127.0.0.1:4175';
 
 export default defineConfig({
-  plugins: [react(), publicManifest()],
+  plugins: [react(), familyNoscript(), publicManifest()],
   server: {
     port: 5173,
     strictPort: true,
