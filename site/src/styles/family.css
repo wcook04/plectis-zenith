@@ -171,13 +171,23 @@
 .film-slot--inline { display: grid; grid-template-columns: minmax(8rem, 11rem) minmax(0, 1fr); gap: 0.4rem 1rem; align-items: start; }
 .film-slot--inline .film-slot__frame { --play: 30px; border-radius: 7px; }
 .film-slot--inline .film-slot__time { right: 0.35rem; bottom: 0.35rem; padding: 0.02rem 0.32rem; font-size: 0.68rem; }
-.film-slot--inline .film-slot__frame--pending { padding: 6% 8%; }
-.film-slot--inline .film-slot__series, .film-slot--inline .film-slot__status { font-size: 0.68rem; }
-.film-slot--inline .film-slot__name { font-size: 0.86rem; }
+/* Small and inline held frames carry the film's name alone, as the Plectis
+   film map's small frames do; the caption beside them says "in preparation". */
+.film-slot--small .film-slot__frame--pending, .film-slot--inline .film-slot__frame--pending { justify-content: center; padding: 6% 9%; }
+.film-slot--small .film-slot__series, .film-slot--small .film-slot__status,
+.film-slot--inline .film-slot__series, .film-slot--inline .film-slot__status { display: none; }
+.film-slot.film-slot--inline .film-slot__name { font-size: 0.86rem; line-height: 1.15; }
 .film-slot.film-slot--inline .film-slot__caption { margin-top: 0; }
 .film-slot.film-slot--inline .film-slot__title { font-size: 1.02rem; }
 .film-slot.film-slot--inline .film-slot__text { font-size: 0.9rem; }
-@media (max-width: 30rem) { .film-slot--inline { grid-template-columns: 7rem minmax(0, 1fr); } }
+/* On a phone the inline slot stacks: beside a small still the description
+   became a column a dozen lines tall. */
+@media (max-width: 40rem) {
+  .film-slot--inline { display: block; }
+  .film-slot--inline .film-slot__frame { max-width: 22rem; --play: 40px; }
+  .film-slot.film-slot--inline .film-slot__caption { margin-top: 0.7rem; }
+  .film-slot.film-slot--inline .film-slot__name { font-size: 1.15rem; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .fam-ladder__up, .film-slot__frame, .film-slot__frame--pending::before, .film-slot__frame--pending::after { transition: none; }
