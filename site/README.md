@@ -22,6 +22,30 @@ a second narrative of the results. The API still provides historical graph,
 node and experiment routes, and saved local runs when explicitly enabled.
 A file hash identifies bytes; it does not establish a scientific claim.
 
+## Links to Will Cook's other websites
+
+The header begins "Will Cook / Zenith". "Will Cook" opens the home page,
+<https://wcook04.github.io/>, which lists every website and film; the footer
+lists every website too, with Zenith marked as the one being read. Beside the
+abstract (after it on narrow screens), a film slot shows the still of the
+[Zenith film](https://www.youtube.com/watch?v=A1Kw5hXvzVw) with its running
+time. Its title opens YouTube in a new tab; the page embeds no player and loads
+nothing from YouTube. The film follows the kept-experience study, which the
+paper does not report, so the slot says so and links that study's report.
+
+These parts follow the shared contract, `docs/family.md` in the
+[wcook04.github.io repository](https://github.com/wcook04/wcook04.github.io),
+and are copies, not edits: `src/content/family.json` is its `sites.json`,
+`src/styles/family.css` is its `assets/family/family.css` (the site's colours
+and typefaces are mapped onto the `--fam-*` names in `src/styles/tokens.css`),
+and `public/assets/films/` holds the two stills of each film this site shows.
+To update them, copy the files again, rebuild and run `npm test`; the tests
+check the markup and that every released film the site lists has both stills.
+The build copies `public/` into `dist/` and lists the stills in
+`zenith-public.json`, so the Python server and GitHub Pages both publish them.
+It also writes the home link and the film link into `index.html`'s noscript
+note from `family.json`, for readers without JavaScript.
+
 ## Develop
 
 ```sh
