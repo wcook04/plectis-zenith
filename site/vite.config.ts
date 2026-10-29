@@ -18,7 +18,7 @@ function familyNoscript(): Plugin {
       const home = esc(FAMILY.owner.home);
       const films = siteFilms().filter(isReleased).map(film => `<a href="${esc(film.youtube)}">${esc(film.title)}</a>`
         + ` (video on YouTube, ${spokenDuration(film.duration_seconds)})`);
-      const text = [`<a href="${home}" rel="author">${esc(FAMILY.owner.name)}</a> / Zenith.`,
+      const text = [`Zenith, one of <a href="${home}" rel="author">${esc(FAMILY.owner.name)}'s websites</a>.`,
         ...(films.length ? [`Film: ${films.join('; ')}.`] : []),
         `<a href="${home}">All websites and films</a>.`].join(' ');
       return html.replace('<!-- family links -->', `<p>${text}</p>`);

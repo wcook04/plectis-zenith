@@ -17,7 +17,7 @@ import { nodeName } from './lib/naming';
 import { useAsync } from './lib/hooks';
 import { ThemeToggle } from './components/ThemeToggle';
 import { CopyButton } from './components/CopyButton';
-import { FamilyLadder, FamilySites, FilmSlot } from './components/Family';
+import { FamilyLockup, FamilySites, FilmSlot, ZenithMark } from './components/Family';
 import { siteFilms } from './content/family';
 
 const RECEIPT_LABEL: Record<string, string> = {
@@ -199,11 +199,7 @@ function Shell({ children, site, chapters = site?.chapters, paperReading = false
           </div>
         </div>
         <div className="wrap masthead__inner">
-          <FamilyLadder>
-            <a className="wordmark" href="#top" translate="no">
-              Zenith
-            </a>
-          </FamilyLadder>
+          <FamilyLockup name="Zenith" href={import.meta.env.BASE_URL} mark={<ZenithMark />} />
           {site && (
             <nav aria-label="Chapters" className="nav">
               {chapters?.map((chapter) => (
