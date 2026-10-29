@@ -56,8 +56,8 @@ describe('family markup', () => {
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(1);
     const title = links[0];
-    expect(title).toHaveAccessibleName(/^Zenith: can an AI tester learn from the bugs it missed\?, video on YouTube, 4 minutes 55 seconds/);
-    expect(title).toHaveAttribute('href', 'https://www.youtube.com/watch?v=A1Kw5hXvzVw');
+    expect(title).toHaveAccessibleName(/^Zenith: I showed an AI tester the bugs it missed, video on YouTube, 5 minutes 3 seconds/);
+    expect(title).toHaveAttribute('href', 'https://www.youtube.com/watch?v=wUxp2Wohmq0');
     expect(title).toHaveAttribute('target', '_blank');
     expect(title).toHaveAttribute('rel', 'noopener noreferrer');
     const frame = container.querySelector('a.film-slot__frame')!;
@@ -67,10 +67,10 @@ describe('family markup', () => {
     expect(frame).toHaveAttribute('target', '_blank');
     const still = frame.querySelector('img')!;
     expect(still).toHaveAttribute('alt', '');
-    expect(still.getAttribute('src')).toBe('/assets/films/zenith-640.webp');
-    expect(still.getAttribute('srcset')).toBe('/assets/films/zenith-640.webp 640w, /assets/films/zenith-1280.webp 1280w');
+    expect(still.getAttribute('src')).toBe('/assets/films/zenith-v3-640.webp');
+    expect(still.getAttribute('srcset')).toBe('/assets/films/zenith-v3-640.webp 640w, /assets/films/zenith-v3-1280.webp 1280w');
     expect(frame.querySelector('.film-slot__play')).not.toBeNull();
-    expect(frame.querySelector('.film-slot__time')).toHaveTextContent('4:55');
+    expect(frame.querySelector('.film-slot__time')).toHaveTextContent('5:03');
     expect(screen.getByText(film.description)).toHaveClass('film-slot__text');
     expect(container.querySelector('iframe')).toBeNull();
   });

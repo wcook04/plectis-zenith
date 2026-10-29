@@ -2,12 +2,12 @@
 
 **Research prototype.** Zenith asks whether solving one software problem can leave behind a better way to investigate the next. It retains programs, executable tests and measured results, then checks what helps on later tasks.
 
-[Watch the experiment](https://www.youtube.com/watch?v=A1Kw5hXvzVw) · [Read its study and replay instructions](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) · [Source map](#source-map) · [Contribute](CONTRIBUTING.md)
+[Watch the experiment](https://www.youtube.com/watch?v=wUxp2Wohmq0) · [Read its study and replay instructions](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) · [Source map](#source-map) · [Contribute](CONTRIBUTING.md)
 
 ## The experiment in the film
 
 Can an AI tester catch more bugs in new programs after reading a record of bugs
-it missed before? The [Zenith film](https://www.youtube.com/watch?v=A1Kw5hXvzVw)
+it missed before? The [Zenith film](https://www.youtube.com/watch?v=wUxp2Wohmq0)
 follows that experiment. The model receives a description of what each function
 should do and chooses five test inputs. It cannot see the code it is testing,
 and its weights are unchanged.
@@ -151,7 +151,7 @@ I'm developing Zenith with AI coding agents and learning the field as I go. Corr
 
 ## Related projects
 
-In the [Plectis introduction](https://www.youtube.com/watch?v=U1z2-XaLe_w),
+In the [Plectis introduction](https://www.youtube.com/watch?v=MBmVMMogXTA),
 Will explains why he uses AI to make its research and software easier for other
 people to inspect. The [Plectis website](https://wcook04.github.io/practical-formal-verification/)
 collects the projects and their videos.

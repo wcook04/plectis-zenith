@@ -115,8 +115,8 @@ it('links the family of websites and shows the Zenith film beside the paper, not
   expect(up).toHaveAttribute('href', 'https://wcook04.github.io/');
   expect(wordmark).toHaveAccessibleName('Zenith');
   const film = screen.getByRole('complementary', { name: 'Film of a related experiment' });
-  expect(within(film).getByRole('link', { name: /video on YouTube, 4 minutes 55 seconds/ }))
-    .toHaveAttribute('href', 'https://www.youtube.com/watch?v=A1Kw5hXvzVw');
+  expect(within(film).getByRole('link', { name: /video on YouTube, 5 minutes 3 seconds/ }))
+    .toHaveAttribute('href', 'https://www.youtube.com/watch?v=wUxp2Wohmq0');
   expect(film).toHaveTextContent('The paper on this page does not report this experiment.');
   expect(within(film).getByRole('link', { name: 'study report' }).getAttribute('href'))
     .toMatch(/\/blob\/2b325e2de0fb763d0998f2a4f61fac59001ded59\/docs\/studies\/kept-experience\/README\.md$/);
