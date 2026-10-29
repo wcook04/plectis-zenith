@@ -3,14 +3,38 @@
 import type { ReactNode } from 'react';
 import { FAMILY, SITE_ID, clock, isReleased, spokenDuration, type FamilyFilm } from '../content/family';
 
-/** "Will Cook / <wordmark>": the header's way back to the home page. */
-export function FamilyLadder({ children }: { children: ReactNode }) {
+/**
+ * The start of the header: the Plectis plait opens the home page (every
+ * website and film), a short upright rule, then this site's mark and name
+ * open this site's front page. The plait is public/assets/family/plectis.svg,
+ * a copy of wcook04.github.io assets/family/marks/plectis.svg, which keeps its
+ * own day and night palettes; the site mark is inline SVG in the site's inks.
+ */
+export function FamilyLockup({ name, href, mark }: { name: string; href: string; mark: ReactNode }) {
   return (
-    <span className="fam-ladder">
-      <a className="fam-ladder__up" href={FAMILY.owner.home} rel="author">{FAMILY.owner.name}</a>
-      <span className="fam-ladder__sep" aria-hidden="true">/</span>
-      {children}
+    <span className="fam-lockup">
+      <a className="fam-lockup__home" href={FAMILY.owner.home} rel="author"
+        title={`All of ${FAMILY.owner.name}'s websites and films`}>
+        <img src={`${import.meta.env.BASE_URL}assets/family/plectis.svg`}
+          alt={`${FAMILY.owner.name}: all websites and films`} width={26} height={26} />
+      </a>
+      <span className="fam-lockup__rule" aria-hidden="true"></span>
+      <a className="fam-lockup__site" href={href}>
+        {mark}
+        <span className="fam-lockup__name" translate="no">{name}</span>
+      </a>
     </span>
+  );
+}
+
+/** Zenith's mark: the sun at its highest point on its arc (assets/family/marks/zenith.svg). */
+export function ZenithMark() {
+  return (
+    <svg className="fam-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path className="fam-mark__cool" d="M3.5 19a8.5 8.5 0 0 1 17 0" />
+      <path className="fam-mark__ink" d="M1.5 19h21" />
+      <circle className="fam-mark__warm-fill" cx="12" cy="10.5" r="3.2" />
+    </svg>
   );
 }
 

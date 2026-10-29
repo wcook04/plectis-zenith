@@ -24,8 +24,10 @@ A file hash identifies bytes; it does not establish a scientific claim.
 
 ## Links to Will Cook's other websites
 
-The header begins "Will Cook / Zenith". "Will Cook" opens the home page,
-<https://wcook04.github.io/>, which lists every website and film; the footer
+The header begins with the family lockup: the Plectis plait, a short upright
+rule, then Zenith's mark (the sun at its highest point on its arc) and name.
+The plait opens the home page, <https://wcook04.github.io/>, which lists every
+website and film; the mark and name open this site's front page. The footer
 lists every website too, with Zenith marked as the one being read. Beside the
 abstract (after it on narrow screens), a film slot shows the still of the
 [Zenith film](https://www.youtube.com/watch?v=A1Kw5hXvzVw) with its running
@@ -38,6 +40,7 @@ These parts follow the shared contract, `docs/family.md` in the
 and are copies, not edits: `src/content/family.json` is its `sites.json`,
 `src/styles/family.css` is its `assets/family/family.css` (the site's colours
 and typefaces are mapped onto the `--fam-*` names in `src/styles/tokens.css`),
+`public/assets/family/plectis.svg` is its `assets/family/marks/plectis.svg`,
 and `public/assets/films/` holds the two stills of each film this site shows.
 To update them, copy the files again, rebuild and run `npm test`; the tests
 check the markup and that every released film the site lists has both stills.

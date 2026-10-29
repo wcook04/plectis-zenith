@@ -28,7 +28,7 @@ export function ThemeToggle() {
   const effective = theme ?? (systemDark ? 'dark' : 'light');
   // The flip never smears: while the scheme changes no colour transition runs
   // (html.vt-theme in site.css), so links with a hover transition, such as the
-  // shared header ladder and film still, change colour at once. Adapted from
+  // shared header lockup and film still, change colour at once. Adapted from
   // the Plectis site's quiet flip (sites/microcosm/assets/docs.js).
   const flip = () => {
     const next = effective === 'dark' ? 'light' : 'dark';

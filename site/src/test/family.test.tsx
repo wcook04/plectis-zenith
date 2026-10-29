@@ -1,6 +1,6 @@
 import { cleanup, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { FamilyLadder, FamilySites, FilmSlot } from '../components/Family';
+import { FamilyLockup, FamilySites, FilmSlot, ZenithMark } from '../components/Family';
 import { FAMILY, clock, isReleased, siteFilms, spokenDuration, type FamilyFilm } from '../content/family';
 
 afterEach(() => cleanup());
@@ -34,14 +34,20 @@ describe('family data', () => {
 });
 
 describe('family markup', () => {
-  it('puts the ladder up to the home page before the wordmark', () => {
-    render(<header><FamilyLadder><a className="wordmark" href="#top">Zenith</a></FamilyLadder></header>);
-    const up = screen.getByRole('link', { name: 'Will Cook' });
-    expect(up).toHaveAttribute('href', 'https://wcook04.github.io/');
-    expect(up).toHaveAttribute('rel', 'author');
-    const wordmark = screen.getByRole('link', { name: 'Zenith' });
-    expect(up.compareDocumentPosition(wordmark) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(up.nextElementSibling).toHaveAttribute('aria-hidden', 'true');
+  it('starts the header with the lockup: the plait to the home page, a rule, then the site', () => {
+    const { container } = render(<header><FamilyLockup name="Zenith" href="/" mark={<ZenithMark />} /></header>);
+    const [home, site] = screen.getAllByRole('link');
+    expect(home).toHaveAccessibleName('Will Cook: all websites and films');
+    expect(home).toHaveAttribute('href', 'https://wcook04.github.io/');
+    expect(home).toHaveAttribute('rel', 'author');
+    expect(home.querySelector('img')?.getAttribute('src')).toMatch(/assets\/family\/plectis\.svg$/);
+    expect(home.nextElementSibling).toHaveClass('fam-lockup__rule');
+    expect(home.nextElementSibling).toHaveAttribute('aria-hidden', 'true');
+    expect(site).toHaveAccessibleName('Zenith');
+    expect(site).toHaveAttribute('href', '/');
+    expect(site.querySelector('svg.fam-mark')).toHaveAttribute('aria-hidden', 'true');
+    // Nothing in the lockup loads from another host.
+    expect(container.querySelector('img[src^="http"], [href^="//"]')).toBeNull();
   });
 
   it('renders a released film as one titled link that opens YouTube in a new tab', () => {

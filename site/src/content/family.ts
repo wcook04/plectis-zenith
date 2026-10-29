@@ -1,4 +1,4 @@
-// Will Cook's websites share a header ladder, film slots and a footer list of
+// Will Cook's websites share a header lockup, film slots and a footer list of
 // sister sites (wcook04.github.io, docs/family.md). family.json is an unchanged
 // copy of that repository's sites.json; replace it, never edit it here.
 import family from './family.json';
