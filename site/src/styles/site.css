@@ -24,7 +24,7 @@ code { background: var(--code-bg); color: var(--code-ink); padding: 0.08em 0.32e
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
 button { font-family: inherit; }
 
-.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.visually-hidden, .sr-only { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .skip { position: absolute; left: 12px; top: -48px; z-index: 100; background: var(--ink); color: var(--page); padding: 8px 12px; border-radius: 6px; font-family: var(--font-sans); }
 .skip:focus { top: 8px; }
 .wrap { width: 100%; max-width: var(--max); margin: 0 auto; padding: 0 32px; }
@@ -38,16 +38,29 @@ button { font-family: inherit; }
 .notice-bar .z-link-button { white-space: nowrap; }
 .notice-bar .z-link-button { color: var(--page); text-decoration: underline; }
 .masthead__inner { display: flex; align-items: center; gap: 28px; height: 48px; }
-.wordmark { font-family: var(--font-serif); font-weight: 700; font-size: 1.3rem; color: var(--ink); text-decoration: none; letter-spacing: 0.01em; }
 .nav { display: flex; gap: 22px; flex: 1; overflow-x: auto; scrollbar-width: none; }
 .nav a { color: var(--muted); text-decoration: none; font-size: 0.9375rem; white-space: nowrap; padding: 6px 0; }
 .nav a:hover { color: var(--ink); }
 .theme-toggle { margin-left: auto; background: none; border: 1px solid var(--rule-control); color: var(--ink); width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; cursor: pointer; }
+/* The lockup (family.css): plait | sun mark "Zenith". It keeps its width; the
+   chapter links scroll beside it. Narrower gaps keep all four links in view
+   down to small laptop widths now that the lockup takes room. */
+.masthead__inner .fam-lockup { flex: none; }
+@media (max-width: 1100px) {
+  .masthead__inner { gap: 20px; }
+  .nav { gap: 16px; }
+}
+/* While the theme switch flips the scheme (ThemeToggle sets the class for two
+   frames), no colour transition runs, so nothing smears. As on Plectis. */
+html.vt-theme *, html.vt-theme *::before, html.vt-theme *::after { transition: none !important; }
 @media (max-width: 760px) {
   .notice-bar__inner { font-size: 0.75rem; }
   .notice-bar__extra { display: none; }
-  .masthead__inner { gap: 16px; }
+  /* The header keeps one row on a phone: the lockup tightens and the chapter
+     links scroll beside it. */
+  .masthead__inner { gap: 12px; }
   .nav { gap: 16px; }
+  .masthead__inner .fam-lockup { gap: 0.5rem; }
 }
 
 /* Buttons */
@@ -296,6 +309,10 @@ figcaption { font-family: var(--font-sans); font-size: 0.875rem; line-height: 1.
 .footer { padding: 32px 0 48px; border-top: 1px solid var(--rule); font-family: var(--font-sans); font-size: 0.875rem; color: var(--muted); }
 .footer__inner { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
 .footer p { margin: 0; max-width: 70ch; }
+/* Will Cook's other websites (family.css), under this site's own links. */
+.footer__family { margin-top: 28px; }
+.footer__family .fam-sites { padding-top: 20px; border-top: 1px solid var(--rule); }
+.footer .fam-sites__title { margin: 0 0 0.4rem; }
 
 /* Research notice dialog */
 .notice-dialog { max-width: 720px; width: calc(100% - 32px); border: 1px solid var(--rule-strong); border-radius: var(--radius); background: var(--surface); color: var(--ink); padding: 0; box-shadow: var(--shadow-pop); }
@@ -328,6 +345,21 @@ figcaption { font-family: var(--font-sans); font-size: 0.875rem; line-height: 1.
 .prose img { background: #fffdf7; border-radius: var(--radius-sm); padding: 8px; }
 .paper-reading__hero { display: block; max-width: calc(72ch + 64px); }
 .paper-reading__hero .hero__actions { margin: 24px 0 32px; }
+/* The Zenith film (family.css film slot) is secondary to the paper: after the
+   abstract on narrow screens, and in the right margin beside it on wide ones,
+   where its label shares the abstract label's line. The reading column keeps
+   its centred measure either way. */
+.paper-reading__film { margin-top: 40px; max-width: 400px; font-family: var(--font-sans); }
+.paper-reading__film .film-slot__title { text-wrap: balance; }
+.paper-reading__film-note { margin: 12px 0 0; font-size: 0.875rem; line-height: 1.5; color: var(--muted); text-wrap: pretty; }
+@media (min-width: 1240px) {
+  .paper-reading__hero--film {
+    display: grid; max-width: var(--max); align-items: start;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 72ch) minmax(0, 1fr); column-gap: 48px; row-gap: 0;
+  }
+  .paper-reading__hero--film > .hero__main, .paper-reading__hero--film > .paper-reading__abstract { grid-column: 2; }
+  .paper-reading__hero--film > .paper-reading__film { grid-column: 3; grid-row: 2; margin-top: 0; max-width: 300px; }
+}
 .paper-reading__scroll-hint { font-family: var(--font-sans); font-size: 0.875rem; color: var(--muted); }
 .paper-reading__text { margin-inline: auto; }
 .paper-reading__figure-scroll { max-width: 100%; overflow-x: auto; border-radius: var(--radius-sm); }

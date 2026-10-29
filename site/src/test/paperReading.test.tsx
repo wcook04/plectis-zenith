@@ -105,6 +105,31 @@ it('reads the title, abstract, sections and navigation from the manuscript paylo
   expect(vi.mocked(fetch).mock.calls.every(([url]) => !String(url).includes('/evidence/') && !String(url).includes('/graph'))).toBe(true);
 });
 
+it('links the family of websites and shows the Zenith film beside the paper, not as its report', async () => {
+  mockPaper();
+  render(<App />);
+  await screen.findByRole('heading', { name: 'Zenith: the actual manuscript title' });
+  const banner = screen.getByRole('banner');
+  const [up, wordmark] = within(banner).getAllByRole('link').slice(0, 2);
+  expect(up).toHaveAccessibleName('Will Cook: all websites and films');
+  expect(up).toHaveAttribute('href', 'https://wcook04.github.io/');
+  expect(wordmark).toHaveAccessibleName('Zenith');
+  const film = screen.getByRole('complementary', { name: 'Film of a related experiment' });
+  expect(within(film).getByRole('link', { name: /video on YouTube, 5 minutes 3 seconds/ }))
+    .toHaveAttribute('href', 'https://www.youtube.com/watch?v=wUxp2Wohmq0');
+  expect(film).toHaveTextContent('The paper on this page does not report this experiment.');
+  expect(within(film).getByRole('link', { name: 'study report' }).getAttribute('href'))
+    .toMatch(/\/blob\/2b325e2de0fb763d0998f2a4f61fac59001ded59\/docs\/studies\/kept-experience\/README\.md$/);
+  // The abstract comes first in reading order; the film follows it.
+  const abstract = screen.getByText('Manuscript abstract: a bounded comparison of retained tests.');
+  expect(abstract.compareDocumentPosition(film) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  expect(document.querySelector('iframe')).toBeNull();
+  const sisters = screen.getByRole('navigation', { name: "Will Cook's websites" });
+  expect(sisters.closest('footer')).not.toBeNull();
+  expect(within(sisters).getByRole('link', { name: 'Zenith' })).toHaveAttribute('aria-current', 'page');
+  expect(within(sisters).getByRole('link', { name: 'All websites and films' })).toHaveAttribute('href', 'https://wcook04.github.io/');
+});
+
 it('renders the paper table, citation targets, reviewed references and the exact figure asset', async () => {
   mockPaper();
   render(<App />);

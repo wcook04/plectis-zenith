@@ -17,6 +17,8 @@ import { nodeName } from './lib/naming';
 import { useAsync } from './lib/hooks';
 import { ThemeToggle } from './components/ThemeToggle';
 import { CopyButton } from './components/CopyButton';
+import { FamilyLockup, FamilySites, FilmSlot, ZenithMark } from './components/Family';
+import { siteFilms } from './content/family';
 
 const RECEIPT_LABEL: Record<string, string> = {
   'continuation-learner': 'Continuation learner and later checks',
@@ -197,9 +199,7 @@ function Shell({ children, site, chapters = site?.chapters, paperReading = false
           </div>
         </div>
         <div className="wrap masthead__inner">
-          <a className="wordmark" href="#top" translate="no">
-            Zenith
-          </a>
+          <FamilyLockup name="Zenith" href={import.meta.env.BASE_URL} mark={<ZenithMark />} />
           {site && (
             <nav aria-label="Chapters" className="nav">
               {chapters?.map((chapter) => (
@@ -256,15 +256,28 @@ function useGraph(url: string | null) {
   return useAsync<Graph | null>(() => (url ? api.graph(url) : Promise.resolve(null)), [url]);
 }
 
+// The Zenith film (family.json) follows the kept-experience study, which this
+// paper does not report. Its report and replay files are fixed at the recorded
+// study revision, the same link the repository README gives.
+const FILM_CONTEXT: Record<string, { label: string; report: string }> = {
+  zenith: {
+    label: 'Film of a related experiment',
+    report: 'https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md',
+  },
+};
+
 // The current reading view is a projection of the manuscript supplied by the
 // backend. Older API editions retain the chapter/receipt view below.
 function PaperReadingPage({ site, paper, reading }: { site: Site; paper: Paper; reading: PaperReading }) {
   const byline = useByline(site);
   const base = paper.source.url;
+  const [film] = siteFilms();
+  const filmContext = film ? FILM_CONTEXT[film.id] : undefined;
   return (
     <SiteFiguresContext.Provider value={site.figures}>
       <Shell site={site} chapters={reading.sections} paperReading>
-        <section className="hero wrap paper-reading__hero" id="top" aria-labelledby="title">
+        <section className={`hero wrap paper-reading__hero${film ? ' paper-reading__hero--film' : ''}`}
+          id="top" aria-labelledby="title">
           <div className="hero__main">
             <h1 id="title" aria-label={paper.title}>{titleParts(paper.title, true)}</h1>
             {byline && <p className="hero__byline">{byline}</p>}
@@ -274,10 +287,21 @@ function PaperReadingPage({ site, paper, reading }: { site: Site; paper: Paper; 
               <a className="button button--ghost" href={apiUrl(paper.source.url)}
                 target="_blank" rel="noreferrer">Current paper source</a>
             </nav>
+          </div>
+          <div className="paper-reading__abstract">
             <h2 className="paper-aside__head">Abstract</h2>
             <Markdown source={reading.abstract} base={base} />
             <Markdown source={reading.disclosure} base={base} />
           </div>
+          {film && <aside className="paper-reading__film" aria-labelledby="film-title">
+            <h2 className="paper-aside__head" id="film-title">{filmContext?.label ?? 'Film'}</h2>
+            <FilmSlot film={film} series="Zenith" size="small"
+              sizes="(min-width: 1240px) 300px, (min-width: 440px) 400px, 100vw" />
+            {filmContext && <p className="paper-reading__film-note">
+              The paper on this page does not report this experiment. Its <a href={filmContext.report}
+                target="_blank" rel="noreferrer">study report</a> gives the protocol, results and limits.
+            </p>}
+          </aside>}
         </section>
         {reading.sections.map(section => (
           <section className={`chapter chapter--${section.id}`} key={section.id} id={section.id}
@@ -306,6 +330,9 @@ function PaperReadingPage({ site, paper, reading }: { site: Site; paper: Paper; 
               target="_blank" rel="noreferrer">Results and replay links</a></p>}
             {site.notice_url && <p><a href={apiUrl(site.notice_url)}
               target="_blank" rel="noreferrer">Research notice</a></p>}
+          </div>
+          <div className="wrap footer__family">
+            <FamilySites />
           </div>
         </footer>
       </Shell>
@@ -417,6 +444,9 @@ function Page({ site, paper }: { site: Site; paper: Paper | null }) {
               Source on GitHub
             </a>
           </p>
+        </div>
+        <div className="wrap footer__family">
+          <FamilySites />
         </div>
       </footer>
     </Shell>
