@@ -16,7 +16,8 @@ ENTRY_DOCS = ('README.md', 'program.md', 'CONTRIBUTING.md', 'paper/README.md',
               'SECURITY.md', 'AGENTS.md', 'site/README.md')
 REQUIRED = {'zenith/__main__.py', 'AGENTS.md', 'docs/architecture.md',
             'docs/history/architecture.md', 'paper/README.md', 'README.md',
-            'master_config.json', 'pyproject.toml', 'scripts/check_structure.py'}
+            'master_config.json', 'pyproject.toml', 'scripts/check_structure.py',
+            'codex/contracts/contract_config.json'}
 TEST_AREAS = ('tests/',)
 REGULAR_MODES = {'100644', '100755'}
 
@@ -38,6 +39,8 @@ def check_paths(paths):
         if required not in paths:
             failures.append(f'Missing source anchor: {required}')
     for name in sorted(paths):
+        if name == 'codex/substrate/contracts/contract_config.json':
+            failures.append(f'Retired validator config mirror (use codex/contracts/contract_config.json): {name}')
         path = PurePosixPath(name)
         if len(path.parts) == 1 and name not in ROOT_FILES:
             failures.append(f'Unassigned root file (choose a documented owner): {name}')
