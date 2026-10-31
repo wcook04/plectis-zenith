@@ -11,7 +11,7 @@ and instructions for repeating the checks. It is a research prototype. The
 video study and the older studies use different code versions; their links
 below identify which one to use.
 
-[Watch the experiment](https://www.youtube.com/watch?v=wUxp2Wohmq0) · [Read its study and replay instructions](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) · [Source map](#source-map) · [Contribute](CONTRIBUTING.md)
+[Watch the experiment](https://www.youtube.com/watch?v=wUxp2Wohmq0) · [Read its study and replay instructions](docs/studies/kept-experience/README.md) · [Source map](#source-map) · [Contribute](CONTRIBUTING.md)
 
 <a id="the-experiment-in-the-film"></a>
 
@@ -33,16 +33,16 @@ Across 58 problems withheld from practice and development, tested twice each, De
 
 About half the gain came from large inputs that made slow programs exceed the one-second time limit. Counting only wrong answers and exceptions, the smaller advantage had an uncertainty interval that included zero. Rules the model wrote from its misses did not produce a clear improvement.
 
-This is one model on short benchmark functions, with no demonstrated transfer to larger software projects. The [study report](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) gives the comparisons, protocol changes, costs and limits. Its [paper](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/paper/zenith.pdf), saved replies and replay code are published at that fixed study revision on the `study/kept-experience-20261019` branch. Follow that report to reproduce the experiment shown in the video; the commands below run separate studies available on `main`.
+This is one model on short benchmark functions, with no demonstrated transfer to larger software projects. The [study report](docs/studies/kept-experience/README.md) gives the comparisons, protocol changes, costs and limits. Its [paper](paper/zenith.pdf), saved replies and replay code are published at that fixed study revision on the `study/kept-experience-20261019` branch. Follow that report to reproduce the experiment shown in the video; the commands below run separate studies available on `main`.
 
 | What you want to reproduce | Where to start |
 |---|---|
-| The bug-finding experiment in the video | [Study report and replay instructions at the recorded revision](https://github.com/wcook04/plectis-zenith/blob/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience/README.md) |
+| The bug-finding experiment in the video | [Study report and replay instructions](docs/studies/kept-experience/README.md) |
 | A small local example without a model account | [Continuation learner demo below](#try-it-without-an-account), a separate authored algorithm |
 | The earlier SQLite tester experiment | [Replay the saved client experiment](#replay-the-published-client-experiment), using its archived code and replies |
 
 The [research website](https://wcook04.github.io/plectis-zenith/) and
-[three-page paper on main](paper/zenith.pdf) describe the earlier studies.
+[paper](paper/zenith.pdf) also describe the earlier studies.
 Their [results and limits](docs/status.md) remain separate from the experiment shown in the video.
 
 ## Try it without an account
@@ -108,7 +108,7 @@ The [contribution guide](CONTRIBUTING.md#install-and-check-the-source-checkout) 
 
 <a id="what-works-today"></a>
 
-## Other studies on main
+## Other studies
 
 These are separate experiments. Their results are not combined with the
 bug-finding study shown in the video.
@@ -179,9 +179,9 @@ For directory roles and implementation boundaries, see the [architecture guide](
 
 | To inspect | Start here |
 |---|---|
-| Bug-finding study in the video | [Recorded study revision](https://github.com/wcook04/plectis-zenith/tree/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience), including its evidence and replay guide |
+| Bug-finding study in the video | [Study folder](docs/studies/kept-experience), including its evidence and replay guide |
 | Small runnable example | [Demo](scripts/demo_continuation_learning.py) and [continuation learner](research/continuation_learning.py) |
-| Measurements for the earlier studies on main | [Results and limits](docs/status.md) and the study reports linked above |
+| Measurements for the earlier studies | [Results and limits](docs/status.md) and the study reports linked above |
 | Saved evidence and replay | [Client bundle](examples/conformance/client-reuse-v2-low), [replay command implementation](scripts/build_client_investigation_report.py), [learner record](examples/continuation-memory/witness-preserving-v1) |
 | Implementation and dependencies | [Architecture and source owners](docs/architecture.md), [code for calling model providers](system/lib/openrouter_free_runtime.py), [which programs read each resource](docs/architecture.md#resource-consumers) |
 | Paper and reading website | [Paper guide](paper/README.md), [manuscript](paper/zenith.tex), [code that turns the manuscript into web pages](zenith/paper_reading.py) |
