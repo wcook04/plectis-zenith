@@ -14,6 +14,10 @@ and its weights are unchanged.
 
 One faulty program should sort the numbers at every other position in a list, but crashes when the list is empty. Without the practice record, the tester missed that input in both attempts; with the record, it tried the empty list both times. The record contains earlier missed bugs and inputs that expose them.
 
+[![Frame from the Zenith experiment: the tester missed the empty-list input that crashes a sorting function](site/public/assets/films/zenith-v3-1280.webp)](https://www.youtube.com/watch?v=wUxp2Wohmq0)
+
+[Watch the five-minute experiment](https://www.youtube.com/watch?v=wUxp2Wohmq0).
+
 Across 58 problems withheld from practice and development, tested twice each, DeepSeek V4.1 Flash caught an average **77.0% of the fault classes per problem**, compared with **69.2%** from the description alone. Faulty programs that fail on the same benchmark inputs count as one fault class.
 
 About half the gain came from large inputs that made slow programs exceed the one-second time limit. Counting only wrong answers and exceptions, the smaller advantage had an uncertainty interval that included zero. Rules the model wrote from its misses did not produce a clear improvement.
@@ -126,6 +130,8 @@ A further question is whether experience improves the procedure that makes subse
 
 ## Source map
 
+For directory roles and implementation boundaries, see the [architecture guide](docs/architecture.md#repository-roles).
+
 | To inspect | Start here |
 |---|---|
 | Filmed bug-finding study | [Recorded study revision](https://github.com/wcook04/plectis-zenith/tree/2b325e2de0fb763d0998f2a4f61fac59001ded59/docs/studies/kept-experience), including its evidence and replay guide |
@@ -153,7 +159,7 @@ I'm developing Zenith with AI coding agents and learning the field as I go. Corr
 
 In the [Plectis introduction](https://www.youtube.com/watch?v=MBmVMMogXTA),
 Will explains why he uses AI to make its research and software easier for other
-people to inspect. The [Plectis website](https://wcook04.github.io/practical-formal-verification/)
+people to inspect. [Will Cook's home page](https://wcook04.github.io/)
 collects the projects and their videos.
 
 - [Safety Core](https://github.com/wcook04/safety-core) compares written agent rules with executable checks in a small coding task. Its experiment asks a different question from Zenith's tester study.
