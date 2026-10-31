@@ -87,7 +87,7 @@
       "required": true,
       "pattern": "^[A-Z]_[0-9A-F]{8}$",
       "constraint": "Lane prefix (must exist in contract_config.json lane_prefix_map) + 8 uppercase hex chars. Unique within payload.",
-      "semantics": "Deterministic identity hash. PREFIX MAP: see codex/substrate/contracts/contract_config.json lane_prefix_map. SHA8: first 8 hex chars of SHA256('{lane}|{identity_key}', UTF-8).",
+      "semantics": "Deterministic identity hash. PREFIX MAP: see codex/contracts/contract_config.json lane_prefix_map. SHA8: first 8 hex chars of SHA256('{lane}|{identity_key}', UTF-8).",
       "examples": [
         "S_DEADBEEF",
         "E_CAFEBABE"
@@ -153,7 +153,7 @@
     "INVALID_REF_ID": "ref_id does not match ^\\[([1-9]\\d*)\\]$.",
     "DUPLICATE_REF_ID": "Two evidence entries share the same ref_id.",
     "DUPLICATE_LEDGER_ID": "Two evidence entries share the same ledger_id.",
-    "INVALID_LEDGER_ID": "ledger_id is malformed or uses a prefix not declared in codex/substrate/contracts/contract_config.json lane_prefix_map.",
+    "INVALID_LEDGER_ID": "ledger_id is malformed or uses a prefix not declared in codex/contracts/contract_config.json lane_prefix_map.",
     "MALFORMED_CITATION": "epicentre_thesis contains a range/CSV/leading-zero citation form.",
     "CITATION_UNRESOLVED": "A [N] citation in epicentre_thesis has no matching ref_id in evidence.",
     "BELOW_MIN_WORD_COUNT": "epicentre_thesis word count is below the configured minimum."
@@ -173,7 +173,7 @@
     }
   },
   "validator": "system.lib.schema_validator.validate_cp1",
-  "config_file": "codex/substrate/contracts/contract_config.json",
+  "config_file": "codex/contracts/contract_config.json",
   "deprecated_contracts": {
     "prediction_vector.md": "Superseded by CP1/CP2 schemas.",
     "evaluate_output.md": "Superseded by ObservationReport + trace.",

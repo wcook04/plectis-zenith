@@ -73,7 +73,7 @@ Some similarly named resources serve different commands. Choose the path from th
 | `codex/nodes/refinement/delta_analyzer.json` and `codex/nodes/refinement/dossier_updater.json` | [run_evolve.py](../tools/refinement/run_evolve.py) reads these files directly when building its prompts, independently of the graph loader's choice. They differ from the substrate definitions and remain live inputs. |
 | `master_config.json` | [Runtime](../zenith/runtime.py) run-directory resolution and [engine](../system/core/engine.py) execution/bridge configuration. Keep it at the checkout root used by those consumers. |
 
-Seven unused Markdown mirrors under `codex/substrate/contracts/` have been retired; their canonical bodies remain under `codex/contracts/` and their original extraction records remain in `retired_files`. The JSON schemas and directly read refinement nodes have the distinct consumers listed above.
+Seven unused Markdown mirrors and the duplicate validator configuration under `codex/substrate/contracts/` have been retired; their canonical owners remain under `codex/contracts/` and their original extraction records remain in `retired_files`. CP1/CP2 schema metadata now names the same configuration file that the loader and validator read. The JSON schemas and directly read refinement nodes have the distinct consumers listed above.
 
 ### Package, snapshot and publication boundaries
 
@@ -124,6 +124,8 @@ Use the source checkout with an editable install on Linux, macOS or a suitable W
 Trace consumers before retiring a file: imports, node declarations, command entry points, publication routes and source manifests can all depend on its path. Matching bytes alone do not establish that two files serve the same role. For example, the retired `codex/substrate/contracts/epicentre_thesis.md` matched its canonical Markdown body but had a different original source checksum. Its complete original extraction row is retained with its replacement path; the canonical file's provenance has not been substituted for it.
 
 The seven retired Markdown copies are `atomic_tuple.md`, `counter_vector.md`, `epicentre_thesis.md`, `exemplar_state.md`, `prediction_vector.md`, `scorecard.md` and `web_search_disabled.md`. Each resolves to its same-named owner under `codex/contracts/`. Their removal leaves all 75 loaded node definitions and the runtime-archive member policy unchanged. The historical daily controller also fingerprints all `codex/` Markdown and JSON: an existing frozen daily programme must continue in its original checkout. Do not rewrite that programme's recorded fingerprint to accept a cleanup.
+
+The retired validator settings path `codex/substrate/contracts/contract_config.json` resolves to `codex/contracts/contract_config.json`. Both files had identical exported bytes, but only the latter was read by the loader and schema validator. Maintained schema metadata uses that live owner; frozen archives retain the original paths and bytes. The layout gate requires the live configuration and rejects a new copy at the retired path.
 
 Preserve frozen evidence byte for byte. After reviewing maintained-source changes, name every affected extraction member explicitly, for example:
 
