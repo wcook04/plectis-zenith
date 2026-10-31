@@ -136,7 +136,7 @@ A further question is whether experience improves the procedure that makes subse
 | Paper and reading website | [Paper guide](paper/README.md), [manuscript](paper/zenith.tex), [manuscript-to-web projection](zenith/paper_reading.py) |
 | Earlier experiments | [Historical results](docs/history/status-20261015.md) and [retained graph architecture](docs/history/architecture.md) |
 
-Frozen experiment copies preserve the code, prompts, unsuccessful attempts and measured costs used by each study. Current Markdown contracts have one owner under `codex/contracts/`; [source-custody rules](docs/architecture.md#documentation-and-evidence) explain their preservation and retirement.
+Frozen experiment copies preserve the code, prompts, unsuccessful attempts and measured costs used by each study. Current contract bodies and validator settings have one owner under `codex/contracts/`; [source-custody rules](docs/architecture.md#documentation-and-evidence) explain their preservation and retirement.
 
 The website projects the paper's prose, table, citations and diagram from the manuscript. Its [plain-text entry point](https://wcook04.github.io/plectis-zenith/llms.txt) provides routes for readers without JavaScript. Earlier experiments retain their own methods, populations and evidence; they are not pooled with the current results.
 

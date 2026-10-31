@@ -1,5 +1,6 @@
 """Negative controls for source roles and Git's staged/ignored boundary."""
 import importlib.util
+import json
 from pathlib import Path
 import subprocess
 
@@ -17,7 +18,8 @@ def test_repository_layout():
 
 
 def test_misplaced_program_test_and_new_owner_are_rejected():
-    for misplaced in ['adhoc.py', 'docs/rebuild.py', 'scripts/test_runtime.py', 'unowned/data.json']:
+    for misplaced in ['adhoc.py', 'docs/rebuild.py', 'scripts/test_runtime.py', 'unowned/data.json',
+                      'codex/substrate/contracts/contract_config.json']:
         failures = structure.check_paths(set(structure.REQUIRED) | {misplaced})
         assert any(misplaced in failure for failure in failures), failures
 
@@ -163,3 +165,16 @@ def test_index_does_not_admit_an_unstaged_route_target(source_repo):
     assert not structure.check_repository(root)[1]
     unused, failures = structure.check_repository(root, index=True)
     assert any('docs/untracked.md' in failure for failure in failures), failures
+
+
+def test_contract_metadata_names_the_validator_settings_owner():
+    from system.lib.schema_validator import _load_config
+
+    canonical = 'codex/contracts/contract_config.json'
+    config = json.loads((ROOT / canonical).read_text())
+    loaded = _load_config()
+    assert all(loaded[key] == value for key, value in config.items())
+    for area in ('codex/contracts', 'codex/substrate/contracts'):
+        for path in (ROOT / area).glob('schema_cp[12].json'):
+            schema = json.loads(path.read_text())
+            assert schema['config_file'] == canonical, path
