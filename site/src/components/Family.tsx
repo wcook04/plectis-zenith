@@ -14,9 +14,9 @@ export function FamilyLockup({ name, href, mark }: { name: string; href: string;
   return (
     <span className="fam-lockup">
       <a className="fam-lockup__home" href={FAMILY.owner.home} rel="author"
-        title={`All of ${FAMILY.owner.name}'s websites and films`}>
+        title={`All of ${FAMILY.owner.name}'s projects and videos`}>
         <img src={`${import.meta.env.BASE_URL}assets/family/plectis.svg`}
-          alt={`${FAMILY.owner.name}: all websites and films`} width={26} height={26} />
+          alt={`${FAMILY.owner.name}: all projects and videos`} width={26} height={26} />
       </a>
       <span className="fam-lockup__rule" aria-hidden="true"></span>
       <a className="fam-lockup__site" href={href}>
@@ -101,7 +101,7 @@ export function FamilySites({ current = SITE_ID }: { current?: string }) {
             <a href={site.url} aria-current={site.id === current ? 'page' : undefined}>{site.short}</a>
           </li>
         ))}
-        <li><a href={FAMILY.owner.home}>All websites and films</a></li>
+        <li><a href={FAMILY.owner.home}>All projects and videos</a></li>
       </ul>
     </nav>
   );

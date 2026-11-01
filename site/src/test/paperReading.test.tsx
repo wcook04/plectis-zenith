@@ -111,7 +111,7 @@ it('links the family of websites and shows the Zenith film beside the paper, not
   await screen.findByRole('heading', { name: 'Zenith: the actual manuscript title' });
   const banner = screen.getByRole('banner');
   const [up, wordmark] = within(banner).getAllByRole('link').slice(0, 2);
-  expect(up).toHaveAccessibleName('Will Cook: all websites and films');
+  expect(up).toHaveAccessibleName('Will Cook: all projects and videos');
   expect(up).toHaveAttribute('href', 'https://wcook04.github.io/');
   expect(wordmark).toHaveAccessibleName('Zenith');
   const film = screen.getByRole('complementary', { name: 'Film of a related experiment' });
@@ -127,7 +127,7 @@ it('links the family of websites and shows the Zenith film beside the paper, not
   const sisters = screen.getByRole('navigation', { name: "Will Cook's websites" });
   expect(sisters.closest('footer')).not.toBeNull();
   expect(within(sisters).getByRole('link', { name: 'Zenith' })).toHaveAttribute('aria-current', 'page');
-  expect(within(sisters).getByRole('link', { name: 'All websites and films' })).toHaveAttribute('href', 'https://wcook04.github.io/');
+  expect(within(sisters).getByRole('link', { name: 'All projects and videos' })).toHaveAttribute('href', 'https://wcook04.github.io/');
 });
 
 it('renders the paper table, citation targets, reviewed references and the exact figure asset', async () => {

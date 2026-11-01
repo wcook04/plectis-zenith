@@ -37,7 +37,7 @@ describe('family markup', () => {
   it('starts the header with the lockup: the plait to the home page, a rule, then the site', () => {
     const { container } = render(<header><FamilyLockup name="Zenith" href="/" mark={<ZenithMark />} /></header>);
     const [home, site] = screen.getAllByRole('link');
-    expect(home).toHaveAccessibleName('Will Cook: all websites and films');
+    expect(home).toHaveAccessibleName('Will Cook: all projects and videos');
     expect(home).toHaveAttribute('href', 'https://wcook04.github.io/');
     expect(home).toHaveAttribute('rel', 'author');
     expect(home.querySelector('img')?.getAttribute('src')).toMatch(/assets\/family\/plectis\.svg$/);
@@ -90,7 +90,7 @@ describe('family markup', () => {
     render(<footer><FamilySites /></footer>);
     const nav = screen.getByRole('navigation', { name: "Will Cook's websites" });
     const links = within(nav).getAllByRole('link');
-    expect(links.map(link => link.textContent)).toEqual([...FAMILY.sites.map(site => site.short), 'All websites and films']);
+    expect(links.map(link => link.textContent)).toEqual([...FAMILY.sites.map(site => site.short), 'All projects and videos']);
     expect(links.map(link => link.getAttribute('href'))).toEqual([...FAMILY.sites.map(site => site.url), 'https://wcook04.github.io/']);
     expect(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.textContent)).toEqual(['Zenith']);
   });
