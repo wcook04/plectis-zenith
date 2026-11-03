@@ -47,6 +47,21 @@ describe('graph layout', () => {
     expect(edges.some((e) => !e.redundant && e.source === 'lab_seed_state')).toBe(true);
   });
 
+  it('keeps first-pass skip links close to their row when feeds expand', () => {
+    const layout = layoutGraph(lab, new Set(['feeds']));
+    const source = layout.items.find((item) => item.id === 'group:miners')!;
+    const target = layout.items.find((item) => item.id === 'lab_decide')!;
+    const edge = layout.edges.find((item) => item.source === source.id && item.target === target.id)!;
+    const skipped = layout.items.filter((item) => item.column > source.column && item.column < target.column);
+    expect(skipped.length).toBeGreaterThan(0);
+    // A tall source-feed group must not pull this short connection into the
+    // empty space above the entire first pass.
+    const rowTop = Math.min(...skipped.map((item) => item.y));
+    const rowBottom = Math.max(...skipped.map((item) => item.y + item.h));
+    expect(Math.min(Math.abs(edge.channelY - rowTop), Math.abs(edge.channelY - rowBottom))).toBeLessThan(32);
+    expect(skipped.every((item) => edge.channelY < item.y || edge.channelY > item.y + item.h)).toBe(true);
+  });
+
   it('expands a family into its native members', () => {
     const layout = layoutGraph(lab, new Set(['miners']));
     const miners = layout.items.filter((i) => i.kind === 'node' && i.id.startsWith('lab_miner_') && !i.id.includes('v2'));

@@ -11,7 +11,7 @@ procedure then needs a separate comparison on later cases.
 [Run the offline example](#run-it) · [Paper](paper/zenith.pdf) ·
 [Architecture](docs/architecture.md) · [Credits](#credits-and-license)
 
-![The Zenith teaching website showing Lab’s reasoning graph and node inspector](docs/images/zenith-lab.png)
+![The Zenith teaching website showing the complete two-pass Lab graph](docs/images/zenith-lab.png)
 
 The [local teaching website](#open-the-teaching-website) lets you select a node
 and read its instructions, inputs and expected output. The picture shows graph

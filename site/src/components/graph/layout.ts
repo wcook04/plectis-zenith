@@ -12,9 +12,9 @@ import { laneIndex, LANE_ORDER } from '../../lib/lanes';
 import { nodeFamily, type Family } from '../../lib/naming';
 
 export const NODE_W = 200;
-export const NODE_H = 94;
-export const GROUP_H = 98;
-export const COL_W = 244;
+export const NODE_H = 108;
+export const GROUP_H = 124;
+export const COL_W = 264;
 const ROW_H = NODE_H + 18;
 const MAX_BAND_COLUMNS = 7;
 const BAND_LABEL_H = 44;
@@ -76,7 +76,11 @@ export type LayoutEdge = {
   // original GraphViewer's showAllDependencies switch.
   redundant: boolean;
   channelY: number;
+  // Edges into the same target share one trunk: one exit lane per target in
+  // the source column's gap and one channel row per target, so a bundle reads
+  // as a bus with branches instead of parallel near-duplicate lines.
   slot: number;
+  outLane: number;
   rawIds: string[];
 };
 
@@ -251,10 +255,10 @@ export function layoutGraph(graph: Graph, expanded: ReadonlySet<string>): GraphL
           id,
           family: entry.family,
           members: entry.members,
-          x: x - 12,
-          y: top - 34,
-          w: NODE_W + 24,
-          h: bottom - top + 46,
+          x: x - 10,
+          y: top - 32,
+          w: NODE_W + 20,
+          h: bottom - top + 42,
         });
       }
     });
@@ -284,6 +288,7 @@ export function layoutGraph(graph: Graph, expanded: ReadonlySet<string>): GraphL
       redundant: false,
       channelY: 0,
       slot: 0,
+      outLane: 0,
       rawIds: [edge.id],
     });
   });
@@ -318,12 +323,20 @@ export function layoutGraph(graph: Graph, expanded: ReadonlySet<string>): GraphL
   // Each band has a channel above it; routed edges run there, one slot each.
   const bandCount = breakAt > 0 ? 2 : 1;
   const slotsInBand = Array.from({ length: bandCount }, () => 0);
+  const slotOfTarget = new Map<string, number>();
+  const lanesInColumn = new Map<number, Map<string, number>>();
   edges
     .filter((e) => e.routed)
-    .sort((a, b) => (columnOf.get(a.source) ?? 0) - (columnOf.get(b.source) ?? 0) || a.id.localeCompare(b.id))
+    .sort((a, b) => (columnOf.get(a.target) ?? 0) - (columnOf.get(b.target) ?? 0) || a.target.localeCompare(b.target))
     .forEach((edge) => {
       const band = bandOfItem.get(edge.target) ?? 0;
-      edge.slot = slotsInBand[band]++;
+      if (!slotOfTarget.has(edge.target)) slotOfTarget.set(edge.target, slotsInBand[band]++);
+      edge.slot = slotOfTarget.get(edge.target)!;
+      const column = columnOf.get(edge.source) ?? 0;
+      if (!lanesInColumn.has(column)) lanesInColumn.set(column, new Map());
+      const lanes = lanesInColumn.get(column)!;
+      if (!lanes.has(edge.target)) lanes.set(edge.target, lanes.size);
+      edge.outLane = lanes.get(edge.target)!;
     });
   const channelHeight = slotsInBand.map((n) => (n === 0 ? 0 : CHANNEL_PAD * 2 + CHANNEL_STEP * Math.min(n, MAX_SLOTS)));
 
@@ -339,10 +352,35 @@ export function layoutGraph(graph: Graph, expanded: ReadonlySet<string>): GraphL
     inBand.forEach((i) => (i.y += offset - minY));
     offset += maxY - minY + BAND_GAP;
   }
+  // A routed edge inside one band takes the free horizontal corridor nearest
+  // the line between its ends, so it passes just above or below the cards it
+  // skips. Only edges into the next band use the channel above that band.
+  const itemsById = new Map<string, NodeItem | GroupItem>(items.map((item) => [item.id, item]));
+  const boxesInColumn = new Map<number, Array<{ top: number; bottom: number }>>();
+  items.forEach((item) => {
+    if (!boxesInColumn.has(item.column)) boxesInColumn.set(item.column, []);
+    boxesInColumn.get(item.column)!.push({ top: item.y, bottom: item.y + item.h });
+  });
+  frames.forEach((frame) => {
+    const member = itemsById.get(frame.members.find((id) => itemsById.has(id)) ?? '');
+    if (member) boxesInColumn.get(member.column)?.push({ top: frame.y, bottom: frame.y + frame.h });
+  });
+  const CLEAR = 16;
   edges.forEach((edge) => {
     if (!edge.routed) return;
     const band = bandOfItem.get(edge.target) ?? 0;
     edge.channelY = bandTop[band] - CHANNEL_PAD - CHANNEL_STEP * (edge.slot % MAX_SLOTS) - CHANNEL_STEP / 2;
+    const source = itemsById.get(edge.source);
+    const target = itemsById.get(edge.target);
+    if (!source || !target || (bandOfItem.get(edge.source) ?? 0) !== band) return;
+    const blocks: Array<{ top: number; bottom: number }> = [];
+    for (let c = source.column + 1; c < target.column; c++) blocks.push(...(boxesInColumn.get(c) ?? []));
+    const free = (y: number) => blocks.every((b) => y < b.top - CLEAR || y > b.bottom + CLEAR);
+    const ideal = (source.y + source.h / 2 + target.y + target.h / 2) / 2;
+    const candidates = [ideal, ...blocks.flatMap((b) => [b.top - CLEAR - 2, b.bottom + CLEAR + 2])]
+      .filter(free)
+      .sort((a, b) => Math.abs(a - ideal) - Math.abs(b - ideal));
+    if (candidates.length) edge.channelY = candidates[0] + 5 * (edge.slot % 3);
   });
 
   const bands: BandLabel[] =
