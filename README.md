@@ -17,6 +17,8 @@ below identify which one to use.
 
 ## The experiment in the video
 
+[Introduction to the projects](https://www.youtube.com/watch?v=Yk_kUQUCylc) · [Zenith experiment short](https://www.youtube.com/watch?v=SIqD9PTFR7g)
+
 Can an AI tester catch more bugs in new programs after reading a record of bugs
 it missed before? The [Zenith video](https://www.youtube.com/watch?v=wUxp2Wohmq0)
 follows that experiment. The model receives a description of what each function
@@ -202,7 +204,7 @@ I'm developing Zenith with AI coding agents and learning the field as I go. Corr
 
 ## Related projects
 
-In the [Plectis introduction](https://www.youtube.com/watch?v=MBmVMMogXTA),
+In the [Plectis introduction](https://www.youtube.com/watch?v=Yk_kUQUCylc),
 Will explains why he uses AI to make its research and software easier for other
 people to inspect. [Will Cook's home page](https://wcook04.github.io/)
 collects the projects and their videos.
