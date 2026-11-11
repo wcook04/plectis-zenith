@@ -141,7 +141,7 @@ function Hero() {
         </p>
         <nav className="hero__actions" aria-label="Study">
           <a className="button" href={STUDY_REPORT} target="_blank" rel="noreferrer">Read the study report</a>
-          <a className="button button--ghost" href={EVIDENCE} target="_blank" rel="noreferrer">Saved replies and scores</a>
+          <a className="button button--ghost" href={EVIDENCE} target="_blank" rel="noreferrer">Replies and scores</a>
         </nav>
         <div className="study-films" aria-label="Videos">
           <StudyFilm id="short-zenith" label="Short video" note="The result and its limits." lead />
