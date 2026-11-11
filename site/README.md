@@ -2,17 +2,49 @@
 
 [Open the public research website](https://wcook04.github.io/plectis-zenith/).
 
-**Experimental research prototype.** The website explains experiments in which an AI proposes tests and repairs for database, cache and text-decoding programs. A separate experiment studies whether a learning algorithm remembers enough earlier actions to predict later behavior. Older financial experiments and System A, a toy example with invented data, remain labelled as earlier work. See the [research notice](../RESEARCH_NOTICE.md).
+**Experimental research prototype.** The front page is about the current study: whether a record of the bugs an AI tester missed on practice problems helps it expose hidden faults in new programs. The tester, DeepSeek V4.1 Flash, returns five inputs for each short Python function; a fault counts as exposed when an input makes a faulty solution behave differently from the reference solution. The page contains a worked example of how one problem is scored, a table of all eight conditions with 95% intervals, the change on each of the 58 held-out problems, the limits, and links to the saved replies and scores. See the [research notice](../RESEARCH_NOTICE.md).
 
-The current reading page projects the three numbered sections of
+## Front page: the current study
+
+`src/Root.tsx` selects the page to render. By default it renders `src/components/Study.tsx`
+(styles in `src/styles/study.css`). The page needs no request to the data server,
+so it is complete on first paint. Every figure comes from
+`src/content/keptExperience.json`, which
+[`scripts/build_kept_experience_site_data.py`](../scripts/build_kept_experience_site_data.py)
+writes from the study's saved files at a fixed revision of this repository. The
+script reads those files from git objects, not from the working tree, and stops
+if its recomputed per-problem figures disagree with the study's `results.json`.
+From the repository root, the first command rewrites the file and the second
+compares it with the study files without writing:
+
+```sh
+python scripts/build_kept_experience_site_data.py          # write
+python scripts/build_kept_experience_site_data.py --check  # compare; needs the study revision fetched
+```
+
+`keptExperience.json` is generated: the next run of the script overwrites a hand
+edit, and the comparison fails until then. `src/test/study.test.tsx` compares the
+printed figures with the study report's table and recomputes the headline
+means and counts from the per-problem scores.
+
+## Earlier studies: the paper reading page
+
+The reading page for the earlier studies is `src/App.tsx`, loaded only when it
+is needed. It is rendered for `?studies=earlier`, for a `?node=` graph link, and
+for any hash that is not one of the front page's own section anchors, so a link
+made before November 2026 (such as `#paper`, `#results` or `#ref-1`) still
+opens that page. A line of text above the paper begins "Earlier studies." and
+links to the front page.
+
+The reading page projects the three numbered sections of
 [`paper/zenith.tex`](../paper/zenith.tex): programs and measured repair, test reuse
 and continuation learning, and related work and next experiments. Its title,
 abstract, paragraphs, table, citations and caption all come from that manuscript.
 The diagram is rendered from the same TikZ source. The PDF is offered as current
 only when its source and file checksums match the inspected edition.
 
-The final section opens each current study's guide in place and links its saved measurements, with
-earlier experiments in a separate disclosure. References include reviewed
+The final section opens each earlier study's guide in place and links its saved measurements, with
+older experiments in a separate disclosure. References include reviewed
 editions, supporting passages and limits of applicability. The site uses its
 existing React components, STIX/Source Sans typography, themes and source links.
 On narrow screens, the diagram and table scroll horizontally at a readable size.
@@ -28,12 +60,18 @@ The header begins with the family lockup: the Plectis plait, a short upright
 rule, then Zenith's mark (the sun at its highest point on its arc) and name.
 The plait opens the home page, <https://wcook04.github.io/>, which lists every
 website and film; the mark and name open this site's front page. The footer
-lists every website too, with Zenith marked as the one being read. Beside the
-abstract (after it on narrow screens), a film slot shows the still of the
-[Zenith film](https://www.youtube.com/watch?v=wUxp2Wohmq0) with its running
-time. Its title opens YouTube in a new tab; the page embeds no player and loads
-nothing from YouTube. The film follows the kept-experience study, which the
-paper does not report, so the slot says so and links that study's report.
+lists every website too, with Zenith marked as the one being read.
+
+The first screen of the front page contains the stills of both Zenith videos,
+each a link that opens YouTube in a new tab: the
+[short video](https://www.youtube.com/watch?v=SIqD9PTFR7g) (1:54), larger, and the
+[full video](https://www.youtube.com/watch?v=wUxp2Wohmq0) (5:03), smaller. On the
+earlier-studies page, a video slot beside the abstract (after it on narrow
+screens) contains the still of the full video with its running time. That video
+is about the kept-experience study, which is not in the paper, so the slot
+contains the sentence "The paper on this page does not report this experiment."
+and a link to that study's report. Neither page embeds a YouTube player or loads
+any file from YouTube.
 
 These parts follow the shared contract, `docs/family.md` in the
 [wcook04.github.io repository](https://github.com/wcook04/wcook04.github.io),
@@ -41,13 +79,15 @@ and are copies, not edits: `src/content/family.json` is its `sites.json`,
 `src/styles/family.css` is its `assets/family/family.css` (the site's colours
 and typefaces are mapped onto the `--fam-*` names in `src/styles/tokens.css`),
 `public/assets/family/plectis.svg` is its `assets/family/marks/plectis.svg`,
-and `public/assets/films/` holds the two stills of each film this site shows.
+and `public/assets/films/` holds the two stills of each film this site shows
+(the short video's stills are in `public/assets/films/next/`, the path given in `family.json`).
 To update them, copy the files again, rebuild and run `npm test`; the tests
 check the markup and that every released film the site lists has both stills.
 The build copies `public/` into `dist/` and lists the stills in
 `zenith-public.json`, so the Python server and GitHub Pages both publish them.
-It also writes the home link and the film link into `index.html`'s noscript
-note from `family.json`, for readers without JavaScript.
+It also writes the home link and both video links into `index.html`'s noscript
+note from `family.json`, for readers without JavaScript; that note also contains
+the current study's question and a link to its report.
 
 ## Develop
 
@@ -80,7 +120,7 @@ public receipts only. Restart the serving process after rebuilding so it reads t
 ## Test
 
 ```sh
-npm test           # layout, run-state, text-helper and interaction tests
+npm test           # study page, layout, run-state, text-helper and interaction tests
 ```
 
 The interaction tests open nodes, walk to an upstream input, close with Escape,

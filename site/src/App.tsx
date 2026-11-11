@@ -271,11 +271,16 @@ const FILM_CONTEXT: Record<string, { label: string; report: string }> = {
 function PaperReadingPage({ site, paper, reading }: { site: Site; paper: Paper; reading: PaperReading }) {
   const byline = useByline(site);
   const base = paper.source.url;
-  const [film] = siteFilms();
+  const film = siteFilms().find(entry => entry.id === 'zenith');
   const filmContext = film ? FILM_CONTEXT[film.id] : undefined;
   return (
     <SiteFiguresContext.Provider value={site.figures}>
       <Shell site={site} chapters={reading.sections} paperReading>
+        <div className="earlier-banner">
+          <p className="wrap">Earlier studies. This page is the paper on program repair and retained tests.
+            The current study, on showing an AI tester the bugs it missed, is on
+            the <a href={import.meta.env.BASE_URL}>front page</a>.</p>
+        </div>
         <section className={`hero wrap paper-reading__hero${film ? ' paper-reading__hero--film' : ''}`}
           id="top" aria-labelledby="title">
           <div className="hero__main">

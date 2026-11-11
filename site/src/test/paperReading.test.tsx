@@ -114,6 +114,10 @@ it('links the family of websites and shows the Zenith film beside the paper, not
   expect(up).toHaveAccessibleName('Will Cook: all projects and videos');
   expect(up).toHaveAttribute('href', 'https://wcook04.github.io/');
   expect(wordmark).toHaveAccessibleName('Zenith');
+  // A line above the paper says it covers the earlier studies and links back to the current study.
+  const earlier = document.querySelector('.earlier-banner')!;
+  expect(earlier).toHaveTextContent(/^Earlier studies\./);
+  expect(within(earlier as HTMLElement).getByRole('link', { name: 'front page' })).toHaveAttribute('href', '/');
   const film = screen.getByRole('complementary', { name: 'Film of a related experiment' });
   expect(within(film).getByRole('link', { name: /video on YouTube, 5 minutes 3 seconds/ }))
     .toHaveAttribute('href', 'https://www.youtube.com/watch?v=wUxp2Wohmq0');

@@ -36,6 +36,7 @@ The preservation rule is finite; it does not prove a repaired program correct on
 | [web.py](../zenith/web.py), [web_content.py](../zenith/web_content.py), [site/](../site/README.md) | Read-only projection of manuscript, public evidence and retained graphs. Public mode excludes private runs and has no inference or editing endpoint. |
 | [references.json](../paper/references.json), [build_paper_references.py](../scripts/build_paper_references.py) | Reviewed source editions and claim support, with a generated inline bibliography and checks binding citations to exact manuscript passages. [test_paper_references.py](../tests/test_paper_references.py) checks this boundary. These files add no experiment runtime. |
 | [paper_reading.py](../zenith/paper_reading.py), [build_paper_reading.py](../scripts/build_paper_reading.py) | Restricted TeX-to-Markdown paper projection and a builder rendering the existing TikZ figure into `paper/repair-loop.svg`. Unsupported content is rejected; `tests/test_paper_reading.py` checks projection and stale-output boundaries. |
+| [build_kept_experience_site_data.py](../scripts/build_kept_experience_site_data.py), [Root.tsx](../site/src/Root.tsx), [Study.tsx](../site/src/components/Study.tsx) | Website front page on the kept-experience study. The script reads the study's saved files from git objects at the recorded revision and writes `site/src/content/keptExperience.json`; it stops when recomputed per-problem figures disagree with the study's `results.json`, and `--check` compares the committed file. `Root.tsx` renders the earlier paper for `?studies=earlier`, `?node=` and older paper anchors. No model call or backend request is involved. |
 
 Direct investigation uses the conformance runner's invocation helper. Some retained module names therefore remain in the active import path. Renaming these files alone would not simplify execution and would disturb published import and replay interfaces.
 
@@ -55,7 +56,7 @@ The website exporter, [`export_site_snapshot.py`](../scripts/export_site_snapsho
 | `examples/` | Published evidence, original attempts, generated programs, hashes and frozen source archives. |
 | `tests/` | Current and historical regression tests; `tests/upstream/` preserves extracted engine checks. |
 | `docs/`, `paper/` | Methods, results, architecture, manuscript and generated reading assets. Narrative does not own executable implementation. |
-| `site/` | React reading website and its own build, tests, fonts and components, with unchanged copies of the website list, styles and film stills shared by Will Cook's websites ([family links](../site/README.md#links-to-will-cooks-other-websites)). |
+| `site/` | React reading website (front page on the kept-experience study, earlier paper at `?studies=earlier`) and its own build, tests, fonts and components, with unchanged copies of the website list, styles and film stills shared by Will Cook's websites ([family links](../site/README.md#links-to-will-cooks-other-websites)). |
 | `system/` | Graph loading/execution and shared provider transport used by current studies. |
 | `tools/`, `feedback/`, `variants/`, `codex/` | Graph tools, refinement and data contracts; see [resource consumers](#resource-consumers) and the [historical source map](history/architecture.md#retained-source-owners). |
 
@@ -113,6 +114,7 @@ Use the source checkout with an editable install on Linux, macOS or a suitable W
 | `make validate` | Reviewed citations, layout/routes, exported custody hashes and retained native graph validation. |
 | `python scripts/build_paper_references.py --check` | Checks the generated bibliography, reviewed source editions and manuscript support bindings; `--index` checks staged copies. |
 | `python scripts/build_paper_reading.py` | Renders the manuscript's TikZ figure through Tectonic and Poppler's `pdftocairo` to `paper/repair-loop.svg`; inspect before binding reviewed hashes. |
+| `python scripts/build_kept_experience_site_data.py` | Writes the website front page's data file from the kept-experience study at its recorded revision; `--check` compares without writing and needs that revision fetched. |
 | `python -m zenith serve …` | Existing read-only website server; build the frontend first. |
 
 [build_client_investigation_report.py](../scripts/build_client_investigation_report.py) and [build_conformance_report.py](../scripts/build_conformance_report.py) own the public study exports and archived-runtime replay. [build_progress_report.py](../scripts/build_progress_report.py) derives the current campaign summary; [analyze_progress_campaign.py](../scripts/analyze_progress_campaign.py) reconstructs paired comparisons. [continue_conformance_budget.py](../scripts/continue_conformance_budget.py) preserves settled responses during an explicitly authorized funding-only continuation.
