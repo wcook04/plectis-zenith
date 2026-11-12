@@ -111,9 +111,13 @@ it('links the family of websites and shows the Zenith film beside the paper, not
   await screen.findByRole('heading', { name: 'Zenith: the actual manuscript title' });
   const banner = screen.getByRole('banner');
   const [up, wordmark] = within(banner).getAllByRole('link').slice(0, 2);
-  expect(up).toHaveAccessibleName('Will Cook: all websites and films');
+  expect(up).toHaveAccessibleName('Will Cook: all projects and videos');
   expect(up).toHaveAttribute('href', 'https://wcook04.github.io/');
   expect(wordmark).toHaveAccessibleName('Zenith');
+  // A line above the paper says it covers the earlier studies and links back to the current study.
+  const earlier = document.querySelector('.earlier-banner')!;
+  expect(earlier).toHaveTextContent(/^Earlier studies\./);
+  expect(within(earlier as HTMLElement).getByRole('link', { name: 'front page' })).toHaveAttribute('href', '/');
   const film = screen.getByRole('complementary', { name: 'Film of a related experiment' });
   expect(within(film).getByRole('link', { name: /video on YouTube, 5 minutes 3 seconds/ }))
     .toHaveAttribute('href', 'https://www.youtube.com/watch?v=wUxp2Wohmq0');
@@ -127,7 +131,7 @@ it('links the family of websites and shows the Zenith film beside the paper, not
   const sisters = screen.getByRole('navigation', { name: "Will Cook's websites" });
   expect(sisters.closest('footer')).not.toBeNull();
   expect(within(sisters).getByRole('link', { name: 'Zenith' })).toHaveAttribute('aria-current', 'page');
-  expect(within(sisters).getByRole('link', { name: 'All websites and films' })).toHaveAttribute('href', 'https://wcook04.github.io/');
+  expect(within(sisters).getByRole('link', { name: 'All projects and videos' })).toHaveAttribute('href', 'https://wcook04.github.io/');
 });
 
 it('renders the paper table, citation targets, reviewed references and the exact figure asset', async () => {

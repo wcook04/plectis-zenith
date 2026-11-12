@@ -7,7 +7,7 @@ afterEach(() => cleanup());
 
 // Stills ship from public/ unchanged; the build copies them into dist and its
 // zenith-public.json allowlist. Only the file names are read here.
-const publicFiles = Object.keys(import.meta.glob('../../public/assets/films/*.webp'))
+const publicFiles = Object.keys(import.meta.glob('../../public/assets/films/**/*.webp'))
   .map(path => path.replace('../../public/', ''));
 
 describe('family data', () => {
@@ -22,10 +22,11 @@ describe('family data', () => {
   });
 
   it('lists this website and ships a still pair for every released film it shows', () => {
-    expect(FAMILY.schema).toBe('will_cook_site_family_v1');
+    expect(FAMILY.schema).toBe('will_cook_site_family_v2');
     expect(FAMILY.sites.find(site => site.id === 'zenith')?.url).toBe('https://wcook04.github.io/plectis-zenith/');
     const films = siteFilms();
-    expect(films.map(film => film.id)).toEqual(['zenith']);
+    expect(films.map(film => film.id)).toEqual(['short-zenith', 'zenith']);
+    expect(films.every(isReleased)).toBe(true);
     for (const film of films.filter(isReleased)) {
       expect(publicFiles).toContain(`${film.still}-640.webp`);
       expect(publicFiles).toContain(`${film.still}-1280.webp`);
@@ -37,7 +38,7 @@ describe('family markup', () => {
   it('starts the header with the lockup: the plait to the home page, a rule, then the site', () => {
     const { container } = render(<header><FamilyLockup name="Zenith" href="/" mark={<ZenithMark />} /></header>);
     const [home, site] = screen.getAllByRole('link');
-    expect(home).toHaveAccessibleName('Will Cook: all websites and films');
+    expect(home).toHaveAccessibleName('Will Cook: all projects and videos');
     expect(home).toHaveAttribute('href', 'https://wcook04.github.io/');
     expect(home).toHaveAttribute('rel', 'author');
     expect(home.querySelector('img')?.getAttribute('src')).toMatch(/assets\/family\/plectis\.svg$/);
@@ -51,12 +52,12 @@ describe('family markup', () => {
   });
 
   it('renders a released film as one titled link that opens YouTube in a new tab', () => {
-    const [film] = siteFilms();
+    const film = siteFilms().find(entry => entry.id === 'zenith')!;
     const { container } = render(<FilmSlot film={film} series="Zenith" />);
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(1);
     const title = links[0];
-    expect(title).toHaveAccessibleName(/^Zenith: I showed an AI tester the bugs it missed, video on YouTube, 5 minutes 3 seconds/);
+    expect(title).toHaveAccessibleName(`${film.title}, video on YouTube, 5 minutes 3 seconds`);
     expect(title).toHaveAttribute('href', 'https://www.youtube.com/watch?v=wUxp2Wohmq0');
     expect(title).toHaveAttribute('target', '_blank');
     expect(title).toHaveAttribute('rel', 'noopener noreferrer');
@@ -90,7 +91,7 @@ describe('family markup', () => {
     render(<footer><FamilySites /></footer>);
     const nav = screen.getByRole('navigation', { name: "Will Cook's websites" });
     const links = within(nav).getAllByRole('link');
-    expect(links.map(link => link.textContent)).toEqual([...FAMILY.sites.map(site => site.short), 'All websites and films']);
+    expect(links.map(link => link.textContent)).toEqual([...FAMILY.sites.map(site => site.short), 'All projects and videos']);
     expect(links.map(link => link.getAttribute('href'))).toEqual([...FAMILY.sites.map(site => site.url), 'https://wcook04.github.io/']);
     expect(links.filter(link => link.getAttribute('aria-current') === 'page').map(link => link.textContent)).toEqual(['Zenith']);
   });

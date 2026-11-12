@@ -17,6 +17,8 @@ below identify which one to use.
 
 ## The experiment in the video
 
+[Introduction to the projects](https://www.youtube.com/watch?v=Yk_kUQUCylc) · [Zenith experiment short](https://www.youtube.com/watch?v=SIqD9PTFR7g)
+
 Can an AI tester catch more bugs in new programs after reading a record of bugs
 it missed before? The [Zenith video](https://www.youtube.com/watch?v=wUxp2Wohmq0)
 follows that experiment. The model receives a description of what each function
@@ -41,8 +43,10 @@ This is one model on short benchmark functions, with no demonstrated transfer to
 | A small local example without a model account | [Continuation learner demo below](#try-it-without-an-account), a separate authored algorithm |
 | The earlier SQLite tester experiment | [Replay the saved client experiment](#replay-the-published-client-experiment), using its archived code and replies |
 
-The [research website](https://wcook04.github.io/plectis-zenith/) and
-[paper](paper/zenith.pdf) also describe the earlier studies.
+The front page of the [research website](https://wcook04.github.io/plectis-zenith/)
+is about the experiment shown in the video. Its
+[earlier-studies page](https://wcook04.github.io/plectis-zenith/?studies=earlier) is about the
+earlier studies, and the [paper](paper/zenith.pdf) also describes them.
 Their [results and limits](docs/status.md) remain separate from the experiment shown in the video.
 
 ## Try it without an account
@@ -185,11 +189,12 @@ For directory roles and implementation boundaries, see the [architecture guide](
 | Saved evidence and replay | [Client bundle](examples/conformance/client-reuse-v2-low), [replay command implementation](scripts/build_client_investigation_report.py), [learner record](examples/continuation-memory/witness-preserving-v1) |
 | Implementation and dependencies | [Architecture and source owners](docs/architecture.md), [code for calling model providers](system/lib/openrouter_free_runtime.py), [which programs read each resource](docs/architecture.md#resource-consumers) |
 | Paper and reading website | [Paper guide](paper/README.md), [manuscript](paper/zenith.tex), [code that turns the manuscript into web pages](zenith/paper_reading.py) |
+| Website front page on the bug-finding study | [page selection](site/src/Root.tsx) between the study and the earlier paper, [study page](site/src/components/Study.tsx), and the [script that writes its data file](scripts/build_kept_experience_site_data.py) from the recorded study revision |
 | Earlier experiments | [Historical results](docs/history/status-20261015.md) and [retained graph architecture](docs/history/architecture.md) |
 
 Saved experiment copies keep the exact code, prompts, unsuccessful attempts and costs used in each study. Current written requirements live under `codex/contracts/`. The [preservation guide](docs/architecture.md#documentation-and-evidence) explains which files can be updated and which must remain unchanged.
 
-The website is generated from the paper's text, table, citations and diagram. Its [plain-text entry point](https://wcook04.github.io/plectis-zenith/llms.txt) provides routes for readers without JavaScript. Earlier experiments retain their own methods, populations and evidence; they are not pooled with the current results.
+The figures on the website's front page come from `site/src/content/keptExperience.json`, which the script above writes from the saved study files at the recorded revision. The earlier-studies page is generated from the paper's text, table, citations and diagram. Its [plain-text entry point](https://wcook04.github.io/plectis-zenith/llms.txt) provides routes for readers without JavaScript. Earlier experiments retain their own methods, populations and evidence; they are not pooled with the current results.
 
 <a id="development"></a>
 <a id="collaboration-and-guidance"></a>
@@ -202,7 +207,7 @@ I'm developing Zenith with AI coding agents and learning the field as I go. Corr
 
 ## Related projects
 
-In the [Plectis introduction](https://www.youtube.com/watch?v=MBmVMMogXTA),
+In the [Plectis introduction](https://www.youtube.com/watch?v=Yk_kUQUCylc),
 Will explains why he uses AI to make its research and software easier for other
 people to inspect. [Will Cook's home page](https://wcook04.github.io/)
 collects the projects and their videos.
