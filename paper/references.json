@@ -1,424 +1,927 @@
 {
-  "schema": "zenith_reviewed_references_v1",
-  "sources": [
+ "schema": "zenith_reviewed_references_v1",
+ "sources": [
+  {
+   "id": "mutants",
+   "authors": [
+    "René Just",
+    "Darioush Jalali",
+    "Laura Inozemtseva",
+    "Michael D. Ernst",
+    "Reid Holmes",
+    "Gordon Fraser"
+   ],
+   "title": "Are Mutants a Valid Substitute for Real Faults in Software Testing?",
+   "author_label": "R. Just et al.",
+   "venue": "FSE",
+   "year_label": "2014",
+   "url": "https://homes.cs.washington.edu/~rjust/publ/mutants_real_faults_fse_2014.pdf",
+   "reviewed_source": {
+    "filename": "source.pdf",
+    "sha256": "264e75e8cc2c62a583b041a4075151549de5b6e95c11cb358147f02d92c6e387",
+    "edition": "Author PDF, FSE'14 (Hong Kong, 16–22 November 2014), ISBN 978-1-4503-3056-5",
+    "annex_id": "just-2014-mutants-valid-substitute-real-faults",
+    "attribution_note": "Six authors on the PDF title page; no DOI printed.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the source.",
+    "distribution_policy": "local_only"
+   },
+   "application": "Grounds treating mechanical mutants as a secondary, imperfect proxy and model-written faults as primary.",
+   "source_locators": [
     {
-      "id": "psr",
-      "authors": [
-        "Michael L. Littman",
-        "Richard S. Sutton",
-        "Satinder Singh"
-      ],
-      "title": "Predictive Representations of State",
-      "author_label": "M. L. Littman, R. S. Sutton and S. Singh",
-      "venue": "NIPS, vol. 14",
-      "year_label": "2001",
-      "url": "https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf",
-      "reviewed_source": {
-        "filename": "NIPS-2001-predictive-representations-of-state-Paper.pdf",
-        "sha256": "0d9199d40bab3dc468fb95e52d5e4bf9a78e07c6a63250397d336bda215d17b8",
-        "edition": "NIPS 2001 proceedings, volume 14, pp. 1555–1561; supplied 14-physical-page PDF",
-        "annex_id": "littman-sutton-singh-2001-predictive-representations-of-state",
-        "attribution_note": "All three authors are verified on the PDF title page; the proceedings HTML/BibTeX omits Singh. Physical PDF pages 1, 3, 5, 7, 9, 11, 13 are content pages 1–7 and proceedings pp. 1555–1561; every even physical page is blank.",
-        "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the supplied PDF.",
-        "distribution_policy": "local_only"
-      },
-      "verification_state": "source_verified",
-      "application": "Conceptual context: future-test probabilities motivate predictive state. Zenith’s implemented deterministic rational-linear learner is not the stochastic PSR construction or evidence of its proposed learning advantages.",
-      "source_locators": [
-        {
-          "id": "future-test-state",
-          "locator": "§1, Eqs. (1)–(3); physical PDF pp. 5, 7 / content pp. 3–4 / proceedings pp. 1557–1558",
-          "supports": "A predictive state determines probabilities of all future action-observation tests; conditioning uses a normalized ratio of linear functions.",
-          "boundary": "A linear PSR does not have an unnormalized linear state update. Its stochastic sufficiency requirement does not certify Zenith’s finite deterministic checks."
-        },
-        {
-          "id": "known-model-construction",
-          "locator": "Theorem 1 at the end of §1 and its §2 proof, including Lemma 1; physical PDF pp. 7, 9, 11 / content pp. 4–6 / proceedings pp. 1558–1560",
-          "supports": "A finite POMDP has a linear PSR using no more tests than states in its minimal POMDP; the construction uses the supplied POMDP model.",
-          "boundary": "This is a known-model representation result, not a black-box acquisition algorithm or a theorem that arbitrary software has finite rank."
-        },
-        {
-          "id": "learning-prospects",
-          "locator": "§3; physical PDF pp. 11, 13 / content pp. 6–7 / proceedings pp. 1560–1561",
-          "supports": "Learnability and generalization are proposed advantages for future investigation.",
-          "boundary": "The paper does not establish empirical learning, cross-task question transfer or recursive self-improvement."
-        }
-      ],
-      "artifact_links": [
-        {
-          "path": "paper/zenith.tex",
-          "expected_text": "Predictive state representations instead describe stochastic state through\nfuture-test probabilities. Their linear predictions use normalised conditional\nupdates; the cited construction starts from a known finite partially observable\nMarkov decision process~\\cite[\\S1, Eq.\\ (3); Theorem 1 and \\S2]{psr}.\nZenith fits deterministic outputs with rational-linear transitions and readouts.",
-          "excerpt_sha256": "d808fcc8d731ec84a10dd583ea9d6c379b09cc04d7567544a22aec5b76a842b1",
-          "source_locator_ids": [
-            "future-test-state",
-            "known-model-construction"
-          ]
-        }
-      ]
+     "id": "coupling",
+     "locator": "§3.1–3.2 boxed findings; Table 4",
+     "supports": "73% of the studied real faults are coupled to mutants from commonly used operators; 27% are not, and about 17% are coupled to no mutant.",
+     "boundary": "Java programs from Defects4J with developer-written tests; coupling rates need not hold for Python functions or model-written faults."
     },
     {
-      "id": "weighted",
-      "authors": [
-        "James Worrell"
-      ],
-      "title": "Exactly Learning Weighted Automata over a Field",
-      "author_label": "J. Worrell",
-      "venue": "Oxford teaching notes",
-      "year_label": "undated",
-      "url": "https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf",
-      "reviewed_source": {
-        "filename": "MA-learning.pdf",
-        "sha256": "b50288b01850ecf938590603612ea8482acdb177e2eb5b3b0599033e60e24d48",
-        "edition": "Supplied three-page Oxford teaching note; no printed date or byline",
-        "annex_id": "weighted-automata-exact-learning-notes",
-        "attribution_note": "Attribution to James Worrell comes from his Oxford teaching index, https://www.cs.ox.ac.uk/people/james.worrell/lectures.html. PDF build metadata dated 23 February 2017 is not a verified publication year. The note credits the algorithm to Beimel, Bergadano, Bshouty, Kushilevitz and Varricchio (JACM 2000).",
-        "license": "No explicit redistribution license established; only metadata and source-located summaries are published.",
-        "distribution_policy": "local_only"
-      },
-      "verification_state": "source_verified",
-      "application": "Implemented antecedent: Zenith’s continuation learner constructs a weighted-automaton hypothesis from exact observation tables and retains paired history/test rank witnesses. Finite challenges can produce valid counterexamples but replace the note’s global equivalence oracle, so the repair restores an established invariant without certifying general source equivalence.",
-      "source_locators": [
-        {
-          "id": "observation-table",
-          "locator": "pp. 1–2, Preliminaries, The Algorithm, and the unnumbered hypothesis construction immediately before Proposition 1",
-          "supports": "For an exact field-valued series f, equal-sized row and column sets containing the empty word and a full-rank table H determine the hypothesis’s initial vector, final vector and transition matrices through H M(σ) = Hσ.",
-          "boundary": "The rank-refinement result concerns this table-induced hypothesis. Field arithmetic is exact. Finite-dimensional representability bounds repeated rank growth; it is not established for arbitrary native software by finite observations."
-        },
-        {
-          "id": "paired-rank-witness",
-          "locator": "Proposition 1, pp. 2–3, Eqs. (1)–(2)",
-          "supports": "For a counterexample to the table-induced hypothesis, the proof finds a prefix wσ at which the predicted test vector first becomes incorrect and a component i with nonzero residual. Adding row w and column σyi increases the table rank from n to n+1.",
-          "boundary": "The paired witnesses follow from the hypothesis construction; an arbitrary failed candidate and a full-rank table are insufficient. A valid finite-challenge counterexample suffices for this local refinement. Zenith’s repair restores an established invariant, not a new learning theorem."
-        },
-        {
-          "id": "oracle-assumptions",
-          "locator": "p. 1, Preliminaries and The Algorithm; p. 2, equivalence-query paragraph before Proposition 1; pp. 2–3, rank-refinement proof",
-          "supports": "Exact membership queries supply values of f. An equivalence query either certifies global equality or returns a counterexample. Rank growth is bounded when the target has a finite weighted-automaton representation.",
-          "boundary": "Finite challenges cannot certify global equality; exact arithmetic alone establishes neither finite representability nor correctness on unqueried inputs. The source does not establish cross-task transfer savings or lifetime economy for native software."
-        },
-        {
-          "id": "algorithm-attribution",
-          "locator": "p. 1, first sentence of The Algorithm; p. 3, reference [1]",
-          "supports": "The note explicitly credits its algorithm to Beimel, Bergadano, Bshouty, Kushilevitz and Varricchio, Learning functions represented as multiplicity automata (JACM, 2000).",
-          "boundary": "This verifies the attribution made by the supplied note, not an independent review of the full JACM article. Worrell is credited for the exposition; the note is not evidence that he originated the algorithm."
-        }
-      ],
-      "artifact_links": [
-        {
-          "path": "paper/zenith.tex",
-          "expected_text": "With exact field-valued observations and a square full-rank table containing\nthe empty history and test, the weighted-automaton construction turns a\ncounterexample to its hypothesis into a paired row/column extension increasing rank~\\cite[Proposition 1, pp.\\ 2--3]{weighted}.\nOur repair restores that established requirement. Finite challenges replace\nthe global equivalence oracle, so a completed fit establishes only agreement\non those challenges.",
-          "excerpt_sha256": "484feb86968fefd1cef3eb7a38436d2dee9b68fe65cb2b371c6b4d2c2bc75749",
-          "source_locator_ids": [
-            "observation-table",
-            "paired-rank-witness",
-            "oracle-assumptions"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "ilf",
-      "authors": [
-        "Jingxuan He",
-        "Mislav Balunović",
-        "Nodar Ambroladze",
-        "Petar Tsankov",
-        "Martin Vechev"
-      ],
-      "title": "Learning to Fuzz from Symbolic Execution with Application to Smart Contracts",
-      "author_label": "J. He et al.",
-      "venue": "CCS",
-      "year_label": "2019",
-      "url": "https://doi.org/10.1145/3319535.3363230",
-      "reviewed_source": {
-        "filename": "ccs19-ilf.pdf",
-        "sha256": "e43953b8837d3d210f82c6554051cd99312f82c5113db9d3d966aa9ed9cb3917",
-        "edition": "CCS 2019, pp. 531–548; supplied 18-page author PDF",
-        "annex_id": "he-2019-learning-to-fuzz-from-symbolic-execution",
-        "attribution_note": "Author list and title verified on the supplied first page. One-based PDF p. 1 corresponds to proceedings p. 531. Publication metadata cross-checked against the authors’ SRI Lab publication page.",
-        "license": "Author PDF carries ACM personal/classroom copying and attribution conditions; no blanket paper redistribution is asserted. The separate ILF code repository uses Apache-2.0.",
-        "distribution_policy": "local_only"
-      },
-      "verification_state": "source_verified",
-      "application": "Context and evaluation precedent: expensive symbolic demonstrations train a reusable fuzzing policy. Zenith does not implement ILF’s neural policy training or Ethereum representation; any future testing comparison must include acquisition and training as well as deployment.",
-      "source_locators": [
-        {
-          "id": "trained-testing-policy",
-          "locator": "PDF p. 7, §4.2, paragraph “Learning from Expert”; pp. 7–9, §§5.1–5.2, Table 2 and Algorithm 1",
-          "supports": "A symbolic expert supplies coverage-improving transaction sequences; imitation learning updates neural policy weights, and the deployed policy consumes contract/history features.",
-          "boundary": "Runtime history adaptation is distinct from retraining. Ethereum-specific features are authored; the paper does not discover arbitrary representation boundaries or improve its own training algorithm."
-        },
-        {
-          "id": "withheld-contracts",
-          "locator": "PDF pp. 9–10, §6.2, Tables 4–5",
-          "supports": "The evaluation deduplicates the collected contracts and uses random five-fold contract-level cross-validation on 18,496 contracts.",
-          "boundary": "Exact deduplication and contract withholding do not establish a project/lineage, functionality-family, chronological or unrelated-domain split."
-        },
-        {
-          "id": "acquisition-and-deployment",
-          "locator": "PDF pp. 9–10, §§6.1–6.3, Figures 7–9",
-          "supports": "The source separates symbolic expert execution, policy training and fast deployment; the useful result is amortization on further contracts.",
-          "boundary": "Deployment throughput is not total lifetime cost. Coverage and detector results are empirical, domain-specific and do not establish correctness or vulnerability completeness."
-        }
-      ],
-      "artifact_links": [
-        {
-          "path": "paper/zenith.tex",
-          "expected_text": "ILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.",
-          "excerpt_sha256": "cb3c1b600ca18df9502302febd8e931a08a4882cc050f23fe9d68907dc8046e0",
-          "source_locator_ids": [
-            "trained-testing-policy",
-            "withheld-contracts"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "coverup",
-      "authors": [
-        "Juan Altmayer Pizzorno",
-        "Emery D. Berger"
-      ],
-      "title": "CoverUp: Effective High Coverage Test Generation for Python",
-      "author_label": "J. Altmayer Pizzorno and E. D. Berger",
-      "venue": "PACMSE 2 (FSE)",
-      "year_label": "2025",
-      "url": "https://arxiv.org/abs/2403.16218v4",
-      "reviewed_source": {
-        "filename": "arXiv-2403.16218v4.tar.gz",
-        "sha256": "59bbb9c1a554be68d8d724d72cd015fc2616325527643cfa15137eb5d242ad4f",
-        "edition": "arXiv:2403.16218v4, 9 May 2025; PACMSE 2 (FSE), article FSE128, 23 pages",
-        "annex_id": "arxiv-2403-16218",
-        "attribution_note": "Supplied main.tex sets arxivfalse and selects the published Effective High Coverage title; its conditional Coverage-Guided title is not the selected title. The actual v4 PDF has 23 pages despite the stale 21-page arXiv comment. Altmayer Pizzorno is the first author’s surname.",
-        "license": "Supplied source declares ACM publication rights; no blanket paper redistribution is asserted. The separate CoverUp code repository uses Apache-2.0.",
-        "distribution_policy": "local_only"
-      },
-      "verification_state": "source_verified",
-      "application": "Context and proposed control: an authored coverage/error-feedback driver refines generated tests using a fixed LLM. A future Zenith preparation protocol may give both retained-code arms bounded development-only execution and refinement; no CoverUp runtime or target feedback is imported.",
-      "source_locators": [
-        {
-          "id": "measured-test-refinement",
-          "locator": "implementation.tex, §§3–3.3, labels impl:prompting and impl:dialogue; FSE128:4–9",
-          "supports": "Source and coverage context guide test generation; execution errors and missing coverage prompt bounded follow-up dialogue, retaining passing tests that add coverage.",
-          "boundary": "The authored driver remains fixed; this is not a learned policy transferred from earlier projects. Coverage against source assumed correct does not certify semantic correctness."
-        },
-        {
-          "id": "integration-and-yield",
-          "locator": "implementation.tex, §§3.5–3.6, labels impl:integration-check and impl:handling-flakies; evaluation.tex, §4.6, Table 4 and Figures 17–18; FSE128:10–12,19–20",
-          "supports": "Integration/flaky-test checks and component ablations distinguish valid tests, useful added coverage and redundant generations.",
-          "boundary": "A changed test or additional successful generation alone does not identify the causal value of feedback; ablations remove interacting components."
-        },
-        {
-          "id": "comparison-and-cost",
-          "locator": "evaluation.tex, §§4.1–4.5; table-cm.tex, Table 1; Table 3; FSE128:13–18",
-          "supports": "The evaluation records model-matched comparisons, cumulative passes, tokens, model dollars and deployed wall time.",
-          "boundary": "Cumulative passes are not independent acquisitions; asynchronous versus serial wall time is not a matched-compute advantage, and reported historical model prices are not current quotes."
-        },
-        {
-          "id": "regression-testing-assumption",
-          "locator": "introduction.tex:3–6, §1; implementation.tex:245–253, §3.3 (impl:dialogue)",
-          "supports": "Tests are generated from an implementation treated as correct for regression testing; CoverUp retains generated tests that pass and increase coverage.",
-          "boundary": "This supplies no independent specification oracle and does not establish fault-detection performance from coverage alone; the intended regression tests can still detect faults introduced by later changes."
-        }
-      ],
-      "artifact_links": [
-        {
-          "path": "paper/zenith.tex",
-          "expected_text": "CoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.",
-          "excerpt_sha256": "18ed40c33752d4c0dc94a24b79942e446df224a486c587a41a867c25149476ab",
-          "source_locator_ids": [
-            "measured-test-refinement",
-            "regression-testing-assumption",
-            "comparison-and-cost"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "voyager",
-      "authors": [
-        "Guanzhi Wang",
-        "Yuqi Xie",
-        "Yunfan Jiang",
-        "Ajay Mandlekar",
-        "Chaowei Xiao",
-        "Yuke Zhu",
-        "Linxi Fan",
-        "Anima Anandkumar"
-      ],
-      "title": "Voyager: An Open-Ended Embodied Agent with Large Language Models",
-      "author_label": "G. Wang et al.",
-      "venue": "arXiv",
-      "year_label": "2023",
-      "url": "https://arxiv.org/abs/2305.16291v2",
-      "reviewed_source": {
-        "filename": "arXiv-2305.16291v2.tar.gz",
-        "sha256": "fc8eb405fdd52906a3423eb56111c956636da71342a761fbf66f92cbcfb3edc2",
-        "edition": "arXiv:2305.16291v2, 19 October 2023",
-        "annex_id": "arxiv-2305-16291",
-        "attribution_note": "Title and all eight authors verified in ms.tex:160–177; edition metadata checked against the exact arXiv record.",
-        "license": "Paper: arXiv nonexclusive distribution license. The separate official Voyager code is MIT-licensed.",
-        "distribution_policy": "local_only",
-        "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/license.html"
-      },
-      "verification_state": "source_verified",
-      "application": "Context: executable skill retention, composition and execution feedback precede Zenith’s retained tester code. The reported method does not learn a successor acquisition procedure; Zenith has not reproduced its new-world skill results.",
-      "source_locators": [
-        {
-          "id": "skill-retention",
-          "locator": "2-method.tex:20–35, §2.2, label sec:method_skill_library",
-          "supports": "Executable skills are retained and retrieved through embedded descriptions, task plans and environment feedback for composition into later skills.",
-          "boundary": "Skill-library growth is not evidence that the acquisition or retrieval algorithm itself improves."
-        },
-        {
-          "id": "fixed-feedback-loop",
-          "locator": "2-method.tex:37–47, §2.3; appendix/pseudocode/voyager.py:1–51",
-          "supports": "An authored loop allows at most four code-generation attempts per task, using environment observations, execution errors and a GPT-4 critic before retaining successful skills.",
-          "boundary": "Fixed orchestration permits adaptive task selection and skill-library growth. The model critic is fallible, not an independently correct executable reference; the foundation models and acquisition machinery remain fixed."
-        },
-        {
-          "id": "new-world-transfer",
-          "locator": "3-experiment.tex:44–49 and tables/downstream_table.tex, label table:downstream",
-          "supports": "Cleared inventory and a new Minecraft world test four new tasks in three trials each; retained skills improve success or prompting efficiency.",
-          "boundary": "Transfer stays within Minecraft mechanics/APIs. The no-library ablation also solves three tasks in all trials; the table does not show unrestricted cross-domain or recursive improvement."
-        }
-      ],
-      "artifact_links": [
-        {
-          "path": "paper/zenith.tex",
-          "expected_text": "Voyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.",
-          "excerpt_sha256": "b73ed13c12d2186d0dffcf5e453268095bfe7aa38e5dc329edcc12e07a794aa2",
-          "source_locator_ids": [
-            "skill-retention",
-            "fixed-feedback-loop"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "stop",
-      "authors": [
-        "Eric Zelikman",
-        "Eliana Lorch",
-        "Lester Mackey",
-        "Adam Tauman Kalai"
-      ],
-      "title": "Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation",
-      "author_label": "E. Zelikman et al.",
-      "venue": "COLM",
-      "year_label": "2024",
-      "url": "https://arxiv.org/abs/2310.02304v3",
-      "reviewed_source": {
-        "filename": "arXiv-2310.02304v3.tar.gz",
-        "sha256": "c8bbe77187dd9d9d187e43c1a13e085a8ed43f0274d03b456343fea2e197e6a7",
-        "edition": "arXiv:2310.02304v3, 16 August 2024; COLM 2024",
-        "annex_id": "arxiv-2310-02304",
-        "attribution_note": "Reviewed edition is the COLM 2024 paper, not the 2023 first preprint. The source author block abbreviates Adam Kalai; official metadata supplies Adam Tauman Kalai.",
-        "license": "Paper: arXiv nonexclusive distribution license. The separate official STOP code is MIT-licensed.",
-        "distribution_policy": "local_only",
-        "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/license.html"
-      },
-      "verification_state": "source_verified",
-      "application": "Proposed comparison: recursive improvement of an executable code-generation scaffold directly precedes Zenith’s O0/O1/O2 ambition. No such acquired improver is implemented or evaluated by the current Zenith campaigns.",
-      "source_locators": [
-        {
-          "id": "recursive-scaffold",
-          "locator": "main.tex:414–508, §§3–4, labels sec:problem and sec:stop; equation eq:it",
-          "supports": "Meta-utility measures an improver’s downstream task utility; the preceding improver is applied recursively to its own source.",
-          "boundary": "The LM, utilities, resource limits and experiment controller remain outside the edited scaffold. Better downstream optimization need not imply better self-optimization."
-        },
-        {
-          "id": "heldout-and-transfer",
-          "locator": "main.tex:596–675, §§5.1–5.2, label sec:fixed and Table tbl:transfer",
-          "supports": "Independent LPN instances test improved scaffolds; a selected improver from four rounds improves the seed on five additional algorithmic tasks without further optimization.",
-          "boundary": "The transfer table concerns a selected improver and bounded tasks, not uniform generalization over acquired improvers or open-ended acceleration."
-        },
-        {
-          "id": "fixed-host-and-cost",
-          "locator": "main.tex:809–864, §§6.2–7; main.tex:2026–2069 and 2818–2826, appendices ap:metautilitydesc and ap:nuances",
-          "supports": "Constraint circumvention and reward-shape errors motivate host-enforced budgets and output semantics; nested utility/model evaluations make acquisition costly.",
-          "boundary": "The authors qualify full recursive self-improvement because the LM is unchanged. A downstream deployment bill cannot stand in for all-stage acquisition and evaluation cost."
-        }
-      ],
-      "artifact_links": [
-        {
-          "path": "paper/zenith.tex",
-          "expected_text": "STOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.",
-          "excerpt_sha256": "f2aee633b06f04369b42e1a1bf21c6239985f6720cc88358a303346affc0a8bd",
-          "source_locator_ids": [
-            "recursive-scaffold",
-            "heldout-and-transfer"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "hyperagents",
-      "authors": [
-        "Jenny Zhang",
-        "Bingchen Zhao",
-        "Wannan Yang",
-        "Jakob Foerster",
-        "Jeff Clune",
-        "Minqi Jiang",
-        "Sam Devlin",
-        "Tatiana Shavrina"
-      ],
-      "title": "Hyperagents",
-      "author_label": "J. Zhang et al.",
-      "venue": "arXiv",
-      "year_label": "2026",
-      "url": "https://arxiv.org/abs/2603.19461v1",
-      "reviewed_source": {
-        "filename": "arXiv-2603.19461v1.tar.gz",
-        "sha256": "befb6be557d8e77c922470b68fd221aa27769cf3b36072305d8d25ffc53b90cb",
-        "edition": "arXiv:2603.19461v1, 19 March 2026",
-        "annex_id": "arxiv-2603-19461",
-        "attribution_note": "Title and eight-author list verified against paper.tex:86–95 and exact arXiv metadata; source title uses a typographic HyperAgents macro.",
-        "license": "Paper: CC BY 4.0. The separate official HyperAgents code repository is CC BY-NC-SA 4.0; no upstream code is copied here.",
-        "distribution_policy": "local_only",
-        "license_url": "https://creativecommons.org/licenses/by/4.0/"
-      },
-      "verification_state": "source_verified",
-      "application": "Concrete precedent and proposed evaluation: distinguish useful fixed-meta transfer from the unresolved advantage of transferred initialisation during continued self-modification. Zenith’s proposed comparison freezes acquired improvers on identical fresh solvers; the current system has no learned self-improver. The source’s architecture and evaluations are precedents, not local results.",
-      "source_locators": [
-        {
-          "id": "editable-meta-fixed-outer-loop",
-          "locator": "paper.tex:178–208, §§3–4; paper.tex:317–326, §7; algorithm algo:DGM-H",
-          "supports": "Task and meta-agent code share an editable program and archive; main experiments keep task distribution, parent selection and evaluation protocols fixed.",
-          "boundary": "Self-editing code is not unrestricted self-modification. Fixed foundation models do not include downstream robotics policies trained by RL."
-        },
-        {
-          "id": "frozen-meta-transfer",
-          "locator": "paper.tex:254–283, §5.2, especially 259, 268, 277 and 283; Figure 3 (fig:res-transfer); paper.tex:707–753, appendices app:genk-metric and app:transfer-selection",
-          "supports": "With both task and meta implementations transferred, §5.2 holds the acquired meta-agent fixed for 50 generation steps. Validation-selected maths graders yield reported median test score and improvement@50 of 0.630 (95% bootstrap CI 0.540–0.630); the source reports p < 0.05 against the initial-agent condition.",
-          "boundary": "The starting task agents differ, and the original agent fails the required output format. This is a system-level transfer result, not an isolated estimate of the meta-agent’s effect on identical solvers. Main §5.2 specifies validation selection before test reporting; the appendix’s generic maximum must not be read as test-set selection. Reported significance has not been independently reproduced."
-        },
-        {
-          "id": "compounding-boundary",
-          "locator": "paper.tex:293–305, §5.3, especially 303; Figure 4 (fig:res-transfer-cont)",
-          "supports": "After 200 iterations with continued self-modification, transferred initialisation yields median 0.640 (95% bootstrap CI 0.550–0.720), versus 0.610 (0.510–0.680) from the original agent. The source reports p > 0.05 for this comparison.",
-          "boundary": "The unresolved advantage in §5.3 does not negate the distinct positive fixed-meta transfer result in §5.2; non-significance is not evidence of equivalence. The 200-step comparison changes initialisation while allowing continued self-modification in both arms; it does not isolate continued meta-agent editing against a matched-budget fixed transferred meta-agent. Neither comparison establishes unbounded or accelerating improvement."
-        },
-        {
-          "id": "reported-statistical-protocol",
-          "locator": "paper.tex:225, §5 opening paragraph; paper.tex:283, §5.2; paper.tex:303, §5.3",
-          "supports": "The paper reports five runs per experiment, medians, 95% bootstrap confidence intervals from 1,000 resamples and Wilcoxon signed-rank tests.",
-          "boundary": "The supplied v1 does not specify test sidedness, exact versus approximate computation, pairing or the observational unit for its p-values. Significance statements are attributed to the source rather than independently reproduced; this specification gap alone does not show that the reported result is false."
-        }
-      ],
-      "artifact_links": [
-        {
-          "path": "paper/zenith.tex",
-          "expected_text": "Hyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
-          "excerpt_sha256": "d363d221821758ad49bbe43e7441b51810306746052dbb9a2f3ea33e5863816a",
-          "source_locator_ids": [
-            "editable-meta-fixed-outer-loop",
-            "frozen-meta-transfer",
-            "compounding-boundary"
-          ]
-        }
-      ]
+     "id": "correlation",
+     "locator": "§3.3 boxed finding; Fig. 8; Table 5",
+     "supports": "Mutant detection is positively correlated with real-fault detection across test suites, with coverage controlled.",
+     "boundary": "A correlation across suites, not a guarantee that a suite killing mutants catches a given real fault."
     }
-  ]
+   ],
+   "verification_state": "source_verified",
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Why model-written faults.} Hand-made faults risk measuring what the study\nauthor expected. Mechanical mutants are standard but are an imperfect proxy for\nreal faults~\\cite[\\S3]{mutants}. We instead use mistakes that code models actually\nmade: EvalPlus showed that many solutions accepted by HumanEval's original tests\nare wrong~\\cite[\\S1; \\S3]{evalplus}. Each such solution is a fault that a\ncompetent-looking test suite missed.",
+     "excerpt_sha256": "7ff0ad2bafe2ce098e3b589acb86b77173f6a612d87b4062a45a6b5cf9a387e6",
+     "source_locator_ids": [
+      "coupling",
+      "correlation"
+     ]
+    },
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "As a secondary population we apply single-site mutation operators (relational,\narithmetic, logical, constant and condition changes) to each reference and keep\nmutants with the same property. Mutant detection correlates with real-fault\ndetection in Java projects, but about a quarter of real faults are not coupled to\ncommon mutants~\\cite[\\S3]{mutants}; we therefore treat model-written faults as\nprimary.",
+     "excerpt_sha256": "e87f7b061fa9f467b1eb063e0c81e8a5e36087e784d2a89501c18c603cfdd8d6",
+     "source_locator_ids": [
+      "coupling",
+      "correlation"
+     ]
+    },
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\hypertarget{related}{}\n\\textbf{6. Related work.}\n\\textbf{Test adequacy and faults.} EvalPlus extends HumanEval with inputs from\nmodel-written seeds and type-aware mutation, and shows that pass rates fall when\nthe extra inputs are used~\\cite[\\S2.1; \\S3]{evalplus}; we reuse its inputs as the\nground truth that defines a fault. Just et al.\\ find mutant detection positively\ncorrelated with real-fault detection, while about a quarter of real faults are not\ncoupled to common mutants~\\cite[\\S3.1--3.3]{mutants}. CodeT uses model-generated\ntests to rank model-generated programs~\\cite[\\S2.1--2.2]{codet}; here tests are the\nproduct and are scored against faults the tester never sees.",
+     "excerpt_sha256": "5f499fca6e2e22d6769d53cf7cf369891c8aef2f04be70b1abc96ddeefa20aae",
+     "source_locator_ids": [
+      "coupling",
+      "correlation"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "evalplus",
+   "authors": [
+    "Jiawei Liu",
+    "Chunqiu Steven Xia",
+    "Yuyao Wang",
+    "Lingming Zhang"
+   ],
+   "title": "Is Your Code Generated by ChatGPT Really Correct? Rigorous Evaluation of Large Language Models for Code Generation",
+   "author_label": "J. Liu, C. S. Xia, Y. Wang and L. Zhang",
+   "venue": "NeurIPS 36",
+   "year_label": "2023",
+   "url": "https://arxiv.org/abs/2305.01210",
+   "reviewed_source": {
+    "filename": "source.tar.gz",
+    "sha256": "8303b58edbbdf90483e2c79c023cd4fec7f057ad87d2494ce95bf80747d8f47a",
+    "edition": "arXiv source bundle as served by arxiv.org e-print on 19 October 2026; version number not printed in the bundle; neurips_2023 final style",
+    "annex_id": "liu-2023-evalplus-is-your-code-really-correct",
+    "attribution_note": "Title, authors and abstract read from MAIN.tex; extracted text omits the title block.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the source.",
+    "distribution_policy": "local_only"
+   },
+   "application": "Supplies the HumanEval+ inputs and contracts that define a natural fault in this study, and the released model samples the faults come from.",
+   "source_locators": [
+    {
+     "id": "input-generation",
+     "locator": "§2.1 Automated Test Input Generation; Fig. 2; §2.3 Program Input Contracts",
+     "supports": "EvalPlus seeds inputs with ChatGPT and expands them by type-aware mutation; contracts filter invalid inputs.",
+     "boundary": "The generator sees the ground-truth solution; augmented inputs are not exhaustive, so some wrong programs remain undetected."
+    },
+    {
+     "id": "base-tests-miss",
+     "locator": "Abstract; §3 Evaluation of LLMs; pass@k table",
+     "supports": "The augmented inputs reveal wrong solutions that pass the original HumanEval tests; reported pass@k falls by up to 19.3–28.9% across 26 models.",
+     "boundary": "Reports aggregate pass-rate drops; it does not study a tester choosing a small number of inputs from the specification."
+    }
+   ],
+   "verification_state": "source_verified",
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Why model-written faults.} Hand-made faults risk measuring what the study\nauthor expected. Mechanical mutants are standard but are an imperfect proxy for\nreal faults~\\cite[\\S3]{mutants}. We instead use mistakes that code models actually\nmade: EvalPlus showed that many solutions accepted by HumanEval's original tests\nare wrong~\\cite[\\S1; \\S3]{evalplus}. Each such solution is a fault that a\ncompetent-looking test suite missed.",
+     "excerpt_sha256": "7ff0ad2bafe2ce098e3b589acb86b77173f6a612d87b4062a45a6b5cf9a387e6",
+     "source_locator_ids": [
+      "input-generation",
+      "base-tests-miss"
+     ]
+    },
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\hypertarget{setting}{}\n\\textbf{2. Programs, faults and the testing task.}\n\\textbf{Programs.} We use the 164 HumanEval problems as extended by\nEvalPlus~\\cite[\\S2]{evalplus}. Each problem supplies a public specification\n(signature, docstring and examples), a reference solution, the original\nHumanEval test inputs and about a thousand augmented inputs that EvalPlus\ngenerated by type-aware mutation of seed inputs. EvalPlus also supplies input\ncontracts: assertions that a legal input must satisfy.",
+     "excerpt_sha256": "7764ebb55f8d6a420b6272dc3c500ddbe513cb6550d781c49a6e6076af054cb8",
+     "source_locator_ids": [
+      "input-generation",
+      "base-tests-miss"
+     ]
+    },
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\hypertarget{related}{}\n\\textbf{6. Related work.}\n\\textbf{Test adequacy and faults.} EvalPlus extends HumanEval with inputs from\nmodel-written seeds and type-aware mutation, and shows that pass rates fall when\nthe extra inputs are used~\\cite[\\S2.1; \\S3]{evalplus}; we reuse its inputs as the\nground truth that defines a fault. Just et al.\\ find mutant detection positively\ncorrelated with real-fault detection, while about a quarter of real faults are not\ncoupled to common mutants~\\cite[\\S3.1--3.3]{mutants}. CodeT uses model-generated\ntests to rank model-generated programs~\\cite[\\S2.1--2.2]{codet}; here tests are the\nproduct and are scored against faults the tester never sees.",
+     "excerpt_sha256": "5f499fca6e2e22d6769d53cf7cf369891c8aef2f04be70b1abc96ddeefa20aae",
+     "source_locator_ids": [
+      "input-generation",
+      "base-tests-miss"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "weighted",
+   "authors": [
+    "James Worrell"
+   ],
+   "title": "Exactly Learning Weighted Automata over a Field",
+   "author_label": "J. Worrell",
+   "venue": "Oxford teaching notes",
+   "year_label": "undated",
+   "url": "https://www.cs.ox.ac.uk/people/james.worrell/MA-learning.pdf",
+   "reviewed_source": {
+    "filename": "MA-learning.pdf",
+    "sha256": "b50288b01850ecf938590603612ea8482acdb177e2eb5b3b0599033e60e24d48",
+    "edition": "Supplied three-page Oxford teaching note; no printed date or byline",
+    "annex_id": "weighted-automata-exact-learning-notes",
+    "attribution_note": "Attribution to James Worrell comes from his Oxford teaching index, https://www.cs.ox.ac.uk/people/james.worrell/lectures.html. PDF build metadata dated 23 February 2017 is not a verified publication year. The note credits the algorithm to Beimel, Bergadano, Bshouty, Kushilevitz and Varricchio (JACM 2000).",
+    "license": "No explicit redistribution license established; only metadata and source-located summaries are published.",
+    "distribution_policy": "local_only"
+   },
+   "verification_state": "source_verified",
+   "application": "Implemented antecedent: Zenith’s continuation learner constructs a weighted-automaton hypothesis from exact observation tables and retains paired history/test rank witnesses. Finite challenges can produce valid counterexamples but replace the note’s global equivalence oracle, so the repair restores an established invariant without certifying general source equivalence.",
+   "source_locators": [
+    {
+     "id": "observation-table",
+     "locator": "pp. 1–2, Preliminaries, The Algorithm, and the unnumbered hypothesis construction immediately before Proposition 1",
+     "supports": "For an exact field-valued series f, equal-sized row and column sets containing the empty word and a full-rank table H determine the hypothesis’s initial vector, final vector and transition matrices through H M(σ) = Hσ.",
+     "boundary": "The rank-refinement result concerns this table-induced hypothesis. Field arithmetic is exact. Finite-dimensional representability bounds repeated rank growth; it is not established for arbitrary native software by finite observations."
+    },
+    {
+     "id": "paired-rank-witness",
+     "locator": "Proposition 1, pp. 2–3, Eqs. (1)–(2)",
+     "supports": "For a counterexample to the table-induced hypothesis, the proof finds a prefix wσ at which the predicted test vector first becomes incorrect and a component i with nonzero residual. Adding row w and column σyi increases the table rank from n to n+1.",
+     "boundary": "The paired witnesses follow from the hypothesis construction; an arbitrary failed candidate and a full-rank table are insufficient. A valid finite-challenge counterexample suffices for this local refinement. Zenith’s repair restores an established invariant, not a new learning theorem."
+    },
+    {
+     "id": "oracle-assumptions",
+     "locator": "p. 1, Preliminaries and The Algorithm; p. 2, equivalence-query paragraph before Proposition 1; pp. 2–3, rank-refinement proof",
+     "supports": "Exact membership queries supply values of f. An equivalence query either certifies global equality or returns a counterexample. Rank growth is bounded when the target has a finite weighted-automaton representation.",
+     "boundary": "Finite challenges cannot certify global equality; exact arithmetic alone establishes neither finite representability nor correctness on unqueried inputs. The source does not establish cross-task transfer savings or lifetime economy for native software."
+    },
+    {
+     "id": "algorithm-attribution",
+     "locator": "p. 1, first sentence of The Algorithm; p. 3, reference [1]",
+     "supports": "The note explicitly credits its algorithm to Beimel, Bergadano, Bshouty, Kushilevitz and Varricchio, Learning functions represented as multiplicity automata (JACM, 2000).",
+     "boundary": "This verifies the attribution made by the supplied note, not an independent review of the full JACM article. Worrell is credited for the exposition; the note is not evidence that he originated the algorithm."
+    }
+   ],
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "With exact field-valued observations and a square full-rank table containing\nthe empty history and test, the weighted-automaton construction turns a\ncounterexample to its hypothesis into a paired row/column extension increasing rank~\\cite[Proposition 1, pp.\\ 2--3]{weighted}.\nOur repair restores that established requirement. Finite challenges replace\nthe global equivalence oracle, so a completed fit establishes only agreement\non those challenges. The five-coordinate queue model fits in ten acquisition\nexecutions and agrees on lengths 0--32; one nonlinear integer counter suffices.",
+     "excerpt_sha256": "1835e2ed8600512345308842e17db69449f8ec4d1727e57b233f3c870bdb5acf",
+     "source_locator_ids": [
+      "observation-table",
+      "paired-rank-witness",
+      "oracle-assumptions"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "psr",
+   "authors": [
+    "Michael L. Littman",
+    "Richard S. Sutton",
+    "Satinder Singh"
+   ],
+   "title": "Predictive Representations of State",
+   "author_label": "M. L. Littman, R. S. Sutton and S. Singh",
+   "venue": "NIPS, vol. 14",
+   "year_label": "2001",
+   "url": "https://proceedings.neurips.cc/paper/2001/file/1e4d36177d71bbb3558e43af9577d70e-Paper.pdf",
+   "reviewed_source": {
+    "filename": "NIPS-2001-predictive-representations-of-state-Paper.pdf",
+    "sha256": "0d9199d40bab3dc468fb95e52d5e4bf9a78e07c6a63250397d336bda215d17b8",
+    "edition": "NIPS 2001 proceedings, volume 14, pp. 1555–1561; supplied 14-physical-page PDF",
+    "annex_id": "littman-sutton-singh-2001-predictive-representations-of-state",
+    "attribution_note": "All three authors are verified on the PDF title page; the proceedings HTML/BibTeX omits Singh. Physical PDF pages 1, 3, 5, 7, 9, 11, 13 are content pages 1–7 and proceedings pp. 1555–1561; every even physical page is blank.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the supplied PDF.",
+    "distribution_policy": "local_only"
+   },
+   "verification_state": "source_verified",
+   "application": "Conceptual context: future-test probabilities motivate predictive state. Zenith’s implemented deterministic rational-linear learner is not the stochastic PSR construction or evidence of its proposed learning advantages.",
+   "source_locators": [
+    {
+     "id": "future-test-state",
+     "locator": "§1, Eqs. (1)–(3); physical PDF pp. 5, 7 / content pp. 3–4 / proceedings pp. 1557–1558",
+     "supports": "A predictive state determines probabilities of all future action-observation tests; conditioning uses a normalized ratio of linear functions.",
+     "boundary": "A linear PSR does not have an unnormalized linear state update. Its stochastic sufficiency requirement does not certify Zenith’s finite deterministic checks."
+    },
+    {
+     "id": "known-model-construction",
+     "locator": "Theorem 1 at the end of §1 and its §2 proof, including Lemma 1; physical PDF pp. 7, 9, 11 / content pp. 4–6 / proceedings pp. 1558–1560",
+     "supports": "A finite POMDP has a linear PSR using no more tests than states in its minimal POMDP; the construction uses the supplied POMDP model.",
+     "boundary": "This is a known-model representation result, not a black-box acquisition algorithm or a theorem that arbitrary software has finite rank."
+    },
+    {
+     "id": "learning-prospects",
+     "locator": "§3; physical PDF pp. 11, 13 / content pp. 6–7 / proceedings pp. 1560–1561",
+     "supports": "Learnability and generalization are proposed advantages for future investigation.",
+     "boundary": "The paper does not establish empirical learning, cross-task question transfer or recursive self-improvement."
+    }
+   ],
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "Predictive state representations instead describe stochastic state through\nfuture-test probabilities. Their linear predictions use normalised conditional\nupdates; the cited construction starts from a known finite partially observable\nMarkov decision process~\\cite[\\S1, Eq.\\ (3); Theorem 1 and \\S2]{psr}.\nZenith fits deterministic outputs with rational-linear transitions and readouts.",
+     "excerpt_sha256": "d808fcc8d731ec84a10dd583ea9d6c379b09cc04d7567544a22aec5b76a842b1",
+     "source_locator_ids": [
+      "future-test-state",
+      "known-model-construction"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "codet",
+   "authors": [
+    "Bei Chen",
+    "Fengji Zhang",
+    "Anh Nguyen",
+    "Daoguang Zan",
+    "Zeqi Lin",
+    "Jian-Guang Lou",
+    "Weizhu Chen"
+   ],
+   "title": "CodeT: Code Generation with Generated Tests",
+   "author_label": "B. Chen et al.",
+   "venue": "ICLR",
+   "year_label": "2023",
+   "url": "https://arxiv.org/abs/2207.10397",
+   "reviewed_source": {
+    "filename": "source.tar.gz",
+    "sha256": "f32a37c1a0d39b6ade07c5d9339ad762c73824563a7692a2e8a778b21966f235",
+    "edition": "arXiv source bundle as served by arxiv.org e-print on 19 October 2026; version number not printed in the bundle; folder labelled arXiv V2 20221123; iclr2023_conference style",
+    "annex_id": "chen-2022-codet-generated-tests",
+    "attribution_note": "Seven authors read from the LaTeX source.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the source.",
+    "distribution_policy": "local_only"
+   },
+   "application": "Contrast: model-generated tests used to rank model-generated programs, whereas here tests are the product and are scored on hidden faults.",
+   "source_locators": [
+    {
+     "id": "test-generation",
+     "locator": "§2.1 Test Case Generation",
+     "supports": "The same model writes tests from the function context with the example input–output cases removed.",
+     "boundary": "Tests are used to select code, not evaluated for fault exposure against hidden faulty programs."
+    },
+    {
+     "id": "dual-agreement",
+     "locator": "§2.2 Dual Execution Agreement; main results table",
+     "supports": "Candidates are grouped by agreement on generated tests; on HumanEval with code-davinci-002 pass@1 rises from 47.0% to 65.8%.",
+     "boundary": "No memory across problems; no fixed test budget is studied as the object of improvement."
+    }
+   ],
+   "verification_state": "source_verified",
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\hypertarget{related}{}\n\\textbf{6. Related work.}\n\\textbf{Test adequacy and faults.} EvalPlus extends HumanEval with inputs from\nmodel-written seeds and type-aware mutation, and shows that pass rates fall when\nthe extra inputs are used~\\cite[\\S2.1; \\S3]{evalplus}; we reuse its inputs as the\nground truth that defines a fault. Just et al.\\ find mutant detection positively\ncorrelated with real-fault detection, while about a quarter of real faults are not\ncoupled to common mutants~\\cite[\\S3.1--3.3]{mutants}. CodeT uses model-generated\ntests to rank model-generated programs~\\cite[\\S2.1--2.2]{codet}; here tests are the\nproduct and are scored against faults the tester never sees.",
+     "excerpt_sha256": "5f499fca6e2e22d6769d53cf7cf369891c8aef2f04be70b1abc96ddeefa20aae",
+     "source_locator_ids": [
+      "test-generation",
+      "dual-agreement"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mutap",
+   "authors": [
+    "Arghavan Moradi Dakhel",
+    "Amin Nikanjam",
+    "Vahid Majdinasab",
+    "Foutse Khomh",
+    "Michel C. Desmarais"
+   ],
+   "title": "Effective Test Generation Using Pre-trained Large Language Models and Mutation Testing",
+   "author_label": "A. M. Dakhel et al.",
+   "venue": "arXiv 2308.16557",
+   "year_label": "2023",
+   "url": "https://arxiv.org/abs/2308.16557",
+   "reviewed_source": {
+    "filename": "source.tar.gz",
+    "sha256": "d3787d3d2cdf3673e4c7e096171668417e8629f60b6f21bd1ed97120fa9f24b7",
+    "edition": "arXiv source bundle as served by arxiv.org e-print on 19 October 2026; version number not printed in the bundle; Elsevier cas-dc class",
+    "annex_id": "dakhel-2024-mutap-mutation-test-generation",
+    "attribution_note": "Authors read from the LaTeX source; journal venue not printed and not asserted.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the source.",
+    "distribution_policy": "local_only"
+   },
+   "application": "Within-program precedent: surviving mutants of the same program are fed back into the test-generation prompt.",
+   "source_locators": [
+    {
+     "id": "surviving-mutant-prompt",
+     "locator": "§1, fourth paragraph; §3.4 prompt augmentation",
+     "supports": "MuTAP augments the initial prompt with the initial tests and a surviving mutant of the same program under test.",
+     "boundary": "The prompt includes the program's source; experience is not carried to other programs, and the mutants that guide the prompt are also those scored."
+    }
+   ],
+   "verification_state": "source_verified",
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Mutation-guided generation.} MuTAP returns surviving mutants of the same\nprogram to the prompt so that the next round of tests kills them~\\cite[\\S3.4]{mutap}.\nMeta's ACH asks a model to write faults of a stated concern and then tests that\ncatch them, and deploys the tests~\\cite[\\S1; \\S2]{ach}. ACH is the closest precedent\nfor our imagined-fault condition; both MuTAP and ACH work within one program,\nwhereas we ask whether experience transfers to unseen programs.",
+     "excerpt_sha256": "1fadfbe3f3821072e10ddb026ba43e24aaaad5fb692a4e4244d009755a117d60",
+     "source_locator_ids": [
+      "surviving-mutant-prompt"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ach",
+   "authors": [
+    "Christopher Foster",
+    "Abhishek Gulati",
+    "Mark Harman",
+    "Inna Harper",
+    "Ke Mao",
+    "Jillian Ritchey",
+    "Hervé Robert",
+    "Shubho Sengupta"
+   ],
+   "title": "Mutation-Guided LLM-based Test Generation at Meta",
+   "author_label": "C. Foster et al.",
+   "venue": "FSE Companion",
+   "year_label": "2025",
+   "url": "https://arxiv.org/abs/2501.12862",
+   "reviewed_source": {
+    "filename": "source.tar.gz",
+    "sha256": "4576a11de77717663ad92ba71ce8bf5ebb626ec54724962b9d1a637a416fc828",
+    "edition": "arXiv source bundle as served by arxiv.org e-print on 19 October 2026; version number not printed in the bundle; acmart FSE Companion '25 (Trondheim, 23–27 June 2025)",
+    "annex_id": "foster-2025-meta-ach-mutation-guided-test-generation",
+    "attribution_note": "The source's printed DOI and year look like template leftovers and are not used.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the source.",
+    "distribution_policy": "local_only"
+   },
+   "application": "Closest precedent for the imagined-fault condition: a model writes faults of concern, then tests that catch them.",
+   "source_locators": [
+    {
+     "id": "fault-of-concern-mutants",
+     "locator": "§1, third paragraph; §2",
+     "supports": "ACH generates few, targeted LLM mutants that simulate faults of a stated concern and that existing tests do not catch.",
+     "boundary": "Applied per class in Kotlin at Meta; no memory across classes and no ablation of test quality with versus without the imagined faults."
+    },
+    {
+     "id": "test-for-mutant",
+     "locator": "§2, prompt table (make a test to catch the fault)",
+     "supports": "A second agent sees the original class, the mutant and existing tests, and writes tests that fail on the mutant and pass on the original.",
+     "boundary": "The authors note the approach hardens code against simulated faults; it does not detect existing faults."
+    }
+   ],
+   "verification_state": "source_verified",
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Mutation-guided generation.} MuTAP returns surviving mutants of the same\nprogram to the prompt so that the next round of tests kills them~\\cite[\\S3.4]{mutap}.\nMeta's ACH asks a model to write faults of a stated concern and then tests that\ncatch them, and deploys the tests~\\cite[\\S1; \\S2]{ach}. ACH is the closest precedent\nfor our imagined-fault condition; both MuTAP and ACH work within one program,\nwhereas we ask whether experience transfers to unseen programs.",
+     "excerpt_sha256": "1fadfbe3f3821072e10ddb026ba43e24aaaad5fb692a4e4244d009755a117d60",
+     "source_locator_ids": [
+      "fault-of-concern-mutants",
+      "test-for-mutant"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "reflexion",
+   "authors": [
+    "Noah Shinn",
+    "Federico Cassano",
+    "Edward Berman",
+    "Ashwin Gopinath",
+    "Karthik Narasimhan",
+    "Shunyu Yao"
+   ],
+   "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+   "author_label": "N. Shinn et al.",
+   "venue": "NeurIPS 36",
+   "year_label": "2023",
+   "url": "https://arxiv.org/abs/2303.11366",
+   "reviewed_source": {
+    "filename": "source.tar.gz",
+    "sha256": "d70b771f527d912ce48da430ccd697fb09aaeabbfbfda404441943d398550304",
+    "edition": "arXiv source bundle as served by arxiv.org e-print on 19 October 2026; version number not printed in the bundle; neurips_2023 style with the preprint option",
+    "annex_id": "shinn-2023-reflexion",
+    "attribution_note": "Figures quoted only where they match this revision.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the source.",
+    "distribution_policy": "local_only"
+   },
+   "application": "Within-task precedent: written reflections reused on later trials of the same task.",
+   "source_locators": [
+    {
+     "id": "verbal-reflection",
+     "locator": "§1, second paragraph",
+     "supports": "Reflexion converts binary or scalar feedback into a textual summary that is added to the next episode's context.",
+     "boundary": "No transfer of reflections to unseen tasks is reported."
+    },
+    {
+     "id": "same-task-trials",
+     "locator": "§4.3 Programming; §4.1–4.2",
+     "supports": "Memory holds a few reflections (one for programming), and learning is measured over repeated trials of the same task; the programming evaluator is the agent's own tests.",
+     "boundary": "Repeated trials on one task differ from transfer to new programs."
+    }
+   ],
+   "verification_state": "source_verified",
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Learning from experience without changing weights.} Reflexion turns\nfeedback into written reflections reused on later trials of the same\ntask~\\cite[\\S1; \\S4.3]{reflexion}. ExpeL gathers insights and successful\ntrajectories on training tasks and evaluates on tasks not used for gathering; it\nfinds distilled insights and retrieved examples complementary, with their\nrelative value depending on the task~\\cite[\\S5.1--5.2]{expel}. Dynamic Cheatsheet\nkeeps a curated memory at test time; appending the whole raw history did worse\nthan curation, and generic structured instructions alone already helped~\\cite[\\S2.3; \\S4.3]{cheatsheet}.\nACE evolves such contexts as itemised playbooks and reports that rewriting a\nwhole context can collapse it~\\cite[\\S2.2; \\S4.3]{ace}. None of these evaluates\nsoftware testing. Our record and playbook conditions apply the idea to the choice\nof test inputs, and the generic-advice condition separates experience from\ninstruction.",
+     "excerpt_sha256": "78decec08f4af6a8c30de40d53242df0884813e94bd007fd75f3c841c5d45c5c",
+     "source_locator_ids": [
+      "verbal-reflection",
+      "same-task-trials"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "expel",
+   "authors": [
+    "Andrew Zhao",
+    "Daniel Huang",
+    "Quentin Xu",
+    "Matthieu Lin",
+    "Yong-Jin Liu",
+    "Gao Huang"
+   ],
+   "title": "ExpeL: LLM Agents Are Experiential Learners",
+   "author_label": "A. Zhao et al.",
+   "venue": "AAAI",
+   "year_label": "2024",
+   "url": "https://arxiv.org/abs/2308.10144",
+   "reviewed_source": {
+    "filename": "source.tar.gz",
+    "sha256": "05939c3f8692979daf3d359223612295b008632c9b3e2e4dcba6e28ecd5e4d7a",
+    "edition": "arXiv source bundle as served by arxiv.org e-print on 19 October 2026; version number not printed in the bundle; AAAI arXiv style",
+    "annex_id": "zhao-2024-expel-experiential-learners",
+    "attribution_note": "Proceedings volume and pages not printed in the source.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the source.",
+    "distribution_policy": "local_only"
+   },
+   "application": "Closest precedent for transfer: insights and examples gathered on training tasks are applied to unseen tasks; motivates comparing raw records with distilled playbooks.",
+   "source_locators": [
+    {
+     "id": "held-out-tasks",
+     "locator": "§4.3 Task Inference; §5.1 Experimental Setup",
+     "supports": "Evaluation uses tasks not used for gathering experience (fold-based validation).",
+     "boundary": "Insights are written by gpt-4-0613 and used by gpt-3.5-turbo-0613; domains are HotpotQA, ALFWorld, WebShop and FEVER, not software testing."
+    },
+    {
+     "id": "insights-and-retrieval",
+     "locator": "§5.2 Main Results",
+     "supports": "Insights only and retrieved examples only each help, with relative value depending on the task; combining them is best.",
+     "boundary": "No uncertainty intervals are reported in the extracted text."
+    }
+   ],
+   "verification_state": "source_verified",
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Learning from experience without changing weights.} Reflexion turns\nfeedback into written reflections reused on later trials of the same\ntask~\\cite[\\S1; \\S4.3]{reflexion}. ExpeL gathers insights and successful\ntrajectories on training tasks and evaluates on tasks not used for gathering; it\nfinds distilled insights and retrieved examples complementary, with their\nrelative value depending on the task~\\cite[\\S5.1--5.2]{expel}. Dynamic Cheatsheet\nkeeps a curated memory at test time; appending the whole raw history did worse\nthan curation, and generic structured instructions alone already helped~\\cite[\\S2.3; \\S4.3]{cheatsheet}.\nACE evolves such contexts as itemised playbooks and reports that rewriting a\nwhole context can collapse it~\\cite[\\S2.2; \\S4.3]{ace}. None of these evaluates\nsoftware testing. Our record and playbook conditions apply the idea to the choice\nof test inputs, and the generic-advice condition separates experience from\ninstruction.",
+     "excerpt_sha256": "78decec08f4af6a8c30de40d53242df0884813e94bd007fd75f3c841c5d45c5c",
+     "source_locator_ids": [
+      "held-out-tasks",
+      "insights-and-retrieval"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cheatsheet",
+   "authors": [
+    "Mirac Suzgun",
+    "Mert Yuksekgonul",
+    "Federico Bianchi",
+    "Dan Jurafsky",
+    "James Zou"
+   ],
+   "title": "Dynamic Cheatsheet: Test-Time Learning with Adaptive Memory",
+   "author_label": "M. Suzgun et al.",
+   "venue": "arXiv 2504.07952",
+   "year_label": "2025",
+   "url": "https://arxiv.org/abs/2504.07952",
+   "reviewed_source": {
+    "filename": "source.tar.gz",
+    "sha256": "40b9fa795a4d5b2365c16f31dcc3cbe4dca50b093ccc1e69dc7a08d3e0133ddc",
+    "edition": "arXiv source bundle as served by arxiv.org e-print on 19 October 2026; version number not printed in the bundle; ICML-style template without an acceptance line",
+    "annex_id": "suzgun-2025-dynamic-cheatsheet",
+    "attribution_note": "Cited as a preprint.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the source.",
+    "distribution_policy": "local_only"
+   },
+   "application": "Evidence that curated memory can beat raw history and that generic structured instructions alone help; motivates the advice control.",
+   "source_locators": [
+    {
+     "id": "raw-history-hurts",
+     "locator": "§4.3 memory curation paragraph; Table 1",
+     "supports": "Appending the whole raw history did worse than curated memory on AIME 2024 (Claude 3.5 Sonnet 26.7% versus 50.0%).",
+     "boundary": "Thirty-question sets; no intervals; not a software-testing task."
+    },
+    {
+     "id": "generic-instructions-help",
+     "locator": "§2.3 Baselines, DC-empty; Table 1",
+     "supports": "The detailed generator prompt with an empty memory already improves on the minimal baseline.",
+     "boundary": "Effect sizes vary by model and task."
+    }
+   ],
+   "verification_state": "source_verified",
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Learning from experience without changing weights.} Reflexion turns\nfeedback into written reflections reused on later trials of the same\ntask~\\cite[\\S1; \\S4.3]{reflexion}. ExpeL gathers insights and successful\ntrajectories on training tasks and evaluates on tasks not used for gathering; it\nfinds distilled insights and retrieved examples complementary, with their\nrelative value depending on the task~\\cite[\\S5.1--5.2]{expel}. Dynamic Cheatsheet\nkeeps a curated memory at test time; appending the whole raw history did worse\nthan curation, and generic structured instructions alone already helped~\\cite[\\S2.3; \\S4.3]{cheatsheet}.\nACE evolves such contexts as itemised playbooks and reports that rewriting a\nwhole context can collapse it~\\cite[\\S2.2; \\S4.3]{ace}. None of these evaluates\nsoftware testing. Our record and playbook conditions apply the idea to the choice\nof test inputs, and the generic-advice condition separates experience from\ninstruction.",
+     "excerpt_sha256": "78decec08f4af6a8c30de40d53242df0884813e94bd007fd75f3c841c5d45c5c",
+     "source_locator_ids": [
+      "raw-history-hurts",
+      "generic-instructions-help"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ace",
+   "authors": [
+    "Qizheng Zhang",
+    "Changran Hu",
+    "Shubhangi Upasani",
+    "Boyuan Ma",
+    "Fenglu Hong",
+    "Vamsidhar Kamanuru",
+    "Jay Rainton",
+    "Chen Wu",
+    "Mengmeng Ji",
+    "Hanchen Li",
+    "Urmish Thakker",
+    "James Zou",
+    "Kunle Olukotun"
+   ],
+   "title": "Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models",
+   "author_label": "Q. Zhang et al.",
+   "venue": "arXiv 2510.04618",
+   "year_label": "2025",
+   "url": "https://arxiv.org/abs/2510.04618",
+   "reviewed_source": {
+    "filename": "source.tar.gz",
+    "sha256": "bde13621a2ecba5b97d8c916ff6aef4af1aa40983958a007638349ca2edacd48",
+    "edition": "arXiv source bundle as served by arxiv.org e-print on 19 October 2026; version number not printed in the bundle; iclr2026 template, a later revision than the first posting",
+    "annex_id": "zhang-2025-ace-agentic-context-engineering",
+    "attribution_note": "Authors read from the LaTeX source; differences are accuracy points written with %.",
+    "license": "No explicit redistribution license established; public metadata and summaries do not redistribute the source.",
+    "distribution_policy": "local_only"
+   },
+   "application": "Playbook-style context evolution with fixed weights; its context-collapse finding motivates keeping the revised playbook bounded and tested.",
+   "source_locators": [
+    {
+     "id": "context-collapse",
+     "locator": "§2.2 Limitations of Existing Context Adaptation Methods; Fig. 2",
+     "supports": "Rewriting a whole accumulated context can abruptly lose its detail (context collapse), observed in an AppWorld case study.",
+     "boundary": "One case study; incremental updates are ACE's remedy, not something this study tests."
+    },
+    {
+     "id": "playbook-results",
+     "locator": "§4.3; Table 1 (AppWorld)",
+     "supports": "With DeepSeek-V3.1 in all roles, an evolving itemised playbook raises AppWorld results over in-context and prompt-optimisation baselines.",
+     "boundary": "The paper's appendix reports an internally inconsistent ablation figure; no uncertainty intervals."
+    }
+   ],
+   "verification_state": "source_verified",
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Learning from experience without changing weights.} Reflexion turns\nfeedback into written reflections reused on later trials of the same\ntask~\\cite[\\S1; \\S4.3]{reflexion}. ExpeL gathers insights and successful\ntrajectories on training tasks and evaluates on tasks not used for gathering; it\nfinds distilled insights and retrieved examples complementary, with their\nrelative value depending on the task~\\cite[\\S5.1--5.2]{expel}. Dynamic Cheatsheet\nkeeps a curated memory at test time; appending the whole raw history did worse\nthan curation, and generic structured instructions alone already helped~\\cite[\\S2.3; \\S4.3]{cheatsheet}.\nACE evolves such contexts as itemised playbooks and reports that rewriting a\nwhole context can collapse it~\\cite[\\S2.2; \\S4.3]{ace}. None of these evaluates\nsoftware testing. Our record and playbook conditions apply the idea to the choice\nof test inputs, and the generic-advice condition separates experience from\ninstruction.",
+     "excerpt_sha256": "78decec08f4af6a8c30de40d53242df0884813e94bd007fd75f3c841c5d45c5c",
+     "source_locator_ids": [
+      "context-collapse",
+      "playbook-results"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ilf",
+   "authors": [
+    "Jingxuan He",
+    "Mislav Balunović",
+    "Nodar Ambroladze",
+    "Petar Tsankov",
+    "Martin Vechev"
+   ],
+   "title": "Learning to Fuzz from Symbolic Execution with Application to Smart Contracts",
+   "author_label": "J. He et al.",
+   "venue": "CCS",
+   "year_label": "2019",
+   "url": "https://doi.org/10.1145/3319535.3363230",
+   "reviewed_source": {
+    "filename": "ccs19-ilf.pdf",
+    "sha256": "e43953b8837d3d210f82c6554051cd99312f82c5113db9d3d966aa9ed9cb3917",
+    "edition": "CCS 2019, pp. 531–548; supplied 18-page author PDF",
+    "annex_id": "he-2019-learning-to-fuzz-from-symbolic-execution",
+    "attribution_note": "Author list and title verified on the supplied first page. One-based PDF p. 1 corresponds to proceedings p. 531. Publication metadata cross-checked against the authors’ SRI Lab publication page.",
+    "license": "Author PDF carries ACM personal/classroom copying and attribution conditions; no blanket paper redistribution is asserted. The separate ILF code repository uses Apache-2.0.",
+    "distribution_policy": "local_only"
+   },
+   "verification_state": "source_verified",
+   "application": "Context and evaluation precedent: expensive symbolic demonstrations train a reusable fuzzing policy. Zenith does not implement ILF’s neural policy training or Ethereum representation; any future testing comparison must include acquisition and training as well as deployment.",
+   "source_locators": [
+    {
+     "id": "trained-testing-policy",
+     "locator": "PDF p. 7, §4.2, paragraph “Learning from Expert”; pp. 7–9, §§5.1–5.2, Table 2 and Algorithm 1",
+     "supports": "A symbolic expert supplies coverage-improving transaction sequences; imitation learning updates neural policy weights, and the deployed policy consumes contract/history features.",
+     "boundary": "Runtime history adaptation is distinct from retraining. Ethereum-specific features are authored; the paper does not discover arbitrary representation boundaries or improve its own training algorithm."
+    },
+    {
+     "id": "withheld-contracts",
+     "locator": "PDF pp. 9–10, §6.2, Tables 4–5",
+     "supports": "The evaluation deduplicates the collected contracts and uses random five-fold contract-level cross-validation on 18,496 contracts.",
+     "boundary": "Exact deduplication and contract withholding do not establish a project/lineage, functionality-family, chronological or unrelated-domain split."
+    },
+    {
+     "id": "acquisition-and-deployment",
+     "locator": "PDF pp. 9–10, §§6.1–6.3, Figures 7–9",
+     "supports": "The source separates symbolic expert execution, policy training and fast deployment; the useful result is amortization on further contracts.",
+     "boundary": "Deployment throughput is not total lifetime cost. Coverage and detector results are empirical, domain-specific and do not establish correctness or vulnerability completeness."
+    }
+   ],
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
+     "source_locator_ids": [
+      "trained-testing-policy",
+      "withheld-contracts"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "coverup",
+   "authors": [
+    "Juan Altmayer Pizzorno",
+    "Emery D. Berger"
+   ],
+   "title": "CoverUp: Effective High Coverage Test Generation for Python",
+   "author_label": "J. Altmayer Pizzorno and E. D. Berger",
+   "venue": "PACMSE 2 (FSE)",
+   "year_label": "2025",
+   "url": "https://arxiv.org/abs/2403.16218v4",
+   "reviewed_source": {
+    "filename": "arXiv-2403.16218v4.tar.gz",
+    "sha256": "59bbb9c1a554be68d8d724d72cd015fc2616325527643cfa15137eb5d242ad4f",
+    "edition": "arXiv:2403.16218v4, 9 May 2025; PACMSE 2 (FSE), article FSE128, 23 pages",
+    "annex_id": "arxiv-2403-16218",
+    "attribution_note": "Supplied main.tex sets arxivfalse and selects the published Effective High Coverage title; its conditional Coverage-Guided title is not the selected title. The actual v4 PDF has 23 pages despite the stale 21-page arXiv comment. Altmayer Pizzorno is the first author’s surname.",
+    "license": "Supplied source declares ACM publication rights; no blanket paper redistribution is asserted. The separate CoverUp code repository uses Apache-2.0.",
+    "distribution_policy": "local_only"
+   },
+   "verification_state": "source_verified",
+   "application": "Context and proposed control: an authored coverage/error-feedback driver refines generated tests using a fixed LLM. A future Zenith preparation protocol may give both retained-code arms bounded development-only execution and refinement; no CoverUp runtime or target feedback is imported.",
+   "source_locators": [
+    {
+     "id": "measured-test-refinement",
+     "locator": "implementation.tex, §§3–3.3, labels impl:prompting and impl:dialogue; FSE128:4–9",
+     "supports": "Source and coverage context guide test generation; execution errors and missing coverage prompt bounded follow-up dialogue, retaining passing tests that add coverage.",
+     "boundary": "The authored driver remains fixed; this is not a learned policy transferred from earlier projects. Coverage against source assumed correct does not certify semantic correctness."
+    },
+    {
+     "id": "integration-and-yield",
+     "locator": "implementation.tex, §§3.5–3.6, labels impl:integration-check and impl:handling-flakies; evaluation.tex, §4.6, Table 4 and Figures 17–18; FSE128:10–12,19–20",
+     "supports": "Integration/flaky-test checks and component ablations distinguish valid tests, useful added coverage and redundant generations.",
+     "boundary": "A changed test or additional successful generation alone does not identify the causal value of feedback; ablations remove interacting components."
+    },
+    {
+     "id": "comparison-and-cost",
+     "locator": "evaluation.tex, §§4.1–4.5; table-cm.tex, Table 1; Table 3; FSE128:13–18",
+     "supports": "The evaluation records model-matched comparisons, cumulative passes, tokens, model dollars and deployed wall time.",
+     "boundary": "Cumulative passes are not independent acquisitions; asynchronous versus serial wall time is not a matched-compute advantage, and reported historical model prices are not current quotes."
+    },
+    {
+     "id": "regression-testing-assumption",
+     "locator": "introduction.tex:3–6, §1; implementation.tex:245–253, §3.3 (impl:dialogue)",
+     "supports": "Tests are generated from an implementation treated as correct for regression testing; CoverUp retains generated tests that pass and increase coverage.",
+     "boundary": "This supplies no independent specification oracle and does not establish fault-detection performance from coverage alone; the intended regression tests can still detect faults introduced by later changes."
+    }
+   ],
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
+     "source_locator_ids": [
+      "measured-test-refinement",
+      "regression-testing-assumption",
+      "comparison-and-cost"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "voyager",
+   "authors": [
+    "Guanzhi Wang",
+    "Yuqi Xie",
+    "Yunfan Jiang",
+    "Ajay Mandlekar",
+    "Chaowei Xiao",
+    "Yuke Zhu",
+    "Linxi Fan",
+    "Anima Anandkumar"
+   ],
+   "title": "Voyager: An Open-Ended Embodied Agent with Large Language Models",
+   "author_label": "G. Wang et al.",
+   "venue": "arXiv",
+   "year_label": "2023",
+   "url": "https://arxiv.org/abs/2305.16291v2",
+   "reviewed_source": {
+    "filename": "arXiv-2305.16291v2.tar.gz",
+    "sha256": "fc8eb405fdd52906a3423eb56111c956636da71342a761fbf66f92cbcfb3edc2",
+    "edition": "arXiv:2305.16291v2, 19 October 2023",
+    "annex_id": "arxiv-2305-16291",
+    "attribution_note": "Title and all eight authors verified in ms.tex:160–177; edition metadata checked against the exact arXiv record.",
+    "license": "Paper: arXiv nonexclusive distribution license. The separate official Voyager code is MIT-licensed.",
+    "distribution_policy": "local_only",
+    "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/license.html"
+   },
+   "verification_state": "source_verified",
+   "application": "Context: executable skill retention, composition and execution feedback precede Zenith’s retained tester code. The reported method does not learn a successor acquisition procedure; Zenith has not reproduced its new-world skill results.",
+   "source_locators": [
+    {
+     "id": "skill-retention",
+     "locator": "2-method.tex:20–35, §2.2, label sec:method_skill_library",
+     "supports": "Executable skills are retained and retrieved through embedded descriptions, task plans and environment feedback for composition into later skills.",
+     "boundary": "Skill-library growth is not evidence that the acquisition or retrieval algorithm itself improves."
+    },
+    {
+     "id": "fixed-feedback-loop",
+     "locator": "2-method.tex:37–47, §2.3; appendix/pseudocode/voyager.py:1–51",
+     "supports": "An authored loop allows at most four code-generation attempts per task, using environment observations, execution errors and a GPT-4 critic before retaining successful skills.",
+     "boundary": "Fixed orchestration permits adaptive task selection and skill-library growth. The model critic is fallible, not an independently correct executable reference; the foundation models and acquisition machinery remain fixed."
+    },
+    {
+     "id": "new-world-transfer",
+     "locator": "3-experiment.tex:44–49 and tables/downstream_table.tex, label table:downstream",
+     "supports": "Cleared inventory and a new Minecraft world test four new tasks in three trials each; retained skills improve success or prompting efficiency.",
+     "boundary": "Transfer stays within Minecraft mechanics/APIs. The no-library ablation also solves three tasks in all trials; the table does not show unrestricted cross-domain or recursive improvement."
+    }
+   ],
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
+     "source_locator_ids": [
+      "skill-retention",
+      "fixed-feedback-loop"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "stop",
+   "authors": [
+    "Eric Zelikman",
+    "Eliana Lorch",
+    "Lester Mackey",
+    "Adam Tauman Kalai"
+   ],
+   "title": "Self-Taught Optimizer (STOP): Recursively Self-Improving Code Generation",
+   "author_label": "E. Zelikman et al.",
+   "venue": "COLM",
+   "year_label": "2024",
+   "url": "https://arxiv.org/abs/2310.02304v3",
+   "reviewed_source": {
+    "filename": "arXiv-2310.02304v3.tar.gz",
+    "sha256": "c8bbe77187dd9d9d187e43c1a13e085a8ed43f0274d03b456343fea2e197e6a7",
+    "edition": "arXiv:2310.02304v3, 16 August 2024; COLM 2024",
+    "annex_id": "arxiv-2310-02304",
+    "attribution_note": "Reviewed edition is the COLM 2024 paper, not the 2023 first preprint. The source author block abbreviates Adam Kalai; official metadata supplies Adam Tauman Kalai.",
+    "license": "Paper: arXiv nonexclusive distribution license. The separate official STOP code is MIT-licensed.",
+    "distribution_policy": "local_only",
+    "license_url": "https://arxiv.org/licenses/nonexclusive-distrib/1.0/license.html"
+   },
+   "verification_state": "source_verified",
+   "application": "Proposed comparison: recursive improvement of an executable code-generation scaffold directly precedes Zenith’s O0/O1/O2 ambition. No such acquired improver is implemented or evaluated by the current Zenith campaigns.",
+   "source_locators": [
+    {
+     "id": "recursive-scaffold",
+     "locator": "main.tex:414–508, §§3–4, labels sec:problem and sec:stop; equation eq:it",
+     "supports": "Meta-utility measures an improver’s downstream task utility; the preceding improver is applied recursively to its own source.",
+     "boundary": "The LM, utilities, resource limits and experiment controller remain outside the edited scaffold. Better downstream optimization need not imply better self-optimization."
+    },
+    {
+     "id": "heldout-and-transfer",
+     "locator": "main.tex:596–675, §§5.1–5.2, label sec:fixed and Table tbl:transfer",
+     "supports": "Independent LPN instances test improved scaffolds; a selected improver from four rounds improves the seed on five additional algorithmic tasks without further optimization.",
+     "boundary": "The transfer table concerns a selected improver and bounded tasks, not uniform generalization over acquired improvers or open-ended acceleration."
+    },
+    {
+     "id": "fixed-host-and-cost",
+     "locator": "main.tex:809–864, §§6.2–7; main.tex:2026–2069 and 2818–2826, appendices ap:metautilitydesc and ap:nuances",
+     "supports": "Constraint circumvention and reward-shape errors motivate host-enforced budgets and output semantics; nested utility/model evaluations make acquisition costly.",
+     "boundary": "The authors qualify full recursive self-improvement because the LM is unchanged. A downstream deployment bill cannot stand in for all-stage acquisition and evaluation cost."
+    }
+   ],
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
+     "source_locator_ids": [
+      "recursive-scaffold",
+      "heldout-and-transfer"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hyperagents",
+   "authors": [
+    "Jenny Zhang",
+    "Bingchen Zhao",
+    "Wannan Yang",
+    "Jakob Foerster",
+    "Jeff Clune",
+    "Minqi Jiang",
+    "Sam Devlin",
+    "Tatiana Shavrina"
+   ],
+   "title": "Hyperagents",
+   "author_label": "J. Zhang et al.",
+   "venue": "arXiv",
+   "year_label": "2026",
+   "url": "https://arxiv.org/abs/2603.19461v1",
+   "reviewed_source": {
+    "filename": "arXiv-2603.19461v1.tar.gz",
+    "sha256": "befb6be557d8e77c922470b68fd221aa27769cf3b36072305d8d25ffc53b90cb",
+    "edition": "arXiv:2603.19461v1, 19 March 2026",
+    "annex_id": "arxiv-2603-19461",
+    "attribution_note": "Title and eight-author list verified against paper.tex:86–95 and exact arXiv metadata; source title uses a typographic HyperAgents macro.",
+    "license": "Paper: CC BY 4.0. The separate official HyperAgents code repository is CC BY-NC-SA 4.0; no upstream code is copied here.",
+    "distribution_policy": "local_only",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/"
+   },
+   "verification_state": "source_verified",
+   "application": "Concrete precedent and proposed evaluation: distinguish useful fixed-meta transfer from the unresolved advantage of transferred initialisation during continued self-modification. Zenith’s proposed comparison freezes acquired improvers on identical fresh solvers; the current system has no learned self-improver. The source’s architecture and evaluations are precedents, not local results.",
+   "source_locators": [
+    {
+     "id": "editable-meta-fixed-outer-loop",
+     "locator": "paper.tex:178–208, §§3–4; paper.tex:317–326, §7; algorithm algo:DGM-H",
+     "supports": "Task and meta-agent code share an editable program and archive; main experiments keep task distribution, parent selection and evaluation protocols fixed.",
+     "boundary": "Self-editing code is not unrestricted self-modification. Fixed foundation models do not include downstream robotics policies trained by RL."
+    },
+    {
+     "id": "frozen-meta-transfer",
+     "locator": "paper.tex:254–283, §5.2, especially 259, 268, 277 and 283; Figure 3 (fig:res-transfer); paper.tex:707–753, appendices app:genk-metric and app:transfer-selection",
+     "supports": "With both task and meta implementations transferred, §5.2 holds the acquired meta-agent fixed for 50 generation steps. Validation-selected maths graders yield reported median test score and improvement@50 of 0.630 (95% bootstrap CI 0.540–0.630); the source reports p < 0.05 against the initial-agent condition.",
+     "boundary": "The starting task agents differ, and the original agent fails the required output format. This is a system-level transfer result, not an isolated estimate of the meta-agent’s effect on identical solvers. Main §5.2 specifies validation selection before test reporting; the appendix’s generic maximum must not be read as test-set selection. Reported significance has not been independently reproduced."
+    },
+    {
+     "id": "compounding-boundary",
+     "locator": "paper.tex:293–305, §5.3, especially 303; Figure 4 (fig:res-transfer-cont)",
+     "supports": "After 200 iterations with continued self-modification, transferred initialisation yields median 0.640 (95% bootstrap CI 0.550–0.720), versus 0.610 (0.510–0.680) from the original agent. The source reports p > 0.05 for this comparison.",
+     "boundary": "The unresolved advantage in §5.3 does not negate the distinct positive fixed-meta transfer result in §5.2; non-significance is not evidence of equivalence. The 200-step comparison changes initialisation while allowing continued self-modification in both arms; it does not isolate continued meta-agent editing against a matched-budget fixed transferred meta-agent. Neither comparison establishes unbounded or accelerating improvement."
+    },
+    {
+     "id": "reported-statistical-protocol",
+     "locator": "paper.tex:225, §5 opening paragraph; paper.tex:283, §5.2; paper.tex:303, §5.3",
+     "supports": "The paper reports five runs per experiment, medians, 95% bootstrap confidence intervals from 1,000 resamples and Wilcoxon signed-rank tests.",
+     "boundary": "The supplied v1 does not specify test sidedness, exact versus approximate computation, pairing or the observational unit for its p-values. Significance statements are attributed to the source rather than independently reproduced; this specification gap alone does not show that the reported result is false."
+    }
+   ],
+   "artifact_links": [
+    {
+     "path": "paper/zenith.tex",
+     "expected_text": "\\textbf{Testing policies and self-improvement.}\nILF trains a neural fuzzing policy from symbolic-execution demonstrations and\nevaluates it on withheld Ethereum contracts~\\cite[\\S\\S4--6]{ilf}.\nCoverUp uses a fixed language model and coverage/error feedback to retain\npassing regression tests that add coverage, treating the implementation as\ncorrect~\\cite[\\S\\S1,3--4]{coverup}.\nVoyager retains and composes executable Minecraft skills within an authored\nacquisition loop~\\cite[\\S\\S2.2--2.3]{voyager}.\nThese methods retain a trained policy, tests or action programs.\nSTOP recursively rewrites the program that organises code improvement,\nwith the model and utility fixed~\\cite[\\S\\S3--5]{stop}.\nHyperagents edits task and meta-agent code, transferring both to maths grading.\nIt reports improved graders with the transferred meta-agent held fixed;\nafter 200 steps of continued self-modification, the transferred-versus-fresh\nadvantage is statistically unresolved~\\cite[\\S\\S5.2--5.3]{hyperagents}.",
+     "excerpt_sha256": "72805982ce023d1c00f8fcdf8bebe60a1579f526ac1802bf83c7143f484ee866",
+     "source_locator_ids": [
+      "editable-meta-fixed-outer-loop",
+      "frozen-meta-transfer",
+      "compounding-boundary"
+     ]
+    }
+   ]
+  }
+ ]
 }

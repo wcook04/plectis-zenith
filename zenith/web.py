@@ -9,7 +9,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlsplit
 
-from .web_content import API, DOCUMENTS, EVIDENCE, FIGURES, PublicContent, digest, safe_read
+from .web_content import API, DOCUMENTS, EVIDENCE, FIGURES, PAPER_EDITION, PublicContent, digest, safe_read
 from .web_runs import RunStore
 
 
@@ -73,7 +73,7 @@ class Website:
                 f"{API}/evidence/{{id}}": {"ids": list(EVIDENCE), "returns": "Public measured-result JSON with source hash; not private run files."},
                 f"{API}/runs": {"enabled": self.local_runs, "query": {"q": "substring", "mission": "optional native mission", "limit": "1..100, default40", "offset": "nonnegative, default0"}, "returns": "Paginated saved-run summaries; loaded and success remain distinct."},
                 f"{API}/runs/{{run_id}}/nodes/{{node_id}}": {"enabled": self.local_runs, "returns": "Artifact data/status/lineage, bounded recorded attempts and explicit omitted/error/truncation markers."},
-                "/assets/repair-loop.svg": "Reviewed SVG generated from the current manuscript TikZ diagram.",
+                "/assets/<figure-id>.svg": "Reviewed SVGs generated from the current manuscript TikZ figures (ids in PAPER_EDITION).",
                 "/assets/paper.pdf": "Paper PDF; consult the paper endpoint for its source binding and edition metadata.",
                 "/assets/graphs/{id}.svg": {"ids": list(FIGURES)},
                 f"{API}/health": "Service version and available capabilities.",
@@ -139,8 +139,9 @@ class Website:
             if not self.runs:
                 raise FileNotFoundError("Local records are disabled")
             return json_response(self.runs.node_evidence(parts[1], parts[3]), True)
-        if path == "/assets/repair-loop.svg":
-            return Response(safe_read(self.root, "paper/repair-loop.svg"), "image/svg+xml")
+        if path.startswith("/assets/") and path.endswith(".svg") and path.count("/") == 2 \
+                and path[len("/assets/"):-len(".svg")] in PAPER_EDITION.get("figures", {}):
+            return Response(safe_read(self.root, "paper/" + path[len("/assets/"):]), "image/svg+xml")
         if path == "/assets/paper.pdf":
             return Response(safe_read(self.root, "paper/zenith.pdf"), "application/pdf")
         if path.startswith("/assets/graphs/") and path.rsplit("/", 1)[-1] in {f"{name}.svg" for name in FIGURES}:

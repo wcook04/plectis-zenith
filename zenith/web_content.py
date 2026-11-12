@@ -7,11 +7,11 @@ import re
 from pathlib import Path
 
 from . import runtime
-from .paper_reading import diagram_source, paper_reading
+from .paper_reading import diagram_sources, paper_reading
 
 API = "/api/v1"
 # Reviewed source/PDF and TikZ/SVG pairs. Update after compiling and visual inspection.
-PAPER_EDITION = {"source_sha256": "dacd20500ace774fa97e2c1fee463677e71a45cc48fc7ce4838625bb3c248577", "pdf_sha256": "f3d0b5e8c89c7d11413fb6e446a4041ac1a519b3eb007ffe29cf3c292b7c3aae", "figure_source_sha256": "53915467b1b07cfbafd5985461f81d74dab096505d4c997ac63dac9a1c4c0a21", "figure_sha256": "c664449f6020a27a973000494f38609ced0bc8cbb014459d7931a7870935724e"}
+PAPER_EDITION = {"source_sha256": "47fc3d9693115e6fdabf6d7c45c83218347fdb52dc7594ac6448a8d41d19f0dc", "pdf_sha256": "f28a7f1f4f94881d13f3368fa86df83317cca59aa5ddb184a5eb811d54d91354", "reviewed_on": "21 October 2026", "figures": {"fault-population": {"source_sha256": "1cf1e7e8b3869e2f0d88b8e7fc8735ad1d68a1af24fc1513a6c0aaddf3e775f3", "svg_sha256": "f7a3f38df0def9998da2abc03c1c5c05ec0515c212d9f5b309dc53c8ebf5425e"}, "kept-experience-flow": {"source_sha256": "cf5959065f73b9b2e23448b484f87b8fdc69a7791fb28840f47de7e332924728", "svg_sha256": "f5430175d5b7c3ccdf8a35db73b116bc5f91d063f309bee5a5a99daaaf54c080"}, "imagined-faults": {"source_sha256": "d049ca87bae08f248b4b80cecd21c06ed600b9dcb7cc70811d92a78e5dea2fa9", "svg_sha256": "48543992dd591596960ffa313d796ef8087e4e5873985de725ac6aa8a0a59b16"}, "kept-experience-results": {"source_sha256": "41894a8d7968936e533ce4ced2905a97aa054eb0f1f91fc0d99e5dec0046a7c7", "svg_sha256": "d65c171a840e029111623931a22a1511873ef0adfcdefda074b7f17b630f2aba"}, "repair-loop": {"source_sha256": "53915467b1b07cfbafd5985461f81d74dab096505d4c997ac63dac9a1c4c0a21", "svg_sha256": "e6fb3f2cd4172c59c42130f6a8e40d9f75a81379609b88067f4a4af4258020fa"}}}
 DOCUMENTS = {
     "introduction": "README.md",
     "paper": "paper/zenith.tex",
@@ -90,7 +90,7 @@ CHAPTER_EVIDENCE = {
     "idea": (), "lab": (), "oracle": ("progress-campaign",), "evolve": ("progress-campaign",),
     "results": ("progress-campaign",), "next": (),
 }
-PAPER_SECTIONS = {"idea": "idea", "lab": "lab", "oracle": "oracle",
+PAPER_SECTIONS = {"idea": "idea", "lab": "conditions", "oracle": "oracle",
                   "evolve": "evolve", "results": "results", "next": "research"}
 
 
@@ -249,10 +249,17 @@ class PublicContent:
         title = re.search(r"\\Large\\bfseries\s+([^}\n]+)", tex)
         citations, references_raw = paper_citations(self.root, tex)
         pdf = safe_read(self.root, "paper/zenith.pdf")
-        figure = safe_read(self.root, "paper/repair-loop.svg")
-        if (digest(figure) != PAPER_EDITION.get("figure_sha256") or
-                digest(diagram_source(tex).encode()) != PAPER_EDITION.get("figure_source_sha256")):
-            raise ValueError("The paper diagram differs from the reviewed source/SVG pair")
+        sources = diagram_sources(tex)
+        reviewed = PAPER_EDITION.get("figures", {})
+        if set(sources) != set(reviewed):
+            raise ValueError("The paper diagram differs from the reviewed source/SVG pair: figure set changed")
+        rendered = {}
+        for figure_id, figure_tex in sources.items():
+            svg = safe_read(self.root, f"paper/{figure_id}.svg")
+            if (digest(svg) != reviewed[figure_id]["svg_sha256"] or
+                    digest(figure_tex.encode()) != reviewed[figure_id]["source_sha256"]):
+                raise ValueError(f"The paper diagram differs from the reviewed source/SVG pair: {figure_id}")
+            rendered[figure_id] = self.source(f"paper/{figure_id}.svg", svg)
         current_pdf = (source["source"]["sha256"] == PAPER_EDITION["source_sha256"]
                        and digest(pdf) == PAPER_EDITION["pdf_sha256"])
         anchors = list(re.finditer(r"\\hypertarget\{([a-z-]+)\}\{\}", tex))
@@ -272,7 +279,7 @@ class PublicContent:
                 "pdf_sha256": digest(pdf), "citations": citations, "sections": sections,
                 "references_source": self.source(REFERENCE_PATH, references_raw),
                 "reading": paper_reading(tex, [record["id"] for record in citations]),
-                "figure_source": self.source("paper/repair-loop.svg", figure),
+                "figure_sources": rendered,
                 "pdf_current": current_pdf,
                 "pdf_edition": "reviewed_current_source" if current_pdf else "retained_previous_edition",
                 "pdf_note": ("The PDF and manuscript match the compiled and visually reviewed edition."
