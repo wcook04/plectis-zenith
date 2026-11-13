@@ -23,7 +23,7 @@ describe('study page', () => {
     expect(headings[0]).toHaveTextContent('Does a record of missed bugs help an AI tester on new programs?');
 
     const short = screen.getByRole('link', { name: /1 minute 54 seconds/ });
-    expect(short).toHaveAttribute('href', 'https://www.youtube.com/watch?v=SIqD9PTFR7g');
+    expect(short).toHaveAttribute('href', 'https://www.youtube.com/watch?v=NQpTlQu_Wrw');
     const full = screen.getByRole('link', { name: /5 minutes 3 seconds/ });
     expect(full).toHaveAttribute('href', 'https://www.youtube.com/watch?v=wUxp2Wohmq0');
     for (const link of [short, full]) {

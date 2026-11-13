@@ -64,7 +64,7 @@ lists every website too, with Zenith marked as the one being read.
 
 The first screen of the front page contains the stills of both Zenith videos,
 each a link that opens YouTube in a new tab: the
-[short video](https://www.youtube.com/watch?v=SIqD9PTFR7g) (1:54), larger, and the
+[short video](https://www.youtube.com/watch?v=NQpTlQu_Wrw) (1:54), larger, and the
 [full video](https://www.youtube.com/watch?v=wUxp2Wohmq0) (5:03), smaller. On the
 earlier-studies page, a video slot beside the abstract (after it on narrow
 screens) contains the still of the full video with its running time. That video
