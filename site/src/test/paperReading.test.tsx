@@ -111,7 +111,7 @@ it('links the family of websites and shows the Zenith film beside the paper, not
   await screen.findByRole('heading', { name: 'Zenith: the actual manuscript title' });
   const banner = screen.getByRole('banner');
   const [up, wordmark] = within(banner).getAllByRole('link').slice(0, 2);
-  expect(up).toHaveAccessibleName('Will Cook: all projects and videos');
+  expect(up).toHaveAccessibleName('Will Cook');
   expect(up).toHaveAttribute('href', 'https://wcook04.github.io/');
   expect(wordmark).toHaveAccessibleName('Zenith');
   // A line above the paper says it covers the earlier studies and links back to the current study.

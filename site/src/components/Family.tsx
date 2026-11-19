@@ -16,7 +16,8 @@ export function FamilyLockup({ name, href, mark }: { name: string; href: string;
       <a className="fam-lockup__home" href={FAMILY.owner.home} rel="author"
         title={`All of ${FAMILY.owner.name}'s projects and videos`}>
         <img src={`${import.meta.env.BASE_URL}assets/family/plectis.svg`}
-          alt={`${FAMILY.owner.name}: all projects and videos`} width={26} height={26} />
+          alt="" width={26} height={26} />
+        <span className="fam-lockup__owner" translate="no">{FAMILY.owner.name}</span>
       </a>
       <span className="fam-lockup__rule" aria-hidden="true"></span>
       <a className="fam-lockup__site" href={href}>

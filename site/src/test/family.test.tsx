@@ -38,9 +38,10 @@ describe('family markup', () => {
   it('starts the header with the lockup: the plait to the home page, a rule, then the site', () => {
     const { container } = render(<header><FamilyLockup name="Zenith" href="/" mark={<ZenithMark />} /></header>);
     const [home, site] = screen.getAllByRole('link');
-    expect(home).toHaveAccessibleName('Will Cook: all projects and videos');
+    expect(home).toHaveAccessibleName('Will Cook');
     expect(home).toHaveAttribute('href', 'https://wcook04.github.io/');
     expect(home).toHaveAttribute('rel', 'author');
+    expect(home.querySelector('.fam-lockup__owner')).toHaveTextContent('Will Cook');
     expect(home.querySelector('img')?.getAttribute('src')).toMatch(/assets\/family\/plectis\.svg$/);
     expect(home.nextElementSibling).toHaveClass('fam-lockup__rule');
     expect(home.nextElementSibling).toHaveAttribute('aria-hidden', 'true');
